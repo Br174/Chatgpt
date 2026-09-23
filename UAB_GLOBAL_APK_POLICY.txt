@@ -1,0 +1,25 @@
+UNIVERSAL APK REQUEST POLICY - GLOBAL
+
+SCOPE
+This policy is the canonical APK/ZIP request flow for Bruno's UAB-enabled Android projects, including MusicLab, GeoVision and future projects. Project-specific adapters may define repositories, branches, workflows and package IDs, but they must not replace this request order.
+
+MANDATORY FLOW
+1. ARTIFACT-FIRST. On every request to obtain, download, generate or deliver an APK/ZIP, first check the configured project's latest UAB manifest.
+2. If the manifest status is ready and its source commit matches the requested/current source commit, immediately return the existing APK and ZIP. Do not rebuild unless Bruno explicitly requests a rebuild.
+3. If no matching ready artifact exists, attempt a new build in this exact default order:
+   a. local/current ChatGPT or AI execution environment;
+   b. GitHub Actions using free included allowance only;
+   c. Codemagic/UAB robust fallback with delivery through the central GitHub Releases registry.
+4. The first two routes must fail fast during availability/preflight checks. Missing Android toolchain, authorization, free quota, runner, service or required configuration must cause immediate fallback instead of waiting minutes.
+5. Once a provider has passed preflight and a real Android build has genuinely started, allow the build to finish normally.
+6. If a real build fails because of project code, signing, dependencies or another project-level error, stop and diagnose it instead of repeating the same broken build on other providers.
+7. If a provider fails before meaningful build steps run because of infrastructure, authorization, quota, runner or service availability, move immediately to the next provider.
+8. Paid fallback is forbidden. Never enable paid overage or buy build minutes automatically.
+9. Email, manual mailbox searches, AppDeploy and improvised artifact-recovery paths are not part of the normal flow.
+10. The user must never need to remember or restate this policy. The AI/router must apply it automatically whenever an APK/ZIP is requested.
+
+DELIVERY
+The stable retrieval endpoint is each project's latest.json manifest in the central artifact registry. APK and ZIP links from a matching ready manifest should be exposed directly to the user.
+
+PROJECT NEUTRALITY
+This policy must remain project-neutral. Each project supplies its own UAB project/router adapter. Future Android projects should be onboarded by pointing their adapter to this same flow rather than creating a separate APK-delivery method.
