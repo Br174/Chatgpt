@@ -12,6 +12,8 @@ Existing relevant workflow: .github/workflows/build_quick.yml (standard ubuntu-l
 Preferred fast route: local build only when Android toolchain is already available; otherwise GitHub Actions.
 Patch/repack: not the default for native Kotlin/Compose/Gradle changes.
 Codemagic: disabled as normal route; verified-free emergency fallback only.
+Persistent cache: MANDATORY. setup-gradle cache plus Gradle --build-cache are enabled in the LAB adapter/core.
+Progress reporting: MANDATORY. UAB_PROGRESS milestones are emitted through build, verification and stable publication.
 Stable UAB registry: existing central manifest at uab-artifacts/MusicLab/latest.json remains valid for the artifact/source state it records. Do not rewrite its historical commit/build metadata merely because routing changed.
 Stable delivery contract (MANDATORY for new LAB deliveries):
 - Fixed release tag: uab-musiclab-lab-latest
@@ -30,6 +32,8 @@ Primary remote full-build route: GitHub Actions on standard GitHub-hosted runner
 Existing relevant workflows include .github/workflows/build-geovision-v144.yml and other GeoVision build workflows, all currently using standard GitHub-hosted Ubuntu runners.
 Preferred fast route: adapter-approved patch/repack for HTML/JavaScript/assets-only changes when signature/package/update compatibility can be preserved; otherwise GitHub Actions full build.
 Codemagic: disabled as normal route; verified-free emergency fallback only.
+Persistent cache: MANDATORY. The primary v144 workflow uses Gradle persistent cache, --build-cache and pip download cache. Other/new GeoVision workflows must be upgraded to the same contract when used.
+Progress reporting: MANDATORY for every modification/build; the primary v144 workflow emits UAB_PROGRESS milestones to 100%.
 UAB status: project-specific universal adapter/manifest publication is not assumed complete merely because version-specific build workflows exist. When GeoVision is onboarded to stable UAB delivery, it must use the same fixed-release/direct-download contract required by the global policy instead of chat attachments as the primary large-file channel.
 
 3. StudyBook-AI
@@ -38,6 +42,8 @@ Visibility: PUBLIC
 Project type: web/PWA (Vite/Node) with Cloudflare migration work; not currently treated as an Android APK project by UAB.
 Primary build/test route: GitHub Actions on standard GitHub-hosted runners.
 Existing relevant workflow: .github/workflows/build.yml (standard ubuntu-latest runner, Node.js build/tests).
+Persistent cache: MANDATORY. ~/.npm download cache is persisted with a package.json-derived key and npm uses --prefer-offline.
+Progress reporting: MANDATORY. Workflow emits UAB_PROGRESS milestones through test/build completion.
 Deployment route: project-specific web deployment flow (currently Cloudflare migration context), not Codemagic APK routing.
 APK rule: do not attempt to generate an Android APK unless/until an actual Android wrapper/project, package ID and Android build command are present and a UAB adapter is defined.
 Codemagic: not used for normal StudyBook web/PWA builds.
@@ -47,6 +53,7 @@ Repository: Br174/streamflix-BV
 Visibility target: PRIVATE
 Project class: streaming/TV project; keep private.
 Default route for Android/TV APK work: local or safe adapter-approved patch/repack first when applicable; then GitHub Actions only within included free private-repository allowance; Codemagic only if the selected machine/account is explicitly verified free for that build.
+Persistent cache + progress: MANDATORY under UAB_ENGINE_CONTRACT.txt whenever this project is built or modified through UAB.
 Paid overage: forbidden unless Bruno explicitly authorizes it for a specific build.
 Delivery note: because the repository is intended to remain private, do not expose private APKs through a public release merely to get a stable link. Use an authenticated/private stable delivery adapter.
 
@@ -55,6 +62,7 @@ Repository: Br174/Visionflix
 Visibility: PRIVATE
 Project class: streaming/TV project; keep private.
 Default route for Android/TV APK work: local or safe adapter-approved patch/repack first when applicable; then GitHub Actions only within included free private-repository allowance; Codemagic only if the selected machine/account is explicitly verified free for that build.
+Persistent cache + progress: MANDATORY under UAB_ENGINE_CONTRACT.txt whenever this project is built or modified through UAB.
 Paid overage: forbidden unless Bruno explicitly authorizes it for a specific build.
 Delivery note: because the repository is private, use a private/authenticated stable delivery adapter rather than publishing the APK publicly.
 
@@ -63,7 +71,7 @@ Repository: Br174/Chatgpt
 Visibility: PRIVATE
 Role: UAB technical control/registry repository, not an app.
 Do not build an APK from this repository.
-Contains the global policy, routing state and UAB artifact registry.
+Contains the global policy, routing state, UAB_ENGINE_CONTRACT.txt and UAB artifact registry.
 Keep private.
 
 ROUTING RULE
@@ -76,3 +84,12 @@ Codemagic -> optional verified-free emergency fallback only, never assumed free 
 
 DELIVERY RULE
 Public UAB Android repositories -> stable GitHub Release with fixed asset names is mandatory as authoritative delivery; temporary Actions artifacts and ChatGPT attachments are secondary only.
+
+ENGINE RULE - MANDATORY FOR ALL PROJECTS
+UAB_ENGINE_CONTRACT.txt is part of the routing contract for every current and future project.
+1. Persistent safe cache must be enabled whenever the build ecosystem supports it.
+2. Android/Gradle routes must use provider Gradle caching plus --build-cache unless an adapter documents a real incompatibility.
+3. Web/Node routes must persist package-manager download caches when safe.
+4. Every substantial modification/build must expose a real milestone-based percentage in chat and, where applicable, in CI logs via UAB_PROGRESS=<number>.
+5. The standard milestone ladder is 5/15/30/45/60/75/85/95/100, with non-applicable phases removed and percentages recalculated for non-build work.
+6. Never report 100% until the requested outcome is verified.
