@@ -13,7 +13,14 @@ Preferred fast route: local build only when Android toolchain is already availab
 Patch/repack: not the default for native Kotlin/Compose/Gradle changes.
 Codemagic: disabled as normal route; verified-free emergency fallback only.
 Stable UAB registry: existing central manifest at uab-artifacts/MusicLab/latest.json remains valid for the artifact/source state it records. Do not rewrite its historical commit/build metadata merely because routing changed.
-Status note: the existing quick workflow uploads an Actions artifact; stable central-release/manifest publication must still be verified for each newly requested UAB delivery before calling delivery complete.
+Stable delivery contract (MANDATORY for new LAB deliveries):
+- Fixed release tag: uab-musiclab-lab-latest
+- Fixed direct APK asset: MusicLab-LAB-LATEST.apk
+- Fixed direct ZIP asset: MusicLab-LAB-LATEST.zip
+- Fixed checksum asset: SHA256SUMS.txt
+- Chat attachments are convenience copies only; the GitHub Release is authoritative for large-file delivery.
+- ZIP should contain a single top-level APK named MusicLab.apk in Android-friendly format.
+- A new MusicLab build is not considered delivered until the stable release assets exist and have plausible non-zero sizes.
 
 2. GeoVision-Test
 Repository: Br174/GeoVision-Test
@@ -23,7 +30,7 @@ Primary remote full-build route: GitHub Actions on standard GitHub-hosted runner
 Existing relevant workflows include .github/workflows/build-geovision-v144.yml and other GeoVision build workflows, all currently using standard GitHub-hosted Ubuntu runners.
 Preferred fast route: adapter-approved patch/repack for HTML/JavaScript/assets-only changes when signature/package/update compatibility can be preserved; otherwise GitHub Actions full build.
 Codemagic: disabled as normal route; verified-free emergency fallback only.
-UAB status: project-specific universal adapter/manifest publication is not assumed complete merely because version-specific build workflows exist. Do not invent a ready manifest until a real matching APK/ZIP has been produced and verified.
+UAB status: project-specific universal adapter/manifest publication is not assumed complete merely because version-specific build workflows exist. When GeoVision is onboarded to stable UAB delivery, it must use the same fixed-release/direct-download contract required by the global policy instead of chat attachments as the primary large-file channel.
 
 3. StudyBook-AI
 Repository: Br174/StudyBook-AI
@@ -41,6 +48,7 @@ Visibility target: PRIVATE
 Project class: streaming/TV project; keep private.
 Default route for Android/TV APK work: local or safe adapter-approved patch/repack first when applicable; then GitHub Actions only within included free private-repository allowance; Codemagic only if the selected machine/account is explicitly verified free for that build.
 Paid overage: forbidden unless Bruno explicitly authorizes it for a specific build.
+Delivery note: because the repository is intended to remain private, do not expose private APKs through a public release merely to get a stable link. Use an authenticated/private stable delivery adapter.
 
 5. Visionflix
 Repository: Br174/Visionflix
@@ -48,6 +56,7 @@ Visibility: PRIVATE
 Project class: streaming/TV project; keep private.
 Default route for Android/TV APK work: local or safe adapter-approved patch/repack first when applicable; then GitHub Actions only within included free private-repository allowance; Codemagic only if the selected machine/account is explicitly verified free for that build.
 Paid overage: forbidden unless Bruno explicitly authorizes it for a specific build.
+Delivery note: because the repository is private, use a private/authenticated stable delivery adapter rather than publishing the APK publicly.
 
 6. Chatgpt
 Repository: Br174/Chatgpt
@@ -64,3 +73,6 @@ COST RULE
 Public Android repositories -> standard GitHub Actions is the default remote compiler.
 Private Android repositories -> conserve included quotas; no paid fallback automatically.
 Codemagic -> optional verified-free emergency fallback only, never assumed free by default.
+
+DELIVERY RULE
+Public UAB Android repositories -> stable GitHub Release with fixed asset names is mandatory as authoritative delivery; temporary Actions artifacts and ChatGPT attachments are secondary only.
