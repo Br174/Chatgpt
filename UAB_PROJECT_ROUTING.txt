@@ -1,0 +1,66 @@
+UAB PROJECT ROUTING - CURRENT STATE
+
+Purpose: repository-specific routing state for the global UAB APK policy.
+Last verified: 2026-09-24.
+
+1. MusicLab
+Repository: Br174/MusicLab
+Visibility: PUBLIC
+Project type: native Android (Kotlin/Compose/Gradle)
+Primary remote build route: GitHub Actions on standard GitHub-hosted runners.
+Existing relevant workflow: .github/workflows/build_quick.yml (standard ubuntu-latest runner).
+Preferred fast route: local build only when Android toolchain is already available; otherwise GitHub Actions.
+Patch/repack: not the default for native Kotlin/Compose/Gradle changes.
+Codemagic: disabled as normal route; verified-free emergency fallback only.
+Stable UAB registry: existing central manifest at uab-artifacts/MusicLab/latest.json remains valid for the artifact/source state it records. Do not rewrite its historical commit/build metadata merely because routing changed.
+Status note: the existing quick workflow uploads an Actions artifact; stable central-release/manifest publication must still be verified for each newly requested UAB delivery before calling delivery complete.
+
+2. GeoVision-Test
+Repository: Br174/GeoVision-Test
+Visibility: PUBLIC
+Project type: Android hybrid, with substantial HTML/JavaScript/assets plus Android wrapper/build files.
+Primary remote full-build route: GitHub Actions on standard GitHub-hosted runners.
+Existing relevant workflows include .github/workflows/build-geovision-v144.yml and other GeoVision build workflows, all currently using standard GitHub-hosted Ubuntu runners.
+Preferred fast route: adapter-approved patch/repack for HTML/JavaScript/assets-only changes when signature/package/update compatibility can be preserved; otherwise GitHub Actions full build.
+Codemagic: disabled as normal route; verified-free emergency fallback only.
+UAB status: project-specific universal adapter/manifest publication is not assumed complete merely because version-specific build workflows exist. Do not invent a ready manifest until a real matching APK/ZIP has been produced and verified.
+
+3. StudyBook-AI
+Repository: Br174/StudyBook-AI
+Visibility: PUBLIC
+Project type: web/PWA (Vite/Node) with Cloudflare migration work; not currently treated as an Android APK project by UAB.
+Primary build/test route: GitHub Actions on standard GitHub-hosted runners.
+Existing relevant workflow: .github/workflows/build.yml (standard ubuntu-latest runner, Node.js build/tests).
+Deployment route: project-specific web deployment flow (currently Cloudflare migration context), not Codemagic APK routing.
+APK rule: do not attempt to generate an Android APK unless/until an actual Android wrapper/project, package ID and Android build command are present and a UAB adapter is defined.
+Codemagic: not used for normal StudyBook web/PWA builds.
+
+4. streamflix-BV
+Repository: Br174/streamflix-BV
+Visibility target: PRIVATE
+Project class: streaming/TV project; keep private.
+Default route for Android/TV APK work: local or safe adapter-approved patch/repack first when applicable; then GitHub Actions only within included free private-repository allowance; Codemagic only if the selected machine/account is explicitly verified free for that build.
+Paid overage: forbidden unless Bruno explicitly authorizes it for a specific build.
+
+5. Visionflix
+Repository: Br174/Visionflix
+Visibility: PRIVATE
+Project class: streaming/TV project; keep private.
+Default route for Android/TV APK work: local or safe adapter-approved patch/repack first when applicable; then GitHub Actions only within included free private-repository allowance; Codemagic only if the selected machine/account is explicitly verified free for that build.
+Paid overage: forbidden unless Bruno explicitly authorizes it for a specific build.
+
+6. Chatgpt
+Repository: Br174/Chatgpt
+Visibility: PRIVATE
+Role: UAB technical control/registry repository, not an app.
+Do not build an APK from this repository.
+Contains the global policy, routing state and UAB artifact registry.
+Keep private.
+
+ROUTING RULE
+Always re-check actual repository visibility before a build because visibility may change. If this routing file conflicts with live repository metadata, live metadata wins and this file should then be updated.
+
+COST RULE
+Public Android repositories -> standard GitHub Actions is the default remote compiler.
+Private Android repositories -> conserve included quotas; no paid fallback automatically.
+Codemagic -> optional verified-free emergency fallback only, never assumed free by default.
