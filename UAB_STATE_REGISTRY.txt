@@ -1,0 +1,41 @@
+UAB STATE REGISTRY - UAB-CORE-V1
+Last updated: 2026-09-24
+
+This registry records lifecycle roles. It does not replace live GitHub refs; live metadata wins and the registry must then be updated.
+
+MusicLab
+- Repository: Br174/MusicLab
+- Current approved stable family: MusicLab 112726 / build #52
+- Historical stable ref: stable-musiclab-lab01-build52
+- Canonical UAB Mother alias: mother/musiclab-112726 (to be created from the exact stable ref)
+- Active experimental line: lab-cover-restart-from-build52
+- Failed/discarded experimental line: lab-cover-repair-from-build52
+- Permanent LAB 'LATEST' release model: deprecated
+
+GeoVision
+- Repository: Br174/GeoVision-Test
+- Lifecycle naming already present: madre/*, lab/*, candidate/*
+- Adapter baseline: madre/023-stabile
+- Before any new GeoVision experiment, confirm the intended current Madre against the user's approved version because newer stable/test workflows may exist without formal promotion.
+
+StudyBook-AI
+- Repository: Br174/StudyBook-AI
+- Current lifecycle baseline: main until a named Mother is explicitly approved/frozen.
+- Project class: web/PWA.
+
+Visionflix
+- Repository: Br174/Visionflix
+- Current lifecycle baseline: main until a named Mother is explicitly approved/frozen.
+- Release publication under UAB-CORE-V1: only mother/* branches.
+- streamflix-BV is delivery adapter, not source lifecycle authority.
+
+streamflix-BV
+- Repository: Br174/streamflix-BV
+- Role: delivery-only adapter for Visionflix TV.
+- Stable Downloader pointer may follow GitHub latest while underlying release tags remain unique and immutable.
+
+GLOBAL
+- MADRE -> LAB -> CANDIDATA -> NEW MADRE
+- LAB/CANDIDATA artifacts temporary
+- Permanent Release = approved MADRE
+- Historical MADRI preserved
