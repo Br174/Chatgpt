@@ -19,8 +19,19 @@ MANDATORY FLOW
 10. The user must never need to remember or restate this policy. The AI/router must apply it automatically whenever an APK/ZIP is requested.
 11. If an Android project is not yet UAB-enabled, the correct action is to onboard that project to the same UAB contract. Do not create a separate ad-hoc APK delivery method for that project.
 
+LIVE BUILD MONITORING - MANDATORY
+1. Every APK/ZIP request that requires a new build or waits for an in-progress build MUST automatically enter LIVE monitoring mode. Bruno must not need to ask for repeated status checks.
+2. While an interactive chat/tool session is active, poll the active provider/check status at short intervals appropriate to the provider. Do not spam identical messages: surface an update when the phase/status changes, when a meaningful milestone is reached, or when the previous ETA materially changes.
+3. Every visible live update should include: current phase/status, elapsed time, and an ETA/range when there is enough evidence to estimate one. ETA must be based on recent comparable builds or provider progress and must be revised when exceeded; never present a guessed ETA as certain.
+4. Continue LIVE monitoring until a terminal result is reached: success, failure, cancellation, or a confirmed infrastructure blocker.
+5. A provider-reported success is not enough for delivery. After success, verify the central latest.json manifest is status=ready and points to the exact requested source commit/build. Then verify the expected APK/ZIP assets are present before exposing download links.
+6. Never deliver a stale APK/ZIP merely because it is the latest currently available artifact while a newer requested build is still running.
+7. If the interactive session cannot remain active long enough for true short-interval monitoring, use the best available condition-watch/notification mechanism as a fallback and explicitly state its minimum checking cadence. Do not call an hourly or delayed background check “real time”.
+8. If a build is already ready when requested, LIVE mode is unnecessary: return the verified APK/ZIP immediately.
+9. LIVE monitoring is project-neutral and applies equally to MusicLab, GeoVision and every future UAB-enabled Android project.
+
 DELIVERY
 The stable retrieval endpoint is each project's latest.json manifest in the central artifact registry. APK and ZIP links from a matching ready manifest should be exposed directly to the user.
 
 PROJECT NEUTRALITY
-This policy must remain project-neutral. Each project supplies its own UAB project/router adapter. Future Android projects should be onboarded by pointing their adapter to this same flow rather than creating a separate APK-delivery method.
+This policy must remain project-neutral. Each project supplies its own UAB project/router adapter. Future Android projects should be onboarded by pointing their adapter to this same flow rather than creating a separate APK-delivery method for that project.
