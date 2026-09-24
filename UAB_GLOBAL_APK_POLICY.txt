@@ -1,85 +1,116 @@
-UNIVERSAL APK REQUEST POLICY - GLOBAL
+UNIVERSAL UAB POLICY - GLOBAL
 
 SCOPE
-This policy is the canonical APK/ZIP request flow for Bruno's Android projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass the routing, cost and delivery rules below.
+This policy is the canonical build/test/delivery flow for Bruno's projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass UAB CORE lifecycle, cost, verification or release rules.
 
 CORE PRINCIPLES
-1. ARTIFACT-FIRST. Before any new build, check whether a verified APK/ZIP already exists for the same source state.
-2. FREE-FIRST. Never spend money automatically. Paid overage, paid runners, larger GitHub runners and paid Codemagic minutes are forbidden unless Bruno explicitly authorizes them in that specific request.
-3. PUBLIC-REPO ADVANTAGE. For a public repository, the default remote build provider is GitHub Actions on standard GitHub-hosted runners. Do not route a public project to Codemagic by default.
-4. PRIVATE-REPO CONSERVATION. For a private repository, preserve included quotas: use local or adapter-approved patch/repack first when practical, then GitHub Actions only while included free allowance is available, then Codemagic only if the exact selected machine/account is confirmed to consume free allowance.
-5. FAIL FAST. Availability, authorization, quota, runner, signing and toolchain checks must fail quickly before a long build starts.
-6. DIAGNOSE CODE FAILURES. If a genuine build starts and fails because of project code, dependencies, signing or packaging, stop and diagnose the project failure instead of repeating the same broken build on another provider.
-7. STABLE DELIVERY. Large APK/ZIP files must not rely on ChatGPT attachment delivery as the primary retrieval channel. For public Android repositories, publish verified deliverables to a stable GitHub Release with fixed direct-download names.
+1. ONE ENGINE. UAB CORE is the single lifecycle/control engine. Project workflows are adapters, not independent engines.
+2. LIFECYCLE. Every project follows MADRE -> LAB -> CANDIDATA -> NEW MADRE.
+3. MADRE IMMUTABILITY. The current MADRE is the last approved stable state and must never be edited or overwritten in place.
+4. LAB FROM MADRE. Every new experiment starts from the current MADRE unless Bruno explicitly chooses to continue an existing LAB.
+5. CLEAN CANDIDATA. Candidate state is rebuilt cleanly from MADRE with only the proven LAB changes.
+6. APPROVAL BEFORE PROMOTION. A CANDIDATA becomes a NEW MADRE only after regression checks and explicit approval.
+7. HISTORY PRESERVATION. Historical MADRI remain permanently available as rollback points.
+8. ARTIFACT-FIRST. Before any new build, check whether a verified matching artifact already exists.
+9. FREE-FIRST. Never spend money automatically. Paid overage, paid runners and paid Codemagic usage require explicit authorization for that specific request.
+10. FAIL FAST. Availability, authorization, quota, runner, signing and toolchain checks should fail before a long build whenever possible.
+11. DIAGNOSE CODE FAILURES. If a real build starts and fails because of project code, dependencies, signing or packaging, diagnose the project failure instead of blindly repeating it on another provider.
 
-MANDATORY APK/ZIP FLOW
-1. Read the project's UAB adapter/routing state and determine repository visibility at request time. Do not rely on stale assumptions.
-2. Check the configured UAB manifest or stable project release.
-3. If a ready artifact matches the requested source commit, return it immediately. A later infrastructure-only commit may be treated as equivalent only when the project adapter explicitly says it cannot change the app binary.
-4. If a new artifact is required, choose the fastest safe route in this order:
-   a. adapter-approved patch/repack or local/current execution environment, but only when it can run immediately without lengthy environment reconstruction and when the change type is safe for that route;
-   b. for PUBLIC repositories: GitHub Actions using STANDARD GitHub-hosted runners;
-   c. for PRIVATE repositories: GitHub Actions only when the included free allowance is available and sufficient;
-   d. Codemagic only as a verified FREE-ALLOWANCE emergency fallback. Never assume Codemagic is free merely because the account has a free plan; verify the chosen machine and remaining free allowance first;
-   e. if every free route is unavailable, stop and report the blocker. Do not enable billing or buy minutes automatically.
-5. Larger GitHub-hosted runners are not part of the normal free route and must not be selected automatically.
-6. Once a real build has started after passing preflight, allow it to finish normally.
-7. If infrastructure fails before meaningful build work begins, move to the next allowed free route.
-8. If a project is not yet UAB-enabled, onboard it to this same contract instead of inventing a separate ad-hoc delivery path.
+MANDATORY LIFECYCLE FLOW
+1. Identify and protect the current MADRE reference.
+2. Create/use a LAB directly from that MADRE for requested experimental changes.
+3. Build/test the LAB using the project adapter.
+4. If LAB fails or seriously regresses another core function, reject that lineage and keep MADRE unchanged.
+5. If LAB proves useful, create a clean CANDIDATA from the current MADRE and apply only the approved/proven changes.
+6. Run adapter-defined regression gates on CANDIDATA.
+7. Await explicit approval for promotion.
+8. Promotion creates a NEW MADRE ref/version and, where applicable, a new immutable permanent Release.
+9. Never delete or replace the previous MADRE.
+
+RELEASE STORAGE - MANDATORY
+1. Permanent GitHub Releases are a deposit of approved good versions (MADRI), not a scratch area for experiments.
+2. LAB and CANDIDATA binaries use temporary Actions artifacts/test delivery until promotion.
+3. Each MADRE release must use a unique immutable tag/version.
+4. Never use --clobber, overwrite_files=true or equivalent against an existing MADRE tag/asset.
+5. A 'latest' concept may exist only as metadata/pointer to the newest immutable MADRE. It may not be the only binary store.
+6. Downloader-style stable URLs may rely on GitHub's latest-release pointer only when each underlying release is uniquely tagged and preserved.
+7. Chat attachments are convenience copies only for large binaries; they are never the authoritative store.
+
+MANDATORY BUILD ROUTING
+1. Read the project adapter/routing state and current repository visibility.
+2. Check existing verified artifacts for the exact requested source state.
+3. If a new build is required, choose the fastest safe route:
+   a. adapter-approved patch/repack or local/current execution environment when immediately available and safe for that change type;
+   b. PUBLIC repository: GitHub Actions on standard GitHub-hosted runners;
+   c. PRIVATE repository: GitHub Actions only within included free allowance;
+   d. Codemagic only as a verified-free emergency fallback;
+   e. if no free route is available, stop and report the blocker.
+4. Larger GitHub runners are not selected automatically.
+5. Once a real build has started after preflight, allow it to finish normally.
+6. Infrastructure failure before meaningful build work may move to the next allowed free route.
+7. Genuine project/build failure is diagnosed, not provider-hopped.
 
 PATCH / REPACK RULE
 Patch/repack is preferred only when the project adapter marks it safe, typically for HTML/JavaScript/assets-only changes or equivalent non-native changes. Do not use patch/repack for native Kotlin/Java/Compose/Gradle/dependency/signing changes unless the adapter explicitly supports that exact change. Preserve package ID, signature expectations and install/update compatibility.
 
 PUBLIC REPOSITORIES
 1. Standard GitHub-hosted runners are the normal remote build route.
-2. Do not perform a private-repository minute-quota fallback check for standard public-repository jobs; still check service availability, workflow validity, permissions, secrets and signing requirements.
-3. Do not send a public project to Codemagic merely to save GitHub minutes.
-4. Keep secrets in GitHub Actions secrets or another protected secret store. Never commit API keys, keystores, passwords or tokens in plaintext merely because the repository is public.
-5. Every UAB-enabled public Android project must define a stable GitHub Release delivery point. The preferred contract is a fixed release tag and fixed asset names for the current LAB APK and ZIP, so the direct download URL remains unchanged across builds.
-6. A public-project delivery is not complete merely because a temporary Actions artifact exists. The stable Release assets must exist and be verified.
+2. Do not send a public project to Codemagic merely to save GitHub minutes.
+3. Keep secrets in protected stores. Never commit API keys, passwords, signing secrets or private tokens in plaintext.
+4. Permanent Releases are immutable MADRE releases only under the default UAB model.
 
 PRIVATE REPOSITORIES
 1. Prefer local or safe patch/repack when practical.
-2. GitHub Actions may be used only within the account's included free allowance unless Bruno explicitly authorizes paid use.
-3. Codemagic is a last-resort provider, not the primary engine. It may be used automatically only after confirming that the selected build machine and remaining account allowance are actually free for that build.
-4. If free allowance is exhausted, stop instead of silently switching to billable usage.
-5. Stable delivery for private projects must use an authenticated/private retrieval point or another adapter-approved channel; never make a private project's binary public merely to simplify downloads.
-
-CODEMAGIC STATUS
-Codemagic remains supported only as an optional fallback for projects that need it. It is NOT the default engine for MusicLab, GeoVision or any other public repository. A free Codemagic account does not make every runner free, so the router must verify current provider terms and remaining allowance before use.
+2. Use GitHub Actions only within included free allowance unless explicitly authorized otherwise.
+3. Codemagic is a last-resort verified-free provider, not the primary engine.
+4. If free allowance is exhausted, stop rather than silently switch to billable usage.
+5. Private projects keep private/authenticated release delivery unless an adapter explicitly defines a deliberate public distribution repository.
 
 WEB / PWA PROJECTS
-A public web/PWA project is not automatically an Android APK project. Use its normal GitHub Actions web build/test/deploy flow. Only route it through UAB APK generation after an actual Android wrapper/project exists and has a defined adapter, package ID and build command.
+1. Web/PWA projects follow the same MADRE/LAB/CANDIDATA lifecycle.
+2. Their artifact is web/PWA output rather than APK unless a real Android wrapper/project exists.
+3. Deployment mechanics remain project-specific adapter behavior.
 
-LIVE BUILD MONITORING - MANDATORY
-1. Every APK/ZIP request that requires a new build or waits for an in-progress build must enter live monitoring mode automatically.
-2. While an interactive session is active, poll the active provider at sensible short intervals. Surface updates when phase/status changes, a meaningful milestone is reached or ETA materially changes; do not spam identical updates.
-3. Visible updates should include current phase/status, elapsed time and an ETA/range only when evidence supports one.
-4. Continue monitoring until success, failure, cancellation or a confirmed infrastructure blocker.
-5. Provider success alone is not enough. Verify that the requested APK/ZIP exists and matches the requested source state before exposing download links.
-6. Never deliver a stale artifact merely because it is the newest currently visible one while a newer requested build is still running.
-7. If true short-interval monitoring cannot continue, use the best available notification/condition-watch fallback and state its real checking cadence.
-8. If a matching artifact is already ready, live monitoring is unnecessary.
+CACHE - MANDATORY
+1. Safe persistent cache must be enabled wherever supported.
+2. Android/Gradle routes use official Gradle caching and --build-cache unless documented incompatible.
+3. Node/web routes persist package-manager download caches when safe.
+4. Cache misses must not fail the build; they repopulate.
 
-DELIVERY - MANDATORY
-1. PUBLIC ANDROID PROJECTS: primary delivery is a stable GitHub Release defined by the project adapter. Chat attachments are convenience copies only, never the authoritative large-file channel.
-2. Each public UAB project should expose fixed direct asset names such as <Project>-LAB-LATEST.apk and <Project>-LAB-LATEST.zip under a fixed release tag. Updating a build replaces those assets rather than forcing Bruno to discover a new link.
-3. APK and ZIP must both be produced when the project contract requires both.
-4. The Android-friendly ZIP should contain the APK as a simple top-level file, avoid unnecessary nested folders, and use a broadly compatible ZIP format. When practical, use a short ASCII internal APK name and avoid Unix-only metadata.
-5. Before publishing, verify the APK is structurally readable, the ZIP passes an integrity test, and compute SHA-256 checksums. The release metadata or manifest must record the source commit used for the binary.
-6. After publishing, verify that the stable Release contains the expected assets and that their reported sizes are plausible/non-zero. If possible, verify the downloaded asset/hash before declaring delivery complete.
-7. Temporary GitHub Actions artifacts may be used for build verification, but they are not the final delivery point for public UAB projects because they can expire and their URLs are not the user-facing stable contract.
-8. Never present an old APK as a newly built one.
-9. If direct chat download produces a truncated/corrupted file, do not keep regenerating chat ZIP variants. Switch immediately to the authoritative stable Release URL and diagnose the transfer channel separately.
+VISIBLE PROGRESS - MANDATORY
+Default full-task ladder:
+5% accepted/scope locked
+15% current MADRE identified/protected
+30% LAB/config changes applied
+45% static/source checks completed
+60% preflight/cache/toolchain ready
+75% build/test output completed
+85% regression/artifact verification completed
+95% candidate/handoff/promotion package ready
+100% requested state verified and delivered
+Non-applicable phases are removed/recalculated. Never report 100% on an unverified or failed result.
+
+LIVE BUILD MONITORING
+1. New/in-progress build requests are monitored while the interactive session is active.
+2. Report meaningful phase changes, not repeated identical status spam.
+3. Provider success alone is insufficient; verify requested artifacts and source state.
+4. Never deliver a stale artifact while a newer requested build is still running.
 
 SECURITY
-1. Public repository source must never contain plaintext secrets.
-2. Before making a repository public or adding a new workflow, check for exposed API keys, credentials, signing passwords and private tokens.
-3. Build logs must not echo secrets.
-4. The central Br174/Chatgpt repository remains a private technical registry/control repository and is not an application.
+1. Public source must never contain plaintext secrets.
+2. Build logs must not echo secrets.
+3. Signing materials and credentials are not stored in unsafe caches.
+4. Br174/Chatgpt remains the private UAB control/registry repository, not an application.
 
 PROJECT NEUTRALITY
-This global policy stays project-neutral. Current repository-specific routing belongs in UAB_PROJECT_ROUTING.txt. Future Android projects should be onboarded by adding/updating their adapter and routing entry instead of creating a new independent build policy.
+Current repository-specific mechanics belong in UAB_PROJECT_ROUTING.txt and each thin project adapter. Future projects are onboarded to UAB CORE rather than given a new independent engine.
 
-LAST POLICY UPDATE
-2026-09-24 - Stable delivery contract added: public Android UAB projects must publish fixed-name APK/ZIP assets to a stable GitHub Release; chat attachments are secondary only.
+CANONICAL FILES
+- UAB_UNIFIED_ENGINE_V1.txt
+- UAB_ADAPTER_SPEC_V1.txt
+- UAB_ENGINE_CONTRACT.txt
+- UAB_GLOBAL_APK_POLICY.txt
+- UAB_PROJECT_ROUTING.txt
+
+Engine version: UAB-CORE-V1
+Last policy update: 2026-09-24
