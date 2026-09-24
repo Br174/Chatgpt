@@ -1,5 +1,5 @@
 UAB STATE REGISTRY - UAB-CORE-V1.1
-Last updated: 2026-09-24
+Last updated: 2026-09-25
 
 This registry records lifecycle roles and promotion identity. It does not replace live GitHub refs; live metadata wins and the registry must then be updated.
 
@@ -20,13 +20,15 @@ MusicLab
 - Initial build verification run: 36061399316 (success)
 - Initial real-device regression test: audio playback confirmed working by Bruno on 2026-09-24.
 - Initial real-device Credits.fm diagnostic for "Sapore di sale": 0 found / NO_MATCH, while Bruno provided Credits.fm screenshots showing ISRC ES5089600145 linked to ISWC T0050008699.
-- Parser-v2 correction: title-only query for match=recording_title; ISRC -> ISWC expansion uses include=recordings, depth=2 and accepts both enriched recording objects and direct ISRC strings; diagnostics now expose source-ISRC candidates, ISWCs and linked recordings.
+- Parser-v2 correction: title-only query for match=recording_title; ISRC -> ISWC expansion uses include=recordings, depth=2 and accepts both enriched recording objects and direct ISRC strings; diagnostics expose source-ISRC candidates, ISWCs and linked recordings.
 - Parser-v2 build verification run: 36064110494 (success)
 - Parser-v2 temporary LAB artifact: MusicLab-CREDITSFM-LAB-01-V2 / artifact 10835193653
 - Parser-v2 package check: it.verlezza.musiclab.lab.creditsfm01v2
-- LAB technical status: parser-v2 compiled, structurally verified, signed, and parallel-install package verified.
-- Functional promotion status: NOT APPROVED YET; waiting for Bruno real-device Credits.fm diagnostic/results on parser-v2. Audio should also be sanity-checked before approval even though no audio/player files changed.
-- CANDIDATA: none. Do not create a candidate until Credits.fm discovery is fixed and Bruno approves the LAB. When approved, create candidate fresh from MADRE commit 770849ff543289de3adffe5bab62bc09528d19f4 and replay the exact approved three-file net application change-set; do not promote/rename the LAB branch.
+- Parser-v2 real-device result on 2026-09-25 for "Sapore di sale": Credits.fm OK; 7 found, 7 resolved, 7 used; diagnostic path 3 source ISRC candidates -> 1 ISWC -> 23 linked recordings; final cover results 14.
+- Audio regression status: PASS on previous LAB build; no audio/player files changed in parser-v2. Before promotion, one final quick audio sanity check on parser-v2 is recommended.
+- LAB technical status: parser-v2 compiled, structurally verified, signed, parallel-install package verified, and Credits.fm real-device discovery confirmed working.
+- Functional promotion status: READY FOR FINAL USER APPROVAL after optional parser-v2 audio sanity check. Do not create a CANDIDATA until Bruno explicitly approves the LAB.
+- CANDIDATA: none. When Bruno explicitly approves this LAB, create candidate fresh from MADRE commit 770849ff543289de3adffe5bab62bc09528d19f4 and replay the exact approved three-file net application change-set; do not promote/rename the LAB branch.
 - Failed/discarded experimental line: lab-cover-repair-from-build52
 - Historical UAB mechanics line: lab-cover-restart-from-build52
 - Permanent LAB 'LATEST' release model: deprecated
