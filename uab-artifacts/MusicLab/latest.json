@@ -4,26 +4,26 @@
   "sourceRepository": "Br174/MusicLab",
   "status": "ready",
   "branch": "universal-apk-builder",
-  "buildNumber": "51",
-  "commit": "54293670e307c0ced92582e174bb23d0c6a8c762",
-  "generatedAt": 1790260260,
+  "buildNumber": "52",
+  "commit": "770849ff543289de3adffe5bab62bc09528d19f4",
+  "generatedAt": 1790261746,
   "delivery": "github-release",
   "releaseTag": "uab-musiclab-latest",
   "releaseUrl": "https://github.com/Br174/Chatgpt/releases/tag/uab-musiclab-latest",
   "artifacts": [
     {
-      "name": "MusicLab-LAB.apk",
+      "name": "MusicLab-LAB-01.apk",
       "kind": "apk",
-      "url": "https://github.com/Br174/Chatgpt/releases/download/uab-musiclab-latest/MusicLab-LAB.apk",
-      "size": 48444231,
-      "sha256": "8bb91c509e10802165b91939ef522be4784bd1aaa5de3693238529d97c840ea7"
+      "url": "https://github.com/Br174/Chatgpt/releases/download/uab-musiclab-latest/MusicLab-LAB-01.apk",
+      "size": 48444227,
+      "sha256": "6ffafd9045babda6986dda5651d192738b017a1f2db77d37f4009a7907acf2c2"
     },
     {
-      "name": "MusicLab-LAB-APK.zip",
+      "name": "MusicLab-LAB-01-APK.zip",
       "kind": "zip",
-      "url": "https://github.com/Br174/Chatgpt/releases/download/uab-musiclab-latest/MusicLab-LAB-APK.zip",
-      "size": 45445838,
-      "sha256": "66247f2411ca0cd3be6ddcaa7772db7e191312767e6c4a36f173af6b0773fcc0"
+      "url": "https://github.com/Br174/Chatgpt/releases/download/uab-musiclab-latest/MusicLab-LAB-01-APK.zip",
+      "size": 45445902,
+      "sha256": "b4568e86fc7ab7bfad5793fe79524a24618734b899d8eca0e110962a062bee9e"
     }
   ]
 }
