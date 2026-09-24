@@ -1,37 +1,76 @@
 UNIVERSAL APK REQUEST POLICY - GLOBAL
 
 SCOPE
-This policy is the canonical APK/ZIP request flow for Bruno's Android projects, including MusicLab, GeoVision and future projects. Project-specific adapters may define repositories, branches, workflows and package IDs, but they must not replace this request order.
+This policy is the canonical APK/ZIP request flow for Bruno's Android projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass the routing and cost rules below.
 
-MANDATORY FLOW
-1. ARTIFACT-FIRST. On every request to obtain, download, generate or deliver an APK/ZIP, first check the configured project's latest UAB manifest.
-2. If the manifest status is ready and it represents the same app source state, immediately return the existing APK and ZIP. The source state is considered the same when the commit matches exactly or when every change since the manifest commit is explicitly classified by that project's adapter as build/delivery infrastructure that cannot change the app binary. Do not rebuild unless Bruno explicitly requests a rebuild.
-3. If no matching ready artifact exists, attempt a new build in this exact default order:
-   a. local/current ChatGPT or AI execution environment;
-   b. GitHub Actions using free included allowance only;
-   c. Codemagic/UAB robust fallback with delivery through the central GitHub Releases registry.
-4. The first two routes must fail fast during availability/preflight checks. Missing Android toolchain, authorization, free quota, runner, service or required configuration must cause immediate fallback instead of waiting minutes.
-5. Once a provider has passed preflight and a real Android build has genuinely started, allow the build to finish normally.
-6. If a real build fails because of project code, signing, dependencies or another project-level error, stop and diagnose it instead of repeating the same broken build on other providers.
-7. If a provider fails before meaningful build steps run because of infrastructure, authorization, quota, runner or service availability, move immediately to the next provider.
-8. Paid fallback is forbidden. Never enable paid overage or buy build minutes automatically.
-9. Email, manual mailbox searches, AppDeploy and improvised artifact-recovery paths are not part of the normal flow.
-10. The user must never need to remember or restate this policy. The AI/router must apply it automatically whenever an APK/ZIP is requested.
-11. If an Android project is not yet UAB-enabled, the correct action is to onboard that project to the same UAB contract. Do not create a separate ad-hoc APK delivery method for that project.
+CORE PRINCIPLES
+1. ARTIFACT-FIRST. Before any new build, check whether a verified APK/ZIP already exists for the same source state.
+2. FREE-FIRST. Never spend money automatically. Paid overage, paid runners, larger GitHub runners and paid Codemagic minutes are forbidden unless Bruno explicitly authorizes them in that specific request.
+3. PUBLIC-REPO ADVANTAGE. For a public repository, the default remote build provider is GitHub Actions on standard GitHub-hosted runners. Do not route a public project to Codemagic by default.
+4. PRIVATE-REPO CONSERVATION. For a private repository, preserve included quotas: use local or adapter-approved patch/repack first when practical, then GitHub Actions only while included free allowance is available, then Codemagic only if the exact selected machine/account is confirmed to consume free allowance.
+5. FAIL FAST. Availability, authorization, quota, runner, signing and toolchain checks must fail quickly before a long build starts.
+6. DIAGNOSE CODE FAILURES. If a genuine build starts and fails because of project code, dependencies, signing or packaging, stop and diagnose the project failure instead of repeating the same broken build on another provider.
+
+MANDATORY APK/ZIP FLOW
+1. Read the project's UAB adapter/routing state and determine repository visibility at request time. Do not rely on stale assumptions.
+2. Check the configured UAB manifest or stable project release.
+3. If a ready artifact matches the requested source commit, return it immediately. A later infrastructure-only commit may be treated as equivalent only when the project adapter explicitly says it cannot change the app binary.
+4. If a new artifact is required, choose the fastest safe route in this order:
+   a. adapter-approved patch/repack or local/current execution environment, but only when it can run immediately without lengthy environment reconstruction and when the change type is safe for that route;
+   b. for PUBLIC repositories: GitHub Actions using STANDARD GitHub-hosted runners;
+   c. for PRIVATE repositories: GitHub Actions only when the included free allowance is available and sufficient;
+   d. Codemagic only as a verified FREE-ALLOWANCE emergency fallback. Never assume Codemagic is free merely because the account has a free plan; verify the chosen machine and remaining free allowance first;
+   e. if every free route is unavailable, stop and report the blocker. Do not enable billing or buy minutes automatically.
+5. Larger GitHub-hosted runners are not part of the normal free route and must not be selected automatically.
+6. Once a real build has started after passing preflight, allow it to finish normally.
+7. If infrastructure fails before meaningful build work begins, move to the next allowed free route.
+8. If a project is not yet UAB-enabled, onboard it to this same contract instead of inventing a separate ad-hoc delivery path.
+
+PATCH / REPACK RULE
+Patch/repack is preferred only when the project adapter marks it safe, typically for HTML/JavaScript/assets-only changes or equivalent non-native changes. Do not use patch/repack for native Kotlin/Java/Compose/Gradle/dependency/signing changes unless the adapter explicitly supports that exact change. Preserve package ID, signature expectations and install/update compatibility.
+
+PUBLIC REPOSITORIES
+1. Standard GitHub-hosted runners are the normal remote build route.
+2. Do not perform a private-repository minute-quota fallback check for standard public-repository jobs; still check service availability, workflow validity, permissions, secrets and signing requirements.
+3. Do not send a public project to Codemagic merely to save GitHub minutes.
+4. Keep secrets in GitHub Actions secrets or another protected secret store. Never commit API keys, keystores, passwords or tokens in plaintext merely because the repository is public.
+
+PRIVATE REPOSITORIES
+1. Prefer local or safe patch/repack when practical.
+2. GitHub Actions may be used only within the account's included free allowance unless Bruno explicitly authorizes paid use.
+3. Codemagic is a last-resort provider, not the primary engine. It may be used automatically only after confirming that the selected build machine and remaining account allowance are actually free for that build.
+4. If free allowance is exhausted, stop instead of silently switching to billable usage.
+
+CODEMAGIC STATUS
+Codemagic remains supported only as an optional fallback for projects that need it. It is NOT the default engine for MusicLab, GeoVision or any other public repository. A free Codemagic account does not make every runner free, so the router must verify current provider terms and remaining allowance before use.
+
+WEB / PWA PROJECTS
+A public web/PWA project is not automatically an Android APK project. Use its normal GitHub Actions web build/test/deploy flow. Only route it through UAB APK generation after an actual Android wrapper/project exists and has a defined adapter, package ID and build command.
 
 LIVE BUILD MONITORING - MANDATORY
-1. Every APK/ZIP request that requires a new build or waits for an in-progress build MUST automatically enter LIVE monitoring mode. Bruno must not need to ask for repeated status checks.
-2. While an interactive chat/tool session is active, poll the active provider/check status at short intervals appropriate to the provider. Do not spam identical messages: surface an update when the phase/status changes, when a meaningful milestone is reached, or when the previous ETA materially changes.
-3. Every visible live update should include: current phase/status, elapsed time, and an ETA/range when there is enough evidence to estimate one. ETA must be based on recent comparable builds or provider progress and must be revised when exceeded; never present a guessed ETA as certain.
-4. Continue LIVE monitoring until a terminal result is reached: success, failure, cancellation, or a confirmed infrastructure blocker.
-5. A provider-reported success is not enough for delivery. After success, verify the central latest.json manifest is status=ready and points to the exact requested source commit/build. Then verify the expected APK/ZIP assets are present before exposing download links.
-6. Never deliver a stale APK/ZIP merely because it is the latest currently available artifact while a newer requested build is still running.
-7. If the interactive session cannot remain active long enough for true short-interval monitoring, use the best available condition-watch/notification mechanism as a fallback and explicitly state its minimum checking cadence. Do not call an hourly or delayed background check “real time”.
-8. If a build is already ready when requested, LIVE mode is unnecessary: return the verified APK/ZIP immediately.
-9. LIVE monitoring is project-neutral and applies equally to MusicLab, GeoVision and every future UAB-enabled Android project.
+1. Every APK/ZIP request that requires a new build or waits for an in-progress build must enter live monitoring mode automatically.
+2. While an interactive session is active, poll the active provider at sensible short intervals. Surface updates when phase/status changes, a meaningful milestone is reached or ETA materially changes; do not spam identical updates.
+3. Visible updates should include current phase/status, elapsed time and an ETA/range only when evidence supports one.
+4. Continue monitoring until success, failure, cancellation or a confirmed infrastructure blocker.
+5. Provider success alone is not enough. Verify that the requested APK/ZIP exists and matches the requested source state before exposing download links.
+6. Never deliver a stale artifact merely because it is the newest currently visible one while a newer requested build is still running.
+7. If true short-interval monitoring cannot continue, use the best available notification/condition-watch fallback and state its real checking cadence.
+8. If a matching artifact is already ready, live monitoring is unnecessary.
 
 DELIVERY
-The stable retrieval endpoint is each project's latest.json manifest in the central artifact registry. APK and ZIP links from a matching ready manifest should be exposed directly to the user.
+1. Prefer a stable, verifiable retrieval point: a project UAB manifest and/or stable GitHub Release defined by the project adapter.
+2. APK and ZIP must both be produced when the project contract requires both.
+3. Temporary GitHub Actions artifacts may be used during build verification, but do not call the delivery complete if the project's adapter requires a stable release/manifest and that publication has not happened.
+4. Never present an old APK as a newly built one.
+
+SECURITY
+1. Public repository source must never contain plaintext secrets.
+2. Before making a repository public or adding a new workflow, check for exposed API keys, credentials, signing passwords and private tokens.
+3. Build logs must not echo secrets.
+4. The central Br174/Chatgpt repository remains a private technical registry/control repository and is not an application.
 
 PROJECT NEUTRALITY
-This policy must remain project-neutral. Each project supplies its own UAB project/router adapter. Future Android projects should be onboarded by pointing their adapter to this same flow rather than creating a separate APK-delivery method for that project.
+This global policy stays project-neutral. Current repository-specific routing belongs in UAB_PROJECT_ROUTING.txt. Future Android projects should be onboarded by adding/updating their adapter and routing entry instead of creating a new independent build policy.
+
+LAST POLICY UPDATE
+2026-09-24 - Public-repository routing updated: standard GitHub Actions is primary remote build path; Codemagic demoted to verified-free emergency fallback only.
