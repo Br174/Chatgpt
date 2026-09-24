@@ -10,7 +10,7 @@ MusicLab
 - MADRE source commit: 770849ff543289de3adffe5bab62bc09528d19f4
 - Current approved stable family: MusicLab 112726 / build #52
 - Active atomic LAB: lab/musiclab-creditsfm-01
-- Active LAB source state: 088dccc1a07020dec3f6bbc5cf81493a712e428b (parser-v2 restored)
+- Active LAB source state after V2-Q1 temporary-tool cleanup: 140125a26881a74254d075c0e64a34657fd8afd6
 - LAB requested modification: isolated Credits.fm cover/version discovery only.
 - LAB net application change-set versus MADRE: exactly three files:
   1. app/src/main/kotlin/com/metrolist/music/ui/component/CreditsFmCoverSource.kt
@@ -28,7 +28,13 @@ MusicLab
 - Parser-v2 real-device audio sanity test: PASS, confirmed by Bruno on 2026-09-25.
 - Parser-v3 experiment: attempted related-works expansion and batch metadata enrichment; build run 36067092077 succeeded technically, but real-device result regressed to 0 valid Credits.fm covers after 21 raw linked recordings.
 - Parser-v3 status: DISCARDED. Branch lab/musiclab-creditsfm-01 was force-restored to parser-v2 commit 088dccc1a07020dec3f6bbc5cf81493a712e428b on 2026-09-25 at Bruno's instruction.
-- Active LAB functional status: parser-v2 restored; audio PASS; Credits.fm functional but quantity/date coverage remains incomplete and will be improved in a later controlled iteration.
+- Parser-v2-Q1 correction: keeps the proven parser-v2 algorithm and endpoints unchanged while widening only quantity ceilings: source recording candidates 3 -> 12; linked ISRC ceiling 60 -> 240; individual metadata fetch ceiling 18 -> 80; Credits.fm cover ceiling 80 -> 120; CoverHub Credits.fm YouTube-resolution ceiling 64 -> 120.
+- Parser-v2-Q1 build verification run: 36070210778 (success)
+- Parser-v2-Q1 temporary LAB artifact: MusicLab-CREDITSFM-LAB-01-V2Q1 / artifact 10837728482
+- Parser-v2-Q1 package check: it.verlezza.musiclab.lab.creditsfm01v2q1
+- Parser-v2-Q1 APK size: 48,460,615 bytes; APK structure, signature and parallel package verified by build workflow.
+- Parser-v2-Q1 scope check: final diff versus MADRE remains exactly the same three Credits.fm/cover files above; no audio/player/service/Innertube application file changed.
+- Active LAB functional status: V2-Q1 technically verified and awaiting Bruno real-device quantity test. Date/year coverage has NOT been modified in this iteration.
 - CANDIDATA: none. Do not create a candidate until Bruno explicitly approves the LAB. When approved, create candidate fresh from MADRE commit 770849ff543289de3adffe5bab62bc09528d19f4 and replay the exact approved three-file net application change-set; do not promote/rename the LAB branch.
 - Failed/discarded experimental line: lab-cover-repair-from-build52
 - Historical UAB mechanics line: lab-cover-restart-from-build52
