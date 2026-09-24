@@ -10,21 +10,23 @@ MusicLab
 - MADRE source commit: 770849ff543289de3adffe5bab62bc09528d19f4
 - Current approved stable family: MusicLab 112726 / build #52
 - Active atomic LAB: lab/musiclab-creditsfm-01
-- LAB final branch/source state after temporary-tool cleanup: 8430ee2f09de6bc079f8f3a9ffac518fbe0e7547
+- LAB final branch/source state after parser-v2 temporary-tool cleanup: 088dccc1a07020dec3f6bbc5cf81493a712e428b
 - LAB requested modification: isolated Credits.fm cover/version discovery only.
 - LAB net application change-set versus MADRE: exactly three files:
   1. app/src/main/kotlin/com/metrolist/music/ui/component/CreditsFmCoverSource.kt
   2. app/src/main/kotlin/com/metrolist/music/ui/component/CoverHubSearchEngine.kt
   3. app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt
 - Audio/player/service/Innertube application files changed versus MADRE: none.
-- Build verification run: 36061399316 (success)
-- Temporary LAB artifact: MusicLab-CREDITSFM-LAB-01 / artifact 10834815552
-- Artifact package check: it.verlezza.musiclab.lab.creditsfm01
-- LAB technical status: compiled, structurally verified, parallel-install package verified.
-- Real-device regression test: audio playback confirmed working by Bruno on 2026-09-24.
-- Real-device Credits.fm diagnostic for "Sapore di sale": 0 found / NO_MATCH, while Bruno provided Credits.fm screenshots showing ISRC ES5089600145 linked to ISWC T0050008699; integration/parser requires another isolated fix before promotion.
-- Functional promotion status: NOT APPROVED; audio regression passed, Credits.fm discovery still failing.
-- CANDIDATA: none. Do not create a candidate until the Credits.fm result is fixed and Bruno approves the LAB. When approved, create candidate fresh from MADRE commit 770849ff543289de3adffe5bab62bc09528d19f4 and replay the exact approved change-set; do not promote/rename the LAB branch.
+- Initial build verification run: 36061399316 (success)
+- Initial real-device regression test: audio playback confirmed working by Bruno on 2026-09-24.
+- Initial real-device Credits.fm diagnostic for "Sapore di sale": 0 found / NO_MATCH, while Bruno provided Credits.fm screenshots showing ISRC ES5089600145 linked to ISWC T0050008699.
+- Parser-v2 correction: title-only query for match=recording_title; ISRC -> ISWC expansion uses include=recordings, depth=2 and accepts both enriched recording objects and direct ISRC strings; diagnostics now expose source-ISRC candidates, ISWCs and linked recordings.
+- Parser-v2 build verification run: 36064110494 (success)
+- Parser-v2 temporary LAB artifact: MusicLab-CREDITSFM-LAB-01-V2 / artifact 10835193653
+- Parser-v2 package check: it.verlezza.musiclab.lab.creditsfm01v2
+- LAB technical status: parser-v2 compiled, structurally verified, signed, and parallel-install package verified.
+- Functional promotion status: NOT APPROVED YET; waiting for Bruno real-device Credits.fm diagnostic/results on parser-v2. Audio should also be sanity-checked before approval even though no audio/player files changed.
+- CANDIDATA: none. Do not create a candidate until Credits.fm discovery is fixed and Bruno approves the LAB. When approved, create candidate fresh from MADRE commit 770849ff543289de3adffe5bab62bc09528d19f4 and replay the exact approved three-file net application change-set; do not promote/rename the LAB branch.
 - Failed/discarded experimental line: lab-cover-repair-from-build52
 - Historical UAB mechanics line: lab-cover-restart-from-build52
 - Permanent LAB 'LATEST' release model: deprecated
