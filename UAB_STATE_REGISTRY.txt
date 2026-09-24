@@ -5,9 +5,10 @@ This registry records lifecycle roles. It does not replace live GitHub refs; liv
 
 MusicLab
 - Repository: Br174/MusicLab
+- Current approved MADRE: mother/musiclab-112726
+- Source stable ref: stable-musiclab-lab01-build52
+- Source commit: 770849ff543289de3adffe5bab62bc09528d19f4
 - Current approved stable family: MusicLab 112726 / build #52
-- Historical stable ref: stable-musiclab-lab01-build52
-- Canonical UAB Mother alias: mother/musiclab-112726 (to be created from the exact stable ref)
 - Active experimental line: lab-cover-restart-from-build52
 - Failed/discarded experimental line: lab-cover-repair-from-build52
 - Permanent LAB 'LATEST' release model: deprecated
