@@ -3,7 +3,7 @@ UAB PROJECT ADAPTER SPEC V1
 Every repository handled by UAB declares a small project adapter. The adapter describes mechanics only; lifecycle policy remains owned by UAB CORE.
 
 REQUIRED FIELDS
-UAB_ENGINE_VERSION=UAB-CORE-V1
+UAB_ENGINE_VERSION=UAB-CORE-V1.1
 UAB_PROJECT_NAME=<human readable name>
 UAB_PROJECT_CLASS=<android|android-hybrid|web-pwa|delivery-only>
 UAB_MOTHER_REF=<current approved stable ref or main until first explicit Mother is created>
@@ -14,6 +14,16 @@ UAB_BUILD_ROUTE=<workflow/command description>
 UAB_CACHE_MODE=<gradle|npm|custom|none-with-reason>
 UAB_RELEASE_MODE=<immutable-mother|no-binary-release|delivery-only>
 UAB_CORE_REGRESSION_GATES=<comma-separated human-readable critical checks>
+
+LIFECYCLE TRACE FIELDS - MANDATORY WHEN PROMOTING
+UAB_SOURCE_MOTHER_REF=<exact Mother used to create LAB>
+UAB_SOURCE_MOTHER_SHA=<exact Mother commit SHA>
+UAB_LAB_REF=<approved LAB ref>
+UAB_LAB_SHA=<approved LAB commit SHA>
+UAB_APPROVED_CHANGESET=<commit SHA, patch identity or deterministic diff identity>
+UAB_CANDIDATE_REF=<fresh Candidate ref created from same Mother>
+UAB_CANDIDATE_SHA=<verified Candidate commit SHA>
+UAB_NEW_MOTHER_REF=<new immutable Mother ref after approval>
 
 ANDROID-SPECIFIC FIELDS WHEN APPLICABLE
 UAB_ANDROID_PACKAGE_STRATEGY=<parallel-lab|stable-update|custom>
@@ -38,7 +48,15 @@ MANDATORY ADAPTER BEHAVIOR
 5. Adapter must define cache behavior and progress milestones.
 6. Adapter must define the core regression gates that must pass before promotion.
 7. Adapter may keep legacy workflows temporarily, but those workflows are not authoritative promotion paths until aligned with UAB CORE.
+8. LAB scope is atomic: one requested modification, or one small inseparable change-set for that single modification. Unrelated changes require a new LAB from the current MADRE unless Bruno explicitly combines them.
+9. A CANDIDATA must be created fresh from the exact same MADRE ref/SHA used by the approved LAB.
+10. The CANDIDATA must replay exactly the approved LAB change-set. No extra cleanup, refactor, dependency update or unrelated fix may be inserted without explicit approval.
+11. Before candidate approval, the adapter must verify that MADRE->CANDIDATA source changes are equivalent to MADRE->approved-LAB changes for the approved change-set.
+12. When Bruno approves the CANDIDATA as NEW MADRE, the new Mother source ref must point to the exact approved CANDIDATA commit SHA. Do not create another source commit merely to promote it.
+13. If final Android Mother packaging/signing differs from Candidate test packaging, it must use the exact approved Candidate source SHA and may alter only adapter-declared packaging/signing metadata, never application source.
+14. If the Mother/LAB/change-set/Candidate identity chain cannot be proven, promotion must stop rather than guess.
 
 VERSION
-UAB-ADAPTER-SPEC-V1
+UAB-ADAPTER-SPEC-V1.1
 Established: 2026-09-24
+Revision 1.1: atomic LAB and exact same-Mother/same-change Candidate promotion chain.
