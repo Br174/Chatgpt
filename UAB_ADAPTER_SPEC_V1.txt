@@ -1,0 +1,44 @@
+UAB PROJECT ADAPTER SPEC V1
+
+Every repository handled by UAB declares a small project adapter. The adapter describes mechanics only; lifecycle policy remains owned by UAB CORE.
+
+REQUIRED FIELDS
+UAB_ENGINE_VERSION=UAB-CORE-V1
+UAB_PROJECT_NAME=<human readable name>
+UAB_PROJECT_CLASS=<android|android-hybrid|web-pwa|delivery-only>
+UAB_MOTHER_REF=<current approved stable ref or main until first explicit Mother is created>
+UAB_LAB_PREFIX=<branch prefix for experiments>
+UAB_CANDIDATE_PREFIX=<branch prefix for clean candidates>
+UAB_MOTHER_PREFIX=<branch/tag prefix for approved Mothers>
+UAB_BUILD_ROUTE=<workflow/command description>
+UAB_CACHE_MODE=<gradle|npm|custom|none-with-reason>
+UAB_RELEASE_MODE=<immutable-mother|no-binary-release|delivery-only>
+UAB_CORE_REGRESSION_GATES=<comma-separated human-readable critical checks>
+
+ANDROID-SPECIFIC FIELDS WHEN APPLICABLE
+UAB_ANDROID_PACKAGE_STRATEGY=<parallel-lab|stable-update|custom>
+UAB_SIGNING_STRATEGY=<stable|ephemeral-lab|custom>
+UAB_PATCH_REPACK=<allowed|forbidden|conditional>
+UAB_OUTPUT_TYPES=<apk,zip,...>
+
+WEB/PWA FIELDS WHEN APPLICABLE
+UAB_PACKAGE_MANAGER=<npm|pnpm|yarn|other>
+UAB_WEB_BUILD_COMMAND=<command>
+UAB_DEPLOYMENT_MODE=<project-specific description>
+
+DELIVERY-ONLY FIELDS WHEN APPLICABLE
+UAB_DELIVERY_SOURCE_REPO=<repo>
+UAB_DELIVERY_STABLE_POINTER=<description>
+
+MANDATORY ADAPTER BEHAVIOR
+1. Adapter cannot make a LAB permanent.
+2. Adapter cannot overwrite an immutable MADRE release.
+3. Adapter cannot promote CANDIDATA to MADRE without explicit approval.
+4. Adapter must preserve prior MADRI.
+5. Adapter must define cache behavior and progress milestones.
+6. Adapter must define the core regression gates that must pass before promotion.
+7. Adapter may keep legacy workflows temporarily, but those workflows are not authoritative promotion paths until aligned with UAB CORE.
+
+VERSION
+UAB-ADAPTER-SPEC-V1
+Established: 2026-09-24
