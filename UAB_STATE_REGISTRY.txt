@@ -1,16 +1,30 @@
-UAB STATE REGISTRY - UAB-CORE-V1
+UAB STATE REGISTRY - UAB-CORE-V1.1
 Last updated: 2026-09-24
 
-This registry records lifecycle roles. It does not replace live GitHub refs; live metadata wins and the registry must then be updated.
+This registry records lifecycle roles and promotion identity. It does not replace live GitHub refs; live metadata wins and the registry must then be updated.
 
 MusicLab
 - Repository: Br174/MusicLab
 - Current approved MADRE: mother/musiclab-112726
 - Source stable ref: stable-musiclab-lab01-build52
-- Source commit: 770849ff543289de3adffe5bab62bc09528d19f4
+- MADRE source commit: 770849ff543289de3adffe5bab62bc09528d19f4
 - Current approved stable family: MusicLab 112726 / build #52
-- Active experimental line: lab-cover-restart-from-build52
+- Active atomic LAB: lab/musiclab-creditsfm-01
+- LAB final branch/source state after temporary-tool cleanup: 8430ee2f09de6bc079f8f3a9ffac518fbe0e7547
+- LAB requested modification: isolated Credits.fm cover/version discovery only.
+- LAB net application change-set versus MADRE: exactly three files:
+  1. app/src/main/kotlin/com/metrolist/music/ui/component/CreditsFmCoverSource.kt
+  2. app/src/main/kotlin/com/metrolist/music/ui/component/CoverHubSearchEngine.kt
+  3. app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt
+- Audio/player/service/Innertube application files changed versus MADRE: none.
+- Build verification run: 36061399316 (success)
+- Temporary LAB artifact: MusicLab-CREDITSFM-LAB-01 / artifact 10834815552
+- Artifact package check: it.verlezza.musiclab.lab.creditsfm01
+- LAB technical status: compiled, structurally verified, parallel-install package verified.
+- Functional promotion status: NOT APPROVED YET; waiting for Bruno device test of audio playback and Credits.fm diagnostics/results.
+- CANDIDATA: none. If Bruno approves this LAB, create candidate fresh from MADRE commit 770849ff543289de3adffe5bab62bc09528d19f4 and replay the exact three-file net application change-set above; do not promote/rename the LAB branch.
 - Failed/discarded experimental line: lab-cover-repair-from-build52
+- Historical UAB mechanics line: lab-cover-restart-from-build52
 - Permanent LAB 'LATEST' release model: deprecated
 
 GeoVision
@@ -27,7 +41,7 @@ StudyBook-AI
 Visionflix
 - Repository: Br174/Visionflix
 - Current lifecycle baseline: main until a named Mother is explicitly approved/frozen.
-- Release publication under UAB-CORE-V1: only mother/* branches.
+- Release publication under UAB-CORE-V1.1: only mother/* branches.
 - streamflix-BV is delivery adapter, not source lifecycle authority.
 
 streamflix-BV
@@ -37,6 +51,10 @@ streamflix-BV
 
 GLOBAL
 - MADRE -> LAB -> CANDIDATA -> NEW MADRE
+- One requested modification (or one tiny inseparable change-set) per LAB
+- LAB starts from exact current MADRE
+- CANDIDATA is rebuilt fresh from the exact same MADRE with the exact approved LAB change-set
+- Approved CANDIDATA source SHA becomes NEW MADRE source SHA
 - LAB/CANDIDATA artifacts temporary
 - Permanent Release = approved MADRE
 - Historical MADRI preserved
