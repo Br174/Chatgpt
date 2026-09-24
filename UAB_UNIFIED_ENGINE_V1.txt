@@ -14,25 +14,44 @@ MADRE -> LAB -> CANDIDATA -> NEW MADRE
 - For Android projects, a MADRE permanent GitHub Release must use a unique immutable tag/version and keep APK/ZIP/checksums permanently.
 - For web/PWA projects, the MADRE reference is the approved stable source/deployment state; the artifact type follows the project adapter.
 
-2. LAB
+2. LAB - ATOMIC EXPERIMENT RULE
 - Every experiment starts directly from the current MADRE, never from a failed LAB and never from an unapproved CANDIDATA.
-- A LAB may contain experimental changes and may fail.
+- A LAB must contain ONE requested modification at a time, or at most one small inseparable group of tightly related changes that together implement the same requested modification.
+- Do not accumulate unrelated feature requests, later experiments or opportunistic cleanup into the same LAB.
+- If a second unrelated modification is requested, create a new LAB again from the current MADRE unless Bruno explicitly asks to combine them.
+- The LAB must record its exact MADRE source ref/commit and its exact approved change-set so the same change can be replayed without reinterpretation.
+- A LAB may fail. If it fails, abandon it and start the next experiment again from the current MADRE unless Bruno explicitly asks to continue that exact LAB.
 - Android LAB builds must use a distinct package/application ID whenever parallel installation is required by the project adapter.
 - LAB output is temporary Actions artifact/test output only. LAB must not overwrite or replace a MADRE release.
-- A failed LAB is abandoned. The next experiment starts again from the current MADRE unless Bruno explicitly asks to continue that exact LAB.
 
-3. CANDIDATA
-- A CANDIDATA is rebuilt cleanly from the current MADRE, applying only the changes that were proven useful in LAB.
-- Do not simply rename/promote a dirty experimental LAB branch when it contains unrelated attempts or failed intermediate work.
+3. CANDIDATA - EXACT REPLAY RULE
+- When Bruno says that a LAB may become CANDIDATA, do NOT rename, move or directly promote the LAB branch.
+- Create the CANDIDATA fresh from the SAME MADRE ref/commit from which that approved LAB was created.
+- Apply exactly the same approved modification/change-set that was tested in the LAB. Do not add extra fixes, cleanup, refactors, dependency changes or other interpretation unless Bruno explicitly approves them.
+- The expected source relationship is: CANDIDATA = SAME MADRE + SAME APPROVED CHANGE-SET.
+- If the approved LAB contained one atomic commit, replay that exact commit/change-set onto the fresh CANDIDATA where technically possible. If the mechanism differs, verify that the resulting source diff against the MADRE is equivalent to the approved LAB diff.
 - Candidate tests must cover both the requested feature and core regression gates defined by the adapter (for example audio playback, startup, navigation, signing/package identity, critical UI flows).
 - CANDIDATA remains non-authoritative until Bruno approves the real result.
 - Candidate binaries are test artifacts, not permanent MADRE releases.
 
-4. NEW MADRE
+4. NEW MADRE - EXACT CANDIDATE SOURCE RULE
 - Promotion occurs only after candidate verification and explicit approval.
+- The new MADRE source ref/tag must point to the EXACT source commit SHA of the approved CANDIDATA. Do not rebuild the source history, cherry-pick again, regenerate equivalent source or create a new source commit merely for promotion.
+- In other words: the source Bruno approved as CANDIDATA is the source that becomes the NEW MADRE.
+- If an Android adapter requires different final packaging/signing metadata for a MADRE binary, that binary may be packaged/signed from the exact approved CANDIDATA source commit, but no application source changes are allowed during promotion. The adapter must verify package/signing sanity separately.
 - Promotion creates a new immutable MADRE reference and a new permanent release/version where the project has release artifacts.
 - Never delete or replace the previous MADRE when promoting a new one.
 - The previous MADRE remains an immediate rollback point.
+
+5. PROMOTION IDENTITY RECORD - MANDATORY
+For every LAB that is eligible for promotion, UAB must be able to identify:
+- MADRE source ref and commit SHA;
+- LAB source ref and commit SHA;
+- exact approved change-set/diff identity;
+- CANDIDATA source ref and commit SHA;
+- verification result;
+- final NEW MADRE ref pointing to the approved CANDIDATA source SHA.
+If this chain cannot be established, automatic promotion must stop instead of guessing.
 
 RELEASE STORAGE RULE
 GitHub Releases are a deposit of good, approved versions.
@@ -45,6 +64,9 @@ GitHub Releases are a deposit of good, approved versions.
 ONE ENGINE / MANY ADAPTERS
 UAB CORE owns:
 - lifecycle state and promotion rules;
+- atomic LAB scope rule;
+- exact LAB change-set replay into CANDIDATA;
+- exact approved CANDIDATA source SHA promotion to NEW MADRE;
 - progress percentages;
 - cache requirements;
 - free-first provider routing;
@@ -64,7 +86,7 @@ Each project adapter may define only project-specific mechanics:
 - artifact names/types;
 - deployment/delivery destination.
 
-An adapter may not override MADRE immutability, LAB-from-MADRE, clean CANDIDATA reconstruction, approval-before-MADRE, or permanent history retention.
+An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction from the same MADRE and same approved change-set, approval-before-MADRE, exact candidate-source promotion, or permanent history retention.
 
 PROGRESS CONTRACT
 Default milestones:
@@ -98,5 +120,6 @@ SINGLE-SOURCE-OF-TRUTH RULE
 Br174/Chatgpt is the private UAB control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt and UAB_PROJECT_ROUTING.txt define the canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
 
 ENGINE VERSION
-UAB-CORE-V1
+UAB-CORE-V1.1
 Established: 2026-09-24
+Revision 1.1: atomic LAB + exact same-MADRE/same-change CANDIDATA + exact candidate source SHA promotion.
