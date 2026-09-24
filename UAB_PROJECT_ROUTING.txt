@@ -1,95 +1,101 @@
-UAB PROJECT ROUTING - CURRENT STATE
+UAB PROJECT ROUTING - UAB-CORE-V1
 
-Purpose: repository-specific routing state for the global UAB APK policy.
+Purpose
+Repository-specific adapter/routing state for the single UAB engine. No repository gets an independent lifecycle engine. All projects follow MADRE -> LAB -> CANDIDATA -> NEW MADRE.
 Last verified: 2026-09-24.
 
 1. MusicLab
 Repository: Br174/MusicLab
 Visibility: PUBLIC
-Project type: native Android (Kotlin/Compose/Gradle)
-Primary remote build route: GitHub Actions on standard GitHub-hosted runners.
-Existing relevant workflow: .github/workflows/build_quick.yml (standard ubuntu-latest runner).
-Preferred fast route: local build only when Android toolchain is already available; otherwise GitHub Actions.
-Patch/repack: not the default for native Kotlin/Compose/Gradle changes.
-Codemagic: disabled as normal route; verified-free emergency fallback only.
-Persistent cache: MANDATORY. setup-gradle cache plus Gradle --build-cache are enabled in the LAB adapter/core.
-Progress reporting: MANDATORY. UAB_PROGRESS milestones are emitted through build, verification and stable publication.
-Stable UAB registry: existing central manifest at uab-artifacts/MusicLab/latest.json remains valid for the artifact/source state it records. Do not rewrite its historical commit/build metadata merely because routing changed.
-Stable delivery contract (MANDATORY for new LAB deliveries):
-- Fixed release tag: uab-musiclab-lab-latest
-- Fixed direct APK asset: MusicLab-LAB-LATEST.apk
-- Fixed direct ZIP asset: MusicLab-LAB-LATEST.zip
-- Fixed checksum asset: SHA256SUMS.txt
-- Chat attachments are convenience copies only; the GitHub Release is authoritative for large-file delivery.
-- ZIP should contain a single top-level APK named MusicLab.apk in Android-friendly format.
-- A new MusicLab build is not considered delivered until the stable release assets exist and have plausible non-zero sizes.
+Project class: Android native (Kotlin/Compose/Gradle)
+Current approved baseline/MADRE: stable-musiclab-lab01-build52 (MusicLab LAB 112726 stable base, commit family anchored at 770849ff...).
+LAB rule: every new MusicLab experiment starts from the current MADRE; LAB uses parallel-install application ID.
+CANDIDATA rule: rebuild cleanly from MADRE with only proven LAB changes; run audio playback plus requested-feature regression gates.
+MADRE release rule: only approved candidate becomes a new immutable permanent Release. Do not overwrite prior MADRE assets.
+Primary remote build route: standard GitHub Actions.
+Patch/repack: forbidden by default for native Kotlin/Compose changes.
+Cache: official Gradle cache + --build-cache.
+Progress: UAB_PROGRESS milestones mandatory.
+Legacy note: fixed uab-musiclab-lab-latest overwrite delivery is DEPRECATED and not an authoritative UAB-CORE-V1 promotion path.
 
 2. GeoVision-Test
 Repository: Br174/GeoVision-Test
 Visibility: PUBLIC
-Project type: Android hybrid, with substantial HTML/JavaScript/assets plus Android wrapper/build files.
-Primary remote full-build route: GitHub Actions on standard GitHub-hosted runners.
-Existing relevant workflows include .github/workflows/build-geovision-v144.yml and other GeoVision build workflows, all currently using standard GitHub-hosted Ubuntu runners.
-Preferred fast route: adapter-approved patch/repack for HTML/JavaScript/assets-only changes when signature/package/update compatibility can be preserved; otherwise GitHub Actions full build.
-Codemagic: disabled as normal route; verified-free emergency fallback only.
-Persistent cache: MANDATORY. The primary v144 workflow uses Gradle persistent cache, --build-cache and pip download cache. Other/new GeoVision workflows must be upgraded to the same contract when used.
-Progress reporting: MANDATORY for every modification/build; the primary v144 workflow emits UAB_PROGRESS milestones to 100%.
-UAB status: project-specific universal adapter/manifest publication is not assumed complete merely because version-specific build workflows exist. When GeoVision is onboarded to stable UAB delivery, it must use the same fixed-release/direct-download contract required by the global policy instead of chat attachments as the primary large-file channel.
+Project class: Android hybrid (HTML/JavaScript/assets + Android wrapper)
+Established lifecycle vocabulary already exists in repository: madre/*, lab/*, candidate/*, with some historical premadre/* branches.
+Current stable family includes madre/023-stabile and other preserved historical Mothers; the exact current MADRE must be confirmed before each new experiment.
+LAB rule: start directly from confirmed MADRE.
+CANDIDATA rule: rebuild cleanly from MADRE with only proven patch(es), preserving the tested Google card/runtime baseline and adapter-defined regressions.
+MADRE release rule: approved candidate only; immutable permanent release/version.
+Primary remote full-build route: standard GitHub Actions.
+Fast route: adapter-approved patch/repack for HTML/JS/assets-only changes when signature/package/update compatibility is preserved.
+Cache: Gradle --build-cache + pip/tool caches where useful.
+Progress: mandatory.
+Existing version-specific workflows remain mechanics/adapters; they do not override UAB CORE lifecycle.
 
 3. StudyBook-AI
 Repository: Br174/StudyBook-AI
 Visibility: PUBLIC
-Project type: web/PWA (Vite/Node) with Cloudflare migration work; not currently treated as an Android APK project by UAB.
-Primary build/test route: GitHub Actions on standard GitHub-hosted runners.
-Existing relevant workflow: .github/workflows/build.yml (standard ubuntu-latest runner, Node.js build/tests).
-Persistent cache: MANDATORY. ~/.npm download cache is persisted with a package.json-derived key and npm uses --prefer-offline.
-Progress reporting: MANDATORY. Workflow emits UAB_PROGRESS milestones through test/build completion.
-Deployment route: project-specific web deployment flow (currently Cloudflare migration context), not Codemagic APK routing.
-APK rule: do not attempt to generate an Android APK unless/until an actual Android wrapper/project, package ID and Android build command are present and a UAB adapter is defined.
-Codemagic: not used for normal StudyBook web/PWA builds.
+Project class: web/PWA (Vite/Node; Cloudflare migration context)
+Current MADRE reference: main until Bruno explicitly freezes/names a stable Mother branch/tag.
+LAB rule: feature work branches from current MADRE reference.
+CANDIDATA rule: clean branch from MADRE with only approved LAB changes; run full StudyBook automated test suite.
+MADRE rule: promotion updates stable source/deployment state; no Android APK unless a real Android wrapper is added.
+Primary build/test route: standard GitHub Actions.
+Cache: npm download cache + prefer-offline.
+Progress: mandatory.
+Deployment route remains a project adapter detail; lifecycle remains UAB CORE.
 
-4. streamflix-BV
-Repository: Br174/streamflix-BV
-Visibility target: PRIVATE
-Project class: streaming/TV project; keep private.
-Default route for Android/TV APK work: local or safe adapter-approved patch/repack first when applicable; then GitHub Actions only within included free private-repository allowance; Codemagic only if the selected machine/account is explicitly verified free for that build.
-Persistent cache + progress: MANDATORY under UAB_ENGINE_CONTRACT.txt whenever this project is built or modified through UAB.
-Paid overage: forbidden unless Bruno explicitly authorizes it for a specific build.
-Delivery note: because the repository is intended to remain private, do not expose private APKs through a public release merely to get a stable link. Use an authenticated/private stable delivery adapter.
-
-5. Visionflix
+4. Visionflix
 Repository: Br174/Visionflix
 Visibility: PRIVATE
-Project class: streaming/TV project; keep private.
-Default route for Android/TV APK work: local or safe adapter-approved patch/repack first when applicable; then GitHub Actions only within included free private-repository allowance; Codemagic only if the selected machine/account is explicitly verified free for that build.
-Persistent cache + progress: MANDATORY under UAB_ENGINE_CONTRACT.txt whenever this project is built or modified through UAB.
-Paid overage: forbidden unless Bruno explicitly authorizes it for a specific build.
-Delivery note: because the repository is private, use a private/authenticated stable delivery adapter rather than publishing the APK publicly.
+Project class: Android Mobile/TV source project
+Current MADRE reference: main until an explicit immutable Mother ref is frozen under UAB CORE.
+LAB/CANDIDATA rule: same UAB lifecycle; experimental builds must not replace an approved Mother binary.
+Special adapter duties: stable signing key, Mobile/TV layout builds, package/version validation, Downloader publishing handoff.
+Primary route: local/safe path first when practical; otherwise GitHub Actions within included private-repo allowance.
+Cache: Gradle cache mandatory; preserve signing identity outside unsafe caches.
+Progress: mandatory.
+Paid overage: forbidden without explicit approval.
+Legacy private tv-latest overwrite behavior is not an authoritative MADRE store under UAB CORE and should be replaced by immutable versioned Mothers before next promotion.
+
+5. streamflix-BV
+Repository: Br174/streamflix-BV
+Actual visibility at last verification: PUBLIC. Historical target was PRIVATE; visibility must be treated as live metadata and changed only by explicit decision.
+Project class: delivery/distribution repository for Verlezza Vision TV, not a separate app-engine authority.
+Role under UAB CORE: thin delivery adapter only.
+Current public publishing workflow already uses unique version tags for Downloader-facing releases; that pattern is compatible with immutable-history rules when each underlying release is preserved.
+Stable Downloader pointer may continue to use GitHub latest-release semantics because underlying release tags remain unique.
+This repository must not define a separate MADRE/LAB engine for Visionflix source.
 
 6. Chatgpt
 Repository: Br174/Chatgpt
 Visibility: PRIVATE
-Role: UAB technical control/registry repository, not an app.
-Do not build an APK from this repository.
-Contains the global policy, routing state, UAB_ENGINE_CONTRACT.txt and UAB artifact registry.
-Keep private.
+Project class: UAB control/registry repository
+Role: canonical UAB CORE policy, lifecycle, adapter specification, project routing and artifact registry.
+Do not build an app from this repository.
+Canonical files:
+- UAB_UNIFIED_ENGINE_V1.txt
+- UAB_ADAPTER_SPEC_V1.txt
+- UAB_ENGINE_CONTRACT.txt
+- UAB_GLOBAL_APK_POLICY.txt
+- UAB_PROJECT_ROUTING.txt
 
-ROUTING RULE
-Always re-check actual repository visibility before a build because visibility may change. If this routing file conflicts with live repository metadata, live metadata wins and this file should then be updated.
+GLOBAL ROUTING RULES
+1. Re-check repository visibility before a build.
+2. Public build projects -> standard GitHub Actions is default remote compiler/test runner.
+3. Private build projects -> conserve included quota; no automatic paid fallback.
+4. Codemagic -> verified-free emergency fallback only.
+5. Project-specific workflows are adapters/mechanics only and cannot override lifecycle/promotion rules.
 
-COST RULE
-Public Android repositories -> standard GitHub Actions is the default remote compiler.
-Private Android repositories -> conserve included quotas; no paid fallback automatically.
-Codemagic -> optional verified-free emergency fallback only, never assumed free by default.
+GLOBAL RELEASE RULE
+Permanent Release = approved MADRE. LAB and CANDIDATA use temporary test artifacts. Never overwrite an existing MADRE release asset/tag. A latest pointer may identify the newest immutable MADRE but may not replace historical storage.
 
-DELIVERY RULE
-Public UAB Android repositories -> stable GitHub Release with fixed asset names is mandatory as authoritative delivery; temporary Actions artifacts and ChatGPT attachments are secondary only.
+GLOBAL ENGINE RULE
+All current and future projects follow UAB-CORE-V1 and UAB_ADAPTER_SPEC_V1. Any workflow that conflicts is legacy until aligned.
 
-ENGINE RULE - MANDATORY FOR ALL PROJECTS
-UAB_ENGINE_CONTRACT.txt is part of the routing contract for every current and future project.
-1. Persistent safe cache must be enabled whenever the build ecosystem supports it.
-2. Android/Gradle routes must use provider Gradle caching plus --build-cache unless an adapter documents a real incompatibility.
-3. Web/Node routes must persist package-manager download caches when safe.
-4. Every substantial modification/build must expose a real milestone-based percentage in chat and, where applicable, in CI logs via UAB_PROGRESS=<number>.
-5. The standard milestone ladder is 5/15/30/45/60/75/85/95/100, with non-applicable phases removed and percentages recalculated for non-build work.
-6. Never report 100% until the requested outcome is verified.
+GLOBAL CACHE RULE
+Persistent safe cache is mandatory where supported.
+
+GLOBAL PROGRESS RULE
+5/15/30/45/60/75/85/95/100 default milestone ladder, recalculated when phases do not apply. Never report 100% before verification.
