@@ -1,0 +1,65 @@
+UAB ENGINE CONTRACT - CACHE + PROGRESS
+
+Purpose
+This file defines two mandatory engine-level behaviors for Bruno's projects: persistent build acceleration and visible percentage progress. These rules are general and apply to every project that is handled through the UAB/project workflow, not only MusicLab.
+
+A. PERSISTENT CACHE - MANDATORY
+1. First-run principle: the first clean build may be slow because dependencies, tools and build outputs must be downloaded/generated.
+2. Subsequent-run principle: every supported workflow must reuse safe persistent caches whenever the provider supports them.
+3. Android/Gradle projects:
+   - Use the official Gradle setup/cache action on GitHub Actions.
+   - Invoke Gradle with --build-cache unless a project adapter explicitly documents an incompatibility.
+   - Preserve dependency/tool caches across runs; do not delete provider caches merely to obtain a clean build.
+   - Do not cache secrets, signing passwords, plaintext keystores or user-sensitive data.
+   - 'clean' may be used when required by a project, but it must not disable the persistent Gradle build cache.
+4. Node/web projects:
+   - Cache the package manager download cache (npm/pnpm/yarn as appropriate) using a key derived from the dependency manifest/lock state.
+   - Never cache secrets or deployment credentials.
+5. Auxiliary tools:
+   - Cache repeatable tool downloads such as protoc, pip wheels or equivalent when safe and useful.
+6. Cache fallback:
+   - A cache miss must never make the build fail. It only means that run behaves like a first run and repopulates the cache.
+7. Cache invalidation:
+   - Keys must change when relevant dependency/toolchain inputs change. Do not deliberately reuse incompatible cache state.
+8. No false speed promises:
+   - A warm-cache build should normally be faster, but source changes, invalidation, provider eviction or non-cacheable tasks can still require full work.
+
+B. VISIBLE PROGRESS PERCENTAGE - MANDATORY
+1. Every substantial modification/build task must expose a current completion percentage to Bruno while work is in progress.
+2. Percentage is based on completed milestones, not elapsed clock time and not an invented ETA.
+3. Default full modification + build + delivery scale:
+   5%  request accepted / scope locked
+   15% source state recovered and protected baseline identified
+   30% requested code/config changes applied
+   45% static checks and source-level verification completed
+   60% preflight completed and cache/toolchain ready
+   75% build/compilation completed
+   85% artifact/runtime verification completed
+   95% stable publication or final handoff prepared
+   100% requested work verified and delivered
+4. Non-build work:
+   - Remove non-applicable phases and proportionally recalculate progress across the real work plan.
+   - Never hold a task at an arbitrary build percentage when no build is required.
+5. Failure behavior:
+   - Keep the last verified percentage and identify the failing phase.
+   - Do not show 100% until the user's requested outcome is actually verified.
+6. Interactive reporting:
+   - In chat, report meaningful percentage changes when a milestone is completed or the active phase materially changes.
+   - Avoid spamming identical percentages.
+7. CI/log reporting:
+   - UAB-enabled build scripts/workflows should emit machine-readable markers in the form UAB_PROGRESS=<number> plus a short phase description.
+8. Cross-project rule:
+   - The percentage contract applies to MusicLab, GeoVision, StudyBook and future projects. Project adapters may refine milestones but may not remove percentage reporting.
+
+C. ONBOARDING REQUIREMENT
+Any new project added to UAB must declare:
+- cache technology used;
+- dependency/toolchain inputs that invalidate cache;
+- progress milestone mapping;
+- whether build and stable delivery are required.
+A project is not considered fully onboarded until these are defined.
+
+D. PRIORITY
+This contract is mandatory alongside UAB_GLOBAL_APK_POLICY.txt and UAB_PROJECT_ROUTING.txt. If an older project workflow lacks these behaviors, it should be upgraded before being considered fully UAB-compliant.
+
+Last updated: 2026-09-24.
