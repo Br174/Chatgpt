@@ -8,11 +8,14 @@ Last verified: 2026-09-24.
 Repository: Br174/MusicLab
 Visibility: PUBLIC
 Project class: Android native (Kotlin/Compose/Gradle)
-Current approved baseline/MADRE: stable-musiclab-lab01-build52 (MusicLab LAB 112726 stable base, commit family anchored at 770849ff...).
+Current approved MADRE: mother/musiclab-112726.
+Source stable ref: stable-musiclab-lab01-build52.
+Source commit: 770849ff543289de3adffe5bab62bc09528d19f4.
 LAB rule: every new MusicLab experiment starts from the current MADRE; LAB uses parallel-install application ID.
 CANDIDATA rule: rebuild cleanly from MADRE with only proven LAB changes; run audio playback plus requested-feature regression gates.
 MADRE release rule: only approved candidate becomes a new immutable permanent Release. Do not overwrite prior MADRE assets.
 Primary remote build route: standard GitHub Actions.
+Current UAB adapter workflow: lifecycle-aware build_quick.yml on active LAB line; LAB/CANDIDATA -> temporary artifact, mother/* -> immutable Release.
 Patch/repack: forbidden by default for native Kotlin/Compose changes.
 Cache: official Gradle cache + --build-cache.
 Progress: UAB_PROGRESS milestones mandatory.
@@ -23,7 +26,7 @@ Repository: Br174/GeoVision-Test
 Visibility: PUBLIC
 Project class: Android hybrid (HTML/JavaScript/assets + Android wrapper)
 Established lifecycle vocabulary already exists in repository: madre/*, lab/*, candidate/*, with some historical premadre/* branches.
-Current stable family includes madre/023-stabile and other preserved historical Mothers; the exact current MADRE must be confirmed before each new experiment.
+Current adapter baseline: madre/023-stabile; before any new experiment confirm that this is still the user-approved current MADRE because newer stable/test workflows may exist without formal promotion.
 LAB rule: start directly from confirmed MADRE.
 CANDIDATA rule: rebuild cleanly from MADRE with only proven patch(es), preserving the tested Google card/runtime baseline and adapter-defined regressions.
 MADRE release rule: approved candidate only; immutable permanent release/version.
@@ -42,6 +45,7 @@ LAB rule: feature work branches from current MADRE reference.
 CANDIDATA rule: clean branch from MADRE with only approved LAB changes; run full StudyBook automated test suite.
 MADRE rule: promotion updates stable source/deployment state; no Android APK unless a real Android wrapper is added.
 Primary build/test route: standard GitHub Actions.
+Workflow now recognizes main, lab/*, candidate/* and mother/* and keeps LAB/CANDIDATA outputs temporary.
 Cache: npm download cache + prefer-offline.
 Progress: mandatory.
 Deployment route remains a project adapter detail; lifecycle remains UAB CORE.
@@ -53,18 +57,20 @@ Project class: Android Mobile/TV source project
 Current MADRE reference: main until an explicit immutable Mother ref is frozen under UAB CORE.
 LAB/CANDIDATA rule: same UAB lifecycle; experimental builds must not replace an approved Mother binary.
 Special adapter duties: stable signing key, Mobile/TV layout builds, package/version validation, Downloader publishing handoff.
+Workflow now recognizes main, lab/*, candidate/* and mother/*; permanent private/public publishing is gated to mother/* only.
+Approved Mother publishing uses unique immutable private tag visionflix-madre-<build> and unique public Downloader tag verlezza-tv-<build>.
 Primary route: local/safe path first when practical; otherwise GitHub Actions within included private-repo allowance.
-Cache: Gradle cache mandatory; preserve signing identity outside unsafe caches.
+Cache: Gradle cache + --build-cache mandatory; preserve signing identity outside unsafe caches.
 Progress: mandatory.
 Paid overage: forbidden without explicit approval.
-Legacy private tv-latest overwrite behavior is not an authoritative MADRE store under UAB CORE and should be replaced by immutable versioned Mothers before next promotion.
+Legacy private tv-latest overwrite behavior is DEPRECATED and no longer present in the UAB-CORE adapter workflow.
 
 5. streamflix-BV
 Repository: Br174/streamflix-BV
 Actual visibility at last verification: PUBLIC. Historical target was PRIVATE; visibility must be treated as live metadata and changed only by explicit decision.
 Project class: delivery/distribution repository for Verlezza Vision TV, not a separate app-engine authority.
 Role under UAB CORE: thin delivery adapter only.
-Current public publishing workflow already uses unique version tags for Downloader-facing releases; that pattern is compatible with immutable-history rules when each underlying release is preserved.
+Public Downloader releases use unique version tags; this is compatible with immutable-history rules when each underlying release is preserved.
 Stable Downloader pointer may continue to use GitHub latest-release semantics because underlying release tags remain unique.
 This repository must not define a separate MADRE/LAB engine for Visionflix source.
 
@@ -72,7 +78,7 @@ This repository must not define a separate MADRE/LAB engine for Visionflix sourc
 Repository: Br174/Chatgpt
 Visibility: PRIVATE
 Project class: UAB control/registry repository
-Role: canonical UAB CORE policy, lifecycle, adapter specification, project routing and artifact registry.
+Role: canonical UAB CORE policy, lifecycle, adapter specification, project routing and state/artifact registry.
 Do not build an app from this repository.
 Canonical files:
 - UAB_UNIFIED_ENGINE_V1.txt
@@ -80,6 +86,7 @@ Canonical files:
 - UAB_ENGINE_CONTRACT.txt
 - UAB_GLOBAL_APK_POLICY.txt
 - UAB_PROJECT_ROUTING.txt
+- UAB_STATE_REGISTRY.txt
 
 GLOBAL ROUTING RULES
 1. Re-check repository visibility before a build.
