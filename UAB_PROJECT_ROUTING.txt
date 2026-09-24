@@ -1,7 +1,7 @@
-UAB PROJECT ROUTING - UAB-CORE-V1
+UAB PROJECT ROUTING - UAB-CORE-V1.1
 
 Purpose
-Repository-specific adapter/routing state for the single UAB engine. No repository gets an independent lifecycle engine. All projects follow MADRE -> LAB -> CANDIDATA -> NEW MADRE.
+Repository-specific adapter/routing state for the single UAB engine. No repository gets an independent lifecycle engine. All projects follow MADRE -> LAB -> CANDIDATA -> NEW MADRE using the atomic/exact-promotion method in UAB_UNIFIED_ENGINE_V1.txt.
 Last verified: 2026-09-24.
 
 1. MusicLab
@@ -11,15 +11,16 @@ Project class: Android native (Kotlin/Compose/Gradle)
 Current approved MADRE: mother/musiclab-112726.
 Source stable ref: stable-musiclab-lab01-build52.
 Source commit: 770849ff543289de3adffe5bab62bc09528d19f4.
-LAB rule: every new MusicLab experiment starts from the current MADRE; LAB uses parallel-install application ID.
-CANDIDATA rule: rebuild cleanly from MADRE with only proven LAB changes; run audio playback plus requested-feature regression gates.
+LAB rule: every new MusicLab experiment starts from the current MADRE and contains one requested modification or one small inseparable change-set; LAB uses parallel-install application ID.
+CANDIDATA rule: create fresh from the exact same MADRE used by the approved LAB and replay exactly the same approved change-set; run audio playback plus requested-feature regression gates.
+MADRE rule: after explicit approval, the new MADRE source ref points to the exact approved CANDIDATA source SHA; no extra source rebuild/commit is allowed during promotion.
 MADRE release rule: only approved candidate becomes a new immutable permanent Release. Do not overwrite prior MADRE assets.
 Primary remote build route: standard GitHub Actions.
 Current UAB adapter workflow: lifecycle-aware build_quick.yml on active LAB line; LAB/CANDIDATA -> temporary artifact, mother/* -> immutable Release.
 Patch/repack: forbidden by default for native Kotlin/Compose changes.
 Cache: official Gradle cache + --build-cache.
 Progress: UAB_PROGRESS milestones mandatory.
-Legacy note: fixed uab-musiclab-lab-latest overwrite delivery is DEPRECATED and not an authoritative UAB-CORE-V1 promotion path.
+Legacy note: fixed uab-musiclab-lab-latest overwrite delivery is DEPRECATED and not an authoritative UAB-CORE-V1.1 promotion path.
 
 2. GeoVision-Test
 Repository: Br174/GeoVision-Test
@@ -27,9 +28,9 @@ Visibility: PUBLIC
 Project class: Android hybrid (HTML/JavaScript/assets + Android wrapper)
 Established lifecycle vocabulary already exists in repository: madre/*, lab/*, candidate/*, with some historical premadre/* branches.
 Current adapter baseline: madre/023-stabile; before any new experiment confirm that this is still the user-approved current MADRE because newer stable/test workflows may exist without formal promotion.
-LAB rule: start directly from confirmed MADRE.
-CANDIDATA rule: rebuild cleanly from MADRE with only proven patch(es), preserving the tested Google card/runtime baseline and adapter-defined regressions.
-MADRE release rule: approved candidate only; immutable permanent release/version.
+LAB rule: start directly from confirmed MADRE with one requested modification or one tightly related change-set.
+CANDIDATA rule: create fresh from the exact same MADRE used by the approved LAB and replay exactly the same proven patch/change-set, preserving the tested Google card/runtime baseline and adapter-defined regressions.
+MADRE rule: approved Candidate source SHA becomes the new MADRE source ref; immutable permanent release/version, with no extra source changes during promotion.
 Primary remote full-build route: standard GitHub Actions.
 Fast route: adapter-approved patch/repack for HTML/JS/assets-only changes when signature/package/update compatibility is preserved.
 Cache: Gradle --build-cache + pip/tool caches where useful.
@@ -41,11 +42,11 @@ Repository: Br174/StudyBook-AI
 Visibility: PUBLIC
 Project class: web/PWA (Vite/Node; Cloudflare migration context)
 Current MADRE reference: main until Bruno explicitly freezes/names a stable Mother branch/tag.
-LAB rule: feature work branches from current MADRE reference.
-CANDIDATA rule: clean branch from MADRE with only approved LAB changes; run full StudyBook automated test suite.
-MADRE rule: promotion updates stable source/deployment state; no Android APK unless a real Android wrapper is added.
+LAB rule: feature work branches from current MADRE reference with one requested modification or one inseparable change-set.
+CANDIDATA rule: fresh branch from the exact same MADRE used by the approved LAB, replaying exactly the same approved change-set; run full StudyBook automated test suite.
+MADRE rule: approved Candidate source SHA becomes the new stable source reference; no extra source commit merely for promotion. No Android APK unless a real Android wrapper is added.
 Primary build/test route: standard GitHub Actions.
-Workflow now recognizes main, lab/*, candidate/* and mother/* and keeps LAB/CANDIDATA outputs temporary.
+Workflow recognizes main, lab/*, candidate/* and mother/* and keeps LAB/CANDIDATA outputs temporary.
 Cache: npm download cache + prefer-offline.
 Progress: mandatory.
 Deployment route remains a project adapter detail; lifecycle remains UAB CORE.
@@ -55,9 +56,11 @@ Repository: Br174/Visionflix
 Visibility: PRIVATE
 Project class: Android Mobile/TV source project
 Current MADRE reference: main until an explicit immutable Mother ref is frozen under UAB CORE.
-LAB/CANDIDATA rule: same UAB lifecycle; experimental builds must not replace an approved Mother binary.
+LAB rule: one requested modification/change-set from current MADRE; experimental builds must not replace an approved Mother binary.
+CANDIDATA rule: fresh from the exact same MADRE used by the approved LAB and replay exactly the same approved change-set.
+MADRE rule: approved Candidate source SHA becomes new Mother source ref. Final signing/packaging may differ only as adapter-declared packaging metadata, never application source.
 Special adapter duties: stable signing key, Mobile/TV layout builds, package/version validation, Downloader publishing handoff.
-Workflow now recognizes main, lab/*, candidate/* and mother/*; permanent private/public publishing is gated to mother/* only.
+Workflow recognizes main, lab/*, candidate/* and mother/*; permanent private/public publishing is gated to mother/* only.
 Approved Mother publishing uses unique immutable private tag visionflix-madre-<build> and unique public Downloader tag verlezza-tv-<build>.
 Primary route: local/safe path first when practical; otherwise GitHub Actions within included private-repo allowance.
 Cache: Gradle cache + --build-cache mandatory; preserve signing identity outside unsafe caches.
@@ -95,11 +98,17 @@ GLOBAL ROUTING RULES
 4. Codemagic -> verified-free emergency fallback only.
 5. Project-specific workflows are adapters/mechanics only and cannot override lifecycle/promotion rules.
 
+GLOBAL EXACT-PROMOTION RULE
+1. LAB = current MADRE + one requested modification (or one small inseparable change-set).
+2. CANDIDATA = exact same MADRE + exact same approved LAB change-set, rebuilt fresh rather than renamed from LAB.
+3. NEW MADRE source ref = exact approved CANDIDATA source SHA after explicit approval.
+4. If this identity chain cannot be proven, promotion stops.
+
 GLOBAL RELEASE RULE
 Permanent Release = approved MADRE. LAB and CANDIDATA use temporary test artifacts. Never overwrite an existing MADRE release asset/tag. A latest pointer may identify the newest immutable MADRE but may not replace historical storage.
 
 GLOBAL ENGINE RULE
-All current and future projects follow UAB-CORE-V1 and UAB_ADAPTER_SPEC_V1. Any workflow that conflicts is legacy until aligned.
+All current and future projects follow UAB-CORE-V1.1 and UAB-ADAPTER-SPEC-V1.1. Any workflow that conflicts is legacy until aligned.
 
 GLOBAL CACHE RULE
 Persistent safe cache is mandatory where supported.
