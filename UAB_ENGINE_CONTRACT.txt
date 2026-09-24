@@ -1,9 +1,28 @@
-UAB ENGINE CONTRACT - CACHE + PROGRESS
+UAB ENGINE CONTRACT - UNIFIED CORE
 
 Purpose
-This file defines two mandatory engine-level behaviors for Bruno's projects: persistent build acceleration and visible percentage progress. These rules are general and apply to every project that is handled through the UAB/project workflow, not only MusicLab.
+This file defines mandatory engine-level behavior for every Bruno project handled through UAB. It applies to Android, hybrid Android, web/PWA and delivery projects. Project-specific workflows are adapters, not independent engines.
 
-A. PERSISTENT CACHE - MANDATORY
+A. SINGLE ENGINE LIFECYCLE - MANDATORY
+1. Canonical lifecycle: MADRE -> LAB -> CANDIDATA -> NEW MADRE.
+2. The current MADRE is the last user-approved stable state and is immutable.
+3. Every LAB starts directly from the current MADRE unless Bruno explicitly requests continuation of an existing LAB.
+4. A failed/corrupted LAB is discarded; do not make a new LAB from that failed lineage by default.
+5. A CANDIDATA is rebuilt cleanly from the current MADRE with only the changes proven useful in LAB.
+6. A CANDIDATA becomes a NEW MADRE only after regression checks and explicit user approval.
+7. Historical MADRI remain preserved as rollback points.
+8. Project adapters may customize mechanics but may not override these lifecycle rules.
+9. UAB_UNIFIED_ENGINE_V1.txt is the canonical lifecycle/state-machine definition.
+10. UAB_ADAPTER_SPEC_V1.txt is the canonical adapter schema.
+
+B. RELEASE IMMUTABILITY - MANDATORY
+1. GitHub permanent Releases are a deposit of approved good versions (MADRI), not a scratch area for experiments.
+2. LAB and CANDIDATA binaries are temporary test artifacts until promotion is approved.
+3. An immutable MADRE tag/asset must never be replaced with --clobber, overwrite_files=true or equivalent.
+4. A 'latest' mechanism may exist only as a pointer to the newest immutable MADRE; it must not be the sole storage location and must not erase history.
+5. Downloader-style URLs may rely on GitHub's latest-release pointer only when every underlying release is uniquely tagged and preserved.
+
+C. PERSISTENT CACHE - MANDATORY
 1. First-run principle: the first clean build may be slow because dependencies, tools and build outputs must be downloaded/generated.
 2. Subsequent-run principle: every supported workflow must reuse safe persistent caches whenever the provider supports them.
 3. Android/Gradle projects:
@@ -13,7 +32,7 @@ A. PERSISTENT CACHE - MANDATORY
    - Do not cache secrets, signing passwords, plaintext keystores or user-sensitive data.
    - 'clean' may be used when required by a project, but it must not disable the persistent Gradle build cache.
 4. Node/web projects:
-   - Cache the package manager download cache (npm/pnpm/yarn as appropriate) using a key derived from the dependency manifest/lock state.
+   - Cache the package manager download cache (npm/pnpm/yarn as appropriate) using a key derived from dependency state.
    - Never cache secrets or deployment credentials.
 5. Auxiliary tools:
    - Cache repeatable tool downloads such as protoc, pip wheels or equivalent when safe and useful.
@@ -24,22 +43,21 @@ A. PERSISTENT CACHE - MANDATORY
 8. No false speed promises:
    - A warm-cache build should normally be faster, but source changes, invalidation, provider eviction or non-cacheable tasks can still require full work.
 
-B. VISIBLE PROGRESS PERCENTAGE - MANDATORY
+D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
 1. Every substantial modification/build task must expose a current completion percentage to Bruno while work is in progress.
 2. Percentage is based on completed milestones, not elapsed clock time and not an invented ETA.
 3. Default full modification + build + delivery scale:
    5%  request accepted / scope locked
-   15% source state recovered and protected baseline identified
-   30% requested code/config changes applied
-   45% static checks and source-level verification completed
+   15% current MADRE identified and protected
+   30% requested LAB/config changes applied
+   45% static/source checks completed
    60% preflight completed and cache/toolchain ready
-   75% build/compilation completed
-   85% artifact/runtime verification completed
-   95% stable publication or final handoff prepared
-   100% requested work verified and delivered
+   75% build/test output completed
+   85% artifact + regression verification completed
+   95% candidate/handoff or promotion package ready
+   100% requested state verified and delivered
 4. Non-build work:
    - Remove non-applicable phases and proportionally recalculate progress across the real work plan.
-   - Never hold a task at an arbitrary build percentage when no build is required.
 5. Failure behavior:
    - Keep the last verified percentage and identify the failing phase.
    - Do not show 100% until the user's requested outcome is actually verified.
@@ -49,17 +67,27 @@ B. VISIBLE PROGRESS PERCENTAGE - MANDATORY
 7. CI/log reporting:
    - UAB-enabled build scripts/workflows should emit machine-readable markers in the form UAB_PROGRESS=<number> plus a short phase description.
 8. Cross-project rule:
-   - The percentage contract applies to MusicLab, GeoVision, StudyBook and future projects. Project adapters may refine milestones but may not remove percentage reporting.
+   - The percentage contract applies to MusicLab, GeoVision, StudyBook, Visionflix/streamflix and future projects.
 
-C. ONBOARDING REQUIREMENT
+E. REGRESSION GATES - MANDATORY
+1. Each project adapter must define critical unrelated functions that must remain healthy before a CANDIDATA can become MADRE.
+2. A feature-specific success is insufficient if it breaks another core function.
+3. Serious regression means the experimental lineage is rejected and the current MADRE remains authoritative.
+
+F. ONBOARDING REQUIREMENT
 Any new project added to UAB must declare:
-- cache technology used;
-- dependency/toolchain inputs that invalidate cache;
+- project class and current MADRE reference;
+- LAB/CANDIDATA/MADRE naming/prefixes;
+- cache technology and invalidation inputs;
 - progress milestone mapping;
-- whether build and stable delivery are required.
-A project is not considered fully onboarded until these are defined.
+- build/test route;
+- regression gates;
+- release/delivery mode;
+- package/signing strategy when Android is involved.
+A project is not fully onboarded until these are defined.
 
-D. PRIORITY
-This contract is mandatory alongside UAB_GLOBAL_APK_POLICY.txt and UAB_PROJECT_ROUTING.txt. If an older project workflow lacks these behaviors, it should be upgraded before being considered fully UAB-compliant.
+G. PRIORITY
+This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt and UAB_PROJECT_ROUTING.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
 
+Engine version: UAB-CORE-V1
 Last updated: 2026-09-24.
