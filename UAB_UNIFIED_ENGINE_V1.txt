@@ -1,0 +1,102 @@
+UAB UNIFIED ENGINE V1
+
+PURPOSE
+This is the single lifecycle/control model for every Bruno project handled through UAB. Projects may differ in language, build system, package/signing rules and delivery channel, but they do not get independent lifecycle engines.
+
+UNIVERSAL LIFECYCLE
+MADRE -> LAB -> CANDIDATA -> NEW MADRE
+
+1. MADRE
+- The MADRE is the last user-approved, verified stable state.
+- It is immutable: do not edit, force-move, overwrite, rebuild in-place or replace its permanent release asset.
+- Every project must have one current MADRE reference, even when the project is web/PWA rather than Android.
+- Historical MADRI remain preserved.
+- For Android projects, a MADRE permanent GitHub Release must use a unique immutable tag/version and keep APK/ZIP/checksums permanently.
+- For web/PWA projects, the MADRE reference is the approved stable source/deployment state; the artifact type follows the project adapter.
+
+2. LAB
+- Every experiment starts directly from the current MADRE, never from a failed LAB and never from an unapproved CANDIDATA.
+- A LAB may contain experimental changes and may fail.
+- Android LAB builds must use a distinct package/application ID whenever parallel installation is required by the project adapter.
+- LAB output is temporary Actions artifact/test output only. LAB must not overwrite or replace a MADRE release.
+- A failed LAB is abandoned. The next experiment starts again from the current MADRE unless Bruno explicitly asks to continue that exact LAB.
+
+3. CANDIDATA
+- A CANDIDATA is rebuilt cleanly from the current MADRE, applying only the changes that were proven useful in LAB.
+- Do not simply rename/promote a dirty experimental LAB branch when it contains unrelated attempts or failed intermediate work.
+- Candidate tests must cover both the requested feature and core regression gates defined by the adapter (for example audio playback, startup, navigation, signing/package identity, critical UI flows).
+- CANDIDATA remains non-authoritative until Bruno approves the real result.
+- Candidate binaries are test artifacts, not permanent MADRE releases.
+
+4. NEW MADRE
+- Promotion occurs only after candidate verification and explicit approval.
+- Promotion creates a new immutable MADRE reference and a new permanent release/version where the project has release artifacts.
+- Never delete or replace the previous MADRE when promoting a new one.
+- The previous MADRE remains an immediate rollback point.
+
+RELEASE STORAGE RULE
+GitHub Releases are a deposit of good, approved versions.
+- Permanent Releases are for MADRI only, unless an adapter explicitly defines another approved-release class.
+- No fixed tag/asset may overwrite a previous MADRE binary.
+- Do not use --clobber, overwrite_files=true or equivalent against an immutable MADRE tag.
+- A 'latest' concept may exist only as metadata/pointer to the newest immutable MADRE. It must not be the sole storage location and must never destroy the previous binary.
+- Downloader-style stable URLs may use GitHub's latest-release pointer while each underlying release tag remains unique and immutable.
+
+ONE ENGINE / MANY ADAPTERS
+UAB CORE owns:
+- lifecycle state and promotion rules;
+- progress percentages;
+- cache requirements;
+- free-first provider routing;
+- immutable release policy;
+- artifact verification and checksums;
+- rollback/history rules;
+- rule that 100% means verified completion only.
+
+Each project adapter may define only project-specific mechanics:
+- project type (Android, hybrid, web/PWA, delivery-only);
+- build/test commands or workflow;
+- safe patch/repack capability;
+- package/application ID strategy;
+- signing requirements;
+- cache implementation;
+- regression gates;
+- artifact names/types;
+- deployment/delivery destination.
+
+An adapter may not override MADRE immutability, LAB-from-MADRE, clean CANDIDATA reconstruction, approval-before-MADRE, or permanent history retention.
+
+PROGRESS CONTRACT
+Default milestones:
+5 accepted/scope locked
+15 current MADRE identified and protected
+30 LAB/config changes applied
+45 source/static checks complete
+60 cache/toolchain/preflight ready
+75 build/test output complete
+85 regression/artifact verification complete
+95 candidate/handoff or promotion package ready
+100 requested state verified and delivered
+Non-applicable steps are removed and progress recalculated. Never claim 100% on a failed or unverified result.
+
+CACHE CONTRACT
+Every adapter must use safe persistent cache when supported. Android/Gradle routes use official Gradle caching and --build-cache unless documented incompatible. Node/web routes persist package-manager download cache. Cache misses are allowed and repopulate automatically.
+
+ROUTING CONTRACT
+- Public repositories: standard GitHub-hosted runners are the normal remote route.
+- Private repositories: conserve included allowance; no automatic paid overage.
+- Codemagic: emergency verified-free fallback only, never default.
+- Real project/code failures are diagnosed; do not blindly rerun the same broken build on another provider.
+
+REGRESSION RULE
+A feature-specific change is not acceptable if it breaks an unrelated core function. Candidate verification must include the project's adapter-defined core health checks before promotion.
+
+ROLLBACK RULE
+If a LAB or CANDIDATA introduces a serious regression, discard it and return to the current MADRE. Do not repair on top of a corrupted experimental lineage unless Bruno explicitly chooses that path.
+
+SINGLE-SOURCE-OF-TRUTH RULE
+Br174/Chatgpt is the private UAB control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt and UAB_PROJECT_ROUTING.txt define the canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
+
+ENGINE VERSION
+UAB-CORE-V1
+Established: 2026-09-24
