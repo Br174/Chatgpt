@@ -1,7 +1,7 @@
 UNIVERSAL APK REQUEST POLICY - GLOBAL
 
 SCOPE
-This policy is the canonical APK/ZIP request flow for Bruno's Android projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass the routing and cost rules below.
+This policy is the canonical APK/ZIP request flow for Bruno's Android projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass the routing, cost and delivery rules below.
 
 CORE PRINCIPLES
 1. ARTIFACT-FIRST. Before any new build, check whether a verified APK/ZIP already exists for the same source state.
@@ -10,6 +10,7 @@ CORE PRINCIPLES
 4. PRIVATE-REPO CONSERVATION. For a private repository, preserve included quotas: use local or adapter-approved patch/repack first when practical, then GitHub Actions only while included free allowance is available, then Codemagic only if the exact selected machine/account is confirmed to consume free allowance.
 5. FAIL FAST. Availability, authorization, quota, runner, signing and toolchain checks must fail quickly before a long build starts.
 6. DIAGNOSE CODE FAILURES. If a genuine build starts and fails because of project code, dependencies, signing or packaging, stop and diagnose the project failure instead of repeating the same broken build on another provider.
+7. STABLE DELIVERY. Large APK/ZIP files must not rely on ChatGPT attachment delivery as the primary retrieval channel. For public Android repositories, publish verified deliverables to a stable GitHub Release with fixed direct-download names.
 
 MANDATORY APK/ZIP FLOW
 1. Read the project's UAB adapter/routing state and determine repository visibility at request time. Do not rely on stale assumptions.
@@ -34,12 +35,15 @@ PUBLIC REPOSITORIES
 2. Do not perform a private-repository minute-quota fallback check for standard public-repository jobs; still check service availability, workflow validity, permissions, secrets and signing requirements.
 3. Do not send a public project to Codemagic merely to save GitHub minutes.
 4. Keep secrets in GitHub Actions secrets or another protected secret store. Never commit API keys, keystores, passwords or tokens in plaintext merely because the repository is public.
+5. Every UAB-enabled public Android project must define a stable GitHub Release delivery point. The preferred contract is a fixed release tag and fixed asset names for the current LAB APK and ZIP, so the direct download URL remains unchanged across builds.
+6. A public-project delivery is not complete merely because a temporary Actions artifact exists. The stable Release assets must exist and be verified.
 
 PRIVATE REPOSITORIES
 1. Prefer local or safe patch/repack when practical.
 2. GitHub Actions may be used only within the account's included free allowance unless Bruno explicitly authorizes paid use.
 3. Codemagic is a last-resort provider, not the primary engine. It may be used automatically only after confirming that the selected build machine and remaining account allowance are actually free for that build.
 4. If free allowance is exhausted, stop instead of silently switching to billable usage.
+5. Stable delivery for private projects must use an authenticated/private retrieval point or another adapter-approved channel; never make a private project's binary public merely to simplify downloads.
 
 CODEMAGIC STATUS
 Codemagic remains supported only as an optional fallback for projects that need it. It is NOT the default engine for MusicLab, GeoVision or any other public repository. A free Codemagic account does not make every runner free, so the router must verify current provider terms and remaining allowance before use.
@@ -57,11 +61,16 @@ LIVE BUILD MONITORING - MANDATORY
 7. If true short-interval monitoring cannot continue, use the best available notification/condition-watch fallback and state its real checking cadence.
 8. If a matching artifact is already ready, live monitoring is unnecessary.
 
-DELIVERY
-1. Prefer a stable, verifiable retrieval point: a project UAB manifest and/or stable GitHub Release defined by the project adapter.
-2. APK and ZIP must both be produced when the project contract requires both.
-3. Temporary GitHub Actions artifacts may be used during build verification, but do not call the delivery complete if the project's adapter requires a stable release/manifest and that publication has not happened.
-4. Never present an old APK as a newly built one.
+DELIVERY - MANDATORY
+1. PUBLIC ANDROID PROJECTS: primary delivery is a stable GitHub Release defined by the project adapter. Chat attachments are convenience copies only, never the authoritative large-file channel.
+2. Each public UAB project should expose fixed direct asset names such as <Project>-LAB-LATEST.apk and <Project>-LAB-LATEST.zip under a fixed release tag. Updating a build replaces those assets rather than forcing Bruno to discover a new link.
+3. APK and ZIP must both be produced when the project contract requires both.
+4. The Android-friendly ZIP should contain the APK as a simple top-level file, avoid unnecessary nested folders, and use a broadly compatible ZIP format. When practical, use a short ASCII internal APK name and avoid Unix-only metadata.
+5. Before publishing, verify the APK is structurally readable, the ZIP passes an integrity test, and compute SHA-256 checksums. The release metadata or manifest must record the source commit used for the binary.
+6. After publishing, verify that the stable Release contains the expected assets and that their reported sizes are plausible/non-zero. If possible, verify the downloaded asset/hash before declaring delivery complete.
+7. Temporary GitHub Actions artifacts may be used for build verification, but they are not the final delivery point for public UAB projects because they can expire and their URLs are not the user-facing stable contract.
+8. Never present an old APK as a newly built one.
+9. If direct chat download produces a truncated/corrupted file, do not keep regenerating chat ZIP variants. Switch immediately to the authoritative stable Release URL and diagnose the transfer channel separately.
 
 SECURITY
 1. Public repository source must never contain plaintext secrets.
@@ -73,4 +82,4 @@ PROJECT NEUTRALITY
 This global policy stays project-neutral. Current repository-specific routing belongs in UAB_PROJECT_ROUTING.txt. Future Android projects should be onboarded by adding/updating their adapter and routing entry instead of creating a new independent build policy.
 
 LAST POLICY UPDATE
-2026-09-24 - Public-repository routing updated: standard GitHub Actions is primary remote build path; Codemagic demoted to verified-free emergency fallback only.
+2026-09-24 - Stable delivery contract added: public Android UAB projects must publish fixed-name APK/ZIP assets to a stable GitHub Release; chat attachments are secondary only.
