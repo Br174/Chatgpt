@@ -2,7 +2,7 @@ UAB PROJECT ROUTING - UAB-CORE-V1.1
 
 Purpose
 Repository-specific adapter/routing state for the single UAB engine. No repository gets an independent lifecycle engine. All projects follow MADRE -> LAB -> CANDIDATA -> NEW MADRE using the atomic/exact-promotion method in UAB_UNIFIED_ENGINE_V1.txt.
-Last verified: 2026-09-24.
+Last verified: 2026-09-25.
 
 1. MusicLab
 Repository: Br174/MusicLab
@@ -90,6 +90,25 @@ Canonical files:
 - UAB_GLOBAL_APK_POLICY.txt
 - UAB_PROJECT_ROUTING.txt
 - UAB_STATE_REGISTRY.txt
+
+7. Cover Lab AI
+Repository: Br174/Cover-Lab-AI
+Visibility: PUBLIC
+Project class: Android native laboratory/client for Cover Lab AI engine.
+Current lifecycle baseline: main until Bruno explicitly approves the first immutable MADRE.
+Active onboarding LAB: lab/uab-onboarding-01.
+LAB rule: experiments start from current MADRE/baseline and use parallel-install package it.coverlab.ai.lab; stable package remains it.coverlab.ai.
+CANDIDATA rule: create fresh from the exact same MADRE/baseline used by the approved LAB and replay only the approved change-set.
+MADRE rule: approved Candidate source SHA becomes a new immutable Mother ref/release only after explicit approval.
+Primary remote build route: standard GitHub Actions because repository is public; workflow is an UAB adapter, not an independent engine.
+Current UAB adapter workflow: .github/workflows/android-apk.yml.
+Outputs: temporary LAB/CANDIDATA APK + ZIP + SHA-256 manifest; permanent Release only for approved MADRE.
+Patch/repack: forbidden by default because the Android laboratory is native Kotlin/Gradle.
+Cache: official Gradle cache + --build-cache.
+Regression gates: engine tests, Wrangler dry-run, Android compilation, package verification, artifact/source identity, APK+ZIP+checksum presence, no plaintext secrets.
+Control adapter: UAB_PROJECT_COVER_LAB_AI.txt.
+Progress and LIVE BUILD MONITORING: mandatory.
+Paid overage/fallback: forbidden without explicit approval.
 
 GLOBAL ROUTING RULES
 1. Re-check repository visibility before a build.
