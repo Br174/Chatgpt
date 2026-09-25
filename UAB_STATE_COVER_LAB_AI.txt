@@ -31,23 +31,20 @@ UAB ONBOARDING
 - First UAB artifact run 36112964829 succeeded, but external checksum verification exposed non-portable paths in SHA256SUMS; that artifact was not accepted as final.
 - Checksum workflow corrected and reverified.
 
-FINAL VERIFIED UAB LAB STATE
-- Source commit: eed763393a39864646d055ac566ff581483ccf54
-- Motor/Worker verification run: 36113489089
-- Motor tests: PASS
-- Wrangler dry-run: PASS
+LAST VERIFIED ANDROID UAB ARTIFACT
+- Android source/build checkpoint: eed763393a39864646d055ac566ff581483ccf54
+- Motor/Worker verification run at checkpoint: 36113489089
 - Android UAB build run: 36113489210
 - Android build: PASS
 - Package verification: it.coverlab.ai.lab PASS
-- Final artifact: 10854340004 / Cover-Lab-AI-UAB-8
+- Artifact: 10854340004 / Cover-Lab-AI-UAB-8
 - APK size: 894205 bytes
 - ZIP size: 884574 bytes
 - APK SHA-256: 8236516ef406c9c5b6a6c2569ef0367ec05b0b64f55927d9f97738b66699e7d3
-- Artifact archive digest reported by GitHub: sha256:d56d6c4c6193434e56d0f3356a98655ee98a9d82eaba42677f784d3074c87056
-- External SHA256SUMS verification after download: PASS
+- External SHA256SUMS verification: PASS
 - Inner ZIP integrity: PASS
 - Inner APK hash equals outer APK hash: PASS
-- UAB manifest source commit equals final LAB commit: PASS
+- Note: later backend/Cloudflare/D1 commits do not modify Android source, but any future APK delivery must still be rebuilt/verified from the requested current source under UAB.
 
 CLOUDFLARE / D1 STATE
 - Worker: cover-lab-ai
@@ -57,12 +54,32 @@ CLOUDFLARE / D1 STATE
 - D1 database: cover-lab-ai-db
 - D1 database ID: 4a1c0fa1-f1d0-46c8-964e-f5f2763b2c9a
 - D1 location hint/region: Europa occidentale (weur)
+- D1 read replication: disabled
 - D1 runtime binding: DB
 - Dashboard binding verification: PASS
 - GitHub LAB wrangler synchronization commit: 40dc8ce31472e7a25a84c45e28a6f3220048799c
-- Verification run after D1 sync: 36118941264
-- Motor tests after D1 sync: PASS
-- Wrangler dry-run after D1 sync: PASS
+- Worker preview configuration explicitly defines AI + D1 for LAB previews.
+
+D1 SCHEMA INITIALIZATION
+- Shared D1 initialized from UAB LAB preview after diagnostic-first correction.
+- Initial errors were isolated to D1 exec parsing of multiline SQL, not to the database binding or schema design.
+- Final initialization source commit: 44ca4c7cc4743f0adb191c71e38032dd2ca8649a
+- Initialization verification run: 36120342822
+- HTTP response: 200 / stato ok
+- Verified tables: composizioni, fonti_verifica, opere_collegate, ricerche, versioni
+- Verified versioni columns include: id_opera_musicbrainz, titolo_opera, derivazione, derivazione_tradotta
+- Temporary public initialization route removed after success.
+- Temporary initializer module removed after success.
+- Temporary draft PR #1 closed without merge.
+- Initial migrations consolidated into one idempotent baseline migration.
+- Permanent regression gate now applies the D1 migration locally on every motor verification run.
+
+CURRENT CLEAN LAB STATE
+- Current source commit: ad0017ce28d481e0d3c98f0b68ad48bb07d2a934
+- Final cleanup verification run: 36120581095
+- Motor tests: PASS (17/17)
+- Local D1 migration validation: PASS
+- Wrangler dry-run: PASS
 - main remains untouched until lifecycle promotion; dashboard production binding remains active meanwhile.
 
 PROMOTION STATE
