@@ -49,6 +49,22 @@ FINAL VERIFIED UAB LAB STATE
 - Inner APK hash equals outer APK hash: PASS
 - UAB manifest source commit equals final LAB commit: PASS
 
+CLOUDFLARE / D1 STATE
+- Worker: cover-lab-ai
+- Public URL: https://cover-lab-ai.brunoverlezza.workers.dev
+- Worker online status: operativo
+- Workers AI binding: AI connected
+- D1 database: cover-lab-ai-db
+- D1 database ID: 4a1c0fa1-f1d0-46c8-964e-f5f2763b2c9a
+- D1 location hint/region: Europa occidentale (weur)
+- D1 runtime binding: DB
+- Dashboard binding verification: PASS
+- GitHub LAB wrangler synchronization commit: 40dc8ce31472e7a25a84c45e28a6f3220048799c
+- Verification run after D1 sync: 36118941264
+- Motor tests after D1 sync: PASS
+- Wrangler dry-run after D1 sync: PASS
+- main remains untouched until lifecycle promotion; dashboard production binding remains active meanwhile.
+
 PROMOTION STATE
 - CANDIDATA: none
 - Approved MADRE: none yet
