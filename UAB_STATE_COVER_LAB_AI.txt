@@ -28,6 +28,26 @@ UAB ONBOARDING
 - Workflow changed to UAB preflight, Gradle cache, package verification, APK+ZIP creation, SHA-256 checksums and source manifest.
 - Central control adapter: UAB_PROJECT_COVER_LAB_AI.txt
 - Central routing entry: UAB_PROJECT_ROUTING.txt section Cover Lab AI
+- First UAB artifact run 36112964829 succeeded, but external checksum verification exposed non-portable paths in SHA256SUMS; that artifact was not accepted as final.
+- Checksum workflow corrected and reverified.
+
+FINAL VERIFIED UAB LAB STATE
+- Source commit: eed763393a39864646d055ac566ff581483ccf54
+- Motor/Worker verification run: 36113489089
+- Motor tests: PASS
+- Wrangler dry-run: PASS
+- Android UAB build run: 36113489210
+- Android build: PASS
+- Package verification: it.coverlab.ai.lab PASS
+- Final artifact: 10854340004 / Cover-Lab-AI-UAB-8
+- APK size: 894205 bytes
+- ZIP size: 884574 bytes
+- APK SHA-256: 8236516ef406c9c5b6a6c2569ef0367ec05b0b64f55927d9f97738b66699e7d3
+- Artifact archive digest reported by GitHub: sha256:d56d6c4c6193434e56d0f3356a98655ee98a9d82eaba42677f784d3074c87056
+- External SHA256SUMS verification after download: PASS
+- Inner ZIP integrity: PASS
+- Inner APK hash equals outer APK hash: PASS
+- UAB manifest source commit equals final LAB commit: PASS
 
 PROMOTION STATE
 - CANDIDATA: none
