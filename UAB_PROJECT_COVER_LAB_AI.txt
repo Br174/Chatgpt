@@ -1,0 +1,36 @@
+UAB CONTROL ADAPTER - COVER LAB AI
+
+UAB_ENGINE_VERSION=UAB-CORE-V1.1
+UAB_PROJECT_NAME=Cover Lab AI
+UAB_REPOSITORY=Br174/Cover-Lab-AI
+UAB_VISIBILITY=PUBLIC
+UAB_PROJECT_CLASS=android
+UAB_MOTHER_REF=main
+UAB_LAB_PREFIX=lab/
+UAB_CANDIDATE_PREFIX=candidate/
+UAB_MOTHER_PREFIX=mother/
+UAB_ACTIVE_LAB=lab/uab-onboarding-01
+UAB_BUILD_ROUTE=.github/workflows/android-apk.yml via standard GitHub-hosted runner
+UAB_CACHE_MODE=gradle --build-cache
+UAB_RELEASE_MODE=immutable-mother
+UAB_ANDROID_PACKAGE_STRATEGY=parallel-lab
+UAB_STABLE_PACKAGE=it.coverlab.ai
+UAB_LAB_PACKAGE=it.coverlab.ai.lab
+UAB_SIGNING_STRATEGY=ephemeral-lab; stable signing to be defined before first approved MADRE
+UAB_PATCH_REPACK=forbidden
+UAB_OUTPUT_TYPES=apk,zip,sha256-manifest
+UAB_CORE_REGRESSION_GATES=motore npm test, Wrangler dry-run, Android build, package verification, APK/ZIP/checksum presence, source/artifact identity, no plaintext secrets
+
+CURRENT STATE - 2026-09-25
+- Repository created public specifically to use the normal free GitHub Actions route.
+- Pre-UAB Android build run 36111808890 succeeded and produced artifact 10853861075; this is historical proof only and is not the authoritative UAB artifact for the onboarding LAB.
+- UAB onboarding LAB created from main: lab/uab-onboarding-01.
+- LAB configuration separates debug package as it.coverlab.ai.lab.
+- UAB project adapter lives in Cover-Lab-AI/UAB_PROJECT_ADAPTER.txt.
+- UAB build must create temporary APK + ZIP + SHA256SUMS + uab-manifest and verify package/source before delivery.
+- No paid route is authorized automatically.
+- No CANDIDATA exists yet.
+- No immutable MADRE release exists yet; main is the lifecycle baseline until Bruno explicitly approves the first MADRE.
+
+RULE
+This file is control/registry metadata only. Cover Lab AI must always follow the canonical UAB_GLOBAL_APK_POLICY.txt, UAB_UNIFIED_ENGINE_V1.txt and UAB_ADAPTER_SPEC_V1.txt. Project workflows are adapters, never a second independent build engine.
