@@ -28,8 +28,6 @@ UAB ONBOARDING
 - Workflow changed to UAB preflight, Gradle cache, package verification, APK+ZIP creation, SHA-256 checksums and source manifest.
 - Central control adapter: UAB_PROJECT_COVER_LAB_AI.txt
 - Central routing entry: UAB_PROJECT_ROUTING.txt section Cover Lab AI
-- First UAB artifact run 36112964829 succeeded, but external checksum verification exposed non-portable paths in SHA256SUMS; that artifact was not accepted as final.
-- Checksum workflow corrected and reverified.
 
 LAST VERIFIED ANDROID UAB ARTIFACT
 - Android source/build checkpoint: eed763393a39864646d055ac566ff581483ccf54
@@ -44,7 +42,7 @@ LAST VERIFIED ANDROID UAB ARTIFACT
 - External SHA256SUMS verification: PASS
 - Inner ZIP integrity: PASS
 - Inner APK hash equals outer APK hash: PASS
-- Note: later backend/Cloudflare/D1 commits do not modify Android source, but any future APK delivery must still be rebuilt/verified from the requested current source under UAB.
+- Note: later backend commits do not modify Android source; any future APK delivery must still be rebuilt/verified from current requested source under UAB.
 
 CLOUDFLARE / D1 STATE
 - Worker: cover-lab-ai
@@ -55,84 +53,108 @@ CLOUDFLARE / D1 STATE
 - D1 location hint/region: Europa occidentale (weur)
 - D1 read replication: disabled
 - D1 runtime binding: DB
-- Dashboard binding verification: PASS
-- GitHub LAB wrangler configuration contains D1 + AI bindings for production configuration and LAB previews.
-- main remains untouched; backend 0.3.0 is still LAB-only.
+- GitHub LAB wrangler configuration contains D1 + AI bindings and LAB preview configuration.
+- main remains untouched; production Worker remains on the old main lifecycle state.
 
 D1 BASE SCHEMA
-- Shared D1 initial schema previously initialized and verified.
+- Shared D1 initial schema initialized and verified.
 - Base tables: composizioni, fonti_verifica, opere_collegate, ricerche, versioni.
-- versioni includes: id_opera_musicbrainz, titolo_opera, derivazione, derivazione_tradotta.
-- Permanent regression gate applies D1 migrations locally on every motor verification run.
+- versioni includes id_opera_musicbrainz, titolo_opera, derivazione, derivazione_tradotta.
+- Permanent regression gate applies all repository D1 migrations locally on every motor verification run.
 
-COVER LAB AI 0.3.0 - ARCHIVIO VIVO LAB
+COVER LAB AI 0.3.0 - ARCHIVIO VIVO
 Product rules fixed in LAB design:
 - No fixed maximum number of cover versions per composition.
 - Archive accelerates responses but never replaces later fresh searches.
-- Music Lab consumes the archive in pages of 20 results with progressive/infinite loading.
-- A cached Music Lab request may return immediately while a fresh deep search is scheduled in the background.
+- Music Lab consumes archive pages of 20 with progressive/infinite loading.
+- Cached requests can return immediately while fresh search is scheduled in background.
 - Requested songs are re-enqueued with high priority for future verification.
-- Archive Vivo uses a work queue and scan history; work is batched for free-tier safety, not capped by cover count.
+- Archive Vivo uses batched work for free-tier safety, never a global cover-count cap.
 
-Permanent LAB files/components:
+Permanent components:
 - migrations/0002_archivio_vivo.sql
 - src/dati/archivio-vivo.js
 - src/motore/archivio-vivo.js
 - Worker scheduled() handler
-- GET /api/versioni pagination endpoint (20 records max per response)
-- wrangler cron configuration: */30 * * * *
+- GET /api/versioni, 20 records max per response
+- wrangler cron: */30 * * * *
 - default work batch: 1 composition per scheduled turn
 - default recheck: 168 hours
-- error retry delay: 6 hours
+- error retry: 6 hours
 - initial Italian seed queue: 10 compositions
 
 D1 ARCHIVIO VIVO REMOTE INITIALIZATION
-- 0002-equivalent schema was applied to the shared remote D1 from a temporary idempotent LAB endpoint, then that endpoint/module was removed.
+- 0002-equivalent schema applied to shared remote D1 from a temporary idempotent LAB endpoint.
 - Remote tables verified: coda_archivio_vivo, configurazione_archivio_vivo, scansioni_archivio_vivo.
-- Configuration verified: enabled=1, Music Lab page size=20, recheck=168h, retry=6h, batch=1.
-- Initial Italian seed entries verified: 10.
-- Remote verification workflow run: 36142877419 PASS.
-- First autonomous test cycle: Nel blu dipinto di blu - Domenico Modugno.
-- Result: stato pronto; 146 versions archived from the currently available source path.
-- Before cycle: 0 archived; after cycle: 146; new: 146.
-- Cycle duration: about 26.2 seconds.
-- Queue state after cycle: da_ricontrollare; cycles completed=1; next check scheduled 168h later.
-- Temporary migration/status/run endpoints removed after verification.
-- Temporary remote Archivio Vivo workflow removed after verification.
+- Remote verification workflow: 36142877419 PASS.
+- First autonomous test: Nel blu dipinto di blu - Domenico Modugno.
+- Result: 146 versions archived; duration about 26.2 seconds.
+- Queue rescheduled for future recheck.
+- Temporary 0002 migration/status/run endpoints removed after verification.
 
 MUSICBRAINZ PROVIDER HARDENING
-- MusicBrainz remains only one provider, not the intended final discovery engine.
+- MusicBrainz is one complementary provider, never the whole engine.
 - Composition discovery no longer stops at the first recording lacking a work relation.
 - Direct work lookup + multi-recording fallback implemented.
-- Transient HTTP 429/500/502/503/504 retries implemented with progressive delay and Retry-After support.
-- Invalid browse include 'releases' removed; first-release-date used where available.
-- Regression test for transient 503 retry added.
-- Sapore di sale real LAB test: run 36142465902 PASS.
-- Correct work identified: e94fdfad-2d84-3cab-9152-3746a4c98162.
-- Real deep search at that checkpoint found 3 usable entries from the MusicBrainz-only path in about 40.2 seconds; this confirms the need for the planned multi-source engine rather than treating MusicBrainz as complete.
-- GET /api/versioni returned the archived result correctly with limit=20.
+- Transient 429/500/502/503/504 retries implemented.
+- Invalid browse include 'releases' removed.
+- Sapore di sale real LAB test run 36142465902 PASS.
+- Correct work: e94fdfad-2d84-3cab-9152-3746a4c98162.
+- MusicBrainz-only deep search found 3 entries in about 40.2 seconds, confirming the need for multi-source discovery.
 
-CURRENT CLEAN LAB STATE
-- Current source commit: 8c67132998b19e6a0e238ec51abab29ce2be61c3
-- Final cleanup verification run: 36143211376
-- Motor tests: PASS 19/19
-- Local D1 migrations 0001 + 0002: PASS
-- Wrangler dry-run: PASS
-- Temporary MusicBrainz diagnostic workflow: removed
-- Temporary real-search workflow: removed
-- Temporary Archivio Vivo remote workflow: removed
-- Temporary migration module/routes: removed
-- Cron is configured in LAB source; do not claim production scheduled execution is active until the corresponding lifecycle promotion/deployment occurs.
+COVER LAB AI 0.4.x - MULTI-SOURCE ORCHESTRATOR
+- migrations/0003_orchestratore_multifonte.sql created and validated.
+- Remote 0003-equivalent tables already verified in shared D1: stato_scoperta_composizione, strategie_scoperta, candidati_scoperta, fonti_candidato.
+- AI discovery generates strategies for youtube, web and cataloghi and stores hypotheses separately from final versions.
+- AI hypotheses are capped only per turn for latency; there is NO fixed global catalog limit.
+- 0.4.1 changed AI discovery to small repeatable batches with explicit timeouts so Archivio Vivo can continue across future turns.
+- YouTube provider adapter exists with pagination/cursor support.
+- YOUTUBE_API_KEY is not configured yet; provider waits without consuming strategy pages.
+- Candidate hypotheses are never exposed by /api/versioni until verified.
+- Multi-source unit/regression suite reached 23/23 PASS before 0.5 work.
+
+CLOUDFLARE PREVIEW BLOCKER
+- Cloudflare GitHub preview stopped publishing new LAB commits after successful preview commit 42fbff8.
+- GitHub Actions continue to execute normally and pass.
+- Closing/reopening draft PR #1 and creating a fresh temporary draft PR #2 did not trigger a new Cloudflare preview.
+- PR #2 was closed without merge.
+- Treat this as external preview/deployment integration blocker, not as an engine test failure.
+- Do not touch or merge main merely to force a preview.
+- Temporary multi-source remote-test routes/workflow remain in LAB only until a future preview can complete the pending remote verification/cleanup.
+
+COVER LAB AI 0.5.0 - CANDIDATE VERIFICATION + CREDITS
+- Current LAB version: 0.5.0.
+- migrations/0004_verifica_crediti.sql added and validated locally.
+- Candidate records now support verified confidence, verification reason and final version link.
+- crediti_versione table added for compact normalized credits.
+- Verification engine rules:
+  * AI alone can never promote a candidate.
+  * a verified structured MusicBrainz work relation can promote a candidate;
+  * coherent evidence from at least two independent provider families can promote when the configured confidence threshold is reached;
+  * repeated results from the same provider do not count as independent sources.
+- MusicBrainz candidate verifier confirms only recordings whose work relation points to the original work or a known derived/adapted work.
+- Verified candidates are promoted into versioni and their evidence is copied into fonti_verifica.
+- Credits currently preserve verified performer plus known original composer when available; future providers can append further roles without duplicating the version.
+- GET /api/versioni enrichment now returns sources and credits together with each of the maximum 20 displayed versions.
+- Safety gate: if remote 0004 schema is not present, candidate promotion returns migration_verifica_non_applicata and does not partially promote.
+- Final 0.5.0 regression: 28/28 tests PASS.
+- Local migrations 0001 + 0002 + 0003 + 0004: PASS.
+- Wrangler dry-run: PASS.
+- Final 0.5.0 verification run on commit 76f61b2f39ed5e22d84d9f6ac41daffe1c9375c9: PASS (push run 36165786311).
+- Remote application/verification of 0004 remains pending only because Cloudflare preview deployment integration is currently stuck.
+
+PROJECT PROGRESS
+- User-facing project completion percentage after verified 0.5.0 block: 78%.
+- Percentage must be reported after meaningful verified blocks.
 
 NEXT BACKEND MILESTONE
-- Build the real multi-source discovery/orchestration layer.
-- MusicBrainz must remain one complementary provider only.
-- Add additional discovery providers (YouTube/platform search where permitted/configured, general web/source adapters, and other metadata/catalog providers).
-- AI should generate/expand candidate cover searches, then sources verify/enrich candidates, deduplication consolidates them, and D1 preserves verified knowledge.
-- No single external provider may become a single point of failure.
+- Expand actual provider coverage beyond MusicBrainz: activate YouTube with a free API key when available; add web/catalog adapters that fit free-tier policy.
+- Continue collecting richer credit roles from providers.
+- Resolve/retry Cloudflare preview integration, apply/verify remote 0004, then remove temporary LAB diagnostic routes/workflow.
+- Benchmark speed and recall across Italian, international, translated-title and rare-cover cases.
 
 PROMOTION STATE
 - CANDIDATA: none
-- Approved MADRE: none yet
+- Approved MADRE: none
 - main: unchanged
-- Do not promote, merge to main, or create permanent Release until Bruno explicitly approves a verified CANDIDATA.
+- Do not promote, merge to main or create permanent Release until Bruno explicitly approves a verified CANDIDATA.
