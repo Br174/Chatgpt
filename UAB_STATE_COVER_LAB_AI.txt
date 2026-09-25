@@ -3,158 +3,249 @@ Last updated: 2026-09-25
 
 Repository: Br174/Cover-Lab-AI
 Visibility: PUBLIC
-Project class: Android native laboratory/client + Cloudflare Worker backend
-Lifecycle baseline: main until first explicit approved MADRE
+Project class: Android native diagnostic client + Cloudflare Worker intelligence backend
+Lifecycle: MADRE -> LAB -> CANDIDATA -> NEW MADRE
 Active LAB: lab/uab-onboarding-01
 Stable package: it.coverlab.ai
 LAB package: it.coverlab.ai.lab
-Primary build route: standard GitHub Actions under UAB CORE
-Workflow adapter: .github/workflows/android-apk.yml
-Output policy: LAB/CANDIDATA -> temporary APK + ZIP + SHA-256 + uab-manifest; MADRE -> immutable release only after explicit approval
-Cache: Gradle cache + --build-cache
-Patch/repack: forbidden by default
-Paid route: not authorized automatically
+Production main: UNCHANGED
+CANDIDATA: none
+Approved MADRE: none
+Promotion rule: never merge/promote without Bruno's explicit approval.
 
-PRE-UAB HISTORICAL BUILD
-- Run: 36111808890
-- Result: success
-- Artifact: 10853861075
-- Purpose: proof that Android source compiled before UAB onboarding; not authoritative for the UAB LAB.
-
-UAB ONBOARDING
-- LAB created from main: lab/uab-onboarding-01
-- UAB adapter added to application repository.
-- Debug/LAB applicationId suffix: .lab
-- Workflow changed to UAB preflight, Gradle cache, package verification, APK+ZIP creation, SHA-256 checksums and source manifest.
-- Central control adapter: UAB_PROJECT_COVER_LAB_AI.txt
-- Central routing entry: UAB_PROJECT_ROUTING.txt section Cover Lab AI
-
-LAST VERIFIED ANDROID UAB ARTIFACT
-- Android source/build checkpoint: eed763393a39864646d055ac566ff581483ccf54
-- Motor/Worker verification run at checkpoint: 36113489089
-- Android UAB build run: 36113489210
-- Android build: PASS
-- Package verification: it.coverlab.ai.lab PASS
-- Artifact: 10854340004 / Cover-Lab-AI-UAB-8
-- APK size: 894205 bytes
-- ZIP size: 884574 bytes
-- APK SHA-256: 8236516ef406c9c5b6a6c2569ef0367ec05b0b64f55927d9f97738b66699e7d3
-- External SHA256SUMS verification: PASS
-- Inner ZIP integrity: PASS
-- Inner APK hash equals outer APK hash: PASS
-- Note: later backend commits do not modify Android source; any future APK delivery must still be rebuilt/verified from current requested source under UAB.
-
-CLOUDFLARE / D1 STATE
-- Worker: cover-lab-ai
-- Public production URL: https://cover-lab-ai.brunoverlezza.workers.dev
-- Workers AI binding: AI connected
-- D1 database: cover-lab-ai-db
-- D1 database ID: 4a1c0fa1-f1d0-46c8-964e-f5f2763b2c9a
-- D1 location hint/region: Europa occidentale (weur)
-- D1 read replication: disabled
-- D1 runtime binding: DB
-- GitHub LAB wrangler configuration contains D1 + AI bindings and LAB preview configuration.
-- main remains untouched; production Worker remains on the old main lifecycle state.
-
-D1 BASE SCHEMA
-- Shared D1 initial schema initialized and verified.
-- Base tables: composizioni, fonti_verifica, opere_collegate, ricerche, versioni.
-- versioni includes id_opera_musicbrainz, titolo_opera, derivazione, derivazione_tradotta.
-- Permanent regression gate applies all repository D1 migrations locally on every motor verification run.
-
-COVER LAB AI 0.3.0 - ARCHIVIO VIVO
-Product rules fixed in LAB design:
-- No fixed maximum number of cover versions per composition.
-- Archive accelerates responses but never replaces later fresh searches.
-- Music Lab consumes archive pages of 20 with progressive/infinite loading.
-- Cached requests can return immediately while fresh search is scheduled in background.
-- Requested songs are re-enqueued with high priority for future verification.
-- Archive Vivo uses batched work for free-tier safety, never a global cover-count cap.
-
-Permanent components:
-- migrations/0002_archivio_vivo.sql
-- src/dati/archivio-vivo.js
-- src/motore/archivio-vivo.js
-- Worker scheduled() handler
-- GET /api/versioni, 20 records max per response
-- wrangler cron: */30 * * * *
-- default work batch: 1 composition per scheduled turn
-- default recheck: 168 hours
-- error retry: 6 hours
-- initial Italian seed queue: 10 compositions
-
-D1 ARCHIVIO VIVO REMOTE INITIALIZATION
-- 0002-equivalent schema applied to shared remote D1 from a temporary idempotent LAB endpoint.
-- Remote tables verified: coda_archivio_vivo, configurazione_archivio_vivo, scansioni_archivio_vivo.
-- Remote verification workflow: 36142877419 PASS.
-- First autonomous test: Nel blu dipinto di blu - Domenico Modugno.
-- Result: 146 versions archived; duration about 26.2 seconds.
-- Queue rescheduled for future recheck.
-- Temporary 0002 migration/status/run endpoints removed after verification.
-
-MUSICBRAINZ PROVIDER HARDENING
-- MusicBrainz is one complementary provider, never the whole engine.
-- Composition discovery no longer stops at the first recording lacking a work relation.
-- Direct work lookup + multi-recording fallback implemented.
-- Transient 429/500/502/503/504 retries implemented.
-- Invalid browse include 'releases' removed.
-- Sapore di sale real LAB test run 36142465902 PASS.
-- Correct work: e94fdfad-2d84-3cab-9152-3746a4c98162.
-- MusicBrainz-only deep search found 3 entries in about 40.2 seconds, confirming the need for multi-source discovery.
-
-COVER LAB AI 0.4.x - MULTI-SOURCE ORCHESTRATOR
-- migrations/0003_orchestratore_multifonte.sql created and validated.
-- Remote 0003-equivalent tables already verified in shared D1: stato_scoperta_composizione, strategie_scoperta, candidati_scoperta, fonti_candidato.
-- AI discovery generates strategies for youtube, web and cataloghi and stores hypotheses separately from final versions.
-- AI hypotheses are capped only per turn for latency; there is NO fixed global catalog limit.
-- 0.4.1 changed AI discovery to small repeatable batches with explicit timeouts so Archivio Vivo can continue across future turns.
-- YouTube provider adapter exists with pagination/cursor support.
-- YOUTUBE_API_KEY is not configured yet; provider waits without consuming strategy pages.
-- Candidate hypotheses are never exposed by /api/versioni until verified.
-- Multi-source unit/regression suite reached 23/23 PASS before 0.5 work.
-
-CLOUDFLARE PREVIEW BLOCKER
-- Cloudflare GitHub preview stopped publishing new LAB commits after successful preview commit 42fbff8.
-- GitHub Actions continue to execute normally and pass.
-- Closing/reopening draft PR #1 and creating a fresh temporary draft PR #2 did not trigger a new Cloudflare preview.
-- PR #2 was closed without merge.
-- Treat this as external preview/deployment integration blocker, not as an engine test failure.
-- Do not touch or merge main merely to force a preview.
-- Temporary multi-source remote-test routes/workflow remain in LAB only until a future preview can complete the pending remote verification/cleanup.
-
-COVER LAB AI 0.5.0 - CANDIDATE VERIFICATION + CREDITS
-- Current LAB version: 0.5.0.
-- migrations/0004_verifica_crediti.sql added and validated locally.
-- Candidate records now support verified confidence, verification reason and final version link.
-- crediti_versione table added for compact normalized credits.
-- Verification engine rules:
-  * AI alone can never promote a candidate.
-  * a verified structured MusicBrainz work relation can promote a candidate;
-  * coherent evidence from at least two independent provider families can promote when the configured confidence threshold is reached;
-  * repeated results from the same provider do not count as independent sources.
-- MusicBrainz candidate verifier confirms only recordings whose work relation points to the original work or a known derived/adapted work.
-- Verified candidates are promoted into versioni and their evidence is copied into fonti_verifica.
-- Credits currently preserve verified performer plus known original composer when available; future providers can append further roles without duplicating the version.
-- GET /api/versioni enrichment now returns sources and credits together with each of the maximum 20 displayed versions.
-- Safety gate: if remote 0004 schema is not present, candidate promotion returns migration_verifica_non_applicata and does not partially promote.
-- Final 0.5.0 regression: 28/28 tests PASS.
-- Local migrations 0001 + 0002 + 0003 + 0004: PASS.
-- Wrangler dry-run: PASS.
-- Final 0.5.0 verification run on commit 76f61b2f39ed5e22d84d9f6ac41daffe1c9375c9: PASS (push run 36165786311).
-- Remote application/verification of 0004 remains pending only because Cloudflare preview deployment integration is currently stuck.
+============================================================
+CURRENT VERIFIED STATE - COVER LAB AI 0.7.0
+============================================================
 
 PROJECT PROGRESS
-- User-facing project completion percentage after verified 0.5.0 block: 78%.
-- Percentage must be reported after meaningful verified blocks.
+- Verified project completion: 99%.
+- Remaining practical gate before 100%: Bruno installs and tests the connected LAB APK on a real Android device and reports the result; any issue found must be fixed before candidate promotion.
 
-NEXT BACKEND MILESTONE
-- Expand actual provider coverage beyond MusicBrainz: activate YouTube with a free API key when available; add web/catalog adapters that fit free-tier policy.
-- Continue collecting richer credit roles from providers.
-- Resolve/retry Cloudflare preview integration, apply/verify remote 0004, then remove temporary LAB diagnostic routes/workflow.
-- Benchmark speed and recall across Italian, international, translated-title and rare-cover cases.
+CLOUDFLARE LAB
+- Worker: cover-lab-ai
+- Production URL remains: https://cover-lab-ai.brunoverlezza.workers.dev
+- Production main was not touched.
+- Active LAB preview URL:
+  https://lab-uab-onboarding-01-cover-lab-ai.brunoverlezza.workers.dev
+- Cloudflare GitHub Workers Builds is functioning again for the LAB branch.
+- Latest strict remote smoke test run: 36195305722 PASS.
+- Remote test verifies:
+  * engine version 0.7.0 is reachable;
+  * Regista AI is exposed;
+  * diagnostic free search is exposed;
+  * result self-check is exposed;
+  * no global cover-count cap;
+  * Music Lab page size = maximum 20;
+  * archive returns real cover records, not only HTTP success;
+  * diagnostic free-text query resolves a composition and returns real versions.
 
-PROMOTION STATE
-- CANDIDATA: none
-- Approved MADRE: none
-- main: unchanged
-- Do not promote, merge to main or create permanent Release until Bruno explicitly approves a verified CANDIDATA.
+D1
+- Database: cover-lab-ai-db
+- Database ID: 4a1c0fa1-f1d0-46c8-964e-f5f2763b2c9a
+- Runtime binding: DB
+- Workers AI binding: AI
+- LAB preview intentionally uses the shared D1 during testing.
+- Archivio Vivo stores metadata/evidence only, never media.
+- Known real archive check: Nel blu dipinto di blu - Domenico Modugno has archived versions and passes the strict remote smoke test.
+
+LATEST BACKEND VERIFICATION
+- Branch checkpoint: 3a17481e95434374e479a8868f36c71c8984c70a
+- Verification run: 36195310539 PASS
+- Automatic tests: PASS
+- Local D1 migration validation: PASS
+- Cloudflare Worker package validation: PASS
+- Strict remote LAB smoke test: PASS
+- Temporary __lab-* HTTP endpoints removed.
+- Obsolete src/dati/lab-migra-multifonte.js removed.
+- Remote LAB smoke workflow remains as a permanent QA gate for relevant backend changes.
+
+============================================================
+LOCKED PRODUCT RULES
+============================================================
+
+NO MEDIA PLAYBACK IN COVER LAB
+- Cover Lab never downloads, streams, embeds, stores or plays audio/video.
+- Platforms are sources of data, metadata, IDs, relationships and evidence only.
+- Flow: platforms -> metadata/evidence -> Cover Lab analyzes/verifies -> archive -> Music Lab.
+- Music Lab remains responsible for playback/consumption.
+
+YOUTUBE REFERENCE RULE
+- YouTube is a first-class discovery/evidence source.
+- If Cover Lab discovers a cover directly on YouTube during its normal discovery work, it preserves/passes the already-found YouTube ID/reference to Music Lab.
+- If a cover is discovered on Apple, MusicBrainz, Internet Archive, Web or another source, Cover Lab does NOT perform an extra YouTube lookup merely to resolve a playable video.
+- Music Lab can perform its own normal YouTube/YouTube Music lookup in that case.
+- If the same version is later naturally encountered on YouTube, that reference can then be associated.
+
+NO GLOBAL COVER LIMIT
+- There is no fixed total numeric maximum for cover/adaptation/version discovery or archive size.
+- Per-turn limits exist only for latency/runtime/provider safety.
+- Archivio Vivo continues discovery in future waves.
+- Temporary saturation of one wave never means the global catalog is complete forever.
+- Music Lab displays results progressively in pages of 20; 20 is a display/page limit, never a discovery limit.
+
+AI ROLE - REGISTA AI
+- AI is the research director, not merely a post-filter.
+- AI self-interrogates before source search.
+- It generates hypotheses and research questions about:
+  * Italian and international covers;
+  * translations and localized titles;
+  * completely different adaptation titles;
+  * countries/languages;
+  * performers;
+  * authors, adapters and translators;
+  * years and metadata;
+  * live/instrumental/remix/karaoke when relevant.
+- AI knowledge generates candidate pistes; AI memory alone is never final verification.
+- Real sources/evidence are used to confirm or refute hypotheses.
+- Discoveries can generate new questions and searches.
+
+CONFLICT INVESTIGATION
+- Conflicting metadata is not silently overwritten.
+- A conflict triggers an AI investigation and targeted source searches.
+- Example: different years may represent composition, publication, first recording or an actual error.
+- AI cannot close a conflict from internal memory alone; evidence is required.
+- If evidence remains insufficient, the datum remains uncertain/in investigation.
+
+============================================================
+IMPLEMENTED ENGINE BLOCKS
+============================================================
+
+- Persistent D1 Archivio Vivo.
+- Background/scheduled archive queue.
+- Source Router.
+- Standard provider registry.
+- Circuit breaker, fallback and retry.
+- Provider health.
+- MusicBrainz structured discovery/verification.
+- Apple catalog discovery provider, no key required.
+- YouTube discovery/evidence provider; API key still optional/config-dependent.
+- Internet Archive metadata/search provider; never media download.
+- Deterministic baseline search strategies.
+- AI self-interrogation / Regista AI agenda.
+- Multi-source candidate discovery.
+- Anti-zero logic: one source returning zero never certifies zero covers.
+- Candidate/evidence separation from verified versions.
+- Multi-source verification and credits.
+- Confidence separate from verification state in output model.
+- Conflict detection and AI investigation queueing.
+- Smart freshness/reopening.
+- Search/result strategy memory foundation.
+- Advanced conservative deduplication:
+  * certain duplicates are merged;
+  * probable duplicates are preserved and flagged;
+  * live/studio/remix/instrumental distinctions are protected;
+  * different interpreters are not merged merely because titles match.
+- Result self-check:
+  * suspicious zero;
+  * incomplete search;
+  * missing essential metadata;
+  * unresolved conflicts;
+  * probable duplicates;
+  * suspicious single-source coverage;
+  * can trigger further background multi-source search.
+- Media/Music Lab policy enforced in code.
+- Internal evolution-plan registry.
+- Automatic remote LAB smoke test.
+
+============================================================
+DIAGNOSTIC APK
+============================================================
+
+Purpose:
+- Manual testing of Cover Lab only.
+- It is NOT Music Lab and contains no player.
+
+UI:
+- One free-text search field: "Titolo, artista, anno…"
+- Button: "CERCA COVER"
+- Examples accepted/targeted:
+  * Sapore di sale
+  * Gino Paoli, Sapore di sale
+  * Sapore di sale, Gino Paoli, 1963
+- AI interprets the free request only to identify the composition.
+- The normal Cover Lab verification engine then searches/returns versions.
+- Ambiguous input must not fabricate a composition.
+- Displays original + cover/version metadata.
+- Displays interpreter, title, year, type, language, country, confidence/verification and sources when available.
+- No audio/video playback.
+- "CERCA ALTRE VERSIONI" continues discovery.
+
+Android configuration:
+- Android LAB version: 0.7.0-lab
+- applicationId: it.coverlab.ai.lab
+- Only DEBUG/LAB points to the Cloudflare LAB preview URL.
+- Release/default build remains deliberately unconfigured for the LAB URL, protecting future MADRE/production separation.
+
+LATEST VERIFIED ANDROID UAB ARTIFACT
+- Android source checkpoint: be3598c89cc961974acf206cce09481f7394ceba
+- Android UAB build run: 36195029214 PASS
+- Artifact ID/name: 10890345338 / Cover-Lab-AI-UAB-10
+- Package verification: it.coverlab.ai.lab PASS
+- Artifact outer digest: sha256:1ad091c55500aa5c39ffef7177d8660ad85c592ef835608762b14e4d061f38e1
+- APK SHA-256: ca14c1f99bab1fe8d27cd64858136336ec764050fa76c57e779c96a0501e5074
+- Inner APK ZIP SHA-256: b71e91ae80a321bb2e99fcd2cb3bde9618022e1257abf4b5df3f6c791ddb3c26
+- UAB ZIP integrity: PASS
+- UAB checksum creation/verification: PASS
+- Artifact includes APK, APK-only ZIP, SHA256SUMS and uab-manifest.
+
+============================================================
+PROVIDER / SEARCH NOTES
+============================================================
+
+MusicBrainz
+- Complementary provider, never the complete engine.
+- Direct work lookup + recording fallback + retry hardening implemented.
+
+Apple
+- Public search/catalog provider without project API key.
+- Used as metadata/evidence source, never as playback target for Music Lab.
+
+YouTube
+- Discovery/evidence metadata source.
+- Can pass already-found video ID/reference to Music Lab only when discovered there naturally.
+- YOUTUBE_API_KEY may still be reported as chiave_da_configurare when not configured; this does not turn another provider's zero into a global zero.
+
+Internet Archive
+- Search/index metadata only.
+- No media payload retrieval.
+
+Web expansion
+- Architecture supports additional providers.
+- General Web coverage remains an extensible area; do not falsely claim literal exhaustive Internet completeness.
+
+============================================================
+D1 MIGRATIONS / HYGIENE NOTE
+============================================================
+
+Known migration files include:
+- 0001_struttura_iniziale.sql
+- 0002_archivio_vivo.sql
+- 0003_orchestratore_multifonte.sql
+- 0004_verifica_crediti.sql
+- 0005_freschezza_multifonte.sql
+- 0005_salute_provider.sql
+- 0006_espansione_fonti.sql
+- 0007_conflitti_versione.sql
+
+There is a historical duplicate numeric prefix 0005.
+- Local migration validation currently passes.
+- Do not casually rename an already potentially-applied remote migration without checking D1 migration state because migration filenames are deployment state.
+
+============================================================
+FINAL GATE
+============================================================
+
+Ready now:
+- Backend LAB: verified.
+- Cloudflare LAB preview: verified.
+- Archive with real cover results: verified remotely.
+- Free-text diagnostic route: verified remotely.
+- Android LAB APK: compiled, package-checked, ZIP-checked and connected to LAB preview.
+
+Before 100% / before CANDIDATA:
+1. Bruno installs UAB-10 LAB APK on a real Android device.
+2. Bruno performs manual searches (recommended first: "Domenico Modugno, Nel blu dipinto di blu" and then "Gino Paoli, Sapore di sale").
+3. Confirm UI/results/latency are acceptable and report any regression.
+4. Only after explicit Bruno approval may a CANDIDATA be prepared.
+
+Production/main remains untouched throughout.
