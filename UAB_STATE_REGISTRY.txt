@@ -39,7 +39,8 @@ MusicLab
 - Parser-v2-Q2 package check: it.verlezza.musiclab.lab.creditsfm01v2q2
 - Parser-v2-Q2 APK size: 48,460,615 bytes; APK structure, signature and parallel package verified by build workflow.
 - Parser-v2-Q2 scope check: final diff versus MADRE remains exactly the same three Credits.fm/cover files above; no audio/player/service/Innertube application file changed.
-- Active LAB functional status: V2-Q2 technically verified and awaiting Bruno real-device quantity test. Date/year and full credit metadata are deliberately deferred to later controlled iterations after quantity coverage is proven.
+- Parser-v2-Q2 real-device result on 2026-09-25 for "Sapore di sale": Credits.fm OK; 13 found, 12 resolved, 12 used; diagnostic path 12 source ISRC candidates -> 1 ISWC -> 32 linked recordings -> 0 from title search; final cover results 16. Conclusion: Q2 improved coverage through the normal V2 path, but the new paginated title-search matching contributed zero records and still needs correction before promotion.
+- Active LAB functional status: V2-Q2 technically verified and real-device tested, but quantity coverage remains incomplete; not approved for CANDIDATA. Date/year and full credit metadata remain deferred until quantity coverage is proven.
 - Future approved sequence after quantity coverage: Credits.fm date/year + full credits metadata; then separate LAB for MusicLab artist/album/credits identity navigation using Credits.fm as primary metadata identity source; then separate LAB for 20-at-a-time cover loading with background prefetch and "Cerca ancora".
 - CANDIDATA: none. Do not create a candidate until Bruno explicitly approves the LAB. When approved, create candidate fresh from MADRE commit 770849ff543289de3adffe5bab62bc09528d19f4 and replay the exact approved three-file net application change-set; do not promote/rename the LAB branch.
 - Failed/discarded experimental line: lab-cover-repair-from-build52
