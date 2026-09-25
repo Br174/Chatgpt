@@ -3,7 +3,7 @@ Last updated: 2026-09-25
 
 Repository: Br174/Cover-Lab-AI
 Visibility: PUBLIC
-Project class: Android native laboratory/client
+Project class: Android native laboratory/client + Cloudflare Worker backend
 Lifecycle baseline: main until first explicit approved MADRE
 Active LAB: lab/uab-onboarding-01
 Stable package: it.coverlab.ai
@@ -48,8 +48,7 @@ LAST VERIFIED ANDROID UAB ARTIFACT
 
 CLOUDFLARE / D1 STATE
 - Worker: cover-lab-ai
-- Public URL: https://cover-lab-ai.brunoverlezza.workers.dev
-- Worker online status: operativo
+- Public production URL: https://cover-lab-ai.brunoverlezza.workers.dev
 - Workers AI binding: AI connected
 - D1 database: cover-lab-ai-db
 - D1 database ID: 4a1c0fa1-f1d0-46c8-964e-f5f2763b2c9a
@@ -57,32 +56,83 @@ CLOUDFLARE / D1 STATE
 - D1 read replication: disabled
 - D1 runtime binding: DB
 - Dashboard binding verification: PASS
-- GitHub LAB wrangler synchronization commit: 40dc8ce31472e7a25a84c45e28a6f3220048799c
-- Worker preview configuration explicitly defines AI + D1 for LAB previews.
+- GitHub LAB wrangler configuration contains D1 + AI bindings for production configuration and LAB previews.
+- main remains untouched; backend 0.3.0 is still LAB-only.
 
-D1 SCHEMA INITIALIZATION
-- Shared D1 initialized from UAB LAB preview after diagnostic-first correction.
-- Initial errors were isolated to D1 exec parsing of multiline SQL, not to the database binding or schema design.
-- Final initialization source commit: 44ca4c7cc4743f0adb191c71e38032dd2ca8649a
-- Initialization verification run: 36120342822
-- HTTP response: 200 / stato ok
-- Verified tables: composizioni, fonti_verifica, opere_collegate, ricerche, versioni
-- Verified versioni columns include: id_opera_musicbrainz, titolo_opera, derivazione, derivazione_tradotta
-- Temporary public initialization route removed after success.
-- Temporary initializer module removed after success.
-- Temporary draft PR #1 closed without merge.
-- Initial migrations consolidated into one idempotent baseline migration.
-- Permanent regression gate now applies the D1 migration locally on every motor verification run.
+D1 BASE SCHEMA
+- Shared D1 initial schema previously initialized and verified.
+- Base tables: composizioni, fonti_verifica, opere_collegate, ricerche, versioni.
+- versioni includes: id_opera_musicbrainz, titolo_opera, derivazione, derivazione_tradotta.
+- Permanent regression gate applies D1 migrations locally on every motor verification run.
+
+COVER LAB AI 0.3.0 - ARCHIVIO VIVO LAB
+Product rules fixed in LAB design:
+- No fixed maximum number of cover versions per composition.
+- Archive accelerates responses but never replaces later fresh searches.
+- Music Lab consumes the archive in pages of 20 results with progressive/infinite loading.
+- A cached Music Lab request may return immediately while a fresh deep search is scheduled in the background.
+- Requested songs are re-enqueued with high priority for future verification.
+- Archive Vivo uses a work queue and scan history; work is batched for free-tier safety, not capped by cover count.
+
+Permanent LAB files/components:
+- migrations/0002_archivio_vivo.sql
+- src/dati/archivio-vivo.js
+- src/motore/archivio-vivo.js
+- Worker scheduled() handler
+- GET /api/versioni pagination endpoint (20 records max per response)
+- wrangler cron configuration: */30 * * * *
+- default work batch: 1 composition per scheduled turn
+- default recheck: 168 hours
+- error retry delay: 6 hours
+- initial Italian seed queue: 10 compositions
+
+D1 ARCHIVIO VIVO REMOTE INITIALIZATION
+- 0002-equivalent schema was applied to the shared remote D1 from a temporary idempotent LAB endpoint, then that endpoint/module was removed.
+- Remote tables verified: coda_archivio_vivo, configurazione_archivio_vivo, scansioni_archivio_vivo.
+- Configuration verified: enabled=1, Music Lab page size=20, recheck=168h, retry=6h, batch=1.
+- Initial Italian seed entries verified: 10.
+- Remote verification workflow run: 36142877419 PASS.
+- First autonomous test cycle: Nel blu dipinto di blu - Domenico Modugno.
+- Result: stato pronto; 146 versions archived from the currently available source path.
+- Before cycle: 0 archived; after cycle: 146; new: 146.
+- Cycle duration: about 26.2 seconds.
+- Queue state after cycle: da_ricontrollare; cycles completed=1; next check scheduled 168h later.
+- Temporary migration/status/run endpoints removed after verification.
+- Temporary remote Archivio Vivo workflow removed after verification.
+
+MUSICBRAINZ PROVIDER HARDENING
+- MusicBrainz remains only one provider, not the intended final discovery engine.
+- Composition discovery no longer stops at the first recording lacking a work relation.
+- Direct work lookup + multi-recording fallback implemented.
+- Transient HTTP 429/500/502/503/504 retries implemented with progressive delay and Retry-After support.
+- Invalid browse include 'releases' removed; first-release-date used where available.
+- Regression test for transient 503 retry added.
+- Sapore di sale real LAB test: run 36142465902 PASS.
+- Correct work identified: e94fdfad-2d84-3cab-9152-3746a4c98162.
+- Real deep search at that checkpoint found 3 usable entries from the MusicBrainz-only path in about 40.2 seconds; this confirms the need for the planned multi-source engine rather than treating MusicBrainz as complete.
+- GET /api/versioni returned the archived result correctly with limit=20.
 
 CURRENT CLEAN LAB STATE
-- Current source commit: ad0017ce28d481e0d3c98f0b68ad48bb07d2a934
-- Final cleanup verification run: 36120581095
-- Motor tests: PASS (17/17)
-- Local D1 migration validation: PASS
+- Current source commit: 8c67132998b19e6a0e238ec51abab29ce2be61c3
+- Final cleanup verification run: 36143211376
+- Motor tests: PASS 19/19
+- Local D1 migrations 0001 + 0002: PASS
 - Wrangler dry-run: PASS
-- main remains untouched until lifecycle promotion; dashboard production binding remains active meanwhile.
+- Temporary MusicBrainz diagnostic workflow: removed
+- Temporary real-search workflow: removed
+- Temporary Archivio Vivo remote workflow: removed
+- Temporary migration module/routes: removed
+- Cron is configured in LAB source; do not claim production scheduled execution is active until the corresponding lifecycle promotion/deployment occurs.
+
+NEXT BACKEND MILESTONE
+- Build the real multi-source discovery/orchestration layer.
+- MusicBrainz must remain one complementary provider only.
+- Add additional discovery providers (YouTube/platform search where permitted/configured, general web/source adapters, and other metadata/catalog providers).
+- AI should generate/expand candidate cover searches, then sources verify/enrich candidates, deduplication consolidates them, and D1 preserves verified knowledge.
+- No single external provider may become a single point of failure.
 
 PROMOTION STATE
 - CANDIDATA: none
 - Approved MADRE: none yet
-- Do not promote or create permanent Release until Bruno explicitly approves a verified CANDIDATA.
+- main: unchanged
+- Do not promote, merge to main, or create permanent Release until Bruno explicitly approves a verified CANDIDATA.
