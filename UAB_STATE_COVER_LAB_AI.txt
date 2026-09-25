@@ -1,0 +1,35 @@
+UAB STATE - COVER LAB AI
+Last updated: 2026-09-25
+
+Repository: Br174/Cover-Lab-AI
+Visibility: PUBLIC
+Project class: Android native laboratory/client
+Lifecycle baseline: main until first explicit approved MADRE
+Active LAB: lab/uab-onboarding-01
+Stable package: it.coverlab.ai
+LAB package: it.coverlab.ai.lab
+Primary build route: standard GitHub Actions under UAB CORE
+Workflow adapter: .github/workflows/android-apk.yml
+Output policy: LAB/CANDIDATA -> temporary APK + ZIP + SHA-256 + uab-manifest; MADRE -> immutable release only after explicit approval
+Cache: Gradle cache + --build-cache
+Patch/repack: forbidden by default
+Paid route: not authorized automatically
+
+PRE-UAB HISTORICAL BUILD
+- Run: 36111808890
+- Result: success
+- Artifact: 10853861075
+- Purpose: proof that Android source compiled before UAB onboarding; not authoritative for the UAB LAB.
+
+UAB ONBOARDING
+- LAB created from main: lab/uab-onboarding-01
+- UAB adapter added to application repository.
+- Debug/LAB applicationId suffix: .lab
+- Workflow changed to UAB preflight, Gradle cache, package verification, APK+ZIP creation, SHA-256 checksums and source manifest.
+- Central control adapter: UAB_PROJECT_COVER_LAB_AI.txt
+- Central routing entry: UAB_PROJECT_ROUTING.txt section Cover Lab AI
+
+PROMOTION STATE
+- CANDIDATA: none
+- Approved MADRE: none yet
+- Do not promote or create permanent Release until Bruno explicitly approves a verified CANDIDATA.
