@@ -1,10 +1,7 @@
 UAB STATE - COVER LAB AI
-Last updated: 2026-09-25
+Last updated: 2026-09-26
 
 Repository: Br174/Cover-Lab-AI
-Visibility: PUBLIC
-Project class: Android native diagnostic client + Cloudflare Worker intelligence backend
-Lifecycle: MADRE -> LAB -> CANDIDATA -> NEW MADRE
 Active LAB: lab/uab-onboarding-01
 Stable package: it.coverlab.ai
 LAB package: it.coverlab.ai.lab
@@ -14,238 +11,134 @@ Approved MADRE: none
 Promotion rule: never merge/promote without Bruno's explicit approval.
 
 ============================================================
-CURRENT VERIFIED STATE - COVER LAB AI 0.7.0
+CURRENT VERIFIED STATE - COVER LAB AI 0.7.2
 ============================================================
 
 PROJECT PROGRESS
 - Verified project completion: 99%.
-- Remaining practical gate before 100%: Bruno installs and tests the connected LAB APK on a real Android device and reports the result; any issue found must be fixed before candidate promotion.
+- Remaining gate before 100%: Bruno installs and tests corrected LAB 0.7.2 on a real Android device.
 
-CLOUDFLARE LAB
-- Worker: cover-lab-ai
-- Production URL remains: https://cover-lab-ai.brunoverlezza.workers.dev
-- Production main was not touched.
-- Active LAB preview URL:
-  https://lab-uab-onboarding-01-cover-lab-ai.brunoverlezza.workers.dev
-- Cloudflare GitHub Workers Builds is functioning again for the LAB branch.
-- Latest strict remote smoke test run: 36195305722 PASS.
-- Remote test verifies:
-  * engine version 0.7.0 is reachable;
-  * Regista AI is exposed;
-  * diagnostic free search is exposed;
-  * result self-check is exposed;
-  * no global cover-count cap;
-  * Music Lab page size = maximum 20;
-  * archive returns real cover records, not only HTTP success;
-  * diagnostic free-text query resolves a composition and returns real versions.
+REAL-DEVICE FINDINGS FROM 0.7.0
+Bruno installed LAB 0.7.0 and observed:
+1. After searching "gino paoli sapore di sale", old Domenico Modugno results could remain visible if the new request failed/timed out.
+2. Need strict distinction between actual published/incised releases and merely recorded performances.
+3. Credits were too sparse and are considered fundamental.
+4. Multi-artist display had a concatenation defect such as "Dean MartinGus Levene".
 
-D1
-- Database: cover-lab-ai-db
-- Database ID: 4a1c0fa1-f1d0-46c8-964e-f5f2763b2c9a
-- Runtime binding: DB
-- Workers AI binding: AI
-- LAB preview intentionally uses the shared D1 during testing.
-- Archivio Vivo stores metadata/evidence only, never media.
-- Known real archive check: Nel blu dipinto di blu - Domenico Modugno has archived versions and passes the strict remote smoke test.
+0.7.2 FIXES
+- New search immediately clears unrelated previous results.
+- Request serial/token prevents an older slow response from overwriting a newer search.
+- Android read timeout increased to allow genuine new-composition searches.
+- Free-text search accepts form without comma; Archivio Vivo exact identity is checked before AI.
+- Multi-artist MusicBrainz credits are separated correctly with commas.
+- New independent axis "naturaVersione":
+  * incisione_pubblicata
+  * performance_registrata
+  * da_classificare
+- "tipo" remains separate (cover, live, strumentale, adattamento, etc.).
+- A live performance can still be a real published recording if catalog evidence exists.
+- YouTube-only presence never proves a discographic release.
+- APK UI groups results into:
+  * INCISIONI / PUBBLICAZIONI
+  * PERFORMANCE REGISTRATE
+  * DA CLASSIFICARE
+- Credits are visible under original and individual versions.
+- Credits are now persisted in Archivio Vivo, not merely displayed transiently.
+- New D1 table/migration: 0009_crediti_composizione.sql.
+- Composition credit roles supported from MusicBrainz include:
+  * compositore
+  * paroliere
+  * autore
+  * traduttore
+  * arrangiatore
+- Version credits include at minimum documented performer identity and additional work/version credits when available.
+- Unknown credits are not invented.
 
-LATEST BACKEND VERIFICATION
-- Branch checkpoint: 3a17481e95434374e479a8868f36c71c8984c70a
-- Verification run: 36195310539 PASS
-- Automatic tests: PASS
-- Local D1 migration validation: PASS
-- Cloudflare Worker package validation: PASS
-- Strict remote LAB smoke test: PASS
-- Temporary __lab-* HTTP endpoints removed.
-- Obsolete src/dati/lab-migra-multifonte.js removed.
-- Remote LAB smoke workflow remains as a permanent QA gate for relevant backend changes.
+REMOTE VERIFICATION
+- LAB preview: https://lab-uab-onboarding-01-cover-lab-ai.brunoverlezza.workers.dev
+- Strict remote smoke run: 36224650692 PASS.
+- The smoke test now requires, not merely interprets, the exact phone-style query:
+  "gino paoli sapore di sale"
+- It requires:
+  * HTTP 200
+  * state = pronto
+  * identity = Gino Paoli / Sapore di sale
+  * at least one real version returned
+  * nature classification on every returned version
+  * credits array on every returned version
+- Modugno archive test requires:
+  * real archived results
+  * max 20/page
+  * non-empty original credits
+  * non-empty per-version credits
+  * nature classification.
+- Latest full backend verification run: 36224650698 PASS.
+- Automatic engine tests: PASS.
+- Local D1 migration validation including 0009: PASS.
+- Worker packaging validation: PASS.
+
+LATEST ANDROID UAB ARTIFACT
+- Android source checkpoint: dd8fde1bb3c1cc72a7447fcd57efdcd2b84cc159
+- Android version: 0.7.2-lab
+- Android build run: 36224507355 PASS
+- Artifact: 10899619489 / Cover-Lab-AI-UAB-13
+- Package: it.coverlab.ai.lab PASS
+- APK SHA-256: 1b63f8a5540c7b2a8cb4c3376a60ffb496a54e316fed07445c9d601c81bb6fb7
+- APK-only ZIP SHA-256: de19f65f971c204b43e1c47577b6998820f138245f927e1036bb04d68bf82c16
+- Artifact outer digest: sha256:36a3e59809b8020f91075720cec96befad6d15a7098ec79b9f13ae04e3aa0082
+- Inner ZIP integrity: PASS.
 
 ============================================================
 LOCKED PRODUCT RULES
 ============================================================
 
-NO MEDIA PLAYBACK IN COVER LAB
-- Cover Lab never downloads, streams, embeds, stores or plays audio/video.
-- Platforms are sources of data, metadata, IDs, relationships and evidence only.
-- Flow: platforms -> metadata/evidence -> Cover Lab analyzes/verifies -> archive -> Music Lab.
-- Music Lab remains responsible for playback/consumption.
-
-YOUTUBE REFERENCE RULE
-- YouTube is a first-class discovery/evidence source.
-- If Cover Lab discovers a cover directly on YouTube during its normal discovery work, it preserves/passes the already-found YouTube ID/reference to Music Lab.
-- If a cover is discovered on Apple, MusicBrainz, Internet Archive, Web or another source, Cover Lab does NOT perform an extra YouTube lookup merely to resolve a playable video.
-- Music Lab can perform its own normal YouTube/YouTube Music lookup in that case.
-- If the same version is later naturally encountered on YouTube, that reference can then be associated.
+MEDIA / MUSIC LAB
+- Cover Lab never plays, downloads, streams, embeds or stores audio/video.
+- All platforms are sources of data/metadata/evidence only.
+- If Cover Lab naturally finds a version on YouTube, it may pass the already-found YouTube ID/reference to Music Lab.
+- Versions discovered elsewhere do NOT trigger an extra YouTube lookup merely to resolve media.
+- Music Lab remains responsible for playback and can do its own YouTube/YouTube Music search.
 
 NO GLOBAL COVER LIMIT
-- There is no fixed total numeric maximum for cover/adaptation/version discovery or archive size.
-- Per-turn limits exist only for latency/runtime/provider safety.
-- Archivio Vivo continues discovery in future waves.
-- Temporary saturation of one wave never means the global catalog is complete forever.
-- Music Lab displays results progressively in pages of 20; 20 is a display/page limit, never a discovery limit.
+- No fixed total cap on cover/adaptation/version discovery.
+- Limits are only per search wave/runtime/provider for stability.
+- Archivio Vivo continues in later waves and periodic rechecks.
+- Music Lab displays 20 at a time; 20 is only a paging limit.
 
-AI ROLE - REGISTA AI
-- AI is the research director, not merely a post-filter.
-- AI self-interrogates before source search.
-- It generates hypotheses and research questions about:
-  * Italian and international covers;
-  * translations and localized titles;
-  * completely different adaptation titles;
-  * countries/languages;
-  * performers;
-  * authors, adapters and translators;
-  * years and metadata;
-  * live/instrumental/remix/karaoke when relevant.
-- AI knowledge generates candidate pistes; AI memory alone is never final verification.
-- Real sources/evidence are used to confirm or refute hypotheses.
-- Discoveries can generate new questions and searches.
+REGISTA AI
+- AI self-interrogates first and is the research director.
+- It generates hypotheses/questions on countries, languages, translations, alternate titles, performers, years, credits, publication nature and variants.
+- AI memory alone is never final proof.
+- External evidence confirms/refutes hypotheses.
 
-CONFLICT INVESTIGATION
-- Conflicting metadata is not silently overwritten.
-- A conflict triggers an AI investigation and targeted source searches.
-- Example: different years may represent composition, publication, first recording or an actual error.
-- AI cannot close a conflict from internal memory alone; evidence is required.
-- If evidence remains insufficient, the datum remains uncertain/in investigation.
+CREDITS RULE
+- Credits are fundamental data, not optional decoration.
+- Composition and version credits must be preserved with source attribution when available.
+- Important roles: performer, composer, lyricist, writer, translator, adapter, arranger.
+- Missing/unverified roles remain missing or to verify; never fabricate them.
 
-============================================================
-IMPLEMENTED ENGINE BLOCKS
-============================================================
-
-- Persistent D1 Archivio Vivo.
-- Background/scheduled archive queue.
-- Source Router.
-- Standard provider registry.
-- Circuit breaker, fallback and retry.
-- Provider health.
-- MusicBrainz structured discovery/verification.
-- Apple catalog discovery provider, no key required.
-- YouTube discovery/evidence provider; API key still optional/config-dependent.
-- Internet Archive metadata/search provider; never media download.
-- Deterministic baseline search strategies.
-- AI self-interrogation / Regista AI agenda.
-- Multi-source candidate discovery.
-- Anti-zero logic: one source returning zero never certifies zero covers.
-- Candidate/evidence separation from verified versions.
-- Multi-source verification and credits.
-- Confidence separate from verification state in output model.
-- Conflict detection and AI investigation queueing.
-- Smart freshness/reopening.
-- Search/result strategy memory foundation.
-- Advanced conservative deduplication:
-  * certain duplicates are merged;
-  * probable duplicates are preserved and flagged;
-  * live/studio/remix/instrumental distinctions are protected;
-  * different interpreters are not merged merely because titles match.
-- Result self-check:
-  * suspicious zero;
-  * incomplete search;
-  * missing essential metadata;
-  * unresolved conflicts;
-  * probable duplicates;
-  * suspicious single-source coverage;
-  * can trigger further background multi-source search.
-- Media/Music Lab policy enforced in code.
-- Internal evolution-plan registry.
-- Automatic remote LAB smoke test.
-
-============================================================
-DIAGNOSTIC APK
-============================================================
-
-Purpose:
-- Manual testing of Cover Lab only.
-- It is NOT Music Lab and contains no player.
-
-UI:
-- One free-text search field: "Titolo, artista, anno…"
-- Button: "CERCA COVER"
-- Examples accepted/targeted:
-  * Sapore di sale
-  * Gino Paoli, Sapore di sale
-  * Sapore di sale, Gino Paoli, 1963
-- AI interprets the free request only to identify the composition.
-- The normal Cover Lab verification engine then searches/returns versions.
-- Ambiguous input must not fabricate a composition.
-- Displays original + cover/version metadata.
-- Displays interpreter, title, year, type, language, country, confidence/verification and sources when available.
-- No audio/video playback.
-- "CERCA ALTRE VERSIONI" continues discovery.
-
-Android configuration:
-- Android LAB version: 0.7.0-lab
-- applicationId: it.coverlab.ai.lab
-- Only DEBUG/LAB points to the Cloudflare LAB preview URL.
-- Release/default build remains deliberately unconfigured for the LAB URL, protecting future MADRE/production separation.
-
-LATEST VERIFIED ANDROID UAB ARTIFACT
-- Android source checkpoint: be3598c89cc961974acf206cce09481f7394ceba
-- Android UAB build run: 36195029214 PASS
-- Artifact ID/name: 10890345338 / Cover-Lab-AI-UAB-10
-- Package verification: it.coverlab.ai.lab PASS
-- Artifact outer digest: sha256:1ad091c55500aa5c39ffef7177d8660ad85c592ef835608762b14e4d061f38e1
-- APK SHA-256: ca14c1f99bab1fe8d27cd64858136336ec764050fa76c57e779c96a0501e5074
-- Inner APK ZIP SHA-256: b71e91ae80a321bb2e99fcd2cb3bde9618022e1257abf4b5df3f6c791ddb3c26
-- UAB ZIP integrity: PASS
-- UAB checksum creation/verification: PASS
-- Artifact includes APK, APK-only ZIP, SHA256SUMS and uab-manifest.
-
-============================================================
-PROVIDER / SEARCH NOTES
-============================================================
-
-MusicBrainz
-- Complementary provider, never the complete engine.
-- Direct work lookup + recording fallback + retry hardening implemented.
-
-Apple
-- Public search/catalog provider without project API key.
-- Used as metadata/evidence source, never as playback target for Music Lab.
-
-YouTube
-- Discovery/evidence metadata source.
-- Can pass already-found video ID/reference to Music Lab only when discovered there naturally.
-- YOUTUBE_API_KEY may still be reported as chiave_da_configurare when not configured; this does not turn another provider's zero into a global zero.
-
-Internet Archive
-- Search/index metadata only.
-- No media payload retrieval.
-
-Web expansion
-- Architecture supports additional providers.
-- General Web coverage remains an extensible area; do not falsely claim literal exhaustive Internet completeness.
-
-============================================================
-D1 MIGRATIONS / HYGIENE NOTE
-============================================================
-
-Known migration files include:
-- 0001_struttura_iniziale.sql
-- 0002_archivio_vivo.sql
-- 0003_orchestratore_multifonte.sql
-- 0004_verifica_crediti.sql
-- 0005_freschezza_multifonte.sql
-- 0005_salute_provider.sql
-- 0006_espansione_fonti.sql
-- 0007_conflitti_versione.sql
-
-There is a historical duplicate numeric prefix 0005.
-- Local migration validation currently passes.
-- Do not casually rename an already potentially-applied remote migration without checking D1 migration state because migration filenames are deployment state.
+PUBLISHED RECORDING VS PERFORMANCE RULE
+- A real single/album/EP/cataloged recording must be distinguished from a performance merely recorded and uploaded/archived.
+- "live" is a musical/version type, not automatically a publication status.
+- Publication evidence can make a live recording a published recording.
+- Without publication evidence, a live recording is classified as performance_registrata.
+- Ambiguous cases remain da_classificare until evidence improves.
 
 ============================================================
 FINAL GATE
 ============================================================
 
-Ready now:
-- Backend LAB: verified.
-- Cloudflare LAB preview: verified.
-- Archive with real cover results: verified remotely.
-- Free-text diagnostic route: verified remotely.
-- Android LAB APK: compiled, package-checked, ZIP-checked and connected to LAB preview.
+Backend LAB 0.7.2: verified.
+Remote Gino Paoli exact query: verified with real versions.
+Nature classification: verified.
+Credits exposure/persistence: verified structurally and remotely.
+Android LAB 0.7.2: compiled and integrity-checked.
 
-Before 100% / before CANDIDATA:
-1. Bruno installs UAB-10 LAB APK on a real Android device.
-2. Bruno performs manual searches (recommended first: "Domenico Modugno, Nel blu dipinto di blu" and then "Gino Paoli, Sapore di sale").
-3. Confirm UI/results/latency are acceptable and report any regression.
-4. Only after explicit Bruno approval may a CANDIDATA be prepared.
+Before 100% / CANDIDATA:
+1. Bruno installs Cover Lab AI LAB 0.7.2.
+2. Repeat "gino paoli sapore di sale" and confirm old Modugno results disappear immediately.
+3. Check the three visual categories and credits.
+4. Report any incorrect classification or missing/incorrect credit.
+5. Only after Bruno's explicit approval may CANDIDATA be prepared.
 
 Production/main remains untouched throughout.
