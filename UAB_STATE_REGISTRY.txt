@@ -1,59 +1,32 @@
 UAB STATE REGISTRY - UAB-CORE-V1.1
-Last updated: 2026-09-25
+Last updated: 2026-09-27
 
-This registry records lifecycle roles and promotion identity. It does not replace live GitHub refs; live metadata wins and the registry must then be updated.
+This registry records current lifecycle roles and promotion identity. It does not replace live GitHub refs; live metadata wins and the registry must then be updated. Historical registry detail remains available in Git history and must not be treated as current state.
 
 MusicLab
 - Repository: Br174/MusicLab
-- Current approved MADRE: mother/musiclab-112726
-- Source stable ref: stable-musiclab-lab01-build52
-- MADRE source commit: 770849ff543289de3adffe5bab62bc09528d19f4
-- Current approved stable family: MusicLab 112726 / build #52
-- Active atomic LAB: lab/musiclab-creditsfm-01
-- Active LAB source state after V2-Q3 temporary-tool cleanup: 55c5a08d51ca193ff62fc5d47cbbb6d84e08bc51
-- LAB requested modification: isolated Credits.fm cover/version discovery only.
-- LAB net application change-set versus MADRE: exactly three files:
-  1. app/src/main/kotlin/com/metrolist/music/ui/component/CreditsFmCoverSource.kt
-  2. app/src/main/kotlin/com/metrolist/music/ui/component/CoverHubSearchEngine.kt
-  3. app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt
-- Audio/player/service/Innertube application files changed versus MADRE: none.
-- Initial build verification run: 36061399316 (success)
-- Initial real-device regression test: audio playback confirmed working by Bruno on 2026-09-24.
-- Initial real-device Credits.fm diagnostic for "Sapore di sale": 0 found / NO_MATCH, while Bruno provided Credits.fm screenshots showing ISRC ES5089600145 linked to ISWC T0050008699.
-- Parser-v2 correction: title-only query for match=recording_title; ISRC -> ISWC expansion uses include=recordings, depth=2 and accepts both enriched recording objects and direct ISRC strings; diagnostics expose source-ISRC candidates, ISWCs and linked recordings.
-- Parser-v2 build verification run: 36064110494 (success)
-- Parser-v2 temporary LAB artifact: MusicLab-CREDITSFM-LAB-01-V2 / artifact 10835193653
-- Parser-v2 package check: it.verlezza.musiclab.lab.creditsfm01v2
-- Parser-v2 real-device result on 2026-09-25 for "Sapore di sale": Credits.fm OK; 7 found, 7 resolved, 7 used; diagnostic path 3 source ISRC candidates -> 1 ISWC -> 23 linked recordings; final cover results 14.
-- Parser-v2 real-device audio sanity test: PASS, confirmed by Bruno on 2026-09-25.
-- Parser-v3 experiment: attempted related-works expansion and batch metadata enrichment; build run 36067092077 succeeded technically, but real-device result regressed to 0 valid Credits.fm covers after 21 raw linked recordings.
-- Parser-v3 status: DISCARDED. Branch lab/musiclab-creditsfm-01 was force-restored to parser-v2 commit 088dccc1a07020dec3f6bbc5cf81493a712e428b on 2026-09-25 at Bruno's instruction.
-- Parser-v2-Q1 correction: keeps the proven parser-v2 algorithm and endpoints unchanged while widening only quantity ceilings: source recording candidates 3 -> 12; linked ISRC ceiling 60 -> 240; individual metadata fetch ceiling 18 -> 80; Credits.fm cover ceiling 80 -> 120; CoverHub Credits.fm YouTube-resolution ceiling 64 -> 120.
-- Parser-v2-Q1 build verification run: 36070210778 (success)
-- Parser-v2-Q1 temporary LAB artifact: MusicLab-CREDITSFM-LAB-01-V2Q1 / artifact 10837728482
-- Parser-v2-Q1 package check: it.verlezza.musiclab.lab.creditsfm01v2q1
-- Parser-v2-Q1 real-device result on 2026-09-25 for "Sapore di sale": 12 source ISRC candidates -> 1 ISWC -> 24 linked recordings; Credits.fm still 7 found / 7 resolved / 7 used; final cover results 15. Conclusion: simple quantity ceilings were not the main bottleneck.
-- Parser-v2-Q2 correction: extends the proven title-focused /v1/search path through pagination (up to the API 1000-result search window), keeps only recordings whose ISWC matches an already verified seed work, merges their embedded title/artist metadata into the linked-recording set, and exposes a separate "from title search" diagnostic counter. No batch enrichment and no related-works logic from discarded parser-v3 is used.
-- Parser-v2-Q2 build verification run: 36073210118 (success)
-- Parser-v2-Q2 temporary LAB artifact: MusicLab-CREDITSFM-LAB-01-V2Q2 / artifact 10839246244
-- Parser-v2-Q2 package check: it.verlezza.musiclab.lab.creditsfm01v2q2
-- Parser-v2-Q2 APK size: 48,460,615 bytes; APK structure, signature and parallel package verified by build workflow.
-- Parser-v2-Q2 scope check: final diff versus MADRE remains exactly the same three Credits.fm/cover files above; no audio/player/service/Innertube application file changed.
-- Parser-v2-Q2 real-device result on 2026-09-25 for "Sapore di sale": Credits.fm OK; 13 found, 12 resolved, 12 used; diagnostic path 12 source ISRC candidates -> 1 ISWC -> 32 linked recordings -> 0 from title search; final cover results 16. Conclusion: Q2 improved coverage through the normal V2 path, but the new paginated title-search matching contributed zero records.
-- Parser-v2-Q3 correction: keeps the proven V2/Q2 paths and uses the public POST /v1/batch endpoint only to verify title-search candidate ISRCs in chunks of 100. Batch responses are parsed as snake_case identifier maps, including cases where the ISRC is the map key. Only candidates whose batch-resolved ISWC matches an already trusted seed ISWC are merged. The title-search candidate scan is capped at 500 for this test, and diagnostics expose both batch-checked count and added-from-title-search count.
-- Parser-v2-Q3 build verification run: 36077459725 (success)
-- Parser-v2-Q3 temporary LAB artifact: MusicLab-CREDITSFM-LAB-01-V2Q3 / artifact 10839929774
-- Parser-v2-Q3 package check: it.verlezza.musiclab.lab.creditsfm01v2q3
-- Parser-v2-Q3 APK size: 48,460,615 bytes; APK structure, signature and parallel package verified by build workflow.
-- Parser-v2-Q3 scope check: final diff versus MADRE remains exactly the same three Credits.fm/cover files above; no audio/player/service/Innertube application file changed.
-- Parser-v2-Q3 real-device test on 2026-09-25 was NOT a valid quantity test: Credits.fm returned an IP block caused by prior rate-limit violations before the initial search completed, so diagnostics showed 0 source ISRC / 0 ISWC / 0 linked recordings / 0 batch checked. This is an external rate-limit condition, not proof of a parser failure.
-- Next Credits.fm hardening step before re-testing Q3: distinguish 401 authentication from 403/rate-limit protection, recognize the explicit IP-block response body, stop further Credits.fm calls while blocked, add conservative backoff/throttling and reuse cached ISRC/ISWC/search results to reduce request volume.
-- Active LAB functional status: V2-Q3 technically verified but real-device quantity test is pending until Credits.fm rate-limit/IP block clears and request-throttling handling is added. Not approved for CANDIDATA. Date/year and full credit metadata remain deferred until quantity coverage is proven.
-- Future approved sequence after quantity coverage: Credits.fm date/year + full credits metadata; then separate LAB for MusicLab artist/album/credits identity navigation using Credits.fm as primary metadata identity source; then separate LAB for 20-at-a-time cover loading with background prefetch and "Cerca ancora".
-- CANDIDATA: none. Do not create a candidate until Bruno explicitly approves the LAB. When approved, create candidate fresh from MADRE commit 770849ff543289de3adffe5bab62bc09528d19f4 and replay the exact approved three-file net application change-set; do not promote/rename the LAB branch.
-- Failed/discarded experimental line: lab-cover-repair-from-build52
-- Historical UAB mechanics line: lab-cover-restart-from-build52
-- Permanent LAB 'LATEST' release model: deprecated
+- Visibility: PUBLIC
+- Current approved MADRE: mother/musiclab-swipe-02-final
+- MADRE source commit: 1a97c18ebca8e22268ed9620d38655faf445967d
+- Active atomic LAB: lab/musiclab-swipe-fluid-play-01
+- Active LAB source commit: ac5bedaa5594cee10dd88415f660f1888597421d
+- LAB requested modification: rendere lo swipe della copertina/player più fluido e affidabile, facendo scattare il cambio brano solo dopo un gesto orizzontale reale dell'utente e senza armare cambi da scroll/centrature programmatiche.
+- Application change-set versus MADRE:
+  1. app/src/main/kotlin/com/metrolist/music/ui/player/Thumbnail.kt
+  2. app/src/main/kotlin/com/metrolist/music/ui/player/ThumbnailSnapUtils.kt
+- UAB adapter/infrastructure changes used only to build/deliver this LAB:
+  1. .github/workflows/build_quick.yml
+  2. uab-project.env
+- Parallel-install package verified by build: it.verlezza.musiclab.lab.swipefluidplay01
+- UAB output identity: MusicLab-LAB-SWIPE-FLUID-PLAY-01
+- Verified UAB build run: 36280225591 (SUCCESS)
+- Verified Actions artifact: 10918462390 / MusicLab-LAB-SWIPE-FLUID-PLAY-01
+- Artifact contains APK, APK ZIP and build log.
+- Build route: standard GitHub Actions because repository is public.
+- Codemagic: REMOVED from UAB; not a primary, fallback or emergency route.
+- CANDIDATA: none. Do not create or promote until Bruno explicitly approves this LAB after real-device testing.
+- Promotion rule when approved: create CANDIDATA fresh from MADRE commit 1a97c18ebca8e22268ed9620d38655faf445967d and replay exactly the approved application change-set; UAB adapter mechanics may be present only as non-application build infrastructure.
+- Previous active Credits.fm LAB line is no longer the current MusicLab lifecycle state. Its historical diagnostics/results remain preserved in prior commits of this registry and in repository history.
 
 GeoVision
 - Repository: Br174/GeoVision-Test
@@ -77,6 +50,13 @@ streamflix-BV
 - Role: delivery-only adapter for Visionflix TV.
 - Stable Downloader pointer may follow GitHub latest while underlying release tags remain unique and immutable.
 
+Cover Lab AI
+- Repository: Br174/Cover-Lab-AI
+- Visibility: PUBLIC
+- Current lifecycle baseline: main until a named MADRE is explicitly approved/frozen.
+- Active onboarding LAB at last verification: lab/uab-onboarding-01.
+- Build route: standard GitHub Actions.
+
 GLOBAL
 - MADRE -> LAB -> CANDIDATA -> NEW MADRE
 - One requested modification (or one tiny inseparable change-set) per LAB
@@ -86,3 +66,5 @@ GLOBAL
 - LAB/CANDIDATA artifacts temporary
 - Permanent Release = approved MADRE
 - Historical MADRI preserved
+- Public repositories -> standard GitHub Actions
+- Codemagic -> REMOVED from UAB routing
