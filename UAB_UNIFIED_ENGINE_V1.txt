@@ -107,7 +107,8 @@ Every adapter must use safe persistent cache when supported. Android/Gradle rout
 ROUTING CONTRACT
 - Public repositories: standard GitHub-hosted runners are the normal remote route.
 - Private repositories: conserve included allowance; no automatic paid overage.
-- Codemagic: emergency verified-free fallback only, never default.
+- Codemagic is REMOVED from UAB routing and must not be selected as primary, fallback or emergency provider.
+- If the allowed GitHub/local route is unavailable, stop and report the blocker instead of provider-hopping.
 - Real project/code failures are diagnosed; do not blindly rerun the same broken build on another provider.
 
 REGRESSION RULE
@@ -123,3 +124,4 @@ ENGINE VERSION
 UAB-CORE-V1.1
 Established: 2026-09-24
 Revision 1.1: atomic LAB + exact same-MADRE/same-change CANDIDATA + exact candidate source SHA promotion.
+Routing amendment 2026-09-27: Codemagic removed from UAB; public projects use standard GitHub Actions, with project adapters/local safe paths only where explicitly supported.
