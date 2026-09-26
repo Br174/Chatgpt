@@ -12,7 +12,7 @@ CORE PRINCIPLES
 6. APPROVAL BEFORE PROMOTION. A CANDIDATA becomes a NEW MADRE only after regression checks and explicit approval.
 7. HISTORY PRESERVATION. Historical MADRI remain permanently available as rollback points.
 8. ARTIFACT-FIRST. Before any new build, check whether a verified matching artifact already exists.
-9. FREE-FIRST. Never spend money automatically. Paid overage, paid runners and paid Codemagic usage require explicit authorization for that specific request.
+9. FREE-FIRST. Never spend money automatically. Paid overage and paid runners require explicit authorization for that specific request. Codemagic is not part of UAB routing.
 10. FAIL FAST. Availability, authorization, quota, runner, signing and toolchain checks should fail before a long build whenever possible.
 11. DIAGNOSE CODE FAILURES. If a real build starts and fails because of project code, dependencies, signing or packaging, diagnose the project failure instead of blindly repeating it on another provider.
 
@@ -43,27 +43,27 @@ MANDATORY BUILD ROUTING
    a. adapter-approved patch/repack or local/current execution environment when immediately available and safe for that change type;
    b. PUBLIC repository: GitHub Actions on standard GitHub-hosted runners;
    c. PRIVATE repository: GitHub Actions only within included free allowance;
-   d. Codemagic only as a verified-free emergency fallback;
-   e. if no free route is available, stop and report the blocker.
-4. Larger GitHub runners are not selected automatically.
-5. Once a real build has started after preflight, allow it to finish normally.
-6. Infrastructure failure before meaningful build work may move to the next allowed free route.
-7. Genuine project/build failure is diagnosed, not provider-hopped.
+   d. if no allowed free route is available, stop and report the blocker.
+4. Codemagic is REMOVED from UAB and must not be selected as primary, fallback or emergency provider.
+5. Larger GitHub runners are not selected automatically.
+6. Once a real build has started after preflight, allow it to finish normally.
+7. Infrastructure failure before meaningful build work may move only to another route explicitly allowed by the project adapter; do not provider-hop.
+8. Genuine project/build failure is diagnosed, not provider-hopped.
 
 PATCH / REPACK RULE
 Patch/repack is preferred only when the project adapter marks it safe, typically for HTML/JavaScript/assets-only changes or equivalent non-native changes. Do not use patch/repack for native Kotlin/Java/Compose/Gradle/dependency/signing changes unless the adapter explicitly supports that exact change. Preserve package ID, signature expectations and install/update compatibility.
 
 PUBLIC REPOSITORIES
 1. Standard GitHub-hosted runners are the normal remote build route.
-2. Do not send a public project to Codemagic merely to save GitHub minutes.
+2. Do not route a public project to external build providers merely to save GitHub minutes.
 3. Keep secrets in protected stores. Never commit API keys, passwords, signing secrets or private tokens in plaintext.
 4. Permanent Releases are immutable MADRE releases only under the default UAB model.
 
 PRIVATE REPOSITORIES
 1. Prefer local or safe patch/repack when practical.
 2. Use GitHub Actions only within included free allowance unless explicitly authorized otherwise.
-3. Codemagic is a last-resort verified-free provider, not the primary engine.
-4. If free allowance is exhausted, stop rather than silently switch to billable usage.
+3. Codemagic is not an allowed UAB fallback.
+4. If free allowance is exhausted, stop rather than silently switch to billable usage or another provider.
 5. Private projects keep private/authenticated release delivery unless an adapter explicitly defines a deliberate public distribution repository.
 
 WEB / PWA PROJECTS
@@ -112,5 +112,5 @@ CANONICAL FILES
 - UAB_GLOBAL_APK_POLICY.txt
 - UAB_PROJECT_ROUTING.txt
 
-Engine version: UAB-CORE-V1
-Last policy update: 2026-09-24
+Engine version: UAB-CORE-V1.1
+Last policy update: 2026-09-27
