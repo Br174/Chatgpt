@@ -2,21 +2,27 @@ UAB PROJECT ROUTING - UAB-CORE-V1.1
 
 Purpose
 Repository-specific adapter/routing state for the single UAB engine. No repository gets an independent lifecycle engine. All projects follow MADRE -> LAB -> CANDIDATA -> NEW MADRE using the atomic/exact-promotion method in UAB_UNIFIED_ENGINE_V1.txt.
-Last verified: 2026-09-25.
+Last verified: 2026-09-27.
 
 1. MusicLab
 Repository: Br174/MusicLab
 Visibility: PUBLIC
 Project class: Android native (Kotlin/Compose/Gradle)
-Current approved MADRE: mother/musiclab-112726.
-Source stable ref: stable-musiclab-lab01-build52.
-Source commit: 770849ff543289de3adffe5bab62bc09528d19f4.
+Current approved MADRE: mother/musiclab-swipe-02-final.
+Source commit: 1a97c18ebca8e22268ed9620d38655faf445967d.
+Active LAB: lab/musiclab-swipe-fluid-play-01.
+Active LAB source commit: ac5bedaa5594cee10dd88415f660f1888597421d.
+LAB requested modification: swipe copertina/player più fluido con cambio brano affidabile dopo gesto reale, senza regressioni automatiche/programmatiche.
 LAB rule: every new MusicLab experiment starts from the current MADRE and contains one requested modification or one small inseparable change-set; LAB uses parallel-install application ID.
 CANDIDATA rule: create fresh from the exact same MADRE used by the approved LAB and replay exactly the same approved change-set; run audio playback plus requested-feature regression gates.
 MADRE rule: after explicit approval, the new MADRE source ref points to the exact approved CANDIDATA source SHA; no extra source rebuild/commit is allowed during promotion.
 MADRE release rule: only approved candidate becomes a new immutable permanent Release. Do not overwrite prior MADRE assets.
 Primary remote build route: standard GitHub Actions.
-Current UAB adapter workflow: lifecycle-aware build_quick.yml on active LAB line; LAB/CANDIDATA -> temporary artifact, mother/* -> immutable Release.
+Current UAB adapter workflow: lifecycle-aware .github/workflows/build_quick.yml on active LAB line; LAB/CANDIDATA -> temporary artifact, mother/* -> immutable Release only when promoted through the approved flow.
+Current verified LAB build run: 36280225591 (success).
+Current verified LAB artifact: MusicLab-LAB-SWIPE-FLUID-PLAY-01 / artifact 10918462390.
+Current LAB package: it.verlezza.musiclab.lab.swipefluidplay01.
+Codemagic: removed from UAB and not an allowed MusicLab route.
 Patch/repack: forbidden by default for native Kotlin/Compose changes.
 Cache: official Gradle cache + --build-cache.
 Progress: UAB_PROGRESS milestones mandatory.
@@ -114,8 +120,9 @@ GLOBAL ROUTING RULES
 1. Re-check repository visibility before a build.
 2. Public build projects -> standard GitHub Actions is default remote compiler/test runner.
 3. Private build projects -> conserve included quota; no automatic paid fallback.
-4. Codemagic -> verified-free emergency fallback only.
-5. Project-specific workflows are adapters/mechanics only and cannot override lifecycle/promotion rules.
+4. Codemagic is REMOVED from UAB and must not be used as primary, fallback or emergency route.
+5. If an allowed route is unavailable, stop and report the blocker rather than switching providers automatically.
+6. Project-specific workflows are adapters/mechanics only and cannot override lifecycle/promotion rules.
 
 GLOBAL EXACT-PROMOTION RULE
 1. LAB = current MADRE + one requested modification (or one small inseparable change-set).
