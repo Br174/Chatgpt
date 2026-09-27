@@ -8,25 +8,22 @@ Last verified: 2026-09-27.
 Repository: Br174/MusicLab
 Visibility: PUBLIC
 Project class: Android native (Kotlin/Compose/Gradle)
-Current approved MADRE: mother/musiclab-swipe-02-final.
-Source commit: 1a97c18ebca8e22268ed9620d38655faf445967d.
-Active LAB: lab/musiclab-swipe-fluid-play-01.
-Active LAB source commit: e4f4f86fbc7163db5a099e2a2587c9be981ab938.
-LAB requested modification: swipe copertina/player più fluido con cambio brano affidabile dopo gesto reale, senza regressioni automatiche/programmatiche.
+Current approved MADRE: mother/musiclab-swipe-fluid-play-01.
+Source commit: cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33.
+Previous MADRE preserved: mother/musiclab-swipe-02-final @ 1a97c18ebca8e22268ed9620d38655faf445967d.
+Last approved CANDIDATA: candidate/musiclab-swipe-fluid-play-01 @ cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33.
+Last approved change-set: lighter/shorter artwork swipe with 20% positional threshold and automatic playback resume after a real swipe changes track, preserving genuine-finger anti-loop guarding.
+Real-device approval: PASS, confirmed by Bruno on 2026-09-27.
+Active LAB: none.
 LAB rule: every new MusicLab experiment starts from the current MADRE and contains one requested modification or one small inseparable change-set; LAB uses parallel-install application ID.
 CANDIDATA rule: create fresh from the exact same MADRE used by the approved LAB and replay exactly the same approved change-set; run audio playback plus requested-feature regression gates.
 MADRE rule: after explicit approval, the new MADRE source ref points to the exact approved CANDIDATA source SHA; no extra source rebuild/commit is allowed during promotion.
 MADRE release rule: only approved candidate becomes a new immutable permanent Release. Do not overwrite prior MADRE assets.
 Primary remote build route: standard GitHub Actions.
-Current UAB adapter workflow: lifecycle-aware .github/workflows/build_quick.yml on active LAB line; LAB/CANDIDATA -> temporary artifact, mother/* -> immutable Release only when promoted through the approved flow.
-Current verified LAB build run: 36280859868 (success).
-Current verified LAB artifact: MusicLab-LAB-SWIPE-FLUID-PLAY-01 / artifact 10918837459.
-Current LAB package: it.verlezza.musiclab.lab.swipefluidplay01.
-Codemagic: removed from UAB and not an allowed MusicLab route; obsolete codemagic.yaml removed from the active LAB.
+Codemagic: REMOVED from UAB and not an allowed MusicLab route.
 Patch/repack: forbidden by default for native Kotlin/Compose changes.
 Cache: official Gradle cache + --build-cache.
 Progress: UAB_PROGRESS milestones mandatory.
-Legacy note: fixed uab-musiclab-lab-latest overwrite delivery is DEPRECATED and not an authoritative UAB-CORE-V1.1 promotion path.
 
 2. GeoVision-Test
 Repository: Br174/GeoVision-Test
@@ -41,7 +38,6 @@ Primary remote full-build route: standard GitHub Actions.
 Fast route: adapter-approved patch/repack for HTML/JS/assets-only changes when signature/package/update compatibility is preserved.
 Cache: Gradle --build-cache + pip/tool caches where useful.
 Progress: mandatory.
-Existing version-specific workflows remain mechanics/adapters; they do not override UAB CORE lifecycle.
 
 3. StudyBook-AI
 Repository: Br174/StudyBook-AI
@@ -52,10 +48,8 @@ LAB rule: feature work branches from current MADRE reference with one requested 
 CANDIDATA rule: fresh branch from the exact same MADRE used by the approved LAB, replaying exactly the same approved change-set; run full StudyBook automated test suite.
 MADRE rule: approved Candidate source SHA becomes the new stable source reference; no extra source commit merely for promotion. No Android APK unless a real Android wrapper is added.
 Primary build/test route: standard GitHub Actions.
-Workflow recognizes main, lab/*, candidate/* and mother/* and keeps LAB/CANDIDATA outputs temporary.
 Cache: npm download cache + prefer-offline.
 Progress: mandatory.
-Deployment route remains a project adapter detail; lifecycle remains UAB CORE.
 
 4. Visionflix
 Repository: Br174/Visionflix
@@ -66,17 +60,14 @@ LAB rule: one requested modification/change-set from current MADRE; experimental
 CANDIDATA rule: fresh from the exact same MADRE used by the approved LAB and replay exactly the same approved change-set.
 MADRE rule: approved Candidate source SHA becomes new Mother source ref. Final signing/packaging may differ only as adapter-declared packaging metadata, never application source.
 Special adapter duties: stable signing key, Mobile/TV layout builds, package/version validation, Downloader publishing handoff.
-Workflow recognizes main, lab/*, candidate/* and mother/*; permanent private/public publishing is gated to mother/* only.
-Approved Mother publishing uses unique immutable private tag visionflix-madre-<build> and unique public Downloader tag verlezza-tv-<build>.
 Primary route: local/safe path first when practical; otherwise GitHub Actions within included private-repo allowance.
 Cache: Gradle cache + --build-cache mandatory; preserve signing identity outside unsafe caches.
 Progress: mandatory.
 Paid overage: forbidden without explicit approval.
-Legacy private tv-latest overwrite behavior is DEPRECATED and no longer present in the UAB-CORE adapter workflow.
 
 5. streamflix-BV
 Repository: Br174/streamflix-BV
-Actual visibility at last verification: PUBLIC. Historical target was PRIVATE; visibility must be treated as live metadata and changed only by explicit decision.
+Actual visibility at last verification: PUBLIC.
 Project class: delivery/distribution repository for Verlezza Vision TV, not a separate app-engine authority.
 Role under UAB CORE: thin delivery adapter only.
 Public Downloader releases use unique version tags; this is compatible with immutable-history rules when each underlying release is preserved.
@@ -106,13 +97,9 @@ Active onboarding LAB: lab/uab-onboarding-01.
 LAB rule: experiments start from current MADRE/baseline and use parallel-install package it.coverlab.ai.lab; stable package remains it.coverlab.ai.
 CANDIDATA rule: create fresh from the exact same MADRE/baseline used by the approved LAB and replay only the approved change-set.
 MADRE rule: approved Candidate source SHA becomes a new immutable Mother ref/release only after explicit approval.
-Primary remote build route: standard GitHub Actions because repository is public; workflow is an UAB adapter, not an independent engine.
-Current UAB adapter workflow: .github/workflows/android-apk.yml.
-Outputs: temporary LAB/CANDIDATA APK + ZIP + SHA-256 manifest; permanent Release only for approved MADRE.
+Primary remote build route: standard GitHub Actions because repository is public.
 Patch/repack: forbidden by default because the Android laboratory is native Kotlin/Gradle.
 Cache: official Gradle cache + --build-cache.
-Regression gates: engine tests, Wrangler dry-run, Android compilation, package verification, artifact/source identity, APK+ZIP+checksum presence, no plaintext secrets.
-Control adapter: UAB_PROJECT_COVER_LAB_AI.txt.
 Progress and LIVE BUILD MONITORING: mandatory.
 Paid overage/fallback: forbidden without explicit approval.
 
