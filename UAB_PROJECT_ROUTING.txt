@@ -11,7 +11,7 @@ Project class: Android native (Kotlin/Compose/Gradle)
 Current approved MADRE: mother/musiclab-swipe-02-final.
 Source commit: 1a97c18ebca8e22268ed9620d38655faf445967d.
 Active LAB: lab/musiclab-swipe-fluid-play-01.
-Active LAB source commit: ac5bedaa5594cee10dd88415f660f1888597421d.
+Active LAB source commit: e4f4f86fbc7163db5a099e2a2587c9be981ab938.
 LAB requested modification: swipe copertina/player più fluido con cambio brano affidabile dopo gesto reale, senza regressioni automatiche/programmatiche.
 LAB rule: every new MusicLab experiment starts from the current MADRE and contains one requested modification or one small inseparable change-set; LAB uses parallel-install application ID.
 CANDIDATA rule: create fresh from the exact same MADRE used by the approved LAB and replay exactly the same approved change-set; run audio playback plus requested-feature regression gates.
@@ -19,10 +19,10 @@ MADRE rule: after explicit approval, the new MADRE source ref points to the exac
 MADRE release rule: only approved candidate becomes a new immutable permanent Release. Do not overwrite prior MADRE assets.
 Primary remote build route: standard GitHub Actions.
 Current UAB adapter workflow: lifecycle-aware .github/workflows/build_quick.yml on active LAB line; LAB/CANDIDATA -> temporary artifact, mother/* -> immutable Release only when promoted through the approved flow.
-Current verified LAB build run: 36280225591 (success).
-Current verified LAB artifact: MusicLab-LAB-SWIPE-FLUID-PLAY-01 / artifact 10918462390.
+Current verified LAB build run: 36280859868 (success).
+Current verified LAB artifact: MusicLab-LAB-SWIPE-FLUID-PLAY-01 / artifact 10918837459.
 Current LAB package: it.verlezza.musiclab.lab.swipefluidplay01.
-Codemagic: removed from UAB and not an allowed MusicLab route.
+Codemagic: removed from UAB and not an allowed MusicLab route; obsolete codemagic.yaml removed from the active LAB.
 Patch/repack: forbidden by default for native Kotlin/Compose changes.
 Cache: official Gradle cache + --build-cache.
 Progress: UAB_PROGRESS milestones mandatory.
