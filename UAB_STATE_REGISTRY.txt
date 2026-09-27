@@ -8,23 +8,27 @@ MusicLab
 - Visibility: PUBLIC
 - Current approved MADRE: mother/musiclab-swipe-fluid-play-01
 - MADRE source commit: cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33
-- Promotion source: candidate/musiclab-swipe-fluid-play-01
-- Approved CANDIDATA source commit: cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33
-- Promotion verification: NEW MADRE ref points to the exact approved CANDIDATA SHA; no application-source rebuild or reinterpretation occurred during promotion.
-- Real-device approval: PASS, explicitly confirmed by Bruno on 2026-09-27.
-- Approved change-set: lighter/shorter artwork swipe with 20% positional threshold plus automatic playback resume when a real swipe changes track, while preserving genuine-finger anti-loop guarding.
-- Application files changed versus previous MADRE mother/musiclab-swipe-02-final:
-  1. app/src/main/kotlin/com/metrolist/music/ui/player/Thumbnail.kt
-  2. app/src/main/kotlin/com/metrolist/music/ui/player/ThumbnailSnapUtils.kt
+- Previous promotion source: candidate/musiclab-swipe-fluid-play-01 @ cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33, real-device approved by Bruno on 2026-09-27.
+- Previous approved change-set preserved in current MADRE: lighter/shorter artwork swipe with 20% positional threshold plus automatic playback resume when a real swipe changes track, with genuine-finger anti-loop guarding.
 - Previous MADRE preserved: mother/musiclab-swipe-02-final @ 1a97c18ebca8e22268ed9620d38655faf445967d
-- Approved LAB lineage: lab/musiclab-swipe-fluid-play-01
-- Approved CANDIDATA lineage: candidate/musiclab-swipe-fluid-play-01
-- Candidate verification build run: 36283215484 (SUCCESS)
-- Candidate Actions artifact: 10919995506 / MusicLab-CANDIDATA-SWIPE-FLUID-PLAY-01
-- Candidate parallel-install package: it.verlezza.musiclab.candidate.candidateswipefluidplay01
+- Active atomic LAB: lab/musiclab-playback-403-recovery-01
+- LAB source commit: 1ba5fd2123a5c6268180c959cdddb202edcc496d
+- LAB requested defect: intermittent playback HTTP 403 / IO_BAD_HTTP_STATUS where Retry fails but opening the same song again from artist/album succeeds.
+- Diagnosis: MusicService already invalidates URL/decryption caches and re-prepares after HTTP 403, but the player can retain the same failed current MediaItem/MediaSource. The player UI Retry previously called only player.prepare(), so it could repeat the same failed source.
+- LAB application change-set versus current MADRE is exactly two files:
+  1. app/src/main/kotlin/com/metrolist/music/playback/PlayerConnection.kt
+  2. app/src/main/kotlin/com/metrolist/music/ui/player/Thumbnail.kt
+- Recovery behavior: preserve MusicService normal 403 refresh as first line; if the same 403 persists, rebuild/replace only the current MediaItem, preserve queue/index/position/play state, and allow at most one automatic strong rebuild per failed track sequence. Manual Retry uses the same strong rebuild and requests playback.
+- Non-403 errors remain outside the automatic strong-403 fallback. Pending recovery is cancelled/reset on successful READY state, track change, cleared error, and PlayerConnection disposal.
+- Swipe/player behavior from current MADRE is otherwise unchanged.
+- Technical UAB build branch: uab-build/musiclab-playback-403-recovery-01; it is build mechanics only and checks out the exact LAB source SHA above.
+- Verified UAB build run: 36284757772 (SUCCESS)
+- Verified Actions artifact: 10920232611 / MusicLab-LAB-PLAYBACK-403-RECOVERY-01
+- Artifact contains APK, APK ZIP and build log.
+- APK SHA-256: 95eb95f1fa347b03925d406df2606ad73a2ce08b334e83173a362bc3dc717b49
 - Build route: standard GitHub Actions because repository is public.
 - Codemagic: REMOVED from UAB; not a primary, fallback or emergency route.
-- Active LAB: none. Every future MusicLab experiment must start from current MADRE mother/musiclab-swipe-fluid-play-01 unless Bruno explicitly chooses otherwise.
+- CANDIDATA: none. LAB requires Bruno real-device testing before any candidate creation or promotion.
 
 GeoVision
 - Repository: Br174/GeoVision-Test
