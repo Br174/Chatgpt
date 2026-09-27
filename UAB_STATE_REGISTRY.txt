@@ -8,26 +8,26 @@ MusicLab
 - Visibility: PUBLIC
 - Current approved MADRE: mother/musiclab-swipe-02-final
 - MADRE source commit: 1a97c18ebca8e22268ed9620d38655faf445967d
-- Active atomic LAB: lab/musiclab-swipe-fluid-play-01
-- Active LAB source commit: e4f4f86fbc7163db5a099e2a2587c9be981ab938
-- LAB requested modification: rendere lo swipe della copertina/player più fluido e affidabile, facendo scattare il cambio brano solo dopo un gesto orizzontale reale dell'utente e senza armare cambi da scroll/centrature programmatiche.
-- Application change-set versus MADRE:
+- Approved LAB: lab/musiclab-swipe-fluid-play-01
+- LAB tested change-set: lighter/shorter artwork swipe with 20% positional threshold plus automatic playback resume when a real swipe changes track, while preserving genuine-finger anti-loop guarding.
+- CANDIDATA: candidate/musiclab-swipe-fluid-play-01
+- CANDIDATA source commit: cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33
+- CANDIDATA reconstruction identity: fresh from MADRE commit 1a97c18ebca8e22268ed9620d38655faf445967d, then exact approved application commits 425f712abb61008b0c0161a10ca69eaf7cad8b1f and cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33.
+- CANDIDATA diff versus MADRE: exactly 2 commits, ahead 2 / behind 0, and exactly two application files:
   1. app/src/main/kotlin/com/metrolist/music/ui/player/Thumbnail.kt
   2. app/src/main/kotlin/com/metrolist/music/ui/player/ThumbnailSnapUtils.kt
-- UAB adapter/infrastructure changes used only to build/deliver this LAB:
-  1. .github/workflows/build_quick.yml
-  2. uab-project.env
-  3. obsolete codemagic.yaml removed from active LAB
-- Parallel-install package verified by build: it.verlezza.musiclab.lab.swipefluidplay01
-- UAB output identity: MusicLab-LAB-SWIPE-FLUID-PLAY-01
-- Verified UAB build run: 36280859868 (SUCCESS)
-- Verified Actions artifact: 10918837459 / MusicLab-LAB-SWIPE-FLUID-PLAY-01
-- Artifact contains APK, APK ZIP and build log.
+- No UAB/Codemagic/workflow infrastructure commit is part of the CANDIDATA source branch.
+- Candidate verification build uses a separate temporary technical UAB build branch that checks out the exact CANDIDATA commit; this build mechanics branch is not lifecycle source authority.
+- Candidate parallel-install package: it.verlezza.musiclab.candidate.candidateswipefluidplay01
+- Candidate output identity: MusicLab-CANDIDATA-SWIPE-FLUID-PLAY-01
+- Verified candidate UAB build run: 36283215484 (SUCCESS)
+- Verified candidate Actions artifact: 10919995506 / MusicLab-CANDIDATA-SWIPE-FLUID-PLAY-01
+- Candidate artifact contains APK, APK ZIP and build log; APK SHA-256: fa2e6cc2a7048a1ba12c397b422dda78eb92e899eb72d30d6f8f083ff45fb7f3.
 - Build route: standard GitHub Actions because repository is public.
 - Codemagic: REMOVED from UAB; not a primary, fallback or emergency route.
-- CANDIDATA: none. Do not create or promote until Bruno explicitly approves this LAB after real-device testing.
-- Promotion rule when approved: create CANDIDATA fresh from MADRE commit 1a97c18ebca8e22268ed9620d38655faf445967d and replay exactly the approved application change-set; UAB adapter mechanics may be present only as non-application build infrastructure.
-- Previous active Credits.fm LAB line is no longer the current MusicLab lifecycle state. Its historical diagnostics/results remain preserved in prior commits of this registry and in repository history.
+- Promotion status: CANDIDATA created and technically verified. Do NOT create NEW MADRE until Bruno explicitly approves this CANDIDATA after real-device testing.
+- Promotion rule when approved: NEW MADRE source ref must point to exact CANDIDATA source SHA cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33, with no application-source rebuild or reinterpretation during promotion.
+- Previous Credits.fm LAB line is not the current MusicLab lifecycle state. Its historical diagnostics/results remain preserved in prior commits of this registry and in repository history.
 
 GeoVision
 - Repository: Br174/GeoVision-Test
@@ -42,7 +42,7 @@ StudyBook-AI
 
 Visionflix
 - Repository: Br174/Visionflix
-- Current lifecycle baseline: main until a named Mother is explicitly approved/frozen.
+- Current lifecycle baseline: main until an explicit immutable Mother ref is frozen under UAB CORE.
 - Release publication under UAB-CORE-V1.1: only mother/* branches.
 - streamflix-BV is delivery adapter, not source lifecycle authority.
 
