@@ -12,23 +12,22 @@ MusicLab
 - Previous approved change-set preserved in current MADRE: lighter/shorter artwork swipe with 20% positional threshold plus automatic playback resume when a real swipe changes track, with genuine-finger anti-loop guarding.
 - Previous MADRE preserved: mother/musiclab-swipe-02-final @ 1a97c18ebca8e22268ed9620d38655faf445967d
 - Active atomic LAB: lab/musiclab-playback-403-recovery-01
-- LAB source commit: 1ba5fd2123a5c6268180c959cdddb202edcc496d
-- LAB requested defect: intermittent playback HTTP 403 / IO_BAD_HTTP_STATUS where Retry fails but opening the same song again from artist/album succeeds.
-- Diagnosis: MusicService already invalidates URL/decryption caches and re-prepares after HTTP 403, but the player can retain the same failed current MediaItem/MediaSource. The player UI Retry previously called only player.prepare(), so it could repeat the same failed source.
-- LAB application change-set versus current MADRE is exactly two files:
-  1. app/src/main/kotlin/com/metrolist/music/playback/PlayerConnection.kt
-  2. app/src/main/kotlin/com/metrolist/music/ui/player/Thumbnail.kt
-- Recovery behavior: preserve MusicService normal 403 refresh as first line; if the same 403 persists, rebuild/replace only the current MediaItem, preserve queue/index/position/play state, and allow at most one automatic strong rebuild per failed track sequence. Manual Retry uses the same strong rebuild and requests playback.
-- Non-403 errors remain outside the automatic strong-403 fallback. Pending recovery is cancelled/reset on successful READY state, track change, cleared error, and PlayerConnection disposal.
-- Swipe/player behavior from current MADRE is otherwise unchanged.
-- Technical UAB build branch: uab-build/musiclab-playback-403-recovery-01; it is build mechanics only and checks out the exact LAB source SHA above.
-- Verified UAB build run: 36284757772 (SUCCESS)
-- Verified Actions artifact: 10920232611 / MusicLab-LAB-PLAYBACK-403-RECOVERY-01
+- LAB source commit: a8f5009e9b046f11171852273d0f03f26575806e
+- LAB requested defect: some songs fail playback, initially surfacing HTTP 403 / IO_BAD_HTTP_STATUS and, on the reproduced track Paradiso beach by Cartoon Band, consistently surfacing Missing stream expire time / IO_UNSPECIFIED even when launched directly from its album.
+- Corrected diagnosis: the failure is resolver-level, not a stale queue MediaItem. YTPlayerUtils can successfully find an audio format and resolve a stream URL, then discard that otherwise usable client solely because streamingData.expiresInSeconds is missing. Repeating player.prepare() or rebuilding the MediaItem cannot fix that deterministic resolver rejection.
+- The earlier experimental PlayerConnection/Thumbnail strong-retry patch was fully reverted after the album test disproved the stale-MediaSource hypothesis.
+- Final LAB application change-set versus current MADRE is exactly one file:
+  1. app/src/main/kotlin/com/metrolist/music/utils/YTPlayerUtils.kt
+- Resolver recovery behavior: prefer expiresInSeconds from the response actually used for the selected format; otherwise use the original stream response value; otherwise derive a conservative cache lifetime from googlevideo URL expire= epoch with a 30-second safety margin; if no expiry information exists at all, accept an otherwise usable stream with a 60-second URL-cache TTL instead of rejecting playback. An explicitly expired or near-expiry URL is still rejected and the client cascade continues.
+- Existing format selection, URL resolution, playability/login handling, stream validation, 403 cache invalidation and swipe/player behavior remain unchanged.
+- Technical UAB build branch: uab-build/musiclab-playback-403-recovery-01; it is build mechanics only and checks out exact LAB source commit a8f5009e9b046f11171852273d0f03f26575806e.
+- Verified UAB build run: 36286576114 (SUCCESS)
+- Verified Actions artifact: 10920880867 / MusicLab-LAB-STREAM-EXPIRY-02
 - Artifact contains APK, APK ZIP and build log.
-- APK SHA-256: 95eb95f1fa347b03925d406df2606ad73a2ce08b334e83173a362bc3dc717b49
+- APK SHA-256: d6b76f80855454b5dab6da59c595a9fe2e440b8af607c2cd61d7b15b47c7e046
 - Build route: standard GitHub Actions because repository is public.
 - Codemagic: REMOVED from UAB; not a primary, fallback or emergency route.
-- CANDIDATA: none. LAB requires Bruno real-device testing before any candidate creation or promotion.
+- CANDIDATA: none. LAB requires Bruno real-device testing, especially Paradiso beach by Cartoon Band, before any candidate creation or promotion.
 
 GeoVision
 - Repository: Br174/GeoVision-Test
