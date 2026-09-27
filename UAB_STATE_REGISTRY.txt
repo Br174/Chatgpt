@@ -9,7 +9,7 @@ MusicLab
 - Current approved MADRE: mother/musiclab-swipe-02-final
 - MADRE source commit: 1a97c18ebca8e22268ed9620d38655faf445967d
 - Active atomic LAB: lab/musiclab-swipe-fluid-play-01
-- Active LAB source commit: ac5bedaa5594cee10dd88415f660f1888597421d
+- Active LAB source commit: e4f4f86fbc7163db5a099e2a2587c9be981ab938
 - LAB requested modification: rendere lo swipe della copertina/player più fluido e affidabile, facendo scattare il cambio brano solo dopo un gesto orizzontale reale dell'utente e senza armare cambi da scroll/centrature programmatiche.
 - Application change-set versus MADRE:
   1. app/src/main/kotlin/com/metrolist/music/ui/player/Thumbnail.kt
@@ -17,10 +17,11 @@ MusicLab
 - UAB adapter/infrastructure changes used only to build/deliver this LAB:
   1. .github/workflows/build_quick.yml
   2. uab-project.env
+  3. obsolete codemagic.yaml removed from active LAB
 - Parallel-install package verified by build: it.verlezza.musiclab.lab.swipefluidplay01
 - UAB output identity: MusicLab-LAB-SWIPE-FLUID-PLAY-01
-- Verified UAB build run: 36280225591 (SUCCESS)
-- Verified Actions artifact: 10918462390 / MusicLab-LAB-SWIPE-FLUID-PLAY-01
+- Verified UAB build run: 36280859868 (SUCCESS)
+- Verified Actions artifact: 10918837459 / MusicLab-LAB-SWIPE-FLUID-PLAY-01
 - Artifact contains APK, APK ZIP and build log.
 - Build route: standard GitHub Actions because repository is public.
 - Codemagic: REMOVED from UAB; not a primary, fallback or emergency route.
