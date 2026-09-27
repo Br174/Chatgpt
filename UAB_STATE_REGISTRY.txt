@@ -12,13 +12,18 @@ MusicLab
 - Previous approved change-set preserved in current MADRE: lighter/shorter artwork swipe with 20% positional threshold plus automatic playback resume when a real swipe changes track, with genuine-finger anti-loop guarding.
 - Previous MADRE preserved: mother/musiclab-swipe-02-final @ 1a97c18ebca8e22268ed9620d38655faf445967d
 - Active atomic LAB: lab/musiclab-playback-403-recovery-01
-- LAB source commit: b68a95095b6e63fcba4e937cbcded0f4d623dd15
+- LAB source commit: d75eee1ff0999ea357808dd7cf7808725513d08a
 - Triggering playback case: Paradiso beach by Cartoon Band can exist and play normally on YouTube while MusicLab's anonymous/extractor paths fail. Diagnostics on videoId LMUSQtlENto showed anti-bot/login-required behavior and NewPipe returned no usable stream URLs. Bruno confirmed his YouTube account is already connected in MusicLab.
 - Earlier stale-MediaSource and missing-expire experiments were disproved by real-device tests and have been fully removed from the final LAB net change-set. YTPlayerUtils, PlayerConnection and Thumbnail are back to current-MADRE behavior unless otherwise included by the approved MADRE itself.
 - Historical manual YouTube replacement was recovered conceptually and generalized so any MusicLab track can retain its original queue/metadata identity while resolving audio from a user-selected replacement YouTube video.
-- Current requested UX: player quick-action grid must be Radio / Playlist / Copy link on row one and, when Spotify is authenticated, Spotify / Originali / Cover on row two.
-- Cover opens the existing internal Cover search and the duplicate lower-menu Cover entry is removed.
-- Originali searches for one candidate only: the version with the oldest verifiable release/year metadata among discovered related/same-title recordings, as a practical heuristic for the first recorded version. It shows artwork/title/artist/year, supports tap-to-preview, has a Sostituisci action, retains manual YouTube-link paste, and can restore automatic matching.
+- Player quick-action grid remains: Radio / Playlist / Copy link on row one and, when Spotify is authenticated, Spotify / Originali / Cover on row two.
+- Cover opens the existing internal Cover search. The existing Cover screen/search engine is a separate feature and was NOT modified by the latest Originali refinements. Do not call Originali secondary results covers.
+- Originali terminology: top result is "Originale"; secondary results are "Altre versioni".
+- Originali layout: manual YouTube link field remains above all automatic content; underneath it the automatic Originale result is shown, followed by a separator and Altre versioni. Manual-link replacement remains available.
+- Originali exact-title rule: partial titles are rejected. Only clear recording/version annotations (for example Live, Remastered, Remix, Official Audio, featuring credits) may be removed for comparison; meaningful subtitle/parenthetical text remains part of the title. Example: "Notte rosa" must not match "Notte"; "Sweet Dreams (Are Made of This)" must not collapse to "Sweet Dreams".
+- Originali chronology: the currently selected/starting YouTube track is included in the chronological candidate set instead of being automatically excluded. Originale is the candidate with the oldest verifiable release/year metadata among exact-title candidates; if no candidate has a verifiable year, the app does not falsely label one as the oldest.
+- Altre versioni: exact same base title only; every result must contain at least one performer credited on the detected Originale. Duets, featuring releases, groups, quartets and collaborations are allowed when the original performer remains present. Results are ordered from oldest known year to newest, with undated results after dated ones.
+- The version used to start the search remains selectable: if it already qualifies as Originale/Altra versione it appears there; otherwise the screen keeps a separate Versione di partenza row so the user can return to it.
 - Universal YouTube source override is persisted by original MusicLab mediaId. Stream resolution uses the replacement videoId while queue identity and metadata remain tied to the original song; changing/clearing an override invalidates relevant URL/media caches.
 - Final LAB application change-set versus current MADRE is exactly eight files:
   1. app/src/main/kotlin/com/metrolist/music/constants/PreferenceKeys.kt
@@ -29,14 +34,16 @@ MusicLab
   6. app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionSearchEngine.kt
   7. app/src/main/kotlin/com/metrolist/music/ui/menu/PlayerMenu.kt
   8. app/src/main/kotlin/com/metrolist/music/ui/screens/NavigationBuilder.kt
-- Technical UAB build branch: uab-build/musiclab-originali-cover-02; build mechanics only, checking out exact LAB source b68a95095b6e63fcba4e937cbcded0f4d623dd15.
-- Verified UAB build run: 36307052851 (SUCCESS)
-- Verified Actions artifact: 10927593507 / MusicLab-LAB-ORIGINALI-COVER-02
-- Artifact digest: sha256:d8c98e17aac2a23e841e92c72888c32be7133871b71e7e367f1958a4ecddfd4d
-- APK SHA-256: bf119280557a33b441c9008685b722c17bf150c9f607f4fb9952ebfc3ef999ee
+- Relative to the previously phone-delivered Originali/Cover LAB source b68a95095b6e63fcba4e937cbcded0f4d623dd15, the current refinement changes exactly two files: OriginalVersionScreen.kt and OriginalVersionSearchEngine.kt. No Cover implementation file is changed.
+- Technical UAB build branch: uab-build/musiclab-originali-exact-05; build mechanics only, checking out exact LAB source d75eee1ff0999ea357808dd7cf7808725513d08a.
+- Verified UAB build run: 36314596344 (SUCCESS)
+- Verified Actions artifact: 10929823870 / MusicLab-LAB-ORIGINALI-EXACT-05
+- Artifact digest: sha256:09a9cd78214b4de724e6e5ba1bd9702bc73bcacad8febfcd33fedc0eb3694386
+- APK SHA-256: b15c1a9d5d2e17197c97e9bc72ba5062da869a06cb14642aac0ba0cca3c096c2
+- APK ZIP SHA-256: 7fa58b9c79f7d01a57e79004f114367705374057beebde57be84748390d830da
 - Build route: standard GitHub Actions because repository is public.
 - Codemagic: REMOVED from UAB; not a primary, fallback or emergency route.
-- CANDIDATA: none. LAB requires Bruno real-device testing of the quick-action layout, Cover, Originali search/preview/substitution/manual-link flow and the problematic playback case before any candidate creation or promotion.
+- CANDIDATA: none. LAB requires Bruno real-device testing before any candidate creation or promotion. Priority tests: exact-title rejection (for example Notte rosa must never degrade to Notte), oldest Originale selection, chronological Altre versioni, duet/group/featuring inclusion only when the original performer is present, manual link replacement and return to Versione di partenza.
 
 GeoVision
 - Repository: Br174/GeoVision-Test
