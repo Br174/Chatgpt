@@ -1,10 +1,14 @@
-UNIVERSAL UAB POLICY - GLOBAL
+UNIVERSAL MOTORLAB/UAB POLICY - GLOBAL
 
 SCOPE
-This policy is the canonical build/test/delivery flow for Bruno's projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass UAB CORE lifecycle, cost, verification or release rules.
+This policy is the canonical build/test/delivery flow for Bruno's projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass MotorLab CORE lifecycle, cost, verification, release or watchdog rules.
+
+NAME / COMPATIBILITY
+Official engine name: MotorLab.
+Legacy UAB filenames, variables and adapter keys remain temporarily valid so existing projects keep working during migration.
 
 CORE PRINCIPLES
-1. ONE ENGINE. UAB CORE is the single lifecycle/control engine. Project workflows are adapters, not independent engines.
+1. ONE ENGINE. MotorLab CORE is the single lifecycle/control engine. Project workflows are adapters, not independent engines.
 2. LIFECYCLE. Every project follows MADRE -> LAB -> CANDIDATA -> NEW MADRE.
 3. MADRE IMMUTABILITY. The current MADRE is the last approved stable state and must never be edited or overwritten in place.
 4. LAB FROM MADRE. Every new experiment starts from the current MADRE unless Bruno explicitly chooses to continue an existing LAB.
@@ -12,9 +16,10 @@ CORE PRINCIPLES
 6. APPROVAL BEFORE PROMOTION. A CANDIDATA becomes a NEW MADRE only after regression checks and explicit approval.
 7. HISTORY PRESERVATION. Historical MADRI remain permanently available as rollback points.
 8. ARTIFACT-FIRST. Before any new build, check whether a verified matching artifact already exists.
-9. FREE-FIRST. Never spend money automatically. Paid overage and paid runners require explicit authorization for that specific request. Codemagic is not part of UAB routing.
+9. FREE-FIRST. Never spend money automatically. Paid overage and paid runners require explicit authorization for that specific request. Codemagic is not part of MotorLab routing.
 10. FAIL FAST. Availability, authorization, quota, runner, signing and toolchain checks should fail before a long build whenever possible.
 11. DIAGNOSE CODE FAILURES. If a real build starts and fails because of project code, dependencies, signing or packaging, diagnose the project failure instead of blindly repeating it on another provider.
+12. WATCHDOG. Long operations must be monitored for real progress, not just elapsed time. Suspected stalls use MotorLab Watchdog escalation with checkpoint recovery and single-writer safety.
 
 MANDATORY LIFECYCLE FLOW
 1. Identify and protect the current MADRE reference.
@@ -44,9 +49,9 @@ MANDATORY BUILD ROUTING
    b. PUBLIC repository: GitHub Actions on standard GitHub-hosted runners;
    c. PRIVATE repository: GitHub Actions only within included free allowance;
    d. if no allowed free route is available, stop and report the blocker.
-4. Codemagic is REMOVED from UAB and must not be selected as primary, fallback or emergency provider.
+4. Codemagic is REMOVED from MotorLab and must not be selected as primary, fallback or emergency provider.
 5. Larger GitHub runners are not selected automatically.
-6. Once a real build has started after preflight, allow it to finish normally.
+6. Once a real build has started after preflight, allow it to finish normally while the watchdog observes progress.
 7. Infrastructure failure before meaningful build work may move only to another route explicitly allowed by the project adapter; do not provider-hop.
 8. Genuine project/build failure is diagnosed, not provider-hopped.
 
@@ -57,12 +62,12 @@ PUBLIC REPOSITORIES
 1. Standard GitHub-hosted runners are the normal remote build route.
 2. Do not route a public project to external build providers merely to save GitHub minutes.
 3. Keep secrets in protected stores. Never commit API keys, passwords, signing secrets or private tokens in plaintext.
-4. Permanent Releases are immutable MADRE releases only under the default UAB model.
+4. Permanent Releases are immutable MADRE releases only under the default MotorLab model.
 
 PRIVATE REPOSITORIES
 1. Prefer local or safe patch/repack when practical.
 2. Use GitHub Actions only within included free allowance unless explicitly authorized otherwise.
-3. Codemagic is not an allowed UAB fallback.
+3. Codemagic is not an allowed MotorLab fallback.
 4. If free allowance is exhausted, stop rather than silently switch to billable usage or another provider.
 5. Private projects keep private/authenticated release delivery unless an adapter explicitly defines a deliberate public distribution repository.
 
@@ -90,20 +95,33 @@ Default full-task ladder:
 100% requested state verified and delivered
 Non-applicable phases are removed/recalculated. Never report 100% on an unverified or failed result.
 
-LIVE BUILD MONITORING
-1. New/in-progress build requests are monitored while the interactive session is active.
+LIVE BUILD MONITORING + MOTORLAB WATCHDOG
+1. New/in-progress build requests are monitored while an execution/control surface is available.
 2. Report meaningful phase changes, not repeated identical status spam.
 3. Provider success alone is insufficient; verify requested artifacts and source state.
 4. Never deliver a stale artifact while a newer requested build is still running.
+5. Repeated identical provider/job state does not count as progress.
+6. Suspected stalls use adaptive thresholds based on operation class and provider evidence rather than one fixed timeout.
+7. First intervention is always non-destructive verification.
+8. User-visible watchdog intervention format is mandatory:
+   ⚡ Verifica anti-stallo — <what appears stalled + what is being checked>
+   ⚡⚡ Ripresa controllata — <how work continues without restarting completed work>
+   ⚡⚡⚡ Recupero da checkpoint — <which checkpoint/substep is being recovered>
+   ⚡⚡⚡⚡ Protezione MotorLab — <why safe automatic recovery stopped>
+9. A lightning symbol must never be shown without an explanatory sentence.
+10. Read-only diagnostics may run in parallel; conflicting write operations may not.
+11. Recovery preserves the last verified checkpoint and percentage and targets the smallest stalled/failed substep.
+12. Blind infinite reruns are forbidden. Repeated recovery without new evidence escalates to safe stop.
+13. Detailed watchdog behavior is governed by MOTORLAB_WATCHDOG_V1.txt.
 
 SECURITY
 1. Public source must never contain plaintext secrets.
 2. Build logs must not echo secrets.
 3. Signing materials and credentials are not stored in unsafe caches.
-4. Br174/Chatgpt remains the private UAB control/registry repository, not an application.
+4. Br174/Chatgpt remains the private MotorLab control/registry repository, not an application.
 
 PROJECT NEUTRALITY
-Current repository-specific mechanics belong in UAB_PROJECT_ROUTING.txt and each thin project adapter. Future projects are onboarded to UAB CORE rather than given a new independent engine.
+Current repository-specific mechanics belong in UAB_PROJECT_ROUTING.txt and each thin project adapter. Future projects are onboarded to MotorLab CORE rather than given a new independent engine.
 
 CANONICAL FILES
 - UAB_UNIFIED_ENGINE_V1.txt
@@ -111,6 +129,7 @@ CANONICAL FILES
 - UAB_ENGINE_CONTRACT.txt
 - UAB_GLOBAL_APK_POLICY.txt
 - UAB_PROJECT_ROUTING.txt
+- MOTORLAB_WATCHDOG_V1.txt
 
-Engine version: UAB-CORE-V1.1
-Last policy update: 2026-09-27
+Engine version: MOTORLAB-CORE-V1.2 (legacy UAB compatibility)
+Last policy update: 2026-09-28
