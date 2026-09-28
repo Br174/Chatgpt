@@ -1,7 +1,11 @@
-UAB UNIFIED ENGINE V1
+MOTORLAB UNIFIED ENGINE V1
+
+COMPATIBILITY NOTE
+Official engine name: MotorLab.
+Legacy UAB filenames, variables, branch conventions and adapter keys remain valid during gradual migration so existing projects do not break.
 
 PURPOSE
-This is the single lifecycle/control model for every Bruno project handled through UAB. Projects may differ in language, build system, package/signing rules and delivery channel, but they do not get independent lifecycle engines.
+This is the single lifecycle/control model for every Bruno project handled through MotorLab. Projects may differ in language, build system, package/signing rules and delivery channel, but they do not get independent lifecycle engines.
 
 UNIVERSAL LIFECYCLE
 MADRE -> LAB -> CANDIDATA -> NEW MADRE
@@ -44,7 +48,7 @@ MADRE -> LAB -> CANDIDATA -> NEW MADRE
 - The previous MADRE remains an immediate rollback point.
 
 5. PROMOTION IDENTITY RECORD - MANDATORY
-For every LAB that is eligible for promotion, UAB must be able to identify:
+For every LAB that is eligible for promotion, MotorLab must be able to identify:
 - MADRE source ref and commit SHA;
 - LAB source ref and commit SHA;
 - exact approved change-set/diff identity;
@@ -62,7 +66,7 @@ GitHub Releases are a deposit of good, approved versions.
 - Downloader-style stable URLs may use GitHub's latest-release pointer while each underlying release tag remains unique and immutable.
 
 ONE ENGINE / MANY ADAPTERS
-UAB CORE owns:
+MotorLab CORE owns:
 - lifecycle state and promotion rules;
 - atomic LAB scope rule;
 - exact LAB change-set replay into CANDIDATA;
@@ -73,7 +77,11 @@ UAB CORE owns:
 - immutable release policy;
 - artifact verification and checksums;
 - rollback/history rules;
-- rule that 100% means verified completion only.
+- rule that 100% means verified completion only;
+- anti-stall watchdog, heartbeat interpretation and progress fingerprints;
+- checkpoint/recovery rules;
+- single-writer lock/concurrency safety;
+- visible watchdog intervention messages using lightning emoji plus explanation.
 
 Each project adapter may define only project-specific mechanics:
 - project type (Android, hybrid, web/PWA, delivery-only);
@@ -84,9 +92,10 @@ Each project adapter may define only project-specific mechanics:
 - cache implementation;
 - regression gates;
 - artifact names/types;
-- deployment/delivery destination.
+- deployment/delivery destination;
+- watchdog operation class, status probe, progress signal, checkpoint mode, lock scope and safe recovery action.
 
-An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction from the same MADRE and same approved change-set, approval-before-MADRE, exact candidate-source promotion, or permanent history retention.
+An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction from the same MADRE and same approved change-set, approval-before-MADRE, exact candidate-source promotion, permanent history retention, or MotorLab Watchdog safety rules.
 
 PROGRESS CONTRACT
 Default milestones:
@@ -101,13 +110,30 @@ Default milestones:
 100 requested state verified and delivered
 Non-applicable steps are removed and progress recalculated. Never claim 100% on a failed or unverified result.
 
+WATCHDOG / ANTI-STALL CONTRACT
+- Long-running work must be assessed by material progress, not by time alone.
+- Ordinary heartbeat/status checks are internal and must not spam Bruno.
+- Repeated identical state is not material progress.
+- Thresholds are adaptive to operation type and provider evidence.
+- First intervention is non-destructive verification.
+- Visible levels are:
+  ⚡ Verifica anti-stallo — explain what appears stalled and what is being checked.
+  ⚡⚡ Ripresa controllata — explain how execution continues without discarding completed work.
+  ⚡⚡⚡ Recupero da checkpoint — explain which verified checkpoint/substep is being recovered.
+  ⚡⚡⚡⚡ Protezione MotorLab — explain why automatic recovery cannot continue safely.
+- Lightning emoji must always be accompanied by an explanation.
+- The watchdog must preserve completed milestones, verified artifacts and checkpoint state whenever technically possible.
+- Read-only diagnostics may run in parallel, but two conflicting writers may not operate on the same lock scope.
+- Recovery targets the smallest stalled/failed substep and bounded retries prevent infinite loops.
+- Detailed mandatory behavior is defined by MOTORLAB_WATCHDOG_V1.txt.
+
 CACHE CONTRACT
 Every adapter must use safe persistent cache when supported. Android/Gradle routes use official Gradle caching and --build-cache unless documented incompatible. Node/web routes persist package-manager download cache. Cache misses are allowed and repopulate automatically.
 
 ROUTING CONTRACT
 - Public repositories: standard GitHub-hosted runners are the normal remote route.
 - Private repositories: conserve included allowance; no automatic paid overage.
-- Codemagic is REMOVED from UAB routing and must not be selected as primary, fallback or emergency provider.
+- Codemagic is REMOVED from MotorLab routing and must not be selected as primary, fallback or emergency provider.
 - If the allowed GitHub/local route is unavailable, stop and report the blocker instead of provider-hopping.
 - Real project/code failures are diagnosed; do not blindly rerun the same broken build on another provider.
 
@@ -118,10 +144,10 @@ ROLLBACK RULE
 If a LAB or CANDIDATA introduces a serious regression, discard it and return to the current MADRE. Do not repair on top of a corrupted experimental lineage unless Bruno explicitly chooses that path.
 
 SINGLE-SOURCE-OF-TRUTH RULE
-Br174/Chatgpt is the private UAB control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt and UAB_PROJECT_ROUTING.txt define the canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
+Br174/Chatgpt is the private MotorLab control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt and MOTORLAB_WATCHDOG_V1.txt define the canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
 
 ENGINE VERSION
-UAB-CORE-V1.1
-Established: 2026-09-24
-Revision 1.1: atomic LAB + exact same-MADRE/same-change CANDIDATA + exact candidate source SHA promotion.
-Routing amendment 2026-09-27: Codemagic removed from UAB; public projects use standard GitHub Actions, with project adapters/local safe paths only where explicitly supported.
+MOTORLAB-CORE-V1.2 (legacy UAB compatibility)
+Established as UAB: 2026-09-24
+MotorLab Watchdog revision: 2026-09-28
+Routing amendment 2026-09-27: Codemagic removed; public projects use standard GitHub Actions, with project adapters/local safe paths only where explicitly supported.
