@@ -1,0 +1,241 @@
+MOTORLAB BACKGROUND EXECUTION V1 - PERSISTENT JOBS + SINGLE-CHAT CONTINUITY
+
+STATUS
+Mandatory MotorLab CORE capability for substantial background-capable work.
+Established: 2026-09-28.
+
+PURPOSE
+MotorLab must allow Bruno to start work from the normal chat of the current project and remain conceptually in that same chat throughout the project workflow, while long-running execution continues on a persistent executor whenever technically possible.
+
+USER EXPERIENCE PRINCIPLE
+The project chat is the canonical user-facing thread.
+Bruno must not be required to migrate manually between a normal Chat, Work, MotorLab, another project chat or another execution surface merely because the execution backend changes.
+
+MotorLab may change executors behind the scenes when safe and supported, but the user-facing project conversation remains the canonical continuity point.
+
+1. SINGLE-CHAT CONTINUITY - MANDATORY
+For each active project task, MotorLab should retain a canonical_chat_ref when the platform exposes a usable conversation/thread identifier.
+The canonical chat is the chat where Bruno initiated or explicitly continued that project task.
+All background state must remain associated with:
+- project_name;
+- canonical_chat_ref when available;
+- operation_id;
+- source repository/ref;
+- current lifecycle state;
+- latest verified checkpoint.
+
+MotorLab must never require Bruno to remember which executor/chat contains the latest state.
+
+2. DO NOT WAIT FOR APP EXIT
+MotorLab cannot rely on detecting the exact moment Bruno leaves the ChatGPT app or switches apps.
+Therefore background routing must happen proactively.
+
+Before a substantial task enters a long-running phase, MotorLab must classify whether the task is:
+- CHAT_LOCAL: expected to finish safely inside the active chat interaction;
+- BACKGROUNDABLE: can be handed to a persistent external executor;
+- USER_BLOCKING: requires Bruno's continuous/near-term decisions and cannot safely run autonomously;
+- MIXED: contains both backgroundable and user-blocking phases.
+
+If BACKGROUNDABLE or MIXED, MotorLab should establish persistent execution/checkpoint state BEFORE depending on a long foreground chat operation.
+
+3. PERSISTENT EXECUTOR REQUIREMENT
+A background-capable task may claim that it can continue after Bruno leaves the chat only when it has been handed to an executor whose execution is independent of the visibility/lifetime of the current ChatGPT client screen.
+
+Examples may include adapter-approved:
+- GitHub Actions workflow/job;
+- persistent cloud worker/service;
+- self-hosted or remote runner;
+- durable queue/worker system;
+- Work/cloud execution when explicitly available and suitable;
+- another adapter-defined durable execution backend.
+
+A normal chat/model turn by itself is NOT a persistent executor.
+
+4. EXECUTOR ROUTING
+MotorLab chooses the safest allowed executor based on project adapter, cost policy, task type and availability.
+Executor choice must not change the user's canonical chat.
+
+Preferred principle:
+- deterministic build/test/download/checksum/repository work -> durable deterministic executor;
+- AI-heavy autonomous work -> cloud/agent executor only when supported and authorized;
+- operations that require immediate Bruno judgment -> remain WAITING_USER in the canonical task state rather than silently guessing.
+
+Work is an optional executor/capability, not the required user-facing conversation.
+MotorLab must not force Bruno to move into a separate Work conversation merely to preserve background continuity.
+
+5. BACKGROUND JOB STATE - MANDATORY
+Every persistent operation should maintain a durable job record containing at least:
+- operation_id
+- project_name
+- canonical_chat_ref when available
+- executor_type
+- executor_job_id/run_id when available
+- repository
+- source_ref
+- source_sha when known
+- lifecycle_role (MADRE/LAB/CANDIDATA/etc. when applicable)
+- task_summary
+- approved_scope
+- status
+- phase
+- last_verified_progress_percent
+- last_heartbeat_at
+- last_progress_at
+- checkpoint_id
+- next_safe_step
+- lock_scope
+- retry_count
+- artifact identifiers/checksums when available
+- waiting_reason when applicable
+- final_result_summary when complete
+
+6. JOB STATES
+Canonical states:
+QUEUED
+RUNNING
+WAITING_EXTERNAL
+WAITING_USER
+RECOVERING
+COMPLETED
+FAILED_SAFE
+CANCELLED_BY_USER
+
+Do not use COMPLETED until the requested output/state is actually verified.
+
+7. CONTINUE WHILE BRUNO IS AWAY
+Once a backgroundable task is safely handed to a persistent executor, it should continue without requiring the ChatGPT app or canonical chat to remain visible.
+
+While Bruno is away MotorLab should, where the execution environment supports it:
+- continue the current autonomous phase;
+- update heartbeat/progress state;
+- create checkpoints;
+- verify intermediate outputs;
+- use Watchdog recovery rules;
+- preserve locks;
+- continue subsequent pre-approved autonomous substeps;
+- stop only when completed, failed safely, externally blocked or Bruno's decision is required.
+
+8. CHECKPOINT IS SAFETY, NOT THE DEFAULT STOP
+Checkpointing does NOT mean the work should pause whenever Bruno leaves.
+The normal behavior is:
+CONTINUE AUTONOMOUSLY + SAVE CHECKPOINTS.
+
+Checkpoint is the recovery point if executor availability ends, the job stalls, a provider fails, or a user decision becomes necessary.
+
+9. RETURN TO THE SAME CHAT
+When Bruno returns to the canonical project chat, MotorLab should reconcile the durable job state before starting new work on the same scope.
+It should report what happened while Bruno was away, for example:
+
+🎆🎆 Progresso MotorLab: 68% — mentre eri fuori dalla chat la build è terminata; sto verificando APK e ZIP.
+
+If the job is waiting for Bruno:
+⚡⚡ Progresso MotorLab: 63% — lavoro preservato al checkpoint <id>; serve una tua decisione per il prossimo passo.
+
+The canonical chat should resume from durable state, not from the last visible assistant message alone.
+
+10. NO CHAT MIGRATION RULE
+Execution backend migration is allowed; user chat migration is not the default workflow.
+MotorLab must not instruct Bruno to continue routine project work in a different chat solely because:
+- Work was used;
+- a worker changed;
+- a GitHub job was used;
+- a runner changed;
+- one executor quota ended.
+
+If the current ChatGPT product itself technically requires a distinct conversation for a capability, MotorLab must treat that as an executor limitation and preserve the canonical task state externally rather than making that second conversation the new authoritative user thread by default.
+
+11. EXECUTOR FAILURE / QUOTA EXHAUSTION
+If an executor becomes unavailable or its quota ends:
+- preserve the latest verified checkpoint;
+- keep completed work and artifacts;
+- release or transfer locks safely;
+- choose another adapter-approved persistent executor when available and authorized;
+- continue from the smallest safe next step;
+- do not restart from zero;
+- do not silently incur paid usage;
+- do not require Bruno to reconstruct context manually.
+
+If no safe executor is available, set WAITING_EXTERNAL or WAITING_USER and explain the blocker.
+
+12. WORK-SPECIFIC RULE
+ChatGPT Work may be used as an execution capability only when available and useful.
+It must not become the only continuity mechanism.
+If using Work would require Bruno to manually manage a second conversation, MotorLab should prefer another durable executor for deterministic background phases when one is available.
+If Work availability ends, durable MotorLab state remains authoritative and execution may continue on another approved executor from the latest checkpoint.
+
+13. CHAT CLIENT LIMITATION
+MotorLab cannot force a suspended ordinary ChatGPT client/model turn to keep computing when the platform has stopped that foreground execution.
+Therefore the guarantee is conditional:
+- if the task has been handed to a persistent executor, execution continues independently of the visible chat;
+- if a task remains only inside a normal chat turn, no false background guarantee may be made.
+
+MotorLab should proactively avoid leaving long backgroundable work only inside a normal chat turn.
+
+14. NOTIFICATIONS / USER ATTENTION
+When a supported notification channel exists, MotorLab may notify Bruno when:
+- the task completes;
+- WAITING_USER is reached;
+- a serious failure requires attention.
+
+Notifications are optional delivery channels and must not become a separate authoritative conversation.
+The durable job/checkpoint state remains the source of truth.
+
+15. WATCHDOG INTEGRATION
+Persistent background jobs are governed by MOTORLAB_WATCHDOG_V1.txt.
+Watchdog must continue to use:
+- progress fingerprints;
+- adaptive thresholds;
+- non-destructive first intervention;
+- single-writer locking;
+- checkpoint recovery;
+- bounded targeted retry.
+
+Visible watchdog status in the canonical chat must include current verified percentage when possible.
+
+16. PROGRESS REPORTING INTEGRATION
+Persistent job state must store the last verified percentage.
+Background execution may advance percentage only on verified micro-milestones.
+When the canonical chat becomes available again, MotorLab reconciles and reports the latest verified percentage plus the work completed while Bruno was away.
+
+17. VISUAL SUCCESS INTEGRATION
+Verified background successes use MOTORLAB_VISUAL_STATUS_V1.txt:
+- 🎆🎆 small verified success;
+- 🎆🎆🎆 significant milestone;
+- 🎆🎆🎆🎆 major/final verified completion.
+
+18. SINGLE-WRITER SAFETY
+Background execution must not create multiple writers to the same lock_scope merely because the foreground chat is reopened.
+When Bruno returns, the chat first inspects the current durable job/lock state.
+If the background job is still RUNNING, the chat must not start a conflicting duplicate operation.
+
+19. PROJECT-ADAPTER REQUIREMENTS
+New/updated adapters should declare:
+MOTORLAB_BACKGROUND_MODE=<none|github-actions|worker|runner|work|hybrid|custom>
+MOTORLAB_BACKGROUND_STATUS_PROBE=<how job state is read>
+MOTORLAB_BACKGROUND_START=<how a durable job is started>
+MOTORLAB_BACKGROUND_RESUME=<how checkpoint continuation occurs>
+MOTORLAB_BACKGROUND_CANCEL=<how cancellation is performed safely>
+MOTORLAB_BACKGROUND_CHECKPOINT_STORE=<registry|artifact|provider|custom>
+MOTORLAB_BACKGROUND_LOCK_SCOPE=<project/repo/ref/resource>
+MOTORLAB_BACKGROUND_NOTIFY=<supported notification path or none>
+
+Legacy adapters remain usable but may not claim true background continuity until a persistent executor is defined.
+
+20. NO PROJECT LOGIC REGRESSION
+Background execution is control-plane infrastructure.
+It must not alter application UI, domain logic, package identity, signing, source lineage or MADRE/LAB/CANDIDATA semantics merely to add background capability.
+
+21. SUCCESS CRITERIA
+MotorLab Background Execution is correctly active when:
+- Bruno can stay conceptually in one canonical project chat;
+- long backgroundable work is proactively handed to a persistent executor;
+- closing/switching away from the visible chat does not stop the persistent executor;
+- checkpoints are continuously preserved;
+- returning to the same chat reconciles the latest durable state;
+- executor changes do not require manual context migration;
+- no duplicate writer starts when the chat is reopened;
+- unsupported normal-chat-only execution is never falsely described as background-capable.
+
+VERSION
+MOTORLAB-BACKGROUND-EXECUTION-V1.0
+Established: 2026-09-28
