@@ -1,8 +1,11 @@
-UAB PROJECT ROUTING - UAB-CORE-V1.1
+UAB PROJECT ROUTING - MOTORLAB-CORE-V1.5
 
 Purpose
-Repository-specific adapter/routing state for the single UAB engine. No repository gets an independent lifecycle engine. All projects follow MADRE -> LAB -> CANDIDATA -> NEW MADRE using the atomic/exact-promotion method in UAB_UNIFIED_ENGINE_V1.txt.
-Last verified: 2026-09-27.
+Repository-specific adapter/routing state for the single MotorLab engine. No repository gets an independent lifecycle engine. All projects follow MADRE -> LAB -> CANDIDATA -> NEW MADRE using the atomic/exact-promotion method in UAB_UNIFIED_ENGINE_V1.txt.
+Last verified: 2026-09-28.
+
+GLOBAL SINGLE-CHAT PRINCIPLE
+For every project, the chat in which Bruno initiates/continues that project task remains the canonical user-facing thread when a usable chat reference exists. Backend jobs may run on GitHub Actions, workers, runners or other durable executors, but Bruno must not be required to migrate manually to another conversation just because the executor changes.
 
 1. MusicLab
 Repository: Br174/MusicLab
@@ -20,10 +23,15 @@ CANDIDATA rule: create fresh from the exact same MADRE used by the approved LAB 
 MADRE rule: after explicit approval, the new MADRE source ref points to the exact approved CANDIDATA source SHA; no extra source rebuild/commit is allowed during promotion.
 MADRE release rule: only approved candidate becomes a new immutable permanent Release. Do not overwrite prior MADRE assets.
 Primary remote build route: standard GitHub Actions.
-Codemagic: REMOVED from UAB and not an allowed MusicLab route.
+Codemagic: REMOVED from MotorLab and not an allowed MusicLab route.
 Patch/repack: forbidden by default for native Kotlin/Compose changes.
 Cache: official Gradle cache + --build-cache.
-Progress: UAB_PROGRESS milestones mandatory.
+Progress: MotorLab progress reporting mandatory.
+Background mode: github-actions for durable build/test/artifact phases; chat-local only for short interactive reasoning/edits that do not require durable execution.
+Background status probe: workflow run/job/step/artifact state.
+Background checkpoint store: MotorLab registry + GitHub run/artifact identifiers.
+Background resume: resume/targeted rerun from latest verified job/checkpoint when safe; never duplicate an active writer.
+Canonical chat: remain in the MusicLab project chat; do not require Bruno to migrate to Work/MotorLab for routine execution.
 
 2. GeoVision-Test
 Repository: Br174/GeoVision-Test
@@ -38,6 +46,11 @@ Primary remote full-build route: standard GitHub Actions.
 Fast route: adapter-approved patch/repack for HTML/JS/assets-only changes when signature/package/update compatibility is preserved.
 Cache: Gradle --build-cache + pip/tool caches where useful.
 Progress: mandatory.
+Background mode: hybrid — GitHub Actions for full durable builds/tests; safe patch/repack may use an adapter-approved durable worker/runner when available; short diagnostics may remain chat-local.
+Background status probe: workflow/job/artifact/ref state or worker state for patch/repack.
+Background checkpoint store: MotorLab registry + provider job/artifact ids.
+Background resume: continue from latest verified source/ref/checkpoint; never alter the blindata Google card/runtime baseline merely to add background capability.
+Canonical chat: remain in the GeoVision project chat.
 
 3. StudyBook-AI
 Repository: Br174/StudyBook-AI
@@ -50,12 +63,16 @@ MADRE rule: approved Candidate source SHA becomes the new stable source referenc
 Primary build/test route: standard GitHub Actions.
 Cache: npm download cache + prefer-offline.
 Progress: mandatory.
+Background mode: github-actions for durable build/test/deploy-preflight phases; deployment worker may be used only when adapter-approved and observable.
+Background status probe: workflow/job/deployment state.
+Background checkpoint store: MotorLab registry + run/deployment identifiers.
+Canonical chat: remain in the StudyBook project chat.
 
 4. Visionflix
 Repository: Br174/Visionflix
 Visibility: PRIVATE
 Project class: Android Mobile/TV source project
-Current MADRE reference: main until an explicit immutable Mother ref is frozen under UAB CORE.
+Current MADRE reference: main until an explicit immutable Mother ref is frozen under MotorLab CORE.
 LAB rule: one requested modification/change-set from current MADRE; experimental builds must not replace an approved Mother binary.
 CANDIDATA rule: fresh from the exact same MADRE used by the approved LAB and replay exactly the same approved change-set.
 MADRE rule: approved Candidate source SHA becomes new Mother source ref. Final signing/packaging may differ only as adapter-declared packaging metadata, never application source.
@@ -64,21 +81,26 @@ Primary route: local/safe path first when practical; otherwise GitHub Actions wi
 Cache: Gradle cache + --build-cache mandatory; preserve signing identity outside unsafe caches.
 Progress: mandatory.
 Paid overage: forbidden without explicit approval.
+Background mode: hybrid/conditional. Use a durable local/remote runner when available; otherwise GitHub Actions only within allowed private-repo quota. If neither durable route is available, checkpoint and report WAITING_EXTERNAL rather than pretending normal chat can continue in background.
+Background checkpoint store: MotorLab registry + provider job/artifact identifiers.
+Canonical chat: remain in the Visionflix project chat.
 
 5. streamflix-BV
 Repository: Br174/streamflix-BV
 Actual visibility at last verification: PUBLIC.
 Project class: delivery/distribution repository for Verlezza Vision TV, not a separate app-engine authority.
-Role under UAB CORE: thin delivery adapter only.
+Role under MotorLab CORE: thin delivery adapter only.
 Public Downloader releases use unique version tags; this is compatible with immutable-history rules when each underlying release is preserved.
 Stable Downloader pointer may continue to use GitHub latest-release semantics because underlying release tags remain unique.
 This repository must not define a separate MADRE/LAB engine for Visionflix source.
+Background mode: github-actions/GitHub release operations for durable delivery steps when applicable.
+Canonical chat: the Visionflix/Verlezza Vision project chat remains user-facing authority; delivery backend does not create a new required chat.
 
 6. Chatgpt
 Repository: Br174/Chatgpt
 Visibility: PRIVATE
-Project class: UAB control/registry repository
-Role: canonical UAB CORE policy, lifecycle, adapter specification, project routing and state/artifact registry.
+Project class: MotorLab control/registry repository
+Role: canonical MotorLab CORE policy, lifecycle, adapter specification, project routing and state/artifact registry.
 Do not build an app from this repository.
 Canonical files:
 - UAB_UNIFIED_ENGINE_V1.txt
@@ -87,6 +109,12 @@ Canonical files:
 - UAB_GLOBAL_APK_POLICY.txt
 - UAB_PROJECT_ROUTING.txt
 - UAB_STATE_REGISTRY.txt
+- MOTORLAB_WATCHDOG_V1.txt
+- MOTORLAB_VISUAL_STATUS_V1.txt
+- MOTORLAB_PROGRESS_REPORTING_V1.txt
+- MOTORLAB_BACKGROUND_EXECUTION_V1.txt
+Background mode: registry/control-plane only. This repository defines durable job/checkpoint rules but is not itself a continuously running worker service.
+Canonical chat: MotorLab chat is used only to design/manage MotorLab itself, not as the required user-facing chat for other projects.
 
 7. Cover Lab AI
 Repository: Br174/Cover-Lab-AI
@@ -102,14 +130,31 @@ Patch/repack: forbidden by default because the Android laboratory is native Kotl
 Cache: official Gradle cache + --build-cache.
 Progress and LIVE BUILD MONITORING: mandatory.
 Paid overage/fallback: forbidden without explicit approval.
+Background mode: github-actions for durable build/test/artifact phases; background state stored in MotorLab registry plus run/artifact ids.
+Background status probe: workflow/job/step/artifact state.
+Background resume: targeted resume/rerun from latest verified checkpoint when safe.
+Canonical chat: remain in the Cover Lab AI project chat.
 
 GLOBAL ROUTING RULES
 1. Re-check repository visibility before a build.
-2. Public build projects -> standard GitHub Actions is default remote compiler/test runner.
-3. Private build projects -> conserve included quota; no automatic paid fallback.
-4. Codemagic is REMOVED from UAB and must not be used as primary, fallback or emergency route.
-5. If an allowed route is unavailable, stop and report the blocker rather than switching providers automatically.
+2. Public build projects -> standard GitHub Actions is default remote compiler/test runner and is a durable background executor for supported build/test phases.
+3. Private build projects -> conserve included quota; no automatic paid fallback. Durable runner/local worker may be used only when adapter-approved and available.
+4. Codemagic is REMOVED from MotorLab and must not be used as primary, fallback or emergency route.
+5. If an allowed route is unavailable, stop and report the blocker rather than switching to an unauthorized provider automatically.
 6. Project-specific workflows are adapters/mechanics only and cannot override lifecycle/promotion rules.
+7. A normal ChatGPT turn alone is never considered a durable background route.
+8. Background-capable work is routed proactively before a long foreground phase; do not wait for Bruno to leave the app.
+9. Reopening the canonical project chat first reconciles active job/lock/checkpoint state before starting new writes.
+10. Executor migration must not force routine user chat migration.
+
+GLOBAL BACKGROUND RULE
+1. Canonical user surface = current project chat.
+2. Execution may move among adapter-approved durable executors behind the scenes.
+3. While Bruno is away, a durable RUNNING job continues through approved autonomous steps and saves checkpoints.
+4. Checkpoint is safety, not pause-on-exit.
+5. If the executor stops/quota ends, continue from checkpoint on another approved route when safe; otherwise WAITING_EXTERNAL/WAITING_USER.
+6. Never claim background continuity unless a real durable executor is active.
+7. Detailed contract: MOTORLAB_BACKGROUND_EXECUTION_V1.txt.
 
 GLOBAL EXACT-PROMOTION RULE
 1. LAB = current MADRE + one requested modification (or one small inseparable change-set).
@@ -121,10 +166,10 @@ GLOBAL RELEASE RULE
 Permanent Release = approved MADRE. LAB and CANDIDATA use temporary test artifacts. Never overwrite an existing MADRE release asset/tag. A latest pointer may identify the newest immutable MADRE but may not replace historical storage.
 
 GLOBAL ENGINE RULE
-All current and future projects follow UAB-CORE-V1.1 and UAB-ADAPTER-SPEC-V1.1. Any workflow that conflicts is legacy until aligned.
+All current and future projects follow MOTORLAB-CORE-V1.5 and UAB-ADAPTER-SPEC-V1.3. Any workflow that conflicts is legacy until aligned.
 
 GLOBAL CACHE RULE
 Persistent safe cache is mandatory where supported.
 
 GLOBAL PROGRESS RULE
-5/15/30/45/60/75/85/95/100 default milestone ladder, recalculated when phases do not apply. Never report 100% before verification.
+5/15/30/45/60/75/85/95/100 broad ladder plus verified micro-milestones and frequent status updates. Never report 100% before verification.
