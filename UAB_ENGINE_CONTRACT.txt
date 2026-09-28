@@ -47,10 +47,10 @@ C. PERSISTENT CACHE - MANDATORY
    - A warm-cache build should normally be faster, but source changes, invalidation, provider eviction or non-cacheable tasks can still require full work.
 
 D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
-1. Every substantial modification/build task must expose a current completion percentage to Bruno while work is in progress.
-2. Percentage is based on completed milestones, not elapsed clock time and not an invented ETA.
-3. Default full modification + build + delivery scale:
-   5%  request accepted / scope locked
+1. Every substantial modification/build task must expose a current completion percentage to Bruno throughout work, not only at major milestones.
+2. Percentage is based on completed verified milestones/micro-milestones, not elapsed clock time and not an invented ETA.
+3. Default broad scale:
+   5% request accepted / scope locked
    15% current MADRE identified and protected
    30% requested LAB/config changes applied
    45% static/source checks completed
@@ -59,18 +59,25 @@ D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
    85% artifact + regression verification completed
    95% candidate/handoff or promotion package ready
    100% requested state verified and delivered
-4. Non-build work:
+4. Large phases may be divided into real deterministic micro-milestones so intermediate values can be reported when justified by actual completed work.
+5. Non-build work:
    - Remove non-applicable phases and proportionally recalculate progress across the real work plan.
-5. Failure behavior:
+6. Failure behavior:
    - Keep the last verified percentage and identify the failing phase.
    - Do not show 100% until the user's requested outcome is actually verified.
-6. Interactive reporting:
-   - In chat, report meaningful percentage changes when a milestone is completed or the active phase materially changes.
-   - Avoid spamming identical percentages.
-7. CI/log reporting:
-   - MotorLab/UAB-enabled build scripts/workflows should emit machine-readable progress markers plus a short phase description.
-8. Cross-project rule:
-   - The percentage contract applies to MusicLab, GeoVision, StudyBook, Visionflix/streamflix and future projects.
+7. Interactive reporting frequency:
+   - report at task start, meaningful subtask start/completion, phase changes, important file/change application, check transitions, build/test transitions, artifact/checkpoint changes, watchdog interventions, recovery outcomes, handoff/promotion transitions and final delivery;
+   - as a practical default, avoid more than roughly 1-3 meaningful tool/operation interactions without a progress update when the interface permits;
+   - for a long single operation, report status as provider/job evidence changes;
+   - do not spam clock-based identical messages with no new information.
+8. Same-percentage updates are explicitly allowed and encouraged when new operational information exists but no new completion has been verified. The explanation must state what is happening and why the percentage remains unchanged.
+9. CI/log reporting:
+   - MotorLab/UAB-enabled build scripts/workflows should emit machine-readable progress markers plus a short phase description when supported.
+10. Cross-project rule:
+   - the percentage contract applies to MusicLab, GeoVision, StudyBook, Visionflix/streamflix, Cover Lab AI and future projects.
+11. Watchdog messages should include the current last verified percentage when visible.
+12. Fireworks success messages should include the current percentage when useful, but fireworks alone do not advance progress.
+13. Detailed semantics are mandatory in MOTORLAB_PROGRESS_REPORTING_V1.txt.
 
 E. REGRESSION GATES - MANDATORY
 1. Each project adapter must define critical unrelated functions that must remain healthy before a CANDIDATA can become MADRE.
@@ -91,7 +98,7 @@ Any new project added to MotorLab must declare:
 A project is not fully onboarded until these are defined.
 
 G. PRIORITY
-This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt and MOTORLAB_VISUAL_STATUS_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
+This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt and MOTORLAB_PROGRESS_REPORTING_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
 
 H. MOTORLAB WATCHDOG / ANTI-STALL - MANDATORY
 1. Every substantial controllable operation must expose heartbeat and material-progress state when technically available.
@@ -121,5 +128,5 @@ I. MOTORLAB VISUAL SUCCESS STATUS - MANDATORY
 8. This is a global MotorLab reporting rule. Project adapters may add detail but may not disable it.
 9. Detailed semantics are mandatory in MOTORLAB_VISUAL_STATUS_V1.txt.
 
-Engine version: MOTORLAB-CORE-V1.3 (legacy UAB compatibility)
+Engine version: MOTORLAB-CORE-V1.4 (legacy UAB compatibility)
 Last updated: 2026-09-28.
