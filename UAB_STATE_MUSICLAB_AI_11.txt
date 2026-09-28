@@ -17,9 +17,9 @@ LIFECYCLE
 - MADRE SHA: cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33
 - MADRE untouched by this LAB work.
 - Current experimental/test ref: uab-build/musiclab-global-ai-engine-11
-- Current ref head at checkpoint creation: 92aa27247816680641325130681dfa101648562f
-- Functional app/backend source verified by final successful build: e26c314f9423aea1cd9ccae64e0e3f11f612bcd4
-- The later commits only added/removed temporary build/preflight workflows/scripts and did not intentionally alter application source.
+- Current ref head at checkpoint update: 2587380c8b2496b74508b07e6a49f0dc527c5248
+- Functional app/backend source verified by final successful Android build: e26c314f9423aea1cd9ccae64e0e3f11f612bcd4
+- The later commits only added/removed temporary build/preflight/dry-run workflows/scripts and did not intentionally alter application source.
 - CANDIDATA: none.
 - Promotion: forbidden until Bruno real-device approval and clean MotorLab candidate reconstruction/identity verification.
 
@@ -35,7 +35,7 @@ APPROVED SCOPE OF CURRENT EXPERIMENT
 9. Settings include master AI ON/OFF plus granular controls; OFF preserves classic MusicLab behavior.
 10. Cloud failure must fall back safely and must never block playback.
 
-VERIFIED BUILD CHECKPOINT
+VERIFIED ANDROID BUILD CHECKPOINT
 - GitHub Actions run: 36391955950
 - Result: SUCCESS
 - Artifact id: 10957325203
@@ -50,28 +50,35 @@ CLOUDFLARE BACKEND STATE
 - D1 schema/migrations exist.
 - App cloud client is wired for Cover and Originali with fallback to local/direct AI behavior when cloud is unavailable.
 - Cloud deployment has NOT been performed.
-- Non-destructive preflight workflow run: 36412182274.
+- Non-destructive credentials preflight workflow run: 36412182274.
 - Preflight result: credentials gate failed before Wrangler install/deploy.
 - Missing repository secrets confirmed without exposing any value:
   * CLOUDFLARE_API_TOKEN
   * CLOUDFLARE_ACCOUNT_ID
   * GEMINI_API_KEY
-- No D1 database was created by the preflight.
-- No Worker was deployed by the preflight.
-- No Cloudflare resource was modified by the preflight.
+- No D1 database was created by the credentials preflight.
+- No Worker was deployed by the credentials preflight.
+- No Cloudflare resource was modified by the credentials preflight.
+- Cloudflare package validation dry-run workflow run: 36412448627.
+- Dry-run result: SUCCESS.
+- npm dependencies installed successfully in the runner.
+- Worker JavaScript syntax check passed.
+- wrangler deploy --dry-run passed using a non-persistent dummy D1 id only for config validation.
+- Therefore the current blocker is credentials/account provisioning, not Worker package syntax/config packaging.
 
 MOTORLAB DURABLE JOB STATE
 - operation_id: musiclab-global-ai-engine-11-20260928
 - status: WAITING_USER
 - phase: cloudflare_credentials
-- last_verified_progress_percent: 87
-- checkpoint_id: musiclab-ai11-cloud-blocker-20260928-01
+- last_verified_progress_percent: 90
+- checkpoint_id: musiclab-ai11-cloud-blocker-20260928-02
 - source_ref: uab-build/musiclab-global-ai-engine-11
-- source_sha: 92aa27247816680641325130681dfa101648562f
+- source_sha: 2587380c8b2496b74508b07e6a49f0dc527c5248
 - functional_source_sha: e26c314f9423aea1cd9ccae64e0e3f11f612bcd4
 - executor_type: github-actions
 - last_build_run_id: 36391955950
 - last_preflight_run_id: 36412182274
+- last_cloudflare_dryrun_run_id: 36412448627
 - lock_scope: MusicLab:Br174/MusicLab:uab-build/musiclab-global-ai-engine-11
 - lock_state: RELEASED (no active writer at checkpoint)
 - retry_count: 0 for credential blocker; do not retry blindly until credentials exist.
