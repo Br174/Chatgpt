@@ -91,7 +91,7 @@ Any new project added to MotorLab must declare:
 A project is not fully onboarded until these are defined.
 
 G. PRIORITY
-This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt and MOTORLAB_WATCHDOG_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
+This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt and MOTORLAB_VISUAL_STATUS_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
 
 H. MOTORLAB WATCHDOG / ANTI-STALL - MANDATORY
 1. Every substantial controllable operation must expose heartbeat and material-progress state when technically available.
@@ -107,5 +107,19 @@ H. MOTORLAB WATCHDOG / ANTI-STALL - MANDATORY
 11. A watchdog event alone does not increase progress percentage; only real verified progress does.
 12. Detailed semantics are mandatory in MOTORLAB_WATCHDOG_V1.txt.
 
-Engine version: MOTORLAB-CORE-V1.2 (legacy UAB compatibility)
+I. MOTORLAB VISUAL SUCCESS STATUS - MANDATORY
+1. Every meaningful verified success during MotorLab-controlled programming, fixing, building, testing, recovery or delivery must be surfaced visually to Bruno with fireworks plus a plain-language explanation.
+2. Fireworks levels are:
+   - 🎆🎆 small verified success;
+   - 🎆🎆🎆 significant milestone or feature/build success;
+   - 🎆🎆🎆🎆 major/final verified completion.
+3. Fireworks must never appear alone. The message must explain what succeeded and, where relevant, how it was verified.
+4. Do not show fireworks for work that merely started, is still pending, is assumed successful or remains unverified where verification is possible.
+5. Emit fireworks for each meaningful small resolved item as well as larger milestones, but do not repeat the same success or decorate no-op/internal polling.
+6. Fireworks complement progress percentages; they do not themselves increase progress.
+7. Watchdog lightning and success fireworks remain semantically distinct. A recovery may show lightning during intervention and fireworks only after recovery success is verified.
+8. This is a global MotorLab reporting rule. Project adapters may add detail but may not disable it.
+9. Detailed semantics are mandatory in MOTORLAB_VISUAL_STATUS_V1.txt.
+
+Engine version: MOTORLAB-CORE-V1.3 (legacy UAB compatibility)
 Last updated: 2026-09-28.
