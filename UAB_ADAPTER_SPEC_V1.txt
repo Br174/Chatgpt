@@ -1,9 +1,13 @@
 UAB PROJECT ADAPTER SPEC V1
 
-Every repository handled by UAB declares a small project adapter. The adapter describes mechanics only; lifecycle policy remains owned by UAB CORE.
+COMPATIBILITY NOTE
+Official engine name: MotorLab.
+Legacy UAB filenames and environment keys remain valid for backward compatibility while projects migrate gradually. Do not rename them blindly if that could break an existing adapter.
+
+Every repository handled by MotorLab/UAB declares a small project adapter. The adapter describes mechanics only; lifecycle policy remains owned by MotorLab CORE.
 
 REQUIRED FIELDS
-UAB_ENGINE_VERSION=UAB-CORE-V1.1
+UAB_ENGINE_VERSION=MOTORLAB-CORE-V1.2
 UAB_PROJECT_NAME=<human readable name>
 UAB_PROJECT_CLASS=<android|android-hybrid|web-pwa|delivery-only>
 UAB_MOTHER_REF=<current approved stable ref or main until first explicit Mother is created>
@@ -40,6 +44,16 @@ DELIVERY-ONLY FIELDS WHEN APPLICABLE
 UAB_DELIVERY_SOURCE_REPO=<repo>
 UAB_DELIVERY_STABLE_POINTER=<description>
 
+MOTORLAB WATCHDOG FIELDS - REQUIRED FOR NEW/UPDATED ADAPTERS
+MOTORLAB_WATCHDOG_CLASS=<short|normal|build|long>
+MOTORLAB_WATCHDOG_STATUS_PROBE=<how current state is checked>
+MOTORLAB_WATCHDOG_PROGRESS_SIGNAL=<job step/status/log/artifact/ref marker>
+MOTORLAB_WATCHDOG_CHECKPOINT_MODE=<native|registry|artifact|none-with-reason>
+MOTORLAB_WATCHDOG_LOCK_SCOPE=<project/repo/ref/resource rule>
+MOTORLAB_WATCHDOG_RECOVERY_ACTION=<safe targeted continuation/retry mechanism>
+
+Legacy adapters that do not yet declare the watchdog fields remain usable. MotorLab applies conservative defaults and MUST NOT perform destructive recovery when it cannot establish the real execution state safely.
+
 MANDATORY ADAPTER BEHAVIOR
 1. Adapter cannot make a LAB permanent.
 2. Adapter cannot overwrite an immutable MADRE release.
@@ -47,7 +61,7 @@ MANDATORY ADAPTER BEHAVIOR
 4. Adapter must preserve prior MADRI.
 5. Adapter must define cache behavior and progress milestones.
 6. Adapter must define the core regression gates that must pass before promotion.
-7. Adapter may keep legacy workflows temporarily, but those workflows are not authoritative promotion paths until aligned with UAB CORE.
+7. Adapter may keep legacy workflows temporarily, but those workflows are not authoritative promotion paths until aligned with MotorLab CORE.
 8. LAB scope is atomic: one requested modification, or one small inseparable change-set for that single modification. Unrelated changes require a new LAB from the current MADRE unless Bruno explicitly combines them.
 9. A CANDIDATA must be created fresh from the exact same MADRE ref/SHA used by the approved LAB.
 10. The CANDIDATA must replay exactly the approved LAB change-set. No extra cleanup, refactor, dependency update or unrelated fix may be inserted without explicit approval.
@@ -55,8 +69,15 @@ MANDATORY ADAPTER BEHAVIOR
 12. When Bruno approves the CANDIDATA as NEW MADRE, the new Mother source ref must point to the exact approved CANDIDATA commit SHA. Do not create another source commit merely to promote it.
 13. If final Android Mother packaging/signing differs from Candidate test packaging, it must use the exact approved Candidate source SHA and may alter only adapter-declared packaging/signing metadata, never application source.
 14. If the Mother/LAB/change-set/Candidate identity chain cannot be proven, promotion must stop rather than guess.
+15. Substantial operations must expose enough state for MotorLab to distinguish a healthy wait from a true stall when the provider supports observability.
+16. Repeated identical status output does not count as progress. Adapters should expose a meaningful progress signal or fingerprint source.
+17. Write-capable operations must declare or derive a lock scope so the watchdog cannot create two conflicting writers.
+18. Safe recovery must target only the stalled/failed substep when possible and preserve verified completed work.
+19. Adapter watchdog events shown to Bruno must always use lightning emoji plus plain-language explanation; never emit a bare lightning symbol without context.
+20. Adapter watchdog behavior is governed by MOTORLAB_WATCHDOG_V1.txt and may not override its non-interruption, checkpoint, bounded-retry or single-writer rules.
 
 VERSION
-UAB-ADAPTER-SPEC-V1.1
+UAB-ADAPTER-SPEC-V1.2 / MOTORLAB COMPATIBILITY
 Established: 2026-09-24
 Revision 1.1: atomic LAB and exact same-Mother/same-change Candidate promotion chain.
+Revision 1.2: MotorLab naming compatibility plus mandatory anti-stall watchdog observability, checkpoint, lock and recovery contract.
