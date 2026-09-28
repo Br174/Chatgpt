@@ -1,7 +1,7 @@
 UNIVERSAL MOTORLAB/UAB POLICY - GLOBAL
 
 SCOPE
-This policy is the canonical build/test/delivery flow for Bruno's projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass MotorLab CORE lifecycle, cost, verification, release or watchdog rules.
+This policy is the canonical build/test/delivery flow for Bruno's projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass MotorLab CORE lifecycle, cost, verification, release, watchdog or visual-status rules.
 
 NAME / COMPATIBILITY
 Official engine name: MotorLab.
@@ -20,6 +20,7 @@ CORE PRINCIPLES
 10. FAIL FAST. Availability, authorization, quota, runner, signing and toolchain checks should fail before a long build whenever possible.
 11. DIAGNOSE CODE FAILURES. If a real build starts and fails because of project code, dependencies, signing or packaging, diagnose the project failure instead of blindly repeating it on another provider.
 12. WATCHDOG. Long operations must be monitored for real progress, not just elapsed time. Suspected stalls use MotorLab Watchdog escalation with checkpoint recovery and single-writer safety.
+13. VISUAL SUCCESS. Every meaningful verified success must be surfaced to Bruno with 2-4 fireworks plus an explanation of what succeeded.
 
 MANDATORY LIFECYCLE FLOW
 1. Identify and protect the current MADRE reference.
@@ -95,6 +96,20 @@ Default full-task ladder:
 100% requested state verified and delivered
 Non-applicable phases are removed/recalculated. Never report 100% on an unverified or failed result.
 
+VISUAL SUCCESS STATUS - MANDATORY
+1. Every meaningful verified completed item must be visibly reported to Bruno.
+2. Use:
+   🎆🎆 for a small verified success;
+   🎆🎆🎆 for a significant milestone/feature/build success;
+   🎆🎆🎆🎆 for a major or final verified completion.
+3. Fireworks must always be accompanied by a short explanation of what succeeded and, where relevant, how it was verified.
+4. Do not show fireworks for work that merely started, is pending, assumed successful or not yet verified when verification is possible.
+5. Small resolved items should receive their own success signal; do not reserve fireworks only for the final response.
+6. Do not repeat fireworks for the same success or decorate internal polling/no-op actions.
+7. Fireworks do not replace progress percentages and do not create progress by themselves.
+8. Watchdog lightning remains distinct: lightning means anti-stall intervention/protection; fireworks mean verified success.
+9. Detailed behavior is governed by MOTORLAB_VISUAL_STATUS_V1.txt.
+
 LIVE BUILD MONITORING + MOTORLAB WATCHDOG
 1. New/in-progress build requests are monitored while an execution/control surface is available.
 2. Report meaningful phase changes, not repeated identical status spam.
@@ -130,6 +145,7 @@ CANONICAL FILES
 - UAB_GLOBAL_APK_POLICY.txt
 - UAB_PROJECT_ROUTING.txt
 - MOTORLAB_WATCHDOG_V1.txt
+- MOTORLAB_VISUAL_STATUS_V1.txt
 
-Engine version: MOTORLAB-CORE-V1.2 (legacy UAB compatibility)
+Engine version: MOTORLAB-CORE-V1.3 (legacy UAB compatibility)
 Last policy update: 2026-09-28
