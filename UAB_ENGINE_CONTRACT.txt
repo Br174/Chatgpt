@@ -60,23 +60,18 @@ D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
    95% candidate/handoff or promotion package ready
    100% requested state verified and delivered
 4. Large phases may be divided into real deterministic micro-milestones so intermediate values can be reported when justified by actual completed work.
-5. Non-build work:
-   - Remove non-applicable phases and proportionally recalculate progress across the real work plan.
-6. Failure behavior:
-   - Keep the last verified percentage and identify the failing phase.
-   - Do not show 100% until the user's requested outcome is actually verified.
+5. Non-build work: remove non-applicable phases and proportionally recalculate progress across the real work plan.
+6. Failure behavior: keep the last verified percentage, identify the failing phase, and never show 100% until the requested outcome is verified.
 7. Interactive reporting frequency:
    - report at task start, meaningful subtask start/completion, phase changes, important file/change application, check transitions, build/test transitions, artifact/checkpoint changes, watchdog interventions, recovery outcomes, handoff/promotion transitions and final delivery;
    - as a practical default, avoid more than roughly 1-3 meaningful tool/operation interactions without a progress update when the interface permits;
    - for a long single operation, report status as provider/job evidence changes;
    - do not spam clock-based identical messages with no new information.
-8. Same-percentage updates are explicitly allowed and encouraged when new operational information exists but no new completion has been verified. The explanation must state what is happening and why the percentage remains unchanged.
-9. CI/log reporting:
-   - MotorLab/UAB-enabled build scripts/workflows should emit machine-readable progress markers plus a short phase description when supported.
-10. Cross-project rule:
-   - the percentage contract applies to MusicLab, GeoVision, StudyBook, Visionflix/streamflix, Cover Lab AI and future projects.
-11. Watchdog messages should include the current last verified percentage when visible.
-12. Fireworks success messages should include the current percentage when useful, but fireworks alone do not advance progress.
+8. Same-percentage updates are explicitly allowed and encouraged when new operational information exists but no new completion has been verified.
+9. CI/log reporting should emit machine-readable progress markers plus a short phase description when supported.
+10. Cross-project rule: percentage applies to all MotorLab projects and future projects.
+11. Watchdog messages should include current last verified percentage when visible.
+12. Fireworks success messages should include current percentage when useful, but fireworks alone do not advance progress.
 13. Detailed semantics are mandatory in MOTORLAB_PROGRESS_REPORTING_V1.txt.
 
 E. REGRESSION GATES - MANDATORY
@@ -94,11 +89,12 @@ Any new project added to MotorLab must declare:
 - regression gates;
 - release/delivery mode;
 - package/signing strategy when Android is involved;
-- watchdog class/status probe/progress signal/checkpoint/lock/recovery fields where supported.
+- watchdog class/status probe/progress signal/checkpoint/lock/recovery fields where supported;
+- background executor/start/status/resume/cancel/checkpoint/lock/notification fields where supported.
 A project is not fully onboarded until these are defined.
 
 G. PRIORITY
-This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt and MOTORLAB_PROGRESS_REPORTING_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
+This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt and MOTORLAB_BACKGROUND_EXECUTION_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
 
 H. MOTORLAB WATCHDOG / ANTI-STALL - MANDATORY
 1. Every substantial controllable operation must expose heartbeat and material-progress state when technically available.
@@ -116,17 +112,34 @@ H. MOTORLAB WATCHDOG / ANTI-STALL - MANDATORY
 
 I. MOTORLAB VISUAL SUCCESS STATUS - MANDATORY
 1. Every meaningful verified success during MotorLab-controlled programming, fixing, building, testing, recovery or delivery must be surfaced visually to Bruno with fireworks plus a plain-language explanation.
-2. Fireworks levels are:
-   - 🎆🎆 small verified success;
-   - 🎆🎆🎆 significant milestone or feature/build success;
-   - 🎆🎆🎆🎆 major/final verified completion.
-3. Fireworks must never appear alone. The message must explain what succeeded and, where relevant, how it was verified.
+2. Fireworks levels are: 🎆🎆 small verified success; 🎆🎆🎆 significant milestone; 🎆🎆🎆🎆 major/final verified completion.
+3. Fireworks must never appear alone and must explain what succeeded and, where relevant, how it was verified.
 4. Do not show fireworks for work that merely started, is still pending, is assumed successful or remains unverified where verification is possible.
-5. Emit fireworks for each meaningful small resolved item as well as larger milestones, but do not repeat the same success or decorate no-op/internal polling.
+5. Emit fireworks for each meaningful small resolved item as well as larger milestones without duplicating the same success.
 6. Fireworks complement progress percentages; they do not themselves increase progress.
-7. Watchdog lightning and success fireworks remain semantically distinct. A recovery may show lightning during intervention and fireworks only after recovery success is verified.
+7. Watchdog lightning and success fireworks remain semantically distinct.
 8. This is a global MotorLab reporting rule. Project adapters may add detail but may not disable it.
 9. Detailed semantics are mandatory in MOTORLAB_VISUAL_STATUS_V1.txt.
 
-Engine version: MOTORLAB-CORE-V1.4 (legacy UAB compatibility)
+J. MOTORLAB BACKGROUND EXECUTION + SINGLE-CHAT CONTINUITY - MANDATORY
+1. The project chat where Bruno initiates/continues a task is the canonical user-facing thread when a usable chat reference is available.
+2. MotorLab must not require Bruno to migrate manually among normal Chat, Work, MotorLab or other executor conversations merely because the execution backend changes.
+3. Long background-capable work must be classified and handed proactively to a durable executor before depending on a long foreground chat turn. Do not wait for app exit detection.
+4. A normal chat/model turn alone is not persistent background execution and must not be described as such.
+5. A durable executor may be GitHub Actions, persistent worker/service, runner, Work/cloud when suitable, or another adapter-approved executor whose lifetime is independent of the visible chat screen.
+6. Once safely handed off, background work continues autonomously through pre-approved steps while Bruno is away and continuously preserves checkpoints/progress/locks.
+7. Checkpoints are a safety mechanism, not the default stop behavior. The normal model is CONTINUE + SAVE CHECKPOINTS.
+8. Durable job state must preserve operation id, project, canonical chat ref when available, executor/job id, repository/ref/SHA, scope, phase, verified percentage, heartbeat/progress timestamps, checkpoint, next step, lock, retry state and artifacts/checksums when available.
+9. Canonical job states are QUEUED, RUNNING, WAITING_EXTERNAL, WAITING_USER, RECOVERING, COMPLETED, FAILED_SAFE and CANCELLED_BY_USER.
+10. Returning to the same project chat must first reconcile durable job state before launching new work on the same scope.
+11. Reopening the chat must never start a duplicate writer when the background job is still active on the same lock scope.
+12. If an executor quota/availability ends, preserve completed work and checkpoint; switch to another adapter-approved executor when safe and authorized; otherwise stop safely with the real blocker. Never silently incur paid usage.
+13. Work is an optional execution capability, not the required user-facing conversation. MotorLab should not force Bruno into a second Work chat merely to preserve continuity.
+14. When the canonical chat becomes available again, report what progressed while Bruno was away using current verified percentage and fireworks/watchdog language as applicable.
+15. Notifications may be used when supported for completion or WAITING_USER, but they do not become the authoritative conversation.
+16. MotorLab cannot force a suspended ordinary ChatGPT foreground turn to continue computing; therefore the background guarantee applies only after handoff to a real durable executor.
+17. MotorLab should proactively avoid leaving long backgroundable phases solely inside normal-chat execution.
+18. Detailed semantics are mandatory in MOTORLAB_BACKGROUND_EXECUTION_V1.txt.
+
+Engine version: MOTORLAB-CORE-V1.5 (legacy UAB compatibility)
 Last updated: 2026-09-28.
