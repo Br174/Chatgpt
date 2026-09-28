@@ -1,0 +1,97 @@
+MOTORLAB STATE - MUSICLAB GLOBAL AI ENGINE LAB11
+
+STATUS
+Canonical control-plane checkpoint for the current MusicLab AI/global metadata work.
+Recorded: 2026-09-28.
+This file supplements UAB_STATE_REGISTRY.txt; live GitHub refs/workflow metadata remain authoritative when newer.
+
+PROJECT
+- Project: MusicLab
+- Repository: Br174/MusicLab
+- Visibility: PUBLIC
+- Canonical user-facing surface: current MusicLab project chat (platform chat id not exposed here)
+- MotorLab CORE: MOTORLAB-CORE-V1.5
+
+LIFECYCLE
+- Current approved MADRE: mother/musiclab-swipe-fluid-play-01
+- MADRE SHA: cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33
+- MADRE untouched by this LAB work.
+- Current experimental/test ref: uab-build/musiclab-global-ai-engine-11
+- Current ref head at checkpoint creation: 92aa27247816680641325130681dfa101648562f
+- Functional app/backend source verified by final successful build: e26c314f9423aea1cd9ccae64e0e3f11f612bcd4
+- The later commits only added/removed temporary build/preflight workflows/scripts and did not intentionally alter application source.
+- CANDIDATA: none.
+- Promotion: forbidden until Bruno real-device approval and clean MotorLab candidate reconstruction/identity verification.
+
+APPROVED SCOPE OF CURRENT EXPERIMENT
+1. Global MusicLab AI engine, not limited to Cover/Originali.
+2. Playback path remains independent and must start without waiting for AI/metadata.
+3. Canonical metadata/credits resolve in background.
+4. Canonical artist/album navigation should prefer the real artist/album rather than uploader/channel metadata.
+5. AI is editorial authority; YouTube/YouTube Music are playback/browse-location sources only.
+6. Cover and Originali share the same cloud/memory method.
+7. Cover progressive search: first 5 studio results quickly, then Studio/Live/Remix/Straniere/background discovery by periods/languages with dedupe.
+8. Cloud memory/D1 is cache-first; repeated known searches should return stored AI decisions first.
+9. Settings include master AI ON/OFF plus granular controls; OFF preserves classic MusicLab behavior.
+10. Cloud failure must fall back safely and must never block playback.
+
+VERIFIED BUILD CHECKPOINT
+- GitHub Actions run: 36391955950
+- Result: SUCCESS
+- Artifact id: 10957325203
+- Artifact name: MusicLab-LAB-GLOBAL-AI-ENGINE-11
+- Artifact digest: sha256:d109363bc22e2ccd76d77bb44b46c69b413f2d5f5a1dd757564a02592f8ecafe
+- APK extracted checksum: sha256:3742ebc246b5b1ebd6d12436c7a03505d23b11b865ed94e5c7a533a87088349d
+- APK ZIP checksum: sha256:8bdf622da1f16e771f82497944a94a4ce5da35d5f2c6bb8f90a27907f6320d86
+- Android compile/build/sign/package/artifact upload completed successfully.
+
+CLOUDFLARE BACKEND STATE
+- Worker source exists under cloudflare/music-intelligence.
+- D1 schema/migrations exist.
+- App cloud client is wired for Cover and Originali with fallback to local/direct AI behavior when cloud is unavailable.
+- Cloud deployment has NOT been performed.
+- Non-destructive preflight workflow run: 36412182274.
+- Preflight result: credentials gate failed before Wrangler install/deploy.
+- Missing repository secrets confirmed without exposing any value:
+  * CLOUDFLARE_API_TOKEN
+  * CLOUDFLARE_ACCOUNT_ID
+  * GEMINI_API_KEY
+- No D1 database was created by the preflight.
+- No Worker was deployed by the preflight.
+- No Cloudflare resource was modified by the preflight.
+
+MOTORLAB DURABLE JOB STATE
+- operation_id: musiclab-global-ai-engine-11-20260928
+- status: WAITING_USER
+- phase: cloudflare_credentials
+- last_verified_progress_percent: 87
+- checkpoint_id: musiclab-ai11-cloud-blocker-20260928-01
+- source_ref: uab-build/musiclab-global-ai-engine-11
+- source_sha: 92aa27247816680641325130681dfa101648562f
+- functional_source_sha: e26c314f9423aea1cd9ccae64e0e3f11f612bcd4
+- executor_type: github-actions
+- last_build_run_id: 36391955950
+- last_preflight_run_id: 36412182274
+- lock_scope: MusicLab:Br174/MusicLab:uab-build/musiclab-global-ai-engine-11
+- lock_state: RELEASED (no active writer at checkpoint)
+- retry_count: 0 for credential blocker; do not retry blindly until credentials exist.
+- next_safe_step: securely configure the three missing GitHub Actions secrets, then run Cloudflare D1 create/reuse -> migrations -> Worker secret -> deploy -> capture endpoint -> set MusicLab cloud endpoint -> rebuild/reverify LAB artifact.
+
+WATCHDOG / RECOVERY
+- This is not a code/build stall; it is a verified external credential blocker.
+- Do not restart completed Android work.
+- Resume only from the cloud credential checkpoint.
+- Preserve successful APK/artifact and all completed source work.
+- Never start a duplicate writer if a future durable job is already RUNNING on the same lock scope.
+
+REAL-DEVICE GATES BEFORE CANDIDATA
+- Play must remain immediate and independent of metadata/background AI.
+- AI master OFF must preserve classic MusicLab behavior.
+- Global credits must populate from canonical AI metadata where available.
+- Vai all'artista must resolve the canonical artist destination, not an arbitrary uploader.
+- Vai all'album must resolve the canonical album destination, not an uploader playlist.
+- Cover: first useful results quickly; progressive background growth; category correctness Cover/Live/Remix/Straniere.
+- Originali regression: existing approved behavior must remain intact.
+- Playlist/player/search paths must remain functional with and without AI.
+
+END CHECKPOINT
