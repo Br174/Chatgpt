@@ -34,36 +34,29 @@ MADRE -> LAB -> CANDIDATA -> NEW MADRE
 - Apply exactly the same approved modification/change-set that was tested in the LAB. Do not add extra fixes, cleanup, refactors, dependency changes or other interpretation unless Bruno explicitly approves them.
 - The expected source relationship is: CANDIDATA = SAME MADRE + SAME APPROVED CHANGE-SET.
 - If the approved LAB contained one atomic commit, replay that exact commit/change-set onto the fresh CANDIDATA where technically possible. If the mechanism differs, verify that the resulting source diff against the MADRE is equivalent to the approved LAB diff.
-- Candidate tests must cover both the requested feature and core regression gates defined by the adapter (for example audio playback, startup, navigation, signing/package identity, critical UI flows).
+- Candidate tests must cover both the requested feature and core regression gates defined by the adapter.
 - CANDIDATA remains non-authoritative until Bruno approves the real result.
 - Candidate binaries are test artifacts, not permanent MADRE releases.
 
 4. NEW MADRE - EXACT CANDIDATE SOURCE RULE
 - Promotion occurs only after candidate verification and explicit approval.
-- The new MADRE source ref/tag must point to the EXACT source commit SHA of the approved CANDIDATA. Do not rebuild the source history, cherry-pick again, regenerate equivalent source or create a new source commit merely for promotion.
-- In other words: the source Bruno approved as CANDIDATA is the source that becomes the NEW MADRE.
-- If an Android adapter requires different final packaging/signing metadata for a MADRE binary, that binary may be packaged/signed from the exact approved CANDIDATA source commit, but no application source changes are allowed during promotion. The adapter must verify package/signing sanity separately.
+- The new MADRE source ref/tag must point to the EXACT source commit SHA of the approved CANDIDATA.
+- Do not rebuild the source history, cherry-pick again, regenerate equivalent source or create a new source commit merely for promotion.
+- If an Android adapter requires different final packaging/signing metadata for a MADRE binary, that binary may be packaged/signed from the exact approved CANDIDATA source commit, but no application source changes are allowed during promotion.
 - Promotion creates a new immutable MADRE reference and a new permanent release/version where the project has release artifacts.
 - Never delete or replace the previous MADRE when promoting a new one.
 - The previous MADRE remains an immediate rollback point.
 
 5. PROMOTION IDENTITY RECORD - MANDATORY
-For every LAB that is eligible for promotion, MotorLab must be able to identify:
-- MADRE source ref and commit SHA;
-- LAB source ref and commit SHA;
-- exact approved change-set/diff identity;
-- CANDIDATA source ref and commit SHA;
-- verification result;
-- final NEW MADRE ref pointing to the approved CANDIDATA source SHA.
+For every LAB eligible for promotion, MotorLab must be able to identify MADRE source ref/SHA, LAB ref/SHA, exact approved change-set, CANDIDATA ref/SHA, verification result and final NEW MADRE ref pointing to the approved CANDIDATA source SHA.
 If this chain cannot be established, automatic promotion must stop instead of guessing.
 
 RELEASE STORAGE RULE
 GitHub Releases are a deposit of good, approved versions.
-- Permanent Releases are for MADRI only, unless an adapter explicitly defines another approved-release class.
+- Permanent Releases are for MADRI only unless an adapter explicitly defines another approved-release class.
 - No fixed tag/asset may overwrite a previous MADRE binary.
 - Do not use --clobber, overwrite_files=true or equivalent against an immutable MADRE tag.
-- A 'latest' concept may exist only as metadata/pointer to the newest immutable MADRE. It must not be the sole storage location and must never destroy the previous binary.
-- Downloader-style stable URLs may use GitHub's latest-release pointer while each underlying release tag remains unique and immutable.
+- A 'latest' concept may exist only as metadata/pointer to the newest immutable MADRE and must never destroy previous binaries.
 
 ONE ENGINE / MANY ADAPTERS
 MotorLab CORE owns:
@@ -82,10 +75,13 @@ MotorLab CORE owns:
 - checkpoint/recovery rules;
 - single-writer lock/concurrency safety;
 - visible watchdog intervention messages using lightning emoji plus explanation;
-- persistent visual success feedback using fireworks plus explanation for verified completions.
+- persistent visual success feedback using fireworks plus explanation for verified completions;
+- persistent background-execution policy;
+- durable background job/checkpoint state;
+- single-chat continuity so the project chat remains the canonical user-facing thread while executors may change behind the scenes.
 
 Each project adapter may define only project-specific mechanics:
-- project type (Android, hybrid, web/PWA, delivery-only);
+- project type;
 - build/test commands or workflow;
 - safe patch/repack capability;
 - package/application ID strategy;
@@ -94,10 +90,11 @@ Each project adapter may define only project-specific mechanics:
 - regression gates;
 - artifact names/types;
 - deployment/delivery destination;
-- watchdog operation class, status probe, progress signal, checkpoint mode, lock scope and safe recovery action;
-- project-specific deterministic progress micro-milestones when available.
+- watchdog operation class/status/progress/checkpoint/lock/recovery;
+- project-specific deterministic progress micro-milestones;
+- background executor/start/status/resume/cancel/checkpoint/lock/notification behavior.
 
-An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction from the same MADRE and same approved change-set, approval-before-MADRE, exact candidate-source promotion, permanent history retention, MotorLab Watchdog safety rules, MotorLab visual-status rules, or MotorLab progress-reporting rules.
+An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction, approval-before-MADRE, exact candidate-source promotion, permanent history retention, Watchdog safety, visual-status rules, progress-reporting rules, or Background Execution / Single-Chat Continuity rules.
 
 PROGRESS CONTRACT
 Broad default milestones:
@@ -112,34 +109,48 @@ Broad default milestones:
 100 requested state verified and delivered
 
 Progress reporting behavior:
-- report percentage throughout substantial work, not only at broad milestones;
-- report when meaningful subtasks start/finish, phases change, files/config are applied, checks/build/test steps change, artifacts/checkpoints change, watchdog/recovery events occur, and handoff/promotion/delivery state changes;
-- as a practical default, avoid more than roughly 1-3 meaningful operations/tool interactions without a user-visible progress update when the chat surface permits;
-- long single external operations should surface provider/job phase changes when available;
-- broad phases may be divided into real deterministic micro-milestones so intermediate percentages are justified by completed work;
-- the same verified percentage may be repeated with a new explanation when status changes but no additional completion is yet verified;
-- never increase progress because time passed;
-- non-applicable phases are removed and progress recalculated;
-- on failure retain the last verified percentage and identify the failing substep;
-- watchdog events should include the last verified percentage when visible;
+- report throughout substantial work, not only at broad milestones;
+- report at meaningful subtask/phase/check/build/artifact/checkpoint/watchdog/recovery transitions;
+- avoid more than roughly 1-3 meaningful operations without a user-visible update when the surface permits;
+- use real micro-milestones for justified intermediate percentages;
+- same verified percentage may be repeated with new status;
+- never increase because time passed;
+- on failure retain last verified percentage;
+- watchdog events should include current percentage when visible;
 - fireworks messages should include percentage when useful;
-- never claim 100% on a failed, pending or unverified result;
-- detailed mandatory behavior is defined by MOTORLAB_PROGRESS_REPORTING_V1.txt.
+- never claim 100% on failed, pending or unverified work;
+- detailed behavior is defined by MOTORLAB_PROGRESS_REPORTING_V1.txt.
+
+BACKGROUND EXECUTION / SINGLE-CHAT CONTINUITY CONTRACT
+- The project chat where Bruno initiates or continues a task is the canonical user-facing thread when the platform exposes a usable chat reference.
+- MotorLab must not make Bruno manually migrate among normal Chat, Work, MotorLab or another executor conversation merely because backend execution changes.
+- MotorLab must not wait for app-exit detection. Before a long phase, classify the task as CHAT_LOCAL, BACKGROUNDABLE, USER_BLOCKING or MIXED.
+- BACKGROUNDABLE/MIXED autonomous phases should be moved proactively to a real durable executor when available and allowed.
+- A normal ChatGPT model turn by itself is NOT durable background execution.
+- Durable executors may include adapter-approved GitHub Actions, persistent workers/services, runners, Work/cloud when suitable, or other backends independent of the visible chat lifetime.
+- Once handed off safely, the job continues through pre-approved autonomous steps while Bruno is away.
+- Normal behavior is CONTINUE + SAVE CHECKPOINTS; checkpoint does not mean pause-on-exit.
+- Durable job state preserves operation/project/canonical chat/executor/job/ref/SHA/scope/phase/verified percentage/heartbeat/checkpoint/next step/lock/retry/artifact information when available.
+- Job states: QUEUED, RUNNING, WAITING_EXTERNAL, WAITING_USER, RECOVERING, COMPLETED, FAILED_SAFE, CANCELLED_BY_USER.
+- On return to the canonical chat, reconcile durable state before starting new work and report what progressed while Bruno was away.
+- Never start a duplicate writer when the durable background job is still active on the same lock scope.
+- If executor quota/availability ends, preserve completed work/checkpoint and move to another adapter-approved executor when safe and authorized; otherwise stop safely with the blocker.
+- Work is optional execution capability, not a required second user-facing chat.
+- Notifications may alert completion/WAITING_USER when supported but do not replace the canonical project conversation.
+- MotorLab cannot force a suspended ordinary foreground ChatGPT turn to continue computing, so background claims are allowed only after real durable handoff.
+- Detailed mandatory behavior is defined by MOTORLAB_BACKGROUND_EXECUTION_V1.txt.
 
 VISUAL SUCCESS CONTRACT
 - Every meaningful verified success must be visibly surfaced to Bruno.
-- Use 🎆🎆 for small verified successes.
-- Use 🎆🎆🎆 for significant milestones, completed features, builds or regression successes.
-- Use 🎆🎆🎆🎆 for major/final verified completions.
-- Fireworks must always be accompanied by an explanation of what succeeded and, where relevant, how it was verified.
-- Do not show fireworks for merely started, pending, assumed or unverified work.
-- Small resolved items receive their own success signal; do not reserve fireworks only for the end of a long task.
+- Use 🎆🎆 for small verified successes, 🎆🎆🎆 for significant milestones/builds/features, 🎆🎆🎆🎆 for major/final verified completions.
+- Fireworks must always be accompanied by an explanation.
+- Do not show fireworks for started, pending, assumed or unverified work.
 - Fireworks complement progress percentages and do not create progress by themselves.
 - Watchdog lightning and success fireworks are distinct status languages.
 - Detailed mandatory behavior is defined by MOTORLAB_VISUAL_STATUS_V1.txt.
 
 WATCHDOG / ANTI-STALL CONTRACT
-- Long-running work must be assessed by material progress, not by time alone.
+- Long-running work is assessed by material progress, not time alone.
 - Ordinary heartbeat/status checks are internal and must not spam Bruno.
 - Repeated identical state is not material progress.
 - Thresholds are adaptive to operation type and provider evidence.
@@ -150,9 +161,9 @@ WATCHDOG / ANTI-STALL CONTRACT
   ⚡⚡⚡ Recupero da checkpoint — explain which verified checkpoint/substep is being recovered.
   ⚡⚡⚡⚡ Protezione MotorLab — explain why automatic recovery cannot continue safely.
 - Lightning emoji must always be accompanied by an explanation.
-- The watchdog must preserve completed milestones, verified artifacts and checkpoint state whenever technically possible.
-- Read-only diagnostics may run in parallel, but two conflicting writers may not operate on the same lock scope.
-- Recovery targets the smallest stalled/failed substep and bounded retries prevent infinite loops.
+- Preserve completed milestones/artifacts/checkpoints whenever possible.
+- Read-only diagnostics may run in parallel, but conflicting writers may not.
+- Recovery targets the smallest stalled/failed substep and retries are bounded.
 - Detailed mandatory behavior is defined by MOTORLAB_WATCHDOG_V1.txt.
 
 CACHE CONTRACT
@@ -166,18 +177,19 @@ ROUTING CONTRACT
 - Real project/code failures are diagnosed; do not blindly rerun the same broken build on another provider.
 
 REGRESSION RULE
-A feature-specific change is not acceptable if it breaks an unrelated core function. Candidate verification must include the project's adapter-defined core health checks before promotion.
+A feature-specific change is not acceptable if it breaks an unrelated core function. Candidate verification must include adapter-defined core health checks before promotion.
 
 ROLLBACK RULE
 If a LAB or CANDIDATA introduces a serious regression, discard it and return to the current MADRE. Do not repair on top of a corrupted experimental lineage unless Bruno explicitly chooses that path.
 
 SINGLE-SOURCE-OF-TRUTH RULE
-Br174/Chatgpt is the private MotorLab control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt and MOTORLAB_PROGRESS_REPORTING_V1.txt define the canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
+Br174/Chatgpt is the private MotorLab control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt and MOTORLAB_BACKGROUND_EXECUTION_V1.txt define canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
 
 ENGINE VERSION
-MOTORLAB-CORE-V1.4 (legacy UAB compatibility)
+MOTORLAB-CORE-V1.5 (legacy UAB compatibility)
 Established as UAB: 2026-09-24
 MotorLab Watchdog revision: 2026-09-28
 MotorLab Visual Status revision: 2026-09-28
 MotorLab Progress Reporting revision: 2026-09-28
+MotorLab Background Execution / Single-Chat Continuity revision: 2026-09-28
 Routing amendment 2026-09-27: Codemagic removed; public projects use standard GitHub Actions, with project adapters/local safe paths only where explicitly supported.
