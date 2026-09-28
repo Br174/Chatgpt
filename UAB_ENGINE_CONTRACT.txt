@@ -1,7 +1,10 @@
 UAB ENGINE CONTRACT - UNIFIED CORE
 
+COMPATIBILITY NOTE
+Official engine name: MotorLab. Legacy UAB filenames and adapter keys remain valid during migration.
+
 Purpose
-This file defines mandatory engine-level behavior for every Bruno project handled through UAB. It applies to Android, hybrid Android, web/PWA and delivery projects. Project-specific workflows are adapters, not independent engines.
+This file defines mandatory engine-level behavior for every Bruno project handled through MotorLab/UAB. It applies to Android, hybrid Android, web/PWA and delivery projects. Project-specific workflows are adapters, not independent engines.
 
 A. SINGLE ENGINE LIFECYCLE - MANDATORY
 1. Canonical lifecycle: MADRE -> LAB -> CANDIDATA -> NEW MADRE.
@@ -65,7 +68,7 @@ D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
    - In chat, report meaningful percentage changes when a milestone is completed or the active phase materially changes.
    - Avoid spamming identical percentages.
 7. CI/log reporting:
-   - UAB-enabled build scripts/workflows should emit machine-readable markers in the form UAB_PROGRESS=<number> plus a short phase description.
+   - MotorLab/UAB-enabled build scripts/workflows should emit machine-readable progress markers plus a short phase description.
 8. Cross-project rule:
    - The percentage contract applies to MusicLab, GeoVision, StudyBook, Visionflix/streamflix and future projects.
 
@@ -75,7 +78,7 @@ E. REGRESSION GATES - MANDATORY
 3. Serious regression means the experimental lineage is rejected and the current MADRE remains authoritative.
 
 F. ONBOARDING REQUIREMENT
-Any new project added to UAB must declare:
+Any new project added to MotorLab must declare:
 - project class and current MADRE reference;
 - LAB/CANDIDATA/MADRE naming/prefixes;
 - cache technology and invalidation inputs;
@@ -83,11 +86,26 @@ Any new project added to UAB must declare:
 - build/test route;
 - regression gates;
 - release/delivery mode;
-- package/signing strategy when Android is involved.
+- package/signing strategy when Android is involved;
+- watchdog class/status probe/progress signal/checkpoint/lock/recovery fields where supported.
 A project is not fully onboarded until these are defined.
 
 G. PRIORITY
-This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt and UAB_PROJECT_ROUTING.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
+This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt and MOTORLAB_WATCHDOG_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
 
-Engine version: UAB-CORE-V1
-Last updated: 2026-09-24.
+H. MOTORLAB WATCHDOG / ANTI-STALL - MANDATORY
+1. Every substantial controllable operation must expose heartbeat and material-progress state when technically available.
+2. MotorLab must distinguish elapsed time from real lack of progress; repeated identical polling is not progress.
+3. The watchdog uses adaptive thresholds appropriate to the operation class and should verify provider/tool state before recovery.
+4. First response to suspected stall is non-destructive observation, never blind cancellation.
+5. Every watchdog intervention visible to Bruno must include lightning emoji plus explanation of the stalled phase and the action being taken.
+6. Escalation levels are: ⚡ verify; ⚡⚡ safe continuation; ⚡⚡⚡ checkpoint recovery of only the stalled substep; ⚡⚡⚡⚡ safe stop when recovery cannot be proven safe.
+7. Completed work, verified artifacts and milestone percentage must be preserved across recovery whenever technically possible.
+8. Write-capable work must use a single-writer lock scope. The watchdog may run read-only diagnostics in parallel but may not start a conflicting second writer.
+9. Retries are bounded and targeted. Deterministic code/configuration failures go to diagnosis instead of blind repetition or provider hopping.
+10. Recovery resumes from the latest verified checkpoint rather than reinterpreting the entire task from scratch.
+11. A watchdog event alone does not increase progress percentage; only real verified progress does.
+12. Detailed semantics are mandatory in MOTORLAB_WATCHDOG_V1.txt.
+
+Engine version: MOTORLAB-CORE-V1.2 (legacy UAB compatibility)
+Last updated: 2026-09-28.
