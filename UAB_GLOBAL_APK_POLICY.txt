@@ -1,7 +1,7 @@
 UNIVERSAL MOTORLAB/UAB POLICY - GLOBAL
 
 SCOPE
-This policy is the canonical build/test/delivery flow for Bruno's projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass MotorLab CORE lifecycle, cost, verification, release, watchdog, visual-status or progress-reporting rules.
+This policy is the canonical build/test/delivery flow for Bruno's projects. Project-specific adapters may define repositories, branches, workflows, package IDs, signing, patch/repack rules and delivery details, but they must not bypass MotorLab CORE lifecycle, cost, verification, release, watchdog, visual-status, progress-reporting or background-execution rules.
 
 NAME / COMPATIBILITY
 Official engine name: MotorLab.
@@ -22,6 +22,7 @@ CORE PRINCIPLES
 12. WATCHDOG. Long operations must be monitored for real progress, not just elapsed time. Suspected stalls use MotorLab Watchdog escalation with checkpoint recovery and single-writer safety.
 13. VISUAL SUCCESS. Every meaningful verified success must be surfaced to Bruno with 2-4 fireworks plus an explanation of what succeeded.
 14. FREQUENT PROGRESS. Substantial tasks must show verified percentage frequently throughout execution, including subtask/phase/status transitions. The same verified percentage may be repeated with new status instead of inventing progress.
+15. BACKGROUND CONTINUITY. Long background-capable phases must be handed proactively to a durable executor when available so execution can continue independently of the visible ChatGPT screen. The project chat remains the canonical user-facing thread.
 
 MANDATORY LIFECYCLE FLOW
 1. Identify and protect the current MADRE reference.
@@ -54,8 +55,27 @@ MANDATORY BUILD ROUTING
 4. Codemagic is REMOVED from MotorLab and must not be selected as primary, fallback or emergency provider.
 5. Larger GitHub runners are not selected automatically.
 6. Once a real build has started after preflight, allow it to finish normally while the watchdog observes progress.
-7. Infrastructure failure before meaningful build work may move only to another route explicitly allowed by the project adapter; do not provider-hop.
+7. Infrastructure failure before meaningful build work may move only to another route explicitly allowed by the project adapter; do not provider-hop blindly.
 8. Genuine project/build failure is diagnosed, not provider-hopped.
+
+PERSISTENT BACKGROUND EXECUTION - MANDATORY
+1. The chat where Bruno starts/continues a project task remains the canonical user-facing chat.
+2. MotorLab must not require routine manual migration between normal Chat, Work, MotorLab or another executor conversation merely because the backend changes.
+3. MotorLab must classify substantial tasks before a long-running phase as CHAT_LOCAL, BACKGROUNDABLE, USER_BLOCKING or MIXED.
+4. BACKGROUNDABLE/MIXED autonomous phases should be handed to a durable executor before depending on a long foreground chat turn.
+5. A normal ChatGPT model turn alone is not a durable executor and must not be represented as background-safe.
+6. Durable executors may include adapter-approved GitHub Actions, persistent workers/services, runners, Work/cloud when suitable, or other durable backends independent of visible chat lifetime.
+7. Once safely handed off, the job continues autonomously through already approved steps while Bruno is away, with heartbeat, progress, checkpoints, watchdog and locks maintained.
+8. Checkpointing does not mean pause-on-exit. Normal behavior is CONTINUE + SAVE CHECKPOINTS.
+9. Job state must be durable and include operation/project/executor/ref/SHA/scope/phase/verified percentage/checkpoint/next step/lock/retry/artifact data when available.
+10. Canonical job states: QUEUED, RUNNING, WAITING_EXTERNAL, WAITING_USER, RECOVERING, COMPLETED, FAILED_SAFE, CANCELLED_BY_USER.
+11. When Bruno returns to the same project chat, MotorLab reconciles durable state before taking new write actions and reports what progressed while he was away.
+12. Reopening the chat must never launch a duplicate writer against a still-running background job on the same lock scope.
+13. If an executor quota/availability ends, preserve completed work and checkpoint; continue on another adapter-approved executor when safe and authorized; otherwise stop safely and report the blocker.
+14. Work is optional and must not become a mandatory second user-facing conversation.
+15. Notifications may be used for completion/WAITING_USER when supported, but do not become the authoritative conversation.
+16. The background guarantee applies only once the task is on a real durable executor. MotorLab cannot force a suspended ordinary foreground chat turn to keep computing.
+17. Detailed behavior is governed by MOTORLAB_BACKGROUND_EXECUTION_V1.txt.
 
 PATCH / REPACK RULE
 Patch/repack is preferred only when the project adapter marks it safe, typically for HTML/JavaScript/assets-only changes or equivalent non-native changes. Do not use patch/repack for native Kotlin/Java/Compose/Gradle/dependency/signing changes unless the adapter explicitly supports that exact change. Preserve package ID, signature expectations and install/update compatibility.
@@ -112,10 +132,7 @@ Progress reporting rules:
 
 VISUAL SUCCESS STATUS - MANDATORY
 1. Every meaningful verified completed item must be visibly reported to Bruno.
-2. Use:
-   🎆🎆 for a small verified success;
-   🎆🎆🎆 for a significant milestone/feature/build success;
-   🎆🎆🎆🎆 for a major or final verified completion.
+2. Use 🎆🎆 for a small verified success; 🎆🎆🎆 for a significant milestone/feature/build success; 🎆🎆🎆🎆 for a major or final verified completion.
 3. Fireworks must always be accompanied by a short explanation of what succeeded and, where relevant, how it was verified.
 4. Do not show fireworks for work that merely started, is pending, assumed successful or not yet verified when verification is possible.
 5. Small resolved items should receive their own success signal; do not reserve fireworks only for the final response.
@@ -161,6 +178,7 @@ CANONICAL FILES
 - MOTORLAB_WATCHDOG_V1.txt
 - MOTORLAB_VISUAL_STATUS_V1.txt
 - MOTORLAB_PROGRESS_REPORTING_V1.txt
+- MOTORLAB_BACKGROUND_EXECUTION_V1.txt
 
-Engine version: MOTORLAB-CORE-V1.4 (legacy UAB compatibility)
+Engine version: MOTORLAB-CORE-V1.5 (legacy UAB compatibility)
 Last policy update: 2026-09-28
