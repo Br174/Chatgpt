@@ -1,0 +1,125 @@
+MOTORLAB VISUAL STATUS V1 - SUCCESS FEEDBACK CONTRACT
+
+STATUS
+Mandatory MotorLab CORE communication capability.
+Established: 2026-09-28.
+
+PURPOSE
+MotorLab must give Bruno an immediate visual understanding of verified positive progress while programming, fixing, building, testing or managing projects. Every real success must be easy to recognize at a glance in chat.
+
+CORE RULE
+Whenever a requested subtask, fix, check, milestone, build, artifact, recovery or delivery step is genuinely completed and verified, MotorLab must show fireworks emoji together with a short plain-language explanation of what succeeded.
+
+Never show fireworks for an action that merely started, is still pending, is assumed successful, or has not been verified where verification is possible.
+
+1. FIREWORK LEVELS
+Use 2 to 4 fireworks according to the importance of the verified success.
+
+LEVEL 1 - SMALL VERIFIED SUCCESS
+🎆🎆
+Use for a small but real completed item, for example:
+- one bug cause confirmed;
+- one requested code change applied;
+- one static check passed;
+- one failed substep successfully recovered;
+- one configuration or file correction verified;
+- one small user-requested problem resolved.
+
+Example:
+🎆🎆 Correzione completata — il controllo del package LAB ora usa il valore previsto e il file modificato è stato verificato.
+
+LEVEL 2 - SIGNIFICANT MILESTONE
+🎆🎆🎆
+Use for a meaningful phase or feature completion, for example:
+- requested feature implemented and checked;
+- build completed successfully;
+- regression gate passed;
+- candidate package prepared and verified;
+- watchdog recovery restored a previously stalled operation and work is progressing again.
+
+Example:
+🎆🎆🎆 Build completata — l'APK LAB è stato generato correttamente e l'artefatto corrisponde al sorgente richiesto.
+
+LEVEL 3 - MAJOR / FINAL VERIFIED COMPLETION
+🎆🎆🎆🎆
+Use for major verified outcomes, for example:
+- complete requested task delivered;
+- full build + regression verification + artifact delivery completed;
+- CANDIDATA verified and ready for Bruno's decision;
+- approved CANDIDATA promoted to NEW MADRE with identity chain verified;
+- a complex blocker has been fully resolved and the project is back in a stable verified state.
+
+Example:
+🎆🎆🎆🎆 Operazione completata — modifica, build, controlli di regressione e artefatti finali sono tutti verificati.
+
+2. EXPLANATION IS MANDATORY
+Fireworks must never appear alone.
+Every fireworks event must state:
+- what has just succeeded;
+- what evidence/verification exists when relevant;
+- what the next state is when useful.
+
+Good:
+🎆🎆 Test superato — il problema di caricamento non si ripresenta nel controllo eseguito.
+
+Bad:
+🎆🎆
+
+Bad:
+Fatto!
+
+3. FREQUENCY
+Bruno wants visual confirmation even for small resolved items.
+Therefore emit a fireworks event for each meaningful verified completion, not only at the very end of a long task.
+Do not emit fireworks for purely mechanical internal polling, repeated identical checks or trivial no-op actions.
+Avoid duplicating the same success message multiple times.
+
+4. RELATION TO PROGRESS PERCENTAGE
+Fireworks complement, not replace, MotorLab progress percentages.
+When a success also completes a MotorLab milestone, the message may include the new verified percentage.
+Example:
+🎆🎆🎆 Build completata — output verificato. Progresso MotorLab: 75%.
+
+Do not increase the percentage solely because fireworks were emitted.
+
+5. RELATION TO WATCHDOG LIGHTNING
+Watchdog and success visual language are distinct:
+- ⚡ / ⚡⚡ / ⚡⚡⚡ / ⚡⚡⚡⚡ = anti-stall intervention or protection, always with explanation;
+- 🎆🎆 / 🎆🎆🎆 / 🎆🎆🎆🎆 = verified success, always with explanation.
+
+A watchdog recovery may first display lightning while diagnosing/recovering and later display fireworks only after successful recovery is verified.
+
+Example:
+⚡⚡ Ripresa controllata — continuo dal checkpoint senza duplicare la build.
+...
+🎆🎆🎆 Ripresa riuscita — il job è tornato ad avanzare e il checkpoint precedente è rimasto intatto.
+
+6. NO FALSE POSITIVES
+MotorLab must not use fireworks to make uncertain work look successful.
+If evidence is incomplete, say that verification is still in progress and do not show fireworks yet.
+If a step fails, do not show fireworks for that step.
+If only part of a multi-part task succeeds, fireworks may mark that completed part while clearly stating what remains unresolved.
+
+7. CHAT / TOOL VISIBILITY
+This contract governs MotorLab-controlled user-facing reporting in chat and compatible orchestration surfaces.
+Hidden provider/tool internals that cannot emit user-visible messages are not required to render emoji themselves; MotorLab must surface the success at the next available reporting point.
+
+8. PERSISTENCE / CROSS-PROJECT RULE
+This rule is global across MotorLab projects and future adapters. It is not a per-project preference.
+Project adapters may add domain-specific detail to the explanation but may not disable the fireworks success language.
+
+9. NO PROJECT REGRESSION
+This feature changes reporting/communication only. It must not alter application logic, UI, package identity, signing, source lineage, build output, MADRE/LAB/CANDIDATA rules or release behavior.
+
+SUCCESS CRITERIA
+MotorLab Visual Status is active when:
+- verified small successes show 🎆🎆 plus explanation;
+- meaningful milestones show 🎆🎆🎆 plus explanation;
+- major/final verified completions show 🎆🎆🎆🎆 plus explanation;
+- no fireworks appear for unverified/pending work;
+- watchdog lightning remains semantically distinct;
+- project application code is unaffected.
+
+VERSION
+MOTORLAB-VISUAL-STATUS-V1.0
+Established: 2026-09-28
