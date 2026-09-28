@@ -71,7 +71,7 @@ MotorLab CORE owns:
 - atomic LAB scope rule;
 - exact LAB change-set replay into CANDIDATA;
 - exact approved CANDIDATA source SHA promotion to NEW MADRE;
-- progress percentages;
+- frequent verified progress percentages and micro-milestone reporting;
 - cache requirements;
 - free-first provider routing;
 - immutable release policy;
@@ -94,12 +94,13 @@ Each project adapter may define only project-specific mechanics:
 - regression gates;
 - artifact names/types;
 - deployment/delivery destination;
-- watchdog operation class, status probe, progress signal, checkpoint mode, lock scope and safe recovery action.
+- watchdog operation class, status probe, progress signal, checkpoint mode, lock scope and safe recovery action;
+- project-specific deterministic progress micro-milestones when available.
 
-An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction from the same MADRE and same approved change-set, approval-before-MADRE, exact candidate-source promotion, permanent history retention, MotorLab Watchdog safety rules, or MotorLab visual-status rules.
+An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction from the same MADRE and same approved change-set, approval-before-MADRE, exact candidate-source promotion, permanent history retention, MotorLab Watchdog safety rules, MotorLab visual-status rules, or MotorLab progress-reporting rules.
 
 PROGRESS CONTRACT
-Default milestones:
+Broad default milestones:
 5 accepted/scope locked
 15 current MADRE identified and protected
 30 LAB/config changes applied
@@ -109,7 +110,21 @@ Default milestones:
 85 regression/artifact verification complete
 95 candidate/handoff or promotion package ready
 100 requested state verified and delivered
-Non-applicable steps are removed and progress recalculated. Never claim 100% on a failed or unverified result.
+
+Progress reporting behavior:
+- report percentage throughout substantial work, not only at broad milestones;
+- report when meaningful subtasks start/finish, phases change, files/config are applied, checks/build/test steps change, artifacts/checkpoints change, watchdog/recovery events occur, and handoff/promotion/delivery state changes;
+- as a practical default, avoid more than roughly 1-3 meaningful operations/tool interactions without a user-visible progress update when the chat surface permits;
+- long single external operations should surface provider/job phase changes when available;
+- broad phases may be divided into real deterministic micro-milestones so intermediate percentages are justified by completed work;
+- the same verified percentage may be repeated with a new explanation when status changes but no additional completion is yet verified;
+- never increase progress because time passed;
+- non-applicable phases are removed and progress recalculated;
+- on failure retain the last verified percentage and identify the failing substep;
+- watchdog events should include the last verified percentage when visible;
+- fireworks messages should include percentage when useful;
+- never claim 100% on a failed, pending or unverified result;
+- detailed mandatory behavior is defined by MOTORLAB_PROGRESS_REPORTING_V1.txt.
 
 VISUAL SUCCESS CONTRACT
 - Every meaningful verified success must be visibly surfaced to Bruno.
@@ -157,11 +172,12 @@ ROLLBACK RULE
 If a LAB or CANDIDATA introduces a serious regression, discard it and return to the current MADRE. Do not repair on top of a corrupted experimental lineage unless Bruno explicitly chooses that path.
 
 SINGLE-SOURCE-OF-TRUTH RULE
-Br174/Chatgpt is the private MotorLab control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt and MOTORLAB_VISUAL_STATUS_V1.txt define the canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
+Br174/Chatgpt is the private MotorLab control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt and MOTORLAB_PROGRESS_REPORTING_V1.txt define the canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
 
 ENGINE VERSION
-MOTORLAB-CORE-V1.3 (legacy UAB compatibility)
+MOTORLAB-CORE-V1.4 (legacy UAB compatibility)
 Established as UAB: 2026-09-24
 MotorLab Watchdog revision: 2026-09-28
 MotorLab Visual Status revision: 2026-09-28
+MotorLab Progress Reporting revision: 2026-09-28
 Routing amendment 2026-09-27: Codemagic removed; public projects use standard GitHub Actions, with project adapters/local safe paths only where explicitly supported.
