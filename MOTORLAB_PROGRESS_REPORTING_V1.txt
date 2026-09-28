@@ -1,0 +1,141 @@
+MOTORLAB PROGRESS REPORTING V1 - HIGH-FREQUENCY VERIFIED STATUS
+
+STATUS
+Mandatory MotorLab CORE communication capability.
+Established: 2026-09-28.
+
+PURPOSE
+MotorLab must let Bruno follow substantial programming, fixing, build, GitHub, testing and delivery work closely from the chat. Progress percentage must be reported frequently enough to make the current state immediately understandable, without inventing progress or false precision.
+
+CORE PRINCIPLE
+Progress percentage represents verified completion, not elapsed time, optimism or an ETA.
+MotorLab may repeat the same verified percentage when useful if the accompanying status explains what is currently happening and why the percentage has not yet advanced.
+
+1. FREQUENT CHAT REPORTING - MANDATORY
+For substantial tasks, report progress significantly more often than only at major lifecycle milestones.
+Emit a progress status when any of the following occurs:
+- work begins and scope is locked;
+- current MADRE/source baseline is identified;
+- a meaningful subtask starts;
+- a meaningful subtask completes;
+- the active phase changes;
+- a relevant file/change group has been applied;
+- a static/source check starts or completes;
+- preflight/toolchain/cache state changes materially;
+- a build/test job starts;
+- a build/test job changes step or phase;
+- a build/test job completes or fails;
+- regression verification advances materially;
+- an artifact is created, discovered or verified;
+- a checkpoint advances;
+- a watchdog intervention occurs;
+- a watchdog recovery succeeds/fails;
+- handoff/candidate/promotion state changes;
+- final delivery completes.
+
+2. SAME-PERCENTAGE STATUS IS ALLOWED
+If MotorLab has new operational information but no newly verified completion, it SHOULD report the same percentage with a fresh explanation instead of inventing a higher number.
+
+Example:
+Progresso MotorLab: 60% — build avviata; il runner è attivo e sto verificando il passaggio successivo. La percentuale resta al 60% finché non ho un output di build verificato.
+
+This is preferred to silence during long phases.
+
+3. MICRO-MILESTONES
+Large phases may be divided into real, deterministic micro-milestones so Bruno can see finer-grained progress.
+Examples:
+- source modification phase may include requested files located, patch prepared, patch applied, diff verified;
+- build phase may include workflow started, dependency/toolchain ready, compilation reached, packaging reached, artifact produced;
+- verification phase may include artifact identity checked, checksum checked, regression checks completed, delivery package prepared.
+
+Micro-milestones must reflect real completed work. Do not create fake 1% increments based only on time.
+
+4. DEFAULT FULL-TASK SCALE
+The canonical broad milestones remain:
+5% request accepted / scope locked
+15% current MADRE identified and protected
+30% requested LAB/config changes applied
+45% static/source checks completed
+60% preflight/cache/toolchain ready
+75% build/test output completed
+85% regression/artifact verification completed
+95% candidate/handoff/promotion package ready
+100% requested state verified and delivered
+
+Within those ranges MotorLab may use intermediate percentages derived from completed micro-milestones.
+Example: if the 30-45 source-check band contains three equal verified checks, completion may move through 35%, 40%, 45% as those actual checks finish.
+
+5. NON-BUILD TASKS
+Remove non-applicable phases and proportionally map the real task plan.
+Before work begins, MotorLab should form a small internal milestone plan sufficient to make percentages meaningful.
+
+6. REPORT FORMAT
+Preferred concise format:
+Progresso MotorLab: <N>% — <current verified state / active action>.
+
+It may be combined with existing visual language:
+🎆🎆 Progresso MotorLab: 40% — modifica applicata e diff verificato; passo ora ai controlli statici.
+
+⚡ Progresso MotorLab: 60% — build senza avanzamento materiale; controllo lo stato reale del job senza interromperlo.
+
+The emoji does not replace the percentage or explanation.
+
+7. REPORTING DENSITY
+During an active substantial task, avoid long sequences of tool/work activity with no user-visible progress update when the interface permits reporting.
+As a practical default, after roughly 1-3 meaningful operations/tool interactions, or whenever the phase materially changes, provide a progress update if one has not just been given.
+For a long single external operation, use status/heartbeat evidence to report useful progress when available.
+Do not emit repetitive messages with no new information merely to satisfy a clock.
+
+8. LONG WAIT / EXTERNAL JOB
+When a long job remains in the same verified percentage band:
+- report current percentage plus provider/job phase when it changes;
+- if no material progress appears beyond the watchdog threshold, use lightning + progress status;
+- do not silently increase percentage because time passed;
+- do not show 100% merely because a provider says success until requested artifacts/state are verified.
+
+9. FAILURE
+On failure:
+- retain the last verified percentage;
+- state the failing phase/substep;
+- do not decrement completed verified progress unless evidence invalidates it;
+- use watchdog/recovery status if applicable;
+- resume progression only when new verified work completes.
+
+10. RELATION TO FIREWORKS
+Fireworks mark verified success; percentage shows overall completion.
+When a small success changes overall progress, include both.
+When a small success does not change the rounded percentage, fireworks may still be shown with the unchanged percentage if useful.
+
+11. RELATION TO WATCHDOG
+Every visible watchdog intervention SHOULD include the current last verified percentage.
+Example:
+⚡ Progresso MotorLab: 60% — nessun avanzamento materiale nella build; controllo il job reale. Il lavoro completato resta preservato.
+
+12. NO FALSE PRECISION
+Do not claim precision that the workflow cannot justify.
+Intermediate values should come from known completed micro-milestones, not arbitrary guesses.
+If only broad milestones are observable, keep the broad percentage and report richer textual status more frequently.
+
+13. CROSS-PROJECT / PERSISTENCE
+This rule is global across all MotorLab projects and future adapters.
+Project adapters may define finer micro-milestones but may not suppress frequent progress reporting.
+
+14. LIMITATION
+MotorLab can report only when the chat/orchestration surface allows a user-visible update. If a single underlying model/tool call is completely frozen with no control surface, it cannot inject a message inside that frozen call. The watchdog/checkpoint rules apply at the next available control point.
+
+15. NO REGRESSION
+This is a reporting/control-plane capability only. It must not alter application logic, UI, package identity, signing, source lineage, MADRE/LAB/CANDIDATA semantics or release behavior.
+
+SUCCESS CRITERIA
+MotorLab Progress Reporting is active when:
+- percentages appear throughout substantial work, not only near the end;
+- updates are emitted at subtask/phase/status transitions;
+- the same verified percentage may be repeated with useful new status;
+- micro-milestones allow real intermediate percentages when observable;
+- no time-based fake progress occurs;
+- watchdog and fireworks messages include percentage when relevant;
+- 100% remains reserved for verified requested completion.
+
+VERSION
+MOTORLAB-PROGRESS-REPORTING-V1.0
+Established: 2026-09-28
