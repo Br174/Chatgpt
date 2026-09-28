@@ -81,7 +81,8 @@ MotorLab CORE owns:
 - anti-stall watchdog, heartbeat interpretation and progress fingerprints;
 - checkpoint/recovery rules;
 - single-writer lock/concurrency safety;
-- visible watchdog intervention messages using lightning emoji plus explanation.
+- visible watchdog intervention messages using lightning emoji plus explanation;
+- persistent visual success feedback using fireworks plus explanation for verified completions.
 
 Each project adapter may define only project-specific mechanics:
 - project type (Android, hybrid, web/PWA, delivery-only);
@@ -95,7 +96,7 @@ Each project adapter may define only project-specific mechanics:
 - deployment/delivery destination;
 - watchdog operation class, status probe, progress signal, checkpoint mode, lock scope and safe recovery action.
 
-An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction from the same MADRE and same approved change-set, approval-before-MADRE, exact candidate-source promotion, permanent history retention, or MotorLab Watchdog safety rules.
+An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction from the same MADRE and same approved change-set, approval-before-MADRE, exact candidate-source promotion, permanent history retention, MotorLab Watchdog safety rules, or MotorLab visual-status rules.
 
 PROGRESS CONTRACT
 Default milestones:
@@ -109,6 +110,18 @@ Default milestones:
 95 candidate/handoff or promotion package ready
 100 requested state verified and delivered
 Non-applicable steps are removed and progress recalculated. Never claim 100% on a failed or unverified result.
+
+VISUAL SUCCESS CONTRACT
+- Every meaningful verified success must be visibly surfaced to Bruno.
+- Use 🎆🎆 for small verified successes.
+- Use 🎆🎆🎆 for significant milestones, completed features, builds or regression successes.
+- Use 🎆🎆🎆🎆 for major/final verified completions.
+- Fireworks must always be accompanied by an explanation of what succeeded and, where relevant, how it was verified.
+- Do not show fireworks for merely started, pending, assumed or unverified work.
+- Small resolved items receive their own success signal; do not reserve fireworks only for the end of a long task.
+- Fireworks complement progress percentages and do not create progress by themselves.
+- Watchdog lightning and success fireworks are distinct status languages.
+- Detailed mandatory behavior is defined by MOTORLAB_VISUAL_STATUS_V1.txt.
 
 WATCHDOG / ANTI-STALL CONTRACT
 - Long-running work must be assessed by material progress, not by time alone.
@@ -144,10 +157,11 @@ ROLLBACK RULE
 If a LAB or CANDIDATA introduces a serious regression, discard it and return to the current MADRE. Do not repair on top of a corrupted experimental lineage unless Bruno explicitly chooses that path.
 
 SINGLE-SOURCE-OF-TRUTH RULE
-Br174/Chatgpt is the private MotorLab control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt and MOTORLAB_WATCHDOG_V1.txt define the canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
+Br174/Chatgpt is the private MotorLab control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt and MOTORLAB_VISUAL_STATUS_V1.txt define the canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
 
 ENGINE VERSION
-MOTORLAB-CORE-V1.2 (legacy UAB compatibility)
+MOTORLAB-CORE-V1.3 (legacy UAB compatibility)
 Established as UAB: 2026-09-24
 MotorLab Watchdog revision: 2026-09-28
+MotorLab Visual Status revision: 2026-09-28
 Routing amendment 2026-09-27: Codemagic removed; public projects use standard GitHub Actions, with project adapters/local safe paths only where explicitly supported.
