@@ -1,0 +1,114 @@
+MOTORLAB INTENT AUTO ACTIVATION V1 - SOFTWARE BUILD INTENT DISCOVERY
+
+STATUS
+Mandatory MotorLab CORE activation capability.
+Established: 2026-09-29.
+Repository authority: Br174/Chatgpt.
+
+PURPOSE
+MotorLab must be able to activate not only for projects already registered, but also when a new or otherwise unregistered chat clearly has the purpose of creating, developing, modifying, packaging or delivering an application, APK, web app or equivalent software project.
+
+This module does NOT replace structural project recognition. Registered project context has higher priority and activates MotorLab without requiring any build intent in the current user message.
+
+1. ACTIVATION PRECEDENCE - MANDATORY
+MotorLab activation must follow this order:
+
+A. REGISTERED PROJECT CONTEXT FIRST
+If the current chat/workspace/repository/project context can be identified as a MotorLab-registered project through project identity, MOTORLAB_PROJECT_HOOK.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt or a canonical successor:
+- activate MotorLab immediately and implicitly;
+- do NOT require the current message to express software-build intent;
+- do NOT wait for keywords such as app, APK, web app, build or develop;
+- load current MotorLab CORE from Br174/Chatgpt before write-capable or lifecycle-changing work;
+- preserve and coexist with the project-native engine.
+
+A chat inside a registered project is therefore already inside MotorLab scope by context alone.
+
+B. INTENT DISCOVERY ONLY WHEN PROJECT CONTEXT IS NOT ALREADY RECOGNIZED
+If no registered MotorLab project context is identifiable, evaluate whether the user is clearly asking to create or actively develop software.
+
+C. BUILD INTENT DETECTED
+When a clear software-build intent is present:
+- treat MotorLab as implicitly requested;
+- load the current canonical MotorLab CORE from Br174/Chatgpt when repository access is available;
+- initialize the new-project workflow;
+- help define architecture, repository, lifecycle, build/test path, checkpoints and delivery;
+- when the project becomes concrete and repository-side integration is applicable, onboard it into MotorLab routing and install the project hook under the normal governance rules.
+
+D. NO BUILD INTENT
+If there is no recognized project context and no clear software-build intent, MotorLab remains inactive for that chat unless explicitly invoked later.
+
+2. BUILD INTENT - SEMANTIC, NOT KEYWORD-ONLY
+Detection must be semantic and based on the user's actual goal, not on isolated words.
+
+Clear build intent includes requests whose practical objective is to:
+- create a new Android app, APK, web app, PWA or equivalent software product;
+- build an application from an idea, specification, prototype or design;
+- start a new software project that is expected to produce an installable/deployable application;
+- continue active development of an unregistered application or web app;
+- implement substantial application functionality, packaging, build or release work where the chat is acting as a software-development workspace.
+
+Examples that SHOULD activate MotorLab when no registered project context exists:
+- "Voglio creare un'app Android per catalogare i miei quadri."
+- "Costruiamo una web app per organizzare i viaggi."
+- "Fammi un APK che faccia questa funzione."
+- "Iniziamo un nuovo progetto software."
+
+3. FALSE-POSITIVE PROTECTION
+The mere presence of words such as app, APK, Android, website or software is not sufficient.
+
+Examples that MUST NOT activate MotorLab by intent alone:
+- asking which existing app is best for a purpose;
+- asking what an APK is;
+- discussing prices, stores, subscriptions or reviews of existing apps;
+- generic technology questions with no software-construction objective;
+- troubleshooting ordinary use of a third-party app when the chat is not developing that software.
+
+When intent is genuinely ambiguous and a write-capable development action would depend on activation, clarify the software-construction goal rather than guessing.
+
+4. PROJECT CONTEXT OVERRIDES INTENT GATING
+Once a project has been registered with MotorLab, future chats that are structurally identifiable as belonging to that project must activate MotorLab by context alone.
+
+This remains true even when the first message in a new project chat is short, administrative, diagnostic or contains no explicit development intent.
+
+Examples:
+- a new MusicLab project chat saying only "continuiamo" still bootstraps MotorLab when MusicLab project identity is available;
+- a GeoVision project chat asking only about a previous bug still bootstraps MotorLab when GeoVision context is available;
+- no repeated "ATTIVA MOTORLAB" phrase is required.
+
+5. NEW PROJECT ONBOARDING
+Intent activation is a discovery/onboarding path for projects that do not yet exist in the MotorLab registry.
+
+Recommended transition:
+BUILD INTENT DETECTED -> MOTORLAB ACTIVE -> PROJECT DEFINITION -> REPOSITORY/WORKSPACE -> ROUTING REGISTRATION -> PROJECT HOOK -> NORMAL REGISTERED-PROJECT AUTO-BOOTSTRAP.
+
+After onboarding, activation no longer depends on recurring intent detection because registered project context becomes authoritative.
+
+6. COEXISTENCE
+Intent activation makes MotorLab the orchestration/control-plane for the software-development workflow. It does not prevent a new application from later having its own project-native/domain engines.
+
+Any project-native engine must coexist with MotorLab under MOTORLAB_GOVERNANCE_V1.txt and must not be replaced merely because MotorLab is active.
+
+7. HOST / PLATFORM BOUNDARY
+The canonical repository can define the activation semantics, but it cannot physically inspect a completely unrelated future chat unless the host execution surface exposes either:
+- registered project identity/context;
+- a persistent project/workspace hook or instruction;
+- a persistent global MotorLab intent trigger;
+- or another supported mechanism that causes this canonical activation policy to be consulted.
+
+Therefore:
+- registered project chats rely primarily on structural project recognition;
+- unregistered future chats rely on the host exposing a persistent global intent-trigger capability if fully automatic intent activation is desired across all chats;
+- recurring manual activation strings are not the intended architecture.
+
+8. SUCCESS CRITERIA
+This capability is correctly implemented when:
+- registered project chats activate MotorLab without requiring build intent in the message;
+- unregistered chats with clear software-construction intent can activate MotorLab and start onboarding;
+- ordinary discussion about apps does not trigger MotorLab;
+- onboarding converts a new project from intent-based discovery to structural project-based activation;
+- current MotorLab CORE remains canonical in Br174/Chatgpt;
+- project-native engines remain preserved.
+
+VERSION
+MOTORLAB-INTENT-AUTO-ACTIVATION-V1.0
+Established: 2026-09-29
