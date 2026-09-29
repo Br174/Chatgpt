@@ -79,7 +79,18 @@ MOTORLAB_SERVICE_FAILOVER=<ordered authorized sources/credentials or none>
 MOTORLAB_SERVICE_HEALTHCHECK=<probe strategy>
 MOTORLAB_SERVICE_DIAGNOSTICS=<available counters/status>
 
-Legacy adapters that do not yet declare watchdog/background/service-guard fields remain usable. MotorLab applies conservative defaults, MUST NOT claim true persistent background continuity unless a durable executor is actually defined and observable, and MUST NOT invent provider quota values that have not been established.
+MOTORLAB VELOCITY LAYER FIELDS - RECOMMENDED FOR NEW/UPDATED ADAPTERS
+MOTORLAB_VELOCITY_MODE=<off|safe|aggressive-safe|custom>
+MOTORLAB_PROJECT_SNAPSHOT=<supported|rebuild-on-demand|none-with-reason>
+MOTORLAB_SNAPSHOT_INVALIDATION=<sha|manifest|custom>
+MOTORLAB_FAST_LAB=<supported|conditional|forbidden>
+MOTORLAB_RISK_MODEL=<default|custom>
+MOTORLAB_INCREMENTAL_BUILD=<supported|conditional|none>
+MOTORLAB_REGRESSION_MAP=<path/description|none-with-reason>
+MOTORLAB_PREAPPROVAL_READONLY=<allowed|restricted|none-with-reason>
+MOTORLAB_PARALLEL_READONLY=<allowed|restricted|none-with-reason>
+
+Legacy adapters that do not yet declare watchdog/background/service-guard/velocity fields remain usable. MotorLab applies conservative defaults, MUST NOT claim true persistent background continuity unless a durable executor is actually defined and observable, MUST NOT invent provider quota values that have not been established, and MUST NOT use a Velocity optimization that cannot be proven compatible with existing MotorLab safety rules.
 
 MANDATORY ADAPTER BEHAVIOR
 1. Adapter cannot make a LAB permanent.
@@ -119,11 +130,23 @@ MANDATORY ADAPTER BEHAVIOR
 35. All-provider/all-credential failure must stop safely, preserve useful queue/cache/checkpoint state and avoid infinite loops.
 36. Existing project-native provider logic should be wrapped/aligned incrementally; MotorLab service protection must not replace the project's domain semantics merely for architectural uniformity.
 37. For a new/updated provider integration, execute the applicable minimum verification set in MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt, including cache reuse, deduplication, limiter/concurrency enforcement, Retry-After, circuit open/half-open recovery, safe all-failure behavior and degraded-mode regression checks.
+38. Velocity Layer is strictly additive. An adapter may accelerate preparation/build/testing mechanics but may not remove, weaken, bypass or redefine any existing MotorLab lifecycle, approval, regression, Watchdog, checkpoint, single-writer, progress, background, service-guard, cost, signing/package or coexistence rule.
+39. A project snapshot is an acceleration index only. Before write-capable work, the adapter must revalidate authoritative source ref/SHA and relevant files; stale snapshot state must be invalidated rather than trusted.
+40. Pre-approval acceleration may perform only read-only preparation allowed by MOTORLAB_VELOCITY_LAYER_V1.txt. It may not change source, branches, releases, production state or other write-capable project resources before required approval.
+41. Independent read-only preparation may run in parallel where safe; write-capable work remains single-writer.
+42. FAST LAB is not a new lifecycle state. It must still start from the protected current MADRE/baseline, stay atomic, preserve the approved scope and cannot promote directly to CANDIDATA or MADRE.
+43. LAB verification depth may scale by evidence-based risk classification, but HIGH-risk work cannot use a reduced verification path and all CANDIDATA/MADRE promotions still require the canonical exact-replay and full adapter-defined regression gates.
+44. Build/cache/incremental reuse must invalidate on incompatible source/dependency/toolchain inputs. A cold/full build remains mandatory when safe reuse cannot be established.
+45. Change Capsule/project snapshot reuse must stop and revalidate when Bruno changes the request materially, source baseline changes, evidence contradicts assumptions, recovery requires revalidation or governance demands it.
+46. Existing approval remains valid across phases/executors for the same clearly described scope; do not ask Bruno to repeat the same approval unless scope/consequences materially change or another canonical rule requires renewed approval.
+47. Provider-dependent acceleration must remain inside MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt budgets/circuit/backoff/failover rules; speed may not come from increasing API pressure.
+48. Adoption of Velocity Layer must execute the applicable verification checks in MOTORLAB_VELOCITY_LAYER_V1.txt, including stale-snapshot invalidation, no pre-approval writes, no conflicting writer, risk gating, FAST LAB lifecycle safety, cache invalidation, Service Guard preservation and continued Watchdog/checkpoint/progress operation.
 
 VERSION
-UAB-ADAPTER-SPEC-V1.4 / MOTORLAB COMPATIBILITY
+UAB-ADAPTER-SPEC-V1.5 / MOTORLAB COMPATIBILITY
 Established: 2026-09-24
 Revision 1.1: atomic LAB and exact same-Mother/same-change Candidate promotion chain.
 Revision 1.2: MotorLab naming compatibility plus mandatory anti-stall watchdog observability, checkpoint, lock and recovery contract.
 Revision 1.3: persistent background execution, durable checkpoints and single-chat continuity contract.
 Revision 1.4: reusable External Service Guard provider/API protection fields and mandatory adapter behavior.
+Revision 1.5: additive-only Velocity Layer fields, project snapshots, Change Capsules, FAST LAB, risk-scaled LAB verification and safe incremental build readiness.
