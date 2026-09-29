@@ -31,12 +31,17 @@ MOTORLAB_SATELLITE_BUNDLE
 RELEASE=<id>
 CENTRAL_AUTHORITY=Br174/Chatgpt
 PROJECT_NATIVE_ENGINE_POLICY=coexist-preserve
+CHANGE_COMPATIBILITY_GUARD=required
 WATCHDOG=required
 RESUME_RECOVERY=required
+FOREGROUND_STALL_GUARD=required
 PROGRESS_REPORTING=required
 VISUAL_STATUS=required
 SINGLE_WRITER=required
 CHECKPOINT_RECOVERY=required
+
+CHANGE COMPATIBILITY REQUIREMENT
+For release 2026.09.29-r4 and later, a bundle is invalid unless CHANGE_COMPATIBILITY_GUARD=required is present. The local fallback must therefore retain the rule that every write-capable MotorLab/project change receives compatibility/conflict/overlap/regression preflight before the first write.
 
 ROLLBACK
 If a new bundle cannot be verified, keep or restore LAST_GOOD, record UPDATE_FAILED_SAFE, preserve the project and report the fallback visibly.
@@ -54,4 +59,5 @@ AUTOMATIC MEANING
 Automatic synchronization occurs when an execution cycle with repository access opens the project. Repository files cannot self-update while no executor or tool is running.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.0
+MOTORLAB-SATELLITE-SYNC-V1.1
+Revision 1.1: Change Compatibility Guard becomes a required bundle marker from release 2026.09.29-r4.
