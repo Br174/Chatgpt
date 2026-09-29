@@ -15,15 +15,24 @@ REGISTERED PROJECT BOOT ORDER
 4. When central access is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt.
 5. Compare local and central release ids.
 6. At a safe boundary, synchronize when central is newer.
-7. Load current central MOTORLAB_AUTO_BOOTSTRAP_V1.txt, MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt, MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt, governance and required CORE modules.
-8. Before substantial work, apply Foreground Stall Guard classification. For FOREGROUND_RISK/BACKGROUNDABLE phases, prepare a recoverable checkpoint before entering the phase and prefer a real persistent executor when available.
-9. Preserve project-native engines and current lifecycle state.
-10. Emit the mandatory visible MotorLab startup banner.
-11. Reconcile checkpoint/lock/pending state and continue the requested project work.
+7. Load current central MOTORLAB_AUTO_BOOTSTRAP_V1.txt, MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt, governance and required CORE modules.
+8. Before ANY write-capable MotorLab or project change, apply MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt. Inspect relevant current state, overlapping mechanisms, protected behavior, blast radius, conflicts, precedence and regression scope. Resolve/merge/define precedence before writing; do not blindly stack another implementation.
+9. Before substantial execution, apply Foreground Stall Guard classification. For FOREGROUND_RISK/BACKGROUNDABLE phases, prepare a recoverable checkpoint before entering the phase and prefer a real persistent executor when available.
+10. Preserve project-native engines and current lifecycle state.
+11. Emit the mandatory visible MotorLab startup banner.
+12. Reconcile checkpoint/lock/pending state and continue the requested project work.
+
+CHANGE COMPATIBILITY PREFLIGHT
+The Change Compatibility Guard is mandatory for both:
+- changes to MotorLab itself; and
+- changes to every current/future MotorLab-managed project.
+
+Its preflight occurs before the first write, including low-risk fast-path changes. It must determine whether the change is CLEAR, COMPLEMENTARY, MERGE_REQUIRED, PRECEDENCE_REQUIRED, CONFLICT, OBSOLETE_PATH or BLOCKED_UNSAFE.
+If overlap/conflict exists, integrate the new behavior into the existing responsible mechanism or define explicit precedence/supersession before proceeding. An unresolved unsafe conflict blocks the write.
 
 FALLBACK
 If central access is temporarily unavailable but the project has a VERIFIED local satellite, use the local release as fallback and preserve the project. Do not invent central state.
-The local satellite must include the current Foreground Stall Guard summary so risky foreground work remains checkpoint-first even during central unavailability.
+The local satellite must include both the current Change Compatibility Guard summary and Foreground Stall Guard summary so pre-change compatibility and risky-foreground protections remain active during central unavailability.
 
 SAFE VERSION PINNING
 The MotorLab release used by an active operation is pinned until that operation reaches a valid terminal state. A newer release is adopted only at the next safe boundary.
@@ -44,6 +53,7 @@ When clear software-build intent creates a new project and repository integratio
 - .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt with the same initial verified content;
 - .motorlab/MOTORLAB_SYNC_STATE.txt;
 and register the project in the canonical MotorLab integration registry.
+The new project automatically inherits the Change Compatibility Guard before its first write-capable modification.
 
 HOST INSTRUCTIONS
 A one-time ChatGPT project instruction may point to this entrypoint/local hook. It must not duplicate the full CORE. Future MotorLab improvements remain centralized in Br174/Chatgpt and are inherited through satellite synchronization.
@@ -52,5 +62,6 @@ NO RUNTIME REGRESSION
 MotorLab satellite/entrypoint files are development control-plane metadata only and do not authorize changes to app runtime, UI, package identity, signing or project-native engines.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.1
+MOTORLAB-CORE-ENTRYPOINT-V1.2
 Revision 1.1: Foreground Stall Guard added as mandatory preflight for long/risky foreground work.
+Revision 1.2: Change Compatibility Guard becomes mandatory before every MotorLab self-change and every MotorLab-managed project write/change.
