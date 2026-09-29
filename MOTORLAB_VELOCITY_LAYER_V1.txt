@@ -1,0 +1,308 @@
+MOTORLAB VELOCITY LAYER V1 - ADDITIVE IDEA-TO-LAB ACCELERATION
+
+STATUS
+Mandatory MotorLab CORE capability for accelerating project work without weakening existing safety, lifecycle, verification or governance controls.
+Established: 2026-09-29.
+
+PURPOSE
+Reduce the elapsed work between Bruno expressing an idea/change and obtaining the first useful LAB/testable result, while preserving every existing MotorLab capability and protection.
+
+NON-NEGOTIABLE PRINCIPLE - ADDITIVE ONLY
+Velocity Layer is strictly additive.
+It MUST NOT remove, replace, weaken, bypass, redefine downward or silently skip any existing MotorLab capability, including but not limited to:
+- MADRE -> LAB -> CANDIDATA -> NEW MADRE lifecycle;
+- MADRE immutability and historical rollback;
+- atomic LAB scope;
+- exact Candidate replay/promotion identity;
+- explicit approval requirements;
+- regression gates;
+- Watchdog/anti-stall;
+- heartbeat/progress fingerprint;
+- checkpoint/recovery;
+- single-writer lock;
+- verified progress reporting;
+- Visual Status;
+- Background Execution / Single-Chat Continuity;
+- cost-aware routing/cache policy;
+- External Service Guard;
+- structural/intent auto-bootstrap;
+- project-native engine coexistence.
+
+If a Velocity optimization conflicts with an existing MotorLab rule, the existing safety/governance rule wins and the optimization is disabled or degraded for that operation.
+
+CORE GOAL
+Make MotorLab less serial, not less safe.
+The preferred acceleration pattern is:
+UNDERSTAND ONCE -> PREPARE IN PARALLEL READ-ONLY -> WRITE ONCE -> VERIFY BY RISK -> KEEP FULL PROMOTION SAFETY.
+
+1. PROJECT SNAPSHOT
+For onboarded projects, MotorLab should maintain/reconstruct a compact current project snapshot when technically possible.
+The snapshot may include:
+- project/repository identity;
+- current approved MADRE ref/SHA;
+- lifecycle branch conventions;
+- major modules/components;
+- important UI/runtime/service entry points;
+- build/test commands;
+- package/signing rules;
+- external providers/services;
+- regression-critical functions;
+- adapter/routing state;
+- recent approved change areas;
+- known protected/blindata components;
+- toolchain/dependency state sufficient for planning.
+
+SNAPSHOT SAFETY
+- Snapshot is an acceleration index, not source-of-truth replacement.
+- Before any write, source ref/SHA and relevant files must be revalidated against the repository/current authoritative state.
+- If snapshot baseline SHA differs from current authoritative SHA, invalidate/rebuild affected snapshot portions before writing.
+- Never make a risky write from stale snapshot assumptions.
+- Sensitive secrets are never stored in the snapshot.
+
+2. CHANGE CAPSULE
+Each concrete change request should be normalized into a compact Change Capsule containing, when determinable:
+- user goal;
+- requested visible behavior;
+- project/lifecycle target;
+- likely affected components/files;
+- explicit protected/non-target areas;
+- acceptance criteria;
+- risk class;
+- required service/provider constraints;
+- minimum relevant checks for LAB;
+- mandatory promotion checks that remain unchanged;
+- whether user approval is already present.
+
+The capsule reduces repeated re-interpretation of the same request during planning, writing, testing and recovery.
+
+3. QUESTION MINIMIZATION
+MotorLab should ask Bruno only for information whose absence materially changes architecture, behavior, safety, cost, privacy, irreversible state or the requested result.
+When a detail can be safely derived from current project state, adapter, existing conventions or the explicit request, derive it instead of asking a redundant question.
+Never invent a consequential requirement merely to avoid a question.
+
+4. PRE-APPROVAL READ-ONLY PREPARATION
+When project workflow requires Bruno to approve a modification before write-capable work, MotorLab may prepare read-only work before that approval, including:
+- identify current MADRE/source baseline;
+- locate likely files/components;
+- inspect relevant code/config;
+- inspect current adapter/routing/service constraints;
+- form Change Capsule;
+- identify regression-critical neighbors;
+- prepare a proposed patch plan/diff outline;
+- warm safe metadata/tooling caches where no project state is mutated.
+
+It MUST NOT modify project source, branch state, releases, external production state or other write-capable resources before the required approval.
+After approval, reuse the verified preparation rather than restarting analysis from zero, subject to source revalidation.
+
+5. SAFE PARALLEL READ-ONLY ANALYSIS
+MotorLab should parallelize independent read-only preparation where the execution surface permits it, for example:
+- source inspection;
+- dependency/config inspection;
+- adapter/routing lookup;
+- documentation lookup;
+- service/provider limit lookup;
+- test inventory/regression mapping;
+- artifact/history inspection.
+
+Single-writer remains mandatory. Parallel analysis may not create competing writers or two independent patch interpretations against the same target.
+
+6. FAST LAB PATH
+FAST LAB is an accelerated way to reach a testable LAB, NOT a new lifecycle state and NOT a shortcut around Candidate/MADRE safety.
+
+Eligibility requires all of the following:
+- current MADRE/source baseline is identified and protected;
+- requested change fits atomic LAB scope;
+- exact change target is sufficiently understood;
+- required approval is present;
+- no unresolved high-risk ambiguity remains;
+- adapter permits the selected fast mechanics.
+
+FAST LAB may accelerate:
+- branch/ref preparation;
+- targeted patch application;
+- incremental build/test;
+- safe cache reuse;
+- feature-focused smoke checks;
+- generation of an installable/testable artifact.
+
+FAST LAB MUST NOT:
+- edit MADRE directly;
+- skip source identity checks;
+- skip single-writer locking;
+- weaken External Service Guard where providers are involved;
+- silently broaden the requested scope;
+- promote directly to CANDIDATA/MADRE;
+- declare 100% before requested LAB result is verified.
+
+7. RISK CLASSIFICATION
+Before selecting fast mechanics, classify the requested modification using evidence from the actual project.
+
+LOW RISK examples may include:
+- text/copy changes;
+- isolated styling/layout changes with clear boundaries;
+- non-sensitive static assets;
+- isolated configuration changes with deterministic validation.
+
+MEDIUM RISK examples may include:
+- ordinary feature logic;
+- API integration adjustments;
+- navigation/state changes;
+- non-critical persistence changes;
+- build/dependency updates with contained scope.
+
+HIGH RISK examples may include:
+- authentication/authorization/security;
+- signing/package/update identity;
+- destructive database/schema migration;
+- payment/billing;
+- production data mutation;
+- lifecycle/promotion infrastructure;
+- core playback/runtime/geospatial engine changes with broad blast radius;
+- concurrency/background/job integrity;
+- secrets/credentials;
+- changes touching protected/blindata areas.
+
+Risk class is a planning accelerator, not permission to skip mandatory promotion checks.
+When uncertain between classes, choose the safer higher class until evidence justifies lowering it.
+
+8. LAB VERIFICATION BY RISK
+Velocity Layer may scale the FIRST LAB verification depth to risk while preserving final promotion requirements.
+
+LOW RISK LAB:
+- diff/scope verification;
+- syntax/static validity where relevant;
+- requested feature check;
+- minimal critical smoke gates affected by the change.
+
+MEDIUM RISK LAB:
+- all LOW checks;
+- targeted unit/integration checks;
+- relevant service/provider checks;
+- adjacent regression smoke gates.
+
+HIGH RISK LAB:
+- full applicable preflight from the beginning;
+- broader regression/security/integrity checks;
+- no reduced verification path where failure impact is high.
+
+CANDIDATA/MADRE RULE
+Before promotion, the existing full adapter-defined regression gates, exact Candidate reconstruction and approval rules remain mandatory regardless of LAB risk class.
+
+9. BUILD READINESS / CACHE REUSE
+MotorLab should reduce setup latency by keeping safe reusable build readiness when technically supported:
+- persistent Gradle/npm/tool caches;
+- dependency/tool download caches;
+- reusable non-secret generated intermediates when compatible;
+- incremental build outputs where the build system safely supports them;
+- preflight/toolchain metadata;
+- known build command/variant/package mappings.
+
+Do not reuse incompatible/stale build state merely for speed.
+Cache keys/invalidation must remain dependency/toolchain/source-aware.
+A cold build remains acceptable when safety requires it.
+
+10. DELTA-SCOPED INSPECTION
+For a small approved change, inspect and test the smallest proven affected surface first rather than rereading/rebuilding unrelated areas by default.
+Expand scope automatically when dependency/blast-radius evidence indicates the change crosses boundaries.
+Promotion verification still follows full adapter gates.
+
+11. PRECOMPUTED REGRESSION MAP
+Adapters may define a map from component/change category to minimum relevant LAB smoke checks.
+Examples:
+UI copy -> screen render/navigation smoke;
+API client -> service guard + parsing + fallback smoke;
+playback -> playback/start/stop/background smoke;
+persistence -> read/write/migration smoke.
+
+This map accelerates test selection but cannot remove the canonical full regression gates required before promotion.
+
+12. ONE-PASS TOOL/FILE GATHERING
+When supported, gather independent required read-only inputs in one planning phase instead of repeated serial lookups.
+Avoid re-fetching unchanged canonical files during the same operation unless freshness evidence requires it.
+
+13. NO RE-ANALYSIS LOOP
+Once a Change Capsule and source baseline are verified, downstream phases should reuse them.
+Re-analysis from scratch occurs only when:
+- Bruno materially changes the request;
+- source baseline changed;
+- new evidence contradicts prior assumptions;
+- Watchdog/checkpoint recovery requires revalidation;
+- safety/governance requires it.
+
+14. APPROVAL CONTINUITY
+If Bruno already approved the clearly described scope, MotorLab must not ask for the same approval again merely because execution moved between tools/executors/phases.
+A new approval is required only when the scope materially changes, a new consequential decision appears, or an existing governance rule requires it.
+
+15. FAST FAILURE
+Detect deterministic blockers as early as possible before expensive build phases:
+- missing required file/ref;
+- incompatible dependency/toolchain declaration;
+- absent signing/build input;
+- malformed config;
+- unavailable required provider/permission;
+- stale snapshot/source mismatch;
+- conflicting active writer.
+
+Fail early with preserved state rather than spending time on a build known to be invalid.
+
+16. WATCHDOG INTEGRATION
+Velocity Layer never replaces Watchdog.
+Fast preparation/build still uses heartbeat, progress fingerprint, bounded retry and checkpoint recovery.
+A faster path that becomes stalled is handled exactly by MOTORLAB_WATCHDOG_V1.txt.
+
+17. EXTERNAL SERVICE GUARD INTEGRATION
+Velocity Layer must not accelerate API/provider work by increasing request pressure.
+Any provider-dependent optimization must remain inside MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt budgets, queues, cache, deduplication, backoff, circuit and policy rules.
+
+18. BACKGROUND EXECUTION INTEGRATION
+Read-only preparation, cache warming, deterministic build/test and other backgroundable steps may be handed to durable executors when allowed.
+Velocity Layer should overlap safe preparation with durable work where dependencies permit, while preserving canonical-chat continuity and single-writer safety.
+
+19. PROGRESS REPORTING
+Speed optimizations do not fabricate progress.
+Report verified micro-milestones using MOTORLAB_PROGRESS_REPORTING_V1.txt.
+A shorter path may legitimately reach milestones sooner; percentages still represent verified completion only.
+
+20. PROJECT ADAPTER FIELDS
+New/updated adapters may declare:
+MOTORLAB_VELOCITY_MODE=<off|safe|aggressive-safe|custom>
+MOTORLAB_PROJECT_SNAPSHOT=<supported|rebuild-on-demand|none-with-reason>
+MOTORLAB_SNAPSHOT_INVALIDATION=<sha|manifest|custom>
+MOTORLAB_FAST_LAB=<supported|conditional|forbidden>
+MOTORLAB_RISK_MODEL=<default|custom>
+MOTORLAB_INCREMENTAL_BUILD=<supported|conditional|none>
+MOTORLAB_REGRESSION_MAP=<path/description>
+MOTORLAB_PREAPPROVAL_READONLY=<allowed|restricted|none-with-reason>
+MOTORLAB_PARALLEL_READONLY=<allowed|restricted|none-with-reason>
+
+Legacy adapters remain valid; MotorLab may use conservative default Velocity behavior until adapter-specific fields are added.
+
+21. MINIMUM VELOCITY VERIFICATION CHECKS
+For implementation/adoption, verify when applicable:
+1. snapshot source SHA mismatch invalidates stale planning;
+2. pre-approval preparation performs no project writes;
+3. parallel preparation creates no conflicting writer;
+4. Change Capsule preserves requested/protected scope;
+5. LOW-risk change receives required LAB checks;
+6. HIGH-risk change cannot enter reduced verification path;
+7. FAST LAB starts from protected current MADRE/baseline;
+8. FAST LAB cannot promote directly to MADRE;
+9. Candidate still requires exact replay + full adapter regression gates;
+10. cache/incremental reuse invalidates safely on incompatible inputs;
+11. External Service Guard remains active for provider-dependent work;
+12. existing Watchdog/checkpoint/progress/background rules continue operating.
+
+22. SUCCESS CRITERIA
+Velocity Layer is active when:
+- idea/change request is converted quickly into a stable Change Capsule;
+- redundant questions/re-reading are reduced;
+- safe read-only work is parallelized;
+- approval does not cause analysis to restart from zero;
+- small/medium changes reach a testable LAB faster;
+- risk scales LAB verification without weakening Candidate/MADRE gates;
+- build readiness/cache reduce avoidable setup time;
+- every previous MotorLab capability remains intact and authoritative.
+
+VERSION
+MOTORLAB-VELOCITY-LAYER-V1.0
+Established: 2026-09-29
