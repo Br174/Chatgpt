@@ -1,0 +1,107 @@
+MOTORLAB STATE - MUSICLAB MELD UPSTREAM / SELF UPDATE LAB13
+
+STATUS
+Canonical control-plane checkpoint for MusicLab upstream/update architecture.
+Recorded: 2026-09-29.
+Live GitHub refs/workflows remain authoritative when newer.
+
+PROJECT
+- Project: MusicLab
+- Repository: Br174/MusicLab
+- MotorLab CORE: MOTORLAB-CORE-V1.5
+- Canonical user-facing surface: current MusicLab project chat.
+
+LIFECYCLE
+- Approved MADRE remains: mother/musiclab-swipe-fluid-play-01
+- MADRE SHA: cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33
+- Previous tested AI repair LAB: uab-build/musiclab-canonical-ai-repair-12 @ 1ed611b47a1dcd6d2e205cbd7d22df6cf0b1e4d7
+- Current upstream/update LAB: uab-build/musiclab-meld-upstream-sync-13
+- LAB13 cleanup head: 5cb6f3ed9db8779219911396e3e2c0ca2aca5e1c
+- CANDIDATA: none.
+- Promotion forbidden until Bruno real-device approval.
+
+UPSTREAM POLICY
+- Single approved upstream source: FrancescoGrazioso/Meld.
+- Direct MetroList import: DISABLED by policy.
+- Meld accepted baseline before current review: v0.8.9 / 645d84ee0fb8ea168c37490afa78de073b956453.
+- Current Meld release observed: v0.9.2.
+- In-app Meld notification is a human trigger only; it must never install Meld.apk over MusicLab.
+- No automatic merge of upstream changes.
+- Every upstream update is analyzed in a LAB and conflicts are reported before apply.
+- Exact upstream patch is produced so selected changes can be applied/cherry-picked instead of reimplemented approximately.
+
+LAB13 IMPLEMENTATION
+- app Updater now has two distinct channels:
+  1. MusicLab self-update from Br174/MusicLab releases tagged musiclab-v<version>.
+  2. Meld upstream notification from FrancescoGrazioso/Meld release page only.
+- Upstream Meld notification opens the release page and never returns/install Meld APK.
+- MusicLab stable release workflow added: .github/workflows/musiclab-release.yml.
+- Production identity configured in workflow: applicationId it.verlezza.musiclab, app name MusicLab.
+- VersionName/versionCode can be supplied at release build time.
+- Old inherited Meld release workflow .github/workflows/release.yml removed from LAB13.
+- Manual upstream analysis workflow added: .github/workflows/meld-upstream-review.yml.
+- Permanent upstream config added: .github/upstream/meld.json.
+
+FIRST REAL UPSTREAM ANALYSIS
+- Range: Meld v0.8.9 -> v0.9.2.
+- Upstream commits: 36.
+- Upstream files changed: 619.
+- Logical hotspots also touched by MusicLab: 19.
+- Actual Git conflicts in dry merge: 13.
+- Review workflow artifact id: 11030747172.
+- Exact binary patch generated in review artifact.
+- Conclusion: DO NOT bulk-merge Meld v0.9.2. Review/import selected features or commits in dedicated LAB(s).
+
+LAB13 BUILD CHECKPOINT
+- Final build run: 36562913237.
+- Result: SUCCESS.
+- Artifact id: 11031115174.
+- Artifact name: MusicLab-LAB-MELD-UPSTREAM-SYNC-13.
+- Artifact digest: sha256:2144de262e343b8205d157af6ff5ad014916be5b35af9d532771dad5e580178d.
+- APK local delivery checksum: sha256:7be380d2295d99a310ae0ebc2ea521e871474904a1a0ae0558f3199253df3f51.
+- APK ZIP local delivery checksum: sha256:1c8e872c2d75628e0506a3c15b5be7cfa532d8089e967feb35249be1f47a2101.
+- Android build/package/artifact upload completed successfully.
+
+STABLE UPDATE SIGNING BLOCKER
+The permanent MusicLab release workflow is ready, but GitHub Actions currently lacks all four stable signing secrets:
+- KEYSTORE
+- KEY_ALIAS
+- KEYSTORE_PASSWORD
+- KEY_PASSWORD
+Preflight verified this without exposing secret values.
+This is a one-time external setup requirement.
+Never commit a keystore or passwords to the public repository.
+After these secrets are configured, publish the first approved stable MusicLab release via .github/workflows/musiclab-release.yml. The first stable build establishes the permanent package/signing identity; subsequent MusicLab releases with the same package and certificate can update in place.
+
+IMPORTANT LAB VS STABLE IDENTITY
+- UAB LAB builds intentionally use unique parallel-install IDs under it.verlezza.musiclab.lab.* and are not designed for in-place updating.
+- Stable production updates will use fixed applicationId it.verlezza.musiclab and the permanent signing certificate.
+- A one-time transition/install to that stable identity may be required before future seamless in-place updates.
+
+FINAL DIFF LAB12 -> LAB13 CLEANUP
+Expected only:
+- .github/upstream/meld.json added
+- .github/workflows/meld-upstream-review.yml added
+- .github/workflows/musiclab-release.yml added
+- .github/workflows/release.yml removed
+- app/build.gradle.kts modified
+- app/src/main/kotlin/com/metrolist/music/MainActivity.kt modified
+- app/src/main/kotlin/com/metrolist/music/utils/Updater.kt modified
+No temporary LAB13 scripts/workflows remain.
+
+MOTORLAB DURABLE JOB STATE
+- operation_id: musiclab-meld-upstream-sync-13-20260929
+- status: WAITING_USER
+- phase: real_device_test_and_stable_signing_setup
+- last_verified_progress_percent: 97
+- checkpoint_id: musiclab-upstream13-20260929-01
+- source_ref: uab-build/musiclab-meld-upstream-sync-13
+- source_sha: 5cb6f3ed9db8779219911396e3e2c0ca2aca5e1c
+- lock_state: RELEASED
+- next_safe_steps:
+  1. Bruno tests LAB13 and confirms no regression to LAB12 AI/player behavior.
+  2. Configure permanent signing secrets securely (prefer Work/browser-assisted GitHub Settings or manual setup).
+  3. Build/publish first stable MusicLab package it.verlezza.musiclab.
+  4. Future Meld notification -> run upstream review -> discuss conflicts -> selected integration LAB -> candidate -> MADRE -> stable MusicLab release.
+
+END CHECKPOINT
