@@ -12,9 +12,10 @@ This contract defines permanent governance rules for MotorLab:
 3. MotorLab activation for registered projects must be structural and implicit: recurring per-chat activation strings are fallback compatibility aids, not the normal architecture.
 4. Registered project context has mandatory precedence over software-build intent detection; intent discovery is used only when no registered project context is already identifiable.
 5. Protection of external APIs/providers/services is a shared MotorLab control-plane responsibility governed by MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt whenever relevant.
+6. Faster idea-to-LAB execution is a shared MotorLab capability governed by MOTORLAB_VELOCITY_LAYER_V1.txt and is strictly additive: no existing capability or safety rule may be removed, weakened or bypassed for speed.
 
 1. PROJECT ENGINE COEXISTENCE - MANDATORY
-MotorLab is the shared orchestration, lifecycle, build/test, checkpoint, watchdog, routing, progress, release, continuity and external-service-protection control-plane.
+MotorLab is the shared orchestration, lifecycle, build/test, checkpoint, watchdog, routing, progress, release, continuity, external-service-protection and safe-acceleration control-plane.
 
 A project may also contain one or more project-native/domain engines, for example playback/search/AI/runtime engines in MusicLab, geospatial/POI/AI/runtime engines in GeoVision, or equivalent engines in present and future projects.
 
@@ -26,7 +27,8 @@ MotorLab MUST:
 - preserve already working project-native behavior;
 - treat project-native engines as authoritative for their own domain responsibilities unless Bruno explicitly approves a migration/change;
 - add cross-project control capabilities without unnecessarily rewriting project internals;
-- protect external-service integrations through reusable cache/rate-limit/queue/backoff/circuit/failover rules instead of encouraging incompatible ad-hoc retry logic in each project.
+- protect external-service integrations through reusable cache/rate-limit/queue/backoff/circuit/failover rules instead of encouraging incompatible ad-hoc retry logic in each project;
+- reduce redundant analysis, questions, serial read-only work and avoidable build setup through the additive Velocity Layer where safe.
 
 MotorLab MUST NOT, merely because it is activated:
 - replace a project-native engine;
@@ -60,7 +62,8 @@ MotorLab CORE is authoritative for cross-project control concerns including:
 - structural auto-bootstrap for registered projects;
 - semantic software-build intent activation for new/unregistered chats when supported by the host;
 - activation precedence: registered project context first, intent discovery second;
-- external-service/API protection through provider-aware caching, deduplication, batching, request budgets, queue/concurrency control, Retry-After, exponential backoff+jitter, circuit breaker, temporary suspension, health checks, authorized failover and diagnostics.
+- external-service/API protection through provider-aware caching, deduplication, batching, request budgets, queue/concurrency control, Retry-After, exponential backoff+jitter, circuit breaker, temporary suspension, health checks, authorized failover and diagnostics;
+- safe idea-to-LAB acceleration through project snapshots, Change Capsules, question minimization, pre-approval read-only preparation, safe parallel read-only analysis, FAST LAB mechanics, risk-scaled LAB verification, incremental build/cache reuse and delta-scoped inspection.
 
 Project-native engines are authoritative for their project-specific domain behavior unless Bruno explicitly approves otherwise.
 
@@ -127,6 +130,7 @@ Before the first write-capable or lifecycle-changing action in a registered proj
 - identify the project context;
 - inspect the current Br174/Chatgpt canonical state;
 - load current CORE contracts and modules, including MOTORLAB_GOVERNANCE_V1.txt and MOTORLAB_AUTO_BOOTSTRAP_V1.txt;
+- load MOTORLAB_VELOCITY_LAYER_V1.txt for additive-only acceleration;
 - load MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt whenever external API/provider/service behavior is relevant;
 - inspect current routing/registry and relevant durable job/checkpoint/lock state;
 - activate MotorLab alongside, never in place of, the project's native engines;
@@ -136,6 +140,7 @@ For an unregistered chat with clear software-construction intent, and only when 
 - load current canonical MotorLab state;
 - apply MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt;
 - initialize project definition/onboarding;
+- apply MOTORLAB_VELOCITY_LAYER_V1.txt to reduce redundant specification/re-analysis while preserving consequential clarification and approval;
 - apply MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt before designing external-provider integrations;
 - transition the project to normal structural activation once it is formally registered.
 
@@ -170,7 +175,32 @@ Multiple credentials must not be used to evade a provider's intended quota/rate-
 
 This governance rule does not automatically modify existing project repositories. Existing provider-specific implementations are aligned incrementally when that project is being changed, preserving working domain behavior.
 
-10. NO FALSE GUARANTEE
+10. VELOCITY LAYER - ADDITIVE ONLY, MANDATORY
+MOTORLAB_VELOCITY_LAYER_V1.txt is the canonical acceleration contract for current and future MotorLab projects.
+
+Its purpose is to shorten the path from idea/change request to a first useful verified LAB result by reducing avoidable serial work, not by weakening verification.
+
+MotorLab may use, where safe:
+- project snapshots tied to authoritative source identity;
+- Change Capsules that preserve goal/scope/protected areas/acceptance criteria;
+- fewer redundant questions when answers can be safely derived;
+- pre-approval read-only preparation;
+- parallel independent read-only analysis;
+- FAST LAB mechanics for eligible atomic changes;
+- risk-scaled FIRST-LAB verification;
+- persistent/incremental build readiness and cache reuse;
+- delta-scoped inspection with automatic expansion when blast radius requires it;
+- precomputed component-to-regression maps;
+- reuse of already verified analysis instead of restarting from zero after approval or executor handoff.
+
+ABSOLUTE PRECEDENCE RULE
+Velocity Layer may NEVER remove, weaken or bypass an existing MotorLab capability. If a speed optimization conflicts with lifecycle, approval, Watchdog, checkpoint, single-writer, progress truthfulness, regression gates, Background Execution safety, External Service Guard, cost policy, signing/package identity, protected project behavior or another canonical rule, the existing rule wins and the optimization is reduced/disabled.
+
+FAST LAB is not a new lifecycle state and cannot promote directly to CANDIDATA or MADRE. Candidate reconstruction, full adapter-defined regression gates and explicit promotion approval remain unchanged.
+
+This governance rule does not automatically rewrite project repositories. Project-specific acceleration mechanics are introduced through adapters and normal authorized project workflows.
+
+11. NO FALSE GUARANTEE
 "Permanent" means the rule is part of the canonical MotorLab design/control repository and remains operative until explicitly superseded.
 It does not mean MotorLab can bypass platform limitations, unavailable tools, permissions, quotas or external service failures.
 When a permanent rule cannot be executed because of an external limitation, preserve the rule and report the operational blocker instead of silently abandoning or replacing it.
@@ -179,10 +209,11 @@ Automatic structural bootstrap cannot physically occur on a completely context-f
 Automatic intent bootstrap across unrelated chats likewise cannot physically occur unless the host exposes a persistent global intent trigger or another supported mechanism that causes MotorLab activation policy to be consulted.
 
 External Service Guard also cannot manufacture quota or bypass a provider-enforced restriction. Its role is to conserve authorized capacity, avoid avoidable blocks, degrade gracefully and recover safely.
+Velocity Layer cannot manufacture speed when an external build/provider/tool is inherently slow; it may reduce avoidable work, overlap safe preparation and reuse valid state, but must report real blockers honestly.
 
-In such exceptional cases MotorLab must report the missing structural/intent/service capability instead of pretending that a per-chat prompt or uncontrolled retry is the architecture.
+In such exceptional cases MotorLab must report the missing structural/intent/service/execution capability instead of pretending that a per-chat prompt, uncontrolled retry or unsafe shortcut is the architecture.
 
-11. SUCCESS CRITERIA
+12. SUCCESS CRITERIA
 This governance contract is active when:
 - MotorLab consistently operates alongside project-native engines rather than replacing them;
 - existing "one engine" wording is interpreted as one lifecycle/control-plane engine only;
@@ -192,13 +223,15 @@ This governance contract is active when:
 - unregistered future chats with genuine software-build intent can enter MotorLab onboarding when the host exposes the required intent-trigger mechanism;
 - project context always takes precedence over intent gating;
 - external-service integrations inherit the reusable Service Guard when relevant instead of relying on uncontrolled retries or repeated duplicate provider calls;
+- Velocity Layer reduces avoidable idea-to-LAB latency while every pre-existing MotorLab capability remains active;
 - manual activation prompts are fallback only;
 - project repositories are not modified merely because a MotorLab governance rule changed;
 - later explicit Bruno decisions can supersede earlier rules through normal versioned repository updates.
 
 VERSION
-MOTORLAB-GOVERNANCE-V1.3
+MOTORLAB-GOVERNANCE-V1.4
 Established: 2026-09-29
 Revision 1.1: structural implicit auto-bootstrap for registered projects; recurring per-chat activation prompts demoted to fallback-only compatibility behavior.
 Revision 1.2: project-first activation precedence plus semantic software-build intent onboarding for unregistered chats.
 Revision 1.3: External Service Guard becomes a permanent cross-project MotorLab control-plane capability for provider/API protection and future service integrations.
+Revision 1.4: Velocity Layer becomes a permanent additive-only acceleration capability; all earlier MotorLab protections retain precedence.
