@@ -1,0 +1,285 @@
+MOTORLAB EXTERNAL SERVICE GUARD V1 - PROVIDER/API PROTECTION CORE
+
+STATUS
+Mandatory MotorLab CORE capability for projects that consume external APIs, AI providers, search/music/video/map services, cloud endpoints or other quota/rate-limited external systems.
+Established: 2026-09-29.
+
+PURPOSE
+MotorLab must protect project functionality and external providers from avoidable quota exhaustion, rate-limit bans, request storms, duplicate calls and cascading failures. The protection model is reusable across present and future projects and must be implemented through project adapters without replacing project-native domain engines.
+
+ORIGIN / DESIGN LINEAGE
+This module generalizes two previously proven patterns:
+- GeoVision/KeyBox sequential key/service failover with active-key persistence, health checks, temporary suspension and controlled recovery;
+- Cover Lab AI provider protection with persistent result reuse/cache, deduplication, batching, queues, rate limiting, Retry-After handling, exponential backoff, circuit breaker and provider suspension.
+
+CORE PRINCIPLE
+Prevent the block before trying to recover from it.
+The preferred order is:
+1. reuse valid local/cached knowledge;
+2. deduplicate/coalesce equivalent requests;
+3. batch/paginate efficiently where supported;
+4. schedule through a provider-aware queue and rate limiter;
+5. call the external service only when needed;
+6. honor provider response limits and Retry-After;
+7. back off and temporarily open the circuit on repeated/transient pressure;
+8. fail over only to an authorized compatible source/credential when policy allows;
+9. stop safely rather than create a request storm.
+
+1. PROVIDER PROFILE - MANDATORY
+Before a project depends materially on an external service, its adapter should define or discover from current official provider documentation when available:
+- provider/service name;
+- endpoint class;
+- authentication/credential scope;
+- documented request/rate limits;
+- quota period and quota scope (credential/account/project/IP/etc. when known);
+- burst limit when documented;
+- concurrency limit when documented;
+- batch size/pagination rules;
+- relevant HTTP/provider error codes;
+- Retry-After semantics;
+- cacheability/freshness constraints;
+- fallback compatibility;
+- provider terms/policy constraints relevant to automated use.
+
+Do not invent a quota number when it is unknown. Unknown limits require conservative defaults plus observation.
+
+2. REQUEST BUDGET / RATE LIMITER
+Every protected provider must have a request budget appropriate to its documented or observed limits.
+Preferred mechanisms may include token bucket, leaky bucket, fixed/sliding window or provider-native quota accounting.
+The limiter must:
+- prevent bursts beyond the provider's safe envelope;
+- reserve capacity for high-priority interactive requests when appropriate;
+- apply limits at the actual quota scope, not merely per UI component;
+- share the same budget across concurrent project components that use the same quota pool;
+- persist enough state when practical to avoid forgetting a quota state after restart.
+
+3. QUEUE + CONCURRENCY CONTROL
+Requests that cannot be executed immediately should enter a bounded queue rather than hammer the provider.
+Queue behavior should support:
+- priority classes where useful;
+- bounded concurrency;
+- expiry/cancellation of obsolete work;
+- duplicate request coalescing;
+- per-provider/per-endpoint scheduling;
+- backpressure when the queue grows too large.
+
+A queue must not become an infinite memory/storage sink. Obsolete or superseded work must be discarded safely.
+
+4. CACHE / SERVICE SHIELD
+MotorLab requires provider-aware caching where data can legally and technically be cached.
+The cache is a SERVICE SHIELD, not merely a speed optimization.
+
+Use appropriate layers where useful:
+- in-memory hot cache for repeated immediate reads;
+- persistent cache/database for reusable provider results;
+- long-lived identity/reference cache for stable identifiers such as IDs, mappings and already-resolved metadata;
+- stale-while-revalidate behavior when stale data is still acceptable for the project;
+- negative cache for confirmed 'not found' results with a bounded TTL when appropriate.
+
+Cache entries should record, when useful:
+- normalized request key;
+- provider/source;
+- result identity;
+- created/verified timestamp;
+- expiry/freshness policy;
+- negative/positive result type;
+- schema/version information needed for safe invalidation.
+
+Do not cache secrets, authentication tokens or data forbidden by provider policy.
+
+5. CACHE WARMING / PRE-GENERATION
+For predictable high-value data, MotorLab may pre-generate or warm a sufficiently useful cache so normal interactive use does not repeatedly hit external services.
+This must be controlled:
+- warm only data with a real expected reuse benefit;
+- obey the same provider rate limiter and request budget as foreground calls;
+- prefer low-priority background execution;
+- pause automatically when quota pressure rises;
+- never create a bulk request storm merely to fill the cache;
+- preserve existing valid cache during provider outages;
+- use incremental refresh instead of full rebuild when possible.
+
+The objective is to reduce external traffic, not move the same traffic to an earlier time.
+
+6. DEDUPLICATION / REQUEST COALESCING
+Before an external call, normalize the request and check whether:
+- an equivalent valid cached result exists;
+- the same request is already in flight;
+- the same work is already queued;
+- a batch operation can cover several equivalent requests.
+
+Equivalent in-flight requests should normally share one provider call and fan out the result to waiting consumers.
+
+7. BATCHING / PAGINATION EFFICIENCY
+When the provider officially supports batch lookup or larger page sizes, MotorLab should prefer the most quota-efficient legal request pattern.
+Do not make N single requests when one supported batch request can safely answer the same N items.
+Do not request pages/data that the application does not need.
+
+8. ERROR CLASSIFICATION
+At minimum distinguish:
+- AUTH_INVALID: invalid/revoked credential, malformed auth;
+- QUOTA_EXHAUSTED: documented quota depleted;
+- RATE_LIMITED: 429 or provider equivalent;
+- TEMPORARY_PROVIDER_FAILURE: 5xx/transient provider error;
+- NETWORK_FAILURE: timeout/DNS/connectivity failure;
+- CLIENT_REQUEST_ERROR: deterministic invalid request/4xx that retry will not fix;
+- CONTENT_NOT_FOUND: valid request with no result;
+- POLICY_BLOCKED: provider explicitly refuses the operation;
+- UNKNOWN_FAILURE: not yet classified.
+
+Retry/failover decisions must use the class, not only 'success/failure'.
+
+9. RETRY-AFTER + EXPONENTIAL BACKOFF + JITTER
+For RATE_LIMITED or transient provider failures:
+- honor a valid Retry-After/provider retry hint as the primary delay;
+- otherwise use bounded exponential backoff with jitter;
+- do not retry immediately in a tight loop;
+- cap retries;
+- reset retry pressure after verified recovery;
+- deterministic client/auth/policy errors go to diagnosis rather than repeated retry.
+
+A suggested generic series when no provider guidance exists is an increasing bounded delay with random jitter. Project adapters may tune it to the provider but may not remove the no-tight-loop rule.
+
+10. CIRCUIT BREAKER
+Each protected provider/endpoint/credential scope should expose a circuit state where useful:
+CLOSED = normal requests allowed;
+OPEN = provider temporarily suspended; normal calls blocked;
+HALF_OPEN = limited health/probe calls allowed to verify recovery.
+
+Open the circuit when evidence shows continuing calls are likely to worsen rate limiting or provider failure.
+The circuit may be scoped more narrowly than the whole provider when only one endpoint/credential is affected.
+
+While OPEN:
+- serve acceptable cached data when possible;
+- queue only work that remains useful after recovery;
+- use authorized compatible fallback when allowed;
+- do not send normal traffic to the blocked scope;
+- schedule conservative health checks.
+
+11. TEMPORARY SUSPENSION / HEALTH CHECK / RECOVERY
+A failed provider or credential should have a suspension-until/next-probe state rather than being retried continuously.
+Health checks must be low-cost and should use a provider-supported status/probe or a minimal safe request.
+A successful probe transitions through HALF_OPEN before restoring full traffic when appropriate.
+Recovery should gradually restore traffic rather than release a large queued burst at once.
+
+12. CREDENTIAL POOL / SEQUENTIAL FAILOVER
+When a project legitimately has multiple credentials for the same service, the preferred pattern is sequential failover, not continuous rotation:
+- keep using the current healthy credential;
+- switch only on a real classified failure that the credential pool is allowed to handle;
+- temporarily suspend the failed credential;
+- test/recover suspended credentials periodically and conservatively;
+- if all credentials are unavailable, stop provider traffic and preserve the queue/cache state until one recovers or another authorized route exists.
+
+IMPORTANT POLICY RULE
+Multiple credentials must not be used to evade a provider's intended quota/rate-limit policy. If quotas are shared at account/project/IP level, rotating keys does not create a new legitimate budget. Quota-based failover is allowed only when the credentials represent independent authorized quota pools and provider policy permits that usage.
+
+13. PROVIDER/SOURCE FAILOVER
+Fallback to another provider/source is allowed only when:
+- the project adapter declares semantic compatibility or a controlled degradation path;
+- the fallback is authorized and technically available;
+- the result provenance remains known when relevant;
+- the fallback does not bypass a provider restriction through equivalent prohibited traffic.
+
+Do not blindly provider-hop on deterministic application bugs. Diagnose code/configuration errors first.
+
+14. DEGRADE GRACEFULLY
+When live provider access is unavailable, prefer a controlled degraded mode where the project can still use:
+- valid cached data;
+- stale-but-acceptable data clearly governed by the project freshness policy;
+- reduced result sets;
+- delayed/background enrichment;
+- queued refresh after recovery.
+
+Do not turn a partial provider outage into total application failure when a safe degraded path exists.
+
+15. OBSERVABILITY / DIAGNOSTICS
+Each protected service should expose, when technically available:
+- service/provider state;
+- circuit state;
+- active credential identity in non-secret masked form;
+- request budget/quota status when known;
+- queue depth;
+- active concurrency;
+- cache hit/miss ratio;
+- deduplicated/coalesced call count;
+- last successful call;
+- last classified error;
+- last 429/quota event;
+- suspension-until/next health check;
+- retry count/backoff state;
+- fallback source currently in use.
+
+Never expose secret credential values in diagnostics.
+
+16. WATCHDOG INTEGRATION
+The External Service Guard and MOTORLAB_WATCHDOG_V1.txt serve different but connected roles:
+- Service Guard prevents and manages external-provider pressure/failure;
+- Watchdog detects lack of material progress in the operation using that service.
+
+A provider circuit OPEN state is not by itself a reason for Watchdog to spam retries. The durable operation should become WAITING_EXTERNAL, use cache/fallback, or continue other safe work as appropriate.
+
+17. BACKGROUND EXECUTION INTEGRATION
+Cache warming, deferred retries, queue draining, low-priority refresh and health checks may run through an adapter-approved durable background executor.
+They must preserve:
+- provider rate limits;
+- queue state;
+- circuit state;
+- checkpoint/progress state;
+- single-writer/resource safety where writes are involved.
+
+Normal chat execution alone must not be described as a durable service-monitor worker.
+
+18. COST / QUOTA SAFETY
+MotorLab must not silently move to a paid tier/provider or incur paid overage to recover from a limit unless Bruno has explicitly authorized that cost route.
+Free-first/cost-aware routing remains authoritative.
+
+19. PROJECT ADAPTER FIELDS
+New or updated projects that materially depend on external services should declare, per relevant provider or through an equivalent structured provider table:
+MOTORLAB_SERVICE_GUARD_MODE=<none|basic|full|custom>
+MOTORLAB_SERVICE_PROVIDER=<provider/service name>
+MOTORLAB_SERVICE_QUOTA_SCOPE=<credential|account|project|ip|unknown|custom>
+MOTORLAB_SERVICE_RATE_POLICY=<documented limiter/observed conservative policy>
+MOTORLAB_SERVICE_CONCURRENCY=<limit or provider-derived>
+MOTORLAB_SERVICE_CACHE=<memory|persistent|hybrid|none-with-reason>
+MOTORLAB_SERVICE_CACHE_TTL=<provider/project policy>
+MOTORLAB_SERVICE_DEDUP=<on|off-with-reason>
+MOTORLAB_SERVICE_BATCHING=<supported policy|none>
+MOTORLAB_SERVICE_BACKOFF=<retry-after+exponential-jitter|custom>
+MOTORLAB_SERVICE_CIRCUIT=<on|off-with-reason>
+MOTORLAB_SERVICE_FAILOVER=<ordered authorized sources/credentials or none>
+MOTORLAB_SERVICE_HEALTHCHECK=<probe strategy>
+MOTORLAB_SERVICE_DIAGNOSTICS=<available counters/status>
+
+Existing adapters remain valid until touched; new/updated provider integrations should adopt the guard rather than create another incompatible retry subsystem.
+
+20. TEN MINIMUM VERIFICATION CHECKS FOR NEW/UPDATED SERVICE INTEGRATIONS
+When technically applicable, verify at least:
+1. cached repeat does not call provider again;
+2. duplicate simultaneous request is coalesced/deduplicated;
+3. configured request rate is not exceeded;
+4. configured concurrency is not exceeded;
+5. Retry-After is honored;
+6. repeated 429/transient failures open/suspend the appropriate circuit scope;
+7. OPEN circuit blocks normal traffic;
+8. HALF_OPEN health probe can restore service without burst release;
+9. all-provider/all-credential failure stops safely without an infinite retry loop;
+10. fallback/cache degraded mode preserves unrelated app functionality.
+Additional provider-specific regression checks may be mandatory.
+
+21. NO REGRESSION / COEXISTENCE
+This module is MotorLab control-plane infrastructure. It must not replace project-native search, playback, AI, geospatial or other domain engines. Existing working provider-specific logic should be wrapped/aligned incrementally rather than rewritten merely for terminology.
+
+22. SUCCESS CRITERIA
+External Service Guard is active when:
+- external calls are budgeted and queued rather than uncontrolled;
+- cache/dedup/batch reduce avoidable calls;
+- Retry-After/backoff prevent immediate request storms;
+- circuit breaker temporarily isolates unhealthy/rate-limited scopes;
+- health checks recover them conservatively;
+- credential/source failover is sequential, authorized and policy-compliant;
+- all-failure state stops safely and preserves work;
+- diagnostics show provider protection state without exposing secrets;
+- future projects can reuse the same MotorLab mechanism through adapters.
+
+VERSION
+MOTORLAB-EXTERNAL-SERVICE-GUARD-V1.0
+Established: 2026-09-29
