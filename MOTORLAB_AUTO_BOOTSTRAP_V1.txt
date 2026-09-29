@@ -41,6 +41,7 @@ Before the first write-capable or lifecycle-changing operation in a registered p
 - detect MOTORLAB_PROJECT_HOOK.txt when project repository access exposes it;
 - read the current canonical MotorLab state from Br174/Chatgpt;
 - load the current CORE contracts, governance, routing and integration registry required for that project;
+- load MOTORLAB_VELOCITY_LAYER_V1.txt for additive idea-to-LAB acceleration;
 - load MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt whenever the project uses or may modify external APIs/providers/services;
 - reconcile current lifecycle/job/checkpoint/lock state where applicable;
 - apply MotorLab rules alongside the project's own native engines;
@@ -71,19 +72,21 @@ Minimum safe order for a registered project:
 A. identify project context;
 B. detect project-side MOTORLAB_PROJECT_HOOK.txt when available;
 C. inspect Br174/Chatgpt canonical state;
-D. load current MotorLab CORE/governance modules, including MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt when external services are relevant and MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt when relevant;
+D. load current MotorLab CORE/governance modules, including MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt when external services are relevant and MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt when relevant;
 E. inspect UAB_PROJECT_ROUTING.txt, UAB_STATE_REGISTRY.txt and MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt or their canonical successors;
 F. reconcile active durable job/checkpoint/lock state when relevant;
-G. proceed with the user's requested work.
+G. use Velocity Layer read-only snapshot/Change Capsule preparation where safe;
+H. proceed with the user's requested work under all existing lifecycle/safety controls.
 
 Minimum safe order for an unregistered chat with clear build intent:
 A. confirm no registered project context is already available;
 B. detect semantic software-build intent under MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt;
 C. inspect Br174/Chatgpt canonical state;
-D. load current MotorLab CORE/governance modules, including MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt before designing external-service integrations;
+D. load current MotorLab CORE/governance modules, including MOTORLAB_VELOCITY_LAYER_V1.txt and MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt before designing external-service integrations;
 E. initialize new-project definition/onboarding;
-F. register routing/hook only when the project becomes concrete and the applicable workflow permits it;
-G. continue under normal MotorLab lifecycle rules.
+F. use Velocity Layer to reduce redundant specification/re-analysis without bypassing consequential clarification or approval;
+G. register routing/hook only when the project becomes concrete and the applicable workflow permits it;
+H. continue under normal MotorLab lifecycle rules.
 
 7. PROJECT-SIDE STRUCTURAL HOOK
 For repositories formally onboarded to MotorLab, MOTORLAB_PROJECT_HOOK.txt is the standard persistent project-side declaration when repository integration is applicable.
@@ -135,17 +138,22 @@ When a new project is discovered through software-build intent and later formall
 - install MOTORLAB_PROJECT_HOOK.txt when repository-side integration is applicable;
 - register the hook in the canonical integration registry;
 - preserve project-native engines;
+- apply MOTORLAB_VELOCITY_LAYER_V1.txt as an additive-only acceleration layer;
 - apply MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt to any external API/provider integration instead of inventing an incompatible per-project protection scheme;
 - do not require a recurring user activation command or recurring build-intent statement.
 
-14. FAILURE MODE
+14. VELOCITY SAFETY PRECEDENCE
+Velocity Layer must never override or bypass an existing MotorLab protection.
+If fast-path mechanics conflict with lifecycle, approval, Watchdog, checkpoint, single-writer, regression, External Service Guard, cost policy, signing/package identity or project-native protected behavior, the existing rule has precedence and the fast path is reduced or disabled.
+
+15. FAILURE MODE
 If bootstrap cannot complete because Br174/Chatgpt is unavailable, permissions are missing, project identity/hook visibility is ambiguous, or the host lacks the global intent trigger required for an unrelated chat:
 - do not make a risky write based on guessed CORE state;
 - report the exact blocker;
 - preserve the project-native engine and current project state;
 - use WAITING_EXTERNAL or WAITING_USER only when genuinely necessary.
 
-15. SUCCESS CRITERIA
+16. SUCCESS CRITERIA
 Auto-bootstrap is considered active when:
 - registered project chats activate MotorLab by context alone and do not require build intent in the current message;
 - registered project chats do not require Bruno to paste an activation string each time;
@@ -153,6 +161,7 @@ Auto-bootstrap is considered active when:
 - unregistered chats with clear software-build intent can enter MotorLab onboarding when the host exposes the intent trigger;
 - ordinary discussion about apps does not activate MotorLab by intent alone;
 - current MotorLab CORE is loaded before write-capable work;
+- Velocity Layer is loaded automatically and accelerates preparation without bypassing existing controls;
 - External Service Guard is loaded automatically whenever external provider/API design or modification is relevant;
 - routing/integration registry/state is reconciled when relevant;
 - project-native engines remain intact and authoritative for their domain logic;
@@ -160,8 +169,9 @@ Auto-bootstrap is considered active when:
 - platform limitations are stated honestly rather than hidden.
 
 VERSION
-MOTORLAB-AUTO-BOOTSTRAP-V1.3
+MOTORLAB-AUTO-BOOTSTRAP-V1.4
 Established: 2026-09-29
 Revision 1.1: persistent MOTORLAB_PROJECT_HOOK.txt integration and canonical MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt support.
 Revision 1.2: dual-path activation; registered project context has mandatory precedence over semantic software-build intent discovery.
 Revision 1.3: External Service Guard becomes an automatic CORE bootstrap dependency whenever external APIs/providers/services are relevant.
+Revision 1.4: Velocity Layer becomes an automatic additive-only bootstrap dependency for faster idea-to-LAB preparation and execution.
