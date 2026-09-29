@@ -1,0 +1,78 @@
+MOTORLAB STATE - MUSICLAB MELD UPSTREAM GUARDIAN LAB13
+
+STATUS
+Recorded: 2026-09-29.
+MotorLab release: 2026.09.29-r2.
+Central authority: Br174/Chatgpt.
+
+PROJECT
+- Project: MusicLab
+- Repository: Br174/MusicLab
+- Approved MADRE remains untouched.
+- LAB source base: uab-build/musiclab-canonical-ai-repair-12 @ 1ed611b47a1dcd6d2e205cbd7d22df6cf0b1e4d7
+- Current LAB: uab-build/musiclab-meld-upstream-guardian-13
+- Current LAB head at checkpoint: ce867e8181ee4e5ae683ead3ec6fa7dbc7812492
+- CANDIDATA: none.
+
+UPSTREAM POLICY
+- Only external upstream followed: FrancescoGrazioso/Meld.
+- Direct MetroList upstream integration: disabled by policy.
+- Meld release APKs are never installed directly as MusicLab updates.
+- Meld notifications are informational triggers for MotorLab audit/review.
+- MusicLab installable updates must come from Br174/MusicLab releases.
+- Every Meld integration must occur in a separate LAB after audit/conflict review.
+
+IMPLEMENTED LAB13
+1. Added MeldUpstreamMonitor for informational Meld release notification.
+2. Existing Updater switched from FrancescoGrazioso/Meld release assets to Br174/MusicLab release assets.
+3. Added independent MusicLab version overrides and MELD_BASE_VERSION.
+4. Added persistent upstream/meld-state.json baseline registry.
+5. Added permanent meld-upstream-audit.yml workflow.
+6. Added permanent musiclab-stable-release.yml workflow.
+7. MainActivity now keeps MusicLab update path and Meld upstream notification separate.
+8. Last Meld notification tag is persisted to avoid repeated upstream notification spam.
+
+VERIFICATION
+- Functional Android source build succeeded in GitHub Actions run 36568210374.
+- Gradle :app:assembleFossDebug completed BUILD SUCCESSFUL.
+- Permanent upstream audit ref handling repaired after first isolated audit-step failure.
+- Corrected audit run: 36569275771, SUCCESS.
+- Audit artifact id: 11032519899.
+- Audit artifact digest: sha256:6b8a708ce78143fcfc4da8e33003d3252750879797495f550d15c19c3c3fb9e0.
+- Meld baseline v0.8.9 -> target v0.9.2: 36 upstream commits, 619 changed files, 19 potential conflict files.
+- Permanent audit summary stored in MusicLab at upstream/audits/meld-v0.9.2.md.
+- No Meld v0.9.2 commit has been imported into MusicLab yet.
+- MADRE was not modified.
+
+SIGNING BLOCKER
+- Preflight verified repository signing state without exposing secret values.
+- Stable release secrets currently missing:
+  * KEYSTORE
+  * KEY_ALIAS
+  * KEYSTORE_PASSWORD
+  * KEY_PASSWORD
+- DEBUG_KEYSTORE also absent; test builds fall back to an ephemeral debug key.
+- Therefore Android in-place MusicLab -> MusicLab update continuity is NOT yet guaranteed.
+- Do not claim permanent self-update is active until a stable MusicLab signing key is configured and verified.
+- Never commit a private keystore to the public repository.
+
+CURRENT OPERATION STATE
+- operation_id: musiclab-meld-upstream-guardian-13-20260929
+- status: WAITING_USER
+- phase: stable_signing_configuration
+- last_verified_progress_percent: 90
+- checkpoint_id: musiclab-meld-upstream-guardian-13-signing-blocker-01
+- source_ref: uab-build/musiclab-meld-upstream-guardian-13
+- source_sha: ce867e8181ee4e5ae683ead3ec6fa7dbc7812492
+- lock_scope: MusicLab:Br174/MusicLab:uab-build/musiclab-meld-upstream-guardian-13
+- lock_state: RELEASED
+- retry_rule: do not rerun signing/release workflow until stable signing secrets exist.
+
+NEXT SAFE STEP
+1. Configure a dedicated stable MusicLab signing key as GitHub Actions secrets KEYSTORE, KEY_ALIAS, KEYSTORE_PASSWORD, KEY_PASSWORD.
+2. Run musiclab-stable-release.yml from an approved CANDIDATA/MADRE ref with explicit versionName/versionCode.
+3. Verify APK package/certificate identity and in-place update behavior on device.
+4. Only then call the permanent MusicLab self-update channel operational.
+5. Separately, if Bruno wants Meld 0.9.2 features, analyze the 19 conflicts and create a new upstream integration LAB; do not import automatically.
+
+END CHECKPOINT
