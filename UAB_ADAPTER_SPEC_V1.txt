@@ -62,7 +62,24 @@ MOTORLAB_BACKGROUND_CHECKPOINT_STORE=<registry|artifact|provider|custom>
 MOTORLAB_BACKGROUND_LOCK_SCOPE=<project/repo/ref/resource>
 MOTORLAB_BACKGROUND_NOTIFY=<supported notification path or none>
 
-Legacy adapters that do not yet declare watchdog/background fields remain usable. MotorLab applies conservative defaults and MUST NOT claim true persistent background continuity unless a durable executor is actually defined and observable.
+MOTORLAB EXTERNAL SERVICE GUARD FIELDS - REQUIRED FOR NEW/UPDATED PROVIDER INTEGRATIONS
+A project may declare these fields once per provider/service or use an equivalent structured provider table when several providers exist.
+MOTORLAB_SERVICE_GUARD_MODE=<none|basic|full|custom>
+MOTORLAB_SERVICE_PROVIDER=<provider/service name>
+MOTORLAB_SERVICE_QUOTA_SCOPE=<credential|account|project|ip|unknown|custom>
+MOTORLAB_SERVICE_RATE_POLICY=<documented limiter/observed conservative policy>
+MOTORLAB_SERVICE_CONCURRENCY=<limit or provider-derived>
+MOTORLAB_SERVICE_CACHE=<memory|persistent|hybrid|none-with-reason>
+MOTORLAB_SERVICE_CACHE_TTL=<provider/project policy>
+MOTORLAB_SERVICE_DEDUP=<on|off-with-reason>
+MOTORLAB_SERVICE_BATCHING=<supported policy|none>
+MOTORLAB_SERVICE_BACKOFF=<retry-after+exponential-jitter|custom>
+MOTORLAB_SERVICE_CIRCUIT=<on|off-with-reason>
+MOTORLAB_SERVICE_FAILOVER=<ordered authorized sources/credentials or none>
+MOTORLAB_SERVICE_HEALTHCHECK=<probe strategy>
+MOTORLAB_SERVICE_DIAGNOSTICS=<available counters/status>
+
+Legacy adapters that do not yet declare watchdog/background/service-guard fields remain usable. MotorLab applies conservative defaults, MUST NOT claim true persistent background continuity unless a durable executor is actually defined and observable, and MUST NOT invent provider quota values that have not been established.
 
 MANDATORY ADAPTER BEHAVIOR
 1. Adapter cannot make a LAB permanent.
@@ -93,10 +110,20 @@ MANDATORY ADAPTER BEHAVIOR
 26. If an executor quota/availability ends, preserve the checkpoint and continue on another adapter-approved executor when safe and authorized; otherwise stop safely with the exact blocker.
 27. A normal chat turn alone must never be described as persistent background execution.
 28. Background execution behavior is governed by MOTORLAB_BACKGROUND_EXECUTION_V1.txt and may not override lifecycle, cost, watchdog or single-writer rules.
+29. New or materially changed external API/provider integrations must apply MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt rather than relying on uncontrolled direct calls or infinite retries.
+30. Provider-aware cache, deduplication/coalescing, official batching/pagination and request budgeting should reduce avoidable calls before any retry/failover behavior is considered.
+31. Retry-After must be honored when valid; otherwise transient failures use bounded exponential backoff with jitter. Deterministic request/auth/policy errors go to diagnosis instead of tight retry loops.
+32. Repeated rate-limit/transient pressure should open or suspend the relevant provider/endpoint/credential scope so normal traffic stops until conservative recovery/health checks justify reopening.
+33. Credential failover is sequential: keep the current healthy credential; switch only on a classified failure the credential pool is allowed to handle; do not continuously rotate healthy credentials.
+34. Multiple credentials or providers must not be used to evade a provider's intended quota/rate-limit policy. Quota failover is valid only for independent authorized capacity when provider policy permits it.
+35. All-provider/all-credential failure must stop safely, preserve useful queue/cache/checkpoint state and avoid infinite loops.
+36. Existing project-native provider logic should be wrapped/aligned incrementally; MotorLab service protection must not replace the project's domain semantics merely for architectural uniformity.
+37. For a new/updated provider integration, execute the applicable minimum verification set in MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt, including cache reuse, deduplication, limiter/concurrency enforcement, Retry-After, circuit open/half-open recovery, safe all-failure behavior and degraded-mode regression checks.
 
 VERSION
-UAB-ADAPTER-SPEC-V1.3 / MOTORLAB COMPATIBILITY
+UAB-ADAPTER-SPEC-V1.4 / MOTORLAB COMPATIBILITY
 Established: 2026-09-24
 Revision 1.1: atomic LAB and exact same-Mother/same-change Candidate promotion chain.
 Revision 1.2: MotorLab naming compatibility plus mandatory anti-stall watchdog observability, checkpoint, lock and recovery contract.
 Revision 1.3: persistent background execution, durable checkpoints and single-chat continuity contract.
+Revision 1.4: reusable External Service Guard provider/API protection fields and mandatory adapter behavior.
