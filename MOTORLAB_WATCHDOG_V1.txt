@@ -3,23 +3,34 @@ MOTORLAB WATCHDOG V1 - PERSISTENT ANTI-STALL CORE
 STATUS
 Mandatory MotorLab CORE capability.
 Established: 2026-09-28.
+Repository authority: Br174/Chatgpt.
 
 NAME / COMPATIBILITY
 The engine's official human-facing name is MotorLab.
 Legacy UAB filenames, variables and adapter keys remain temporarily valid for backward compatibility and must not be mass-renamed in a way that breaks existing project adapters.
 
 PURPOSE
-MotorLab must detect apparent stalls during long programming, build, GitHub, API and tool operations and attempt safe continuation without discarding completed work, duplicating writes or corrupting the active project state.
+MotorLab must detect apparent stalls and emerging no-progress loops during programming, build, GitHub, API and tool operations and attempt safe continuation without discarding completed work, duplicating writes or corrupting project state.
+
+COORDINATION ROLE - MANDATORY
+Watchdog is the single coordinator for progress-health detection and anti-stall intervention.
+Related modules retain distinct responsibilities:
+- MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt owns prevention, risky-phase classification, chunking and durable handoff preparation;
+- MOTORLAB_RESUME_RECOVERY_V1.txt owns deterministic continuation from checkpoint/pending state after tool return or interruption;
+- MOTORLAB_BACKGROUND_EXECUTION_V1.txt owns persistent executor/job semantics;
+- MOTORLAB_PROGRESS_REPORTING_V1.txt owns user-visible operational status and verified percentages;
+- MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt owns pre-change conflict/overlap/regression compatibility.
+These modules must not launch competing recoveries for the same event. Watchdog decides the health/intervention level; Resume Recovery performs checkpoint continuation when recovery is required.
 
 CORE PRINCIPLE
 A timer alone is not proof of a stall. MotorLab must distinguish:
 - alive and progressing;
 - alive but waiting legitimately;
 - alive but not making progress;
+- repeating the same ineffective strategy;
 - provider/tool unreachable;
 - process finished but result not yet verified;
 - process failed.
-
 The watchdog is progress-based, not merely time-based.
 
 1. OPERATION STATE - MANDATORY
@@ -36,8 +47,10 @@ Every substantial MotorLab-controlled operation should maintain, when technicall
 - progress_fingerprint
 - last_verified_progress_percent
 - checkpoint_id
+- next_safe_step
 - lock_scope
 - retry_count
+- same_strategy_no_progress_count
 - recovery_level
 - status
 
@@ -45,7 +58,7 @@ Every substantial MotorLab-controlled operation should maintain, when technicall
 A heartbeat means the worker/tool is still reachable.
 A progress heartbeat additionally proves that something materially changed.
 Examples of material progress:
-- new tool response;
+- new tool response with new material state;
 - build job/step transition;
 - new commit or verified file state;
 - artifact created;
@@ -53,173 +66,186 @@ Examples of material progress:
 - provider job status changed;
 - completed milestone;
 - checkpoint advanced.
-
 Repeated identical polling output is NOT progress.
 Ordinary heartbeats are internal and should not spam Bruno's chat.
 
 3. PROGRESS FINGERPRINT
-MotorLab should derive a compact fingerprint from the meaningful state of the active operation, for example phase + provider status + job/step id + artifact count + commit/ref + completed checks.
-If the fingerprint remains unchanged beyond the adaptive threshold, the operation becomes stall-suspect even when the process still reports itself alive.
+MotorLab should derive a compact fingerprint from meaningful state, for example phase + provider status + job/step id + artifact count + commit/ref + completed checks.
+If the fingerprint remains unchanged beyond an adaptive threshold, the operation becomes stall-suspect even when the process reports itself alive.
 
-4. ADAPTIVE THRESHOLDS
+4. PREVENTIVE HEALTH CHECK - MANDATORY
+Watchdog must not wait exclusively for a hard stall.
+During substantial work, whenever execution control/status probes exist, perform lightweight progress-health checks at meaningful boundaries, especially when:
+- several tool/model actions have occurred without a verified milestone;
+- the same phase/action pattern repeats;
+- latency becomes unusual for that class of operation;
+- progress fingerprint is unchanged across successive useful checks;
+- a long provider/build phase is still active and its real job state can be inspected.
+
+A preventive check asks: "Is there real material progress, legitimate waiting, or an emerging loop?"
+It must use observable state and must not interrupt healthy work merely to prove the watchdog exists.
+
+When a preventive check is user-visible because it finds suspicious or ambiguous no-progress state, use a concise Level 1 lightning message, for example:
+⚡ Controllo MotorLab — verifico che questa fase stia producendo progresso reale; il lavoro già completato resta preservato.
+
+If the check confirms healthy progress/waiting, continue normally. Do not fabricate a problem.
+
+5. ADAPTIVE THRESHOLDS
 Do not use one fixed timeout for every task.
-MotorLab classifies the active step and chooses a threshold appropriate to it.
 Default guidance:
 - short local/read/API step: suspicion roughly after 60-90 seconds without material progress;
 - normal tool/GitHub step: suspicion roughly after 90-180 seconds;
-- build/test/provider job: allow a wider window and use provider job/step state before deciding;
-- known long operations: extend automatically while fresh provider/job evidence shows legitimate work.
-
+- build/test/provider job: wider window and provider job/step evidence;
+- known long operations: extend while fresh provider/job evidence proves legitimate work.
 Thresholds are guidance, not a reason to cancel a healthy operation.
-A user message such as "a che punto sei?" may trigger an immediate check but must never be required for MotorLab to recover.
+A user message such as "a che punto sei?" may trigger an immediate check but is never required for automatic recovery.
 
-5. WATCHDOG LEVELS AND USER-VISIBLE EVENTS
-Every actual watchdog intervention must be visible to Bruno and MUST contain lightning emoji plus a plain-language explanation of what is happening.
-Do not show a lightning symbol without explanatory text.
+6. WATCHDOG LEVELS AND USER-VISIBLE EVENTS
+Every actual Watchdog intervention must be visible and contain lightning plus a plain-language explanation.
+The assistant must not output a bare lightning symbol as the entire Watchdog report.
 
 LEVEL 0 - NORMAL
-No visible event. Work is progressing.
+No mandatory visible event. Work is progressing. Ordinary progress reporting may still be shown.
 
-LEVEL 1 - VERIFY
-Format example:
-⚡ Verifica anti-stallo — nessun avanzamento materiale nella fase <fase>; controllo stato di <tool/provider> senza interrompere il lavoro.
+LEVEL 1 - VERIFY / PREVENTIVE CHECK
+Examples:
+⚡ Controllo MotorLab — verifico che questa fase stia producendo progresso reale.
+⚡ Verifica anti-stallo — nessun avanzamento materiale nella fase <fase>; controllo lo stato di <tool/provider> senza interrompere il lavoro.
 Action:
 - query current job/tool/ref state;
 - compare fingerprint;
-- confirm whether work is still progressing, waiting, finished or failed;
-- do not cancel or duplicate the active operation.
+- distinguish healthy progress/waiting from no-progress/failed state;
+- do not cancel or duplicate a live operation.
 
-LEVEL 2 - SAFE CONTINUE
-Format example:
-⚡⚡ Ripresa controllata — la fase <fase> risulta ferma; continuo dallo stato corrente/checkpoint <id> senza ricominciare il lavoro già completato.
+LEVEL 2 - SAFE CONTINUE / STRATEGY ADJUST
+Example:
+⚡⚡ Ripresa controllata — la fase <fase> non avanza; continuo dal checkpoint <id> con il prossimo passo sicuro senza rifare il lavoro valido.
 Action:
-- re-issue only a safe continuation/status/fetch action when the execution model supports it;
-- preserve current lock and state;
-- never start a second writer against the same lock_scope.
+- preserve current state/lock;
+- continue only the smallest safe pending step;
+- if an ineffective recovery strategy has already repeated, choose a materially different safe strategy instead of repeating it.
 
 LEVEL 3 - CHECKPOINT RECOVERY
-Format example:
+Example:
 ⚡⚡⚡ Recupero da checkpoint — il processo non mostra più progresso verificabile; preservo il lavoro valido e riparto dal checkpoint <id> sul solo sottopasso bloccato.
 Action:
-- confirm the prior execution is dead/cancelled/irrecoverable where technically possible;
-- persist the last verified checkpoint;
+- confirm prior execution is dead/cancelled/irrecoverable when technically possible;
+- persist last verified checkpoint;
 - restart only the smallest failed/stalled substep;
-- increment retry_count;
-- preserve completed milestones and artifacts already verified.
+- increment recovery/retry state;
+- preserve completed milestones/artifacts.
 
 LEVEL 4 - SAFE STOP / HUMAN BLOCKER
-Format example:
-⚡⚡⚡⚡ Protezione MotorLab — non posso riprendere in sicurezza senza rischiare duplicazioni o perdita di stato; mantengo il checkpoint <id> e segnalo il blocco reale.
+Example:
+⚡⚡⚡⚡ Protezione MotorLab — non posso proseguire in sicurezza senza rischiare duplicazioni o perdita di stato; mantengo il checkpoint <id> e segnalo il blocco reale.
 Action:
 - do not guess;
 - do not create concurrent writers;
-- keep last verified percentage and checkpoint;
-- report the exact blocker and evidence.
+- retain last verified percentage/checkpoint;
+- report exact blocker/evidence.
 
-6. NON-INTERRUPTION RULE
-The first watchdog response is observation, not cancellation.
-MotorLab must not cancel, restart or replace a live operation merely because time has passed.
-Before any destructive recovery, verify provider/process state when possible.
-If state cannot be verified, prefer preserving the current operation and reporting the uncertainty over launching a conflicting writer.
+7. TWO-STRIKE NO-PROGRESS RULE - MANDATORY
+Do not repeat an ineffective recovery/action strategy indefinitely.
+If the same write/retry/recovery approach has been attempted twice without material progress or new evidence:
+- a third materially identical attempt is prohibited;
+- first verify whether the underlying external job is legitimately still running/waiting;
+- if healthy waiting is confirmed, observe/status-probe rather than retrying;
+- otherwise change to a different safe strategy, diagnose the deterministic cause, narrow to a smaller substep, use an approved alternate executor/provider only when justified, or escalate to Level 4.
 
-7. SINGLE-WRITER / CONCURRENCY LOCK
-Every write-capable operation must have a lock_scope such as:
-<project>:<repository>:<branch-or-resource>
+Repeated read-only status probes of a legitimately running long job are not counted as failed strategy attempts merely because status is unchanged; they are governed by adaptive thresholds and provider evidence.
+
+8. MANUAL LIGHTNING COMMAND - UNIVERSAL RECOVERY ENTRYPOINT
+If Bruno sends a message consisting only or primarily of `⚡`, interpret it as a high-priority MotorLab health/recovery command, not as decoration.
+At the first available execution cycle:
+- inspect any active/pending MotorLab operation;
+- restore/read the latest verified checkpoint and pending-action state when available;
+- inspect real repository/provider/job state before writing;
+- preserve completed work and last verified percentage;
+- preserve single-writer safety;
+- determine whether the operation is progressing, waiting, stalled, interrupted or complete;
+- if stalled/interrupted, invoke the appropriate Watchdog level and Resume Recovery;
+- continue from the smallest safe pending step instead of restarting from the original request.
+
+If no active/pending operation exists, perform a concise health check and say so; do not invent a checkpoint.
+The manual `⚡` command is a fallback/control shortcut. Automatic Watchdog/Resume Recovery remain mandatory and must not depend on Bruno sending it.
+If the ChatGPT host does not accept/deliver the message because the client is fully suspended, the command cannot create an execution cycle by itself.
+
+9. NON-INTERRUPTION RULE
+The first Watchdog response is observation, not cancellation.
+MotorLab must not cancel, restart or replace a live operation merely because time passed.
+Before destructive recovery, verify provider/process state when possible.
+If state cannot be verified, preserve the current operation rather than launch a conflicting writer.
+
+10. SINGLE-WRITER / CONCURRENCY LOCK
+Every write-capable operation must have a lock_scope such as <project>:<repository>:<branch-or-resource>.
 Only one writer may hold a given lock_scope at a time.
-The watchdog may run read-only diagnostics in parallel.
-It may also perform independent read-only/background analysis that cannot modify the active files/ref.
-It must not start a second modification/build promotion operation that can conflict with the current writer.
+Watchdog may run read-only diagnostics in parallel, but must not start a second conflicting modification/build/promotion operation.
 
-8. CHECKPOINT CONTRACT
-Create/checkpoint after meaningful safe milestones when the execution environment supports persistence.
-A checkpoint should record enough information to continue deterministically, including:
-- operation_id;
-- source ref/SHA;
-- completed phase/milestone;
-- exact next intended step;
-- files/resources already changed when known;
-- build/run/job ids;
-- artifact ids/checksums when known;
-- last verified progress percentage;
-- recovery-relevant tool/provider state.
+11. CHECKPOINT CONTRACT
+Create/checkpoint after meaningful safe milestones when persistence is available.
+Record enough to continue deterministically, including operation/source ref, completed milestone, exact next step, changed resources, build/job ids, artifacts/checksums, last verified percentage and recovery state.
+Recovery continues from latest verified checkpoint, not from reinterpretation of the original request.
 
-Recovery must continue from the latest verified checkpoint, not reinterpret the original request from scratch.
-
-9. RETRY CONTRACT
+12. RETRY CONTRACT
 Retries are targeted and bounded.
-Do not blindly repeat the exact same failed action when evidence indicates a deterministic code/configuration failure.
-Infrastructure/transient failures may retry the failed substep when safe.
-Project/code failures go to diagnosis instead of provider hopping.
-Repeated recovery without new evidence must escalate to LEVEL 4 rather than loop indefinitely.
+Do not blindly repeat deterministic code/configuration failures.
+Transient infrastructure failures may retry a failed substep when safe.
+Project/code failures go to diagnosis instead of blind provider hopping.
+The Two-Strike No-Progress Rule is controlling for repeated ineffective strategies.
 
-10. BACKGROUND / PARALLEL WORK
-While one write operation is waiting, MotorLab may perform only independent safe work, for example:
-- read logs;
-- inspect provider/job state;
-- compare refs;
-- read documentation;
-- prepare diagnostics;
-- verify artifacts already produced.
-Do not edit the same branch/files or run a conflicting promotion/build mutation in parallel.
+13. BACKGROUND / PARALLEL WORK
+While one writer waits, MotorLab may perform independent safe read-only work: logs, provider/job state, ref comparison, documentation, diagnostics, artifact verification.
+Do not edit the same branch/files or run conflicting promotion/build mutations in parallel.
 
-11. CHAT VISIBILITY CONTRACT
-When the watchdog acts, Bruno must see:
-- lightning level (⚡ / ⚡⚡ / ⚡⚡⚡ / ⚡⚡⚡⚡);
-- what appears stalled;
-- what MotorLab is checking or doing;
-- whether the active work is being preserved;
-- checkpoint/recovery information when relevant.
+14. CHAT VISIBILITY CONTRACT
+When Watchdog acts, Bruno must see:
+- lightning level;
+- what is being checked/recovered;
+- whether work is preserved;
+- checkpoint/recovery information when relevant;
+- current verified percentage when available.
+A preventive lightning check may occur before a hard stall when evidence suggests possible no-progress behavior.
 
-Good example:
-⚡ Verifica anti-stallo — GitHub build fermo sullo stesso step da troppo tempo; controllo lo stato reale del job. Il lavoro già completato resta intatto.
-
-Bad example:
-⚡
-
-Bad example:
-Sto aspettando...
-
-12. PROGRESS INTEGRATION
+15. PROGRESS INTEGRATION
 Watchdog events do not invent progress.
-Keep the last verified MotorLab/UAB milestone percentage until new evidence proves advancement.
-A watchdog recovery itself is not progress unless it completes a real milestone.
+Keep last verified percentage until evidence proves advancement.
+A recovery action itself is not progress unless it completes a real milestone.
 
-13. TOOL/PROVIDER ADAPTER REQUIREMENTS
-Adapters should expose, where the provider supports it:
+16. TOOL/PROVIDER ADAPTER REQUIREMENTS
+Adapters should expose where supported:
 - WATCHDOG_CLASS=<short|normal|build|long>
 - WATCHDOG_STATUS_PROBE=<how current state is checked>
 - WATCHDOG_PROGRESS_SIGNAL=<job step/status/log/artifact/ref marker>
 - WATCHDOG_CHECKPOINT_MODE=<native|registry|artifact|none-with-reason>
 - WATCHDOG_LOCK_SCOPE=<project/repo/ref/resource rule>
 - WATCHDOG_RECOVERY_ACTION=<safe targeted continuation/retry mechanism>
+Legacy adapters use conservative defaults.
 
-Legacy adapters without these fields remain usable, but MotorLab must apply conservative defaults and must not perform destructive recovery when state cannot be established safely.
+17. GITHUB-SPECIFIC BEHAVIOR
+Prefer observable state such as commit/ref identity, workflow status, job/step transitions and artifacts.
+If a workflow is active, do not launch a duplicate because chat appears idle.
+If a specific failed job/substep can be safely rerun, target it rather than restarting unrelated successful work.
 
-14. GITHUB-SPECIFIC BEHAVIOR
-For GitHub-controlled work, prefer observable state such as commit/ref identity, workflow run status, job/step transitions and artifacts.
-If a workflow is still active, do not launch a duplicate write/build merely because the chat appears idle.
-If a specific failed job can be safely rerun, target that job/substep rather than restarting unrelated successful work.
-Never deliver an older artifact while a newer requested run is still active or awaiting verification.
+18. CHAT/MODEL LIMITATION
+MotorLab cannot guarantee that the ChatGPT client UI can self-inject a visible message while a model/tool call is completely frozen with no heartbeat/control surface.
+Therefore controllable external operations must persist enough state for the next available Watchdog cycle/resumed turn to continue from checkpoint.
+The manual `⚡` shortcut also requires the host to accept the message and provide an execution cycle.
 
-15. CHAT/MODEL LIMITATION
-MotorLab's persistent watchdog governs work that exposes state through the orchestration/tool/workflow layer.
-It cannot guarantee that the ChatGPT client UI itself can self-inject a new visible message while a single model/tool call is completely frozen inside infrastructure that exposes no heartbeat or control surface.
-Therefore every controllable external operation must persist enough state that the next available watchdog cycle or resumed turn can continue from the checkpoint instead of starting over.
-This limitation must not be hidden or confused with project failure.
+19. NO REGRESSION
+Watchdog is control-plane infrastructure. It must not alter application logic, UI, package identity, signing, MADRE/LAB/CANDIDATA semantics or project-specific behavior merely to add monitoring.
 
-16. NO REGRESSION
-The watchdog is cross-cutting infrastructure. It must not alter project application logic, UI, package identity, signing, MADRE/LAB/CANDIDATA semantics or project-specific behavior merely to add monitoring.
-
-17. SUCCESS CRITERIA
-MotorLab Watchdog is considered active when:
-- the CORE contract requires it;
-- adapters can declare progress/status/checkpoint/recovery signals;
-- interventions are safe and single-writer;
-- recovery is checkpoint-based;
-- visible interventions always include lightning + explanation;
-- no infinite blind-retry loop is possible;
+20. SUCCESS CRITERIA
+Watchdog is active when:
+- progress health is checked preventively during substantial work when evidence/control surfaces permit;
+- genuine stalls/loops are detected from material state rather than elapsed time alone;
+- the same ineffective recovery strategy cannot repeat a third time without new evidence;
+- `⚡` acts as a universal manual health/recovery shortcut at the first available execution cycle;
+- automatic recovery does not depend on the shortcut;
+- interventions remain checkpoint-based and single-writer safe;
+- visible interventions contain lightning plus explanation;
 - completed work is preserved whenever technically possible.
 
 VERSION
-MOTORLAB-WATCHDOG-V1.0
+MOTORLAB-WATCHDOG-V1.1
 Established: 2026-09-28
+Revision 1.1: preventive health checks, two-strike no-progress strategy switching, explicit cross-module coordinator roles and manual `⚡` recovery entrypoint.
