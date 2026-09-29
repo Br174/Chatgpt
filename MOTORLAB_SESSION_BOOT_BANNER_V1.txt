@@ -9,52 +9,46 @@ PURPOSE
 Bruno must be able to tell immediately whether the current chat/session is actually operating under MotorLab. Hidden or assumed activation is not sufficient.
 
 CORE RULE
-Whenever MotorLab activates in a registered project chat, or activates for a new software project through an authorized intent/bootstrap path, the first available user-facing response must visibly state that the session is being processed with MotorLab.
+Whenever MotorLab activates in a registered project chat, or activates for a new software project through an authorized intent/bootstrap path, the first available user-facing response must visibly state that MotorLab is active.
 
 REQUIRED STARTUP MESSAGE
-Preferred Italian form:
-"⚙️ MotorLab attivo — questa chat verrà elaborata con MotorLab, affiancando il motore nativo del progetto senza sostituirlo."
+Exact preferred Italian form:
+"⚙️ MotorLab attivo"
 
-The wording may be shortened slightly when needed, but it must always contain:
-- explicit name "MotorLab";
-- explicit confirmation that MotorLab is active for the current chat/session;
-- confirmation that it works alongside the project-native engine when one exists.
+The normal startup banner must not add satellite, CORE, synchronization, native-engine or other technical detail unless a real warning, recovery event or blocker needs explanation.
 
 1. REGISTERED PROJECTS
 For projects already registered in MotorLab routing/integration state, the banner is mandatory at the first available user-visible response of every new chat/session once the project context is recognized.
 No build intent or manual "ATTIVA MOTORLAB" phrase is required.
 
 2. NEW PROJECT / INTENT ACTIVATION
-For an unregistered chat that legitimately activates MotorLab through software-build intent, show the same banner immediately after activation is established.
+For an unregistered chat that legitimately activates MotorLab through software-build intent, show the same short banner immediately after activation is established.
 
 3. AUDIT RULE
 If the banner has not appeared, Bruno must not be expected to assume that MotorLab is active.
-The banner is the visible proof of session bootstrap, not merely decoration.
+The banner is visible proof of session bootstrap, not a technical status report.
 
 4. VISUAL STATUS DEPENDENCIES
-After the startup banner, all applicable MotorLab communication contracts remain mandatory, including:
-- MOTORLAB_PROGRESS_REPORTING_V1.txt for verified percentages;
-- MOTORLAB_WATCHDOG_V1.txt for lightning/recovery reporting;
-- MOTORLAB_VISUAL_STATUS_V1.txt for verified fireworks successes;
-- current checkpoint, single-writer, lifecycle and background-execution rules.
+After the startup banner, all applicable MotorLab communication contracts remain mandatory, including progress reporting, Watchdog lightning/recovery, verified fireworks successes, checkpoint, single-writer, lifecycle and background-execution rules.
 
 5. NO FALSE ACTIVATION
 Do not show the banner unless the current execution surface has enough context to establish a supported MotorLab activation path.
 If project identity, hook visibility or canonical MotorLab state cannot be established where required, report the blocker instead of pretending MotorLab is active.
 
 6. HOST-PLATFORM BOUNDARY
-This contract cannot cause a completely context-free host chat to read GitHub or MotorLab state by itself. A persistent project/workspace/global host integration must expose the MotorLab activation path. Once that path is exposed, the banner is mandatory and must appear automatically.
+This contract cannot cause a completely context-free host chat to read GitHub or MotorLab state by itself. A persistent project/workspace/global host integration must expose the MotorLab activation path. Once that path is exposed, the short banner is mandatory and must appear automatically.
 
 7. NO PROJECT REGRESSION
 This feature changes session reporting only. It must not alter application code, UI, package identity, signing, runtime logic, native project engines or release behavior.
 
 SUCCESS CRITERIA
 MotorLab Session Boot Banner is active when:
-- every recognized MotorLab project chat visibly identifies MotorLab at session start;
-- Bruno can distinguish an active MotorLab session from a non-MotorLab chat immediately;
+- every recognized MotorLab project chat shows exactly the concise activation proof "⚙️ MotorLab attivo" under normal conditions;
+- extra technical wording is omitted from normal startup;
 - percentage, lightning and fireworks contracts continue normally after startup;
 - no banner is shown for unsupported/unverified activation.
 
 VERSION
-MOTORLAB-SESSION-BOOT-BANNER-V1.0
+MOTORLAB-SESSION-BOOT-BANNER-V1.1
 Established: 2026-09-29
+Revision 1.1: startup text shortened to the exact normal form "⚙️ MotorLab attivo".
