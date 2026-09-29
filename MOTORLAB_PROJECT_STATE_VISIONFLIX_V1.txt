@@ -1,0 +1,20 @@
+MOTORLAB PROJECT STATE V1
+PROJECT_NAME=Visionflix-VerlezzaVision
+PROJECT_REPOSITORY=Br174/Visionflix
+STATE_REVISION=1
+STATE_STATUS=BOOT_RECONCILE_REQUIRED
+RECONCILE_ON_BOOT=required
+STATE_AUTHORITY=Br174/Chatgpt + live Br174/Visionflix evidence
+ACTIVE_OPERATION_ID=unknown_until_live_reconcile
+OPERATION_STATUS=unknown_until_live_reconcile
+CURRENT_PHASE=unknown_until_live_reconcile
+CURRENT_REF=unknown_until_live_reconcile
+CURRENT_HEAD_SHA=unknown_until_live_reconcile
+LAST_VERIFIED_PROGRESS_PERCENT=unknown_until_live_reconcile
+LAST_COMPLETED_MATERIAL_STEP=Load current Visionflix/Verlezza Vision live state before work
+NEXT_SAFE_STEP=Reconcile live source lifecycle, refs/head, delivery relationship with streamflix-BV, jobs/artifacts and latest verified project work before any write
+PENDING_VERIFICATION=Current authoritative Visionflix source/delivery state
+LAST_USER_INTENT_SUMMARY=Preserve latest Visionflix/Verlezza Vision work across new chats without transfer prompts
+CONTINUITY_RULES=Visionflix remains source lifecycle authority; streamflix-BV remains delivery adapter; live newer evidence wins; update this ledger at material transitions and turn handoff.
+UPDATED_BY=MotorLab r8 continuity bootstrap
+UPDATED_DATE=2026-09-30
