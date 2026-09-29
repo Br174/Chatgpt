@@ -15,16 +15,27 @@ REGISTERED PROJECT BOOT ORDER
 4. When central access is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt.
 5. Compare local and central release ids.
 6. At a safe boundary, synchronize when central is newer.
-7. Load current central MOTORLAB_AUTO_BOOTSTRAP_V1.txt, MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt, governance and required CORE modules.
-8. Preserve project-native engines and current lifecycle state.
-9. Emit the mandatory visible MotorLab startup banner.
-10. Reconcile checkpoint/lock/pending state and continue the requested project work.
+7. Load current central MOTORLAB_AUTO_BOOTSTRAP_V1.txt, MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt, MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt, governance and required CORE modules.
+8. Before substantial work, apply Foreground Stall Guard classification. For FOREGROUND_RISK/BACKGROUNDABLE phases, prepare a recoverable checkpoint before entering the phase and prefer a real persistent executor when available.
+9. Preserve project-native engines and current lifecycle state.
+10. Emit the mandatory visible MotorLab startup banner.
+11. Reconcile checkpoint/lock/pending state and continue the requested project work.
 
 FALLBACK
 If central access is temporarily unavailable but the project has a VERIFIED local satellite, use the local release as fallback and preserve the project. Do not invent central state.
+The local satellite must include the current Foreground Stall Guard summary so risky foreground work remains checkpoint-first even during central unavailability.
 
 SAFE VERSION PINNING
 The MotorLab release used by an active operation is pinned until that operation reaches a valid terminal state. A newer release is adopted only at the next safe boundary.
+
+FOREGROUND STALL PREVENTION
+A normal ChatGPT foreground turn is not a durable executor. Before a phase that may run long, MotorLab must apply MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt:
+- classify foreground risk;
+- establish checkpoint/next-safe-step state;
+- hand backgroundable autonomous work to a real persistent executor when one is available and authorized;
+- otherwise split work into bounded recoverable foreground segments;
+- never treat a client UI "still processing" state as a MotorLab heartbeat;
+- if the host suspends execution, recover at the first later cycle under Resume Recovery and show lightning when MotorLab actually performs recovery.
 
 FUTURE PROJECTS
 When clear software-build intent creates a new project and repository integration becomes available, onboarding must install:
@@ -41,4 +52,5 @@ NO RUNTIME REGRESSION
 MotorLab satellite/entrypoint files are development control-plane metadata only and do not authorize changes to app runtime, UI, package identity, signing or project-native engines.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.0
+MOTORLAB-CORE-ENTRYPOINT-V1.1
+Revision 1.1: Foreground Stall Guard added as mandatory preflight for long/risky foreground work.
