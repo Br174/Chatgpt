@@ -1,0 +1,110 @@
+MOTORLAB RESUME RECOVERY V1 - POST-TOOL CONTINUATION + NEXT-CYCLE RECOVERY
+
+STATUS
+Mandatory MotorLab CORE capability.
+Established: 2026-09-29.
+Repository authority: Br174/Chatgpt.
+
+PURPOSE
+Prevent a MotorLab-controlled task from appearing to stop after a tool/build/API/GitHub response when the requested work is still incomplete, and guarantee deterministic recovery at the first execution cycle that becomes available after a host/model interruption.
+
+This module complements MOTORLAB_WATCHDOG_V1.txt. It does not claim that a normal ChatGPT conversation can emit a new message while the model is not executing.
+
+1. POST-TOOL CONTINUATION GUARD - MANDATORY
+After every tool/provider/build/GitHub/API response, MotorLab must immediately evaluate whether the user task is complete.
+
+If the task is NOT complete and the assistant still has execution control, MotorLab MUST continue the same turn with the next safe action.
+It must not silently terminate merely because a tool returned successfully.
+
+A tool result is an intermediate state unless it actually satisfies the user request or establishes a genuine blocker.
+
+2. VALID TURN TERMINATION STATES
+A MotorLab-controlled turn may finish only in one of these states:
+- COMPLETED: the requested operation or current approved phase is finished and verified;
+- BLOCKED_EXTERNAL: an external dependency prevents safe continuation and the exact blocker is reported;
+- BLOCKED_USER: a genuinely necessary user decision/credential/approval is required and cannot be inferred safely;
+- SAFE_STOP: Watchdog Level 4 conditions make further action unsafe;
+- HANDOFF_COMPLETE: the current turn intentionally produced the requested artifact/status/handoff and no pending approved action remains.
+
+It is NOT valid to end because:
+- a tool call merely returned;
+- a long operation has not yet been checked again;
+- a repository read completed while the requested change is still pending;
+- an intermediate percentage/status was produced;
+- the assistant forgot to continue the plan.
+
+3. PENDING-ACTION LEDGER
+For substantial tasks MotorLab should maintain a compact pending-action ledger when technically possible:
+- operation_id;
+- current phase;
+- completed step;
+- exact next safe step;
+- pending verification;
+- checkpoint_id;
+- last verified progress percentage;
+- write lock scope when applicable.
+
+Before ending a turn, MotorLab must verify that no approved safe action remains pending.
+
+4. SAME-TURN RESUME
+If a tool response arrives and the task is incomplete:
+A. update progress fingerprint/checkpoint if materially changed;
+B. perform the next safe action;
+C. continue until a valid termination state is reached;
+D. emit user-visible progress only when useful, according to MOTORLAB_PROGRESS_REPORTING_V1.txt.
+
+Do not ask Bruno to say "continua" merely to resume a known pending action.
+
+5. NEXT-AVAILABLE-CYCLE RECOVERY
+If the model/host/client interrupts execution so the same-turn continuation cannot occur, the first later execution cycle that has access to project/session state must:
+- detect the unfinished operation when state is available;
+- restore the last verified checkpoint/pending-action ledger;
+- preserve the last verified percentage;
+- verify current external/provider/repository state before writing;
+- resume only the smallest safe pending substep;
+- avoid duplicating completed work;
+- preserve single-writer locking;
+- visibly report the recovery with a lightning event.
+
+Default visible format:
+⚡ Ripresa MotorLab — il turno precedente si è interrotto prima del completamento. Riprendo dal checkpoint <id>/<fase> preservando il lavoro già verificato.
+
+6. USER MESSAGE AS RECOVERY OPPORTUNITY, NOT REQUIREMENT
+A later user message such as "ti sei bloccato", "continua" or any unrelated follow-up may provide the first available execution cycle and therefore trigger recovery.
+However MotorLab architecture must not treat such a user message as logically required for correctness; it is only one possible way the host makes a new cycle available.
+
+7. NO FALSE AUTONOMY CLAIM
+MotorLab must never claim that it can independently wake a completely frozen ChatGPT client/model turn when the host exposes no execution cycle, heartbeat, callback, durable job or automation trigger.
+Repository rules cannot physically create a new assistant turn on their own.
+
+Where a provider exposes a durable asynchronous job, webhook, automation, Work execution or other supported continuation surface, MotorLab may use that surface according to its real capabilities. Otherwise recovery occurs at the first available assistant execution cycle.
+
+8. WATCHDOG INTEGRATION
+This module is part of Watchdog behavior:
+- same-turn missing continuation is treated as a continuation-guard failure;
+- unchanged external state is handled using Watchdog progress fingerprints and adaptive thresholds;
+- recovery never creates a second writer against the same lock_scope;
+- retries remain targeted and bounded;
+- Level 4 safe-stop remains authoritative when deterministic recovery is unsafe.
+
+9. PROJECT-WIDE SCOPE
+This capability applies automatically to every current and future MotorLab-managed software project through the shared CORE.
+Project repositories should not carry frozen copies of this module; they inherit the canonical Br174/Chatgpt version through MotorLab bootstrap/hook integration.
+
+10. BOOTSTRAP REQUIREMENT
+MOTORLAB_AUTO_BOOTSTRAP_V1.txt must load this module for recognized projects and intent-activated future software projects.
+MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt must treat it as inherited CORE behavior.
+
+11. SUCCESS CRITERIA
+Resume Recovery is active when:
+- tool results cannot silently become the end of an incomplete controlled task while execution control remains available;
+- the next safe action is explicit in state/checkpoint data for substantial work;
+- interruptions recover at the first available cycle from the last verified checkpoint;
+- no completed work is repeated unnecessarily;
+- no second writer is created;
+- Bruno sees a lightning recovery message when recovery actually occurs;
+- no claim is made that the repository can force the ChatGPT client to generate a message while no execution cycle exists.
+
+VERSION
+MOTORLAB-RESUME-RECOVERY-V1.0
+Established: 2026-09-29
