@@ -1,0 +1,76 @@
+MOTORLAB GLOBAL PERSISTENT ACTIVATION V1
+
+STATUS
+Mandatory MotorLab CORE scope and activation contract.
+Established: 2026-09-29.
+Repository authority: Br174/Chatgpt.
+
+PURPOSE
+MotorLab is a persistent shared orchestration layer for Bruno's software projects. It must not depend on a recurring manual activation phrase and it must apply to present and future app, web-app and software-development projects whenever the execution surface exposes enough context to recognize either the project or genuine software-build intent.
+
+1. GLOBAL SCOPE - MANDATORY
+MotorLab scope includes:
+- every currently registered MotorLab software project;
+- every future software project formally registered with MotorLab;
+- every new chat whose clear practical purpose is to create, develop, modify, package, test, release or maintain an app, APK, web app, PWA or equivalent software product;
+- every new chat opened inside an already recognized MotorLab project, even when the first message contains no software-build keywords.
+
+2. PERSISTENT PROJECT ACTIVATION
+When a chat belongs to an already recognized MotorLab project, activation is structural and implicit.
+The user must not repeat intent, paste an activation string or restate that the work concerns an app/web app.
+Project context alone is sufficient when the host exposes that context.
+
+3. FUTURE PROJECT ACTIVATION
+When a chat is not yet associated with a registered project but the user's actual goal is clearly software construction or active software development, MotorLab must be treated as implicitly requested and the new-project onboarding path must start automatically.
+This is semantic intent detection, not keyword matching.
+Once the project becomes concrete and technically identifiable, it must transition from intent activation to persistent structural project activation.
+
+4. AUTOMATIC ONBOARDING CONTRACT
+Every future software project that enters MotorLab scope must, when technically applicable:
+- receive a persistent MOTORLAB_PROJECT_HOOK.txt or equivalent project-side declaration;
+- be added to canonical routing/integration state;
+- inherit the current MotorLab CORE rather than a frozen copy;
+- preserve project-native engines and domain logic;
+- inherit Watchdog, progress reporting, visual status, checkpoint, single-writer, regression, background execution, External Service Guard and Velocity Layer rules when relevant;
+- require the visible MotorLab session boot banner at the first available user-facing response of each recognized chat/session.
+
+5. VISIBLE ACTIVATION PROOF
+A successful activation must visibly identify MotorLab at session start according to MOTORLAB_SESSION_BOOT_BANNER_V1.txt.
+If the banner does not appear, Bruno must not be expected to assume MotorLab is active.
+
+6. PROJECT-NATIVE ENGINE COEXISTENCE
+MotorLab always acts as orchestration/control-plane and must coexist with the project's native engines.
+It must never replace, disable, absorb or rewrite a native project engine merely because MotorLab is active.
+
+7. NO RECURRING MANUAL TRIGGER
+"ATTIVA MOTORLAB" and similar phrases are fallback-only compatibility mechanisms.
+They are not part of the normal architecture and must never be presented as a required per-chat step.
+
+8. PLATFORM BOUNDARY
+This contract defines the permanent desired behavior, but a repository cannot physically inject itself into a completely context-free host chat that exposes no project identity, no persistent project/user instruction, no memory/global trigger and no repository access.
+Where the host exposes project context, persistent user/project instructions, memory or another supported activation mechanism, that capability must be used so MotorLab auto-activates without recurring user action.
+Do not falsely claim activation when the host has exposed none of these mechanisms.
+
+9. PRECEDENCE
+Activation precedence is:
+A. recognized MotorLab project context -> immediate implicit activation;
+B. otherwise clear software-build intent -> implicit MotorLab activation + onboarding;
+C. otherwise MotorLab remains inactive until one of the above conditions becomes true or the user explicitly invokes it.
+
+10. PERMANENCE
+This rule is permanent MotorLab CORE behavior until Bruno explicitly supersedes it.
+It applies to existing and future software projects and future project chats where technically relevant.
+
+11. SUCCESS CRITERIA
+This contract is correctly implemented when:
+- existing registered projects auto-activate MotorLab by context alone;
+- new chats inside those projects do not require repeated intent or activation strings;
+- new unregistered software-building chats auto-enter MotorLab scope by genuine build intent;
+- future projects become structurally registered and persistently linked once concrete;
+- visible MotorLab activation proof is shown at session start;
+- project-native engines remain intact;
+- ordinary non-development discussion about apps does not trigger MotorLab by keyword alone.
+
+VERSION
+MOTORLAB-GLOBAL-PERSISTENT-ACTIVATION-V1.0
+Established: 2026-09-29
