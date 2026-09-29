@@ -20,11 +20,12 @@ GLOBAL PRINCIPLES
 - MotorLab release changes occur only at safe boundaries, never in the middle of an active write/build/test/promotion operation.
 
 CURRENT SATELLITE RELEASE
-Release: 2026.09.29-r1
+Release: 2026.09.29-r2
 Schema: 1
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync contract: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
+Normal startup banner: ⚙️ MotorLab attivo
 
 REGISTERED PROJECTS
 1. MusicLab
@@ -32,7 +33,7 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r1
+   Local release: 2026.09.29-r2
    Local state: VERIFIED
    LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
@@ -44,7 +45,7 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r1
+   Local release: 2026.09.29-r2
    Local state: VERIFIED
    LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
@@ -56,7 +57,7 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r1
+   Local release: 2026.09.29-r2
    Local state: VERIFIED
    LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
@@ -68,7 +69,7 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r1
+   Local release: 2026.09.29-r2
    Local state: VERIFIED
    LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
@@ -80,7 +81,7 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r1
+   Local release: 2026.09.29-r2
    Local state: VERIFIED
    LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
@@ -92,7 +93,7 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first when used as Visionflix/Verlezza Vision delivery path
    Satellite: installed
-   Local release: 2026.09.29-r1
+   Local release: 2026.09.29-r2
    Local state: VERIFIED
    LAST_GOOD: 2026.09.29-r1
    Native engine policy: delivery-adapter-coexist-preserve
@@ -102,6 +103,11 @@ REGISTERED PROJECTS
 
 BOOTSTRAP REQUIREMENT
 Recognized project sessions should use MOTORLAB_CORE_ENTRYPOINT_V1.txt. The verified local satellite is available first; central release comparison/synchronization occurs at the first safe boundary. Current central CORE remains authoritative whenever reachable.
+
+VISIBLE BANNER REQUIREMENT
+Under normal successful activation, the startup proof is exactly:
+⚙️ MotorLab attivo
+Do not append satellite, CORE, synchronization or native-engine wording unless reporting a real warning, recovery event or blocker.
 
 HOST LIMITATION
 A repository cannot force a context-free or completely frozen host/model to open a new execution cycle. A one-time persistent ChatGPT project/global instruction can expose the MotorLab entrypoint to every new chat. Once an execution cycle exists, local-first activation and safe synchronization apply automatically.
@@ -118,8 +124,9 @@ When a future software project becomes concrete and repository integration is av
 - require visible activation proof and all current MotorLab CORE protections.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.3
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.4
 Established: 2026-09-29
 Revision 1.1: visible activation proof.
 Revision 1.2: Resume Recovery mandatory.
 Revision 1.3: local-first synchronized satellite architecture installed across all registered projects and mandated for future onboarding.
+Revision 1.4: satellite release 2026.09.29-r2 and concise normal startup banner "⚙️ MotorLab attivo".
