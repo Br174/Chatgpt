@@ -10,6 +10,7 @@ This contract defines permanent governance rules for MotorLab:
 1. MotorLab must always coexist with and support project-native engines; it must never replace them merely because MotorLab is active.
 2. MotorLab decisions explicitly approved by Bruno in the canonical MotorLab administration chat are permanent CORE decisions by default and must be persisted in the MotorLab control repository, unless Bruno explicitly marks them temporary, experimental, local-only or reversible for a test.
 3. MotorLab activation for registered projects must be structural and implicit: recurring per-chat activation strings are fallback compatibility aids, not the normal architecture.
+4. Registered project context has mandatory precedence over software-build intent detection; intent discovery is used only when no registered project context is already identifiable.
 
 1. PROJECT ENGINE COEXISTENCE - MANDATORY
 MotorLab is the shared orchestration, lifecycle, build/test, checkpoint, watchdog, routing, progress, release and continuity control-plane.
@@ -54,7 +55,9 @@ MotorLab CORE is authoritative for cross-project control concerns including:
 - background execution and single-chat continuity;
 - checkpoint/recovery and single-writer safety;
 - control-plane state and registry behavior;
-- structural auto-bootstrap for registered projects.
+- structural auto-bootstrap for registered projects;
+- semantic software-build intent activation for new/unregistered chats when supported by the host;
+- activation precedence: registered project context first, intent discovery second.
 
 Project-native engines are authoritative for their project-specific domain behavior unless Bruno explicitly approves otherwise.
 
@@ -106,12 +109,16 @@ Project repositories are modified only when the approved MotorLab feature actual
 
 MotorLab governance must prefer additive, compatible integration over invasive replacement.
 
-8. STRUCTURAL ACTIVATION / AUTO-BOOTSTRAP - MANDATORY
+8. STRUCTURAL + INTENT ACTIVATION / AUTO-BOOTSTRAP - MANDATORY
 MotorLab activation must not depend on Bruno remembering or pasting an activation prompt in every new chat.
 
-For every context that can be identified as a project registered in the canonical MotorLab routing state, MotorLab bootstrap is implicit.
+ACTIVATION PRECEDENCE IS MANDATORY:
+A. If the current context can be identified as a project registered in canonical MotorLab routing/integration state, MotorLab bootstrap is implicit by project context alone.
+B. Only if no registered project context is identifiable may semantic software-build intent be evaluated as an activation path, according to MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt.
 
-Before the first write-capable or lifecycle-changing action in that project, the execution surface must, when technically able to do so:
+For a registered project, the current user message does not need to express an app/APK/web-app creation intention. A new project chat is already inside MotorLab scope when the project identity/hook is visible.
+
+Before the first write-capable or lifecycle-changing action in a registered project, the execution surface must, when technically able to do so:
 - identify the project context;
 - inspect the current Br174/Chatgpt canonical state;
 - load current CORE contracts and modules, including MOTORLAB_GOVERNANCE_V1.txt and MOTORLAB_AUTO_BOOTSTRAP_V1.txt;
@@ -119,11 +126,19 @@ Before the first write-capable or lifecycle-changing action in that project, the
 - activate MotorLab alongside, never in place of, the project's native engines;
 - then continue the requested project work.
 
-A manual "ATTIVA MOTORLAB" string may exist only as a fallback for a host surface that has lost project context or cannot expose persistent project configuration. It is not the normal workflow and must not be required for each new project chat.
+For an unregistered chat with clear software-construction intent, and only when the host surface exposes the required persistent intent-trigger mechanism:
+- load current canonical MotorLab state;
+- apply MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt;
+- initialize project definition/onboarding;
+- transition the project to normal structural activation once it is formally registered.
+
+A manual "ATTIVA MOTORLAB" string may exist only as a fallback for a host surface that has lost project context or cannot expose persistent project/global activation configuration. It is not the normal workflow and must not be required for each new project chat.
 
 If the host platform requires a persistent project-level instruction/integration so that all new chats know their MotorLab relationship, that configuration should be installed once for the project/workspace and must reference the canonical Br174/Chatgpt state rather than embedding a frozen copy of the CORE.
 
-Detailed mandatory semantics are defined by MOTORLAB_AUTO_BOOTSTRAP_V1.txt.
+If automatic MotorLab discovery is desired in otherwise unrelated future chats, the host may require a minimal persistent global intent trigger. That trigger is infrastructure only: it should detect genuine software-build intent and then consult Br174/Chatgpt; it must not contain a frozen copy of MotorLab CORE.
+
+Detailed mandatory semantics are defined by MOTORLAB_AUTO_BOOTSTRAP_V1.txt and MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt.
 
 Do not reconstruct MotorLab from conversational memory when the repository is available.
 
@@ -132,7 +147,10 @@ Do not reconstruct MotorLab from conversational memory when the repository is av
 It does not mean MotorLab can bypass platform limitations, unavailable tools, permissions, quotas or external service failures.
 When a permanent rule cannot be executed because of an external limitation, preserve the rule and report the operational blocker instead of silently abandoning or replacing it.
 
-Automatic bootstrap cannot physically occur on a completely context-free host surface that provides neither project identity nor persistent project instructions/integration nor repository access. In that exceptional case MotorLab must report the missing structural hook instead of pretending that a per-chat prompt is the architecture.
+Automatic structural bootstrap cannot physically occur on a completely context-free host surface that provides neither project identity nor persistent project instructions/integration nor repository access.
+Automatic intent bootstrap across unrelated chats likewise cannot physically occur unless the host exposes a persistent global intent trigger or another supported mechanism that causes MotorLab activation policy to be consulted.
+
+In such exceptional cases MotorLab must report the missing structural/intent hook instead of pretending that a per-chat prompt is the architecture.
 
 10. SUCCESS CRITERIA
 This governance contract is active when:
@@ -140,12 +158,15 @@ This governance contract is active when:
 - existing "one engine" wording is interpreted as one lifecycle/control-plane engine only;
 - approved MotorLab changes in the canonical MotorLab chat are permanent by default;
 - those changes are persisted in Br174/Chatgpt rather than trusted only to chat memory;
-- registered project contexts bootstrap MotorLab implicitly without recurring user activation strings when the host exposes the required structural context;
+- registered project contexts bootstrap MotorLab implicitly without recurring user activation strings and without requiring build intent in the current message when the host exposes the required structural context;
+- unregistered future chats with genuine software-build intent can enter MotorLab onboarding when the host exposes the required intent-trigger mechanism;
+- project context always takes precedence over intent gating;
 - manual activation prompts are fallback only;
 - project repositories are not modified merely because a MotorLab governance rule changed;
 - later explicit Bruno decisions can supersede earlier rules through normal versioned repository updates.
 
 VERSION
-MOTORLAB-GOVERNANCE-V1.1
+MOTORLAB-GOVERNANCE-V1.2
 Established: 2026-09-29
 Revision 1.1: structural implicit auto-bootstrap for registered projects; recurring per-chat activation prompts demoted to fallback-only compatibility behavior.
+Revision 1.2: project-first activation precedence plus semantic software-build intent onboarding for unregistered chats.
