@@ -1,0 +1,20 @@
+MOTORLAB PROJECT STATE V1
+PROJECT_NAME=Cover Lab AI
+PROJECT_REPOSITORY=Br174/Cover-Lab-AI
+STATE_REVISION=1
+STATE_STATUS=BOOT_RECONCILE_REQUIRED
+RECONCILE_ON_BOOT=required
+STATE_AUTHORITY=Br174/Chatgpt + live Br174/Cover-Lab-AI evidence
+ACTIVE_OPERATION_ID=unknown_until_live_reconcile
+OPERATION_STATUS=unknown_until_live_reconcile
+CURRENT_PHASE=unknown_until_live_reconcile
+CURRENT_REF=unknown_until_live_reconcile
+CURRENT_HEAD_SHA=unknown_until_live_reconcile
+LAST_VERIFIED_PROGRESS_PERCENT=unknown_until_live_reconcile
+LAST_COMPLETED_MATERIAL_STEP=Load current Cover Lab AI live state before work
+NEXT_SAFE_STEP=Reconcile live repository refs/head, project-native Cover Lab engine state, jobs/artifacts and latest verified project work before any write
+PENDING_VERIFICATION=Current authoritative Cover Lab AI work state
+LAST_USER_INTENT_SUMMARY=Preserve latest Cover Lab AI work across new chats without transfer prompts and always load MotorLab alongside the native Cover Lab engine
+CONTINUITY_RULES=MotorLab must start first as orchestration and then load/preserve Cover Lab native engine; live newer evidence wins; older memory/registries are advisory only; update this ledger at material transitions and turn handoff.
+UPDATED_BY=MotorLab r8 continuity bootstrap
+UPDATED_DATE=2026-09-30
