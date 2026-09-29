@@ -6,9 +6,10 @@ Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
 PURPOSE
-This contract defines two permanent governance rules for MotorLab:
+This contract defines permanent governance rules for MotorLab:
 1. MotorLab must always coexist with and support project-native engines; it must never replace them merely because MotorLab is active.
 2. MotorLab decisions explicitly approved by Bruno in the canonical MotorLab administration chat are permanent CORE decisions by default and must be persisted in the MotorLab control repository, unless Bruno explicitly marks them temporary, experimental, local-only or reversible for a test.
+3. MotorLab activation for registered projects must be structural and implicit: recurring per-chat activation strings are fallback compatibility aids, not the normal architecture.
 
 1. PROJECT ENGINE COEXISTENCE - MANDATORY
 MotorLab is the shared orchestration, lifecycle, build/test, checkpoint, watchdog, routing, progress, release and continuity control-plane.
@@ -52,7 +53,8 @@ MotorLab CORE is authoritative for cross-project control concerns including:
 - visual status;
 - background execution and single-chat continuity;
 - checkpoint/recovery and single-writer safety;
-- control-plane state and registry behavior.
+- control-plane state and registry behavior;
+- structural auto-bootstrap for registered projects.
 
 Project-native engines are authoritative for their project-specific domain behavior unless Bruno explicitly approves otherwise.
 
@@ -104,17 +106,33 @@ Project repositories are modified only when the approved MotorLab feature actual
 
 MotorLab governance must prefer additive, compatible integration over invasive replacement.
 
-8. ACTIVATION / BOOTSTRAP REQUIREMENT
-Every full MotorLab activation must inspect the current Br174/Chatgpt canonical state and apply this governance contract together with the existing CORE contracts.
+8. STRUCTURAL ACTIVATION / AUTO-BOOTSTRAP - MANDATORY
+MotorLab activation must not depend on Bruno remembering or pasting an activation prompt in every new chat.
 
-A bootstrap/activation prompt that says to load the current MotorLab CORE, contracts, routing and registry is understood to include MOTORLAB_GOVERNANCE_V1.txt and any later canonical governance revision discovered in the repository.
+For every context that can be identified as a project registered in the canonical MotorLab routing state, MotorLab bootstrap is implicit.
 
-Do not reconstruct this rule from memory when the repository is available.
+Before the first write-capable or lifecycle-changing action in that project, the execution surface must, when technically able to do so:
+- identify the project context;
+- inspect the current Br174/Chatgpt canonical state;
+- load current CORE contracts and modules, including MOTORLAB_GOVERNANCE_V1.txt and MOTORLAB_AUTO_BOOTSTRAP_V1.txt;
+- inspect current routing/registry and relevant durable job/checkpoint/lock state;
+- activate MotorLab alongside, never in place of, the project's native engines;
+- then continue the requested project work.
+
+A manual "ATTIVA MOTORLAB" string may exist only as a fallback for a host surface that has lost project context or cannot expose persistent project configuration. It is not the normal workflow and must not be required for each new project chat.
+
+If the host platform requires a persistent project-level instruction/integration so that all new chats know their MotorLab relationship, that configuration should be installed once for the project/workspace and must reference the canonical Br174/Chatgpt state rather than embedding a frozen copy of the CORE.
+
+Detailed mandatory semantics are defined by MOTORLAB_AUTO_BOOTSTRAP_V1.txt.
+
+Do not reconstruct MotorLab from conversational memory when the repository is available.
 
 9. NO FALSE GUARANTEE
 "Permanent" means the rule is part of the canonical MotorLab design/control repository and remains operative until explicitly superseded.
 It does not mean MotorLab can bypass platform limitations, unavailable tools, permissions, quotas or external service failures.
 When a permanent rule cannot be executed because of an external limitation, preserve the rule and report the operational blocker instead of silently abandoning or replacing it.
+
+Automatic bootstrap cannot physically occur on a completely context-free host surface that provides neither project identity nor persistent project instructions/integration nor repository access. In that exceptional case MotorLab must report the missing structural hook instead of pretending that a per-chat prompt is the architecture.
 
 10. SUCCESS CRITERIA
 This governance contract is active when:
@@ -122,9 +140,12 @@ This governance contract is active when:
 - existing "one engine" wording is interpreted as one lifecycle/control-plane engine only;
 - approved MotorLab changes in the canonical MotorLab chat are permanent by default;
 - those changes are persisted in Br174/Chatgpt rather than trusted only to chat memory;
+- registered project contexts bootstrap MotorLab implicitly without recurring user activation strings when the host exposes the required structural context;
+- manual activation prompts are fallback only;
 - project repositories are not modified merely because a MotorLab governance rule changed;
 - later explicit Bruno decisions can supersede earlier rules through normal versioned repository updates.
 
 VERSION
-MOTORLAB-GOVERNANCE-V1.0
+MOTORLAB-GOVERNANCE-V1.1
 Established: 2026-09-29
+Revision 1.1: structural implicit auto-bootstrap for registered projects; recurring per-chat activation prompts demoted to fallback-only compatibility behavior.
