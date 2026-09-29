@@ -12,19 +12,19 @@ BOOT
 1. Read project MOTORLAB_PROJECT_HOOK.txt.
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt.
 3. Read .motorlab/MOTORLAB_LOCAL_CORE.txt.
-4. The verified local core is available immediately as fallback.
-5. When Br174/Chatgpt is reachable, read MOTORLAB_RELEASE_MANIFEST_V1.txt and compare local and central release ids.
+4. Verified local core is immediately available as fallback.
+5. When central is reachable, read MOTORLAB_RELEASE_MANIFEST_V1.txt and compare local/central releases.
 
 SAFE UPDATE
-- A MotorLab release is pinned for the whole active operation.
-- Never update the local satellite during an active write, build, test, promotion or release operation.
-- Update only at a safe boundary before a new operation or after the previous operation is complete.
-- Before adopting a newer bundle, preserve the current verified local bundle as .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt.
-- Fetch MOTORLAB_SATELLITE_BUNDLE_V1.txt from Br174/Chatgpt.
-- Validate its release id and required capability markers.
-- Replace only MotorLab control-plane files.
-- Update .motorlab/MOTORLAB_SYNC_STATE.txt.
-- Re-read the new local files and verify the release before declaring success.
+- pin a MotorLab release for the whole active operation;
+- never update during active write/build/test/promotion/release;
+- update only at safe boundary;
+- preserve current verified local bundle as LAST_GOOD before adopting newer bundle;
+- fetch MOTORLAB_SATELLITE_BUNDLE_V1.txt;
+- validate release id and required markers;
+- replace only MotorLab control-plane files;
+- update sync state;
+- re-read local files and verify before declaring success.
 
 REQUIRED BUNDLE MARKERS
 MOTORLAB_SATELLITE_BUNDLE
@@ -33,6 +33,9 @@ CENTRAL_AUTHORITY=Br174/Chatgpt
 PROJECT_NATIVE_ENGINE_POLICY=coexist-preserve
 CHANGE_COMPATIBILITY_GUARD=required
 WATCHDOG=required
+PREVENTIVE_WATCHDOG=required
+MANUAL_LIGHTNING_RECOVERY=required
+TWO_STRIKE_NO_PROGRESS=required
 RESUME_RECOVERY=required
 FOREGROUND_STALL_GUARD=required
 PROGRESS_REPORTING=required
@@ -40,24 +43,32 @@ VISUAL_STATUS=required
 SINGLE_WRITER=required
 CHECKPOINT_RECOVERY=required
 
-CHANGE COMPATIBILITY REQUIREMENT
-For release 2026.09.29-r4 and later, a bundle is invalid unless CHANGE_COMPATIBILITY_GUARD=required is present. The local fallback must therefore retain the rule that every write-capable MotorLab/project change receives compatibility/conflict/overlap/regression preflight before the first write.
+R4+ COMPATIBILITY REQUIREMENT
+Bundle is invalid without CHANGE_COMPATIBILITY_GUARD=required. Every write-capable MotorLab/project change receives conflict/overlap/regression preflight before first write.
+
+R5+ CONTINUITY REQUIREMENT
+For release 2026.09.29-r5 and later, bundle is invalid unless all are present:
+PREVENTIVE_WATCHDOG=required
+MANUAL_LIGHTNING_RECOVERY=required
+TWO_STRIKE_NO_PROGRESS=required
+This guarantees local fallback retains preventive health checks, the manual `⚡` recovery shortcut and prohibition on a third identical no-progress recovery/write/retry attempt without new evidence.
 
 ROLLBACK
-If a new bundle cannot be verified, keep or restore LAST_GOOD, record UPDATE_FAILED_SAFE, preserve the project and report the fallback visibly.
+If newer bundle cannot be verified, keep/restore LAST_GOOD, record safe failure, preserve project and report fallback.
 
 CENTRAL UNAVAILABLE
-If Br174/Chatgpt is temporarily unavailable, continue with a previously VERIFIED local release. Do not invent an update. Recheck central state at a later safe execution cycle.
+Use previously VERIFIED local release. Do not invent update. Recheck at later safe cycle.
 
 NO APP RUNTIME CHANGE
-The .motorlab directory is development/orchestration metadata and must not intentionally alter application code, UI, package identity, signing, native engines or runtime dependencies.
+.motorlab is development/orchestration metadata and must not intentionally alter app code, UI, package identity, signing, native engines or runtime dependencies.
 
 FUTURE PROJECTS
-A future MotorLab software project must receive MOTORLAB_PROJECT_HOOK.txt plus the three local satellite files during onboarding when repository integration is available.
+Future MotorLab software projects receive hook + local satellite files during onboarding when repository integration is available.
 
 AUTOMATIC MEANING
-Automatic synchronization occurs when an execution cycle with repository access opens the project. Repository files cannot self-update while no executor or tool is running.
+Synchronization occurs when an execution cycle with repository access opens the project. Repository files cannot self-update while no executor/tool is running.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.1
-Revision 1.1: Change Compatibility Guard becomes a required bundle marker from release 2026.09.29-r4.
+MOTORLAB-SATELLITE-SYNC-V1.2
+Revision 1.1: r4 Change Compatibility Guard marker.
+Revision 1.2: r5 preventive Watchdog, manual lightning recovery and two-strike markers required.
