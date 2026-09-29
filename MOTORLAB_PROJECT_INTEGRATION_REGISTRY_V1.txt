@@ -13,67 +13,80 @@ Project-side hooks do not contain a frozen MotorLab CORE. They only declare the 
 VISIBLE ACTIVATION PRINCIPLE
 Every registered project-side hook must bind MOTORLAB_SESSION_BOOT_BANNER_V1.txt and require visible activation proof at the first available user-facing response of each recognized chat/session. If the MotorLab startup message has not appeared, Bruno must not be expected to assume that MotorLab is active. After startup, the current progress percentage, watchdog lightning/recovery and verified fireworks-success contracts remain mandatory when applicable.
 
+RESUME RECOVERY PRINCIPLE
+Every registered project-side hook must bind MOTORLAB_RESUME_RECOVERY_V1.txt. If a tool/provider response returns while the approved task is incomplete and execution control remains available, MotorLab must continue the same turn. If the host/model/client interrupts execution, the first later execution cycle that can access state must resume from the last verified checkpoint/pending action, preserve completed work and single-writer safety, and surface a visible lightning recovery event. A repository must never falsely claim it can force a new assistant message while no execution cycle exists.
+
 REGISTERED HOOKS
 1. MusicLab
    Repository: Br174/MusicLab
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit
+   Activation: implicit-persistent
    Native engine policy: coexist/preserve
    Visible activation proof: required
+   Resume recovery: required
 
 2. GeoVision
    Repository: Br174/GeoVision-Test
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit
+   Activation: implicit-persistent
    Native engine policy: coexist/preserve
    Visible activation proof: required
+   Resume recovery: required
 
 3. StudyBook-AI
    Repository: Br174/StudyBook-AI
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit
+   Activation: implicit-persistent
    Native engine policy: coexist/preserve
    Visible activation proof: required
+   Resume recovery: required
 
 4. Visionflix / Verlezza Vision source
    Repository: Br174/Visionflix
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit
+   Activation: implicit-persistent
    Native engine policy: coexist/preserve
    Visible activation proof: required
+   Resume recovery: required
 
 5. Cover Lab AI
    Repository: Br174/Cover-Lab-AI
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit
+   Activation: implicit-persistent
    Native engine policy: coexist/preserve
    Visible activation proof: required
+   Resume recovery: required
 
 6. streamflix-BV delivery adapter
    Repository: Br174/streamflix-BV
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit when used as Visionflix/Verlezza Vision delivery path
+   Activation: implicit-persistent when used as Visionflix/Verlezza Vision delivery path
    Lifecycle authority: NO; Visionflix source lifecycle remains authoritative
    Visible activation proof: required
+   Resume recovery: required
 
 BOOTSTRAP REQUIREMENT
-When an execution surface can identify one of these project repositories or corresponding project contexts, it must treat MotorLab as implicitly enabled and follow MOTORLAB_AUTO_BOOTSTRAP_V1.txt before write-capable or lifecycle-changing operations. It must also load MOTORLAB_SESSION_BOOT_BANNER_V1.txt and surface the activation message at the first available user-visible response.
+When an execution surface can identify one of these project repositories or corresponding project contexts, it must treat MotorLab as implicitly enabled and follow MOTORLAB_AUTO_BOOTSTRAP_V1.txt before write-capable or lifecycle-changing operations. It must also load MOTORLAB_SESSION_BOOT_BANNER_V1.txt, MOTORLAB_RESUME_RECOVERY_V1.txt and surface the activation message at the first available user-visible response.
 
 COEXISTENCE REQUIREMENT
 All hooks are orchestration metadata only. They must never be interpreted as authorization to replace, disable, absorb or rewrite project-native/domain engines. MOTORLAB_GOVERNANCE_V1.txt remains controlling.
 
 HOST LIMITATION
 A repository hook is a durable structural identifier, but a host surface that exposes neither repository/project identity nor project instructions cannot discover a hook it cannot access. In such a host, the correct solution is a one-time persistent project/workspace integration, not a recurring per-chat activation string.
+A repository also cannot independently awaken a completely frozen host/model turn with no available execution cycle. Resume Recovery therefore guarantees same-turn continuation while control exists and checkpoint-based continuation at the first later execution cycle.
 
 NEW PROJECTS
 When a future project is formally onboarded to MotorLab:
 - register it in UAB_PROJECT_ROUTING.txt or successor;
 - install MOTORLAB_PROJECT_HOOK.txt in the project repository when repository-side integration is applicable;
 - bind MOTORLAB_SESSION_BOOT_BANNER_V1.txt in the new hook and require visible activation proof;
+- bind MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt;
+- bind MOTORLAB_RESUME_RECOVERY_V1.txt;
 - add it to this registry or its canonical successor;
 - preserve all project-native engines unless Bruno explicitly approves otherwise.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.1
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.2
 Established: 2026-09-29
 Revision 1.1: visible MotorLab session activation proof required across all registered hooks and future onboarded projects.
+Revision 1.2: Resume Recovery is mandatory across every registered and future MotorLab project.
