@@ -1,0 +1,114 @@
+MOTORLAB MUSICLAB MELD UPSTREAM V1
+
+SCOPE
+Permanent external MotorLab policy for MusicLab upstream maintenance.
+This is CONTROL-PLANE state only. It MUST NOT be embedded in the MusicLab runtime/APK.
+
+PROJECT
+- Project: MusicLab
+- Repository: Br174/MusicLab
+- Upstream source: FrancescoGrazioso/Meld
+- Direct Metrolist upstream: DISABLED by user decision.
+- MusicLab remains an independent customized application.
+
+CORE RULE
+Meld is a source of candidate code improvements, never the installable application channel for MusicLab.
+Do not install a Meld APK over MusicLab.
+Do not replace MusicLab with Meld.
+Do not overwrite MusicLab customizations blindly.
+
+TRIGGER MODEL
+Preferred trigger is the existing in-app Meld upstream notification.
+When Bruno reports a Meld update, MotorLab must:
+1. identify the new Meld tag/release;
+2. compare accepted Meld baseline -> target Meld release;
+3. produce exact changed files/commits/patch;
+4. compare those changes against the current approved MusicLab source;
+5. classify clean changes, logical hotspots, and real Git conflicts;
+6. create/use a dedicated MusicLab LAB;
+7. apply clean upstream changes exactly where safe;
+8. resolve overlapping changes semantically while preserving approved MusicLab behavior;
+9. build and run regression checks;
+10. present material conflicts/choices to Bruno before promotion;
+11. never promote to MADRE without Bruno real-device approval.
+
+IMPORT POLICY
+- Prefer exact Git merge/cherry-pick/patch semantics when history permits.
+- MusicLab and Meld currently share Git ancestry, so exact upstream changes can be retained where compatible.
+- Never reimplement an upstream change merely approximately when the exact patch is safely reusable.
+- A clean Git merge does not prove semantic compatibility; logical conflict analysis remains mandatory.
+- If both MusicLab and Meld modify the same behavior, preserve both when compatible; otherwise explain the alternatives before choosing.
+
+CURRENT VERIFIED BASELINE
+- Accepted Meld baseline before the current pending update: v0.8.9
+- Baseline commit: 645d84ee0fb8ea168c37490afa78de073b956453
+- Current Meld target detected on 2026-09-29: v0.9.2
+- Target commit: dc7a27224acee33fa475ab70e1935dc03d3ef4ef
+- Analysis v0.8.9 -> v0.9.2:
+  * upstream changed files: 619
+  * MusicLab changed files from shared base at analysis time: 81
+  * directly overlapping files: 17
+- Therefore v0.9.2 must NOT be auto-merged wholesale without review.
+- Do not advance accepted baseline to v0.9.2 until its selected changes are integrated, built, tested, and approved.
+
+SENSITIVE OVERLAP SET FROM FIRST ANALYSIS
+- .github/workflows/build.yml
+- .github/workflows/build_quick.yml
+- .gitmodules
+- app/src/main/kotlin/com/metrolist/music/App.kt
+- app/src/main/kotlin/com/metrolist/music/MainActivity.kt
+- app/src/main/kotlin/com/metrolist/music/constants/Dimensions.kt
+- app/src/main/kotlin/com/metrolist/music/constants/PreferenceKeys.kt
+- app/src/main/kotlin/com/metrolist/music/playback/MusicService.kt
+- app/src/main/kotlin/com/metrolist/music/ui/component/BottomSheet.kt
+- app/src/main/kotlin/com/metrolist/music/ui/menu/PlayerMenu.kt
+- app/src/main/kotlin/com/metrolist/music/ui/menu/SongMenu.kt
+- app/src/main/kotlin/com/metrolist/music/ui/player/Thumbnail.kt
+- app/src/main/kotlin/com/metrolist/music/ui/screens/NavigationBuilder.kt
+- app/src/main/kotlin/com/metrolist/music/ui/screens/settings/SettingsScreen.kt
+- app/src/main/kotlin/com/metrolist/music/ui/utils/ShowMediaInfo.kt
+- app/src/main/kotlin/com/metrolist/music/utils/DataStore.kt
+- docs/spotify-gql-hashes.json
+
+MUSICLAB UPDATE CHANNEL
+MusicLab installable updates must come only from Br174/MusicLab releases with tag prefix:
+- musiclab-v<version>
+
+Permanent intended Android identity:
+- applicationId: it.verlezza.musiclab
+- app name: MusicLab
+
+Stable release signing requires the same persistent private key for all future versions.
+Expected GitHub Actions secrets:
+- KEYSTORE
+- KEY_ALIAS
+- KEYSTORE_PASSWORD
+- KEY_PASSWORD
+
+As of 2026-09-29 these four signing secrets were verified MISSING in Br174/MusicLab.
+Never commit the private signing key into the repository as a workaround.
+
+MIGRATION NOTE
+LAB/test APKs through LAB12/LAB13 were commonly signed with regenerated temporary debug keys and are not a valid permanent Android update identity.
+The first move to it.verlezza.musiclab + permanent signing is a one-time migration/install. After that, future musiclab-v releases with the same applicationId and signing key can update in place.
+Preserve user data through the application's backup/restore path or another explicitly tested migration method before removing an old differently-signed package.
+
+REPOSITORY IMPLEMENTATION CHECKPOINT
+Canonical implementation branch for the permanent updater infrastructure:
+- uab-build/musiclab-meld-upstream-sync-13
+
+Verified permanent files on that branch include:
+- .github/upstream/meld.json
+- .github/workflows/meld-upstream-review.yml
+- .github/workflows/musiclab-release.yml
+- app updater split between Br174/MusicLab releases and FrancescoGrazioso/Meld upstream notifications
+- build-time version/baseline overrides
+
+The permanent Meld review workflow must never auto-apply changes. It generates an audit/report and exact patch for selective integration.
+
+SEPARATION FROM MUSICLAB AI
+This upstream policy is unrelated to MusicLab's musical AI engine (Cloudflare/Gemini/D1).
+Never replace or merge those responsibilities.
+MotorLab manages development lifecycle externally; MusicLab AI remains an application feature.
+
+END POLICY
