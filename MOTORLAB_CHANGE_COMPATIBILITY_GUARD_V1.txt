@@ -1,0 +1,135 @@
+MOTORLAB CHANGE COMPATIBILITY GUARD V1 - PRE-CHANGE CONFLICT / OVERLAP / REGRESSION PREFLIGHT
+
+STATUS
+Mandatory MotorLab CORE capability.
+Established: 2026-09-29.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Before MotorLab changes itself or changes any MotorLab-managed project, it must verify that the proposed change does not create avoidable conflicts, duplicated responsibilities, contradictory rules, hidden regressions, unsafe precedence, stale behavior or incompatible interaction with existing engines/modules/configuration.
+
+CORE PRINCIPLE
+ANALYZE FIRST, MODIFY SECOND.
+Do not stack a new rule or implementation on top of existing behavior until its relationship with the current system is understood.
+
+1. SCOPE - MANDATORY
+This guard applies before:
+- MotorLab CORE/module/governance/routing/release changes;
+- project application/source/configuration changes;
+- project adapter/hook/workflow changes;
+- UI/functionality changes that can affect existing behavior;
+- API/provider/integration changes;
+- build/release/lifecycle changes;
+- replacement, extension or addition of an engine/module/automation;
+- changes in current and future MotorLab-managed projects.
+
+2. REQUIRED PRE-CHANGE CHECK
+Before the first write, inspect the relevant current state and determine:
+- requested goal and exact scope;
+- existing modules/functions/rules touching the same responsibility;
+- project-native engine responsibilities that must remain authoritative;
+- protected areas and previously approved behavior;
+- dependency and blast radius;
+- possible direct conflicts;
+- possible semantic conflicts even when files differ;
+- duplicated or overlapping responsibility;
+- precedence ambiguity;
+- regression risk;
+- backward-compatibility risk;
+- migration/rollback implications;
+- whether an existing mechanism should be extended instead of creating a new one.
+
+3. CLASSIFICATION
+Classify findings as:
+- CLEAR: no meaningful overlap/conflict found;
+- COMPLEMENTARY: overlap exists but responsibilities are distinct and compatible;
+- MERGE_REQUIRED: a new behavior should be integrated into an existing mechanism rather than added independently;
+- PRECEDENCE_REQUIRED: both mechanisms are valid but explicit priority/order is required;
+- CONFLICT: proposed behavior contradicts existing canonical/project behavior;
+- OBSOLETE_PATH: an older active path must be explicitly superseded/deactivated to avoid double behavior;
+- BLOCKED_UNSAFE: safe integration cannot yet be established.
+
+4. RESOLUTION RULE
+If anything other than CLEAR is found, MotorLab must resolve it before or as part of implementation.
+Preferred order:
+A. reuse/extend the existing responsible mechanism;
+B. merge duplicate responsibilities;
+C. define explicit non-ambiguous precedence;
+D. preserve backward compatibility where required;
+E. supersede obsolete active behavior explicitly rather than leaving both active;
+F. stop safely if the conflict cannot be resolved without additional approval or evidence.
+
+Do not keep two competing implementations active merely because both individually work.
+
+5. PRECEDENCE PRINCIPLE
+When rules overlap, apply this order unless a more specific canonical contract explicitly defines another safe order:
+1. explicit current user-approved protected requirement;
+2. project safety / data integrity / signing / package identity / single-writer / lifecycle protections;
+3. current canonical MotorLab governance and required CORE safety contracts;
+4. project-native/domain engine authority for its domain behavior;
+5. compatibility/backward-compatibility obligations;
+6. new additive behavior;
+7. speed/optimization/convenience behavior.
+
+A newer change does not automatically win merely because it is newer. It must be intentionally integrated or explicitly supersede the prior rule.
+
+6. MOTORLAB SELF-CHANGE RULE
+When changing MotorLab itself, inspect the relevant CORE modules before writing. New MotorLab capabilities must be harmonized with existing Watchdog, Resume Recovery, Foreground Stall Guard, Background Execution, Progress Reporting, Governance, Velocity, External Service Guard, lifecycle, checkpoint and single-writer rules as applicable.
+
+If two MotorLab modules address the same trigger/event, define one coordinator/precedence path instead of allowing independent competing actions.
+
+7. PROJECT CHANGE RULE
+When changing MusicLab, GeoVision, Cover Lab AI, StudyBook-AI, Visionflix/Verlezza Vision, streamflix-BV or any future project:
+- inspect the relevant current project behavior/configuration first;
+- identify the native/domain engine responsible for the affected behavior;
+- check adjacent components and dependent flows;
+- preserve approved working behavior not included in the change request;
+- prefer additive compatible changes over replacement;
+- include conflict/overlap findings in the implementation plan when material;
+- run regression verification proportional to the blast radius.
+
+8. NO MEMORY-ONLY ASSUMPTION
+Do not decide compatibility only from conversational memory when repository/project state is available. Read current authoritative files/state before write-capable changes.
+
+9. CHANGE CAPSULE INTEGRATION
+For substantial changes, the internal Change Capsule/preflight should include at least:
+- goal;
+- affected components;
+- protected components;
+- existing overlapping mechanisms;
+- conflict classification;
+- chosen resolution/precedence;
+- regression checks required;
+- rollback/checkpoint plan.
+
+10. FAST PATH
+For truly atomic low-risk changes, the check may be concise, but it may not be skipped. A fast path still verifies that the target is not protected and that no known existing mechanism conflicts with the requested change.
+
+11. CONFLICT DISCOVERED DURING IMPLEMENTATION
+If a conflict or unexpected overlap is discovered after work starts:
+- stop expanding the write scope;
+- preserve completed valid work/checkpoint;
+- inspect the conflicting mechanism;
+- reclassify the change;
+- merge/define precedence/rollback as appropriate;
+- do not hide the conflict by adding another workaround layer.
+
+12. RELATION TO EXISTING MODULES
+This guard does not replace regression testing, Governance, Watchdog, Foreground Stall Guard, Resume Recovery, lifecycle controls or project-native engines.
+It is the mandatory pre-change compatibility coordinator that decides how a proposed change fits those existing protections before implementation.
+
+13. NO PROJECT REGRESSION
+This guard is control-plane behavior. Its installation alone must not alter application UI, runtime/domain logic, package identity, signing, source lineage or release behavior.
+
+14. SUCCESS CRITERIA
+The guard is active when:
+- every MotorLab self-change receives a compatibility/overlap preflight before writes;
+- every MotorLab-managed project change receives the same preflight before writes;
+- overlapping mechanisms are merged or given explicit precedence instead of silently accumulating;
+- protected/native behavior is preserved unless explicitly approved for change;
+- conflict findings affect implementation and regression scope;
+- unresolved unsafe conflicts stop safely rather than being worked around blindly.
+
+VERSION
+MOTORLAB-CHANGE-COMPATIBILITY-GUARD-V1.0
+Established: 2026-09-29
