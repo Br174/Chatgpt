@@ -48,6 +48,7 @@ CURRENT VERIFIED BASELINE
   * upstream changed files: 619
   * MusicLab changed files from shared base at analysis time: 81
   * directly overlapping files: 17
+- Full merge simulation on canonical LAB13 updater branch found 14 real Git conflicts.
 - Therefore v0.9.2 must NOT be auto-merged wholesale without review.
 - Do not advance accepted baseline to v0.9.2 until its selected changes are integrated, built, tested, and approved.
 
@@ -69,6 +70,30 @@ SENSITIVE OVERLAP SET FROM FIRST ANALYSIS
 - app/src/main/kotlin/com/metrolist/music/ui/utils/ShowMediaInfo.kt
 - app/src/main/kotlin/com/metrolist/music/utils/DataStore.kt
 - docs/spotify-gql-hashes.json
+
+REAL GIT CONFLICT SET FOR MELD v0.9.2 ON CANONICAL LAB13
+- .github/workflows/build.yml
+- .github/workflows/build_quick.yml
+- .github/workflows/release.yml
+- .gitmodules
+- app/build.gradle.kts
+- app/src/main/kotlin/com/metrolist/music/App.kt
+- app/src/main/kotlin/com/metrolist/music/playback/MusicService.kt
+- app/src/main/kotlin/com/metrolist/music/ui/component/BottomSheet.kt
+- app/src/main/kotlin/com/metrolist/music/ui/menu/PlayerMenu.kt
+- app/src/main/kotlin/com/metrolist/music/ui/menu/SongMenu.kt
+- app/src/main/kotlin/com/metrolist/music/ui/player/Thumbnail.kt
+- app/src/main/kotlin/com/metrolist/music/ui/screens/settings/SettingsScreen.kt
+- app/src/main/kotlin/com/metrolist/music/ui/utils/ShowMediaInfo.kt
+- app/src/main/kotlin/com/metrolist/music/utils/Updater.kt
+
+AUTO-MERGED HOTSPOTS IN THE SAME SIMULATION
+These were changed on both sides but Git merged them without a text conflict. They still require regression review:
+- app/src/main/kotlin/com/metrolist/music/MainActivity.kt
+- app/src/main/kotlin/com/metrolist/music/constants/Dimensions.kt
+- app/src/main/kotlin/com/metrolist/music/constants/PreferenceKeys.kt
+- app/src/main/kotlin/com/metrolist/music/ui/screens/NavigationBuilder.kt
+- app/src/main/kotlin/com/metrolist/music/utils/DataStore.kt
 
 MUSICLAB UPDATE CHANNEL
 MusicLab installable updates must come only from Br174/MusicLab releases with tag prefix:
