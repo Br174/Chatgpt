@@ -1,0 +1,148 @@
+MOTORLAB PROJECT CONTINUITY V1 - DURABLE CROSS-CHAT PROJECT STATE
+
+STATUS
+Mandatory MotorLab CORE capability.
+Established: 2026-09-30.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Make a new chat continue from the latest materially verified project state without requiring Bruno to paste transfer prompts, manually restate the previous chat, or rely on stale conversational memory.
+
+ROLE / PRECEDENCE
+- Project Continuity owns durable cross-chat project-state ledgers.
+- Auto Bootstrap owns activation and boot ordering.
+- Resume Recovery owns continuation/recovery from pending state once loaded.
+- Watchdog owns health/stall/recovery-level decisions.
+- Progress Reporting owns user-visible verified percentages.
+- Live repository/provider/job state is authoritative when newer than the ledger.
+This module must not become a second recovery engine or a replacement for project-native engines.
+
+CORE PRINCIPLE
+CHAT IS THE INTERFACE; PROJECT STATE IS PERSISTENT CONTROL-PLANE DATA.
+A new chat must reconstruct current work from persistent project state plus live repository/provider evidence, not from a copied prompt or memory-only summary.
+
+1. CENTRAL PER-PROJECT LEDGER - MANDATORY
+Each registered MotorLab project must have one canonical project continuity state file in Br174/Chatgpt, referenced by its project hook and integration registry.
+Recommended naming:
+MOTORLAB_PROJECT_STATE_<PROJECT>_V1.txt
+
+The ledger should contain when available:
+- PROJECT_NAME
+- PROJECT_REPOSITORY
+- STATE_REVISION
+- UPDATED_AT / OBSERVED_AT when technically available
+- ACTIVE_OPERATION_ID
+- OPERATION_STATUS
+- CURRENT_PHASE
+- CURRENT_REF / branch
+- CURRENT_HEAD_SHA
+- CURRENT_PROVIDER / JOB_ID / JOB_STATUS
+- LAST_VERIFIED_PROGRESS_PERCENT
+- LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT
+- LAST_COMPLETED_MATERIAL_STEP
+- NEXT_SAFE_STEP
+- PENDING_VERIFICATION
+- ACTIVE_ARTIFACT / relevant identity
+- WRITE_LOCK_SCOPE when applicable
+- CURRENT_MADRE / LAB / CANDIDATA identities when applicable
+- LAST_USER_INTENT_SUMMARY limited to operational intent, not private reasoning
+- STATE_SOURCE / evidence notes
+- RECONCILE_ON_BOOT=required
+
+Do not store passwords, API secrets, tokens, private chain-of-thought or hidden reasoning.
+
+2. WRITE-THROUGH CONTINUITY - MANDATORY
+During MotorLab-controlled work, update the project continuity ledger whenever continuation-relevant material state changes and a safe central write surface is available, especially after:
+- new active operation is accepted;
+- branch/ref/head changes;
+- project files are materially modified/committed;
+- build/test/workflow job starts or changes terminal/material state;
+- verified progress floor advances;
+- artifact is created/verified;
+- lifecycle role changes;
+- a blocker is discovered;
+- next safe step materially changes;
+- operation completes, safe-stops or hands off.
+
+Do not write merely because time passed. Coalesce updates when several adjacent tool results belong to one material transition.
+
+3. TERMINATION FLUSH - MANDATORY
+Before a substantial MotorLab turn ends in COMPLETED, BLOCKED_EXTERNAL, BLOCKED_USER, SAFE_STOP or HANDOFF_COMPLETE, persist the freshest coherent continuation state when technically possible.
+If central persistence is unavailable, preserve the best available local/checkpoint state and mark continuity sync pending for the next safe cycle.
+
+4. NEW-CHAT BOOT RECONCILIATION - MANDATORY
+After MotorLab activation and before unrelated project work, a recognized project chat must:
+A. read its project hook;
+B. load the referenced canonical project continuity ledger;
+C. inspect live repository/ref/head and provider/job/artifact state that can materially supersede the ledger;
+D. compare ledger evidence with live state;
+E. if live state is newer/coherent, update the ledger before proceeding when safe;
+F. reconstruct current operation, phase, verified progress floor, pending verification and next safe step;
+G. if unfinished work exists, route continuation through Resume Recovery/Watchdog rather than restarting from a historical prompt;
+H. only after reconciliation begin unrelated write-capable work.
+
+5. AUTHORITY / STALENESS ORDER
+For continuation decisions use this precedence:
+1. explicit current Bruno instruction that intentionally changes the task;
+2. live repository/provider/job/artifact evidence;
+3. canonical project continuity ledger;
+4. current MotorLab checkpoint/pending ledger;
+5. older lifecycle/state registries;
+6. remembered/copied chat summaries.
+
+Older registries remain useful history but must not roll a project backward when newer live/continuity evidence exists.
+
+6. SAME-OPERATION IDENTITY
+Preserve ACTIVE_OPERATION_ID across chat boundaries while the logical task remains the same.
+A new chat is not a new operation merely because the conversation id changed.
+Create a new operation id only for a genuinely new approved operation or an explicitly superseding task.
+
+7. PROGRESS CONTINUITY
+The project continuity ledger carries the latest coherent verified progress evidence into the next chat.
+It must integrate with MOTORLAB_RESUME_RECOVERY_V1.txt and the r7+ MONOTONIC_RECOVERY_FLOOR:
+- a new chat must not reset verified progress to an older value merely because its conversational context is fresh;
+- stale checkpoints/registries cannot override newer coherent ledger/live progress;
+- any material invalidation/regression must be evidenced and visibly explained.
+
+8. CHAT PROMPT INDEPENDENCE
+Bruno must not be required to request or paste a handoff prompt when opening a new chat in a recognized project.
+A transfer prompt may be accepted as auxiliary context, but cannot outrank live repository/provider evidence or the canonical project continuity ledger.
+
+9. PROJECT-NATIVE ENGINE CONTINUITY
+On boot, after MotorLab activation, also restore the declared project-native/domain engine relationship from the project hook/registry.
+MotorLab coordinates continuity but must not replace that engine.
+
+10. CURRENT/FUTURE PROJECTS
+All registered projects receive a central continuity state file and hook pointer.
+Every future MotorLab project receives one during onboarding once its project identity is concrete.
+
+11. CENTRAL WRITE SAFETY
+Project continuity state is control-plane metadata in Br174/Chatgpt so updates do not mutate app source SHA, MADRE/LAB identity, signing or runtime behavior.
+Use one writer per project continuity state file. Do not let two chats overwrite the same project ledger blindly; reconcile current file content/evidence before update when concurrent activity is possible.
+
+12. FAILURE / DEGRADED MODE
+If the central ledger cannot be read:
+- use live repo/provider state plus existing verified local MotorLab satellite/checkpoints;
+- do not invent missing state;
+- do not roll back solely because continuity data is unavailable;
+- report the continuity limitation only if it materially affects safe continuation.
+If the ledger can be read but is stale, live state wins and the ledger must be refreshed at the next safe write.
+
+13. PLATFORM BOUNDARY
+This module cannot make a completely context-free host expose a project that the host does not identify, nor can it wake a frozen host with no execution cycle.
+Once the chat exposes recognized project identity, a persistent project instruction/global rule, repository identity or clear software-build intent, Auto Bootstrap must activate MotorLab and Project Continuity must reconcile state without a manual transfer prompt.
+
+14. SUCCESS CRITERIA
+Project Continuity is active when:
+- new recognized project chats load the canonical project ledger automatically;
+- continuation does not depend on a copied prompt;
+- live repo/provider state supersedes stale ledger/history safely;
+- the same operation id/progress floor survives chat changes;
+- newest verified modifications and next safe step are available to the next chat;
+- older registries cannot silently move the project backward;
+- project-native engines remain preserved;
+- app source/lifecycle identity is not mutated merely to persist chat continuity.
+
+VERSION
+MOTORLAB-PROJECT-CONTINUITY-V1.0
+Established: 2026-09-30
