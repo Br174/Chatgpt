@@ -1,0 +1,68 @@
+MOTORLAB PROJECT INTEGRATION REGISTRY V1
+
+STATUS
+Canonical MotorLab registry of persistent project-side bootstrap hooks.
+Established: 2026-09-29.
+
+PURPOSE
+This registry records which project repositories contain the persistent MOTORLAB_PROJECT_HOOK.txt integration that points back to the canonical MotorLab control repository Br174/Chatgpt.
+
+STRUCTURAL PRINCIPLE
+Project-side hooks do not contain a frozen MotorLab CORE. They only declare the permanent relationship to MotorLab and require current CORE/governance/routing/registry state to be loaded from Br174/Chatgpt before write-capable or lifecycle-changing work.
+
+REGISTERED HOOKS
+1. MusicLab
+   Repository: Br174/MusicLab
+   Hook: MOTORLAB_PROJECT_HOOK.txt
+   Activation: implicit
+   Native engine policy: coexist/preserve
+
+2. GeoVision
+   Repository: Br174/GeoVision-Test
+   Hook: MOTORLAB_PROJECT_HOOK.txt
+   Activation: implicit
+   Native engine policy: coexist/preserve
+
+3. StudyBook-AI
+   Repository: Br174/StudyBook-AI
+   Hook: MOTORLAB_PROJECT_HOOK.txt
+   Activation: implicit
+   Native engine policy: coexist/preserve
+
+4. Visionflix / Verlezza Vision source
+   Repository: Br174/Visionflix
+   Hook: MOTORLAB_PROJECT_HOOK.txt
+   Activation: implicit
+   Native engine policy: coexist/preserve
+
+5. Cover Lab AI
+   Repository: Br174/Cover-Lab-AI
+   Hook: MOTORLAB_PROJECT_HOOK.txt
+   Activation: implicit
+   Native engine policy: coexist/preserve
+
+6. streamflix-BV delivery adapter
+   Repository: Br174/streamflix-BV
+   Hook: MOTORLAB_PROJECT_HOOK.txt
+   Activation: implicit when used as Visionflix/Verlezza Vision delivery path
+   Lifecycle authority: NO; Visionflix source lifecycle remains authoritative
+
+BOOTSTRAP REQUIREMENT
+When an execution surface can identify one of these project repositories or corresponding project contexts, it must treat MotorLab as implicitly enabled and follow MOTORLAB_AUTO_BOOTSTRAP_V1.txt before write-capable or lifecycle-changing operations.
+
+COEXISTENCE REQUIREMENT
+All hooks are orchestration metadata only. They must never be interpreted as authorization to replace, disable, absorb or rewrite project-native/domain engines. MOTORLAB_GOVERNANCE_V1.txt remains controlling.
+
+HOST LIMITATION
+A repository hook is a durable structural identifier, but a host surface that exposes neither repository/project identity nor project instructions cannot discover a hook it cannot access. In such a host, the correct solution is a one-time persistent project/workspace integration, not a recurring per-chat activation string.
+
+NEW PROJECTS
+When a future project is formally onboarded to MotorLab:
+- register it in UAB_PROJECT_ROUTING.txt or successor;
+- install MOTORLAB_PROJECT_HOOK.txt in the project repository when repository-side integration is applicable;
+- add it to this registry or its canonical successor;
+- preserve all project-native engines unless Bruno explicitly approves otherwise.
+
+VERSION
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.0
+Established: 2026-09-29
