@@ -5,7 +5,7 @@ Canonical MotorLab release/version manifest.
 Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.29-r6
+CURRENT_RELEASE=2026.09.30-r7
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -77,23 +77,34 @@ For release 2026.09.29-r5 and later:
 
 MANUAL LIGHTNING SAVE-THEN-RESUME RULE - RELEASE R6+
 For release 2026.09.29-r6 and later, manual `⚡` uses a strict SAVE-THEN-RESUME order:
-1. at the first available execution cycle, identify the active/pending operation and previous checkpoint;
+1. identify active/pending operation and previous checkpoint;
 2. before recovery/retry/new write, create or refresh a lightweight MANUAL_LIGHTNING_SALVAGE checkpoint with the freshest recoverable material state currently available;
 3. keep salvage bounded and fast: no full repository backup, exhaustive traversal, full log archive or rebuild merely to save state;
 4. preserve completed work, verified percentage, provider/job/ref/artifact identity and single-writer ownership when available;
 5. then Watchdog classifies health and Resume Recovery continues only the smallest safe pending step;
 6. if healthy external work is still running, do not duplicate or cancel it;
-7. this cannot retroactively capture hidden model reasoning that was interrupted before the new execution cycle; it preserves observable/recoverable material state and reconciles real external state before continuing.
+7. hidden model reasoning interrupted before the new execution cycle cannot be retroactively captured.
 
-The Rapid Salvage Checkpoint is part of Resume Recovery and does not create a second recovery coordinator. Watchdog remains the sole health/intervention coordinator.
+MONOTONIC RECOVERY FLOOR RULE - RELEASE R7+
+For release 2026.09.30-r7 and later:
+- same-operation verified progress is monotonic by default across manual and automatic recovery;
+- before continuation, Resume Recovery reconciles coherent progress evidence from persisted checkpoint/ledger, latest user-visible verified MotorLab percentage, verified micro-milestones and current provider/job/ref/artifact state;
+- recovery_floor_percent is the highest coherent verified value on the same operation/progress scale;
+- a stale lower checkpoint cannot override newer coherent verified progress;
+- Watchdog must not authorize a lower recovery percentage unless material evidence proves previous progress was invalidated;
+- invalidation must be explicit and visible, e.g. verified rollback/reset, milestone-invalidating job failure, required artifact proven missing/corrupt, or approved replacement with a new operation/progress scale;
+- interrupted chat, failed `⚡` send, missing newer checkpoint, elapsed time or conversation-load problems are not invalidation evidence.
+
+The recovery floor does not invent progress and does not turn user-visible unverified estimates into verified milestones. It preserves only progress that MotorLab previously represented as verified or that current material state verifies.
 
 FUTURE PROJECT RULE
-Every future MotorLab software project receives the current satellite files during onboarding when repository integration is available and inherits all current guards and anti-loop/wake/save-then-resume behavior automatically.
+Every future MotorLab software project receives the current satellite files during onboarding when repository integration is available and inherits all current guards and anti-loop/wake/save-then-resume/monotonic-recovery behavior automatically.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.6
+MOTORLAB-RELEASE-MANIFEST-V1.7
 Revision 1.2: release r2; concise startup banner.
 Revision 1.3: release r3; Foreground Stall Guard.
 Revision 1.4: release r4; Change Compatibility Guard.
 Revision 1.5: release r5; preventive Watchdog checks, two-strike anti-loop rule, manual `⚡` recovery shortcut and denser operational progress visibility integrated into existing modules.
 Revision 1.6: release r6; manual `⚡` becomes bounded rapid SAVE-THEN-RESUME with a fresh recoverable-state salvage checkpoint before Watchdog classification and continuation.
+Revision 1.7: release r7; monotonic recovery floor prevents stale lower checkpoints from silently rolling same-operation recovery backward; regressions require explicit material invalidation evidence.
