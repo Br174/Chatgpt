@@ -13,6 +13,7 @@ Resume Recovery owns continuation from checkpoint/pending-action state.
 MOTORLAB_WATCHDOG_V1.txt owns health detection, anti-loop decisions and recovery level.
 MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt owns prevention before risky foreground work.
 Resume Recovery must not independently start a competing second recovery path for the same operation.
+For the manual `⚡` path, Resume Recovery also owns the RAPID SALVAGE CHECKPOINT pre-step described below; this is a pre-recovery state capture, not an independent health/recovery coordinator.
 
 1. POST-TOOL CONTINUATION GUARD - MANDATORY
 After every tool/provider/build/GitHub/API response, immediately evaluate whether the user task is complete.
@@ -65,20 +66,38 @@ If model/host/client interrupts execution so same-turn continuation cannot occur
 Default visible format:
 ⚡ Ripresa MotorLab — riprendo dal checkpoint <id>/<fase> preservando il lavoro già verificato.
 
-6. MANUAL `⚡` RECOVERY OPPORTUNITY - HIGH PRIORITY
-When Bruno sends a message consisting only or primarily of `⚡`, treat that message as an explicit request to inspect and resume the current MotorLab operation at the first available execution cycle.
+6. MANUAL `⚡` SAVE-THEN-RESUME - HIGH PRIORITY
+When Bruno sends a message consisting only or primarily of `⚡`, treat that message as an explicit request to SAVE the freshest recoverable state available at the first execution cycle and then inspect/resume the current MotorLab operation.
 Do not reinterpret the whole project request from zero.
-Procedure:
-A. look for active/pending operation and latest checkpoint;
-B. inspect current provider/job/repository state;
-C. preserve completed work and percentage;
-D. preserve lock/single-writer safety;
-E. invoke Watchdog health classification;
-F. if stalled/interrupted, continue from the exact next safe step;
-G. if healthy external work is still running, report that state and do not duplicate it;
-H. if no pending operation exists, report that no recoverable pending task was found instead of inventing one.
 
-The manual `⚡` command is a shortcut/fallback, not a prerequisite. Automatic same-turn and next-cycle recovery remain mandatory.
+6A. RAPID SALVAGE CHECKPOINT - SAVE FIRST
+Before starting recovery, retry, changed strategy or any new write for the interrupted operation:
+A. identify the active/pending operation and read the previous verified checkpoint/pending ledger when available;
+B. immediately capture the freshest recoverable material state that is already observable in the current cycle, including when available: operation_id, current phase, latest completed material step, exact next safe step, pending verification, latest verified percentage, progress fingerprint, repository/ref identity, provider/job id/status, artifact/result identity, changed-resource list and write lock scope;
+C. persist or refresh a lightweight checkpoint/pending ledger when a persistence surface is available;
+D. mark this capture as MANUAL_LIGHTNING_SALVAGE so it is distinguishable from ordinary milestone checkpoints;
+E. preserve single-writer ownership and do not cancel/restart a healthy external job merely to create the salvage checkpoint.
+
+The rapid salvage path is intentionally lightweight. It must NOT perform a full repository copy, exhaustive history scan, complete log download, rebuild, broad project traversal or other heavy operation merely to create the checkpoint.
+Use current known state first. Add only the smallest targeted read/status probe needed to make the saved state coherent. If a slow external verification is still needed, preserve the lightweight ledger first when technically possible, then perform the targeted verification.
+
+6B. SAVE-THEN-RECOVER ORDER
+After the Rapid Salvage Checkpoint:
+A. inspect current provider/job/repository state as needed;
+B. preserve completed work and percentage;
+C. invoke Watchdog health classification;
+D. if stalled/interrupted, continue from the exact smallest safe pending step;
+E. if healthy external work is still running, report that state and do not duplicate it;
+F. if no pending operation exists, report that no recoverable pending task was found instead of inventing one.
+
+6C. PLATFORM BOUNDARY / NO FALSE BACKUP CLAIM
+The manual `⚡` message itself can interrupt an in-progress ChatGPT turn before MotorLab receives another execution cycle. Therefore Rapid Salvage Checkpoint cannot guarantee capture of hidden model reasoning, undisclosed token-by-token thought, or state that never became observable/persistent before the interruption.
+It DOES preserve the freshest recoverable material state still available when the `⚡` cycle begins, and then rechecks external/repository/provider state so material progress that completed before or during the interruption is not unnecessarily lost or repeated.
+
+6D. SPEED PRINCIPLE
+Manual lightning salvage is a fast recovery pre-step, not a archival backup job. Prefer immediate bounded state capture and targeted verification over completeness that would materially delay resumption. No fixed number of seconds is guaranteed because external tools/providers can be slow, but MotorLab must not intentionally turn `⚡` into a multi-minute full-backup workflow.
+
+The manual `⚡` command is a shortcut/fallback, not a prerequisite. Automatic same-turn and next-cycle recovery remain mandatory and unchanged.
 If the host/client is fully suspended and does not deliver the message, `⚡` cannot create an execution cycle by itself.
 
 7. USER MESSAGE AS RECOVERY OPPORTUNITY, NOT REQUIREMENT
@@ -90,6 +109,7 @@ Resume Recovery must honor Watchdog's Two-Strike No-Progress Rule.
 If the same recovery/action strategy has already failed to create material progress twice without new evidence, Resume Recovery must not execute a third materially identical attempt.
 It must instead follow Watchdog's changed-strategy/diagnosis/safe-stop decision.
 Legitimate read-only status checks of a healthy long-running job are not failed recovery attempts.
+The Rapid Salvage Checkpoint itself is state preservation and does not count as a failed recovery strategy attempt.
 
 9. NO FALSE AUTONOMY CLAIM
 MotorLab cannot independently wake a completely frozen ChatGPT client/model turn when the host exposes no execution cycle, heartbeat, callback, durable job or automation trigger.
@@ -97,6 +117,7 @@ Where a durable async job/Work/worker exists, use its real capabilities; otherwi
 
 10. WATCHDOG INTEGRATION
 - Watchdog owns detection/intervention level;
+- manual `⚡` Rapid Salvage Checkpoint occurs before Watchdog recovery classification so the freshest recoverable state is preserved first;
 - unchanged external state uses Watchdog fingerprints/adaptive thresholds;
 - recovery never creates a second writer;
 - retries remain targeted/bounded;
@@ -113,14 +134,16 @@ Resume Recovery is active when:
 - tool results cannot silently terminate incomplete work while execution control remains available;
 - next safe action is explicit for substantial work;
 - interruptions recover at first available cycle from latest verified checkpoint;
-- manual `⚡` can request immediate checkpoint/status recovery without restarting from zero;
+- manual `⚡` first performs a lightweight salvage of the freshest recoverable material state available, then health-checks/resumes without restarting from zero;
+- manual salvage avoids heavy full-backup work and does not intentionally delay recovery with exhaustive scans;
 - automatic recovery does not depend on Bruno sending `⚡`;
 - Watchdog two-strike strategy decisions are obeyed;
 - no completed work is repeated unnecessarily;
 - no second writer is created;
-- no false claim is made about awakening a host with no execution cycle.
+- no false claim is made about capturing hidden model reasoning or awakening a host with no execution cycle.
 
 VERSION
-MOTORLAB-RESUME-RECOVERY-V1.1
+MOTORLAB-RESUME-RECOVERY-V1.2
 Established: 2026-09-29
 Revision 1.1: manual `⚡` high-priority recovery opportunity, explicit Watchdog precedence and two-strike integration.
+Revision 1.2: manual `⚡` becomes rapid SAVE-THEN-RESUME: lightweight salvage checkpoint first, then Watchdog classification and targeted continuation; no heavy backup and no false hidden-reasoning snapshot claim.
