@@ -11,11 +11,12 @@ Let Bruno follow substantial programming, fixing, build, GitHub, testing and del
 CORE PRINCIPLE
 Progress percentage represents verified completion, not elapsed time, optimism or ETA.
 MotorLab may repeat the same verified percentage when useful if new operational information exists.
+For the same logical operation and progress scale, verified progress is monotonic unless material evidence explicitly invalidates previously counted work.
 
 ROLE / PRECEDENCE
 Progress Reporting owns user-visible operational status and verified percentages.
 Watchdog owns health/stall decisions and lightning intervention level.
-Resume Recovery owns checkpoint continuation.
+Resume Recovery owns checkpoint continuation and reconstruction of the recovery floor.
 Progress Reporting must describe observable actions/results/state, not hidden internal reasoning.
 
 1. FREQUENT CHAT REPORTING - MANDATORY
@@ -89,14 +90,31 @@ When a long job remains in the same percentage band:
 - do not show 100% until requested output/state is verified.
 
 9. FAILURE / RECOVERY
-On failure retain last verified percentage unless evidence invalidates it.
+On failure retain last verified percentage unless material evidence invalidates it.
 State failing phase/substep.
 When recovery succeeds, report what was recovered and the new real state.
 A recovery action itself does not increase percentage unless it completes a real milestone.
+A stale or older checkpoint is not evidence that a newer verified percentage should be discarded.
+
+9A. MONOTONIC VERIFIED PROGRESS - MANDATORY
+Within the same logical operation and same progress scale:
+- once MotorLab has reported a percentage as verified progress, that value becomes part of the recovery-floor evidence;
+- later normal/recovery status may repeat or increase that percentage, but must not silently display a lower value;
+- checkpoint percentage, current ledger, latest user-visible verified MotorLab percentage, and current provider/job/ref/artifact evidence must be reconciled before a recovery percentage is shown;
+- if sources disagree but remain coherent with the same operation, prefer the highest verified value as the recovery floor while targeted checks determine the exact continuation step;
+- a lower percentage is allowed only when material evidence proves previous progress was invalidated or the approved work has intentionally moved to a new operation/progress scale.
+
+If progress is invalidated, say so explicitly, identify the evidence in plain language, and state the revised verified percentage. Never make a recovery look as if it casually fell from e.g. 93% to 20%.
+
+Examples:
+- Correct: `⚡ Progresso MotorLab: 93% — recupero lo stesso job; il checkpoint persistente era più vecchio ma il progresso verificato resta preservato.`
+- Correct with invalidation: `⚡ Progresso MotorLab: 75% — il 93% precedente è stato invalidato perché il job verificato è fallito prima della produzione dell'artefatto richiesto; riparto dal più alto stato ancora valido.`
+- Incorrect: showing 20% after a verified 93% merely because the persisted checkpoint is 20%.
 
 10. MANUAL `⚡` STATUS
-If Bruno sends `⚡`, the resulting Watchdog/Resume Recovery cycle should report concise status including current verified percentage when available, checkpoint/pending step when relevant and the action being taken.
+If Bruno sends `⚡`, the resulting Watchdog/Resume Recovery cycle should report concise status including the monotonic current verified percentage/recovery floor when available, checkpoint/pending step when relevant and the action being taken.
 Do not answer with a bare lightning symbol.
+Before emitting a manual-recovery percentage, reconcile the same-operation progress evidence required by Resume Recovery.
 
 11. RELATION TO FIREWORKS
 Fireworks mark verified success; percentage shows overall completion.
@@ -108,6 +126,7 @@ If only broad milestones are observable, keep broad percentage and provide riche
 
 13. CROSS-PROJECT / PERSISTENCE
 This rule is global across all current/future MotorLab projects. Project adapters may define finer milestones but may not suppress useful progress visibility.
+When persistence is available, store enough operation identity and latest verified progress metadata for Resume Recovery to reconstruct the recovery floor without relying on a stale checkpoint alone.
 
 14. LIMITATION
 MotorLab can report only when the chat/orchestration surface allows a user-visible update. If an underlying model/tool call is fully frozen with no control surface, it cannot inject an update inside that frozen call. Watchdog/checkpoint/Resume Recovery apply at the next available control point.
@@ -120,12 +139,16 @@ Progress Reporting is active when:
 - substantial work shows operational status throughout, not only near the end;
 - default density is roughly every 1-2 meaningful operations/phase changes when useful and possible;
 - same percentage may repeat with real new information;
+- verified progress for the same operation does not silently regress across recovery;
+- stale checkpoints cannot override newer verified progress simply because they are persisted;
+- any legitimate regression is evidence-based and explicitly explained;
 - preventive Watchdog checks can appear with lightning and verified percentage;
 - no hidden chain-of-thought is exposed;
 - no time-based fake progress occurs;
 - 100% remains reserved for verified requested completion.
 
 VERSION
-MOTORLAB-PROGRESS-REPORTING-V1.1
+MOTORLAB-PROGRESS-REPORTING-V1.2
 Established: 2026-09-28
 Revision 1.1: denser live-like operational visibility, preventive Watchdog reporting and manual `⚡` status integration without exposing hidden reasoning.
+Revision 1.2: same-operation verified progress becomes monotonic across recovery; visible verified progress participates in recovery-floor reconstruction and can only regress with explicit material invalidation evidence.
