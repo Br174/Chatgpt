@@ -16,16 +16,17 @@ GLOBAL PRINCIPLES
 - .motorlab/MOTORLAB_SYNC_STATE.txt records local release and verification state.
 - Br174/Chatgpt remains the only central authority; local satellites are synchronized mirrors, not forks.
 - Project-native/domain engines are preserved and coexist with MotorLab.
-- Visible session boot proof, verified progress reporting, Watchdog, Resume Recovery, checkpoint recovery, single-writer protection and fireworks-success reporting remain mandatory when applicable.
+- Visible session boot proof, verified progress reporting, Watchdog, Resume Recovery, Foreground Stall Guard, checkpoint recovery, single-writer protection and fireworks-success reporting remain mandatory when applicable.
 - MotorLab release changes occur only at safe boundaries, never in the middle of an active write/build/test/promotion operation.
 
 CURRENT SATELLITE RELEASE
-Release: 2026.09.29-r2
+Release: 2026.09.29-r3
 Schema: 1
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync contract: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
 Normal startup banner: ⚙️ MotorLab attivo
+Foreground stall guard: required
 
 REGISTERED PROJECTS
 1. MusicLab
@@ -33,9 +34,10 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r2
+   Local release: 2026.09.29-r3
    Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r1
+   LAST_GOOD: 2026.09.29-r2
+   Foreground Stall Guard: required
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -45,9 +47,10 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r2
+   Local release: 2026.09.29-r3
    Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r1
+   LAST_GOOD: 2026.09.29-r2
+   Foreground Stall Guard: required
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -57,9 +60,10 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r2
+   Local release: 2026.09.29-r3
    Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r1
+   LAST_GOOD: 2026.09.29-r2
+   Foreground Stall Guard: required
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -69,9 +73,10 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r2
+   Local release: 2026.09.29-r3
    Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r1
+   LAST_GOOD: 2026.09.29-r2
+   Foreground Stall Guard: required
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -81,9 +86,10 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r2
+   Local release: 2026.09.29-r3
    Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r1
+   LAST_GOOD: 2026.09.29-r2
+   Foreground Stall Guard: required
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -93,9 +99,10 @@ REGISTERED PROJECTS
    Hook: MOTORLAB_PROJECT_HOOK.txt
    Activation: implicit-persistent-local-first when used as Visionflix/Verlezza Vision delivery path
    Satellite: installed
-   Local release: 2026.09.29-r2
+   Local release: 2026.09.29-r3
    Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r1
+   LAST_GOOD: 2026.09.29-r2
+   Foreground Stall Guard: required
    Native engine policy: delivery-adapter-coexist-preserve
    Lifecycle authority: NO; Visionflix source lifecycle remains authoritative
    Visible activation proof: required
@@ -103,14 +110,18 @@ REGISTERED PROJECTS
 
 BOOTSTRAP REQUIREMENT
 Recognized project sessions should use MOTORLAB_CORE_ENTRYPOINT_V1.txt. The verified local satellite is available first; central release comparison/synchronization occurs at the first safe boundary. Current central CORE remains authoritative whenever reachable.
+Before substantial execution, MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt must classify foreground risk and prepare checkpoint/durable execution state as applicable.
 
 VISIBLE BANNER REQUIREMENT
 Under normal successful activation, the startup proof is exactly:
 ⚙️ MotorLab attivo
 Do not append satellite, CORE, synchronization or native-engine wording unless reporting a real warning, recovery event or blocker.
 
+FOREGROUND STALL REQUIREMENT
+A ChatGPT client "still processing" message, spinner or elapsed time is not a MotorLab heartbeat. Long/backgroundable phases should be checkpointed and handed to a real persistent executor when one is safely available. If work must remain in ordinary chat, use bounded recoverable segments. If host execution disappears, Resume Recovery resumes at the first later available cycle and a lightning event is shown when MotorLab actually performs recovery.
+
 HOST LIMITATION
-A repository cannot force a context-free or completely frozen host/model to open a new execution cycle. A one-time persistent ChatGPT project/global instruction can expose the MotorLab entrypoint to every new chat. Once an execution cycle exists, local-first activation and safe synchronization apply automatically.
+A repository cannot force a context-free or completely frozen host/model to open a new execution cycle. Foreground Stall Guard is therefore preventive: it reduces exposure to unrecoverable foreground silence and prepares deterministic recovery, but it does not claim to wake a suspended host on its own.
 
 NEW PROJECTS
 When a future software project becomes concrete and repository integration is available:
@@ -120,13 +131,15 @@ When a future software project becomes concrete and repository integration is av
 - install an identical initial .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt;
 - install .motorlab/MOTORLAB_SYNC_STATE.txt as VERIFIED for the current release;
 - bind MOTORLAB_CORE_ENTRYPOINT_V1.txt, release manifest and sync protocol;
+- inherit MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt;
 - preserve all project-native engines;
 - require visible activation proof and all current MotorLab CORE protections.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.4
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.5
 Established: 2026-09-29
 Revision 1.1: visible activation proof.
 Revision 1.2: Resume Recovery mandatory.
 Revision 1.3: local-first synchronized satellite architecture installed across all registered projects and mandated for future onboarding.
 Revision 1.4: satellite release 2026.09.29-r2 and concise normal startup banner "⚙️ MotorLab attivo".
+Revision 1.5: satellite release 2026.09.29-r3; Foreground Stall Guard required across all current and future MotorLab projects.
