@@ -16,7 +16,7 @@ GLOBAL PRINCIPLES
 - Background Execution owns persistent executor/job semantics.
 - Progress Reporting owns user-visible operational status.
 - Preventive Watchdog health checks are required for substantial work when progress is unclear/repetitive and control/status evidence exists.
-- After two materially identical no-progress write/retry/recovery attempts without new evidence, a third identical attempt is prohibited; change strategy/diagnose/safe-stop unless healthy external waiting is confirmed.
+- After two materially identical no-progress write/retry/recovery attempts without new evidence, a third identical attempt is prohibited unless healthy external waiting is confirmed.
 - User message `⚡` is the universal manual MotorLab health/recovery shortcut at the first available execution cycle; it never restarts completed work from zero.
 - Automatic recovery remains mandatory and does not depend on the shortcut.
 - MotorLab cannot force a new assistant turn while the host exposes no execution cycle.
@@ -33,13 +33,15 @@ Preventive Watchdog: required
 Manual lightning recovery: required
 Two-strike no-progress: required
 Foreground Stall Guard: required
+Canonical r5 local-core blob: 564af1510709206403de97be072a320680d6aea0
+Canonical r4 LAST_GOOD blob: 185c19ba9d99b63fbb52a6018288951271c34071
 
 REGISTERED PROJECTS
 1. MusicLab — Br174/MusicLab
    Activation: implicit-persistent-local-first
-   Satellite: installed
-   Local release target: 2026.09.29-r5
-   LAST_GOOD target after sync: 2026.09.29-r4
+   Satellite: installed and VERIFIED
+   Local release: 2026.09.29-r5
+   LAST_GOOD: 2026.09.29-r4
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
@@ -48,9 +50,9 @@ REGISTERED PROJECTS
 
 2. GeoVision — Br174/GeoVision-Test
    Activation: implicit-persistent-local-first
-   Satellite: installed
-   Local release target: 2026.09.29-r5
-   LAST_GOOD target after sync: 2026.09.29-r4
+   Satellite: installed and VERIFIED
+   Local release: 2026.09.29-r5
+   LAST_GOOD: 2026.09.29-r4
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
@@ -59,9 +61,9 @@ REGISTERED PROJECTS
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Activation: implicit-persistent-local-first
-   Satellite: installed
-   Local release target: 2026.09.29-r5
-   LAST_GOOD target after sync: 2026.09.29-r4
+   Satellite: installed and VERIFIED
+   Local release: 2026.09.29-r5
+   LAST_GOOD: 2026.09.29-r4
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
@@ -70,9 +72,9 @@ REGISTERED PROJECTS
 
 4. Visionflix / Verlezza Vision source — Br174/Visionflix
    Activation: implicit-persistent-local-first
-   Satellite: installed
-   Local release target: 2026.09.29-r5
-   LAST_GOOD target after sync: 2026.09.29-r4
+   Satellite: installed and VERIFIED
+   Local release: 2026.09.29-r5
+   LAST_GOOD: 2026.09.29-r4
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
@@ -81,9 +83,9 @@ REGISTERED PROJECTS
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Activation: implicit-persistent-local-first
-   Satellite: installed
-   Local release target: 2026.09.29-r5
-   LAST_GOOD target after sync: 2026.09.29-r4
+   Satellite: installed and VERIFIED
+   Local release: 2026.09.29-r5
+   LAST_GOOD: 2026.09.29-r4
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
@@ -92,9 +94,9 @@ REGISTERED PROJECTS
 
 6. streamflix-BV delivery adapter — Br174/streamflix-BV
    Activation: implicit-persistent-local-first when used as Visionflix/Verlezza Vision delivery path
-   Satellite: installed
-   Local release target: 2026.09.29-r5
-   LAST_GOOD target after sync: 2026.09.29-r4
+   Satellite: installed and VERIFIED
+   Local release: 2026.09.29-r5
+   LAST_GOOD: 2026.09.29-r4
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
@@ -106,12 +108,12 @@ BOOTSTRAP REQUIREMENT
 Recognized project sessions use current CORE entrypoint. Before write-capable changes apply Change Compatibility Guard. Before risky/long work apply Foreground Stall Guard. During substantial work Watchdog may perform preventive progress-health checks. Interrupted work resumes through Resume Recovery.
 
 MANUAL LIGHTNING REQUIREMENT
-If Bruno sends only/primarily `⚡` and a new execution cycle is available:
+If Bruno sends only/primarily `⚡` and an execution cycle is available:
 - inspect active/pending operation and latest checkpoint;
 - verify current external/repository state;
 - preserve completed work, percentage and writer lock;
 - Watchdog classifies health;
-- Resume Recovery continues the exact smallest safe pending step if needed;
+- Resume Recovery continues the smallest safe pending step if needed;
 - do not restart from zero or duplicate healthy external work.
 If no pending operation exists, report that rather than inventing one.
 
@@ -125,7 +127,8 @@ NEW PROJECTS
 Every future MotorLab software project receives the current satellite/hook during onboarding when technically available and inherits Change Compatibility Guard, preventive Watchdog, manual `⚡`, two-strike anti-loop, Resume Recovery, Foreground Stall Guard and all other current CORE protections.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.7
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.8
 Established: 2026-09-29
 Revision 1.6: r4 Change Compatibility Guard across current/future projects.
 Revision 1.7: r5 preventive Watchdog, two-strike anti-loop, manual `⚡` recovery and denser operational visibility integrated across current/future projects.
+Revision 1.8: r5 installation verified across all registered satellites; actual r5/r4 blob identities recorded.
