@@ -31,7 +31,7 @@ Every future software project that enters MotorLab scope must, when technically 
 - be added to canonical routing/integration state;
 - inherit the current MotorLab CORE rather than a frozen copy;
 - preserve project-native engines and domain logic;
-- inherit Watchdog, progress reporting, visual status, checkpoint, single-writer, regression, background execution, External Service Guard and Velocity Layer rules when relevant;
+- inherit Watchdog, progress reporting, visual status, checkpoint, single-writer, regression, background execution, External Service Guard, Velocity Layer and Resume Recovery rules when relevant;
 - require the visible MotorLab session boot banner at the first available user-facing response of each recognized chat/session.
 
 5. VISIBLE ACTIVATION PROOF
@@ -51,6 +51,8 @@ This contract defines the permanent desired behavior, but a repository cannot ph
 Where the host exposes project context, persistent user/project instructions, memory or another supported activation mechanism, that capability must be used so MotorLab auto-activates without recurring user action.
 Do not falsely claim activation when the host has exposed none of these mechanisms.
 
+A repository also cannot force a new assistant message while a model/client turn is completely frozen and the host exposes no execution cycle, callback, durable job or automation trigger. In that case MOTORLAB_RESUME_RECOVERY_V1.txt requires recovery at the first execution cycle that becomes available, from the last verified checkpoint, with a visible lightning recovery event.
+
 9. PRECEDENCE
 Activation precedence is:
 A. recognized MotorLab project context -> immediate implicit activation;
@@ -60,6 +62,7 @@ C. otherwise MotorLab remains inactive until one of the above conditions becomes
 10. PERMANENCE
 This rule is permanent MotorLab CORE behavior until Bruno explicitly supersedes it.
 It applies to existing and future software projects and future project chats where technically relevant.
+MOTORLAB_RESUME_RECOVERY_V1.txt is a mandatory inherited CORE capability for all projects in this scope.
 
 11. SUCCESS CRITERIA
 This contract is correctly implemented when:
@@ -69,8 +72,11 @@ This contract is correctly implemented when:
 - future projects become structurally registered and persistently linked once concrete;
 - visible MotorLab activation proof is shown at session start;
 - project-native engines remain intact;
-- ordinary non-development discussion about apps does not trigger MotorLab by keyword alone.
+- ordinary non-development discussion about apps does not trigger MotorLab by keyword alone;
+- incomplete tool-driven work continues in the same turn when execution control remains available;
+- host/model interruptions recover at the first available cycle from the last verified checkpoint without pretending that the repository can awaken a frozen client on its own.
 
 VERSION
-MOTORLAB-GLOBAL-PERSISTENT-ACTIVATION-V1.0
+MOTORLAB-GLOBAL-PERSISTENT-ACTIVATION-V1.1
 Established: 2026-09-29
+Revision 1.1: Resume Recovery added as mandatory inherited CORE behavior; same-turn continuation and first-available-cycle recovery are now global project requirements.
