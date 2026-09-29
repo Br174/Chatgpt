@@ -6,77 +6,91 @@ Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
 PURPOSE
-MotorLab is a persistent shared orchestration layer for Bruno's software projects. It must not depend on a recurring manual activation phrase and it must apply to present and future app, web-app and software-development projects whenever the execution surface exposes enough context to recognize either the project or genuine software-build intent.
+MotorLab is a persistent shared orchestration layer for Bruno's software projects. It must activate automatically whenever a supported project/software-development signal is available and must not depend on recurring activation or chat-transfer prompts.
 
 1. GLOBAL SCOPE - MANDATORY
-MotorLab scope includes:
-- every currently registered MotorLab software project;
-- every future software project formally registered with MotorLab;
-- every new chat whose clear practical purpose is to create, develop, modify, package, test, release or maintain an app, APK, web app, PWA or equivalent software product;
-- every new chat opened inside an already recognized MotorLab project, even when the first message contains no software-build keywords.
+MotorLab applies to:
+- every registered MotorLab software project;
+- every future project registered with MotorLab;
+- every chat whose practical purpose is active software creation/development/modification/testing/build/release/maintenance;
+- every new chat inside a recognized project, even when the first message is short or contains no build keyword.
 
-2. PERSISTENT PROJECT ACTIVATION
-When a chat belongs to an already recognized MotorLab project, activation is structural and implicit.
-The user must not repeat intent, paste an activation string or restate that the work concerns an app/web app.
-Project context alone is sufficient when the host exposes that context.
+2. PRE-RESPONSE ACTIVATION GATE - MANDATORY
+When a supported activation path is visible, MotorLab must activate BEFORE any substantive project answer/tool/write/build/technical plan.
+The first user-visible line of activated project work must be the Session Boot Banner.
+Do not defer MotorLab activation until after project work has already started.
 
-3. FUTURE PROJECT ACTIVATION
-When a chat is not yet associated with a registered project but the user's actual goal is clearly software construction or active software development, MotorLab must be treated as implicitly requested and the new-project onboarding path must start automatically.
-This is semantic intent detection, not keyword matching.
-Once the project becomes concrete and technically identifiable, it must transition from intent activation to persistent structural project activation.
+Activation precedence:
+A. recognized registered project context -> immediate implicit activation;
+B. otherwise clear software-build intent -> immediate implicit activation + onboarding;
+C. otherwise inactive until a supported signal exists or explicit invocation occurs.
 
-4. AUTOMATIC ONBOARDING CONTRACT
-Every future software project that enters MotorLab scope must, when technically applicable:
-- receive a persistent MOTORLAB_PROJECT_HOOK.txt or equivalent project-side declaration;
+3. PERSISTENT PROJECT ACTIVATION
+A recognized project context alone is sufficient.
+Bruno must not repeat intent, paste "ATTIVA MOTORLAB", or paste a transfer prompt.
+The bootstrap must load current hook/satellite/CORE and Project Continuity automatically.
+
+4. CROSS-CHAT PROJECT CONTINUITY - MANDATORY
+Each registered project has a canonical Project Continuity ledger in Br174/Chatgpt.
+A new chat must automatically load that ledger, reconcile it with newer live repository/provider/job/artifact evidence, reconstruct the same logical operation/progress/next step, and route unfinished work through Resume Recovery.
+A new chat id is not a new project state and not a reason to restart from an older summary.
+
+5. WRITE-THROUGH CONTINUITY
+Continuation-relevant project changes must update the central project ledger at safe material boundaries and before valid substantial-turn termination when technically possible.
+This replaces recurring manual handoff prompts as the normal continuity mechanism.
+
+6. FUTURE PROJECT ONBOARDING
+Every future concrete software project must, when technically applicable:
+- receive MOTORLAB_PROJECT_HOOK.txt/local satellite;
 - be added to canonical routing/integration state;
-- inherit the current MotorLab CORE rather than a frozen copy;
-- preserve project-native engines and domain logic;
-- inherit Watchdog, progress reporting, visual status, checkpoint, single-writer, regression, background execution, External Service Guard, Velocity Layer and Resume Recovery rules when relevant;
-- require the visible MotorLab session boot banner at the first available user-facing response of each recognized chat/session.
+- receive a central Project Continuity ledger;
+- inherit the current CORE rather than a frozen copy;
+- preserve project-native/domain engines;
+- inherit Watchdog, Resume Recovery, Foreground Stall Guard, Progress Reporting, checkpoint, single-writer, regression, background execution, External Service Guard and Velocity rules.
 
-5. VISIBLE ACTIVATION PROOF
-A successful activation must visibly identify MotorLab at session start according to MOTORLAB_SESSION_BOOT_BANNER_V1.txt.
+7. VISIBLE ACTIVATION PROOF
+A successful activation must visibly identify MotorLab according to MOTORLAB_SESSION_BOOT_BANNER_V1.txt.
 If the banner does not appear, Bruno must not be expected to assume MotorLab is active.
 
-6. PROJECT-NATIVE ENGINE COEXISTENCE
-MotorLab always acts as orchestration/control-plane and must coexist with the project's native engines.
-It must never replace, disable, absorb or rewrite a native project engine merely because MotorLab is active.
+8. PROJECT-NATIVE ENGINE COEXISTENCE
+MotorLab is orchestration/control-plane and always coexists with project-native/domain engines. It must never replace, disable, absorb or rewrite them merely because MotorLab is active.
+Project Continuity must restore this relationship on new-chat boot.
 
-7. NO RECURRING MANUAL TRIGGER
-"ATTIVA MOTORLAB" and similar phrases are fallback-only compatibility mechanisms.
-They are not part of the normal architecture and must never be presented as a required per-chat step.
+9. NO RECURRING MANUAL TRIGGER / HANDOFF
+"ATTIVA MOTORLAB" and copied chat-transfer prompts are fallback-only compatibility aids.
+They are not normal architecture and must never be presented as required per-chat steps.
 
-8. PLATFORM BOUNDARY
-This contract defines the permanent desired behavior, but a repository cannot physically inject itself into a completely context-free host chat that exposes no project identity, no persistent project/user instruction, no memory/global trigger and no repository access.
-Where the host exposes project context, persistent user/project instructions, memory or another supported activation mechanism, that capability must be used so MotorLab auto-activates without recurring user action.
-Do not falsely claim activation when the host has exposed none of these mechanisms.
+10. AUTHORITY ORDER FOR NEW CHAT
+For current project state use:
+1. explicit current Bruno instruction;
+2. live repo/provider/job/artifact evidence;
+3. canonical Project Continuity ledger;
+4. current checkpoint/pending ledger;
+5. older registries;
+6. conversational memory/copied summaries.
+Older state must not move work backward when newer evidence exists.
 
-A repository also cannot force a new assistant message while a model/client turn is completely frozen and the host exposes no execution cycle, callback, durable job or automation trigger. In that case MOTORLAB_RESUME_RECOVERY_V1.txt requires recovery at the first execution cycle that becomes available, from the last verified checkpoint, with a visible lightning recovery event.
+11. PLATFORM BOUNDARY
+A repository cannot inject itself into a completely context-free host that exposes no project identity, persistent user/project instruction, memory/global trigger, repository identity or software-build intent.
+Where any supported signal is exposed, MotorLab must activate automatically.
+MotorLab also cannot force a new assistant turn while the host exposes no execution cycle/callback/durable executor.
 
-9. PRECEDENCE
-Activation precedence is:
-A. recognized MotorLab project context -> immediate implicit activation;
-B. otherwise clear software-build intent -> implicit MotorLab activation + onboarding;
-C. otherwise MotorLab remains inactive until one of the above conditions becomes true or the user explicitly invokes it.
+12. PERMANENCE
+This rule is permanent until Bruno explicitly supersedes it. It applies to current/future projects and future project chats.
 
-10. PERMANENCE
-This rule is permanent MotorLab CORE behavior until Bruno explicitly supersedes it.
-It applies to existing and future software projects and future project chats where technically relevant.
-MOTORLAB_RESUME_RECOVERY_V1.txt is a mandatory inherited CORE capability for all projects in this scope.
-
-11. SUCCESS CRITERIA
-This contract is correctly implemented when:
-- existing registered projects auto-activate MotorLab by context alone;
-- new chats inside those projects do not require repeated intent or activation strings;
-- new unregistered software-building chats auto-enter MotorLab scope by genuine build intent;
-- future projects become structurally registered and persistently linked once concrete;
-- visible MotorLab activation proof is shown at session start;
-- project-native engines remain intact;
-- ordinary non-development discussion about apps does not trigger MotorLab by keyword alone;
-- incomplete tool-driven work continues in the same turn when execution control remains available;
-- host/model interruptions recover at the first available cycle from the last verified checkpoint without pretending that the repository can awaken a frozen client on its own.
+13. SUCCESS CRITERIA
+Correct implementation means:
+- MotorLab starts before substantive software-project work;
+- registered projects auto-activate by context alone;
+- new build/development chats auto-activate by intent;
+- no recurring activation prompt is required;
+- no recurring chat-transfer prompt is required;
+- new chats reconstruct the latest verified project state from continuity ledger + live evidence;
+- unfinished work continues through Resume Recovery;
+- native engines remain intact;
+- platform limitations are represented honestly.
 
 VERSION
-MOTORLAB-GLOBAL-PERSISTENT-ACTIVATION-V1.1
+MOTORLAB-GLOBAL-PERSISTENT-ACTIVATION-V1.2
 Established: 2026-09-29
-Revision 1.1: Resume Recovery added as mandatory inherited CORE behavior; same-turn continuation and first-available-cycle recovery are now global project requirements.
+Revision 1.2: pre-response activation gate and mandatory durable Project Continuity across new chats; manual activation/transfer prompts become fallback-only.
