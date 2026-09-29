@@ -9,7 +9,8 @@ PURPOSE
 MotorLab activation must be structural and persistent, not dependent on Bruno remembering or pasting an activation prompt in every new chat.
 
 MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt is a mandatory scope dependency of this bootstrap.
-It defines MotorLab as the persistent orchestration layer for all current and future software projects that fall within MotorLab scope.
+MOTORLAB_RESUME_RECOVERY_V1.txt is a mandatory continuation/recovery dependency of this bootstrap.
+It defines same-turn post-tool continuation while execution control remains available and checkpoint-based recovery at the first later execution cycle after a host/model interruption.
 
 MotorLab supports two activation paths:
 1. structural activation for already registered/recognized projects;
@@ -32,11 +33,13 @@ A. If REGISTERED PROJECT CONTEXT is identifiable:
 - do not require keywords or an explicit app/APK/web-app creation request in the current message;
 - do not gate activation on semantic intent;
 - load MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt;
+- load MOTORLAB_RESUME_RECOVERY_V1.txt;
 - continue with structural bootstrap.
 
 B. If NO REGISTERED PROJECT CONTEXT is identifiable:
 - evaluate genuine software-build intent whenever the execution surface exposes user/chat intent;
 - if clear build/development intent exists, activate MotorLab implicitly and begin new-project onboarding under MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt;
+- load MOTORLAB_RESUME_RECOVERY_V1.txt once MotorLab is activated;
 - do not require a manual MotorLab phrase;
 - otherwise leave MotorLab inactive unless explicitly invoked later.
 
@@ -46,6 +49,7 @@ Before the first write-capable or lifecycle-changing operation in a registered p
 - detect MOTORLAB_PROJECT_HOOK.txt when project repository access exposes it;
 - read the current canonical MotorLab state from Br174/Chatgpt;
 - load MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt;
+- load MOTORLAB_RESUME_RECOVERY_V1.txt;
 - load the current CORE contracts, governance, routing and integration registry required for that project;
 - load MOTORLAB_VELOCITY_LAYER_V1.txt for additive idea-to-LAB acceleration;
 - load MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt whenever the project uses or may modify external APIs/providers/services;
@@ -74,30 +78,35 @@ The current project chat remains the canonical user-facing chat.
 
 A first message such as "continuiamo", a diagnostic question, a short administrative request or any other message without explicit software-build intent does not prevent activation when the project context itself is recognized.
 
+If a prior MotorLab-controlled turn ended unexpectedly before reaching a valid completion/block state, the first later execution cycle that can access the project/session state must invoke MOTORLAB_RESUME_RECOVERY_V1.txt and resume from the last verified checkpoint/pending action rather than restarting the request from zero.
+
 6. BOOTSTRAP ORDER
 Minimum safe order for a registered project:
 A. identify project context;
 B. detect project-side MOTORLAB_PROJECT_HOOK.txt when available;
 C. inspect Br174/Chatgpt canonical state;
 D. load MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt;
-E. load current MotorLab CORE/governance modules, including MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt when external services are relevant and MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt when relevant;
-F. inspect UAB_PROJECT_ROUTING.txt, UAB_STATE_REGISTRY.txt and MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt or their canonical successors;
-G. reconcile active durable job/checkpoint/lock state when relevant;
-H. emit MOTORLAB_SESSION_BOOT_BANNER_V1.txt visible activation proof;
-I. use Velocity Layer read-only snapshot/Change Capsule preparation where safe;
-J. proceed with the user's requested work under all existing lifecycle/safety controls.
+E. load MOTORLAB_RESUME_RECOVERY_V1.txt;
+F. load current MotorLab CORE/governance modules, including MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt when external services are relevant and MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt when relevant;
+G. inspect UAB_PROJECT_ROUTING.txt, UAB_STATE_REGISTRY.txt and MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt or their canonical successors;
+H. reconcile active durable job/checkpoint/lock/pending-action state when relevant;
+I. emit MOTORLAB_SESSION_BOOT_BANNER_V1.txt visible activation proof;
+J. if unfinished prior controlled work is detected, apply Resume Recovery before starting unrelated write-capable work;
+K. use Velocity Layer read-only snapshot/Change Capsule preparation where safe;
+L. proceed with the user's requested work under all existing lifecycle/safety controls.
 
 Minimum safe order for an unregistered chat with clear build intent:
 A. confirm no registered project context is already available;
 B. detect semantic software-build intent under MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt;
 C. inspect Br174/Chatgpt canonical state;
 D. load MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt;
-E. load current MotorLab CORE/governance modules, including MOTORLAB_VELOCITY_LAYER_V1.txt and MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt before designing external-service integrations;
-F. emit MOTORLAB_SESSION_BOOT_BANNER_V1.txt visible activation proof;
-G. initialize new-project definition/onboarding;
-H. use Velocity Layer to reduce redundant specification/re-analysis without bypassing consequential clarification or approval;
-I. register routing/hook once the project becomes concrete and the applicable workflow permits it;
-J. continue under normal MotorLab lifecycle rules.
+E. load MOTORLAB_RESUME_RECOVERY_V1.txt;
+F. load current MotorLab CORE/governance modules, including MOTORLAB_VELOCITY_LAYER_V1.txt and MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt before designing external-service integrations;
+G. emit MOTORLAB_SESSION_BOOT_BANNER_V1.txt visible activation proof;
+H. initialize new-project definition/onboarding;
+I. use Velocity Layer to reduce redundant specification/re-analysis without bypassing consequential clarification or approval;
+J. register routing/hook once the project becomes concrete and the applicable workflow permits it;
+K. continue under normal MotorLab lifecycle rules.
 
 7. PROJECT-SIDE STRUCTURAL HOOK
 For repositories formally onboarded to MotorLab, MOTORLAB_PROJECT_HOOK.txt is the standard persistent project-side declaration when repository integration is applicable.
@@ -106,6 +115,7 @@ The hook must:
 - declare implicit activation;
 - declare coexistence/preservation of project-native engines;
 - bind MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt and MOTORLAB_SESSION_BOOT_BANNER_V1.txt;
+- bind MOTORLAB_RESUME_RECOVERY_V1.txt;
 - contain orchestration metadata only, not a frozen copy of MotorLab CORE;
 - avoid changing application logic by its mere presence.
 
@@ -133,6 +143,8 @@ In that exceptional case:
 - prefer a one-time persistent host/project/workspace/global integration over repeated per-chat prompts;
 - once project identity, user/project context, intent visibility, project hook access or global trigger support becomes available, return to implicit activation.
 
+MotorLab also cannot force a new assistant turn while the host/model/client is completely frozen and exposes no execution cycle, callback, durable job, webhook, automation or other continuation surface. MOTORLAB_RESUME_RECOVERY_V1.txt therefore guarantees same-turn continuation while execution control exists and deterministic checkpoint-based recovery at the first later execution cycle; it must not be misrepresented as autonomous wake-up of an unavailable host.
+
 11. ONE-TIME PROJECT / USER INTEGRATION, WHEN REQUIRED BY HOST
 If a host product requires persistent project instructions/configuration to expose MotorLab to every new chat inside a project, that configuration is infrastructure, not a recurring activation step.
 It should be installed once per project/workspace and should point to the project-side MOTORLAB_PROJECT_HOOK.txt and/or Br174/Chatgpt canonical state rather than embedding a frozen copy of the CORE.
@@ -153,13 +165,14 @@ When a new project is discovered through software-build intent and becomes concr
 - preserve project-native engines;
 - bind MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt;
 - bind MOTORLAB_SESSION_BOOT_BANNER_V1.txt;
+- bind MOTORLAB_RESUME_RECOVERY_V1.txt;
 - apply MOTORLAB_VELOCITY_LAYER_V1.txt as an additive-only acceleration layer;
 - apply MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt to any external API/provider integration instead of inventing an incompatible per-project protection scheme;
 - do not require a recurring user activation command or recurring build-intent statement.
 
 14. VELOCITY SAFETY PRECEDENCE
 Velocity Layer must never override or bypass an existing MotorLab protection.
-If fast-path mechanics conflict with lifecycle, approval, Watchdog, checkpoint, single-writer, regression, External Service Guard, cost policy, signing/package identity or project-native protected behavior, the existing rule has precedence and the fast path is reduced or disabled.
+If fast-path mechanics conflict with lifecycle, approval, Watchdog, Resume Recovery, checkpoint, single-writer, regression, External Service Guard, cost policy, signing/package identity or project-native protected behavior, the existing rule has precedence and the fast path is reduced or disabled.
 
 15. FAILURE MODE
 If bootstrap cannot complete because Br174/Chatgpt is unavailable, permissions are missing, project identity/hook visibility is ambiguous for a registered project, or the host exposes none of the supported activation signals:
@@ -167,6 +180,8 @@ If bootstrap cannot complete because Br174/Chatgpt is unavailable, permissions a
 - report the exact blocker;
 - preserve the project-native engine and current project state;
 - use WAITING_EXTERNAL or WAITING_USER only when genuinely necessary.
+
+If execution control itself disappears, persist/reuse checkpoint state where technically possible and resume under MOTORLAB_RESUME_RECOVERY_V1.txt at the first later available execution cycle rather than pretending the repository can generate a message while the host is unavailable.
 
 16. SUCCESS CRITERIA
 Auto-bootstrap is considered active when:
@@ -178,6 +193,9 @@ Auto-bootstrap is considered active when:
 - every successful activation emits the MotorLab visible startup banner;
 - ordinary discussion about apps does not activate MotorLab by intent alone;
 - current MotorLab CORE is loaded before write-capable work;
+- Resume Recovery is loaded automatically for every MotorLab-managed project and intent-activated future software project;
+- tool results do not silently terminate incomplete work while same-turn execution remains available;
+- interrupted work resumes at the first available later cycle from the last verified checkpoint when state exists;
 - Velocity Layer is loaded automatically and accelerates preparation without bypassing existing controls;
 - External Service Guard is loaded automatically whenever external provider/API design or modification is relevant;
 - routing/integration registry/state is reconciled when relevant;
@@ -186,10 +204,11 @@ Auto-bootstrap is considered active when:
 - platform limitations are stated honestly rather than hidden.
 
 VERSION
-MOTORLAB-AUTO-BOOTSTRAP-V1.5
+MOTORLAB-AUTO-BOOTSTRAP-V1.6
 Established: 2026-09-29
 Revision 1.1: persistent MOTORLAB_PROJECT_HOOK.txt integration and canonical MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt support.
 Revision 1.2: dual-path activation; registered project context has mandatory precedence over semantic software-build intent discovery.
 Revision 1.3: External Service Guard becomes an automatic CORE bootstrap dependency whenever external APIs/providers/services are relevant.
 Revision 1.4: Velocity Layer becomes an automatic additive-only bootstrap dependency for faster idea-to-LAB preparation and execution.
 Revision 1.5: global persistent activation contract added for all current and future software projects; clear software-build intent now implicitly activates MotorLab without a recurring manual trigger, while registered projects continue to activate by context alone.
+Revision 1.6: Resume Recovery becomes a mandatory bootstrap dependency for same-turn post-tool continuation and first-available-cycle checkpoint recovery after host/model interruption.
