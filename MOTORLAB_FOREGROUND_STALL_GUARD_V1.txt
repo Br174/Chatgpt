@@ -1,0 +1,111 @@
+MOTORLAB FOREGROUND STALL GUARD V1 - PREVENT FOREGROUND SILENCE + PREPARE DURABLE RECOVERY
+
+STATUS
+Mandatory MotorLab CORE capability.
+Established: 2026-09-29.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Reduce long silent or apparently frozen foreground ChatGPT phases by preparing durable state before risky work, preferring persistent execution for long/backgroundable phases, and making every foreground-only operation resumable from a verified checkpoint.
+
+CORE PRINCIPLE
+PREVENT THE UNRECOVERABLE FOREGROUND GAP BEFORE IT STARTS.
+A normal ChatGPT foreground turn is not a durable executor. A host/client message such as "still processing" is not proof that MotorLab itself has a live control cycle.
+
+1. FOREGROUND RISK CLASSIFICATION - MANDATORY
+Before substantial execution, classify the next phase:
+- FOREGROUND_SHORT: expected to finish with a small bounded number of immediate tool/model steps;
+- FOREGROUND_RISK: may involve long reasoning, many serial tool calls, provider delay, build wait, large repository traversal or uncertain latency;
+- BACKGROUNDABLE: safe to hand to a persistent executor;
+- USER_BLOCKING: needs Bruno's decision before safe continuation.
+
+2. PRE-FLIGHT CHECKPOINT - MANDATORY FOR FOREGROUND_RISK/BACKGROUNDABLE
+Before entering a FOREGROUND_RISK or BACKGROUNDABLE phase, persist or reconstruct when technically available:
+- operation_id;
+- project/repository/ref;
+- approved scope;
+- current phase;
+- completed work;
+- exact next safe step;
+- pending verification;
+- last verified progress percentage;
+- source/ref identity;
+- lock_scope;
+- provider/job identifiers if already available.
+
+Do not begin a long fragile foreground phase with no recoverable next step.
+
+3. DURABLE-EXECUTOR FIRST RULE
+If the next autonomous phase is BACKGROUNDABLE and an approved persistent executor is available, hand it off before depending on a long ordinary chat turn.
+Preferred examples include adapter-approved GitHub Actions/runner, remote worker, Work/cloud execution or another durable executor.
+Do not claim background continuity until the handoff is real and an executor/job identifier or equivalent durable state exists.
+
+4. FOREGROUND CHUNKING RULE
+If no persistent executor is available and work must remain in ordinary chat:
+- split work into the smallest practical safe segments;
+- prefer one bounded write/tool group followed by state reconciliation instead of one very long opaque chain;
+- checkpoint after material milestones;
+- revalidate external/repository state before the next write segment;
+- avoid unnecessary rereading/reasoning loops that prolong a single foreground cycle.
+
+This rule optimizes recoverability, not artificial message spam.
+
+5. NO FALSE HEARTBEAT
+A ChatGPT UI message saying that systems are still processing, a spinner, typing indicator or elapsed time is NOT a MotorLab heartbeat and is NOT material progress.
+Only observable model/tool/provider/job/repository state counts as progress.
+
+6. HOST-SUSPENSION DETECTION AT NEXT CONTROL CYCLE
+If the host/client displays an extended-processing state and no MotorLab tool/model cycle is available, MotorLab cannot inject lightning or a new message during that unavailable interval.
+At the first later execution cycle, MotorLab must treat the prior unfinished phase as a foreground-interruption candidate and:
+- load Resume Recovery;
+- restore the last verified checkpoint/pending action;
+- inspect current provider/repository/job state before writing;
+- preserve single-writer safety;
+- emit a visible lightning recovery message if the prior operation was interrupted or stalled;
+- continue the smallest safe pending step without requiring Bruno to reconstruct the task.
+
+7. VISIBLE WATCHDOG SEMANTICS
+Lightning is shown only when MotorLab actually has an execution cycle and performs a watchdog/recovery action.
+Do not promise a lightning message while the host/model is fully suspended and cannot produce output.
+When control returns after a real interrupted phase, the recovery event is mandatory when state supports that conclusion.
+
+8. LONG PROVIDER/BUILD RULE
+Do not keep a long build/provider job dependent on a foreground chat turn when the provider exposes durable job state.
+Start/hand off the job, record its id, checkpoint, and inspect it through status probes. The chat may later reconcile the durable state without duplicating the job.
+
+9. FAILURE / NO DURABLE EXECUTOR
+If a long task cannot be safely backgrounded and the execution surface offers no durable continuation mechanism:
+- preserve the latest checkpoint;
+- use bounded foreground segments;
+- never claim independent wake-up capability;
+- if the host suspends the turn, resume at the first available cycle.
+
+10. RELATION TO WATCHDOG
+Watchdog detects missing material progress while control/status probes exist.
+Foreground Stall Guard reduces the chance that work enters a state where Watchdog has no control surface at all.
+Both remain mandatory and complementary.
+
+11. RELATION TO RESUME RECOVERY
+Resume Recovery handles same-turn continuation and first-available-cycle recovery.
+Foreground Stall Guard ensures a useful checkpoint and explicit next action exist before fragile phases, improving the quality of that recovery.
+
+12. RELATION TO BACKGROUND EXECUTION
+Background Execution defines durable job behavior.
+Foreground Stall Guard decides early when a long phase should leave ordinary foreground execution and enter that durable path.
+
+13. NO PROJECT REGRESSION
+This module changes MotorLab orchestration only. It must not alter application logic, UI, package/signing identity, source lineage, native project engines, MADRE/LAB/CANDIDATA semantics or approved project behavior.
+
+14. SUCCESS CRITERIA
+The guard is active when:
+- risky phases are checkpointed before they begin;
+- backgroundable long work is handed to a real persistent executor when available;
+- ordinary-chat-only work is divided into recoverable bounded segments;
+- UI "still processing" states are never mistaken for a MotorLab heartbeat;
+- first later cycles recover deterministically from interrupted foreground phases;
+- lightning appears when MotorLab actually executes a watchdog/recovery action, not as a fake promise during host suspension;
+- Bruno is not required to reconstruct the project task after a foreground interruption.
+
+VERSION
+MOTORLAB-FOREGROUND-STALL-GUARD-V1.0
+Established: 2026-09-29
