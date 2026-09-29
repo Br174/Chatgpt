@@ -1,14 +1,14 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=2
-STATE_STATUS=ACTIVE_RECONCILE_ON_BOOT
+STATE_REVISION=3
+STATE_STATUS=MANUAL_LIGHTNING_SALVAGE
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab15-upstream-system
 OPERATION_STATUS=IN_PROGRESS_RECOVERY
-CURRENT_PHASE=LAB15 upstream system verification - signing recovery
+CURRENT_PHASE=LAB15 upstream system verification - post-lightning salvage before changed-strategy build
 CURRENT_REF=uab-build/musiclab-meld-upstream-system-15
 CURRENT_HEAD_SHA=3bf3f948be2ec69a2f5146a2d210473d2599b580
 CURRENT_PROVIDER=GitHub Actions
@@ -17,29 +17,40 @@ CURRENT_JOB_STATUS=completed_failure
 LAST_VERIFIED_PROGRESS_PERCENT=93
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=93
 RECOVERY_FLOOR_PERCENT=93
-LAST_COMPLETED_MATERIAL_STEP=Guardian/config/ledger/analyzer structural verification passed; LAB15 app diff remains empty versus LAB14; signing failure isolated to unavailable DEBUG_KEYSTORE secret
-NEXT_SAFE_STEP=At safe r8 boundary, sync LAB15 MotorLab control-plane r7->r8 and change LAB verification/Guardian signing to the proven LAB14 temporary ~/.android/debug.keystore method; then run one changed-strategy verification build and verify APK+ZIP artifact
-PENDING_VERIFICATION=Changed-strategy LAB15 build using proven LAB14 temporary debug keystore, package/ZIP/checksum/artifact verification, temporary workflow cleanup, final LAB15 head verification
-ACTIVE_ARTIFACT=none_build_not_reached_after_signing_preflight_failure
+LAST_COMPLETED_MATERIAL_STEP=Permanent upstream Guardian/config/ledger/analyzer implemented in LAB15; structural checks passed; LAB15 app diff versus LAB14 is empty; signing failures isolated; proven LAB14 temporary debug-keystore strategy identified
+NEXT_SAFE_STEP=Apply one atomic LAB15 control-plane/workflow commit: sync MotorLab r8 in LAB15, replace secret-dependent signing with proven temporary ~/.android/debug.keystore generation, keep UAB parallel-install build, pass MELD_UPSTREAM_BASELINE explicitly, then run exactly one changed-strategy verification build
+PENDING_VERIFICATION=Changed-strategy LAB15 build, APK+ZIP/applicationId/checksum/artifact verification, temporary verification-workflow cleanup, final LAB15 head/diff verification
+ACTIVE_ARTIFACT=none_current_build_not_successful_yet
 WRITE_LOCK_SCOPE=MusicLab:Br174/MusicLab:uab-build/musiclab-meld-upstream-system-15
-LAST_USER_INTENT_SUMMARY=Continue the current MusicLab permanent Meld upstream update system from LAB15 without redoing Meld 0.9.2, preserve MusicLab native engines, verify build and artifacts, and never promote to CANDIDATA/MADRE without Bruno approval
+LAST_USER_INTENT_SUMMARY=Continue the current MusicLab permanent Meld upstream update system from LAB15 without redoing Meld 0.9.2; preserve MusicLab native engines and approved UI; verify build/artifacts; never promote to CANDIDATA/MADRE without Bruno approval
+
+MANUAL_LIGHTNING_SALVAGE
+SALVAGE_STATUS=COMPLETED
+SALVAGE_TRIGGER=manual_lightning
+SALVAGE_HEAD_VERIFIED=3bf3f948be2ec69a2f5146a2d210473d2599b580
+SALVAGE_BRANCH_VERIFIED=uab-build/musiclab-meld-upstream-system-15
+SALVAGE_RECOVERY_FLOOR_PERCENT=93
+SALVAGE_PREVIOUS_RUN_1=36639807872 completed_failure at validateSigningFossDebug because ~/.android/debug.keystore absent
+SALVAGE_PREVIOUS_RUN_2=36640542668 completed_failure because DEBUG_KEYSTORE secret is not configured
+SALVAGE_PROVEN_RECOVERY_PATH=LAB14 successful workflow generated a standard temporary ~/.android/debug.keystore with keytool and built through tools/universal-apk-builder/build-apk.sh
+SALVAGE_NOTE=No branch/source write occurred during the lightning salvage. Live LAB15 HEAD remained unchanged. Any interrupted unreferenced Git tree construction does not alter the branch and is not treated as completed work.
 
 LIVE_EVIDENCE
-- branch uab-build/musiclab-meld-upstream-system-15 advanced from a10fb5577fbdf7d089a3fd80e68c5bfd686cae01 to 3bf3f948be2ec69a2f5146a2d210473d2599b580
-- run 36639807872 failed only at :app:validateSigningFossDebug because ~/.android/debug.keystore was absent; earlier structural/pre-build checks passed
-- changed-strategy run 36640542668 proved repository secret DEBUG_KEYSTORE is not configured and therefore that official secret-based restore path is unavailable
-- historical successful LAB14 workflow at ac86e3c457d28f470388b1473e5a5938d477e28e proves the working isolated-LAB signing path: generate a temporary standard ~/.android/debug.keystore with keytool before build
-- central MotorLab release advanced to 2026.09.30-r8 during the build/test; it was intentionally not adopted mid-run and is now eligible for safe-boundary synchronization
-- user-visible MotorLab progress floor remains 93%; signing verification failure did not invalidate already verified upstream-system implementation work
+- LAB15 live branch remains exactly 3bf3f948be2ec69a2f5146a2d210473d2599b580 after the interruption
+- no application-source modification has been introduced by LAB15 updater-system work
+- Meld latest verified release remains v0.9.2; no new upstream delta is pending
+- central MotorLab current release is 2026.09.30-r8; safe-boundary adoption is now allowed
+- user-visible MotorLab progress floor remains 93%; the failed signing/build verification does not invalidate already verified upstream-system implementation work
 
 CONTINUITY_RULES
 - New MusicLab chats must load this ledger automatically after MotorLab boot.
 - Live repository/workflow state newer than this ledger wins and must refresh this file when safe.
-- Do not restart from UAB_STATE_REGISTRY historical MusicLab state if this ledger/live state is newer.
 - Preserve ACTIVE_OPERATION_ID across chat ids while the same LAB15 task remains active.
-- Preserve r7+ monotonic recovery floor; do not silently regress below 93% for this operation unless material invalidation evidence exists.
+- Preserve monotonic recovery floor; do not silently regress below 93% unless material invalidation evidence exists.
+- Do not restart from LAB14 or historical UAB registry state.
+- Do not duplicate completed work or rerun the two failed signing strategies unchanged.
 - r8 Project Continuity is control-plane only and must not alter MusicLab application logic/UI/native engines.
 - Do not require Bruno to paste a transfer prompt.
 
-UPDATED_BY=MotorLab r8 continuity reconciliation
+UPDATED_BY=MotorLab r8 manual lightning SAVE-THEN-RESUME
 UPDATED_DATE=2026-09-30
