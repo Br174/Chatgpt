@@ -32,12 +32,18 @@ It is not valid to end merely because a tool returned, a repository read finishe
 3. PENDING-ACTION LEDGER
 For substantial tasks maintain when possible:
 - operation_id;
+- operation lineage / repository-ref-task identity;
 - current phase;
 - completed step;
 - exact next safe step;
 - pending verification;
 - checkpoint_id;
 - last verified progress percentage;
+- last user-visible verified MotorLab progress percentage when available;
+- recovery_floor_percent;
+- recovery_floor_source;
+- progress fingerprint;
+- provider/job identity when applicable;
 - write lock scope;
 - Watchdog recovery level;
 - same_strategy_no_progress_count when relevant.
@@ -46,25 +52,53 @@ Before ending, verify that no approved safe action remains pending.
 4. SAME-TURN RESUME
 If a tool response arrives and the task is incomplete:
 A. update fingerprint/checkpoint if materially changed;
-B. perform the next safe action;
-C. continue until a valid terminal state;
-D. emit useful operational progress according to MOTORLAB_PROGRESS_REPORTING_V1.txt.
+B. update the verified recovery floor when newly verified progress advances;
+C. perform the next safe action;
+D. continue until a valid terminal state;
+E. emit useful operational progress according to MOTORLAB_PROGRESS_REPORTING_V1.txt.
 Do not ask Bruno to say "continua" merely to resume a known safe pending action.
 
 5. NEXT-AVAILABLE-CYCLE RECOVERY
 If model/host/client interrupts execution so same-turn continuation cannot occur, the first later execution cycle with access to state must:
 - detect the unfinished operation when state is available;
 - restore latest verified checkpoint/pending ledger;
+- reconstruct the MONOTONIC RECOVERY FLOOR before choosing a continuation point;
 - preserve last verified percentage;
 - verify current external/provider/repository state before writing;
 - ask Watchdog to classify current health/recovery level;
-- resume only the smallest safe pending substep;
+- resume only the smallest safe pending substep at or above the recovery floor unless invalidation evidence exists;
 - avoid duplicating completed work;
 - preserve single-writer locking;
 - visibly report recovery with lightning when a real recovery is performed.
 
 Default visible format:
 ⚡ Ripresa MotorLab — riprendo dal checkpoint <id>/<fase> preservando il lavoro già verificato.
+
+5A. MONOTONIC RECOVERY FLOOR - MANDATORY
+For the SAME logical operation, recovery progress is monotonic by default.
+Before any manual or automatic recovery chooses a continuation point, build a set of coherent verified progress candidates from the same operation lineage, including when available:
+- persisted checkpoint/ledger percentage;
+- latest user-visible percentage explicitly reported as verified MotorLab progress;
+- latest verified micro-milestone/phase completion;
+- current provider/job/repository/artifact evidence that proves equal or later material progress.
+
+Set recovery_floor_percent to the highest coherent verified candidate on the same progress scale and operation lineage.
+A stale checkpoint with a lower percentage MUST NOT pull recovery below a newer coherent verified progress state.
+Example: if the same operation has a 20% checkpoint but later verified MotorLab progress reached 93% and the same job/ref remains coherent, recovery floor is 93%, not 20%.
+
+Do not compare unrelated percentages blindly. Candidate percentages are comparable only when they refer to the same logical operation/task scale and compatible repository/ref/job lineage.
+If operation identity is ambiguous, preserve the highest known verified value as a provisional floor, perform the smallest targeted identity/status check, and do not silently restart from a lower value.
+
+5B. REGRESSION EXCEPTION - EVIDENCE REQUIRED
+Recovery may go below the established floor only when material evidence proves that previously verified progress is no longer valid for the same requested outcome.
+Examples include:
+- verified rollback/reset to an earlier ref/state;
+- provider/job failure that demonstrably invalidates a milestone previously counted as completed;
+- required artifact/result proven missing, corrupt or invalid after it had been counted;
+- explicit approved scope/operation replacement that starts a new progress scale.
+
+Elapsed time, a stale checkpoint, missing chat continuity, an interrupted turn, a failed `⚡` send, or inability to find a newer checkpoint are NOT sufficient reasons to lower progress.
+When a floor is invalidated, report the evidence and the resulting revised percentage explicitly; never silently display a lower percentage.
 
 6. MANUAL `⚡` SAVE-THEN-RESUME - HIGH PRIORITY
 When Bruno sends a message consisting only or primarily of `⚡`, treat that message as an explicit request to SAVE the freshest recoverable state available at the first execution cycle and then inspect/resume the current MotorLab operation.
@@ -73,29 +107,32 @@ Do not reinterpret the whole project request from zero.
 6A. RAPID SALVAGE CHECKPOINT - SAVE FIRST
 Before starting recovery, retry, changed strategy or any new write for the interrupted operation:
 A. identify the active/pending operation and read the previous verified checkpoint/pending ledger when available;
-B. immediately capture the freshest recoverable material state that is already observable in the current cycle, including when available: operation_id, current phase, latest completed material step, exact next safe step, pending verification, latest verified percentage, progress fingerprint, repository/ref identity, provider/job id/status, artifact/result identity, changed-resource list and write lock scope;
-C. persist or refresh a lightweight checkpoint/pending ledger when a persistence surface is available;
-D. mark this capture as MANUAL_LIGHTNING_SALVAGE so it is distinguishable from ordinary milestone checkpoints;
-E. preserve single-writer ownership and do not cancel/restart a healthy external job merely to create the salvage checkpoint.
+B. immediately capture the freshest recoverable material state that is already observable in the current cycle, including when available: operation_id, operation lineage, current phase, latest completed material step, exact next safe step, pending verification, latest verified percentage, latest user-visible verified MotorLab percentage, progress fingerprint, repository/ref identity, provider/job id/status, artifact/result identity, changed-resource list and write lock scope;
+C. reconstruct and persist the recovery_floor_percent/recovery_floor_source before choosing a recovery point;
+D. persist or refresh a lightweight checkpoint/pending ledger when a persistence surface is available;
+E. mark this capture as MANUAL_LIGHTNING_SALVAGE so it is distinguishable from ordinary milestone checkpoints;
+F. preserve single-writer ownership and do not cancel/restart a healthy external job merely to create the salvage checkpoint.
 
 The rapid salvage path is intentionally lightweight. It must NOT perform a full repository copy, exhaustive history scan, complete log download, rebuild, broad project traversal or other heavy operation merely to create the checkpoint.
-Use current known state first. Add only the smallest targeted read/status probe needed to make the saved state coherent. If a slow external verification is still needed, preserve the lightweight ledger first when technically possible, then perform the targeted verification.
+Use current known state first. Add only the smallest targeted read/status probe needed to make the saved state coherent. If a slow external verification is still needed, preserve the lightweight ledger and provisional recovery floor first when technically possible, then perform the targeted verification.
 
 6B. SAVE-THEN-RECOVER ORDER
 After the Rapid Salvage Checkpoint:
 A. inspect current provider/job/repository state as needed;
-B. preserve completed work and percentage;
-C. invoke Watchdog health classification;
-D. if stalled/interrupted, continue from the exact smallest safe pending step;
-E. if healthy external work is still running, report that state and do not duplicate it;
-F. if no pending operation exists, report that no recoverable pending task was found instead of inventing one.
+B. preserve completed work and the monotonic recovery floor;
+C. reconcile checkpoint percentage, latest user-visible verified percentage and current material provider/job/ref evidence;
+D. invoke Watchdog health classification;
+E. if stalled/interrupted, continue from the exact smallest safe pending step compatible with the recovery floor;
+F. if healthy external work is still running, report that state and do not duplicate it;
+G. if no pending operation exists, report that no recoverable pending task was found instead of inventing one.
 
 6C. PLATFORM BOUNDARY / NO FALSE BACKUP CLAIM
 The manual `⚡` message itself can interrupt an in-progress ChatGPT turn before MotorLab receives another execution cycle. Therefore Rapid Salvage Checkpoint cannot guarantee capture of hidden model reasoning, undisclosed token-by-token thought, or state that never became observable/persistent before the interruption.
 It DOES preserve the freshest recoverable material state still available when the `⚡` cycle begins, and then rechecks external/repository/provider state so material progress that completed before or during the interruption is not unnecessarily lost or repeated.
+A user-visible verified MotorLab percentage from the same operation is recoverable progress evidence and must be considered when reconstructing the recovery floor, even if the older persisted checkpoint is lower.
 
 6D. SPEED PRINCIPLE
-Manual lightning salvage is a fast recovery pre-step, not a archival backup job. Prefer immediate bounded state capture and targeted verification over completeness that would materially delay resumption. No fixed number of seconds is guaranteed because external tools/providers can be slow, but MotorLab must not intentionally turn `⚡` into a multi-minute full-backup workflow.
+Manual lightning salvage is a fast recovery pre-step, not an archival backup job. Prefer immediate bounded state capture and targeted verification over completeness that would materially delay resumption. No fixed number of seconds is guaranteed because external tools/providers can be slow, but MotorLab must not intentionally turn `⚡` into a multi-minute full-backup workflow.
 
 The manual `⚡` command is a shortcut/fallback, not a prerequisite. Automatic same-turn and next-cycle recovery remain mandatory and unchanged.
 If the host/client is fully suspended and does not deliver the message, `⚡` cannot create an execution cycle by itself.
@@ -117,7 +154,8 @@ Where a durable async job/Work/worker exists, use its real capabilities; otherwi
 
 10. WATCHDOG INTEGRATION
 - Watchdog owns detection/intervention level;
-- manual `⚡` Rapid Salvage Checkpoint occurs before Watchdog recovery classification so the freshest recoverable state is preserved first;
+- manual `⚡` Rapid Salvage Checkpoint and recovery-floor reconstruction occur before Watchdog recovery classification so the freshest recoverable state is preserved first;
+- Watchdog must not authorize a lower continuation percentage merely because an older checkpoint is lower;
 - unchanged external state uses Watchdog fingerprints/adaptive thresholds;
 - recovery never creates a second writer;
 - retries remain targeted/bounded;
@@ -133,8 +171,11 @@ MOTORLAB_AUTO_BOOTSTRAP_V1.txt must load this module for recognized projects and
 Resume Recovery is active when:
 - tool results cannot silently terminate incomplete work while execution control remains available;
 - next safe action is explicit for substantial work;
-- interruptions recover at first available cycle from latest verified checkpoint;
-- manual `⚡` first performs a lightweight salvage of the freshest recoverable material state available, then health-checks/resumes without restarting from zero;
+- interruptions recover at first available cycle from the freshest coherent verified state, not merely the oldest persisted checkpoint;
+- the same operation cannot silently regress from a higher verified percentage to a lower one;
+- manual `⚡` first performs a lightweight salvage of the freshest recoverable material state available, reconstructs the monotonic recovery floor, then health-checks/resumes without restarting from zero;
+- a stale lower checkpoint cannot override newer coherent verified progress;
+- any real progress invalidation is evidence-based and explicitly reported;
 - manual salvage avoids heavy full-backup work and does not intentionally delay recovery with exhaustive scans;
 - automatic recovery does not depend on Bruno sending `⚡`;
 - Watchdog two-strike strategy decisions are obeyed;
@@ -143,7 +184,8 @@ Resume Recovery is active when:
 - no false claim is made about capturing hidden model reasoning or awakening a host with no execution cycle.
 
 VERSION
-MOTORLAB-RESUME-RECOVERY-V1.2
+MOTORLAB-RESUME-RECOVERY-V1.3
 Established: 2026-09-29
 Revision 1.1: manual `⚡` high-priority recovery opportunity, explicit Watchdog precedence and two-strike integration.
 Revision 1.2: manual `⚡` becomes rapid SAVE-THEN-RESUME: lightweight salvage checkpoint first, then Watchdog classification and targeted continuation; no heavy backup and no false hidden-reasoning snapshot claim.
+Revision 1.3: monotonic recovery floor added; same-operation recovery selects the highest coherent verified progress across checkpoint, visible verified status and real provider/job/ref evidence, with explicit evidence required for any regression.
