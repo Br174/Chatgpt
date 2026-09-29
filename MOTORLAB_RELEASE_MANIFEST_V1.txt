@@ -1,0 +1,55 @@
+MOTORLAB RELEASE MANIFEST V1
+
+STATUS
+Canonical MotorLab release/version manifest.
+Established: 2026-09-29.
+Repository authority: Br174/Chatgpt.
+
+CURRENT_RELEASE=2026.09.29-r1
+SATELLITE_SCHEMA=1
+SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
+SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
+
+PURPOSE
+Provide one authoritative version identifier for the current MotorLab CORE and a stable source for project satellites to detect and safely adopt updates.
+
+CORE AUTHORITY
+Br174/Chatgpt is the only authoritative source for MotorLab release identity. Project repositories may hold synchronized local satellite copies for immediate activation and fallback, but those copies are not independent authorities.
+
+CURRENT REQUIRED CORE MODULES
+- MOTORLAB_AUTO_BOOTSTRAP_V1.txt
+- MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt
+- MOTORLAB_GOVERNANCE_V1.txt
+- MOTORLAB_WATCHDOG_V1.txt
+- MOTORLAB_RESUME_RECOVERY_V1.txt
+- MOTORLAB_PROGRESS_REPORTING_V1.txt
+- MOTORLAB_VISUAL_STATUS_V1.txt
+- MOTORLAB_SESSION_BOOT_BANNER_V1.txt
+- MOTORLAB_BACKGROUND_EXECUTION_V1.txt
+- MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt
+- MOTORLAB_VELOCITY_LAYER_V1.txt
+- MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt
+- MOTORLAB_SATELLITE_SYNC_V1.txt
+- MOTORLAB_SATELLITE_BUNDLE_V1.txt
+
+SATELLITE LOCAL FILES
+Each registered project should contain:
+- .motorlab/MOTORLAB_LOCAL_CORE.txt
+- .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt
+- .motorlab/MOTORLAB_SYNC_STATE.txt
+- MOTORLAB_PROJECT_HOOK.txt
+
+UPDATE RULE
+A project satellite compares its local RELEASE with CURRENT_RELEASE at a safe bootstrap boundary. If central is newer, synchronization follows MOTORLAB_SATELLITE_SYNC_V1.txt. Never replace the active local core in the middle of a write/build/test/promotion operation.
+
+ROLLBACK RULE
+Before applying a newer satellite bundle, preserve the currently verified local core as LAST_GOOD. If validation of the new bundle fails, restore LAST_GOOD and report a visible MotorLab protection event.
+
+NATIVE ENGINE RULE
+Satellite synchronization must never overwrite project-native engines, application source, UI, package/signing identity, project adapters or lifecycle state. Only MotorLab control-plane files are synchronized.
+
+FUTURE PROJECT RULE
+Every future MotorLab software project must receive the satellite local files during onboarding when repository integration is technically available.
+
+VERSION
+MOTORLAB-RELEASE-MANIFEST-V1.0
