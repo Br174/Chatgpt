@@ -5,7 +5,7 @@ Canonical MotorLab release/version manifest.
 Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.29-r4
+CURRENT_RELEASE=2026.09.29-r5
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -53,24 +53,34 @@ NATIVE ENGINE RULE
 Satellite synchronization must never overwrite project-native engines, application source, UI, package/signing identity, project adapters or lifecycle state. Only MotorLab control-plane files are synchronized.
 
 VISIBLE STARTUP RULE
-For release 2026.09.29-r2 and later until superseded, the normal visible activation banner is exactly:
+The normal visible activation banner is exactly:
 "⚙️ MotorLab attivo"
 Extra technical wording is reserved for actual warnings, recovery events or blockers.
 
 FOREGROUND STALL RULE
-For release 2026.09.29-r3 and later, MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt is mandatory.
-Before long/risky phases MotorLab must establish recoverable checkpoint/next-step state, prefer a real persistent executor for backgroundable work when available, and otherwise split ordinary-chat work into bounded recoverable segments. ChatGPT client "still processing" UI is not a MotorLab heartbeat. If host execution disappears, recovery occurs at the first later available cycle under Resume Recovery.
+MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt is mandatory. Before long/risky phases MotorLab establishes recoverable checkpoint/next-step state, prefers a real persistent executor for backgroundable work when available, otherwise uses bounded recoverable foreground segments. ChatGPT client "still processing" UI is not a MotorLab heartbeat.
 
 CHANGE COMPATIBILITY RULE
-For release 2026.09.29-r4 and later, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is mandatory before every write-capable MotorLab self-change and every write-capable change to a MotorLab-managed project.
-The preflight must inspect current relevant state for conflicts, overlaps, duplicated responsibility, protected behavior, precedence ambiguity, blast radius, backward compatibility and regression risk. Overlaps must be merged or explicitly ordered/superseded; unresolved unsafe conflicts block the write.
-This rule applies to all existing and future MotorLab projects.
+MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is mandatory before every write-capable MotorLab self-change and every write-capable change to a MotorLab-managed project. Overlaps/conflicts must be integrated, ordered or explicitly superseded before writing; unresolved unsafe conflicts block the write.
+
+ANTI-LOOP / WAKE RULE - RELEASE R5
+For release 2026.09.29-r5 and later:
+- Watchdog is the single coordinator for progress-health detection and anti-stall intervention;
+- preventive progress-health checks occur during substantial work when control/status evidence exists, without interrupting healthy work;
+- the same ineffective write/retry/recovery strategy may not be attempted a third materially identical time after two no-progress attempts without new evidence;
+- Resume Recovery owns checkpoint continuation after Watchdog classification;
+- Foreground Stall Guard owns prevention/chunking/durable handoff and routes emerging loops to Watchdog;
+- Progress Reporting provides denser live-like operational status from observable actions/results, not hidden chain-of-thought;
+- user message `⚡` is a universal manual health/recovery shortcut at the first available execution cycle, restoring/checking the current operation/checkpoint instead of restarting from zero;
+- automatic recovery remains mandatory and does not depend on Bruno sending `⚡`;
+- `⚡` cannot independently create a new execution cycle if the ChatGPT host is fully suspended and does not accept/deliver the message.
 
 FUTURE PROJECT RULE
-Every future MotorLab software project must receive the satellite local files during onboarding when repository integration is technically available and use MOTORLAB_CORE_ENTRYPOINT_V1.txt as the canonical boot path. It inherits the Change Compatibility Guard automatically.
+Every future MotorLab software project receives the current satellite files during onboarding when repository integration is available and inherits all current guards and anti-loop/wake behavior automatically.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.4
-Revision 1.2: current release 2026.09.29-r2; concise startup banner adopted globally.
-Revision 1.3: current release 2026.09.29-r3; Foreground Stall Guard added as mandatory CORE protection.
-Revision 1.4: current release 2026.09.29-r4; Change Compatibility Guard becomes mandatory before MotorLab and project changes.
+MOTORLAB-RELEASE-MANIFEST-V1.5
+Revision 1.2: release r2; concise startup banner.
+Revision 1.3: release r3; Foreground Stall Guard.
+Revision 1.4: release r4; Change Compatibility Guard.
+Revision 1.5: release r5; preventive Watchdog checks, two-strike anti-loop rule, manual `⚡` recovery shortcut and denser operational progress visibility integrated into existing modules.
