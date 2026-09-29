@@ -1,26 +1,26 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=4
+STATE_REVISION=5
 STATE_STATUS=IN_PROGRESS_RECONCILED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab15-upstream-system
 OPERATION_STATUS=IN_PROGRESS_VERIFICATION
-CURRENT_PHASE=LAB15 changed-strategy verification build after manual lightning salvage
+CURRENT_PHASE=LAB15 changed-strategy UAB build after signing recovery
 CURRENT_REF=uab-build/musiclab-meld-upstream-system-15
 CURRENT_HEAD_SHA=410334734bb5c032a16e0d1475b02596b0fa91e2
 CURRENT_PROVIDER=GitHub Actions
 CURRENT_JOB_ID=36641422644
-CURRENT_JOB_STATUS=queued_last_observed
+CURRENT_JOB_STATUS=build_in_progress_last_observed
 LAST_VERIFIED_PROGRESS_PERCENT=93
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=93
 RECOVERY_FLOOR_PERCENT=93
-LAST_COMPLETED_MATERIAL_STEP=Atomic LAB15 commit applied: MotorLab r8 synchronized with r7 LAST_GOOD, proven LAB14 temporary debug-keystore strategy installed in verification and permanent Guardian build path, UAB parallel-install retained, Meld runtime baseline passed explicitly
-NEXT_SAFE_STEP=Follow workflow run 36641422644 on exact head 410334734bb5c032a16e0d1475b02596b0fa91e2 to terminal state; if green verify APK+ZIP/applicationId/checksums/artifact, then remove temporary LAB15 verification workflow and verify final head/diff
-PENDING_VERIFICATION=Run 36641422644 terminal result; APK+ZIP/applicationId/checksum/artifact verification; temp workflow cleanup; final LAB15 head and no-app-diff verification
-ACTIVE_ARTIFACT=unknown_until_run_36641422644_completes
+LAST_COMPLETED_MATERIAL_STEP=Structural Guardian verification passed; protobuf setup passed; temporary debug keystore generation passed; UAB LAB15 environment preparation passed; signing recovery path is now materially verified
+NEXT_SAFE_STEP=Follow run 36641422644 to terminal state without duplication; if build succeeds verify APK+ZIP/applicationId/checksums/artifact, then remove temporary LAB15 verification workflow and verify final head/diff
+PENDING_VERIFICATION=UAB build completion; APK+ZIP/applicationId/checksum/artifact verification; temp workflow cleanup; final LAB15 head and no-app-diff verification
+ACTIVE_ARTIFACT=unknown_build_in_progress
 WRITE_LOCK_SCOPE=MusicLab:Br174/MusicLab:uab-build/musiclab-meld-upstream-system-15
 LAST_USER_INTENT_SUMMARY=Continue the current MusicLab permanent Meld upstream update system from LAB15 without redoing Meld 0.9.2; preserve MusicLab native engines and approved UI; verify build/artifacts; never promote to CANDIDATA/MADRE without Bruno approval
 
@@ -32,15 +32,16 @@ SALVAGE_RESUMED_HEAD=410334734bb5c032a16e0d1475b02596b0fa91e2
 SALVAGE_RECOVERY_FLOOR_PERCENT=93
 SALVAGE_PREVIOUS_RUN_1=36639807872 completed_failure at validateSigningFossDebug because ~/.android/debug.keystore absent
 SALVAGE_PREVIOUS_RUN_2=36640542668 completed_failure because DEBUG_KEYSTORE secret is not configured
-SALVAGE_CHANGED_STRATEGY_RUN=36641422644 queued_last_observed
-SALVAGE_PROVEN_RECOVERY_PATH=LAB14 successful workflow generated a standard temporary ~/.android/debug.keystore with keytool and built through tools/universal-apk-builder/build-apk.sh; LAB15 now uses that same path
+SALVAGE_CHANGED_STRATEGY_RUN=36641422644 build_in_progress_last_observed
+SALVAGE_PROVEN_RECOVERY_PATH=LAB14 successful workflow generated a standard temporary ~/.android/debug.keystore with keytool and built through tools/universal-apk-builder/build-apk.sh; LAB15 now uses that same path and its keystore step has passed
 
 LIVE_EVIDENCE
-- LAB15 live branch advanced atomically to 410334734bb5c032a16e0d1475b02596b0fa91e2
-- run 36641422644 was created on that exact head by push and is the only changed-strategy verification run to follow
-- no application-source change was part of the atomic recovery commit; changes remain control-plane/upstream-system only
-- MotorLab r8 is now present in LAB15 and r7 is preserved as LAST_GOOD
-- user-visible MotorLab progress floor remains 93%; verification is pending, not regressed
+- LAB15 live branch is 410334734bb5c032a16e0d1475b02596b0fa91e2
+- run 36641422644 passed Guardian verification, Java/Gradle prep, protobuf, temporary keystore generation and UAB environment preparation
+- run 36641422644 is currently executing the LAB15 isolated UAB build
+- no application-source change was part of the recovery commit; changes remain control-plane/upstream-system only
+- MotorLab r8 is present in LAB15 and r7 is preserved as LAST_GOOD
+- user-visible MotorLab progress floor remains 93%; verification is advancing without regression
 
 CONTINUITY_RULES
 - New MusicLab chats must load this ledger automatically after MotorLab boot.
@@ -53,5 +54,5 @@ CONTINUITY_RULES
 - r8 Project Continuity is control-plane only and must not alter MusicLab application logic/UI/native engines.
 - Do not require Bruno to paste a transfer prompt.
 
-UPDATED_BY=MotorLab r8 write-through continuity after manual lightning resume
+UPDATED_BY=MotorLab r8 write-through continuity during changed-strategy build
 UPDATED_DATE=2026-09-30
