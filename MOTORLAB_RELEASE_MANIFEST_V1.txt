@@ -5,7 +5,7 @@ Canonical MotorLab release/version manifest.
 Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.29-r1
+CURRENT_RELEASE=2026.09.29-r2
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -45,13 +45,19 @@ UPDATE RULE
 A project satellite compares its local RELEASE with CURRENT_RELEASE at a safe bootstrap boundary. If central is newer, synchronization follows MOTORLAB_SATELLITE_SYNC_V1.txt. Never replace the active local core in the middle of a write/build/test/promotion operation.
 
 ROLLBACK RULE
-Before applying a newer satellite bundle, preserve the currently verified local core as LAST_GOOD. If validation of the new bundle fails, restore LAST_GOOD and report a visible MotorLab protection event.
+Before applying a newer satellite bundle, preserve the previously verified local core as LAST_GOOD. If validation of the new bundle fails, restore LAST_GOOD and report a visible MotorLab protection event.
 
 NATIVE ENGINE RULE
 Satellite synchronization must never overwrite project-native engines, application source, UI, package/signing identity, project adapters or lifecycle state. Only MotorLab control-plane files are synchronized.
+
+VISIBLE STARTUP RULE
+For release 2026.09.29-r2 and later until superseded, the normal visible activation banner is exactly:
+"⚙️ MotorLab attivo"
+Extra technical wording is reserved for actual warnings, recovery events or blockers.
 
 FUTURE PROJECT RULE
 Every future MotorLab software project must receive the satellite local files during onboarding when repository integration is technically available and use MOTORLAB_CORE_ENTRYPOINT_V1.txt as the canonical boot path.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.1
+MOTORLAB-RELEASE-MANIFEST-V1.2
+Revision 1.2: current release 2026.09.29-r2; concise startup banner adopted globally.
