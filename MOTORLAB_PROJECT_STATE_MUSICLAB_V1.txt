@@ -1,0 +1,42 @@
+MOTORLAB PROJECT STATE V1
+PROJECT_NAME=MusicLab
+PROJECT_REPOSITORY=Br174/MusicLab
+STATE_REVISION=1
+STATE_STATUS=ACTIVE_RECONCILE_ON_BOOT
+RECONCILE_ON_BOOT=required
+STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
+
+ACTIVE_OPERATION_ID=musiclab-lab15-upstream-system
+OPERATION_STATUS=IN_PROGRESS_LAST_OBSERVED
+CURRENT_PHASE=LAB15 upstream system verification
+CURRENT_REF=uab-build/musiclab-meld-upstream-system-15
+CURRENT_HEAD_SHA=a10fb5577fbdf7d089a3fd80e68c5bfd686cae01
+CURRENT_PROVIDER=GitHub Actions
+CURRENT_JOB_ID=36639807872
+CURRENT_JOB_STATUS=in_progress_last_observed
+LAST_VERIFIED_PROGRESS_PERCENT=93
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=93
+RECOVERY_FLOOR_PERCENT=93
+LAST_COMPLETED_MATERIAL_STEP=LAB15 verification workflow created and active on exact LAB15 head
+NEXT_SAFE_STEP=Reconcile workflow run 36639807872 and its jobs/artifacts; continue same LAB15 operation from latest live state, never from older LAB14/UAB registry state
+PENDING_VERIFICATION=LAB15 workflow terminal result, job outcome, artifact/result verification and next approved project step
+ACTIVE_ARTIFACT=unknown_until_live_reconcile
+WRITE_LOCK_SCOPE=MusicLab:Br174/MusicLab:uab-build/musiclab-meld-upstream-system-15
+LAST_USER_INTENT_SUMMARY=Continue the current MusicLab update and upstream system verification without losing the latest progress across chat changes
+
+LIVE_EVIDENCE
+- branch uab-build/musiclab-meld-upstream-system-15 observed at a10fb5577fbdf7d089a3fd80e68c5bfd686cae01
+- commit message: LAB15: aggiunge verifica temporanea Guardian upstream
+- workflow run 36639807872 observed in_progress on the same head
+- user-visible MotorLab progress reached 93% for the same operation before chat interruption/recovery testing
+
+CONTINUITY_RULES
+- New MusicLab chats must load this ledger automatically after MotorLab boot.
+- Live repository/workflow state newer than this ledger wins and must refresh this file when safe.
+- Do not restart from UAB_STATE_REGISTRY historical MusicLab state if this ledger/live state is newer.
+- Preserve ACTIVE_OPERATION_ID across chat ids while the same LAB15 task remains active.
+- Preserve r7+ monotonic recovery floor; do not silently regress below 93% for this operation unless material invalidation evidence exists.
+- Do not require Bruno to paste a transfer prompt.
+
+UPDATED_BY=MotorLab r8 continuity bootstrap
+UPDATED_DATE=2026-09-30
