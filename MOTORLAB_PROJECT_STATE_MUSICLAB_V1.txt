@@ -1,60 +1,67 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=7
-STATE_STATUS=MANUAL_LIGHTNING_SALVAGE
+STATE_REVISION=8
+STATE_STATUS=COMPLETED_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab15-upstream-system
-OPERATION_STATUS=IN_PROGRESS_RECOVERY
-CURRENT_PHASE=LAB15 final Guardian regression-gate correction after manual lightning
+OPERATION_STATUS=COMPLETED_LAB_READY
+CURRENT_PHASE=LAB15 permanent Meld upstream Guardian completed and verified
 CURRENT_REF=uab-build/musiclab-meld-upstream-system-15
-CURRENT_HEAD_SHA=dca1ed0f8b995a55cfd9bd89b8cbb26489816395
-CURRENT_PROVIDER=GitHub Actions
-CURRENT_JOB_ID=36642529038
-CURRENT_JOB_STATUS=completed_failure_test_task_selection
-LAST_VERIFIED_PROGRESS_PERCENT=93
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=93
-RECOVERY_FLOOR_PERCENT=93
-LAST_COMPLETED_MATERIAL_STEP=Permanent Guardian logic and verified-baseline recorder self-test passed; previous isolated LAB15 UAB build, APK+ZIP/applicationId verification and artifact upload remain successfully verified
-NEXT_SAFE_STEP=Inspect actual LAB15 Gradle modules/test tasks; replace only the invalid spotify/betterlyrics regression task references with tests that exist in LAB15 lineage; run one changed-strategy light verification; if green remove temporary LAB15 workflow, verify final no-app-diff/head, and persist completion
-PENDING_VERIFICATION=Actual LAB15 regression task selection; one light final verification; temp workflow cleanup; final head/no-app-diff verification
+CURRENT_HEAD_SHA=39769490e6d88535102e48e6e83eef0e6cfaea3d
+CURRENT_PROVIDER=GitHub + GitHub Actions
+CURRENT_JOB_ID=36644097790
+CURRENT_JOB_STATUS=tests_success_cleanup_permission_failure_resolved_manually
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+LAST_COMPLETED_MATERIAL_STEP=Permanent Guardian finalized on LAB15; correct app+innertube JVM regression gate persisted; temporary verification workflow removed; LAB14->LAB15 diff verified control-plane/upstream-only with zero app source changes
+NEXT_SAFE_STEP=Remain on LAB15 as the verified permanent upstream-system source; when MusicLab in-app Meld notification reports a tag newer than v0.9.2, run Guardian analyze for that tag. Create/resolve only a new isolated LAB; never promote CANDIDATA/MADRE without Bruno approval.
+PENDING_VERIFICATION=none_for_guardian_implementation; future Meld updates are event-driven by in-app notification and each generated LAB requires its own tests/build and Bruno review before promotion
 ACTIVE_ARTIFACT=MusicLab-LAB-UPSTREAM-SYSTEM-15-VERIFY artifact_id=11066853076 digest=sha256:bcd348bff85ec953aaa8a1b943623c99b393ed1e020f36722af11aeb80c1aee2 run_id=36641422644
-WRITE_LOCK_SCOPE=MusicLab:Br174/MusicLab:uab-build/musiclab-meld-upstream-system-15
-LAST_USER_INTENT_SUMMARY=Continue the permanent Meld upstream Guardian from LAB15 without redoing Meld 0.9.2; preserve MusicLab native engines/UI; finish regression verification and cleanup; never promote to CANDIDATA/MADRE without Bruno approval
+WRITE_LOCK_SCOPE=released
+LAST_USER_INTENT_SUMMARY=Complete the permanent Meld upstream update system without redoing Meld 0.9.2; preserve MusicLab native engines/UI; create isolated LABs, classify changes, test/build APK+ZIP, and never promote CANDIDATA/MADRE without Bruno approval
 
-MANUAL_LIGHTNING_SALVAGE
-SALVAGE_STATUS=COMPLETED
-SALVAGE_TRIGGER=manual_lightning
-SALVAGE_HEAD_VERIFIED=dca1ed0f8b995a55cfd9bd89b8cbb26489816395
-SALVAGE_BRANCH_VERIFIED=uab-build/musiclab-meld-upstream-system-15
-SALVAGE_RECOVERY_FLOOR_PERCENT=93
-SALVAGE_SUCCESSFUL_BUILD_RUN=36641422644 completed_success
-SALVAGE_SUCCESSFUL_ARTIFACT=11066853076 MusicLab-LAB-UPSTREAM-SYSTEM-15-VERIFY
-SALVAGE_FINAL_LOGIC_RUN=36642529038 completed_failure
-SALVAGE_FINAL_LOGIC_RESULT=Guardian permanent logic passed; verified-baseline recorder self-test passed; failure occurred before tests because Gradle projects spotify and betterlyrics do not exist in LAB15 settings
-SALVAGE_LAB15_MODULE_EVIDENCE=settings.gradle.kts includes only :app and :innertube
-SALVAGE_NOTE=Do not rerun the invalid spotify/betterlyrics task command. No app source/runtime regression is evidenced by this task-selection failure.
+VERIFIED_FINAL_STATE
+- LAB15 final head: 39769490e6d88535102e48e6e83eef0e6cfaea3d
+- LAB15 base: LAB14 1e1d6b066ca6466225677c0dfcb34c5a8b48da05
+- compare LAB14..LAB15: ahead 15, behind 0; changed paths only MotorLab/upstream/Guardian control-plane; no app/ files changed
+- Meld accepted baseline: v0.9.2
+- Meld baseline commit: dc7a27224acee33fa475ab70e1935dc03d3ef4ef
+- sole upstream: FrancescoGrazioso/Meld
+- direct MetroList upstream: disabled
+- classifier supports safe / already_present / compatible_adaptation / real_conflict / possible_regression
+- automatic integration is permitted only for fully safe deltas; adaptation/conflict/regression cases create review-required isolated LAB state
+- finalize_current_lab verifies resolved Meld commit ancestry before tests/build
+- regression tasks verified for LAB15 lineage: :app:testFossDebugUnitTest and :innertube:testDebugUnitTest
+- run 36644097790 executed the real app+innertube JVM tests and Gradle reported BUILD SUCCESSFUL in 4m34s
+- run 36641422644 completed isolated UAB APK+ZIP/applicationId verification and artifact upload successfully
+- LAB signing uses temporary standard debug keystore for side-by-side LAB testing; stable production/in-place signing is a separate concern and is not claimed solved
+- verified-baseline recorder self-test passed; after a future verified integration it advances tag/SHA and integration history only in the LAB lineage
+- temporary LAB15 verification workflow is deleted
+- permanent Guardian test gate is persisted as :app:testFossDebugUnitTest :innertube:testDebugUnitTest
+- no CANDIDATA created
+- no MADRE modified
+- MusicLab native playback/search/AI/runtime engine and approved UI were not changed by this LAB15 operation
+- MotorLab r8 control-plane present with r7 LAST_GOOD
 
-LIVE_EVIDENCE
-- LAB15 live branch is dca1ed0f8b995a55cfd9bd89b8cbb26489816395
-- prior run 36641422644 completed SUCCESS with APK+ZIP/applicationId verification and artifact upload
-- finalization run 36642529038 passed Guardian logic and recorder self-test, then failed because :spotify:test project was not found
-- settings.gradle.kts on LAB15 declares root Metrolist with modules :app and :innertube only
-- no application-source modification has been introduced by LAB15 upstream-system work
-- MotorLab r8 is present in LAB15 and r7 is preserved as LAST_GOOD
-- Meld latest verified release remains v0.9.2; no new upstream delta is pending
+MANUAL_LIGHTNING_RECOVERY_HISTORY
+- manual lightning salvage preserved the same operation and 93% monotonic recovery floor through signing and test-gate recovery
+- signing failures were isolated to missing debug keystore/secret; changed strategy reused proven LAB14 temporary debug keystore and succeeded
+- invalid spotify/betterlyrics test selection was not repeated after module evidence showed LAB15 contains only :app and :innertube
+- final GitHub Actions cleanup push was rejected only because the Actions token lacked workflows permission; build/tests were already green
+- cleanup and permanent workflow correction were then completed directly through the authorized GitHub connector without rerunning verified work
 
 CONTINUITY_RULES
 - New MusicLab chats must load this ledger automatically after MotorLab boot.
-- Live repository/workflow state newer than this ledger wins and must refresh this file when safe.
-- Preserve ACTIVE_OPERATION_ID across chat ids while the same LAB15 task remains active.
-- Preserve monotonic recovery floor; do not silently regress below 93% unless material invalidation evidence exists.
-- Do not restart from LAB14 or historical UAB registry state.
-- Do not repeat the invalid spotify/betterlyrics task strategy.
-- r8 Project Continuity is control-plane only and must not alter MusicLab application logic/UI/native engines.
-- Do not require Bruno to paste a transfer prompt.
+- Live repository/provider/artifact evidence newer than this ledger wins and must refresh it when safe.
+- This completed operation must not restart from LAB12/LAB13/LAB14 or from stale historical UAB registries.
+- Future Meld work starts from the last accepted baseline recorded by the Guardian lineage, not from v0.8.9.
+- CANDIDATA -> MADRE remains an explicit Bruno approval gate.
+- MotorLab remains control-plane only and must not replace or rewrite MusicLab native/domain engines merely because it is active.
+- Do not require Bruno to paste an activation or transfer prompt.
 
-UPDATED_BY=MotorLab r8 manual lightning SAVE-THEN-RESUME
+UPDATED_BY=MotorLab r8 verified completion
 UPDATED_DATE=2026-09-30
