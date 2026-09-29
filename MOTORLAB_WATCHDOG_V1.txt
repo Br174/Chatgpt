@@ -16,11 +16,11 @@ COORDINATION ROLE - MANDATORY
 Watchdog is the single coordinator for progress-health detection and anti-stall intervention.
 Related modules retain distinct responsibilities:
 - MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt owns prevention, risky-phase classification, chunking and durable handoff preparation;
-- MOTORLAB_RESUME_RECOVERY_V1.txt owns deterministic continuation from checkpoint/pending state after tool return or interruption;
+- MOTORLAB_RESUME_RECOVERY_V1.txt owns deterministic continuation from checkpoint/pending state after tool return or interruption, including the manual-lightning Rapid Salvage Checkpoint pre-step;
 - MOTORLAB_BACKGROUND_EXECUTION_V1.txt owns persistent executor/job semantics;
 - MOTORLAB_PROGRESS_REPORTING_V1.txt owns user-visible operational status and verified percentages;
 - MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt owns pre-change conflict/overlap/regression compatibility.
-These modules must not launch competing recoveries for the same event. Watchdog decides the health/intervention level; Resume Recovery performs checkpoint continuation when recovery is required.
+These modules must not launch competing recoveries for the same event. Watchdog decides the health/intervention level; Resume Recovery preserves the manual-lightning salvage checkpoint and performs checkpoint continuation when recovery is required.
 
 CORE PRINCIPLE
 A timer alone is not proof of a stall. MotorLab must distinguish:
@@ -154,21 +154,23 @@ If the same write/retry/recovery approach has been attempted twice without mater
 
 Repeated read-only status probes of a legitimately running long job are not counted as failed strategy attempts merely because status is unchanged; they are governed by adaptive thresholds and provider evidence.
 
-8. MANUAL LIGHTNING COMMAND - UNIVERSAL RECOVERY ENTRYPOINT
-If Bruno sends a message consisting only or primarily of `⚡`, interpret it as a high-priority MotorLab health/recovery command, not as decoration.
+8. MANUAL LIGHTNING COMMAND - SAVE-THEN-RESUME ENTRYPOINT
+If Bruno sends a message consisting only or primarily of `⚡`, interpret it as a high-priority MotorLab SAVE-THEN-RESUME health/recovery command, not as decoration.
 At the first available execution cycle:
-- inspect any active/pending MotorLab operation;
-- restore/read the latest verified checkpoint and pending-action state when available;
-- inspect real repository/provider/job state before writing;
-- preserve completed work and last verified percentage;
-- preserve single-writer safety;
+- inspect any active/pending MotorLab operation and previous checkpoint;
+- before any recovery/retry/new write, invoke Resume Recovery's RAPID SALVAGE CHECKPOINT to preserve the freshest recoverable material state currently available;
+- keep that salvage lightweight: current ledger/state first, only the smallest targeted status/read probe needed, never a heavy full-backup scan merely because `⚡` was sent;
+- preserve completed work, last verified percentage and single-writer ownership;
+- inspect real repository/provider/job state as needed after the salvage checkpoint;
 - determine whether the operation is progressing, waiting, stalled, interrupted or complete;
-- if stalled/interrupted, invoke the appropriate Watchdog level and Resume Recovery;
+- if stalled/interrupted, invoke the appropriate Watchdog level and Resume Recovery continuation;
 - continue from the smallest safe pending step instead of restarting from the original request.
 
 If no active/pending operation exists, perform a concise health check and say so; do not invent a checkpoint.
+The Rapid Salvage Checkpoint is state preservation, not a second health coordinator and not a retry; Watchdog remains the sole health/intervention coordinator.
 The manual `⚡` command is a fallback/control shortcut. Automatic Watchdog/Resume Recovery remain mandatory and must not depend on Bruno sending it.
 If the ChatGPT host does not accept/deliver the message because the client is fully suspended, the command cannot create an execution cycle by itself.
+The manual command cannot guarantee capture of hidden model reasoning that was interrupted before the new cycle; it preserves observable/recoverable material state available when the cycle begins and reconciles external state before continuing.
 
 9. NON-INTERRUPTION RULE
 The first Watchdog response is observation, not cancellation.
@@ -185,6 +187,7 @@ Watchdog may run read-only diagnostics in parallel, but must not start a second 
 Create/checkpoint after meaningful safe milestones when persistence is available.
 Record enough to continue deterministically, including operation/source ref, completed milestone, exact next step, changed resources, build/job ids, artifacts/checksums, last verified percentage and recovery state.
 Recovery continues from latest verified checkpoint, not from reinterpretation of the original request.
+Manual-lightning Rapid Salvage Checkpoints may additionally capture the freshest coherent recoverable state at recovery entry, even when it is not a normal milestone, provided they remain lightweight and clearly marked.
 
 12. RETRY CONTRACT
 Retries are targeted and bounded.
@@ -205,11 +208,13 @@ When Watchdog acts, Bruno must see:
 - checkpoint/recovery information when relevant;
 - current verified percentage when available.
 A preventive lightning check may occur before a hard stall when evidence suggests possible no-progress behavior.
+For manual `⚡`, the salvage and recovery may be reported in one concise message so state preservation does not create unnecessary chat delay/spam.
 
 15. PROGRESS INTEGRATION
 Watchdog events do not invent progress.
 Keep last verified percentage until evidence proves advancement.
 A recovery action itself is not progress unless it completes a real milestone.
+A Rapid Salvage Checkpoint preserves state but does not by itself increase the verified completion percentage.
 
 16. TOOL/PROVIDER ADAPTER REQUIREMENTS
 Adapters should expose where supported:
@@ -225,11 +230,13 @@ Legacy adapters use conservative defaults.
 Prefer observable state such as commit/ref identity, workflow status, job/step transitions and artifacts.
 If a workflow is active, do not launch a duplicate because chat appears idle.
 If a specific failed job/substep can be safely rerun, target it rather than restarting unrelated successful work.
+For manual lightning salvage, prefer current ref/commit/job/artifact identity over broad repository traversal.
 
 18. CHAT/MODEL LIMITATION
 MotorLab cannot guarantee that the ChatGPT client UI can self-inject a visible message while a model/tool call is completely frozen with no heartbeat/control surface.
 Therefore controllable external operations must persist enough state for the next available Watchdog cycle/resumed turn to continue from checkpoint.
 The manual `⚡` shortcut also requires the host to accept the message and provide an execution cycle.
+It cannot retroactively snapshot hidden model reasoning that was never exposed to a recoverable state surface before interruption.
 
 19. NO REGRESSION
 Watchdog is control-plane infrastructure. It must not alter application logic, UI, package identity, signing, MADRE/LAB/CANDIDATA semantics or project-specific behavior merely to add monitoring.
@@ -239,13 +246,15 @@ Watchdog is active when:
 - progress health is checked preventively during substantial work when evidence/control surfaces permit;
 - genuine stalls/loops are detected from material state rather than elapsed time alone;
 - the same ineffective recovery strategy cannot repeat a third time without new evidence;
-- `⚡` acts as a universal manual health/recovery shortcut at the first available execution cycle;
+- `⚡` acts as a universal manual SAVE-THEN-RESUME shortcut: first lightweight salvage of freshest recoverable material state, then health classification and targeted continuation;
+- manual salvage does not become a heavy full-backup workflow and does not create a competing coordinator;
 - automatic recovery does not depend on the shortcut;
 - interventions remain checkpoint-based and single-writer safe;
 - visible interventions contain lightning plus explanation;
 - completed work is preserved whenever technically possible.
 
 VERSION
-MOTORLAB-WATCHDOG-V1.1
+MOTORLAB-WATCHDOG-V1.2
 Established: 2026-09-28
 Revision 1.1: preventive health checks, two-strike no-progress strategy switching, explicit cross-module coordinator roles and manual `⚡` recovery entrypoint.
+Revision 1.2: manual `⚡` routes through Resume Recovery Rapid Salvage Checkpoint before health classification/recovery, preserving the freshest recoverable material state with a bounded lightweight save-first path.
