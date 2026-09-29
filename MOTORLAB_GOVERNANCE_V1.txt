@@ -1,0 +1,130 @@
+MOTORLAB GOVERNANCE V1 - PERMANENT CORE GOVERNANCE + PROJECT ENGINE COEXISTENCE
+
+STATUS
+Mandatory MotorLab CORE governance capability.
+Established: 2026-09-29.
+Repository authority: Br174/Chatgpt.
+
+PURPOSE
+This contract defines two permanent governance rules for MotorLab:
+1. MotorLab must always coexist with and support project-native engines; it must never replace them merely because MotorLab is active.
+2. MotorLab decisions explicitly approved by Bruno in the canonical MotorLab administration chat are permanent CORE decisions by default and must be persisted in the MotorLab control repository, unless Bruno explicitly marks them temporary, experimental, local-only or reversible for a test.
+
+1. PROJECT ENGINE COEXISTENCE - MANDATORY
+MotorLab is the shared orchestration, lifecycle, build/test, checkpoint, watchdog, routing, progress, release and continuity control-plane.
+
+A project may also contain one or more project-native/domain engines, for example playback/search/AI/runtime engines in MusicLab, geospatial/POI/AI/runtime engines in GeoVision, or equivalent engines in present and future projects.
+
+Those project-native engines remain part of their own project architecture.
+
+MotorLab MUST:
+- operate alongside project-native engines;
+- coordinate through adapters, hooks, workflows, status probes, checkpoints and compatible interfaces;
+- preserve already working project-native behavior;
+- treat project-native engines as authoritative for their own domain responsibilities unless Bruno explicitly approves a migration/change;
+- add cross-project control capabilities without unnecessarily rewriting project internals.
+
+MotorLab MUST NOT, merely because it is activated:
+- replace a project-native engine;
+- disable a project-native engine;
+- rename or absorb a project-native engine into MotorLab;
+- duplicate the same domain responsibility with a competing implementation;
+- rewrite a functioning project engine to make it conform to MotorLab terminology;
+- classify a project-native engine as obsolete/legacy solely because MotorLab exists;
+- remove project-specific automation, memory, AI logic, search logic, playback logic, geospatial logic or other domain machinery that already belongs to that project.
+
+Any replacement, consolidation or migration of a project-native engine requires a separate, explicit Bruno approval that identifies the affected project and scope.
+
+2. MEANING OF "ONE ENGINE" IN EXISTING CORE FILES
+Any existing MotorLab/UAB wording such as "one engine", "single engine" or "single lifecycle engine" means ONE SHARED MOTORLAB LIFECYCLE/CONTROL-PLANE ENGINE.
+
+It does NOT mean that applications are allowed to have only one software engine, and it does NOT authorize MotorLab to replace project-native/domain engines.
+
+If older wording is ambiguous, this governance contract provides the controlling interpretation.
+
+3. LAYER PRECEDENCE
+MotorLab CORE is authoritative for cross-project control concerns including:
+- MADRE -> LAB -> CANDIDATA -> NEW MADRE lifecycle;
+- promotion identity and release immutability;
+- build/test routing and cost policy;
+- Watchdog/anti-stall;
+- verified progress reporting;
+- visual status;
+- background execution and single-chat continuity;
+- checkpoint/recovery and single-writer safety;
+- control-plane state and registry behavior.
+
+Project-native engines are authoritative for their project-specific domain behavior unless Bruno explicitly approves otherwise.
+
+When a generic MotorLab mechanism and a project-native domain mechanism overlap, MotorLab must integrate non-destructively and preserve the functioning project behavior. It must not silently override the project engine.
+
+Core safety/lifecycle rules still apply to how project changes are developed, tested, promoted and delivered; coexistence does not allow a project adapter to bypass MotorLab lifecycle safety.
+
+4. PERMANENT MOTORLAB DECISION RULE - MANDATORY
+The canonical MotorLab administration chat is where Bruno designs, changes and administers MotorLab itself.
+
+When Bruno clearly decides or approves that a capability/rule/behavior is to be implemented in MotorLab, the default interpretation is:
+- the decision is permanent MotorLab CORE behavior;
+- it applies to future MotorLab use where technically relevant;
+- it must be persisted in Br174/Chatgpt, not left only in conversational memory;
+- future MotorLab activation must obtain the rule from the canonical repository state;
+- implementation should preserve backward compatibility and existing working project behavior.
+
+Bruno does NOT need to repeat words such as "permanent", "save this forever" or "put it in the CORE" each time he approves a MotorLab change in the canonical MotorLab chat.
+
+The permanent default does NOT apply when Bruno explicitly says the change is:
+- temporary;
+- a test/experiment only;
+- for this chat/session only;
+- for one named operation only;
+- a proposal to discuss rather than an approved implementation.
+
+5. PERSISTENCE REQUIREMENT
+Conversational memory is not the technical source of truth for permanent MotorLab rules.
+
+For an approved permanent MotorLab change, MotorLab must persist the authoritative result in Br174/Chatgpt using the appropriate canonical contract/module/registry/configuration file when repository write access is available and the change is technically ready.
+
+If repository write access is temporarily unavailable, MotorLab must explicitly report that the decision is approved but not yet technically persisted, rather than falsely claiming permanent implementation.
+
+Once persisted, future sessions must read the repository state before relying on remembered summaries.
+
+6. REVERSALS AND SUPERSEDING DECISIONS
+A later explicit Bruno decision may amend or reverse an earlier MotorLab rule.
+
+When that happens:
+- update the canonical repository state to the new rule;
+- preserve Git history rather than erasing history;
+- avoid leaving contradictory active rules;
+- make the newer explicit canonical rule authoritative.
+
+7. PROJECT REPOSITORY PROTECTION
+A MotorLab governance change does not, by itself, authorize changes to MusicLab, GeoVision, Cover Lab AI, StudyBook, Visionflix or any other project repository.
+
+Project repositories are modified only when the approved MotorLab feature actually requires project-side adapter/integration work and that project-side scope is authorized under the applicable workflow.
+
+MotorLab governance must prefer additive, compatible integration over invasive replacement.
+
+8. ACTIVATION / BOOTSTRAP REQUIREMENT
+Every full MotorLab activation must inspect the current Br174/Chatgpt canonical state and apply this governance contract together with the existing CORE contracts.
+
+A bootstrap/activation prompt that says to load the current MotorLab CORE, contracts, routing and registry is understood to include MOTORLAB_GOVERNANCE_V1.txt and any later canonical governance revision discovered in the repository.
+
+Do not reconstruct this rule from memory when the repository is available.
+
+9. NO FALSE GUARANTEE
+"Permanent" means the rule is part of the canonical MotorLab design/control repository and remains operative until explicitly superseded.
+It does not mean MotorLab can bypass platform limitations, unavailable tools, permissions, quotas or external service failures.
+When a permanent rule cannot be executed because of an external limitation, preserve the rule and report the operational blocker instead of silently abandoning or replacing it.
+
+10. SUCCESS CRITERIA
+This governance contract is active when:
+- MotorLab consistently operates alongside project-native engines rather than replacing them;
+- existing "one engine" wording is interpreted as one lifecycle/control-plane engine only;
+- approved MotorLab changes in the canonical MotorLab chat are permanent by default;
+- those changes are persisted in Br174/Chatgpt rather than trusted only to chat memory;
+- project repositories are not modified merely because a MotorLab governance rule changed;
+- later explicit Bruno decisions can supersede earlier rules through normal versioned repository updates.
+
+VERSION
+MOTORLAB-GOVERNANCE-V1.0
+Established: 2026-09-29
