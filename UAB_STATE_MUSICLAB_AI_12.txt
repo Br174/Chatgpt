@@ -1,0 +1,100 @@
+MOTORLAB STATE - MUSICLAB CANONICAL AI REPAIR LAB12
+
+STATUS
+Canonical control-plane checkpoint for the MusicLab LAB12 canonical identity repair.
+Recorded: 2026-09-29.
+Live GitHub refs/workflow metadata remain authoritative when newer.
+
+PROJECT
+- Project: MusicLab
+- Repository: Br174/MusicLab
+- MotorLab CORE: MOTORLAB-CORE-V1.5
+- MotorLab remains external orchestration/control only; it is NOT part of the MusicLab APK and does not replace MusicLab AI.
+
+LIFECYCLE
+- Approved MADRE: mother/musiclab-swipe-fluid-play-01
+- MADRE SHA: cf5ee85d0a6a2eeacddb2da9ca6a9b6c4e7cab33
+- MADRE untouched.
+- LAB11 base: uab-build/musiclab-global-ai-engine-11
+- LAB11 base SHA: 7d0256a5b6541b17a713d9f64c55c69754c67183
+- Current LAB12: uab-build/musiclab-canonical-ai-repair-12
+- Current cleanup head: 1ed611b47a1dcd6d2e205cbd7d22df6cf0b1e4d7
+- Functional source used for successful APK build: b9343c5f3923ecaf843418d97f339ebe74d3c799
+- CANDIDATA: none.
+- Promotion forbidden until Bruno completes real-device validation.
+
+LAB12 PURPOSE
+Repair the canonical identity chain observed on real device where a YouTube uploader/channel could incorrectly propagate as the musical artist into Cover, Originali, artist navigation, album navigation and Credits.
+
+PRODUCT RULES PRESERVED
+1. AI is the only editorial authority.
+2. YouTube/YouTube Music are technical playback/discovery/browse-location sources only.
+3. Playback remains independent and must never wait for AI/metadata.
+4. Metadata, credits and canonical destinations resolve in background.
+5. Cover and Originali use the same canonical AI seed.
+6. When canonical AI mode is enabled, unresolved artist/album navigation must not silently fall back to an uploader/channel page.
+7. Old low-trust cached identities are isolated by resolver-version handling.
+8. The title structure may be supplied to AI as evidence, but the app does not deterministically impose editorial metadata from YouTube fields.
+
+FINAL CLEAN DIFF VS LAB11
+Only these functional files remain changed/added after cleanup:
+- app/src/main/kotlin/com/metrolist/music/intelligence/MusicIntelligence.kt
+- app/src/main/kotlin/com/metrolist/music/ui/menu/PlayerMenu.kt
+- app/src/main/kotlin/com/metrolist/music/ui/menu/SongMenu.kt
+- cloudflare/music-intelligence/migrations/0002_canonical_ai_repair.sql
+- cloudflare/music-intelligence/src/index.js
+- cloudflare/music-intelligence/wrangler.jsonc
+All temporary LAB12 workflows and patch/debug scripts were removed after verification.
+
+CLOUDFLARE / D1
+- Worker: musiclab-music-intelligence
+- Endpoint: https://musiclab-music-intelligence.brunoverlezza.workers.dev
+- D1 database: musiclab-intelligence-db
+- Migration 0002_canonical_ai_repair.sql applied successfully remotely.
+- Worker resolver version: 12.
+- Worker engine version reached 1.2.0 during canonical repair deployment.
+- Gemini secret is configured server-side.
+- Do not expose secret values in chat or source.
+
+VERIFIED REAL BACKEND TESTS
+Workflow run 36520861688:
+- Canonical resolver smoke test for the screenshot/uploader failure case: SUCCESS.
+- Originali smoke test using canonical performer seed: SUCCESS.
+- Cover smoke test using the same canonical performer seed: SUCCESS.
+- Backend logic passed; Android build in that run stopped only on a Kotlin regex syntax issue later fixed.
+
+VERIFIED FINAL ANDROID BUILD
+Workflow run: 36521284064
+Job: 109254489659
+Result: SUCCESS.
+Successful stages included Kotlin fix, UAB diagnose, Android compile, signing, APK/ZIP packaging, LAB12 invariant checks and artifact upload.
+Artifact id: 11013585949
+Artifact name: MusicLab-LAB-CANONICAL-AI-REPAIR-12
+Artifact archive digest: sha256:04709db0966056e9c4712a14ad912ba436afced408fde2e383f6b59e1034384e
+APK SHA256: 95029da59087ea646e50325347742017b5f7f9514c30663e1def46667271fc20
+APK ZIP SHA256: a8c71dc339586dc62ef5bc1723dc2d23717b3d559f7f6b915b415e557da8e311
+
+MOTORLAB DURABLE JOB STATE
+- operation_id: musiclab-canonical-ai-repair-12-20260929
+- status: WAITING_USER_VALIDATION
+- phase: real_device_validation
+- last_verified_progress_percent: 100_for_build_and_backend / promotion_pending
+- checkpoint_id: musiclab-ai12-device-gate-20260929-01
+- source_ref: uab-build/musiclab-canonical-ai-repair-12
+- cleanup_source_sha: 1ed611b47a1dcd6d2e205cbd7d22df6cf0b1e4d7
+- built_functional_sha: b9343c5f3923ecaf843418d97f339ebe74d3c799
+- lock_scope: MusicLab:Br174/MusicLab:uab-build/musiclab-canonical-ai-repair-12
+- lock_state: RELEASED
+- next_safe_step: Bruno installs LAB12 APK and validates the listed real-device gates. If approved, create a clean CANDIDATA from the verified functional changes and follow MotorLab promotion workflow. Do not modify MADRE before approval.
+
+REAL-DEVICE GATES
+1. Playback starts immediately and is unaffected by canonical metadata work.
+2. Test the same upload seen in screenshots: title containing Gianluca Grignani with uploader/channel Alessandra De Angelis.
+3. Cover and Originali must start from the canonical AI identity, not the uploader/channel.
+4. Credits must show canonical AI metadata/credits when available.
+5. Vai all'artista must not open the uploader page when AI canonical mode is enabled.
+6. Vai all'album must not open an uploader playlist as album.
+7. Test at least one normal official YouTube Music song to ensure no regression.
+8. Test AI master OFF to confirm classic MusicLab behavior remains available.
+
+END CHECKPOINT
