@@ -19,6 +19,7 @@ If the current chat/workspace/repository/project context can be identified as a 
 - do NOT require the current message to express software-build intent;
 - do NOT wait for keywords such as app, APK, web app, build or develop;
 - load current MotorLab CORE from Br174/Chatgpt before write-capable or lifecycle-changing work;
+- load MOTORLAB_SESSION_BOOT_BANNER_V1.txt and visibly identify MotorLab at the first available user-facing response;
 - preserve and coexist with the project-native engine.
 
 A chat inside a registered project is therefore already inside MotorLab scope by context alone.
@@ -30,6 +31,7 @@ C. BUILD INTENT DETECTED
 When a clear software-build intent is present:
 - treat MotorLab as implicitly requested;
 - load the current canonical MotorLab CORE from Br174/Chatgpt when repository access is available;
+- load MOTORLAB_SESSION_BOOT_BANNER_V1.txt and visibly identify MotorLab at the first available user-facing response after activation is established;
 - initialize the new-project workflow;
 - help define architecture, repository, lifecycle, build/test path, checkpoints and delivery;
 - when the project becomes concrete and repository-side integration is applicable, onboard it into MotorLab routing and install the project hook under the normal governance rules.
@@ -79,7 +81,7 @@ Examples:
 Intent activation is a discovery/onboarding path for projects that do not yet exist in the MotorLab registry.
 
 Recommended transition:
-BUILD INTENT DETECTED -> MOTORLAB ACTIVE -> PROJECT DEFINITION -> REPOSITORY/WORKSPACE -> ROUTING REGISTRATION -> PROJECT HOOK -> NORMAL REGISTERED-PROJECT AUTO-BOOTSTRAP.
+BUILD INTENT DETECTED -> MOTORLAB ACTIVE -> VISIBLE MOTORLAB BOOT BANNER -> PROJECT DEFINITION -> REPOSITORY/WORKSPACE -> ROUTING REGISTRATION -> PROJECT HOOK -> NORMAL REGISTERED-PROJECT AUTO-BOOTSTRAP.
 
 After onboarding, activation no longer depends on recurring intent detection because registered project context becomes authoritative.
 
@@ -100,15 +102,20 @@ Therefore:
 - unregistered future chats rely on the host exposing a persistent global intent-trigger capability if fully automatic intent activation is desired across all chats;
 - recurring manual activation strings are not the intended architecture.
 
-8. SUCCESS CRITERIA
+8. VISIBLE ACTIVATION PROOF
+Whenever either activation path succeeds, MotorLab must surface the startup message required by MOTORLAB_SESSION_BOOT_BANNER_V1.txt. Hidden activation is not sufficient as user-facing proof. If the banner has not appeared, Bruno must not be expected to assume MotorLab is active.
+
+9. SUCCESS CRITERIA
 This capability is correctly implemented when:
 - registered project chats activate MotorLab without requiring build intent in the message;
 - unregistered chats with clear software-construction intent can activate MotorLab and start onboarding;
+- every successful activation path emits the visible MotorLab boot banner;
 - ordinary discussion about apps does not trigger MotorLab;
 - onboarding converts a new project from intent-based discovery to structural project-based activation;
 - current MotorLab CORE remains canonical in Br174/Chatgpt;
 - project-native engines remain preserved.
 
 VERSION
-MOTORLAB-INTENT-AUTO-ACTIVATION-V1.0
+MOTORLAB-INTENT-AUTO-ACTIVATION-V1.1
 Established: 2026-09-29
+Revision 1.1: mandatory visible MotorLab session boot banner for both registered-context and intent-based activation paths.
