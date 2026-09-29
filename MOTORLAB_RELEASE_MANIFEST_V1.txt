@@ -5,7 +5,7 @@ Canonical MotorLab release/version manifest.
 Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.29-r5
+CURRENT_RELEASE=2026.09.29-r6
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -63,7 +63,7 @@ MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt is mandatory. Before long/risky phases Mo
 CHANGE COMPATIBILITY RULE
 MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is mandatory before every write-capable MotorLab self-change and every write-capable change to a MotorLab-managed project. Overlaps/conflicts must be integrated, ordered or explicitly superseded before writing; unresolved unsafe conflicts block the write.
 
-ANTI-LOOP / WAKE RULE - RELEASE R5
+ANTI-LOOP / WAKE RULE - RELEASE R5+
 For release 2026.09.29-r5 and later:
 - Watchdog is the single coordinator for progress-health detection and anti-stall intervention;
 - preventive progress-health checks occur during substantial work when control/status evidence exists, without interrupting healthy work;
@@ -71,16 +71,29 @@ For release 2026.09.29-r5 and later:
 - Resume Recovery owns checkpoint continuation after Watchdog classification;
 - Foreground Stall Guard owns prevention/chunking/durable handoff and routes emerging loops to Watchdog;
 - Progress Reporting provides denser live-like operational status from observable actions/results, not hidden chain-of-thought;
-- user message `⚡` is a universal manual health/recovery shortcut at the first available execution cycle, restoring/checking the current operation/checkpoint instead of restarting from zero;
+- user message `⚡` is a universal manual health/recovery shortcut at the first available execution cycle;
 - automatic recovery remains mandatory and does not depend on Bruno sending `⚡`;
 - `⚡` cannot independently create a new execution cycle if the ChatGPT host is fully suspended and does not accept/deliver the message.
 
+MANUAL LIGHTNING SAVE-THEN-RESUME RULE - RELEASE R6+
+For release 2026.09.29-r6 and later, manual `⚡` uses a strict SAVE-THEN-RESUME order:
+1. at the first available execution cycle, identify the active/pending operation and previous checkpoint;
+2. before recovery/retry/new write, create or refresh a lightweight MANUAL_LIGHTNING_SALVAGE checkpoint with the freshest recoverable material state currently available;
+3. keep salvage bounded and fast: no full repository backup, exhaustive traversal, full log archive or rebuild merely to save state;
+4. preserve completed work, verified percentage, provider/job/ref/artifact identity and single-writer ownership when available;
+5. then Watchdog classifies health and Resume Recovery continues only the smallest safe pending step;
+6. if healthy external work is still running, do not duplicate or cancel it;
+7. this cannot retroactively capture hidden model reasoning that was interrupted before the new execution cycle; it preserves observable/recoverable material state and reconciles real external state before continuing.
+
+The Rapid Salvage Checkpoint is part of Resume Recovery and does not create a second recovery coordinator. Watchdog remains the sole health/intervention coordinator.
+
 FUTURE PROJECT RULE
-Every future MotorLab software project receives the current satellite files during onboarding when repository integration is available and inherits all current guards and anti-loop/wake behavior automatically.
+Every future MotorLab software project receives the current satellite files during onboarding when repository integration is available and inherits all current guards and anti-loop/wake/save-then-resume behavior automatically.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.5
+MOTORLAB-RELEASE-MANIFEST-V1.6
 Revision 1.2: release r2; concise startup banner.
 Revision 1.3: release r3; Foreground Stall Guard.
 Revision 1.4: release r4; Change Compatibility Guard.
 Revision 1.5: release r5; preventive Watchdog checks, two-strike anti-loop rule, manual `⚡` recovery shortcut and denser operational progress visibility integrated into existing modules.
+Revision 1.6: release r6; manual `⚡` becomes bounded rapid SAVE-THEN-RESUME with a fresh recoverable-state salvage checkpoint before Watchdog classification and continuation.
