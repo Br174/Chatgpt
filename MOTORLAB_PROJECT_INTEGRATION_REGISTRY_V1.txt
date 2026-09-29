@@ -1,161 +1,131 @@
 MOTORLAB PROJECT INTEGRATION REGISTRY V1
 
 STATUS
-Canonical MotorLab registry of persistent project-side hooks and synchronized local satellites.
+Canonical registry of persistent project-side hooks and synchronized local MotorLab satellites.
 Established: 2026-09-29.
 Central authority: Br174/Chatgpt.
 
-PURPOSE
-Track which project repositories are structurally connected to MotorLab and which contain the local-first synchronized satellite defined by MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt.
-
 GLOBAL PRINCIPLES
-- MotorLab activation is implicit and persistent for recognized registered projects.
-- MOTORLAB_PROJECT_HOOK.txt is the project identity/adapter entrypoint.
-- .motorlab/MOTORLAB_LOCAL_CORE.txt provides immediate verified local activation/fallback.
-- .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt provides rollback safety.
-- .motorlab/MOTORLAB_SYNC_STATE.txt records local release and verification state.
-- Br174/Chatgpt remains the only central authority; local satellites are synchronized mirrors, not forks.
-- Project-native/domain engines are preserved and coexist with MotorLab.
-- Change Compatibility Guard, visible session boot proof, verified progress reporting, Watchdog, Resume Recovery, Foreground Stall Guard, checkpoint recovery, single-writer protection and fireworks-success reporting remain mandatory when applicable.
-- Before every write-capable MotorLab self-change or project change, Change Compatibility Guard must inspect current relevant state for conflicts, overlaps, duplicated responsibility, precedence ambiguity, protected behavior, blast radius, backward compatibility and regression risk.
-- Overlaps must be integrated/merged or given explicit precedence/supersession before the write; unresolved unsafe conflicts block the write.
-- MotorLab release changes occur only at safe boundaries, never in the middle of an active write/build/test/promotion operation.
+- MotorLab activation is implicit/persistent for recognized projects.
+- Br174/Chatgpt is the only central authority; local satellites are synchronized mirrors, not forks.
+- Project-native/domain engines remain preserved and authoritative for domain behavior.
+- Change Compatibility Guard is mandatory before every write-capable MotorLab/project change.
+- Watchdog is the single coordinator for progress-health detection and anti-stall intervention.
+- Resume Recovery owns checkpoint continuation after Watchdog classification.
+- Foreground Stall Guard owns prevention/chunking/durable handoff.
+- Background Execution owns persistent executor/job semantics.
+- Progress Reporting owns user-visible operational status.
+- Preventive Watchdog health checks are required for substantial work when progress is unclear/repetitive and control/status evidence exists.
+- After two materially identical no-progress write/retry/recovery attempts without new evidence, a third identical attempt is prohibited; change strategy/diagnose/safe-stop unless healthy external waiting is confirmed.
+- User message `⚡` is the universal manual MotorLab health/recovery shortcut at the first available execution cycle; it never restarts completed work from zero.
+- Automatic recovery remains mandatory and does not depend on the shortcut.
+- MotorLab cannot force a new assistant turn while the host exposes no execution cycle.
 
 CURRENT SATELLITE RELEASE
-Release: 2026.09.29-r4
+Release: 2026.09.29-r5
 Schema: 1
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
-Canonical sync contract: MOTORLAB_SATELLITE_SYNC_V1.txt
+Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
 Normal startup banner: ⚙️ MotorLab attivo
 Change Compatibility Guard: required
+Preventive Watchdog: required
+Manual lightning recovery: required
+Two-strike no-progress: required
 Foreground Stall Guard: required
 
 REGISTERED PROJECTS
-1. MusicLab
-   Repository: Br174/MusicLab
-   Hook: MOTORLAB_PROJECT_HOOK.txt
+1. MusicLab — Br174/MusicLab
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r4
-   Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r3
-   Change Compatibility Guard: required before every write-capable project change
-   Foreground Stall Guard: required
-   Native engine policy: coexist/preserve
-   Visible activation proof: required
-   Resume recovery: required
+   Local release target: 2026.09.29-r5
+   LAST_GOOD target after sync: 2026.09.29-r4
+   Change Compatibility Guard: required
+   Preventive Watchdog: required
+   Manual `⚡` recovery: required
+   Two-strike no-progress: required
+   Native engine: coexist/preserve
 
-2. GeoVision
-   Repository: Br174/GeoVision-Test
-   Hook: MOTORLAB_PROJECT_HOOK.txt
+2. GeoVision — Br174/GeoVision-Test
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r4
-   Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r3
-   Change Compatibility Guard: required before every write-capable project change
-   Foreground Stall Guard: required
-   Native engine policy: coexist/preserve
-   Visible activation proof: required
-   Resume recovery: required
+   Local release target: 2026.09.29-r5
+   LAST_GOOD target after sync: 2026.09.29-r4
+   Change Compatibility Guard: required
+   Preventive Watchdog: required
+   Manual `⚡` recovery: required
+   Two-strike no-progress: required
+   Native engine: coexist/preserve
 
-3. StudyBook-AI
-   Repository: Br174/StudyBook-AI
-   Hook: MOTORLAB_PROJECT_HOOK.txt
+3. StudyBook-AI — Br174/StudyBook-AI
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r4
-   Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r3
-   Change Compatibility Guard: required before every write-capable project change
-   Foreground Stall Guard: required
-   Native engine policy: coexist/preserve
-   Visible activation proof: required
-   Resume recovery: required
+   Local release target: 2026.09.29-r5
+   LAST_GOOD target after sync: 2026.09.29-r4
+   Change Compatibility Guard: required
+   Preventive Watchdog: required
+   Manual `⚡` recovery: required
+   Two-strike no-progress: required
+   Native engine: coexist/preserve
 
-4. Visionflix / Verlezza Vision source
-   Repository: Br174/Visionflix
-   Hook: MOTORLAB_PROJECT_HOOK.txt
+4. Visionflix / Verlezza Vision source — Br174/Visionflix
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r4
-   Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r3
-   Change Compatibility Guard: required before every write-capable project change
-   Foreground Stall Guard: required
-   Native engine policy: coexist/preserve
-   Visible activation proof: required
-   Resume recovery: required
+   Local release target: 2026.09.29-r5
+   LAST_GOOD target after sync: 2026.09.29-r4
+   Change Compatibility Guard: required
+   Preventive Watchdog: required
+   Manual `⚡` recovery: required
+   Two-strike no-progress: required
+   Native engine: coexist/preserve
 
-5. Cover Lab AI
-   Repository: Br174/Cover-Lab-AI
-   Hook: MOTORLAB_PROJECT_HOOK.txt
+5. Cover Lab AI — Br174/Cover-Lab-AI
    Activation: implicit-persistent-local-first
    Satellite: installed
-   Local release: 2026.09.29-r4
-   Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r3
-   Change Compatibility Guard: required before every write-capable project change
-   Foreground Stall Guard: required
-   Native engine policy: coexist/preserve
-   Visible activation proof: required
-   Resume recovery: required
+   Local release target: 2026.09.29-r5
+   LAST_GOOD target after sync: 2026.09.29-r4
+   Change Compatibility Guard: required
+   Preventive Watchdog: required
+   Manual `⚡` recovery: required
+   Two-strike no-progress: required
+   Native engine: coexist/preserve
 
-6. streamflix-BV delivery adapter
-   Repository: Br174/streamflix-BV
-   Hook: MOTORLAB_PROJECT_HOOK.txt
+6. streamflix-BV delivery adapter — Br174/streamflix-BV
    Activation: implicit-persistent-local-first when used as Visionflix/Verlezza Vision delivery path
    Satellite: installed
-   Local release: 2026.09.29-r4
-   Local state: VERIFIED
-   LAST_GOOD: 2026.09.29-r3
-   Change Compatibility Guard: required before every write-capable delivery/project change
-   Foreground Stall Guard: required
-   Native engine policy: delivery-adapter-coexist-preserve
-   Lifecycle authority: NO; Visionflix source lifecycle remains authoritative
-   Visible activation proof: required
-   Resume recovery: required
+   Local release target: 2026.09.29-r5
+   LAST_GOOD target after sync: 2026.09.29-r4
+   Change Compatibility Guard: required
+   Preventive Watchdog: required
+   Manual `⚡` recovery: required
+   Two-strike no-progress: required
+   Native engine: delivery-adapter-coexist-preserve
+   Lifecycle authority: NO; Visionflix source remains lifecycle authority
 
 BOOTSTRAP REQUIREMENT
-Recognized project sessions should use MOTORLAB_CORE_ENTRYPOINT_V1.txt. The verified local satellite is available first; central release comparison/synchronization occurs at the first safe boundary. Current central CORE remains authoritative whenever reachable.
-Before the first write-capable change, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt must analyze compatibility/conflict/overlap/regression risk and resolve any non-clear relationship.
-Before substantial execution, MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt must classify foreground risk and prepare checkpoint/durable execution state as applicable.
+Recognized project sessions use current CORE entrypoint. Before write-capable changes apply Change Compatibility Guard. Before risky/long work apply Foreground Stall Guard. During substantial work Watchdog may perform preventive progress-health checks. Interrupted work resumes through Resume Recovery.
 
-VISIBLE BANNER REQUIREMENT
-Under normal successful activation, the startup proof is exactly:
-⚙️ MotorLab attivo
-Do not append satellite, CORE, synchronization or native-engine wording unless reporting a real warning, recovery event or blocker.
+MANUAL LIGHTNING REQUIREMENT
+If Bruno sends only/primarily `⚡` and a new execution cycle is available:
+- inspect active/pending operation and latest checkpoint;
+- verify current external/repository state;
+- preserve completed work, percentage and writer lock;
+- Watchdog classifies health;
+- Resume Recovery continues the exact smallest safe pending step if needed;
+- do not restart from zero or duplicate healthy external work.
+If no pending operation exists, report that rather than inventing one.
 
-CHANGE COMPATIBILITY REQUIREMENT
-This requirement applies both to MotorLab itself and to every present/future MotorLab-managed project. It is not optional project advice. A low-risk/atomic change may use a concise preflight, but the preflight may not be skipped.
-If a new feature overlaps an existing mechanism, prefer extending or merging the existing responsible mechanism. If both must remain, define explicit precedence. If the old path must stop, supersede it explicitly rather than leaving duplicate active behavior.
-
-FOREGROUND STALL REQUIREMENT
-A ChatGPT client "still processing" message, spinner or elapsed time is not a MotorLab heartbeat. Long/backgroundable phases should be checkpointed and handed to a real persistent executor when one is safely available. If work must remain in ordinary chat, use bounded recoverable segments. If host execution disappears, Resume Recovery resumes at the first later available cycle and a lightning event is shown when MotorLab actually performs recovery.
+PROGRESS VISIBILITY
+Substantial work should provide concise live-like operational status when possible, normally after roughly 1-2 meaningful operations or material phase/status transitions. Report observable actions/results, not hidden chain-of-thought. Verified percentages never advance from elapsed time alone.
 
 HOST LIMITATION
-A repository cannot force a context-free or completely frozen host/model to open a new execution cycle. Foreground Stall Guard is preventive and Resume Recovery acts at the first later available cycle; neither claims to awaken a suspended host independently.
+If ChatGPT/the host is fully suspended and provides no execution cycle, MotorLab cannot inject a lightning message or make a user `⚡` message execute until the host accepts/delivers it. Checkpointing, persistent executors and first-available-cycle recovery reduce the impact but do not bypass this platform boundary.
 
 NEW PROJECTS
-When a future software project becomes concrete and repository integration is available:
-- register it in canonical routing/integration state;
-- install MOTORLAB_PROJECT_HOOK.txt;
-- install .motorlab/MOTORLAB_LOCAL_CORE.txt from the current canonical bundle;
-- install an identical initial .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt;
-- install .motorlab/MOTORLAB_SYNC_STATE.txt as VERIFIED for the current release;
-- bind MOTORLAB_CORE_ENTRYPOINT_V1.txt, release manifest and sync protocol;
-- inherit MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt before all write-capable changes;
-- inherit MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt;
-- preserve all project-native engines;
-- require visible activation proof and all current MotorLab CORE protections.
+Every future MotorLab software project receives the current satellite/hook during onboarding when technically available and inherits Change Compatibility Guard, preventive Watchdog, manual `⚡`, two-strike anti-loop, Resume Recovery, Foreground Stall Guard and all other current CORE protections.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.6
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.7
 Established: 2026-09-29
-Revision 1.1: visible activation proof.
-Revision 1.2: Resume Recovery mandatory.
-Revision 1.3: local-first synchronized satellite architecture installed across all registered projects and mandated for future onboarding.
-Revision 1.4: satellite release 2026.09.29-r2 and concise normal startup banner "⚙️ MotorLab attivo".
-Revision 1.5: satellite release 2026.09.29-r3; Foreground Stall Guard required across all current and future MotorLab projects.
-Revision 1.6: satellite release 2026.09.29-r4; Change Compatibility Guard required before MotorLab self-changes and all current/future project changes.
+Revision 1.6: r4 Change Compatibility Guard across current/future projects.
+Revision 1.7: r5 preventive Watchdog, two-strike anti-loop, manual `⚡` recovery and denser operational visibility integrated across current/future projects.
