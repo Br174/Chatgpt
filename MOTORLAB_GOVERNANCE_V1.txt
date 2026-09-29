@@ -11,9 +11,10 @@ This contract defines permanent governance rules for MotorLab:
 2. MotorLab decisions explicitly approved by Bruno in the canonical MotorLab administration chat are permanent CORE decisions by default and must be persisted in the MotorLab control repository, unless Bruno explicitly marks them temporary, experimental, local-only or reversible for a test.
 3. MotorLab activation for registered projects must be structural and implicit: recurring per-chat activation strings are fallback compatibility aids, not the normal architecture.
 4. Registered project context has mandatory precedence over software-build intent detection; intent discovery is used only when no registered project context is already identifiable.
+5. Protection of external APIs/providers/services is a shared MotorLab control-plane responsibility governed by MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt whenever relevant.
 
 1. PROJECT ENGINE COEXISTENCE - MANDATORY
-MotorLab is the shared orchestration, lifecycle, build/test, checkpoint, watchdog, routing, progress, release and continuity control-plane.
+MotorLab is the shared orchestration, lifecycle, build/test, checkpoint, watchdog, routing, progress, release, continuity and external-service-protection control-plane.
 
 A project may also contain one or more project-native/domain engines, for example playback/search/AI/runtime engines in MusicLab, geospatial/POI/AI/runtime engines in GeoVision, or equivalent engines in present and future projects.
 
@@ -24,7 +25,8 @@ MotorLab MUST:
 - coordinate through adapters, hooks, workflows, status probes, checkpoints and compatible interfaces;
 - preserve already working project-native behavior;
 - treat project-native engines as authoritative for their own domain responsibilities unless Bruno explicitly approves a migration/change;
-- add cross-project control capabilities without unnecessarily rewriting project internals.
+- add cross-project control capabilities without unnecessarily rewriting project internals;
+- protect external-service integrations through reusable cache/rate-limit/queue/backoff/circuit/failover rules instead of encouraging incompatible ad-hoc retry logic in each project.
 
 MotorLab MUST NOT, merely because it is activated:
 - replace a project-native engine;
@@ -57,11 +59,14 @@ MotorLab CORE is authoritative for cross-project control concerns including:
 - control-plane state and registry behavior;
 - structural auto-bootstrap for registered projects;
 - semantic software-build intent activation for new/unregistered chats when supported by the host;
-- activation precedence: registered project context first, intent discovery second.
+- activation precedence: registered project context first, intent discovery second;
+- external-service/API protection through provider-aware caching, deduplication, batching, request budgets, queue/concurrency control, Retry-After, exponential backoff+jitter, circuit breaker, temporary suspension, health checks, authorized failover and diagnostics.
 
 Project-native engines are authoritative for their project-specific domain behavior unless Bruno explicitly approves otherwise.
 
 When a generic MotorLab mechanism and a project-native domain mechanism overlap, MotorLab must integrate non-destructively and preserve the functioning project behavior. It must not silently override the project engine.
+
+For external services, MotorLab governs protection/scheduling/recovery policy while the project-native engine remains authoritative for domain semantics, search meaning, playback logic, geospatial logic, AI prompt/domain behavior or equivalent application-specific responsibilities.
 
 Core safety/lifecycle rules still apply to how project changes are developed, tested, promoted and delivered; coexistence does not allow a project adapter to bypass MotorLab lifecycle safety.
 
@@ -122,6 +127,7 @@ Before the first write-capable or lifecycle-changing action in a registered proj
 - identify the project context;
 - inspect the current Br174/Chatgpt canonical state;
 - load current CORE contracts and modules, including MOTORLAB_GOVERNANCE_V1.txt and MOTORLAB_AUTO_BOOTSTRAP_V1.txt;
+- load MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt whenever external API/provider/service behavior is relevant;
 - inspect current routing/registry and relevant durable job/checkpoint/lock state;
 - activate MotorLab alongside, never in place of, the project's native engines;
 - then continue the requested project work.
@@ -130,6 +136,7 @@ For an unregistered chat with clear software-construction intent, and only when 
 - load current canonical MotorLab state;
 - apply MOTORLAB_INTENT_AUTO_ACTIVATION_V1.txt;
 - initialize project definition/onboarding;
+- apply MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt before designing external-provider integrations;
 - transition the project to normal structural activation once it is formally registered.
 
 A manual "ATTIVA MOTORLAB" string may exist only as a fallback for a host surface that has lost project context or cannot expose persistent project/global activation configuration. It is not the normal workflow and must not be required for each new project chat.
@@ -142,7 +149,28 @@ Detailed mandatory semantics are defined by MOTORLAB_AUTO_BOOTSTRAP_V1.txt and M
 
 Do not reconstruct MotorLab from conversational memory when the repository is available.
 
-9. NO FALSE GUARANTEE
+9. EXTERNAL SERVICE GUARD - MANDATORY WHEN RELEVANT
+When a current or future MotorLab project materially uses external APIs/providers/services, MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt is the canonical reusable protection contract.
+
+MotorLab must prefer prevention over recovery by reducing unnecessary provider calls before limits are reached. Where technically and legally applicable this includes:
+- provider-aware cache/service shield and controlled cache warming;
+- request deduplication/coalescing;
+- efficient official batching/pagination;
+- documented/conservative rate limiting and shared request budgets;
+- bounded queues and concurrency;
+- Retry-After compliance;
+- exponential backoff with jitter;
+- circuit breaker and temporary provider/credential suspension;
+- low-cost health checks and gradual recovery;
+- sequential, authorized failover rather than continuous credential rotation;
+- graceful degradation using acceptable cached data/fallback sources;
+- diagnostics without exposing secrets.
+
+Multiple credentials must not be used to evade a provider's intended quota/rate-limit policy. Failover across credentials/providers must remain authorized, quota-scope aware and compatible with provider terms.
+
+This governance rule does not automatically modify existing project repositories. Existing provider-specific implementations are aligned incrementally when that project is being changed, preserving working domain behavior.
+
+10. NO FALSE GUARANTEE
 "Permanent" means the rule is part of the canonical MotorLab design/control repository and remains operative until explicitly superseded.
 It does not mean MotorLab can bypass platform limitations, unavailable tools, permissions, quotas or external service failures.
 When a permanent rule cannot be executed because of an external limitation, preserve the rule and report the operational blocker instead of silently abandoning or replacing it.
@@ -150,9 +178,11 @@ When a permanent rule cannot be executed because of an external limitation, pres
 Automatic structural bootstrap cannot physically occur on a completely context-free host surface that provides neither project identity nor persistent project instructions/integration nor repository access.
 Automatic intent bootstrap across unrelated chats likewise cannot physically occur unless the host exposes a persistent global intent trigger or another supported mechanism that causes MotorLab activation policy to be consulted.
 
-In such exceptional cases MotorLab must report the missing structural/intent hook instead of pretending that a per-chat prompt is the architecture.
+External Service Guard also cannot manufacture quota or bypass a provider-enforced restriction. Its role is to conserve authorized capacity, avoid avoidable blocks, degrade gracefully and recover safely.
 
-10. SUCCESS CRITERIA
+In such exceptional cases MotorLab must report the missing structural/intent/service capability instead of pretending that a per-chat prompt or uncontrolled retry is the architecture.
+
+11. SUCCESS CRITERIA
 This governance contract is active when:
 - MotorLab consistently operates alongside project-native engines rather than replacing them;
 - existing "one engine" wording is interpreted as one lifecycle/control-plane engine only;
@@ -161,12 +191,14 @@ This governance contract is active when:
 - registered project contexts bootstrap MotorLab implicitly without recurring user activation strings and without requiring build intent in the current message when the host exposes the required structural context;
 - unregistered future chats with genuine software-build intent can enter MotorLab onboarding when the host exposes the required intent-trigger mechanism;
 - project context always takes precedence over intent gating;
+- external-service integrations inherit the reusable Service Guard when relevant instead of relying on uncontrolled retries or repeated duplicate provider calls;
 - manual activation prompts are fallback only;
 - project repositories are not modified merely because a MotorLab governance rule changed;
 - later explicit Bruno decisions can supersede earlier rules through normal versioned repository updates.
 
 VERSION
-MOTORLAB-GOVERNANCE-V1.2
+MOTORLAB-GOVERNANCE-V1.3
 Established: 2026-09-29
 Revision 1.1: structural implicit auto-bootstrap for registered projects; recurring per-chat activation prompts demoted to fallback-only compatibility behavior.
 Revision 1.2: project-first activation precedence plus semantic software-build intent onboarding for unregistered chats.
+Revision 1.3: External Service Guard becomes a permanent cross-project MotorLab control-plane capability for provider/API protection and future service integrations.
