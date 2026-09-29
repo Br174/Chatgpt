@@ -1,0 +1,91 @@
+MOTORLAB AUTO BOOTSTRAP V1 - STRUCTURAL PROJECT ACTIVATION
+
+STATUS
+Mandatory MotorLab CORE capability.
+Established: 2026-09-29.
+Repository authority: Br174/Chatgpt.
+
+PURPOSE
+MotorLab activation must be structural, not dependent on Bruno remembering or pasting an activation prompt in every new chat.
+
+CORE PRINCIPLE
+When the current work context can be identified as a project registered in UAB_PROJECT_ROUTING.txt or a later canonical MotorLab routing registry, MotorLab activation is IMPLICIT.
+
+Bruno must not be required to write "ATTIVA MOTORLAB" or paste any bootstrap string for every new chat.
+
+1. IMPLICIT ACTIVATION - MANDATORY
+Before the first write-capable or lifecycle-changing operation in a registered project context, MotorLab must:
+- identify the current project/repository when technically available;
+- read the current canonical MotorLab state from Br174/Chatgpt;
+- load the current CORE contracts, governance, routing and registry required for that project;
+- reconcile current lifecycle/job/checkpoint/lock state where applicable;
+- apply MotorLab rules alongside the project's own native engines;
+- only then perform the requested project change.
+
+This bootstrap is automatic and does not require a user activation phrase.
+
+2. PROJECT-NATIVE ENGINE COEXISTENCE
+Auto-bootstrap activates MotorLab as orchestration/control-plane only.
+It MUST NOT replace, disable, absorb, rename or rewrite a project-native/domain engine merely because MotorLab has loaded.
+MOTORLAB_GOVERNANCE_V1.txt remains authoritative for coexistence.
+
+3. CHAT CONTINUITY
+A new chat inside a registered project should treat MotorLab bootstrap as part of project initialization, not as a separate user task.
+The current project chat remains the canonical user-facing chat.
+
+4. BOOTSTRAP ORDER
+Minimum safe order:
+A. identify project context;
+B. inspect Br174/Chatgpt canonical state;
+C. load current MotorLab CORE/governance modules;
+D. inspect UAB_PROJECT_ROUTING.txt and UAB_STATE_REGISTRY.txt or their canonical successors;
+E. reconcile active durable job/checkpoint/lock state when relevant;
+F. proceed with the user's requested work.
+
+5. NO MEMORY-ONLY BOOTSTRAP
+Saved conversational memory, prior summaries or a copied activation prompt may help identify context, but they are not authoritative MotorLab state.
+When repository access is available, Br174/Chatgpt must be consulted before relying on remembered MotorLab rules for write-capable work.
+
+6. NO PER-CHAT ESCAMOTAGE
+Manual activation strings are compatibility/fallback aids only.
+They are not part of the normal MotorLab architecture and must not be presented as a recurring requirement.
+
+7. PLATFORM BOUNDARY
+MotorLab can enforce auto-bootstrap only on execution surfaces that expose enough project identity/context and repository access to perform the bootstrap.
+If the host platform opens a completely context-free chat with no project identity, no MotorLab project instructions and no repository access, MotorLab cannot physically self-start from information the host did not provide.
+In that case:
+- do not pretend automatic activation occurred;
+- prefer a one-time persistent project-level integration/instruction over repeated per-chat prompts;
+- once project identity and repository access are available, return to implicit activation.
+
+8. ONE-TIME PROJECT INTEGRATION, WHEN REQUIRED BY HOST
+If a host product requires persistent project instructions/configuration to expose MotorLab to every new chat, that configuration is considered infrastructure, not a recurring activation step.
+It should be installed once per project/workspace and should point to Br174/Chatgpt as the canonical source rather than embedding a frozen copy of the CORE.
+
+9. REGISTERED PROJECTS
+Projects listed in current canonical routing are MotorLab-managed unless Bruno explicitly removes/suspends them.
+Current examples include MusicLab, GeoVision, StudyBook-AI, Visionflix/Verlezza Vision delivery path, Cover Lab AI and future projects added to routing.
+
+10. NEW PROJECT ONBOARDING
+When a new project is formally added to MotorLab routing, implicit bootstrap becomes part of its onboarding contract.
+No separate recurring user activation command should be required after onboarding.
+
+11. FAILURE MODE
+If bootstrap cannot complete because Br174/Chatgpt is unavailable, permissions are missing, or the project identity is ambiguous:
+- do not make a risky write based on guessed CORE state;
+- report the exact blocker;
+- preserve the project-native engine and current project state;
+- use WAITING_EXTERNAL or WAITING_USER only when genuinely necessary.
+
+12. SUCCESS CRITERIA
+Auto-bootstrap is considered active when:
+- registered project chats do not require Bruno to paste an activation string each time;
+- current MotorLab CORE is loaded before write-capable work;
+- routing/registry state is reconciled when relevant;
+- project-native engines remain intact and authoritative for their domain logic;
+- manual activation strings are fallback only;
+- platform limitations are stated honestly rather than hidden.
+
+VERSION
+MOTORLAB-AUTO-BOOTSTRAP-V1.0
+Established: 2026-09-29
