@@ -1,26 +1,40 @@
 MOTORLAB PROJECT INTEGRATION REGISTRY V1
 
 STATUS
-Canonical MotorLab registry of persistent project-side bootstrap hooks.
+Canonical MotorLab registry of persistent project-side hooks and synchronized local satellites.
 Established: 2026-09-29.
+Central authority: Br174/Chatgpt.
 
 PURPOSE
-This registry records which project repositories contain the persistent MOTORLAB_PROJECT_HOOK.txt integration that points back to the canonical MotorLab control repository Br174/Chatgpt.
+Track which project repositories are structurally connected to MotorLab and which contain the local-first synchronized satellite defined by MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt.
 
-STRUCTURAL PRINCIPLE
-Project-side hooks do not contain a frozen MotorLab CORE. They only declare the permanent relationship to MotorLab and require current CORE/governance/routing/registry state to be loaded from Br174/Chatgpt before write-capable or lifecycle-changing work.
+GLOBAL PRINCIPLES
+- MotorLab activation is implicit and persistent for recognized registered projects.
+- MOTORLAB_PROJECT_HOOK.txt is the project identity/adapter entrypoint.
+- .motorlab/MOTORLAB_LOCAL_CORE.txt provides immediate verified local activation/fallback.
+- .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt provides rollback safety.
+- .motorlab/MOTORLAB_SYNC_STATE.txt records local release and verification state.
+- Br174/Chatgpt remains the only central authority; local satellites are synchronized mirrors, not forks.
+- Project-native/domain engines are preserved and coexist with MotorLab.
+- Visible session boot proof, verified progress reporting, Watchdog, Resume Recovery, checkpoint recovery, single-writer protection and fireworks-success reporting remain mandatory when applicable.
+- MotorLab release changes occur only at safe boundaries, never in the middle of an active write/build/test/promotion operation.
 
-VISIBLE ACTIVATION PRINCIPLE
-Every registered project-side hook must bind MOTORLAB_SESSION_BOOT_BANNER_V1.txt and require visible activation proof at the first available user-facing response of each recognized chat/session. If the MotorLab startup message has not appeared, Bruno must not be expected to assume that MotorLab is active. After startup, the current progress percentage, watchdog lightning/recovery and verified fireworks-success contracts remain mandatory when applicable.
+CURRENT SATELLITE RELEASE
+Release: 2026.09.29-r1
+Schema: 1
+Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
+Canonical sync contract: MOTORLAB_SATELLITE_SYNC_V1.txt
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
 
-RESUME RECOVERY PRINCIPLE
-Every registered project-side hook must bind MOTORLAB_RESUME_RECOVERY_V1.txt. If a tool/provider response returns while the approved task is incomplete and execution control remains available, MotorLab must continue the same turn. If the host/model/client interrupts execution, the first later execution cycle that can access state must resume from the last verified checkpoint/pending action, preserve completed work and single-writer safety, and surface a visible lightning recovery event. A repository must never falsely claim it can force a new assistant message while no execution cycle exists.
-
-REGISTERED HOOKS
+REGISTERED PROJECTS
 1. MusicLab
    Repository: Br174/MusicLab
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit-persistent
+   Activation: implicit-persistent-local-first
+   Satellite: installed
+   Local release: 2026.09.29-r1
+   Local state: VERIFIED
+   LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -28,7 +42,11 @@ REGISTERED HOOKS
 2. GeoVision
    Repository: Br174/GeoVision-Test
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit-persistent
+   Activation: implicit-persistent-local-first
+   Satellite: installed
+   Local release: 2026.09.29-r1
+   Local state: VERIFIED
+   LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -36,7 +54,11 @@ REGISTERED HOOKS
 3. StudyBook-AI
    Repository: Br174/StudyBook-AI
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit-persistent
+   Activation: implicit-persistent-local-first
+   Satellite: installed
+   Local release: 2026.09.29-r1
+   Local state: VERIFIED
+   LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -44,7 +66,11 @@ REGISTERED HOOKS
 4. Visionflix / Verlezza Vision source
    Repository: Br174/Visionflix
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit-persistent
+   Activation: implicit-persistent-local-first
+   Satellite: installed
+   Local release: 2026.09.29-r1
+   Local state: VERIFIED
+   LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -52,7 +78,11 @@ REGISTERED HOOKS
 5. Cover Lab AI
    Repository: Br174/Cover-Lab-AI
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit-persistent
+   Activation: implicit-persistent-local-first
+   Satellite: installed
+   Local release: 2026.09.29-r1
+   Local state: VERIFIED
+   LAST_GOOD: 2026.09.29-r1
    Native engine policy: coexist/preserve
    Visible activation proof: required
    Resume recovery: required
@@ -60,33 +90,36 @@ REGISTERED HOOKS
 6. streamflix-BV delivery adapter
    Repository: Br174/streamflix-BV
    Hook: MOTORLAB_PROJECT_HOOK.txt
-   Activation: implicit-persistent when used as Visionflix/Verlezza Vision delivery path
+   Activation: implicit-persistent-local-first when used as Visionflix/Verlezza Vision delivery path
+   Satellite: installed
+   Local release: 2026.09.29-r1
+   Local state: VERIFIED
+   LAST_GOOD: 2026.09.29-r1
+   Native engine policy: delivery-adapter-coexist-preserve
    Lifecycle authority: NO; Visionflix source lifecycle remains authoritative
    Visible activation proof: required
    Resume recovery: required
 
 BOOTSTRAP REQUIREMENT
-When an execution surface can identify one of these project repositories or corresponding project contexts, it must treat MotorLab as implicitly enabled and follow MOTORLAB_AUTO_BOOTSTRAP_V1.txt before write-capable or lifecycle-changing operations. It must also load MOTORLAB_SESSION_BOOT_BANNER_V1.txt, MOTORLAB_RESUME_RECOVERY_V1.txt and surface the activation message at the first available user-visible response.
-
-COEXISTENCE REQUIREMENT
-All hooks are orchestration metadata only. They must never be interpreted as authorization to replace, disable, absorb or rewrite project-native/domain engines. MOTORLAB_GOVERNANCE_V1.txt remains controlling.
+Recognized project sessions should use MOTORLAB_CORE_ENTRYPOINT_V1.txt. The verified local satellite is available first; central release comparison/synchronization occurs at the first safe boundary. Current central CORE remains authoritative whenever reachable.
 
 HOST LIMITATION
-A repository hook is a durable structural identifier, but a host surface that exposes neither repository/project identity nor project instructions cannot discover a hook it cannot access. In such a host, the correct solution is a one-time persistent project/workspace integration, not a recurring per-chat activation string.
-A repository also cannot independently awaken a completely frozen host/model turn with no available execution cycle. Resume Recovery therefore guarantees same-turn continuation while control exists and checkpoint-based continuation at the first later execution cycle.
+A repository cannot force a context-free or completely frozen host/model to open a new execution cycle. A one-time persistent ChatGPT project/global instruction can expose the MotorLab entrypoint to every new chat. Once an execution cycle exists, local-first activation and safe synchronization apply automatically.
 
 NEW PROJECTS
-When a future project is formally onboarded to MotorLab:
-- register it in UAB_PROJECT_ROUTING.txt or successor;
-- install MOTORLAB_PROJECT_HOOK.txt in the project repository when repository-side integration is applicable;
-- bind MOTORLAB_SESSION_BOOT_BANNER_V1.txt in the new hook and require visible activation proof;
-- bind MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt;
-- bind MOTORLAB_RESUME_RECOVERY_V1.txt;
-- add it to this registry or its canonical successor;
-- preserve all project-native engines unless Bruno explicitly approves otherwise.
+When a future software project becomes concrete and repository integration is available:
+- register it in canonical routing/integration state;
+- install MOTORLAB_PROJECT_HOOK.txt;
+- install .motorlab/MOTORLAB_LOCAL_CORE.txt from the current canonical bundle;
+- install an identical initial .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt;
+- install .motorlab/MOTORLAB_SYNC_STATE.txt as VERIFIED for the current release;
+- bind MOTORLAB_CORE_ENTRYPOINT_V1.txt, release manifest and sync protocol;
+- preserve all project-native engines;
+- require visible activation proof and all current MotorLab CORE protections.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.2
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.3
 Established: 2026-09-29
-Revision 1.1: visible MotorLab session activation proof required across all registered hooks and future onboarded projects.
-Revision 1.2: Resume Recovery is mandatory across every registered and future MotorLab project.
+Revision 1.1: visible activation proof.
+Revision 1.2: Resume Recovery mandatory.
+Revision 1.3: local-first synchronized satellite architecture installed across all registered projects and mandated for future onboarding.
