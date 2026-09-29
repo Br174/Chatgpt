@@ -11,20 +11,22 @@ GLOBAL PRINCIPLES
 - Project-native/domain engines remain preserved and authoritative for domain behavior.
 - Change Compatibility Guard is mandatory before every write-capable MotorLab/project change.
 - Watchdog is the single coordinator for progress-health detection and anti-stall intervention.
-- Resume Recovery owns checkpoint continuation after Watchdog classification and the manual-lightning Rapid Salvage Checkpoint pre-step.
+- Resume Recovery owns checkpoint continuation after Watchdog classification, the manual-lightning Rapid Salvage Checkpoint pre-step and reconstruction of the monotonic recovery floor.
 - Foreground Stall Guard owns prevention/chunking/durable handoff.
 - Background Execution owns persistent executor/job semantics.
-- Progress Reporting owns user-visible operational status.
+- Progress Reporting owns user-visible operational status and verified percentages.
 - Preventive Watchdog health checks are required for substantial work when progress is unclear/repetitive and control/status evidence exists.
 - After two materially identical no-progress write/retry/recovery attempts without new evidence, a third identical attempt is prohibited unless healthy external waiting is confirmed.
-- User message `⚡` is the universal manual MotorLab SAVE-THEN-RESUME shortcut at the first available execution cycle: preserve the freshest recoverable material state first, then health-check and continue without restarting completed work from zero.
+- User message `⚡` is the universal manual MotorLab SAVE-THEN-RESUME shortcut at the first available execution cycle: preserve the freshest recoverable material state first, reconstruct the same-operation recovery floor, then health-check and continue without restarting completed work from zero.
 - The manual salvage checkpoint is lightweight and bounded; it must not become a full repository backup, rebuild or exhaustive scan.
+- Same-operation verified progress is monotonic across recovery by default: a stale lower checkpoint cannot silently override newer coherent verified progress.
+- A lower recovery percentage requires material invalidation evidence and must be visibly explained.
 - The manual shortcut cannot retroactively capture hidden model reasoning interrupted before the new cycle; it preserves observable/recoverable material state and reconciles real external state.
 - Automatic recovery remains mandatory and does not depend on the shortcut.
 - MotorLab cannot force a new assistant turn while the host exposes no execution cycle.
 
 CURRENT SATELLITE RELEASE
-Release: 2026.09.29-r6
+Release: 2026.09.30-r7
 Schema: 1
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -34,114 +36,133 @@ Change Compatibility Guard: required
 Preventive Watchdog: required
 Manual lightning recovery: required
 Manual lightning save-then-resume: required
+Monotonic recovery floor: required
 Two-strike no-progress: required
 Foreground Stall Guard: required
-Canonical r6 local-core blob: a1cc7e7e871b797106b6834ee61e1b16f4c12252
-Canonical r5 LAST_GOOD blob: 564af1510709206403de97be072a320680d6aea0
+Canonical r7 local-core blob: 02a0931db8c12414c19acfd1c7aa80d896e032f2
+Canonical r6 LAST_GOOD blob: a1cc7e7e871b797106b6834ee61e1b16f4c12252
 
 REGISTERED PROJECTS
 1. MusicLab — Br174/MusicLab
    Activation: implicit-persistent-local-first
    Satellite: installed and VERIFIED
-   Local release: 2026.09.29-r6
-   LAST_GOOD: 2026.09.29-r5
+   Local release: 2026.09.30-r7
+   LAST_GOOD: 2026.09.29-r6
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
    Manual `⚡` save-then-resume: required
+   Monotonic recovery floor: required
    Two-strike no-progress: required
    Native engine: coexist/preserve
 
 2. GeoVision — Br174/GeoVision-Test
    Activation: implicit-persistent-local-first
    Satellite: installed and VERIFIED
-   Local release: 2026.09.29-r6
-   LAST_GOOD: 2026.09.29-r5
+   Local release: 2026.09.30-r7
+   LAST_GOOD: 2026.09.29-r6
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
    Manual `⚡` save-then-resume: required
+   Monotonic recovery floor: required
    Two-strike no-progress: required
    Native engine: coexist/preserve
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Activation: implicit-persistent-local-first
    Satellite: installed and VERIFIED
-   Local release: 2026.09.29-r6
-   LAST_GOOD: 2026.09.29-r5
+   Local release: 2026.09.30-r7
+   LAST_GOOD: 2026.09.29-r6
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
    Manual `⚡` save-then-resume: required
+   Monotonic recovery floor: required
    Two-strike no-progress: required
    Native engine: coexist/preserve
 
 4. Visionflix / Verlezza Vision source — Br174/Visionflix
    Activation: implicit-persistent-local-first
    Satellite: installed and VERIFIED
-   Local release: 2026.09.29-r6
-   LAST_GOOD: 2026.09.29-r5
+   Local release: 2026.09.30-r7
+   LAST_GOOD: 2026.09.29-r6
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
    Manual `⚡` save-then-resume: required
+   Monotonic recovery floor: required
    Two-strike no-progress: required
    Native engine: coexist/preserve
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Activation: implicit-persistent-local-first
    Satellite: installed and VERIFIED
-   Local release: 2026.09.29-r6
-   LAST_GOOD: 2026.09.29-r5
+   Local release: 2026.09.30-r7
+   LAST_GOOD: 2026.09.29-r6
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
    Manual `⚡` save-then-resume: required
+   Monotonic recovery floor: required
    Two-strike no-progress: required
    Native engine: coexist/preserve
 
 6. streamflix-BV delivery adapter — Br174/streamflix-BV
    Activation: implicit-persistent-local-first when used as Visionflix/Verlezza Vision delivery path
    Satellite: installed and VERIFIED
-   Local release: 2026.09.29-r6
-   LAST_GOOD: 2026.09.29-r5
+   Local release: 2026.09.30-r7
+   LAST_GOOD: 2026.09.29-r6
    Change Compatibility Guard: required
    Preventive Watchdog: required
    Manual `⚡` recovery: required
    Manual `⚡` save-then-resume: required
+   Monotonic recovery floor: required
    Two-strike no-progress: required
    Native engine: delivery-adapter-coexist-preserve
    Lifecycle authority: NO; Visionflix source remains lifecycle authority
 
 BOOTSTRAP REQUIREMENT
-Recognized project sessions use current CORE entrypoint. Before write-capable changes apply Change Compatibility Guard. Before risky/long work apply Foreground Stall Guard. During substantial work Watchdog may perform preventive progress-health checks. Interrupted work resumes through Resume Recovery.
+Recognized project sessions use current CORE entrypoint. Before write-capable changes apply Change Compatibility Guard. Before risky/long work apply Foreground Stall Guard. During substantial work Watchdog may perform preventive progress-health checks. Interrupted work resumes through Resume Recovery using the freshest coherent verified state and monotonic recovery floor.
 
 MANUAL LIGHTNING SAVE-THEN-RESUME REQUIREMENT
 If Bruno sends only/primarily `⚡` and an execution cycle is available:
 1. inspect active/pending operation and previous checkpoint;
 2. before recovery/retry/new write, create or refresh a lightweight MANUAL_LIGHTNING_SALVAGE checkpoint with the freshest recoverable material state currently available;
-3. preserve completed work, verified percentage, next safe step, current ref/provider/job/artifact identity and writer lock when available;
+3. preserve completed work, verified percentage, latest user-visible verified MotorLab percentage, next safe step, current ref/provider/job/artifact identity and writer lock when available;
 4. keep the salvage bounded and fast; do not perform a full backup/exhaustive traversal/rebuild merely to save state;
-5. verify current external/repository state as needed;
-6. Watchdog classifies health;
-7. Resume Recovery continues the smallest safe pending step if needed;
-8. do not restart from zero or duplicate healthy external work.
+5. reconstruct recovery_floor_percent from coherent same-operation evidence;
+6. a stale lower checkpoint must not override newer coherent verified progress;
+7. verify current external/repository state as needed;
+8. Watchdog classifies health;
+9. Resume Recovery continues the smallest safe pending step compatible with the floor if needed;
+10. do not restart from zero or duplicate healthy external work.
 If no pending operation exists, report that rather than inventing one.
 The command cannot guarantee capture of hidden model reasoning that was interrupted before the new cycle.
 
+MONOTONIC RECOVERY REQUIREMENT
+For manual and automatic recovery on the same logical operation/progress scale:
+- reconcile persisted checkpoint/ledger percentage, latest user-visible verified MotorLab percentage, verified micro-milestones and current provider/job/ref/artifact evidence;
+- establish the highest coherent verified value as recovery floor;
+- repeat or advance that floor during recovery unless material invalidation evidence exists;
+- never silently fall back because the persisted checkpoint is older;
+- interrupted chat, failed `⚡` send, missing newer checkpoint, elapsed time or conversation-load failure are not invalidation evidence;
+- any legitimate reduction must identify the invalidating evidence and revised verified percentage visibly.
+
 PROGRESS VISIBILITY
-Substantial work should provide concise live-like operational status when possible, normally after roughly 1-2 meaningful operations or material phase/status transitions. Report observable actions/results, not hidden chain-of-thought. Verified percentages never advance from elapsed time alone.
+Substantial work should provide concise live-like operational status when possible, normally after roughly 1-2 meaningful operations or material phase/status transitions. Report observable actions/results, not hidden chain-of-thought. Verified percentages never advance from elapsed time alone and do not silently regress during same-operation recovery.
 
 HOST LIMITATION
 If ChatGPT/the host is fully suspended and provides no execution cycle, MotorLab cannot inject a lightning message or make a user `⚡` message execute until the host accepts/delivers it. Checkpointing, persistent executors and first-available-cycle recovery reduce the impact but do not bypass this platform boundary.
 
 NEW PROJECTS
-Every future MotorLab software project receives the current satellite/hook during onboarding when technically available and inherits Change Compatibility Guard, preventive Watchdog, manual `⚡` SAVE-THEN-RESUME, two-strike anti-loop, Resume Recovery, Foreground Stall Guard and all other current CORE protections.
+Every future MotorLab software project receives the current satellite/hook during onboarding when technically available and inherits Change Compatibility Guard, preventive Watchdog, manual `⚡` SAVE-THEN-RESUME, MONOTONIC_RECOVERY_FLOOR, two-strike anti-loop, Resume Recovery, Foreground Stall Guard and all other current CORE protections.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.9
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V1.10
 Established: 2026-09-29
 Revision 1.6: r4 Change Compatibility Guard across current/future projects.
 Revision 1.7: r5 preventive Watchdog, two-strike anti-loop, manual `⚡` recovery and denser operational visibility integrated across current/future projects.
 Revision 1.8: r5 installation verified across all registered satellites; actual r5/r4 blob identities recorded.
 Revision 1.9: r6 manual lightning rapid SAVE-THEN-RESUME deployed and verified across all registered satellites; r5 preserved as LAST_GOOD.
+Revision 1.10: r7 MONOTONIC_RECOVERY_FLOOR deployed across all registered satellites; r6 preserved as LAST_GOOD; same-operation recovery cannot silently fall back to a stale lower checkpoint.
