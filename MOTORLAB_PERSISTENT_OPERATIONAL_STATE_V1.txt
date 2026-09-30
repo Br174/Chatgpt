@@ -1,0 +1,156 @@
+MOTORLAB PERSISTENT OPERATIONAL STATE V1
+
+STATUS
+Mandatory MotorLab CORE contract for durable operational continuity.
+Central authority: Br174/Chatgpt.
+Primary operational backend target: Cloudflare D1, with Cloudflare KV as cache only.
+
+PURPOSE
+Reduce forgotten steps, stale chat-state reconstruction, duplicated work and interrupted operations by maintaining a durable operational ledger outside ephemeral chat context.
+
+PRIMARY MODEL
+GitHub remains the technical source of truth.
+D1 stores the live operational state needed to continue work correctly.
+KV accelerates reads but is reconstructible and never authoritative.
+
+MINIMUM D1 ENTITIES
+1. projects
+- project_id
+- repository
+- lifecycle identity
+- current known technical ref/head pointers
+- local satellite release state
+- updated_at
+
+2. operations
+- MOTORLAB_OPERATION_ID
+- project_id
+- title/type
+- requested_scope
+- approved_scope
+- approval_status
+- lifecycle_stage
+- risk_class
+- status
+- phase
+- artifact_progress
+- overall_progress
+- source_ref/source_head
+- created_at/updated_at
+
+3. approvals
+- operation_id
+- scope_hash or equivalent stable scope identity
+- approval_state
+- approval timestamp/evidence reference
+- superseded_by when scope changes
+
+4. checkpoints
+- operation_id
+- checkpoint_id
+- phase
+- verified progress
+- completed material steps
+- next safe step
+- lock state/reference
+- external wait state when any
+- created_at
+
+5. locks
+- lock key/scope
+- operation_id
+- owner
+- acquired_at
+- heartbeat/verified state
+- released_at
+- status
+
+6. artifacts
+- operation_id
+- artifact identity/name
+- source ref/head
+- APK/ZIP or other artifact checksum(s)
+- verification state
+- delivery state
+- immutable-under-test flag
+- created_at
+
+7. root_causes
+- root cause id
+- operation_id
+- defect/symptom
+- immediate repair/containment
+- status
+- evidence refs
+- recurrence surfaces
+- prevention/follow-up step
+- approval-scope status
+- associated delivered artifact
+
+8. operation_events
+Append-oriented operational history for material transitions only.
+Examples: request parsed, pre-change report emitted, approval captured, write started, checkpoint reached, artifact verified, artifact delivered, causal queue opened/closed, operation closed.
+Do not log every low-value internal thought/tool call.
+
+WRITE DISCIPLINE
+- D1 writes must be bounded and meaningful; avoid polling/event spam.
+- Persist at material transitions and checkpoints.
+- Use idempotent keys where possible so Resume Recovery does not duplicate state.
+- One logical operation uses one MOTORLAB_OPERATION_ID.
+- Approval records must preserve scope identity so old approval cannot authorize broadened scope.
+
+KV POLICY
+KV may cache:
+- current operation summary per project;
+- latest verified progress snapshot;
+- quick project status cards;
+- frequently-read reference pointers.
+KV values must include freshness/version metadata where useful.
+Loss or staleness of KV must not lose authoritative state.
+
+GITHUB CHECKPOINT BACKSTOP
+At major durable boundaries, especially artifact delivery, promotion, definitive closure, or long-lived external wait, persist enough technical state in GitHub Project Continuity/technical registries so the operation can still be reconstructed if D1 is unavailable.
+Do not mirror every D1 event into GitHub.
+
+FALLBACK MODE
+If D1 is unavailable:
+1. do not invent D1 state;
+2. use GitHub canonical technical state + project live evidence + verified local satellite;
+3. preserve new operational changes in an in-turn checkpoint and, where appropriate, GitHub continuity backstop;
+4. mark D1_RECONCILE_PENDING;
+5. when D1 returns, reconcile from authoritative evidence before accepting cached state.
+
+RECONCILIATION
+On D1 recovery:
+- compare operation ids, source refs/heads, artifact checksums and durable GitHub transitions;
+- never overwrite newer verified GitHub technical truth with stale D1 data;
+- merge only non-conflicting operational records;
+- stale locks must be validated before release/reuse;
+- unresolved conflicts become explicit reconciliation tasks, not silent guesses.
+
+QUOTA/COST SAFETY
+D1/KV usage must comply with current free-plan limits and MotorLab External Service Guard.
+Use cache, deduplication, batch writes and transition-based persistence to minimize quota consumption.
+Never auto-enable paid billing.
+
+SECURITY
+Store no raw API keys, access tokens or secrets in D1/KV operational records.
+Only identifiers/masked references permitted where needed.
+
+IMPLEMENTATION PHASES
+Phase A: CORE contract/schema and fallback logic.
+Phase B: actual Cloudflare D1/KV resources and provider-native secrets/bindings.
+Phase C: project adapters incrementally write/read operational state.
+No project may be forced onto Phase C during active/unsafe work; adoption occurs at safe boundaries.
+
+SUCCESS CRITERIA
+- interrupted approved work can resume from durable state;
+- approval scope is not forgotten;
+- active locks/checkpoints/artifacts/root-cause queues survive chat changes;
+- optional cache loss is harmless;
+- D1 outage does not make MotorLab unusable;
+- GitHub remains the durable technical backstop.
+
+VERSION
+MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.0
+Established: 2026-09-30
