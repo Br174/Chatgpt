@@ -14,12 +14,12 @@ BOOT
 3. Read .motorlab/MOTORLAB_LOCAL_CORE.txt.
 4. Verified local core is immediately available as fallback.
 5. When central is reachable, read MOTORLAB_RELEASE_MANIFEST_V1.txt and compare local/central releases.
-6. Resolve the project-specific Project Continuity ledger pointer from hook/registry and reconcile state before choosing a work starting point.
+6. Resolve the project-specific Project Continuity ledger pointer and reconcile current state before choosing a work starting point.
 
 SAFE UPDATE
 - pin a MotorLab release for the whole active operation;
 - never update during active write/build/test/promotion/release;
-- update only at safe boundary;
+- update only at a safe boundary;
 - preserve current verified local bundle as LAST_GOOD before adopting newer bundle;
 - fetch MOTORLAB_SATELLITE_BUNDLE_V1.txt;
 - validate release id and required markers;
@@ -34,6 +34,7 @@ CENTRAL_AUTHORITY=Br174/Chatgpt
 PROJECT_NATIVE_ENGINE_POLICY=coexist-preserve
 PRE_RESPONSE_BOOT_GATE=required
 PROJECT_CONTINUITY=required
+LABELED_VISUAL_STATUS=required
 CHANGE_COMPATIBILITY_GUARD=required
 WATCHDOG=required
 PREVENTIVE_WATCHDOG=required
@@ -66,17 +67,26 @@ Stale lower checkpoints cannot silently lower same-operation verified recovery p
 R8+ FIRST BOOT + CROSS-CHAT CONTINUITY
 PRE_RESPONSE_BOOT_GATE=required
 PROJECT_CONTINUITY=required
-A valid r8+ local fallback must preserve these rules:
-- recognized project/software-build activation occurs before substantive work;
-- first user-visible line is the MotorLab banner;
-- each project hook points to a central Project Continuity ledger;
-- new chats reconcile ledger + newer live repo/provider/job/artifact state;
-- unfinished work continues under Resume Recovery/Watchdog without transfer prompts;
-- continuation-relevant material state writes through to the central ledger when safe;
-- older registries/memory cannot override newer coherent state.
+Recognized project/software-build activation occurs before substantive work and new chats reconcile durable project state with newer live evidence without transfer prompts.
+
+R9+ LABELED VISUAL STATUS
+LABELED_VISUAL_STATUS=required
+A valid r9+ local fallback must preserve the canonical readable legend:
+⚙️ MotorLab attivo
+🎆 Azione completata
+⚡ Risveglio / recupero
+✅ Problema risolto
+👍🏻 Procede tutto bene
+⚠️ Piccolo problema risolvibile
+🧭 Cambiare approccio
+🛑 Stop di sicurezza / blocco reale
+♻️ Una parte va rifatta
+💀 Tutto da rifare
+💯 Conclusione definitiva
+Every MotorLab status emoji must carry its label beside it. Repeated fireworks/lightning counts are not user-facing severity codes. 💯 is reserved for full verified completion.
 
 ROLLBACK
-If newer bundle cannot be verified, keep/restore LAST_GOOD, record safe failure, preserve project and report fallback.
+If newer bundle cannot be verified, keep/restore LAST_GOOD, preserve project and report fallback.
 
 CENTRAL UNAVAILABLE
 Use previously VERIFIED local release plus live repository/provider evidence. Do not invent continuity state. Recheck central at a later safe cycle.
@@ -85,11 +95,11 @@ NO APP RUNTIME CHANGE
 .motorlab is development/orchestration metadata and must not intentionally alter app code, UI, package identity, signing, native engines or runtime dependencies.
 
 FUTURE PROJECTS
-Future MotorLab software projects receive hook + local satellite + central Project Continuity ledger during onboarding when technically available.
+Future MotorLab software projects receive hook + local satellite + central Project Continuity ledger during onboarding and inherit the current labeled visual status rule.
 
 AUTOMATIC MEANING
-Synchronization/continuity writes occur when an execution cycle with repository access exists. Repository text cannot self-update or wake a frozen host without an executor.
+Synchronization/continuity writes occur only when an execution cycle with repository access exists. Repository text cannot self-update or wake a frozen host without an executor.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.5
-Revision 1.5: r8 requires PRE_RESPONSE_BOOT_GATE and PROJECT_CONTINUITY markers and durable promptless cross-chat reconciliation.
+MOTORLAB-SATELLITE-SYNC-V1.6
+Revision 1.6: r9 requires LABELED_VISUAL_STATUS and the permanent readable emoji legend with 💯 reserved for definitive completion.
