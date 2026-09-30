@@ -46,9 +46,16 @@ NOTES: ChatGPT plugin installation state verified after OAuth completion. PostHo
 
 4. Notion
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
-PLUGIN: available in ChatGPT
-CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+PLUGIN: installed in ChatGPT
+CONNECTION: CONNECTED_VERIFIED
 ROLE TARGET: Bruno-facing status projection only.
+WORKSPACE: 36de4eaa-a28b-4134-a4f0-ce95622a5a09 — Bruno Verlezza's Notion
+OFFICIAL DASHBOARD: 3eb10112-5bf1-8199-ae89-d45eaa804c3a — MotorLab Control Center
+DASHBOARD URL: https://app.notion.com/p/3eb101125bf18199ae89d45eaa804c3a?pvs=204
+RESOURCE READ CHECK: PASSED; dashboard fetched after creation with authority guard, service matrix, project snapshot and pending-integration list intact
+AUTHORITY RULE: Notion is a derived human-readable projection only; GitHub always wins on divergence
+DELETE SAFETY: MotorLab must never delete Notion pages/databases/resources without explicit Bruno approval
+NOTES: Initial MotorLab Control Center created and verified on 2026-09-30. The connected workspace's plan exposes normal read/write page tools; AI search is plan-gated and is not required for MotorLab's dashboard role.
 
 5. GitBook
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
@@ -87,6 +94,9 @@ Central MotorLab D1/KV becomes RESOURCE_READY only after actual resources, schem
 GITBOOK RULE
 GitBook is a derived manual/architecture projection, never technical authority. GitHub remains authoritative. The official GitBook organization/site identifiers above must be used for future MotorLab documentation work unless Bruno explicitly changes them. OAuth permission to delete does not constitute approval to delete. A GitBook plan/trial state must not silently create paid usage; MotorLab must remain free-first.
 
+NOTION RULE
+Notion is a derived Bruno-facing control view, never technical authority. GitHub remains authoritative. The official dashboard identifier and URL above must be used for future MotorLab status projection unless Bruno explicitly changes them. No Notion page/database deletion is authorized by connection or write access alone.
+
 PROJECT ADOPTION RULE
 PostHog instrumentation or other runtime integration inside an app is PROJECT_ADOPTED only after normal MotorLab pre-change approval, isolated LAB change, verification and project-specific safe adoption.
 
@@ -94,6 +104,6 @@ FAIL-SAFE
 No AVAILABLE_NOT_CONNECTED or DEGRADED optional integration blocks MotorLab core operation.
 
 VERSION
-MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.2
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.3
 Established: 2026-09-30
-Revision 1.2: PostHog and GitBook connections verified; official GitBook organization/site fixed; duplicate quarantined; GitBook trial and destructive-scope safeguards recorded.
+Revision 1.3: Notion connection verified; official MotorLab Control Center created, fetched and registered as derived status projection.
