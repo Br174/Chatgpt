@@ -1,0 +1,9 @@
+MOTORLAB MODIFICATION + RESTORE REGISTER - Visionflix / Verlezza Vision
+PROJECT=Visionflix-VerlezzaVision
+REPOSITORY=Br174/Visionflix
+REGISTER_STATUS=ACTIVE_CONFIRMED_ONLY
+DISPLAY_NAME=Registro Modifiche e Ripristini
+NEXT_RESTORE_NO=1
+VISIBLE_SLOTS=0
+RULE=Only Bruno-confirmed working modifications explicitly approved for conservation enter this register. Technical history remains in Git/MOTORLAB_CHANGE_REGISTRY_VISIONFLIX_V1.txt. Existing pre-r14 technical records are not promoted automatically.
+VERSION=MOTORLAB-VISIONFLIX-MODIFICATION-RESTORE-REGISTER-V1.0
