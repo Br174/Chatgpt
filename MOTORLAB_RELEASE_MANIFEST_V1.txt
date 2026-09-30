@@ -20,6 +20,7 @@ AUTHORITY_DATA_OWNERSHIP_MODULE=MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
 PERSISTENT_OPERATIONAL_STATE_MODULE=MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
 OBSERVABILITY_DIAGNOSTICS_MODULE=MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
 KNOWLEDGE_TOOL_ROUTING_MODULE=MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
+SERVICE_INTEGRATION_STATUS_MODULE=MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
 
 CURRENT REQUIRED CORE MODULES
 - MOTORLAB_CORE_ENTRYPOINT_V1.txt
@@ -48,6 +49,7 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
 - MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
 - MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
+- MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
 - MOTORLAB_SATELLITE_SYNC_V1.txt
 - MOTORLAB_SATELLITE_BUNDLE_V1.txt
 
@@ -97,6 +99,7 @@ MotorLab r16 adds a non-conflicting service architecture:
 Every logical operation should use one MOTORLAB_OPERATION_ID for cross-service correlation.
 No optional service may become a single point of failure or silently enable paid usage.
 Actual provider/plugin connection is capability-gated and must not be claimed until verified.
+MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt is the required registry separating CORE readiness from real connection/resource readiness.
 Existing project instrumentation/adoption occurs only at safe approved boundaries.
 
 CURRENT/FUTURE PROJECT RULE
@@ -108,4 +111,4 @@ MotorLab control-plane metadata alone must not alter application runtime/UI/pack
 VERSION
 MOTORLAB-RELEASE-MANIFEST-V1.16
 Established: 2026-09-29
-Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics and non-redundant knowledge/plugin routing while preserving all r15 gates.
+Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
