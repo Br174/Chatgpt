@@ -14,6 +14,8 @@ MANDATORY DEPENDENCIES
 - MOTORLAB_PROJECT_CONTINUITY_V1.txt
 - MOTORLAB_RESUME_RECOVERY_V1.txt
 - MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt
+- MOTORLAB_PROGRESS_REPORTING_V1.txt
+- MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 - current required CORE modules from MOTORLAB_RELEASE_MANIFEST_V1.txt
 
 MotorLab supports two activation paths:
@@ -35,8 +37,6 @@ E. only then continue bootstrap/reconciliation and the requested work.
 This gate is not optional because the user message is short, administrative, says only "continua", arrives in a new chat, or does not contain the word MotorLab.
 Do not wait for a later write step to activate if software-project context is already available at the start.
 
-If no supported activation signal exists, do not fabricate activation. Once a supported signal becomes available, activate immediately.
-
 1. ACTIVATION PRECEDENCE - MANDATORY
 A. REGISTERED PROJECT CONTEXT identifiable:
 - activate MotorLab implicitly and immediately;
@@ -56,12 +56,14 @@ For a registered project, bootstrap must:
 - detect/read MOTORLAB_PROJECT_HOOK.txt when available;
 - activate from verified local satellite immediately when valid;
 - consult Br174/Chatgpt canonical MotorLab state;
-- load Global Persistent Activation, Project Continuity, Resume Recovery and Foreground Stall Guard;
+- load Global Persistent Activation, Project Continuity, Resume Recovery, Foreground Stall Guard, Progress Reporting and Root Cause Closure;
 - load current governance/routing/Velocity/External Service Guard modules as relevant;
 - reconcile project continuity ledger with live repository/ref/job/artifact state;
+- classify newer live events before treating them as application lifecycle changes;
 - restore project-native/domain engine coexistence;
 - reconcile lifecycle/checkpoint/pending-action/lock/progress-floor state;
 - if unfinished prior work exists, route it through Watchdog/Resume Recovery before unrelated write-capable work;
+- if an unexpected stale ledger/missed write-through is found, route the causal defect through Root Cause Closure;
 - proceed only after the project starting state is coherent.
 
 3. INTENT-BASED NEW-PROJECT ACTIVATION
@@ -82,22 +84,34 @@ At boot:
 A. load the project hook;
 B. load the project-specific central continuity ledger referenced by hook/registry;
 C. inspect current live repository/ref/head and relevant provider/job/artifact state;
-D. let newer coherent live evidence supersede stale ledger/history;
-E. reconstruct ACTIVE_OPERATION_ID, phase, verified progress floor, completed step, pending verification and next safe step;
-F. if prior work is unfinished, invoke Resume Recovery/Watchdog and continue the same logical operation;
-G. do not restart from an older copied prompt, older UAB registry, or memory summary when newer evidence exists.
+D. classify newer live events as application work, MotorLab control-plane activity, external automation or unknown-before-reconcile;
+E. let newer coherent live evidence supersede stale ledger/history without inventing a new app lifecycle operation from control-plane-only activity;
+F. reconstruct ACTIVE_OPERATION_ID, phase, verified progress floor, completed step, pending verification and next safe step;
+G. if prior work is unfinished, invoke Resume Recovery/Watchdog and continue the same logical operation;
+H. if expected write-through was missed, invoke Root Cause Closure rather than merely refreshing the file;
+I. do not restart from an older copied prompt, older UAB registry, or memory summary when newer evidence exists.
 
 A chat-id change alone never creates a new operation.
 
+5A. FIRST VISIBLE PROGRESS GATE - MANDATORY
+Immediately after activation/reconciliation, if a substantial operation is active, pending, newly accepted or visible from live provider/repository evidence:
+- establish or reconstruct the evidence-based progress scale;
+- emit a user-visible status containing `Progresso MotorLab: <N>%` before entering a long opaque sequence of tool/build/provider work;
+- for already-running jobs, derive the current verified band from completed steps/milestones rather than restarting at 5%;
+- repeat the same N% on later material state transitions when no new verified milestone exists.
+
+The banner alone is NOT sufficient visibility for an active substantial operation.
+If no active quantified operation exists, activation-only output may omit percentage.
+
 6. WRITE-THROUGH CONTINUITY
 During substantial work, Project Continuity must be refreshed at continuation-relevant material transitions and before valid terminal turn states when a safe central write surface is available.
-This is how the next chat receives the latest verified modifications rather than a stale snapshot.
-Do not write continuity state just because time passed.
+A missed expected write-through is itself a Root Cause Closure problem; manual realignment alone is not definitive closure.
 
 7. FOREGROUND STALL PREVENTION - MANDATORY
 Before substantial execution classify FOREGROUND_SHORT / FOREGROUND_RISK / BACKGROUNDABLE / USER_BLOCKING.
 For FOREGROUND_RISK/BACKGROUNDABLE:
 - establish recoverable checkpoint and exact next-safe-step first;
+- emit the current numeric progress before entering the long phase when a quantified operation exists;
 - prefer a real approved persistent executor for safe backgroundable work;
 - otherwise split work into bounded recoverable segments;
 - never treat ChatGPT UI processing indicators as MotorLab heartbeat/progress;
@@ -109,25 +123,28 @@ B. activate MotorLab immediately;
 C. emit the visible startup banner as the first user-facing line;
 D. read project hook + verified local satellite/sync state;
 E. inspect current central release/entrypoint safely;
-F. load Global Persistent Activation + Project Continuity + Resume Recovery + Foreground Stall Guard + required CORE;
+F. load Global Persistent Activation + Project Continuity + Resume Recovery + Foreground Stall Guard + Progress Reporting + Root Cause Closure + required CORE;
 G. read project continuity ledger;
-H. reconcile ledger against live repository/ref/head/provider/job/artifact evidence;
+H. reconcile ledger against live repository/ref/head/provider/job/artifact evidence and classify event source;
 I. reconcile lifecycle/checkpoint/lock/pending action/monotonic progress floor;
 J. restore project-native engine coexistence;
-K. if unfinished work exists, Resume Recovery continues it before unrelated writes;
-L. apply Change Compatibility Guard before writes;
-M. classify substantial execution under Foreground Stall Guard;
-N. proceed with the requested work.
+K. emit the first numeric progress status when a substantial operation is active/pending;
+L. if unfinished work exists, Resume Recovery continues it before unrelated writes;
+M. if stale-state/write-through failure is detected, Root Cause Closure owns causal closure;
+N. apply Change Compatibility Guard before writes;
+O. classify substantial execution under Foreground Stall Guard;
+P. proceed with the requested work.
 
 9. NEW-PROJECT BOOT ORDER
 A. confirm no registered context is available;
 B. detect genuine software-build intent;
 C. activate MotorLab and emit banner first;
 D. inspect current central CORE;
-E. load mandatory CORE modules including Project Continuity;
+E. load mandatory CORE modules including Project Continuity, Progress Reporting and Root Cause Closure;
 F. initialize project identity/onboarding;
-G. once concrete, create project hook, satellite, registry entry and project continuity ledger;
-H. proceed under normal MotorLab safety/lifecycle rules.
+G. once scope is locked, establish and display the first evidence-based numeric percentage;
+H. once concrete, create project hook, satellite, registry entry and project continuity ledger;
+I. proceed under normal MotorLab safety/lifecycle rules.
 
 10. PROJECT-SIDE STRUCTURAL HOOK
 For formally onboarded repositories, MOTORLAB_PROJECT_HOOK.txt must:
@@ -166,6 +183,8 @@ Future concrete software projects inherit:
 - project hook/local satellite;
 - central project continuity ledger;
 - cross-chat state reconciliation;
+- numeric progress visibility gate;
+- Root Cause Closure;
 - current Watchdog/Resume/Foreground/Progress/safety rules;
 - native-engine coexistence.
 
@@ -174,16 +193,19 @@ If bootstrap/continuity cannot complete because project identity, permissions or
 - do not make risky writes based on guessed state;
 - use live/local verified evidence when safe;
 - preserve project/native engine/current state;
-- report only the real blocker that affects safe work.
+- report the real blocker and current verified percentage if one exists;
+- do not declare a stale-state problem solved without root-cause closure.
 
 17. SUCCESS CRITERIA
 Auto Bootstrap is active when:
 - MotorLab is the first orchestration layer engaged in every identifiable software-project session;
 - the startup banner is the first user-visible line in activated project work;
 - registered project chats require no activation phrase;
-- new software-build chats activate by intent;
 - new chats require no handoff prompt;
-- project continuity ledger + live GitHub/provider state reconstruct the latest operation automatically;
+- project continuity ledger + live evidence reconstruct the latest operation automatically;
+- live event source is classified before lifecycle changes;
+- the first substantive status of an active operation contains the evidence-based numeric percentage;
+- stale write-through failures route through Root Cause Closure;
 - same operation/progress survives chat changes;
 - stale memory/registries cannot silently move work backward;
 - unfinished work resumes through Resume Recovery;
@@ -191,6 +213,7 @@ Auto Bootstrap is active when:
 - platform limits are represented honestly.
 
 VERSION
-MOTORLAB-AUTO-BOOTSTRAP-V1.8
+MOTORLAB-AUTO-BOOTSTRAP-V1.9
 Established: 2026-09-29
-Revision 1.8: mandatory pre-response MotorLab gate plus durable cross-chat Project Continuity bootstrap; new chats reconstruct latest verified project state automatically without transfer prompts.
+Revision 1.8: pre-response MotorLab gate plus durable cross-chat Project Continuity bootstrap.
+Revision 1.9: r11 adds mandatory first-visible numeric progress and Root Cause Closure routing for stale/missed continuity and discovered problems.
