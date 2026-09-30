@@ -1,173 +1,59 @@
-MOTORLAB CHANGE HISTORY REGISTRY V1 - SEMANTIC MODIFICATION INDEX + SELECTIVE EXACT RESTORE
+MOTORLAB CHANGE HISTORY REGISTRY V1 - TECHNICAL SEMANTIC PROVENANCE INDEX
 
 STATUS
-Mandatory MotorLab CORE capability.
-Established: 2026-09-30.
+Mandatory MotorLab CORE technical-history capability.
 Central authority: Br174/Chatgpt.
 
 PURPOSE
-Maintain a durable, human-searchable register of Bruno-approved project modifications so a past working change can be found by ordinary semantic terms such as "player", "cover", "foto", "API", "menu" or "grafica" and safely restored from its exact immutable Git source without rolling back unrelated later work.
+Maintain a durable Git-backed semantic index of project modifications for provenance, diagnosis, historical search and selective reconstruction. This is the TECHNICAL history layer, not the r14 user-visible Registro Modifiche e Ripristini.
 
 CORE PRINCIPLE
-GIT IS THE IMMUTABLE SOURCE; THE REGISTRY IS THE SEMANTIC INDEX.
-Do not duplicate source code as prose. Every restorable record points to real repository refs/commits/trees/files and verification evidence.
+GIT IS THE IMMUTABLE SOURCE; THIS REGISTRY IS THE TECHNICAL SEMANTIC INDEX.
+Exact restore provenance must resolve to real repository refs/commits/trees/files.
 
-ROLE / NON-DUPLICATION
-- Git history remains source-of-truth for exact source bytes/diffs.
-- UAB/MotorLab lifecycle remains owner of MADRE -> LAB -> CANDIDATA -> NEW MADRE and whole-version rollback.
-- Project Continuity remains owner of current operational state.
-- Change Compatibility Guard remains mandatory before restoration writes.
-- Root Cause Closure remains owner when a regression/problem caused the restore request.
-- Fast Iteration may accelerate the restoration LAB according to actual risk.
-This registry adds semantic discovery, provenance and selective restore orchestration only.
+R14 TWO-LAYER SEPARATION
+- MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt + project MOTORLAB_CHANGE_REGISTRY_* files may contain verified, historical, superseded, automatically captured or backfilled technical records.
+- MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt + project visible restore-register files contain only Bruno-confirmed working restore points he wants conserved.
+- A technical record never becomes a visible numbered restore point automatically.
+- When Bruno asks for the ordinary "Registro Modifiche e Ripristini", show the visible r14 register, not this technical archive.
+- This technical registry remains available when Bruno asks to search old history, diagnose provenance, or when a visible restore slot needs its exact Git source.
 
-1. PROJECT CHANGE REGISTRY - MANDATORY
-Each MotorLab-managed project has one canonical central change registry referenced by project hook/integration registry when available.
-Recommended naming:
-MOTORLAB_CHANGE_REGISTRY_<PROJECT>_V1.txt
+PROJECT TECHNICAL REGISTRY
+Each MotorLab-managed project has one canonical central technical change registry, normally MOTORLAB_CHANGE_REGISTRY_<PROJECT>_V1.txt.
 
-2. WRITE-THROUGH RULE
-After every material Bruno-approved application/domain/configuration change reaches a verified project state, MotorLab must append/update a registry record when central write access exists.
-Do not register transient tool chatter or temporary verification scaffolding as user-facing modifications.
-MotorLab/control-plane-only changes may be recorded separately when useful but must never be confused with app features.
+TECHNICAL RECORD FIELDS
+When available: CHANGE_ID, PROJECT/REPOSITORY, DATE, TITLE, SEMANTIC_TAGS/ALIASES, USER_INTENT, CHANGE_SCOPE, lifecycle identity, source base/ref/SHA, result ref/SHA, implementation commits, changed files/hunks, behavior summary, verification evidence, technical STATUS, supersedes links, restore hints and source confidence. Never store secrets.
 
-3. CANONICAL RECORD FIELDS
-A restorable change record should contain, when available:
-- CHANGE_ID: stable unique identifier;
-- PROJECT / REPOSITORY;
-- DATE;
-- TITLE: short human description;
-- SEMANTIC_TAGS / ALIASES: terms Bruno is likely to use;
-- USER_INTENT: what Bruno asked to change;
-- CHANGE_SCOPE: atomic or composite;
-- LIFECYCLE_ROLE / LAB/CANDIDATA/MADRE identity;
-- SOURCE_BASE_REF / SOURCE_BASE_SHA when known;
-- RESULT_REF / RESULT_SHA;
-- IMPLEMENTATION_COMMIT(S): exact commit(s) that produced the behavior;
-- CHANGED_FILES or scoped files/hunks when known;
-- BEHAVIOR_SUMMARY;
-- VERIFICATION: run/test/artifact/checksum evidence;
-- STATUS: ACTIVE / HISTORICAL / SUPERSEDED / REGRESSED / REJECTED / RESTORED;
-- SUPERSEDES / SUPERSEDED_BY links when relevant;
-- RESTORE_SCOPE_HINTS: safe selective scope and known protected neighbors;
-- SOURCE_CONFIDENCE: VERIFIED_GIT / VERIFIED_LEDGER / PARTIAL_BACKFILL.
-Secrets and credentials are never stored.
+TECHNICAL WRITE-THROUGH
+At verified material boundaries MotorLab may append/update technical history records automatically when useful and write access exists. This does NOT mean Bruno approved the change as a visible restore point.
 
-4. SEMANTIC SEARCH
-When Bruno asks for a prior modification by a natural term (for example "player"):
-A. load the project registry first;
-B. match TITLE, SEMANTIC_TAGS, USER_INTENT, BEHAVIOR_SUMMARY and scoped files;
-C. rank exact tag/title matches before broad textual matches;
-D. reconcile matched records against live Git refs/commits before restoration;
-E. if one record clearly matches the request, use it;
-F. if multiple materially different records match, present a concise dated/LAB-labelled choice before destructive/selective restoration unless Bruno already disambiguated (for example "l'ultima", "quella della LAB18", "quella che minimizzava il player").
-Do not choose an unrelated commit merely because its message contains the same word.
+SEMANTIC SEARCH
+Search title/tags/intent/behavior/files. Prefer exact semantic matches. Reconcile a candidate against immutable Git before restoration. If several materially different technical records match and Bruno has not disambiguated, show concise choices only when he is searching technical history; do not inject them into the visible confirmed register.
 
-5. EXACT SOURCE RESOLUTION
-Before restore, verify that every selected immutable Git object still resolves.
-Preferred source identity:
-- exact implementation commit + its parent/base for an atomic change;
-- exact base..result range for a verified composite change;
-- exact tree/blob/path only when the registered change cannot be represented safely as an atomic commit/range.
-If registry metadata and Git evidence disagree, Git evidence wins and the registry must be corrected through Root Cause Closure before claiming exact restoration.
+HISTORICAL BACKFILL
+Pre-r13 work can be backfilled from verified Git/ledger evidence on demand. Do not perform unbounded archaeology on every boot. Persist verified backfill so later technical searches are faster.
 
-6. DEFAULT RESTORE MODE - SELECTIVE TRANSPLANT
-"Rimetti quella modifica" means by default:
-- preserve the current approved baseline and all unrelated later work;
-- create a new isolated LAB from the current proper lifecycle baseline;
-- reconstruct only the selected registered change from its exact Git provenance;
-- apply it using the smallest safe patch/file/hunk scope;
-- run Change Compatibility Guard against current neighboring code;
-- verify according to actual risk;
-- produce a testable artifact when appropriate;
-- never modify MADRE directly.
-A restore is a new controlled change operation, not permission to rewrite current history.
+SELECTIVE RESTORE PROVENANCE
+Technical history provides exact source identity for restore/reconstruction. Default feature restoration preserves the current proper baseline/unrelated newer work, uses the smallest safe patch/hunk/file scope, runs Change Compatibility Guard and lifecycle protections, and never direct-edits MADRE. Whole-version rollback requires explicit whole-version intent.
 
-7. WHOLE-VERSION RESTORE
-Only when Bruno explicitly asks to restore the entire old version/state, use the lifecycle historical rollback path (historical MADRE/LAB/tree as appropriate). Do not silently interpret a feature restore as whole-project rollback.
+R14 APPROVAL INTERACTION
+Any restore write, whether selected from visible register or technical history, must pass MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt: resolve/analyze read-only, show the proposed restore plan, then wait for Bruno's post-plan approval before writing.
 
-8. EXACTNESS VS CURRENT COMPATIBILITY
-"Esattamente com'era" means the original registered implementation is the authoritative source of intended behavior/content.
-If the old patch applies cleanly to the current baseline, preserve it exactly.
-If newer code makes a byte-identical transplant impossible or unsafe:
-- do not overwrite entire modern files blindly;
-- perform a three-way/base-result-current comparison;
-- preserve unrelated modern code;
-- reconstruct the smallest equivalent original behavior with explicit compatibility evidence;
-- mark RESTORE_MODE=COMPATIBLE_REPLAY rather than BYTE_EXACT_REPLAY;
-- report any unavoidable deviation before declaring success.
+COMPOSITE SAFETY
+A composite commit/LAB must not replay unrelated subfeatures when a safe scoped boundary exists. If safe separation cannot be proven, explain the ambiguity before any restore write.
 
-9. COMPOSITE CHANGE RECORDS
-A commit/LAB may contain several user features. A composite record must list subscopes/tags and file/hunk boundaries when known.
-A query for one subfeature (e.g. "player" inside a LAB that also changed Cover/Originali) must not automatically replay unrelated subfeatures.
-If safe separation cannot be proven, treat selection as ambiguous and use the exact composite state only with Bruno's explicit whole-change intent.
+REGRESSION LINKING / ROOT CAUSE
+When a later change regresses an earlier behavior, preserve technical provenance and link the incident/earlier record. Restoration alone does not close Root Cause Closure.
 
-10. REGRESSION LINKING
-When a later change regresses an earlier registered feature:
-- link the incident to the earlier CHANGE_ID;
-- mark the newer offending change/incident relationship;
-- preserve the last known good registry record as RESTORE_CANDIDATE;
-- Root Cause Closure still investigates why the regression occurred;
-- restoration alone does not close the root cause.
+HISTORY PRESERVATION
+Do not delete technical records merely because they are superseded, rejected or no longer visible. Git/technical history is the audit trail; the r14 visible register stays short by pointing only to the latest Bruno-confirmed working point per feature.
 
-11. AUTOMATIC FUTURE CAPTURE
-For r13+ every verified user-requested material change is registered automatically at a material verified boundary. Bruno does not need to ask "salva questa modifica".
-The registry update is control-plane metadata and should use CI suppression/path filters so it does not launch unrelated app builds.
+CURRENT/FUTURE PROJECTS
+All current/future MotorLab projects inherit both layers: technical Change History and the separate user-confirmed numbered Registro Modifiche e Ripristini.
 
-12. HISTORICAL BACKFILL
-Past work created before r13 remains recoverable from Git even if not yet indexed.
-Backfill policy:
-- seed recent/current verified user-specific LAB/CANDIDATA/MADRE changes when adopting r13;
-- on a semantic query with no complete registry match, search immutable Git/project ledgers for likely historical modifications;
-- verify provenance before use;
-- persist the newly verified historical record so the same query is fast next time;
-- do not perform an unbounded repository-wide archaeology scan on every boot.
-Thus the registry becomes progressively complete without making normal startup slow.
-
-13. SEARCHABLE ALIASES
-Registry tags should include user vocabulary, not only code terminology. Examples:
-player, lettore, mini-player, riproduzione;
-cover, copertine;
-originali, versione originale;
-foto, immagini;
-menu, drawer;
-API, chiavi;
-and project-specific synonyms learned from the concrete change request.
-Do not infer sensitive personal information into tags.
-
-14. RESTORE SAFETY GATES
-Before any restore write:
-- current source ref/SHA verified;
-- selected registry record resolved to immutable Git evidence;
-- Change Compatibility Guard completed;
-- single-writer lock held;
-- current MADRE/base protected;
-- restore scope bounded;
-- risk class established;
-- rollback/checkpoint prepared.
-After restore, write a new registry record linking RESTORED_FROM=<CHANGE_ID>.
-
-15. DELETION / HISTORY PRESERVATION
-Do not delete historical registry records merely because a feature was superseded or rejected. Update STATUS and links instead. The purpose is to remember what existed and where its exact source lives.
-
-16. CURRENT/FUTURE PROJECT RULE
-All current and future MotorLab-managed software projects inherit this capability. New project onboarding creates/registers a canonical change registry. Existing projects adopt it at a safe MotorLab release boundary.
-
-17. NO RUNTIME COUPLING
-The registry is control-plane metadata. Its presence alone must not alter app UI/runtime/domain behavior, package/signing identity, lifecycle state or project-native engines.
-
-SUCCESS CRITERIA
-The capability is correctly active when:
-- Bruno can use an ordinary feature word to locate relevant past approved modifications;
-- matches point to immutable real Git evidence rather than memory-only descriptions;
-- feature restore preserves unrelated newer work by default;
-- whole-project rollback happens only when explicitly requested;
-- composite changes do not drag unrelated features into a selective restore;
-- every new verified material user change is automatically indexed;
-- old unindexed changes can be backfilled on demand and then remain searchable;
-- restored changes are themselves recorded with provenance;
-- no application build is triggered merely by registry metadata updates when CI suppression is supported.
+NO RUNTIME COUPLING
+Registry metadata alone must not alter app runtime/UI/package/signing/lifecycle/native engines.
 
 VERSION
-MOTORLAB-CHANGE-HISTORY-REGISTRY-V1.0
-Established: 2026-09-30
+MOTORLAB-CHANGE-HISTORY-REGISTRY-V1.1
+Revision 1.1: r14 explicitly separates technical automatic/history provenance from the Bruno-confirmed visible Registro Modifiche e Ripristini.
