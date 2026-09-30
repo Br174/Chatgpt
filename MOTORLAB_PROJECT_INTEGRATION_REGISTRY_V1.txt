@@ -93,7 +93,7 @@ CENTRAL SERVICE INTEGRATION STATUS
 - Notion: CONNECTED_VERIFIED; MotorLab Control Center is derived status projection only.
 - GitBook: CONNECTED_VERIFIED for read/write. User-authenticated OAuth Full access was explicitly authorized on 2026-09-30; site read passed and harmless draft change-request creation passed in Documentation space as change request #1 `MotorLab write-auth verification` (id Om35NPWJOlL2sYvHGNgm). The verification change request remains draft and unmerged. Previous HTTP 403 root cause was Read only OAuth scope; future verification requires separate read and harmless draft-write checks.
 - Superpowers: CONNECTED_VERIFIED; subordinate engineering-method layer.
-- Context7: AVAILABLE_NOT_CONNECTED; optional on-demand documentation and never blocking.
+- Context7: CONNECTED_VERIFIED through the custom MCP app `Context7 Free` at `https://mcp.context7.com/mcp` with anonymous/no-auth free access. Two functional checks passed on 2026-10-01 (Cloudflare documentation; Next.js resolved as `/vercel/next.js` with current official docs/code). The public catalog plugin remains not installed (`installed:false`) and is a separate surface, not an error. The failed OAuth prototype was removed. Context7 remains optional, advisory, quota-aware and never blocking.
 Existing Cloudflare use inside MusicLab/Cover Lab AI remains project-specific and distinct from the verified central MotorLab state store.
 
 SAFE ADOPTION RULE
@@ -106,5 +106,6 @@ FUTURE PROJECTS
 Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r16 authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.11
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.12
 Revision 2.11: GitBook live status reconciled to read/write CONNECTED_VERIFIED after OAuth Full access authorization and successful harmless draft change-request write check. Root cause recorded as prior Read only OAuth scope; prevention requires separate read and write capability checks. Central r16 release unchanged.
+Revision 2.12: Context7 Free custom MCP app reconciled to CONNECTED_VERIFIED after two end-to-end documentation checks. Catalog-plugin state is explicitly separated from custom-app state; the anonymous free endpoint is pinned and the failed OAuth prototype is recorded as removed. Central r16 release unchanged.
