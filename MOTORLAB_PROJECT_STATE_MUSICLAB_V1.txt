@@ -1,15 +1,15 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=19
-STATE_STATUS=CANDIDATA_VERIFIED
+STATE_REVISION=20
+STATE_STATUS=MADRE_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab19-player-direct-collapse
-OPERATION_STATUS=CANDIDATA_READY
-CURRENT_PHASE=LAB19 device-accepted by Bruno and preserved as stable CANDIDATA; MotorLab r15 synchronized on the LAB19 control-plane branch only.
-CURRENT_REF=candidate/musiclab-lab19-player-stable
+OPERATION_STATUS=MADRE_PROMOTED
+CURRENT_PHASE=LAB19 device-accepted CANDIDATA promoted by explicit Bruno approval to immutable MADRE at the exact same source SHA.
+CURRENT_REF=mother/musiclab-lab19-final
 CURRENT_HEAD_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 CURRENT_PROVIDER=GitHub + GitHub Actions
 CURRENT_JOB_ID=36682604681
@@ -18,24 +18,45 @@ LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
 WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=MADRE promotion only, intentionally pending explicit Bruno approval
-NEXT_SAFE_STEP=Preserve candidate/musiclab-lab19-player-stable unchanged. Any new application change requires r15 pre-change report + Bruno approval. For requested APK/ZIP defect work, use Artifact-First when causal work is safely deferrable.
-LAST_USER_INTENT_SUMMARY=Bruno approved global MotorLab Artifact-First behavior: deliver requested safe test APK/ZIP before safely deferrable root-cause/prevention work, while Root Cause Closure remains mandatory afterward.
+PENDING_VERIFICATION=none for MADRE promotion; exact Candidate SHA was preserved
+NEXT_SAFE_STEP=Use mother/musiclab-lab19-final as the canonical base for future LAB work. Preserve this MADRE unchanged. Any new application change starts in a new isolated LAB and follows the pre-change approval gate.
+LAST_USER_INTENT_SUMMARY=Bruno explicitly promoted the already tested LAB19 CANDIDATA directly to MADRE; no method replay, no rebuild, no runtime modification during promotion.
 
-STABLE_CANDIDATA
+CURRENT_MADRE
+REF=mother/musiclab-lab19-final
+SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+PROMOTED_FROM=candidate/musiclab-lab19-player-stable
+PROMOTED_FROM_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+PROMOTION_MODE=exact approved Candidate ref -> new immutable Mother ref
+RUNTIME_DIFF_FROM_CANDIDATE=NONE
+DEVICE_ACCEPTANCE=Bruno accepted LAB19/CANDIDATA on device as sufficiently working
+PROMOTION_APPROVAL=explicit Bruno approval 2026-09-30
+PREVIOUS_CANONICAL_MOTHER=mother/musiclab-112726
+PREVIOUS_CANONICAL_MOTHER_SHA=770849ff543289de3adffe5bab62bc09528d19f4
+UAB_MAIN_POINTER_UPDATED=yes
+PROMOTION_TRACE=.uab/promotions/MOTHER_LAB19_2026-09-30.txt
+
+STABLE_CANDIDATA_HISTORY
 REF=candidate/musiclab-lab19-player-stable
 SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 TESTED_RUNTIME_COMMIT=77745bcf77b4ded698c826b04c08843275d83fa1
 ARTIFACT_ID=11082129447
 APK_SHA256=da84c357b4d812dc51ce12fe719a77914412c87b2fb4ed28db9d18b51c8b8a66
 ZIP_SHA256=ebb10eee36a363c2280ec9d2f0a4036c6d6db1421e908775ec43bff5975f90f1
-DEVICE_ACCEPTANCE=Bruno accepted LAB19 on device as sufficiently working
-MADRE_MODIFIED=no
-MADRE_PROMOTION=no
+DEVICE_ACCEPTANCE=Bruno accepted on device before Mother promotion
+MADRE_PROMOTION=yes -> mother/musiclab-lab19-final
+
+CANDIDATE_LIFECYCLE_RULE_PERMANENT
+- A CANDIDATA is NOT a renamed LAB and must not be created by simply relabeling a LAB branch.
+- Normal CANDIDATA creation starts from the exact current MADRE, then replays/transplants the approved LAB method/change-set onto that MADRE.
+- Every newly constructed CANDIDATA must receive its own isolated identity plus APK + ZIP and must be tested by Bruno before MADRE promotion.
+- Only after Bruno explicitly approves a tested CANDIDATA may it be promoted to MADRE.
+- CANDIDATA -> MADRE promotion is different: it preserves the exact approved Candidate source SHA and creates/moves the new immutable Mother reference without replaying the LAB method again.
+- Existing historical MADRI remain preserved and are never overwritten merely because a newer MADRE is promoted.
 
 PLAYER_ROOT_CAUSE
 STATUS=CLOSED_DEVICE_VERIFIED
-SUMMARY=LAB19 fixed player re-expansion/ownership/collapse race and preserved the accepted implementation in the stable CANDIDATA and technical registry.
+SUMMARY=LAB19 fixed player re-expansion/ownership/collapse race and is now preserved in current MADRE mother/musiclab-lab19-final.
 
 MOTORLAB_R15_SYNC
 SYNC_STATUS=VERIFIED_CONTROL_PLANE_ONLY
@@ -46,12 +67,7 @@ LOCAL_CORE_BLOB=673b79c3954c1150c1fea470a9ad40a90409f855
 LAST_GOOD_BLOB=f9add06e85890f6a1e9d270c98c10c4fc6566b40
 SYNC_STATE_BLOB=2443e97fb4e33dbb6e2630d4072c6396c8f69f9b
 HOOK_BLOB=288a96c706a46db970b4880e1f2090659ba1446e
-CONTROL_PLANE_BRANCH_HEAD=dcf20dcb00f9b20ed8a1cdfc59864f0052fd636a
-COMPARE_BASE_R14=97cd0ad605e73c5a895ea08f9ccbbf7e9b29aa2e
-COMPARE_RESULT=only .motorlab/MOTORLAB_LOCAL_CORE.txt, .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt, .motorlab/MOTORLAB_SYNC_STATE.txt and MOTORLAB_PROJECT_HOOK.txt changed
-CI_SUPPRESSION=zero workflow runs at r15 control-plane head
 APPLICATION_RUNTIME_IMPACT=NONE
-CANDIDATE_IMMUTABILITY=preserved; r15 metadata not injected into stable candidate ref
 
 R15_ARTIFACT_FIRST
 POLICY=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -73,17 +89,20 @@ PATH=MOTORLAB_MODIFICATION_RESTORE_REGISTER_MUSICLAB_V1.txt
 VISIBLE_SLOTS=1
 NEXT_RESTORE_NO=2
 RESTORE_NO_1=Player / mini-player fuori dal lettore
-RESTORE_NO_1_SOURCE_REF=candidate/musiclab-lab19-player-stable
+RESTORE_NO_1_SOURCE_REF=mother/musiclab-lab19-final
 RESTORE_NO_1_SOURCE_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 RULE=only Bruno-confirmed working modifications enter; same feature updates same number; failed/unconfirmed attempts stay out
 
 TECHNICAL_CHANGE_HISTORY=MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
 
 CONTINUITY_RULES
-- Stable application continuation point is candidate/musiclab-lab19-player-stable.
-- Preserve CANDIDATA unchanged as rollback/restore point.
+- Canonical application continuation point is mother/musiclab-lab19-final.
+- Preserve current MADRE unchanged as stable production baseline/rollback point.
+- Future LABs start from current MADRE unless Bruno explicitly selects another base.
+- Future CANDIDATE creation uses the permanent Mother -> replay approved LAB method -> isolated Candidate APK+ZIP -> Bruno test workflow.
+- Candidate -> Mother promotion preserves exact approved Candidate SHA.
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r15 Artifact-First + deferred Root Cause + dual progress
+UPDATED_BY=MotorLab r15 LAB19 CANDIDATA -> MADRE exact promotion
 UPDATED_DATE=2026-09-30
