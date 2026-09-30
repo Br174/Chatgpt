@@ -12,7 +12,7 @@ BOOT
 2. Use VERIFIED local core immediately as fallback.
 3. When central is reachable, read release manifest and compare releases.
 4. Reconcile Project Continuity/live state before selecting a safe update boundary.
-5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, and r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing.
+5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, and r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status.
 
 SAFE UPDATE
 - pin one MotorLab release during active write/build/test/promotion;
@@ -70,6 +70,7 @@ GITBOOK_MANUAL_PROJECTION_ONLY=required
 SUPERPOWERS_SUBORDINATE=required
 CONTEXT7_ON_DEMAND=required
 FREE_FIRST_PLUGIN_ROUTING=required
+SERVICE_INTEGRATION_STATUS=required
 
 R16+ AUTHORITY / PERSISTENT STATE / TOOL ROUTING
 Local fallback must preserve:
@@ -81,7 +82,8 @@ Local fallback must preserve:
 - Notion/GitBook projection-only roles;
 - Superpowers subordinate methodology;
 - Context7 targeted on-demand documentation;
-- graceful degradation and no hidden paid fallback.
+- graceful degradation and no hidden paid fallback;
+- explicit CORE_READY vs CONNECTED_VERIFIED/RESOURCE_READY/PROJECT_ADOPTED status from MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt.
 Local r16 adoption does NOT mean optional provider/plugin connections are active; capability status must be verified separately.
 
 R15+ ARTIFACT-FIRST
@@ -120,4 +122,4 @@ MotorLab metadata must not intentionally alter app code/UI/package/signing/nativ
 
 VERSION
 MOTORLAB-SATELLITE-SYNC-V1.12
-Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing markers and explicit separation between policy adoption and live provider/plugin connection.
+Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
