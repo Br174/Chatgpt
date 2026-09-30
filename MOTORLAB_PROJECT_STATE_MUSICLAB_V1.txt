@@ -1,15 +1,15 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=16
-STATE_STATUS=COMPLETED_VERIFIED
+STATE_REVISION=17
+STATE_STATUS=CANDIDATA_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab19-player-direct-collapse
-OPERATION_STATUS=COMPLETED_LAB_READY
-CURRENT_PHASE=LAB19 correzione diretta player completata, testata, pulita, sincronizzata MotorLab r13 e artefatto pronto per Bruno
-CURRENT_REF=uab-build/musiclab-player-direct-collapse-19
+OPERATION_STATUS=CANDIDATA_READY
+CURRENT_PHASE=LAB19 verificata sul dispositivo da Bruno e promossa a CANDIDATA stabile per futura MADRE; non perfetta ma sufficientemente funzionante secondo accettazione utente
+CURRENT_REF=candidate/musiclab-lab19-player-stable
 CURRENT_HEAD_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 CURRENT_PROVIDER=GitHub + GitHub Actions
 CURRENT_JOB_ID=36682604681
@@ -17,25 +17,25 @@ CURRENT_JOB_STATUS=success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB19 runtime commit 77745bcf77b4ded698c826b04c08843275d83fa1 passed real app+innertube JVM regression, UAB preflight, isolated LAB19 build, ZIP validation and artifact upload. Temporary LAB19 workflow/transform scripts were removed. At the next safe boundary only MotorLab control-plane files were synchronized to r13; compare tested runtime..final contains no app/runtime changes. Direct APK and ZIP were extracted and locally reverified.
-NEXT_SAFE_STEP=Bruno installs/tests MusicLab LAB19 side-by-side. Verify that the full player becomes mini-player when opening Originali, Cover, artist/album and when starting playback from Cover/Originali results. Device acceptance is required before declaring the visible behavior definitively closed. If the defect remains, preserve LAB19 and create isolated LAB20; never edit MADRE directly. Do not promote CANDIDATA/MADRE without Bruno explicit approval.
-PENDING_VERIFICATION=device acceptance by Bruno only; automated implementation/test/build/delivery verification complete
-ACTIVE_ARTIFACT=MusicLab-LAB-19-APK-ZIP artifact_id=11082129447 digest=sha256:556414a45b852f22f1d14f20e01159c925aa4a3ec1baf13057009cf239237e75 run_id=36682604681 tested_runtime_head=77745bcf77b4ded698c826b04c08843275d83fa1 final_branch_head=6f3efabd77d6e0a918b91091bb1862986d1dc5fc apk_sha256=da84c357b4d812dc51ce12fe719a77914412c87b2fb4ed28db9d18b51c8b8a66 zip_sha256=ebb10eee36a363c2280ec9d2f0a4036c6d6db1421e908775ec43bff5975f90f1
+LAST_COMPLETED_MATERIAL_STEP=LAB19 runtime commit 77745bcf77b4ded698c826b04c08843275d83fa1 passed full regression/UAB/build and Bruno then confirmed on real device that the player now works sufficiently well. Stable candidate ref candidate/musiclab-lab19-player-stable was created at exact final LAB19 SHA 6f3efabd77d6e0a918b91091bb1862986d1dc5fc and indexed in the r13 semantic restore registry.
+NEXT_SAFE_STEP=Preserve candidate/musiclab-lab19-player-stable unchanged. If Bruno requests further refinements, create a new isolated LAB from this CANDIDATA and keep the candidate as rollback/restore point. Promote to MADRE only after Bruno explicitly requests final promotion and the required CANDIDATA->MADRE gate is satisfied.
+PENDING_VERIFICATION=no pending player device verification; Bruno accepted LAB19 as sufficiently working. MADRE promotion is intentionally pending explicit future Bruno approval.
+ACTIVE_ARTIFACT=MusicLab-LAB-19-APK-ZIP artifact_id=11082129447 digest=sha256:556414a45b852f22f1d14f20e01159c925aa4a3ec1baf13057009cf239237e75 run_id=36682604681 tested_runtime_head=77745bcf77b4ded698c826b04c08843275d83fa1 final_branch_head=6f3efabd77d6e0a918b91091bb1862986d1dc5fc candidate_ref=candidate/musiclab-lab19-player-stable candidate_sha=6f3efabd77d6e0a918b91091bb1862986d1dc5fc apk_sha256=da84c357b4d812dc51ce12fe719a77914412c87b2fb4ed28db9d18b51c8b8a66 zip_sha256=ebb10eee36a363c2280ec9d2f0a4036c6d6db1421e908775ec43bff5975f90f1
 WRITE_LOCK_SCOPE=released
-LAST_USER_INTENT_SUMMARY=LAB18 still left the expanded player persistent when opening Originali/Cover/artist and when interacting with Cover/Originali results. Create isolated LAB19 and fix the actual player ownership/navigation/playback paths without changing AI, graphics or MADRE.
+LAST_USER_INTENT_SUMMARY=Bruno confirmed that LAB19 player behavior now works, though the version is not perfect. He explicitly promoted this state to CANDIDATA for a future MADRE and requested that the working player state be preserved in the restore registry.
 
 VERIFIED_LAB19_FINAL_STATE
 - source base: LAB18 final 0dca84c1855dd8c7bb8de021208700b8f72a06fe
 - LAB19 branch: uab-build/musiclab-player-direct-collapse-19
 - tested runtime commit: 77745bcf77b4ded698c826b04c08843275d83fa1
-- final branch head after cleanup + MotorLab r13 control-plane sync: 6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-- compare tested runtime..final: three temporary LAB19 verification files removed plus .motorlab/MOTORLAB_LOCAL_CORE.txt, .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt, .motorlab/MOTORLAB_SYNC_STATE.txt and MOTORLAB_PROJECT_HOOK.txt changed; zero app/runtime changes after tested runtime
+- final LAB19 branch head: 6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+- stable CANDIDATA ref: candidate/musiclab-lab19-player-stable
+- stable CANDIDATA SHA: 6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 - successful full verification run: 36682604681
 - final verification job: 109781495366
 - real regression JVM tests passed: :app:testFossDebugUnitTest and :innertube:testDebugUnitTest
-- Gradle regression result: BUILD SUCCESSFUL in 4m41s; 67 actionable tasks, 65 executed, 2 from cache
 - UAB preflight: 9 OK, 0 warnings, 0 errors
-- UAB build: BUILD SUCCESSFUL in 1m38s
+- UAB build: success
 - isolated applicationId: it.verlezza.musiclab.lab.lab19
 - generated archive: MusicLab-LAB-19-APK.zip
 - ZIP validation: no errors detected
@@ -43,16 +43,16 @@ VERIFIED_LAB19_FINAL_STATE
 - artifact digest: sha256:556414a45b852f22f1d14f20e01159c925aa4a3ec1baf13057009cf239237e75
 - APK SHA256: da84c357b4d812dc51ce12fe719a77914412c87b2fb4ed28db9d18b51c8b8a66
 - delivery ZIP SHA256: ebb10eee36a363c2280ec9d2f0a4036c6d6db1421e908775ec43bff5975f90f1
-- direct APK/ZIP extracted and reverified locally
+- Bruno device acceptance: 2026-09-30, player funziona abbastanza bene; version not perfect but accepted as CANDIDATA
 - no MADRE modified
-- no CANDIDATA created
+- no final MADRE promotion performed
 - AI discovery/search behavior inherited unchanged from LAB17/LAB18
 - approved graphics unchanged
 
 LAB19_IMPLEMENTATION_SCOPE
 - MainActivity explicitly owns/binds PlayerBottomSheetBridge to the true primary player BottomSheetState; generic BottomSheet creation no longer heuristically claims the bridge.
-- BottomSheetState gained collapseToMiniPlayerNow(), which moves the real player directly to the collapsed anchor and cancels competing animation state before external navigation proceeds.
-- MainActivity route fallback uses the immediate mini-player collapse.
+- BottomSheetState gained collapseToMiniPlayerNow(), moving the real player directly to the collapsed anchor and cancelling competing animation state before external navigation proceeds.
+- MainActivity route fallback uses immediate mini-player collapse.
 - PlayerMenu passes its real playerBottomSheetState into MusicLabIntelligenceActions and collapses before artist/album navigation.
 - MusicLabIntelligenceActions accepts direct real state when supplied; SongMenu remains compatible through the explicitly MainActivity-bound bridge fallback.
 - CoverNavigationBridge and OriginalVersionNavigationBridge collapse the true player before route entry.
@@ -62,15 +62,15 @@ LAB19_IMPLEMENTATION_SCOPE
 - Existing LAB18 global navigation protection is retained as a second layer.
 
 ROOT_CAUSE_LAB19_PLAYER_PERSISTENCE_2026_09_30
-INCIDENT_STATUS=CLOSED_IMPLEMENTATION_VERIFIED_DEVICE_ACCEPTANCE_PENDING
+INCIDENT_STATUS=CLOSED_DEVICE_VERIFIED
 SYMPTOM=LAB18 device test still showed full player persistence for Originali, Cover, Vai all'artista and Cover/Originali result interactions.
 ROOT_CAUSE_CONFIRMED_1=CoverSearchScreen.play() and OriginalVersionScreen.preview() explicitly called PlayerBottomSheetBridge.expandSoft() after starting playback, directly re-expanding the player after navigation/result actions.
 ROOT_CAUSE_CONFIRMED_2=MusicLabIntelligenceActions did not receive PlayerMenu's real BottomSheetState and relied on a global bridge.
 ROOT_CAUSE_CONFIRMED_3=PlayerBottomSheetBridge was attached heuristically from generic rememberBottomSheetState creation, so ownership of the primary player was not structurally guaranteed.
 ROOT_CAUSE_CONFIRMED_4=Soft collapse animation could compete with later expand/state animation; route-level checks alone could not guarantee the final collapsed anchor.
 CORRECTION=Explicit MainActivity bridge ownership + immediate collapsed-anchor API + direct PlayerMenu state propagation + direct-state-first/SongMenu-safe fallback + collapse before route entry + removal of result expandSoft paths.
-REVERIFICATION=Final run 36682604681 passed full JVM regression, UAB preflight, LAB19 build, ZIP validation and artifact upload. Workflow gate explicitly asserted that CoverSearchScreen and OriginalVersionScreen no longer contain PlayerBottomSheetBridge.expandSoft() in the transformed source.
-RECURRENCE_PROTECTION=Primary player bridge ownership is explicit; MusicLab entry paths collapse before navigation; result playback cannot deliberately expand full player; compiler covers multiple MusicLab menu callers; device acceptance remains mandatory before visible-behavior closure.
+REVERIFICATION=Run 36682604681 passed full JVM regression/UAB/build and Bruno then confirmed real-device behavior is sufficiently working.
+RECURRENCE_PROTECTION=Primary player bridge ownership is explicit; MusicLab entry paths collapse before navigation; result playback cannot deliberately expand full player; exact accepted implementation is preserved in candidate/musiclab-lab19-player-stable and semantic restore registry.
 
 ROOT_CAUSE_LAB19_API_COMPAT_2026_09_30
 INCIDENT_STATUS=CLOSED_VERIFIED
@@ -86,19 +86,17 @@ CENTRAL_RELEASE=2026.09.30-r13
 LAB19_LOCAL_RELEASE=2026.09.30-r13
 LAB19_LAST_GOOD_RELEASE=2026.09.30-r11
 SAFE_BOUNDARY=after LAB19 runtime test/build/artifact/cleanup
-- .motorlab/MOTORLAB_LOCAL_CORE.txt is exact r13 central bundle blob 833072f9213ce7d7e8b83548e2ea8571a90f0505
-- .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt preserves exact former r11 bundle blob 1d23d9d02a938fc6b661574dd580bc1d6f0148e3
-- MOTORLAB_PROJECT_HOOK.txt is r13 hook blob 898e8945cc7e14f0f72bc5f39a0e50e1135da950
-- sync state declares LOCAL_RELEASE r13 and LAST_GOOD r11
 - r13 semantic Change History registry pointer and selective exact restore are active
-- branch workflow query after cleanup/sync showed no new app workflow runs beyond the five LAB19 verification attempts; metadata-only sync did not become a new LAB/build
-- application runtime impact: NONE
+- application runtime impact of MotorLab sync: NONE
 
 CHANGE_HISTORY_R13
 - central semantic registry: MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
-- LAB19 registered as musiclab-20260930-lab19-player-direct-mini-collapse with immutable implementation commit 77745bcf77b4ded698c826b04c08843275d83fa1
-- LAB18 player record marked SUPERSEDED by LAB19
-- future semantic queries such as player/lettore/mini-player resolve registry evidence before raw Git archaeology
+- LAB19 registered as musiclab-20260930-lab19-player-direct-mini-collapse
+- status now CANDIDATA_DEVICE_VERIFIED
+- exact implementation commit: 77745bcf77b4ded698c826b04c08843275d83fa1
+- stable candidate ref: candidate/musiclab-lab19-player-stable at 6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+- LAB18 player record remains SUPERSEDED by LAB19
+- future player/lettore/mini-player restore requests should prefer this accepted candidate unless Bruno specifies a different historical version
 
 INHERITED_LAB17_AI_SCOPE
 - Cover/Originali AI remains stepwise and inherited unchanged.
@@ -111,23 +109,20 @@ INHERITED_LAB17_AI_SCOPE
 - Details/credits are on demand.
 
 UPSTREAM_GUARDIAN_STATE_PRESERVED
-- permanent Meld Guardian inherited from LAB15 through LAB19
+- permanent Meld Guardian inherited from LAB15 through LAB19 CANDIDATA
 - Meld accepted baseline remains v0.9.2 commit dc7a27224acee33fa475ab70e1935dc03d3ef4ef
 - sole upstream remains FrancescoGrazioso/Meld
 - direct MetroList upstream remains disabled
-- no upstream integration/promotion occurred in LAB19
+- no upstream integration/promotion occurred in this candidate promotion
 
 CONTINUITY_RULES
 - New MusicLab chats load this ledger automatically after MotorLab boot and reconcile newer live evidence.
-- Current application continuation point is LAB19.
-- Completed LAB19 automated work has a 100% recovery floor; do not restart it because a chat changes.
-- Device acceptance by Bruno is the only pending LAB19 acceptance gate.
-- A Bruno-reported defect after LAB19 device testing starts a new isolated LAB20 while preserving LAB19.
+- Current stable application continuation point is candidate/musiclab-lab19-player-stable.
+- Preserve this CANDIDATA unchanged as rollback/restore point.
+- Further changes start in a new isolated LAB from the CANDIDATA unless Bruno specifies another baseline.
 - MotorLab/control-plane-only commits/jobs do not create a new LAB/MADRE/CANDIDATA.
-- Future isolated correction loops use current MotorLab risk-scaled verification; HIGH risk and CANDIDATA/MADRE retain full applicable gates.
-- Future Meld work uses the Guardian baseline inherited by LAB19.
-- CANDIDATA -> MADRE requires explicit Bruno approval.
+- MADRE promotion requires explicit Bruno approval; candidate status alone is not MADRE approval.
 - Do not require Bruno to paste activation or transfer prompts.
 
-UPDATED_BY=MotorLab r13 LAB19 completion + semantic change capture
+UPDATED_BY=MotorLab r13 LAB19 device acceptance + CANDIDATA promotion
 UPDATED_DATE=2026-09-30
