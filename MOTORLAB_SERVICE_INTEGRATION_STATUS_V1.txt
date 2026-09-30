@@ -37,10 +37,12 @@ NOTES: Existing project Cloudflare usage (for example MusicLab backend and Cover
 
 3. PostHog
 CORE: READY via MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
-PLUGIN: available in ChatGPT
-CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+PLUGIN: installed in ChatGPT
+CONNECTION: CONNECTED_VERIFIED
 ROLE TARGET: runtime error/diagnostic evidence
+ACCESS MODE: read-only OAuth permissions selected by Bruno during 2026-09-30 connection flow
 PROJECT INSTRUMENTATION: none implied by r16; requires approved project changes.
+NOTES: ChatGPT plugin installation state verified after OAuth completion. PostHog remains evidence-only and may not authorize MotorLab lifecycle or code changes.
 
 4. Notion
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
@@ -50,9 +52,17 @@ ROLE TARGET: Bruno-facing status projection only.
 
 5. GitBook
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
-PLUGIN: available in ChatGPT
-CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+PLUGIN: installed in ChatGPT
+CONNECTION: CONNECTED_VERIFIED
 ROLE TARGET: stable architecture/manual projection only.
+OFFICIAL ORGANIZATION: A9usorLUOQqSZkfpTNSC — MotorLab
+OFFICIAL SITE: site_Sa5jX — MotorLab Docs
+RESOURCE READ CHECK: PASSED; site and private spaces readable through GitBook connector
+WRITE SCOPE: granted for space content because GitBook groups create/update/delete in one OAuth scope; no destructive use is authorized by scope grant alone
+DELETE SAFETY: MotorLab must never delete GitBook pages/spaces/resources without explicit Bruno approval
+DUPLICATE ORGANIZATION: b4kJ1c9U3q9PiotBhFW4 — MotorLab — DO_NOT_USE; created seconds earlier during onboarding duplication
+PLAN STATE: official and duplicate organizations currently report active Pro trial through 2026-10-14; Free is the intended steady-state plan. Do not assume downgrade complete until separately verified.
+NOTES: Official organization selection fixed on 2026-09-30 after read-only comparison of both duplicates. Site publishing/admin/AI/OpenAPI/change-request merge permissions were intentionally not granted in the OAuth customization used by Bruno.
 
 6. Superpowers
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
@@ -64,14 +74,18 @@ NOTES: Connection verified in the 2026-09-30 r16 integration session; Superpower
 7. Context7
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 PLUGIN: available in ChatGPT
-CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+CONNECTION: AVAILABLE_NOT_CONNECTED
 ROLE TARGET: quota-aware, on-demand current/versioned technical documentation.
+NOTES: Initial 2026-09-30 mobile connection attempt failed on Context7 client-side page load; MotorLab remains fully usable without it.
 
 CONNECTION RULE
 Connecting/installing a ChatGPT plugin requires explicit user action. Once connected, update this registry only after a real tool capability check verifies access.
 
 CLOUDFLARE RULE
 Central MotorLab D1/KV becomes RESOURCE_READY only after actual resources, schema/bindings and read/write/recovery checks are verified. Existing Cloudflare resources owned by application projects do not automatically satisfy this requirement.
+
+GITBOOK RULE
+GitBook is a derived manual/architecture projection, never technical authority. GitHub remains authoritative. The official GitBook organization/site identifiers above must be used for future MotorLab documentation work unless Bruno explicitly changes them. OAuth permission to delete does not constitute approval to delete. A GitBook plan/trial state must not silently create paid usage; MotorLab must remain free-first.
 
 PROJECT ADOPTION RULE
 PostHog instrumentation or other runtime integration inside an app is PROJECT_ADOPTED only after normal MotorLab pre-change approval, isolated LAB change, verification and project-specific safe adoption.
@@ -80,6 +94,6 @@ FAIL-SAFE
 No AVAILABLE_NOT_CONNECTED or DEGRADED optional integration blocks MotorLab core operation.
 
 VERSION
-MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.1
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.2
 Established: 2026-09-30
-Revision 1.1: Superpowers connection verified during r16 integration.
+Revision 1.2: PostHog and GitBook connections verified; official GitBook organization/site fixed; duplicate quarantined; GitBook trial and destructive-scope safeguards recorded.
