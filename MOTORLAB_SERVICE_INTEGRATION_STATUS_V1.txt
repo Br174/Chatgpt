@@ -68,16 +68,18 @@ NOTES: Initial MotorLab Control Center created and verified on 2026-09-30. The c
 5. GitBook
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 PLUGIN: installed in ChatGPT
-CONNECTION: CONNECTED_VERIFIED
+CONNECTION: CONNECTED_VERIFIED for read access
+WRITE CAPABILITY: DEGRADED — change-request creation returned HTTP 403 `requires user auth` on 2026-09-30
 ROLE TARGET: stable architecture/manual projection only.
 OFFICIAL ORGANIZATION: A9usorLUOQqSZkfpTNSC — MotorLab
 OFFICIAL SITE: site_Sa5jX — MotorLab Docs
 RESOURCE READ CHECK: PASSED; site and private spaces readable through GitBook connector
-WRITE SCOPE: granted for space content because GitBook groups create/update/delete in one OAuth scope; no destructive use is authorized by scope grant alone
+WRITE CHECK: FAILED at create_change_request; current connector can read but cannot publish content changes until user-authenticated write access is restored.
+GIT SYNC CHECK: no Git sync configured for the Documentation space, so there is no safe GitHub-side bypass.
 DELETE SAFETY: MotorLab must never delete GitBook pages/spaces/resources without explicit Bruno approval
 DUPLICATE ORGANIZATION: b4kJ1c9U3q9PiotBhFW4 — MotorLab — DO_NOT_USE; created seconds earlier during onboarding duplication
 PLAN STATE: official and duplicate organizations currently report active Pro trial through 2026-10-14; Free is the intended steady-state plan. Do not assume downgrade complete until separately verified.
-NOTES: Official organization selection fixed on 2026-09-30 after read-only comparison of both duplicates. Site publishing/admin/AI/OpenAPI/change-request merge permissions were intentionally not granted in the OAuth customization used by Bruno.
+NOTES: Official organization selection fixed on 2026-09-30 after read-only comparison of both duplicates. GitBook remains optional and non-blocking; GitHub remains authoritative while GitBook write auth is degraded.
 
 6. Superpowers
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
@@ -100,7 +102,7 @@ CLOUDFLARE RULE
 Central MotorLab D1/KV is RESOURCE_READY only while actual resources, bindings and read/write/recovery behavior remain verified. GitHub remains technical authority and recovery source; Cloudflare never becomes a competing technical source of truth.
 
 GITBOOK RULE
-GitBook is a derived manual/architecture projection, never technical authority. GitHub remains authoritative. The official GitBook organization/site identifiers above must be used for future MotorLab documentation work unless Bruno explicitly changes them. OAuth permission to delete does not constitute approval to delete. A GitBook plan/trial state must not silently create paid usage; MotorLab must remain free-first.
+GitBook is a derived manual/architecture projection, never technical authority. GitHub remains authoritative. The official GitBook organization/site identifiers above must be used for future MotorLab documentation work unless Bruno explicitly changes them. OAuth permission to delete does not constitute approval to delete. A GitBook plan/trial state must not silently create paid usage; MotorLab must remain free-first. If write auth is unavailable, MotorLab records the degradation and continues without blocking core work.
 
 NOTION RULE
 Notion is a derived Bruno-facing control view, never technical authority. GitHub remains authoritative. The official dashboard identifier and URL above must be used for future MotorLab status projection unless Bruno explicitly changes them. No Notion page/database deletion is authorized by connection or write access alone.
@@ -112,6 +114,6 @@ FAIL-SAFE
 No AVAILABLE_NOT_CONNECTED or DEGRADED optional integration blocks MotorLab core operation.
 
 VERSION
-MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.4
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.5
 Established: 2026-09-30
-Revision 1.4: central MotorLab Cloudflare Worker/D1/KV resources and GitHub webhook relay verified end-to-end; Cloudflare marked CONNECTED_VERIFIED / RESOURCE_READY with GitHub authoritative fallback preserved.
+Revision 1.5: Cloudflare remains CONNECTED_VERIFIED / RESOURCE_READY; GitBook read access verified but write capability truthfully marked DEGRADED after HTTP 403 user-auth requirement and absence of Git Sync bypass.
