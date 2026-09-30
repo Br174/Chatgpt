@@ -5,12 +5,13 @@ Canonical MotorLab release/version manifest.
 Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.30-r10
+CURRENT_RELEASE=2026.09.30-r11
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
+ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 
 PURPOSE
 Provide one authoritative MotorLab release identity and required capabilities for persistent project orchestration.
@@ -23,6 +24,7 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_PROJECT_CONTINUITY_V1.txt
 - MOTORLAB_GOVERNANCE_V1.txt
 - MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt
+- MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 - MOTORLAB_WATCHDOG_V1.txt
 - MOTORLAB_RESUME_RECOVERY_V1.txt
 - MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt
@@ -67,7 +69,7 @@ R9+ LABELED VISUAL STATUS
 Every MotorLab status emoji shown to Bruno includes its canonical short Italian label beside it. Repeated fireworks/lightning counts are obsolete as user-facing severity codes. 🎆 means a completed action/phase, while 💯 is reserved exclusively for full end-to-end requested completion after verification/delivery.
 
 R10+ EXTENDED VISUAL STATUS + HIGH-PRESENCE NUMERIC PROGRESS
-For release 2026.09.30-r10 and later, canonical visual status additionally includes:
+Canonical visual status additionally includes:
 - 🔍 Ricerca soluzione
 - 🧩 Compatibile
 - 🐢 Lentezza rilevata
@@ -75,8 +77,24 @@ For release 2026.09.30-r10 and later, canonical visual status additionally inclu
 - ⏳ Attesa esterna
 - 🧪 Test / verifica in corso
 - 🔄 Sincronizzazione in corso
+Classic format remains `Progresso MotorLab: <N>%`; numeric progress is evidence-based, monotonic and highly present.
 
-Full canonical legend:
+R11+ ROOT CAUSE CLOSURE + HARD PROGRESS VISIBILITY
+For release 2026.09.30-r11 and later:
+- every real problem/anomaly receives immediate containment plus root-cause investigation;
+- manual alignment/symptom repair alone is not definitive closure;
+- causal status must distinguish confirmed cause, leading hypothesis, external cause or unknown cause;
+- recurrence surfaces are checked proportionately and prevention/regression protection is added when justified;
+- `✅ Problema risolto` requires Root Cause Closure permission; a one-off successful retry or manual refresh is insufficient;
+- stale Project Continuity write-through is itself a problem whose cause must be investigated;
+- newer live events are classified before they can change app lifecycle identity; MotorLab-control-plane-only activity cannot silently become a new LAB/MADRE/CANDIDATA;
+- control-plane-only changes that unexpectedly trigger app builds/releases are root-cause anomalies and trigger hygiene must be corrected when safe;
+- after the MotorLab banner, any active/pending substantial operation must establish/reconstruct and show `Progresso MotorLab: <N>%` before long opaque work;
+- every meaningful visible status during a quantified operation carries the current N% when the surface permits;
+- long/provider jobs repeat the same percentage on material phase changes instead of going silent;
+- root-cause/prevention work is part of the operation and prevents premature 100% closure.
+
+FULL CANONICAL LEGEND
 ⚙️ MotorLab attivo
 🎆 Azione completata
 ⚡ Risveglio / recupero
@@ -96,17 +114,6 @@ Full canonical legend:
 🧪 Test / verifica in corso
 🔄 Sincronizzazione in corso
 
-R10 numeric-progress rule:
-- classic format remains `Progresso MotorLab: <N>%`;
-- numeric percentage is a first-class high-presence signal during substantial work;
-- once a verified progress value exists, every meaningful user-facing operational status should normally include the current N%, even if unchanged;
-- repeated same percentage is correct when state changes without a newly verified milestone;
-- no percentage is invented merely for visibility;
-- numeric progress remains evidence-based, monotonic and governed by Progress Reporting/Recovery Floor;
-- 💭 is high-level operational analysis only and must not expose private chain-of-thought;
-- 🐢 slow-but-live and ⏳ legitimate external waiting are distinct from ⚡ actual recovery/health intervention;
-- 🧪 and 🔄 indicate in-progress verification/synchronization and do not imply completion.
-
 STATE AUTHORITY ORDER
 1. explicit current Bruno instruction;
 2. live repository/provider/job/artifact evidence;
@@ -116,12 +123,13 @@ STATE AUTHORITY ORDER
 6. memory/copied summaries.
 
 FUTURE PROJECT RULE
-Every future concrete MotorLab software project receives hook + local satellite + central Project Continuity ledger and inherits the current labeled visual-status and numeric-progress contracts automatically.
+Every future concrete MotorLab software project receives hook + local satellite + central Project Continuity ledger and inherits Root Cause Closure, labeled visual status and the hard numeric-progress visibility gate automatically.
 
 NO RUNTIME REGRESSION
 MotorLab control-plane/reporting metadata must not intentionally alter application runtime, UI, package/signing identity, source lifecycle or native engines.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.10
-Revision 1.9: release r9; permanent labeled visual status legend and final-only 💯.
-Revision 1.10: release r10; seven additional labeled operational states and highly present classic numeric Progresso MotorLab N% on substantial status updates.
+MOTORLAB-RELEASE-MANIFEST-V1.11
+Revision 1.9: r9 permanent labeled visual status and final-only 💯.
+Revision 1.10: r10 extended visual status and high-presence classic numeric progress.
+Revision 1.11: r11 adds mandatory Root Cause Closure, live-event classification and hard first/ongoing numeric progress visibility.
