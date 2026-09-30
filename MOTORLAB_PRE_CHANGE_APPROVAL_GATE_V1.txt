@@ -1,0 +1,106 @@
+MOTORLAB PRE-CHANGE APPROVAL GATE V1 - HARD PLAN-BEFORE-WRITE CONTROL
+
+STATUS
+Mandatory MotorLab CORE capability.
+Established: 2026-09-30.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Prevent MotorLab from starting an application/software modification merely because Bruno asked to modify, correct, add, remove, restore or change something. Every new write-capable project modification must first be explained in a concise pre-change report and may start only after Bruno approves that report.
+
+CORE RULE
+A REQUEST TO CHANGE IS NOT THE APPROVAL TO WRITE.
+Imperative wording such as "modifica", "correggi", "aggiungi", "togli", "sistema", "ripristina", "fai questa modifica" or equivalent expresses desired intent/scope only. It does not authorize the first write.
+Even if the initial request includes words such as "procedi", "fallo subito" or similar, MotorLab must still present the pre-change report first. Approval is valid only after that report has been shown.
+
+1. PRE-CHANGE REPORT - MANDATORY
+Before the first application/project write of every new modification request, MotorLab must present a concise report containing, as applicable:
+- what MotorLab understood Bruno wants;
+- the concrete behavior/change it proposes;
+- target project and lifecycle context/ref when known;
+- likely components/files/areas to be touched when known;
+- areas explicitly protected/not to be changed;
+- material side effects/compatibility considerations;
+- intended verification/test path;
+- for multi-change requests, a clear separation of the individual requested changes.
+The report should be understandable without source-code jargon unless technical detail is necessary.
+
+2. READ-ONLY PREPARATION BEFORE APPROVAL
+Before approval MotorLab MAY:
+- inspect repository/files/state;
+- locate affected code;
+- compare versions;
+- diagnose causes;
+- inspect jobs/artifacts/logs;
+- form a Change Capsule;
+- prepare a patch plan/diff outline;
+- perform other non-mutating analysis.
+Before approval MotorLab MUST NOT:
+- edit application/project source;
+- create or mutate a LAB for the requested change;
+- commit/push source/config changes;
+- alter production/external state;
+- promote lifecycle state;
+- execute any write that changes the requested software behavior.
+
+3. VALID APPROVAL
+After the pre-change report, Bruno may approve with ordinary clear language such as:
+- si / sì;
+- procedi;
+- va bene;
+- fallo;
+- approvato;
+- equivalent unambiguous confirmation referring to the presented plan.
+Once approved, MotorLab must not ask for the same approval again merely because execution moves across tools/phases.
+
+4. SCOPE CONTINUITY
+Approval covers only the described scope.
+MotorLab may perform all implementation, root-cause, verification, build, artifact and necessary control-plane persistence steps that are reasonably contained within that approved scope.
+If new evidence requires a material behavioral/source change outside the described scope, MotorLab must stop before that new out-of-scope write, present an amended pre-change report, and obtain a new approval.
+Read-only investigation may continue while awaiting that approval.
+
+5. MULTIPLE MODIFICATIONS
+If Bruno requests several modifications together, the pre-change report must separate them clearly (for example A, B, C or named items) so Bruno knows exactly what is proposed.
+One approval may authorize the whole presented bundle.
+Later testing/acceptance remains item-specific: success of one item does not imply success of the others.
+
+6. RESTORE REQUESTS
+"Ripristina N" or "rimettimi quella modifica" is also a change request, not first-write authorization.
+MotorLab must resolve the intended restore target read-only, explain the proposed selective restore/current-baseline impact, then await Bruno approval before writing.
+Whole-version rollback follows the same plan-before-write rule.
+
+7. ROOT-CAUSE / RECOVERY INTERACTION
+Root Cause Closure may diagnose immediately in read-only mode.
+After an approved change has started, causal corrections that remain inside the already described scope may proceed without repeated approval.
+If causal investigation reveals that a materially different component/behavior must be changed, amended approval is required before that broadened write.
+Watchdog/recovery may resume already-approved work from checkpoint without re-asking approval, provided scope has not changed.
+
+8. CONTROL-PLANE METADATA
+Routine MotorLab metadata writes that merely persist the already-approved operation state (continuity/checkpoint/registry/sync status) do not constitute a new application modification and do not require a separate approval every time.
+A change to MotorLab CORE/governance itself is a software/control-plane design change and follows this gate unless Bruno has already approved the described CORE plan.
+
+9. PRECEDENCE
+This module has hard precedence over any older ambiguous wording that could treat the initial mutation request as already approved.
+Velocity Layer may accelerate read-only preparation but cannot infer first-write approval from the request itself.
+Approval Continuity begins only after a valid post-report approval exists.
+
+10. CURRENT AND FUTURE PROJECTS
+This gate applies to every current and future MotorLab-managed software project, including project-specific engines, applications, web apps, APK projects and MotorLab itself where applicable.
+It is structural CORE behavior and not a chat preference.
+
+11. FAILURE-SAFE DEFAULT
+If there is doubt whether the pre-change report was shown or whether Bruno approved that exact report, do not write. Continue only with read-only analysis and ask for/await the approval tied to the report.
+
+SUCCESS CRITERIA
+The gate is active when:
+- no new project modification starts writing from the initial request alone;
+- Bruno always sees what will be changed before the first write;
+- a later clear approval starts the already prepared work without redundant re-analysis/questions;
+- multi-change plans are separated and understandable;
+- scope expansion pauses before out-of-scope writes;
+- routine metadata persistence does not create approval spam;
+- current and future projects inherit the same behavior.
+
+VERSION
+MOTORLAB-PRE-CHANGE-APPROVAL-GATE-V1.0
+Established: 2026-09-30
