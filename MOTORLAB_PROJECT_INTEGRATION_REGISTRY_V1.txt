@@ -1,117 +1,87 @@
 MOTORLAB PROJECT INTEGRATION REGISTRY V1
 
 STATUS
-Canonical registry of MotorLab-managed projects, persistent hooks, verified local satellites, cross-chat continuity ledgers and r13 semantic Change History registries.
-Established: 2026-09-29.
+Canonical registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
-GLOBAL PRINCIPLES
-- MotorLab activation is implicit/persistent for recognized projects.
-- PRE_RESPONSE_BOOT_GATE is mandatory; first user-visible line is "⚙️ MotorLab attivo".
-- Br174/Chatgpt is the single central MotorLab authority.
-- Each registered project has one canonical Project Continuity ledger and, r13+, one canonical semantic Change History registry.
-- New chats reconcile continuity with newer live evidence before choosing a starting point.
-- Change History is used for historical semantic lookup/restoration and never overrides newer live/current state.
-- No recurring activation or chat-transfer prompt is required.
-- Watchdog remains sole health/intervention coordinator; Resume Recovery owns continuation; Project Continuity owns cross-chat current state; Root Cause Closure owns causal closure; Change History owns historical semantic index/provenance/restore routing.
-- Project-native/domain engines remain preserved.
-- Change Compatibility Guard is mandatory before writes/restores.
-- MotorLab/control-plane-only activity must not silently create or advance application lifecycle state.
-- Metadata-only MotorLab/history synchronization should suppress unrelated CI.
-- r12 Fast Iteration + No-Spin remains mandatory.
-- r13 semantic Change History + selective exact restore is mandatory.
-
 CURRENT CENTRAL RELEASE
-Release: 2026.09.30-r13
-Schema: 1
+Release: 2026.09.30-r14
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
-Canonical continuity: MOTORLAB_PROJECT_CONTINUITY_V1.txt
-Canonical root-cause: MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
-Canonical Fast Iteration/No-Spin: MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
-Canonical Change History: MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
-Normal startup banner: ⚙️ MotorLab attivo
-PRE_RESPONSE_BOOT_GATE=required
-PROJECT_CONTINUITY=required
-ROOT_CAUSE_CLOSURE=required
-FAST_ITERATION_NO_SPIN=required
-CHANGE_HISTORY_REGISTRY=required
-SEMANTIC_CHANGE_LOOKUP=required
-SELECTIVE_EXACT_RESTORE=required
-HISTORICAL_BACKFILL_ON_DEMAND=required
+Canonical technical history: MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
+Canonical pre-change approval: MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
+Canonical visible restore register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
 
-R13 CHANGE HISTORY RULE
-- Every verified material Bruno-requested project change is indexed automatically when technically possible.
-- Each record points to immutable Git provenance and semantic aliases Bruno may naturally use.
-- Natural query such as "player" searches project registry before raw Git archaeology.
-- Multiple materially different matches are disambiguated unless Bruno already identified one.
-- Default restore is selective into a new isolated LAB from current proper baseline and preserves unrelated later work.
-- Whole-version rollback is separate and requires explicit whole-version intent.
-- Pre-r13 history is backfilled from verified Git/ledger evidence on demand and then persisted.
-- Successful restore writes a new record with RESTORED_FROM provenance.
+GLOBAL R14 RULES
+- Initial request to modify/correct/add/remove/restore is intent only. Show pre-change report first; write only after Bruno approves that report.
+- Read-only preparation before approval is allowed.
+- Material scope expansion requires amended approval.
+- Technical Change History and Git remain provenance/history.
+- Visible Registro Modifiche e Ripristini contains only specific Bruno-confirmed working modifications he wants conserved.
+- Visible numbers are plain stable integers 1,2,3... One feature family keeps one number.
+- Multi-change LAB/APK work registers only the specific successful item(s) Bruno identifies.
+- Failed/unconfirmed/ambiguous attempts never enter the visible list.
+- Existing pre-r14 technical records are not promoted automatically.
+- Restore by number still requires pre-change report + Bruno approval before write.
 
 REGISTERED PROJECTS
 1. MusicLab — Br174/MusicLab
    Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt
-   Change registry: MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
-   Local satellite: 2026.09.30-r13 VERIFIED
-   LAST_GOOD: 2026.09.30-r12
-   r13 control-plane commit: fdee0d5afbfba39a243dbd62f3b446b310a49a10
-   CI suppression verification: head_sha fdee0d5afbfba39a243dbd62f3b446b310a49a10 produced zero workflow runs
-   Native engine: coexist/preserve
-   Iteration mode: risk-scaled
-   No-Spin handoff: required
-   Background mode: GitHub Actions
-   Change registry seeded with verified recent LAB16/LAB17/LAB18 entries, including distinct player LAB17 and LAB18 records.
+   Technical registry: MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
+   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_MUSICLAB_V1.txt
+   Visible state: N.1 Player / mini-player fuori dal lettore, confirmed from device-accepted LAB19 CANDIDATA
+   Stable CANDIDATA: candidate/musiclab-lab19-player-stable @ 6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+   r14 local control-plane adoption: VERIFIED on uab-build/musiclab-player-direct-collapse-19
+   r14 control-plane head: 97cd0ad605e73c5a895ea08f9ccbbf7e9b29aa2e
+   LAST_GOOD: r13
+   CI verification: zero workflow runs for r14 control-plane head
+   Candidate ref remains unchanged.
 
 2. GeoVision — Br174/GeoVision-Test
    Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
-   Change registry: MOTORLAB_CHANGE_REGISTRY_GEOVISION_V1.txt
-   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
-   Native engine: coexist/preserve
-   Historical registry: active, verified-on-demand backfill
+   Technical registry: MOTORLAB_CHANGE_REGISTRY_GEOVISION_V1.txt
+   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_GEOVISION_V1.txt
+   Visible state: empty confirmed-only
+   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Project state: MOTORLAB_PROJECT_STATE_STUDYBOOK_AI_V1.txt
-   Change registry: MOTORLAB_CHANGE_REGISTRY_STUDYBOOK_AI_V1.txt
-   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
-   Native engine: coexist/preserve
-   Historical registry: active, verified-on-demand backfill
+   Technical registry: MOTORLAB_CHANGE_REGISTRY_STUDYBOOK_AI_V1.txt
+   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_STUDYBOOK_AI_V1.txt
+   Visible state: empty confirmed-only
+   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
 
-4. Visionflix / Verlezza Vision source — Br174/Visionflix
+4. Visionflix / Verlezza Vision — Br174/Visionflix
    Project state: MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt
-   Change registry: MOTORLAB_CHANGE_REGISTRY_VISIONFLIX_V1.txt
-   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
-   Native engine: coexist/preserve
-   Lifecycle authority: Visionflix source
-   Historical registry: active, verified-on-demand backfill
+   Technical registry: MOTORLAB_CHANGE_REGISTRY_VISIONFLIX_V1.txt
+   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_VISIONFLIX_V1.txt
+   Visible state: empty confirmed-only
+   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Project state: MOTORLAB_PROJECT_STATE_COVER_LAB_AI_V1.txt
-   Change registry: MOTORLAB_CHANGE_REGISTRY_COVER_LAB_AI_V1.txt
-   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
-   Native engine: Cover Lab engine coexist/preserve
-   Historical registry: active, verified-on-demand backfill
+   Technical registry: MOTORLAB_CHANGE_REGISTRY_COVER_LAB_AI_V1.txt
+   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_COVER_LAB_AI_V1.txt
+   Visible state: empty confirmed-only
+   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
 
-6. streamflix-BV delivery adapter — Br174/streamflix-BV
+6. streamflix-BV — Br174/streamflix-BV
    Project state: MOTORLAB_PROJECT_STATE_STREAMFLIX_BV_V1.txt
-   Change registry: MOTORLAB_CHANGE_REGISTRY_STREAMFLIX_BV_V1.txt
-   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
-   Native engine: delivery-adapter-coexist-preserve
-   Lifecycle authority: NO; Visionflix source remains authority
-   Historical registry: active, verified-on-demand backfill
+   Technical registry: MOTORLAB_CHANGE_REGISTRY_STREAMFLIX_BV_V1.txt
+   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_STREAMFLIX_BV_V1.txt
+   Visible state: empty confirmed-only
+   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
 
 SAFE ADOPTION RULE
-Never force release change into active write/build/test/promotion. Pin current release until safe boundary. Preserve verified local bundle as LAST_GOOD before adoption. Metadata-only sync/registry commits use CI suppression/path filters where safe.
+Never force a release change into active/unknown project work. Projects marked BOOT_RECONCILE_REQUIRED must be live-reconciled before local r14 satellite adoption. Central r14 remains authoritative whenever central access exists.
+
+SYNC CLOSURE
+MOTORLAB_SATELLITE_SYNC_V1.txt is now v1.10 and explicitly includes r12/r13/r14 markers so future release closure reconciles manifest + entrypoint + bundle + sync + continuity/integration.
 
 FUTURE PROJECTS
-Every future concrete software project receives hook + local satellite + central continuity ledger + central semantic Change History registry. Where no historical records exist, registry starts empty and future changes auto-capture; older imported history may be backfilled only from verified immutable evidence.
-
-HOST LIMITATION
-Repository state cannot wake a host with no execution cycle. Persistent external jobs and historical registries remain durable and are reconciled/read at next available control cycle.
+Every future project receives hook + local satellite + Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherits r14 pre-change approval.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.5
-Revision 2.4: r12 Fast Iteration + No-Spin globally; MusicLab first r12 satellite.
-Revision 2.5: r13 adds canonical per-project semantic Change History registries, automatic change capture, verified historical backfill and selective exact restore; MusicLab is first r13 VERIFIED satellite.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.6
+Revision 2.6: r14 global pre-change approval + user-confirmed numbered restore registers + MusicLab r14 control-plane adoption.
