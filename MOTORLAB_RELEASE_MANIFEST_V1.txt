@@ -5,7 +5,7 @@ Canonical MotorLab release/version manifest.
 Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.30-r9
+CURRENT_RELEASE=2026.09.30-r10
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -41,7 +41,7 @@ Each registered project should contain:
 - .motorlab/MOTORLAB_LOCAL_CORE.txt
 - .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt
 - .motorlab/MOTORLAB_SYNC_STATE.txt
-Each registered project must additionally reference one central Project Continuity ledger in Br174/Chatgpt.
+Each registered project additionally references one central Project Continuity ledger in Br174/Chatgpt.
 
 UPDATE / ROLLBACK
 A project satellite adopts a newer central release only at a safe boundary. Preserve the current verified bundle as LAST_GOOD before adoption. Never replace an active operation's pinned release mid-write/build/test/promotion.
@@ -64,27 +64,48 @@ R8+ PRE-RESPONSE BOOT GATE / PROJECT CONTINUITY
 Registered project context or clear software-build intent activates MotorLab before substantive project work. Every registered project has a canonical Project Continuity ledger; new chats reconcile it with newer live repository/provider/job/artifact state and continue unfinished work without transfer prompts.
 
 R9+ LABELED VISUAL STATUS
-For release 2026.09.30-r9 and later:
-- every MotorLab status emoji shown to Bruno must include its canonical short Italian label beside it;
-- canonical legend is:
-  ⚙️ MotorLab attivo
-  🎆 Azione completata
-  ⚡ Risveglio / recupero
-  ✅ Problema risolto
-  👍🏻 Procede tutto bene
-  ⚠️ Piccolo problema risolvibile
-  🧭 Cambiare approccio
-  🛑 Stop di sicurezza / blocco reale
-  ♻️ Una parte va rifatta
-  💀 Tutto da rifare
-  💯 Conclusione definitiva
-- preferred form is `<emoji> <canonical label> — <context>`;
-- repeated-fireworks/repeated-lightning counts are superseded as user-facing status-level codes;
-- Watchdog internal recovery levels remain valid technical metadata but are rendered through the labeled visual language;
-- 🎆 marks a completed action/phase/milestone while work may remain;
-- 💯 is reserved exclusively for full end-to-end requested completion after all required verification/delivery is complete;
-- 💀 is exceptional and requires evidence that the whole current implementation/approach is materially unusable;
-- visual reporting does not alter progress math, recovery semantics, project logic or native engines.
+Every MotorLab status emoji shown to Bruno includes its canonical short Italian label beside it. Repeated fireworks/lightning counts are obsolete as user-facing severity codes. 🎆 means a completed action/phase, while 💯 is reserved exclusively for full end-to-end requested completion after verification/delivery.
+
+R10+ EXTENDED VISUAL STATUS + HIGH-PRESENCE NUMERIC PROGRESS
+For release 2026.09.30-r10 and later, canonical visual status additionally includes:
+- 🔍 Ricerca soluzione
+- 🧩 Compatibile
+- 🐢 Lentezza rilevata
+- 💭 Elaborazione in corso
+- ⏳ Attesa esterna
+- 🧪 Test / verifica in corso
+- 🔄 Sincronizzazione in corso
+
+Full canonical legend:
+⚙️ MotorLab attivo
+🎆 Azione completata
+⚡ Risveglio / recupero
+✅ Problema risolto
+👍🏻 Procede tutto bene
+⚠️ Piccolo problema risolvibile
+🧭 Cambiare approccio
+🛑 Stop di sicurezza / blocco reale
+♻️ Una parte va rifatta
+💀 Tutto da rifare
+💯 Conclusione definitiva
+🔍 Ricerca soluzione
+🧩 Compatibile
+🐢 Lentezza rilevata
+💭 Elaborazione in corso
+⏳ Attesa esterna
+🧪 Test / verifica in corso
+🔄 Sincronizzazione in corso
+
+R10 numeric-progress rule:
+- classic format remains `Progresso MotorLab: <N>%`;
+- numeric percentage is a first-class high-presence signal during substantial work;
+- once a verified progress value exists, every meaningful user-facing operational status should normally include the current N%, even if unchanged;
+- repeated same percentage is correct when state changes without a newly verified milestone;
+- no percentage is invented merely for visibility;
+- numeric progress remains evidence-based, monotonic and governed by Progress Reporting/Recovery Floor;
+- 💭 is high-level operational analysis only and must not expose private chain-of-thought;
+- 🐢 slow-but-live and ⏳ legitimate external waiting are distinct from ⚡ actual recovery/health intervention;
+- 🧪 and 🔄 indicate in-progress verification/synchronization and do not imply completion.
 
 STATE AUTHORITY ORDER
 1. explicit current Bruno instruction;
@@ -95,11 +116,12 @@ STATE AUTHORITY ORDER
 6. memory/copied summaries.
 
 FUTURE PROJECT RULE
-Every future concrete MotorLab software project receives hook + local satellite + central Project Continuity ledger and inherits the current labeled visual-status contract automatically.
+Every future concrete MotorLab software project receives hook + local satellite + central Project Continuity ledger and inherits the current labeled visual-status and numeric-progress contracts automatically.
 
 NO RUNTIME REGRESSION
 MotorLab control-plane/reporting metadata must not intentionally alter application runtime, UI, package/signing identity, source lifecycle or native engines.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.9
-Revision 1.9: release r9; permanent labeled visual status legend, single-emoji readable semantics and 💯 reserved for definitive completion.
+MOTORLAB-RELEASE-MANIFEST-V1.10
+Revision 1.9: release r9; permanent labeled visual status legend and final-only 💯.
+Revision 1.10: release r10; seven additional labeled operational states and highly present classic numeric Progresso MotorLab N% on substantial status updates.
