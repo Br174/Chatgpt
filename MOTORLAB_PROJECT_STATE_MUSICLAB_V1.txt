@@ -1,7 +1,7 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=14
+STATE_REVISION=15
 STATE_STATUS=COMPLETED_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
@@ -57,6 +57,17 @@ CORRECTION=MainActivity now collapses on a real destination change whenever the 
 REVERIFICATION=Transform reported two pre-navigation replacements; only MainActivity.kt changed at runtime (7 insertions, 3 deletions). Full regression run 36677968793 passed tests, preflight, build, ZIP verification and artifact upload.
 RECURRENCE_PROTECTION=Future navigation-collapse checks must use semantic player state (already mini-player/closed vs not) rather than exact animated anchor equality. Device acceptance remains required before declaring the visible behavior closed.
 
+MOTORLAB_R12_FAST_ITERATION_NO_SPIN_ADOPTION_2026_09_30
+INCIDENT_STATUS=CLOSED_VERIFIED_CONTROL_PLANE
+USER_SYMPTOM=Bruno observed an overnight MusicLab correction that still appeared “in corso” hours later and reported that repeated correction/test cycles were too slow for practical iteration.
+ROOT_CAUSE_CONFIRMED_NO_SPIN=The durable GitHub Actions LAB17 job had completed successfully in minutes while the ordinary ChatGPT foreground/client still appeared to be processing. A normal chat turn is not a durable executor and cannot self-wake while the host exposes no execution cycle. The missing prevention was a hard foreground-handoff termination invariant after durable job identity/checkpoint existed.
+ROOT_CAUSE_CONFIRMED_ITERATION_LATENCY=MusicLab correction loops were routinely paying promotion/high-risk grade full JVM regression plus UAB artifact build even when future corrections may be LOW/MEDIUM risk. Existing Velocity Layer permitted risk scaling but did not make the iterative LAB policy explicit/mandatory enough.
+CORRECTION_CENTRAL=MotorLab release 2026.09.30-r12 adds mandatory MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt. It binds No-Spin durable handoff, default maximum two unchanged foreground job probes, next-cycle job-id reconciliation, and risk-scaled LOW/MEDIUM/HIGH LAB iteration while preserving HIGH/CANDIDATA/MADRE full gates.
+CORRECTION_MUSICLAB=MusicLab main commit 70f5c01f3bff257dd6f58887e58f987f09eac71b atomically adopted r12 local core, r11 LAST_GOOD, r12 sync state and hook profile. Iteration mode=risk-scaled; background mode=github-actions; No-Spin=required; foreground unchanged job probes max=2; full regression default=HIGH/CANDIDATA/MADRE.
+CI_SUPPRESSION_VERIFICATION=GitHub Actions query for head_sha 70f5c01f3bff257dd6f58887e58f987f09eac71b returned total_count=0, so the MotorLab-only synchronization did not launch APK/build workflows.
+APPLICATION_LIFECYCLE_IMPACT=NONE. LAB18 remains the current application continuation point; no LAB19/MADRE/CANDIDATA/runtime source was created or modified by r12 adoption.
+RECURRENCE_PROTECTION=Future persistent jobs must use durable handoff instead of indefinite foreground polling; future eligible iterative MusicLab LAB corrections use risk-scaled checks and only expand to full regression when risk/evidence/promotion requires it.
+
 INHERITED_LAB17_AI_SCOPE
 - Cover/Originali AI remains stepwise and inherited unchanged from LAB17.
 - Canonical composition/original performer identification precedes discovery.
@@ -76,20 +87,25 @@ UPSTREAM_GUARDIAN_STATE_PRESERVED
 - no upstream integration/promotion occurred in LAB18 work
 
 MOTORLAB_SATELLITE_STATE
-- local MotorLab satellite inherited/current: 2026.09.30-r11
-- LAST_GOOD: 2026.09.30-r8
+- local MotorLab satellite current: 2026.09.30-r12 VERIFIED
+- LAST_GOOD: 2026.09.30-r11
+- r12 local-core blob: 17f6dae4d2ec3320ec7493e54c2895b8e398718a
+- r12 sync-state blob: 2fcd87534e9e647371a4eb14bef598f50c34259e
+- r12 project-hook blob: b919e717595416473001832f55b0b09eebb67af0
 - MotorLab remains control-plane only and must not replace or rewrite MusicLab native/domain engines
 
 CONTINUITY_RULES
 - New MusicLab chats load this ledger automatically after MotorLab boot and reconcile against newer live GitHub evidence.
 - Current application continuation point is LAB18, not LAB17/LAB16/LAB15/LAB14 or older historical branches.
-- This completed operation has a 100% recovery floor; do not restart or redo LAB18 merely because a chat changes.
-- Device acceptance by Bruno is the only pending acceptance gate; automated implementation/build verification is complete.
+- This completed LAB18 operation has a 100% recovery floor; do not restart or redo LAB18 merely because a chat changes.
+- Device acceptance by Bruno is the only pending LAB18 acceptance gate; automated implementation/build verification is complete.
 - A Bruno-reported defect after LAB18 device testing starts a new isolated LAB19 while preserving LAB18.
 - MotorLab/control-plane-only commits/jobs do not create a new LAB/MADRE/CANDIDATA.
+- Future eligible LAB19+ correction loops apply r12 risk-scaled Fast Iteration; HIGH risk and CANDIDATA/MADRE still require full applicable regression.
+- Persistent GitHub Actions jobs use r12 No-Spin handoff and are reconciled by recorded run id at the next available cycle rather than keeping an ordinary chat spinning indefinitely.
 - Future Meld work uses the Guardian baseline inherited by LAB18.
 - CANDIDATA -> MADRE requires explicit Bruno approval.
 - Do not require Bruno to paste activation or transfer prompts.
 
-UPDATED_BY=MotorLab r11 LAB18 player-collapse root-cause closure + delivery verification
+UPDATED_BY=MotorLab r12 Fast Iteration + No-Spin adoption; LAB18 application state preserved
 UPDATED_DATE=2026-09-30
