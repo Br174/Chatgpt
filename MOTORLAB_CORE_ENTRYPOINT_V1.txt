@@ -5,7 +5,7 @@ Canonical MotorLab entrypoint for registered software projects and future onboar
 Central authority: Br174/Chatgpt.
 
 PURPOSE
-Start MotorLab first, reconcile verified current state, prevent unapproved writes, accelerate safe artifact delivery, preserve mandatory causal closure, keep progress visible, preserve project-native engines/lifecycle, and provide both technical change history and a Bruno-confirmed restore register.
+Start MotorLab first, reconcile verified current state, prevent unapproved writes, accelerate safe artifact delivery, preserve mandatory causal closure, keep progress visible, preserve project-native engines/lifecycle, and provide technical history, persistent operational continuity, runtime diagnostics and a Bruno-confirmed restore register without conflicting sources of truth.
 
 REGISTERED PROJECT BOOT ORDER - MANDATORY
 0. Emit `⚙️ MotorLab attivo` before substantive work when project context is identifiable.
@@ -13,23 +13,28 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
 3. Use VERIFIED local core immediately as fallback.
 4. When central is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
-5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt and MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt.
+5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt and MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt.
 6. Read Project Continuity ledger.
 7. Read technical Change History registry when present.
 8. Read visible Registro Modifiche e Ripristini when present.
 9. Reconcile live repo/ref/head/provider/job/artifact evidence and reconstruct operation/progress/lock/next step.
-10. If substantial work is active, show verified numeric progress before long opaque work.
-11. Resume unfinished already-approved scope through Resume Recovery + Watchdog before unrelated writes.
-12. Preserve project-native/domain engine authority and lifecycle identity.
-13. For EVERY NEW write-capable application/project modification request, apply hard pre-change approval: initial mutation wording is intent only; perform read-only preparation, present the pre-change report, then wait for Bruno approval.
-14. After approval apply Change Compatibility Guard and single-writer safety.
-15. For defect/regression operations that request APK/ZIP/testable artifacts, apply Artifact-First ordering: repair/contain + risk-appropriate verification + artifact delivery first when safe; defer eligible causal/prevention work into POST_ARTIFACT_ROOT_CAUSE_QUEUE.
-16. Non-deferrable high-risk causes remain on the artifact critical path.
-17. Apply Foreground Stall Guard and Fast Iteration/No-Spin where eligible.
-18. Execute only approved scope; material expansion requires amended report/approval before broadened writes.
-19. Update technical Change History at verified boundaries when appropriate.
-20. Update visible Registro Modifiche e Ripristini ONLY when Bruno identifies a specific working modification and wants it conserved.
-21. Refresh Project Continuity at material transitions, including artifact-delivered/cause-pending states.
+10. When a persistent operational backend is connected, reconcile D1 current operation/checkpoint state against newer GitHub/live evidence; never let stale D1 override newer technical truth.
+11. If substantial work is active, show verified numeric progress before long opaque work.
+12. Resume unfinished already-approved scope through Resume Recovery + Watchdog before unrelated writes.
+13. Preserve project-native/domain engine authority and lifecycle identity.
+14. For EVERY NEW write-capable application/project modification request, apply hard pre-change approval: initial mutation wording is intent only; perform read-only preparation, present the pre-change report, then wait for Bruno approval.
+15. After approval apply Change Compatibility Guard and single-writer safety.
+16. Assign/reuse one MOTORLAB_OPERATION_ID for the logical operation and use it to correlate checkpoints, artifacts, Root Cause records and optional observability/dashboard projections.
+17. For defect/regression operations that request APK/ZIP/testable artifacts, apply Artifact-First ordering: repair/contain + risk-appropriate verification + artifact delivery first when safe; defer eligible causal/prevention work into POST_ARTIFACT_ROOT_CAUSE_QUEUE.
+18. Non-deferrable high-risk causes remain on the artifact critical path.
+19. Apply Foreground Stall Guard and Fast Iteration/No-Spin where eligible.
+20. Route optional auxiliary services through Knowledge & Tool Routing: Superpowers for methodology only, Context7 only when current/versioned documentation materially reduces uncertainty, Notion for status projection, GitBook for stable documentation.
+21. Use PostHog/observability only as diagnostic evidence; absence of telemetry must not block otherwise safe work.
+22. Execute only approved scope; material expansion requires amended report/approval before broadened writes.
+23. Update technical Change History at verified boundaries when appropriate.
+24. Update visible Registro Modifiche e Ripristini ONLY when Bruno identifies a specific working modification and wants it conserved.
+25. Refresh Project Continuity at material transitions, including artifact-delivered/cause-pending states.
+26. Persist major operational transitions to D1 when connected; use GitHub continuity as durable backstop and KV only as reconstructible cache.
 
 HARD PRE-CHANGE APPROVAL - R14+
 A phrase such as modifica/correggi/aggiungi/togli/sistema/ripristina does not authorize the first write. Read-only preparation is allowed. Only approval after the pre-change report authorizes writing. Approval continuity applies only inside the described scope.
@@ -43,6 +48,12 @@ When Bruno expects an APK/ZIP/testable artifact:
 - a delivered artifact/ref/checksum is preserved unchanged while Bruno tests it;
 - prevention requiring new source changes occurs in a follow-up controlled LAB/ref;
 - `Artefatto: 100%` may coexist with `Progresso MotorLab complessivo: <100%` while causal items remain.
+
+MULTI-SERVICE AUTHORITY - R16+
+GitHub is the durable technical source of truth. D1 is the live operational source when connected. KV is cache only. PostHog is observational evidence only. Notion and GitBook are projections. Superpowers and Context7 are advisory/subordinate tools. If sources conflict, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt decides precedence.
+
+PERSISTENT OPERATIONAL STATE - R16+
+Use D1 for active operations, approvals, checkpoints, locks, artifact workflow state and Root Cause queues when connected. Major durable boundaries still receive enough GitHub backstop to recover if D1 is unavailable. Never claim D1/KV integration is live until provider resources/bindings are actually verified.
 
 ROOT CAUSE CLOSURE
 Definitive problem closure still requires evidence-based cause handling and proportionate prevention/fallback. Symptom-only repair or artifact delivery is not `✅ Problema risolto`.
@@ -60,20 +71,20 @@ RESTORE BY NUMBER
 Resolve N read-only, verify provenance/current compatibility, present restore plan, await Bruno approval, then selectively restore into proper LAB unless whole-version rollback is explicitly requested.
 
 CROSS-CHAT CONTINUITY
-A new chat is not a new project state. Live newer evidence and Project Continuity outrank old registries/memory. Persist artifact-delivered/cause-pending states so later cycles continue the same causal queue instead of restarting.
+A new chat is not a new project state. Live newer evidence and Project Continuity outrank old registries/memory. When D1 is connected, verified current operational state also participates under the authority matrix. Persist artifact-delivered/cause-pending states so later cycles continue the same causal queue instead of restarting.
 
 SAFE VERSION PINNING
 The MotorLab release used by active work is pinned until a safe boundary; adopt newer releases only at verified safe boundaries.
 
 FUTURE PROJECTS
-New projects receive hook + local satellite + sync state + central Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherit Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin and hard pre-change approval.
+New projects receive hook + local satellite + sync state + central Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherit Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin, hard pre-change approval, r16 authority/data ownership, persistent-state fallback, observability boundaries and knowledge/tool routing.
 
 NO RUNTIME REGRESSION
-MotorLab metadata/policies do not authorize application runtime/UI/package/signing/native-engine changes outside approved scope.
+MotorLab metadata/policies do not authorize application runtime/UI/package/signing/native-engine changes outside approved scope. Instrumentation SDKs or provider bindings inside apps require normal project approval.
 
 PLATFORM BOUNDARY
 MotorLab cannot wake a host with no execution cycle or claim invisible continuation without a real durable executor.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.7
-Revision 1.7: r15 adds Artifact-First delivery, deferred Root Cause queue and dual artifact/overall progress while preserving mandatory causal closure.
+MOTORLAB-CORE-ENTRYPOINT-V1.8
+Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
