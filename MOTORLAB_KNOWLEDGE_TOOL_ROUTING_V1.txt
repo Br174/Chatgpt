@@ -1,0 +1,101 @@
+MOTORLAB KNOWLEDGE & TOOL ROUTING V1
+
+STATUS
+Mandatory MotorLab CORE contract for auxiliary knowledge, documentation and engineering-method plugins.
+Central authority: Br174/Chatgpt.
+Targets: Notion, GitBook, Superpowers, Context7.
+
+PURPOSE
+Use auxiliary plugins only where they add unique value, prevent duplicate authority, conserve free quotas, and keep MotorLab operational when any plugin is unavailable.
+
+ROUTING PRINCIPLE
+Choose the narrowest tool that uniquely improves the operation. Do not call several plugins for the same fact merely because they are available.
+
+NOTION
+Role: Bruno-facing live status/dashboard projection.
+Use for:
+- readable project summaries;
+- current LAB/CANDIDATA/MADRE pointers;
+- latest artifact state;
+- open Root Cause count/status;
+- visible restore-register summary;
+- high-level operation status.
+Do not use Notion as source-code authority, approval authority or technical history authority.
+Default write direction: authoritative MotorLab state -> Notion projection.
+Manual Notion edits do not silently mutate MotorLab.
+
+GITBOOK
+Role: stable MotorLab architecture/manual documentation.
+Use for:
+- architecture descriptions;
+- module responsibilities;
+- lifecycle explanations;
+- recovery/fallback procedures;
+- integration manuals;
+- human-facing release notes where useful.
+Do not update GitBook for every app patch or transient operation.
+If GitBook conflicts with GitHub CORE, GitHub wins.
+
+SUPERPOWERS
+Role: optional engineering-method layer.
+May improve:
+- problem decomposition;
+- design review;
+- test-driven development;
+- debugging discipline;
+- verification/review methods.
+MotorLab remains procedurally superior.
+Superpowers may not bypass:
+- Pre-Change Approval Gate;
+- lifecycle rules;
+- single-writer lock;
+- Artifact-First ordering;
+- Root Cause obligations;
+- user-requested scope;
+- cost/safety policies.
+Use when it materially improves software work; do not invoke mechanically for trivial metadata operations.
+
+CONTEXT7
+Role: just-in-time version-aware external technical documentation.
+Use when:
+- library/framework/API behavior is uncertain;
+- current syntax/version materially affects correctness;
+- official/current examples reduce hallucination or stale implementation risk.
+Do not use for facts already verified in the project source or current official project docs.
+Quota conservation is mandatory; prefer one targeted query over repeated broad calls.
+
+PLUGIN AVAILABILITY
+Plugin install/connection requires explicit user action in ChatGPT.
+MotorLab may define integration contracts before a plugin is connected, but must not claim live capability until connection is verified.
+
+FREE-FIRST ROUTING
+Auxiliary plugins are optional accelerators.
+- no hidden paid upgrade;
+- no billable fallback;
+- no operation should be blocked only because an optional plugin quota is exhausted;
+- conserve monthly quotas by using plugins on demand rather than continuously.
+
+SOURCE PRIORITY FOR TECHNICAL ANSWERS
+1. current project source/live evidence;
+2. GitHub canonical MotorLab/project docs;
+3. current official provider/library documentation (Context7 or web/tool source);
+4. GitBook explanatory docs;
+5. Notion status projection;
+6. chat memory.
+
+DUPLICATION CONTROL
+- Notion receives status, not full technical history.
+- GitBook receives architecture/manual content, not live operation logs.
+- Context7 is not copied wholesale into GitBook; only stable conclusions worth documenting may be summarized.
+- Superpowers outputs are working methods, not permanent state unless MotorLab promotes a method into CORE through an approved MotorLab change.
+
+FAILURE MODE
+If any plugin is unavailable, MotorLab continues with GitHub, current project evidence and built-in reasoning/tools.
+Mark plugin-specific functionality degraded only when relevant; do not mark the whole MotorLab unavailable.
+
+SUCCESS CRITERIA
+Each plugin has one clear job, no plugin can override MotorLab/GitHub authority, quotas are conserved, and auxiliary capability improves quality without increasing fragility.
+
+VERSION
+MOTORLAB-KNOWLEDGE-TOOL-ROUTING-V1.0
+Established: 2026-09-30
