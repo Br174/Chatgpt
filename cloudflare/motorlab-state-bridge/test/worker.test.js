@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
-import worker, { sha256Hex, validateSnapshot } from '../src/index.js';
+import worker, { sha256Hex, validateSnapshot } from '../src/entry.js';
 
 function sign(secret, timestamp, body) {
   return createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
