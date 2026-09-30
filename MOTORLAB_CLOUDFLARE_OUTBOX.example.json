@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "motorlab-bootstrap-example",
+  "sent_at": "2026-09-30T17:00:00.000Z",
+  "projects": [
+    {
+      "project_id": "motorlab",
+      "repository": "Br174/Chatgpt",
+      "lifecycle_stage": "CORE",
+      "source_ref": "main",
+      "source_head": null,
+      "local_satellite_release_state": "r16",
+      "updated_at": "2026-09-30T17:00:00.000Z"
+    }
+  ],
+  "operations": [
+    {
+      "operation_id": "motorlab-cloudflare-bootstrap-20260930",
+      "project_id": "motorlab",
+      "title": "Cloudflare central operational state bootstrap",
+      "type": "infrastructure",
+      "requested_scope": "Dedicated MotorLab D1/KV and private GitHub issue relay",
+      "approved_scope": "Dedicated MotorLab D1/KV and private GitHub issue relay",
+      "approval_status": "approved",
+      "lifecycle_stage": "LAB",
+      "risk_class": "low",
+      "status": "active",
+      "phase": "activation_pending",
+      "artifact_progress": 0,
+      "overall_progress": 92,
+      "source_ref": "motorlab/cloudflare-state-r16",
+      "source_head": null,
+      "created_at": "2026-09-30T17:00:00.000Z",
+      "updated_at": "2026-09-30T17:00:00.000Z"
+    }
+  ],
+  "approvals": [],
+  "checkpoints": [],
+  "locks": [],
+  "artifacts": [],
+  "root_causes": [],
+  "events": []
+}
