@@ -15,6 +15,7 @@ BOOT
 4. Verified local core is immediately available as fallback.
 5. When central is reachable, read MOTORLAB_RELEASE_MANIFEST_V1.txt and compare local/central releases.
 6. Resolve the project-specific Project Continuity ledger pointer and reconcile current state before choosing a work starting point.
+7. Load Root Cause Closure and hard numeric-progress visibility requirements for r11+.
 
 SAFE UPDATE
 - pin a MotorLab release for the whole active operation;
@@ -37,6 +38,9 @@ PROJECT_CONTINUITY=required
 LABELED_VISUAL_STATUS=required
 EXTENDED_VISUAL_STATUS=required
 HIGH_PRESENCE_NUMERIC_PROGRESS=required
+HARD_PROGRESS_VISIBILITY=required
+ROOT_CAUSE_CLOSURE=required
+LIVE_EVENT_CLASSIFICATION=required
 CHANGE_COMPATIBILITY_GUARD=required
 WATCHDOG=required
 PREVENTIVE_WATCHDOG=required
@@ -78,22 +82,22 @@ Every canonical MotorLab status emoji must carry its readable canonical label; r
 R10+ EXTENDED VISUAL STATUS / NUMERIC PROGRESS
 EXTENDED_VISUAL_STATUS=required
 HIGH_PRESENCE_NUMERIC_PROGRESS=required
-A valid r10+ local fallback must preserve these additional canonical labeled states:
-🔍 Ricerca soluzione
-🧩 Compatibile
-🐢 Lentezza rilevata
-💭 Elaborazione in corso
-⏳ Attesa esterna
-🧪 Test / verifica in corso
-🔄 Sincronizzazione in corso
+Preserve additional labeled states 🔍 🧩 🐢 💭 ⏳ 🧪 🔄 and classic `Progresso MotorLab: <N>%` with evidence-based monotonic progress.
 
-It must also preserve:
-- classic `Progresso MotorLab: <N>%` format;
-- high presence of the current verified percentage on meaningful substantial operational statuses once a verified value exists;
-- same-percentage repetition when state changes without new verified progress;
-- no fabricated percentage advancement;
-- distinction between 🐢 slow-but-live, ⏳ legitimate external wait and ⚡ actual recovery/health action;
-- no hidden chain-of-thought disclosure under 💭.
+R11+ ROOT CAUSE / HARD PROGRESS / EVENT CLASSIFICATION
+ROOT_CAUSE_CLOSURE=required
+HARD_PROGRESS_VISIBILITY=required
+LIVE_EVENT_CLASSIFICATION=required
+A valid r11+ local fallback must preserve:
+- immediate symptom containment plus evidence-based root-cause investigation for real problems;
+- no definitive ✅ closure from a one-off retry/manual alignment alone;
+- proportional recurrence-surface and prevention/regression checks;
+- stale/missed continuity write-through routed through Root Cause Closure;
+- classification of live events before app lifecycle identity changes;
+- MotorLab-control-plane-only activity not silently becoming a new LAB/MADRE/CANDIDATA;
+- after banner, active substantial work shows an evidence-based numeric percentage before long opaque execution;
+- meaningful statuses carry/repeat current N% when the surface permits;
+- long provider/job phase changes do not go silent merely because N% is unchanged.
 
 ROLLBACK
 If newer bundle cannot be verified, keep/restore LAST_GOOD, preserve project and report fallback.
@@ -105,12 +109,13 @@ NO APP RUNTIME CHANGE
 .motorlab is development/orchestration metadata and must not intentionally alter app code, UI, package identity, signing, native engines or runtime dependencies.
 
 FUTURE PROJECTS
-Future MotorLab software projects receive hook + local satellite + central Project Continuity ledger during onboarding and inherit current visual/progress rules.
+Future MotorLab software projects receive hook + local satellite + central Project Continuity ledger during onboarding and inherit current visual/progress/root-cause rules.
 
 AUTOMATIC MEANING
 Synchronization/continuity writes occur only when an execution cycle with repository access exists. Repository text cannot self-update or wake a frozen host without an executor.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.7
+MOTORLAB-SATELLITE-SYNC-V1.8
 Revision 1.6: r9 labeled visual status contract.
-Revision 1.7: r10 requires EXTENDED_VISUAL_STATUS and HIGH_PRESENCE_NUMERIC_PROGRESS.
+Revision 1.7: r10 extended visual status and high-presence numeric progress.
+Revision 1.8: r11 requires ROOT_CAUSE_CLOSURE, HARD_PROGRESS_VISIBILITY and LIVE_EVENT_CLASSIFICATION.
