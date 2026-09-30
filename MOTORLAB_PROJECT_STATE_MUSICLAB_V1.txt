@@ -1,86 +1,101 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=9
+STATE_REVISION=10
 STATE_STATUS=COMPLETED_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-lab15-upstream-system
+ACTIVE_OPERATION_ID=musiclab-lab16-originali-cover-player
 OPERATION_STATUS=COMPLETED_LAB_READY
-CURRENT_PHASE=LAB15 permanent Meld upstream Guardian completed and verified
-CURRENT_REF=uab-build/musiclab-meld-upstream-system-15
-CURRENT_HEAD_SHA=39769490e6d88535102e48e6e83eef0e6cfaea3d
+CURRENT_PHASE=LAB16 correzioni Originali/Cover/player/date completate, testate e artefatto pronto per Bruno
+CURRENT_REF=uab-build/musiclab-originali-cover-player-16
+CURRENT_HEAD_SHA=cf62bf9e3d7bf9bbe9f1de5de7f372f0dafbf763
 CURRENT_PROVIDER=GitHub + GitHub Actions
-CURRENT_JOB_ID=36644097790
-CURRENT_JOB_STATUS=tests_success_cleanup_permission_failure_resolved_manually
+CURRENT_JOB_ID=36649618835
+CURRENT_JOB_STATUS=success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=Permanent Guardian finalized on LAB15; correct app+innertube JVM regression gate persisted; temporary verification workflow removed; LAB14->LAB15 diff verified control-plane/upstream-only with zero app source changes
-NEXT_SAFE_STEP=Remain on LAB15 as the verified permanent upstream-system source; when MusicLab in-app Meld notification reports a tag newer than v0.9.2, run Guardian analyze for that tag. Create/resolve only a new isolated LAB; never promote CANDIDATA/MADRE without Bruno approval.
-PENDING_VERIFICATION=none_for_guardian_implementation; future Meld updates are event-driven by in-app notification and each generated LAB requires its own tests/build and Bruno review before promotion
-ACTIVE_ARTIFACT=MusicLab-LAB-UPSTREAM-SYSTEM-15-VERIFY artifact_id=11066853076 digest=sha256:bcd348bff85ec953aaa8a1b943623c99b393ed1e020f36722af11aeb80c1aee2 run_id=36641422644
+LAST_COMPLETED_MATERIAL_STEP=LAB16 runtime fixes passed real JVM regression tests, UAB preflight, isolated LAB APK+ZIP build, ZIP validation and artifact upload; temporary verify workflow removed; satellite synced safely to MotorLab r11 with r8 LAST_GOOD
+NEXT_SAFE_STEP=Bruno installs/tests MusicLab LAB16 side-by-side. If accepted, continue only from LAB16 for subsequent fixes; do not promote CANDIDATA/MADRE unless Bruno explicitly approves. If Bruno reports a defect, preserve LAB16 checkpoint and open a new isolated corrective LAB rather than editing MADRE.
+PENDING_VERIFICATION=device acceptance by Bruno before any candidate/mother promotion; automated regression/build verification complete
+ACTIVE_ARTIFACT=MusicLab-LAB-16-APK-ZIP artifact_id=11070506415 digest=sha256:8adb912166b283a2474ef2370890d57b4964b89a8a718370b13dd4d637c9254b run_id=36649618835 tested_runtime_head=8f909764fb077ff6a89531699cb58872995cffa2 apk_sha256=f4bfef413b03d126e663c3f0b3f6505ef18cb4d0c69015ba753ec03894decdc7
 WRITE_LOCK_SCOPE=released
-LAST_USER_INTENT_SUMMARY=Complete the permanent Meld upstream update system without redoing Meld 0.9.2; preserve MusicLab native engines/UI; create isolated LABs, classify changes, test/build APK+ZIP, and never promote CANDIDATA/MADRE without Bruno approval
+LAST_USER_INTENT_SUMMARY=Fix LAB15 regressions by creating isolated LAB16: Originali must open, player must collapse to mini-player when navigating to artist/album/Cover/Originali, Cover should search toward at least 50 and Originali toward at least 20 when available, display results 10 at a time with progressive bottom loading, and ensure dates are populated from real metadata where AI metadata is missing.
 
-VERIFIED_FINAL_STATE
-- LAB15 final head: 39769490e6d88535102e48e6e83eef0e6cfaea3d
-- LAB15 base: LAB14 1e1d6b066ca6466225677c0dfcb34c5a8b48da05
-- compare LAB14..LAB15: ahead 15, behind 0; changed paths only MotorLab/upstream/Guardian control-plane; no app/ files changed
-- Meld accepted baseline: v0.9.2
-- Meld baseline commit: dc7a27224acee33fa475ab70e1935dc03d3ef4ef
-- sole upstream: FrancescoGrazioso/Meld
-- direct MetroList upstream: disabled
-- classifier supports safe / already_present / compatible_adaptation / real_conflict / possible_regression
-- automatic integration is permitted only for fully safe deltas; adaptation/conflict/regression cases create review-required isolated LAB state
-- finalize_current_lab verifies resolved Meld commit ancestry before tests/build
-- regression tasks verified for LAB15 lineage: :app:testFossDebugUnitTest and :innertube:testDebugUnitTest
-- run 36644097790 executed the real app+innertube JVM tests and Gradle reported BUILD SUCCESSFUL in 4m34s
-- run 36641422644 completed isolated UAB APK+ZIP/applicationId verification and artifact upload successfully
-- LAB signing uses temporary standard debug keystore for side-by-side LAB testing; stable production/in-place signing is a separate concern and is not claimed solved
-- verified-baseline recorder self-test passed; after a future verified integration it advances tag/SHA and integration history only in the LAB lineage
-- temporary LAB15 verification workflow is deleted
-- permanent Guardian test gate is persisted as :app:testFossDebugUnitTest :innertube:testDebugUnitTest
-- no CANDIDATA created
+VERIFIED_LAB16_STATE
+- LAB16 branch: uab-build/musiclab-originali-cover-player-16
+- LAB16 source base: LAB15 39769490e6d88535102e48e6e83eef0e6cfaea3d
+- runtime tested head: 8f909764fb077ff6a89531699cb58872995cffa2
+- final branch head after cleanup/MotorLab sync: cf62bf9e3d7bf9bbe9f1de5de7f372f0dafbf763
+- compare tested runtime head..final head: 4 commits ahead, 0 behind; changed paths only removed temporary workflow and .motorlab control-plane files; zero app runtime changes after tested head
+- run 36649618835: SUCCESS
+- real regression JVM tests passed: :app:testFossDebugUnitTest and :innertube:testDebugUnitTest
+- UAB preflight passed
+- isolated LAB build passed with side-by-side LAB application identity
+- ZIP verification passed
+- artifact upload passed
+- artifact id: 11070506415
+- artifact digest: sha256:8adb912166b283a2474ef2370890d57b4964b89a8a718370b13dd4d637c9254b
+- APK SHA256: f4bfef413b03d126e663c3f0b3f6505ef18cb4d0c69015ba753ec03894decdc7
+- outer artifact contains MusicLab-LAB-16.apk, MusicLab-LAB-16-APK.zip, SHA256SUMS and build log
+- temporary .github/workflows/lab16-verify-temp.yml removed after successful verification
 - no MADRE modified
-- MusicLab native playback/search/AI/runtime engine and approved UI were not changed by this LAB15 operation
+- no CANDIDATA created
+- approved graphics were not changed
+
+ROOT_CAUSE_LAB16_FIXES_2026_09_30
+INCIDENT_STATUS=CLOSED_IMPLEMENTATION_VERIFIED_DEVICE_ACCEPTANCE_PENDING
+ORIGINALI_CAUSE_CONFIRMED=MusicLabIntelligenceMenu required a second resolveCanonical AI result before calling OriginalVersionNavigationBridge.open; when that preliminary AI resolution returned null, navigation never occurred although OriginalVersionScreen has its own AI/search pipeline.
+ORIGINALI_CORRECTION=Originali now opens immediately from current media metadata/request context and performs its AI identification/search inside OriginalVersionScreen; Cover entry received the same robust opening pattern.
+PLAYER_CAUSE_CONFIRMED=canonical navigation actions to artist/album and MusicLab Cover/Originali paths navigated/dismissed menus without explicitly collapsing the existing PlayerBottomSheet; the expanded player therefore remained visually persistent over the destination.
+PLAYER_CORRECTION=PlayerBottomSheetBridge.collapseSoft is invoked before relevant navigation so the destination screen is visible with mini-player behavior preserved.
+COVER_QUANTITY_CAUSE_CONFIRMED=initial cover discovery was capped at five and expanded discovery was broad but not target-driven toward the requested studio-cover floor; playable resolution also processed a limited per-candidate search surface.
+COVER_QUANTITY_CORRECTION=Cover discovery now continues toward a 50-cover target when real candidates exist, without inventing versions, while preserving higher available totals and existing category rules.
+ORIGINALI_QUANTITY_CAUSE_CONFIRMED=expanded Originali search used only three continuation pages per query and a narrower context/query surface, which could stop below the requested practical floor even when additional valid versions existed.
+ORIGINALI_QUANTITY_CORRECTION=Originali expanded search now uses deeper continuation coverage and additional real version contexts while preserving strict same-title/original-artist filters; target intent is at least 20 when source data actually provides them.
+PAGINATION_CAUSE_CONFIRMED=Cover and Originali UIs rendered the full currently available result lists instead of a user-controlled visible window.
+PAGINATION_CORRECTION=Both result surfaces now expose results in windows of 10 and expand by another 10 when the user reaches the bottom/continues scrolling, rather than dumping the entire discovered set at once.
+DATE_CAUSE_CONFIRMED=AI/editorial year fields can legitimately be null, and the UI previously stopped at 'anno non disponibile' instead of resolving an available release year from the playable song's album metadata.
+DATE_CORRECTION=Cover and Originali now enrich missing years from real YouTube Music album metadata via cached CoverYearResolver/background enrichment; no fabricated date is inserted when no real year exists.
+BUILD_GATE_INCIDENT=First LAB16 verification run 36649081893 failed at Kotlin compilation because the new Originali date-enrichment code invoked async outside an explicit coroutine scope under the current Kotlin/Gradle compiler rules.
+BUILD_GATE_ROOT_CAUSE_CONFIRMED=Missing coroutineScope wrapper around async date lookup batch.
+BUILD_GATE_CORRECTION=Wrapped the concurrent lookups in coroutineScope; subsequent run 36649618835 passed compilation, real JVM tests and full UAB build.
+RECURRENCE_PROTECTION=Permanent real app+innertube JVM regression gate plus isolated UAB build prevented delivery of the broken intermediate commit; future date-enrichment concurrency changes must pass the same gate.
+
+UPSTREAM_GUARDIAN_STATE_PRESERVED
+- Permanent Meld Guardian remains inherited from LAB15.
+- Meld accepted baseline remains v0.9.2 commit dc7a27224acee33fa475ab70e1935dc03d3ef4ef.
+- Sole upstream remains FrancescoGrazioso/Meld; direct MetroList upstream remains disabled.
+- Future Meld notification handling starts from the Guardian lineage now carried forward through LAB16, never by rebuilding LAB14/LAB15 from scratch.
 
 ROOT_CAUSE_INCIDENT_2026_09_30
 INCIDENT_STATUS=CLOSED_VERIFIED
 INCIDENT_CLASS=MOTORLAB_CONTROL_PLANE_TRIGGER_LEAK
-SYMPTOM=MotorLab r10 metadata-only sync on main unexpectedly launched Build APKs and Quick Test Build; user-visible MotorLab reporting did not show the expected numeric progress/status during that external build activity.
-TRIGGER_COMMIT=ea7c05dbba07f935d789de2a622e33b0f53ba22c
-TRIGGER_CHANGED_PATH=.motorlab/MOTORLAB_SYNC_STATE.txt only
-UNEXPECTED_RUNS=36650282610 Build APKs; 36650282469 Quick Test Build
-ROOT_CAUSE_CONFIRMED_1=.github/workflows/build.yml and build_quick.yml listened to push on all branches and did not ignore .motorlab/** or MOTORLAB_PROJECT_HOOK.txt, so control-plane-only pushes were allowed to launch application APK workflows.
-ROOT_CAUSE_CONFIRMED_2=r10 numeric progress language was high-presence but still permissive enough that an active external build could be observed without a hard first-visible percentage/status gate in the chat.
-ROOT_CAUSE_CONFIRMED_3=Project Continuity previously treated build/workflow starts broadly without first classifying whether the live event was application work or MotorLab control-plane activity, creating ambiguity about whether a ledger/app operation should advance.
-CORRECTION_1=build.yml now ignores .motorlab/** and MOTORLAB_PROJECT_HOOK.txt for push-triggered APK builds; commit 95db766487d6d3087ddb2a62f4fd11794d5d6916.
-CORRECTION_2=build_quick.yml now ignores .motorlab/** and MOTORLAB_PROJECT_HOOK.txt for push-triggered quick APK builds; commit bb14684c8c0a13f8504f8125606b36f8dc7cc2fe.
-CORRECTION_3=Both correction commits used [skip ci]; verification shows no newer APK workflow runs were created after them. Latest relevant runs remain the old r10-triggered runs on ea7c05dbba07f935d789de2a622e33b0f53ba22c.
-CORRECTION_4=MotorLab r11 introduces Root Cause Closure, hard numeric progress visibility after boot, live-event classification, and stale-write-through causal handling.
-LIFECYCLE_DECISION=The r10-triggered runs are classified MOTORLAB_CONTROL_PLANE side effects, not a new application LAB. LAB15 remains the verified application/upstream-system state. Do not invent LAB16 from this incident.
-RECURRENCE_PROTECTION=Future .motorlab/** or MOTORLAB_PROJECT_HOOK.txt-only pushes must not trigger Build APKs/Quick Test Build; future MotorLab problems cannot be closed by manual alignment alone; active substantial work must show evidence-based numeric progress when the chat surface permits.
+SYMPTOM=MotorLab metadata-only sync on main unexpectedly launched app build workflows; those live events were control-plane side effects, not a new application LAB.
+ROOT_CAUSE_CONFIRMED_1=.github/workflows/build.yml and build_quick.yml listened to push without excluding .motorlab/** / MOTORLAB_PROJECT_HOOK.txt.
+CORRECTION_1=Relevant push-triggered application workflows were updated to ignore MotorLab-only paths, with no new application lifecycle identity created by those control-plane events.
+CORRECTION_2=MotorLab r11 requires live-event classification, hard numeric progress visibility and Root Cause Closure before definitive problem closure.
+LIFECYCLE_DECISION=Control-plane-only runs do not create or supersede LAB16/MADRE/CANDIDATA.
 
-MANUAL_LIGHTNING_RECOVERY_HISTORY
-- manual lightning salvage preserved the same operation and 93% monotonic recovery floor through signing and test-gate recovery
-- signing failures were isolated to missing debug keystore/secret; changed strategy reused proven LAB14 temporary debug keystore and succeeded
-- invalid spotify/betterlyrics test selection was not repeated after module evidence showed LAB15 contains only :app and :innertube
-- final GitHub Actions cleanup push was rejected only because the Actions token lacked workflows permission; build/tests were already green
-- cleanup and permanent workflow correction were then completed directly through the authorized GitHub connector without rerunning verified work
+MOTORLAB_SATELLITE_STATE
+- current local satellite on LAB16: 2026.09.30-r11
+- LAST_GOOD preserved: 2026.09.30-r8
+- r11 synchronization occurred only after LAB16 test/build/artifact completion at a safe boundary
+- MotorLab sync changed only .motorlab control-plane files and did not alter MusicLab app runtime/UI/package/signing/native engines
 
 CONTINUITY_RULES
 - New MusicLab chats must load this ledger automatically after MotorLab boot.
 - Live repository/provider/artifact evidence newer than this ledger wins and must refresh it when safe.
+- Current application continuation point is LAB16, not LAB15, LAB14, LAB13 or LAB12.
 - Classify newer live events before treating them as application lifecycle changes.
 - MotorLab/control-plane-only commits/jobs do not create a new LAB/MADRE/CANDIDATA or reset the application progress scale.
-- An unexpected missed write-through or trigger leak must route through Root Cause Closure; manual realignment alone is not definitive closure.
-- This completed LAB15 operation must not restart from LAB12/LAB13/LAB14 or from stale historical UAB registries.
-- Future Meld work starts from the last accepted baseline recorded by the Guardian lineage, not from v0.8.9.
+- A missed write-through, trigger leak or recurring defect routes through Root Cause Closure; manual realignment alone is not definitive closure.
+- Future Meld work starts from the last accepted Guardian baseline inherited by LAB16.
 - CANDIDATA -> MADRE remains an explicit Bruno approval gate.
 - MotorLab remains control-plane only and must not replace or rewrite MusicLab native/domain engines merely because it is active.
 - Do not require Bruno to paste an activation or transfer prompt.
 
-UPDATED_BY=MotorLab r11 Root Cause Closure incident verification
+UPDATED_BY=MotorLab r11 LAB16 completion + manual lightning save-then-resume
 UPDATED_DATE=2026-09-30
