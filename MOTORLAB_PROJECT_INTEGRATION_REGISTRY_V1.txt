@@ -55,7 +55,10 @@ REGISTERED PROJECTS
 1. MusicLab — Br174/MusicLab
    Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt
    Change registry: MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
-   Local satellite before r13 adoption: 2026.09.30-r12 VERIFIED; r13 adoption allowed at safe boundary because LAB18 automated work is complete and write lock released.
+   Local satellite: 2026.09.30-r13 VERIFIED
+   LAST_GOOD: 2026.09.30-r12
+   r13 control-plane commit: fdee0d5afbfba39a243dbd62f3b446b310a49a10
+   CI suppression verification: head_sha fdee0d5afbfba39a243dbd62f3b446b310a49a10 produced zero workflow runs
    Native engine: coexist/preserve
    Iteration mode: risk-scaled
    No-Spin handoff: required
@@ -111,4 +114,4 @@ Repository state cannot wake a host with no execution cycle. Persistent external
 VERSION
 MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.5
 Revision 2.4: r12 Fast Iteration + No-Spin globally; MusicLab first r12 satellite.
-Revision 2.5: r13 adds canonical per-project semantic Change History registries, automatic change capture, verified historical backfill and selective exact restore.
+Revision 2.5: r13 adds canonical per-project semantic Change History registries, automatic change capture, verified historical backfill and selective exact restore; MusicLab is first r13 VERIFIED satellite.
