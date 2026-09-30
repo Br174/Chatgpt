@@ -2,10 +2,9 @@ MOTORLAB RELEASE MANIFEST V1
 
 STATUS
 Canonical MotorLab release/version manifest.
-Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.30-r13
+CURRENT_RELEASE=2026.09.30-r14
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -14,9 +13,8 @@ PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 FAST_ITERATION_NO_SPIN_MODULE=MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
 CHANGE_HISTORY_REGISTRY_MODULE=MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
-
-PURPOSE
-Provide one authoritative MotorLab release identity and required capabilities for persistent project orchestration.
+PRE_CHANGE_APPROVAL_GATE_MODULE=MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
+MODIFICATION_RESTORE_REGISTER_MODULE=MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
 
 CURRENT REQUIRED CORE MODULES
 - MOTORLAB_CORE_ENTRYPOINT_V1.txt
@@ -37,106 +35,43 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_VELOCITY_LAYER_V1.txt
 - MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
 - MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
+- MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
+- MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
 - MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt
 - MOTORLAB_SATELLITE_SYNC_V1.txt
 - MOTORLAB_SATELLITE_BUNDLE_V1.txt
 
 SATELLITE LOCAL FILES
-Each registered project should contain:
-- MOTORLAB_PROJECT_HOOK.txt;
-- .motorlab/MOTORLAB_LOCAL_CORE.txt;
-- .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt;
-- .motorlab/MOTORLAB_SYNC_STATE.txt.
-Each registered project additionally references one central Project Continuity ledger and, for r13+, one canonical semantic Change History registry.
+Each registered project should contain MOTORLAB_PROJECT_HOOK.txt, .motorlab/MOTORLAB_LOCAL_CORE.txt, .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt and .motorlab/MOTORLAB_SYNC_STATE.txt. Each project also references one central Project Continuity ledger, one technical Change History registry, and for r14+ one visible Registro Modifiche e Ripristini.
 
-UPDATE / ROLLBACK
-A project satellite adopts a newer central release only at a safe boundary. Preserve the current verified bundle as LAST_GOOD before adoption. Never replace an active operation's pinned release mid-write/build/test/promotion.
+SAFE UPDATE
+Adopt a newer MotorLab release only at a safe boundary, preserve the current verified local bundle as LAST_GOOD, and never switch release mid active write/build/test/promotion.
 
 VISIBLE STARTUP RULE
-Normal activation proof is exactly:
-"⚙️ MotorLab attivo"
-For r8+, this is the mandatory pre-response first-line gate whenever a supported MotorLab activation path is visible.
+First user-visible line for MotorLab project work: "⚙️ MotorLab attivo".
 
-R5+ ANTI-LOOP / WAKE
-Watchdog remains sole health/intervention coordinator; Resume Recovery owns continuation; Foreground Stall Guard owns prevention; automatic recovery does not depend on `⚡`.
+R11+ ROOT CAUSE
+Contain the symptom, determine why it happened, correct/contain the causal mechanism, inspect recurrence surfaces and add proportionate prevention before definitive closure.
 
-R6+ MANUAL LIGHTNING SAVE-THEN-RESUME
-Manual `⚡` performs bounded recoverable-state salvage first, then Watchdog classification and targeted continuation.
+R12+ FAST ITERATION / NO-SPIN
+Risk-scaled LAB iteration is allowed only where eligible. HIGH-risk and CANDIDATA/MADRE keep full gates. Persistent executor handoff must not cause indefinite foreground polling.
 
-R7+ MONOTONIC RECOVERY FLOOR
-Same-operation verified progress is monotonic by default. Stale lower checkpoints cannot silently override newer coherent verified progress. Regression requires material invalidation evidence and visible explanation.
+R13+ TECHNICAL CHANGE HISTORY
+MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt remains the technical semantic provenance/history layer backed by immutable Git. It can retain historical, superseded and automatically verified records for discovery, diagnosis and selective restore provenance.
 
-R8+ PRE-RESPONSE BOOT GATE / PROJECT CONTINUITY
-Registered project context or clear software-build intent activates MotorLab before substantive project work. Every registered project has a canonical Project Continuity ledger; new chats reconcile it with newer live repository/provider/job/artifact state and continue unfinished work without transfer prompts.
+R14+ PRE-CHANGE APPROVAL
+MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt is mandatory. A request to modify/correct/add/remove/restore expresses desired intent but does not authorize the first project/application write. MotorLab first shows a concise pre-change report; only a later Bruno approval of that report authorizes writing. Read-only preparation is allowed before approval. Material scope expansion requires an amended report and new approval.
 
-R9+ LABELED VISUAL STATUS
-Every MotorLab status emoji shown to Bruno includes its canonical short Italian label beside it. 🎆 means a completed action/phase, while 💯 is reserved exclusively for full end-to-end requested completion after verification/delivery.
+R14+ REGISTRO MODIFICHE E RIPRISTINI
+MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt is the user-facing restore-point layer. Visible numbers are plain stable integers 1, 2, 3... One feature family keeps one number. Only a specific modification Bruno confirms as working and wants conserved may create/update a visible slot. Automated build/test success alone is insufficient. Failed, ambiguous, experimental or unconfirmed attempts do not enter the visible register. A multi-change LAB/APK registers only the exact item(s) Bruno identifies for conservation. A newer confirmed implementation of the same feature updates the existing number; older provenance remains in Git/technical history. After persistence MotorLab explicitly reports the saved number. Existing pre-r14 technical records are not promoted automatically. "Ripristina N" resolves the visible slot but still requires the pre-change report and Bruno approval before writing.
 
-R10+ EXTENDED VISUAL STATUS + HIGH-PRESENCE NUMERIC PROGRESS
-Canonical visual status additionally includes solution search, compatibility, slowness, elaboration, external wait, tests and sync states. Classic format remains `Progresso MotorLab: <N>%`; numeric progress is evidence-based and monotonic.
-
-R11+ ROOT CAUSE CLOSURE + HARD PROGRESS VISIBILITY
-Every real problem/anomaly receives immediate containment plus root-cause investigation. Manual alignment/symptom repair alone is not definitive closure. Causal status distinguishes confirmed cause/hypothesis/external/unknown; recurrence surfaces are checked proportionately. Control-plane-only activity cannot silently become a new LAB/MADRE/CANDIDATA. Numeric progress remains visible through substantial operations.
-
-R12+ FAST ITERATION + NO-SPIN HANDOFF
-MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt is mandatory. Verified persistent executor handoff must not leave foreground chat polling indefinitely; default unchanged provider probes max 2. Eligible LOW/MEDIUM isolated LAB correction loops use risk-scaled verification, while HIGH-risk and every CANDIDATA/MADRE promotion retain full applicable regression/lifecycle protections.
-
-R13+ SEMANTIC CHANGE HISTORY + SELECTIVE EXACT RESTORE
-For release 2026.09.30-r13 and later:
-- MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt is mandatory;
-- each registered project receives a canonical project change registry pointer;
-- every verified material Bruno-requested change is automatically indexed at a material verified boundary;
-- records use ordinary semantic aliases plus immutable Git refs/commits/trees/files as exact provenance;
-- queries such as "player" search the project registry before raw repository archaeology;
-- multiple materially different matches are disambiguated by title/date/LAB/status unless Bruno already specified one;
-- default restore is selective into a new isolated LAB from the current proper baseline, preserving unrelated later work;
-- feature restore does not imply whole-project rollback;
-- whole-version rollback remains available only when explicitly requested;
-- composite changes must not replay unrelated subfeatures when a safe scoped source boundary exists;
-- if historical work predates r13, verified Git/ledger backfill occurs on demand and is then persisted for future searches;
-- restored changes create new registry records linking RESTORED_FROM;
-- registry/control-plane metadata uses CI suppression/path filters and must not launch unrelated app builds;
-- Change Compatibility Guard, Root Cause Closure, single-writer and lifecycle protections remain mandatory.
-
-FULL CANONICAL LEGEND
-⚙️ MotorLab attivo
-🎆 Azione completata
-⚡ Risveglio / recupero
-✅ Problema risolto
-👍🏻 Procede tutto bene
-⚠️ Piccolo problema risolvibile
-🧭 Cambiare approccio
-🛑 Stop di sicurezza / blocco reale
-♻️ Una parte va rifatta
-💀 Tutto da rifare
-💯 Conclusione definitiva
-🔍 Ricerca soluzione
-🧩 Compatibile
-🐢 Lentezza rilevata
-💭 Elaborazione in corso
-⏳ Attesa esterna
-🧪 Test / verifica in corso
-🔄 Sincronizzazione in corso
-
-STATE AUTHORITY ORDER
-1. explicit current Bruno instruction;
-2. live repository/provider/job/artifact evidence;
-3. canonical Project Continuity ledger;
-4. canonical Change History registry for historical semantic lookup only (never newer-current-state authority);
-5. current checkpoint/pending ledger;
-6. older registries;
-7. memory/copied summaries.
-
-FUTURE PROJECT RULE
-Every future concrete MotorLab software project receives hook + local satellite + central Project Continuity ledger + semantic Change History registry and inherits Root Cause Closure, labeled visual status, hard numeric progress, Fast Iteration, No-Spin Handoff and selective exact restore automatically.
+CURRENT/FUTURE PROJECT RULE
+All current and future MotorLab-managed software projects inherit hard pre-change approval plus a visible user-confirmed Registro Modifiche e Ripristini in addition to Project Continuity and technical Change History.
 
 NO RUNTIME REGRESSION
-MotorLab control-plane/reporting/history metadata must not intentionally alter application runtime, UI, package/signing identity, source lifecycle or native engines.
+MotorLab control-plane metadata alone must not alter application runtime, UI, package/signing identity, lifecycle or project-native engines.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.13
-Revision 1.9: r9 permanent labeled visual status and final-only 💯.
-Revision 1.10: r10 extended visual status and high-presence numeric progress.
-Revision 1.11: r11 mandatory Root Cause Closure, live-event classification and hard numeric progress.
-Revision 1.12: r12 mandatory Fast Iteration + No-Spin Handoff.
-Revision 1.13: r13 adds mandatory semantic Change History registry, automatic verified change capture, on-demand historical backfill and selective exact restore from immutable Git provenance.
+MOTORLAB-RELEASE-MANIFEST-V1.14
+Established: 2026-09-29
+Revision 1.14: r14 adds plan-before-write approval and user-confirmed numbered Registro Modifiche e Ripristini.
