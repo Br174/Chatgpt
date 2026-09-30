@@ -15,6 +15,7 @@ Watchdog is the single coordinator for progress-health detection and anti-stall 
 - Background Execution owns persistent executor/job semantics.
 - Progress Reporting owns visible numeric percentages/status density.
 - Visual Status owns canonical user-facing emoji+label language.
+- Root Cause Closure owns symptom/cause/prevention closure after real faults/anomalies.
 - Change Compatibility Guard owns pre-change conflict/overlap/regression checks.
 No competing recovery paths are allowed for the same event.
 
@@ -104,26 +105,39 @@ Do not hide the percentage just because the same N% was already shown; repetitio
 Watchdog does not invent progress. Keep highest coherent verified percentage for the same operation unless material evidence invalidates it. Older checkpoints, interrupted chat, failed/queued lightning, elapsed time or conversation-load failure are not invalidation evidence.
 A real regression requires material evidence such as verified rollback/reset, milestone-invalidating job failure, corrupted/missing required artifact or an explicitly approved replacement operation/scale, and must be explained visibly.
 
-15. GITHUB-SPECIFIC BEHAVIOR
+15. ROOT-CAUSE HANDOFF AFTER FAULT / RECOVERY - MANDATORY
+When Watchdog detects a real failure/anomaly or performs a non-trivial recovery:
+- immediate recovery/containment may restore progress;
+- if the fault is non-transient, repeated, configuration/state related, unexpected, or capable of recurring, invoke MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt before definitive problem closure;
+- identify whether the cause is confirmed, hypothesized, external or unknown;
+- correct/prevent the causal mechanism when safe;
+- check the smallest relevant recurrence surface;
+- do not emit `✅ Problema risolto` solely because a retry/recovery succeeded once.
+
+Purely transient provider noise may be closed with evidence that the external transient condition cleared and no project-side causal defect exists; otherwise Root Cause Closure remains controlling.
+
+16. GITHUB-SPECIFIC BEHAVIOR
 Prefer commit/ref identity, workflow/job/step transitions and artifacts. Do not duplicate an active workflow because chat appears idle. For manual salvage prefer targeted current ref/job/artifact state over broad traversal.
 A GitHub job that remains alive but slow may use 🐢; a queued/running job legitimately awaiting provider progress may use ⏳; use ⚡ only when a real health/recovery check is warranted.
+If a control-plane-only commit unexpectedly triggers application build/release workflows, classify it as an anomaly and route to Root Cause Closure rather than treating the build as normal app lifecycle progress.
 
-16. PLATFORM LIMIT
+17. PLATFORM LIMIT
 MotorLab cannot self-inject while the host exposes no execution cycle, and the manual lightning command also requires delivery of the user message. It cannot retroactively snapshot hidden model reasoning that was never persisted to a recoverable state surface.
 
-17. VISUAL STATUS PRECEDENCE
+18. VISUAL STATUS PRECEDENCE
 MOTORLAB_VISUAL_STATUS_V1.txt is authoritative for user-facing emoji semantics and labels.
 Legacy repeated lightning counts in older examples/history are obsolete as user-facing status language.
 Internal Watchdog levels remain fully active and must not be inferred from emoji count.
 
-18. NO REGRESSION
+19. NO REGRESSION
 Watchdog is control-plane infrastructure and must not alter application logic/UI/package/signing/lifecycle merely to add monitoring.
 
 SUCCESS CRITERIA
-Watchdog is active when stalls/loops are evidence-based, slow work and external waiting are distinguished from recovery, two-strike protection is enforced, manual lightning saves/reconciles then resumes, monotonic recovery is preserved, single-writer safety holds, and every meaningful visible status carries canonical readable language plus the verified numeric progress percentage when available.
+Watchdog is active when stalls/loops are evidence-based, slow work and external waiting are distinguished from recovery, two-strike protection is enforced, manual lightning saves/reconciles then resumes, monotonic recovery is preserved, single-writer safety holds, meaningful visible status carries the verified numeric percentage when available, and real recovered faults pass through Root Cause Closure before being called definitively solved.
 
 VERSION
-MOTORLAB-WATCHDOG-V1.5
+MOTORLAB-WATCHDOG-V1.6
 Established: 2026-09-28
-Revision 1.4: user-facing Watchdog events aligned with permanent labeled visual legend; internal levels remain technical metadata.
-Revision 1.5: adds explicit 🐢 slow-but-live and ⏳ external-wait states, keeps ⚡ for real recovery/health action, and makes numeric progress highly visible on meaningful Watchdog updates.
+Revision 1.4: labeled visual Watchdog language.
+Revision 1.5: explicit 🐢 slow-but-live, ⏳ external-wait and high-presence numeric progress.
+Revision 1.6: r11 routes non-trivial recovered faults/anomalies through Root Cause Closure and blocks symptom-only definitive closure.
