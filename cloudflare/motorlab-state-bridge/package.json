@@ -1,0 +1,10 @@
+{
+  "name": "motorlab-state-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "validate:outbox": "node scripts/validate-outbox.mjs"
+  }
+}
