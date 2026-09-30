@@ -31,9 +31,17 @@ NOTES: Br174/Chatgpt central authority and project repositories are accessible t
 
 2. Cloudflare D1/KV for MotorLab central operational state
 CORE: READY via MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt and MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
-CONNECTION/RESOURCE: AVAILABLE_NOT_CONNECTED / central MotorLab D1+KV resources not yet provisioned or verified in this release operation
-ROLE TARGET: persistent operational state + cache
-NOTES: Existing project Cloudflare usage (for example MusicLab backend and Cover Lab AI preparation) is distinct from the new MotorLab central state store. Do not conflate them.
+CONNECTION: CONNECTED_VERIFIED
+RESOURCE: RESOURCE_READY
+ROLE: persistent live operational state + reconstructible cache
+WORKER: motorlab-state-bridge
+D1: motorlab-operational-state-db
+KV: motorlab-operational-cache
+GITHUB RELAY: Br174/Chatgpt Issue #1 webhook transport
+END-TO-END CHECK: PASSED on 2026-09-30; GitHub event -> signed webhook -> Worker -> D1 write -> verification read returned snapshot_id and payload_hash.
+AUTHORITY RULE: GitHub remains durable technical authority; D1 is live operational state; KV is cache only and may be rebuilt.
+FAIL-SAFE: MotorLab must continue from GitHub authoritative state if Cloudflare is unavailable or quota-limited, then resynchronize operational state when available.
+NOTES: Existing project Cloudflare usage (for example MusicLab backend and Cover Lab AI preparation) remains project-specific and distinct from the central MotorLab state store.
 
 3. PostHog
 CORE: READY via MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
@@ -89,7 +97,7 @@ CONNECTION RULE
 Connecting/installing a ChatGPT plugin requires explicit user action. Once connected, update this registry only after a real tool capability check verifies access.
 
 CLOUDFLARE RULE
-Central MotorLab D1/KV becomes RESOURCE_READY only after actual resources, schema/bindings and read/write/recovery checks are verified. Existing Cloudflare resources owned by application projects do not automatically satisfy this requirement.
+Central MotorLab D1/KV is RESOURCE_READY only while actual resources, bindings and read/write/recovery behavior remain verified. GitHub remains technical authority and recovery source; Cloudflare never becomes a competing technical source of truth.
 
 GITBOOK RULE
 GitBook is a derived manual/architecture projection, never technical authority. GitHub remains authoritative. The official GitBook organization/site identifiers above must be used for future MotorLab documentation work unless Bruno explicitly changes them. OAuth permission to delete does not constitute approval to delete. A GitBook plan/trial state must not silently create paid usage; MotorLab must remain free-first.
@@ -104,6 +112,6 @@ FAIL-SAFE
 No AVAILABLE_NOT_CONNECTED or DEGRADED optional integration blocks MotorLab core operation.
 
 VERSION
-MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.3
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.4
 Established: 2026-09-30
-Revision 1.3: Notion connection verified; official MotorLab Control Center created, fetched and registered as derived status projection.
+Revision 1.4: central MotorLab Cloudflare Worker/D1/KV resources and GitHub webhook relay verified end-to-end; Cloudflare marked CONNECTED_VERIFIED / RESOURCE_READY with GitHub authoritative fallback preserved.
