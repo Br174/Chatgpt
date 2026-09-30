@@ -91,7 +91,7 @@ CENTRAL SERVICE INTEGRATION STATUS
 - Cloudflare central MotorLab D1/KV: CONNECTED_VERIFIED / RESOURCE_READY; end-to-end GitHub webhook -> Worker -> D1 write -> verification read passed on 2026-09-30; GitHub remains authoritative fallback.
 - PostHog: CONNECTED_VERIFIED at ChatGPT/plugin account level; project instrumentation not yet adopted.
 - Notion: CONNECTED_VERIFIED; MotorLab Control Center is derived status projection only.
-- GitBook: CONNECTED_VERIFIED for read; WRITE AUTH DEGRADED because change-request creation returned HTTP 403 `requires user auth`; no Git Sync bypass is configured.
+- GitBook: CONNECTED_VERIFIED for read/write. User-authenticated OAuth Full access was explicitly authorized on 2026-09-30; site read passed and harmless draft change-request creation passed in Documentation space as change request #1 `MotorLab write-auth verification` (id Om35NPWJOlL2sYvHGNgm). The verification change request remains draft and unmerged. Previous HTTP 403 root cause was Read only OAuth scope; future verification requires separate read and harmless draft-write checks.
 - Superpowers: CONNECTED_VERIFIED; subordinate engineering-method layer.
 - Context7: AVAILABLE_NOT_CONNECTED; optional on-demand documentation and never blocking.
 Existing Cloudflare use inside MusicLab/Cover Lab AI remains project-specific and distinct from the verified central MotorLab state store.
@@ -106,5 +106,5 @@ FUTURE PROJECTS
 Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r16 authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.10
-Revision 2.10: Cloudflare central state remains verified RESOURCE_READY; GitBook live status corrected to read-verified/write-auth-degraded without changing the r16 release.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.11
+Revision 2.11: GitBook live status reconciled to read/write CONNECTED_VERIFIED after OAuth Full access authorization and successful harmless draft change-request write check. Root cause recorded as prior Read only OAuth scope; prevention requires separate read and write capability checks. Central r16 release unchanged.
