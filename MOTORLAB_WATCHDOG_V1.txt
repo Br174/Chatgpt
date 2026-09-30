@@ -13,13 +13,13 @@ Watchdog is the single coordinator for progress-health detection and anti-stall 
 - Foreground Stall Guard owns prevention/chunking/durable handoff.
 - Resume Recovery owns deterministic continuation, manual-lightning salvage and monotonic recovery-floor reconstruction.
 - Background Execution owns persistent executor/job semantics.
-- Progress Reporting owns visible percentages/status.
-- Visual Status owns the canonical user-facing emoji+label language.
+- Progress Reporting owns visible numeric percentages/status density.
+- Visual Status owns canonical user-facing emoji+label language.
 - Change Compatibility Guard owns pre-change conflict/overlap/regression checks.
 No competing recovery paths are allowed for the same event.
 
 CORE PRINCIPLE
-A timer alone is not proof of a stall. Distinguish healthy progress, legitimate waiting, no-progress, repeated ineffective strategy, unreachable provider/tool, finished-unverified result and failure using observable evidence.
+A timer alone is not proof of a stall. Distinguish healthy progress, slow-but-live progress, legitimate external waiting, no-progress, repeated ineffective strategy, unreachable provider/tool, finished-unverified result and failure using observable evidence.
 
 1. OPERATION STATE
 Maintain when available: operation_id, project, repository/ref, phase, action, provider/job, timestamps, progress fingerprint, last verified percent, latest visible verified percent, recovery floor/source, checkpoint, next safe step, lock scope, retry count, same-strategy count, internal recovery level and status.
@@ -30,9 +30,12 @@ Heartbeat means reachable; progress means material state changed. Examples: new 
 3. PREVENTIVE CHECKS
 During substantial work perform lightweight progress-health checks at meaningful boundaries when progress is unclear, repetitive or unusually slow. Do not interrupt healthy work merely to prove Watchdog exists.
 
-When a preventive/recovery event is visible, use the canonical labeled form:
-⚡ Risveglio / recupero — <what MotorLab is checking/recovering and what remains preserved>.
-Do not use repeated lightning counts as user-facing severity encoding.
+User-facing distinction is mandatory:
+- 👍🏻 Procede tutto bene — observable work is healthy and normal.
+- 🐢 Lentezza rilevata — observable work is still alive/legitimate but materially slower than normal.
+- ⏳ Attesa esterna — a provider/job/build/API/service is legitimately waiting and MotorLab should not duplicate it.
+- ⚡ Risveglio / recupero — actual health/recovery investigation or continuation is required.
+Do not use ⚡ merely because work is slow or externally waiting when evidence still shows a healthy state.
 
 4. ADAPTIVE THRESHOLDS
 Guidance only: short read/API ~60-90s no material progress; normal GitHub/tool ~90-180s; builds/provider jobs use wider evidence-based windows. Healthy active jobs are not cancelled because time passed.
@@ -46,11 +49,13 @@ Internal recovery levels remain control-plane metadata, not a visual code:
 - Level 4 SAFE_STOP: stop because safe continuation is not possible.
 
 User-facing mapping follows Visual Status:
-- Level 1/3 recovery activity: ⚡ Risveglio / recupero — ...
+- healthy normal: 👍🏻 Procede tutto bene — ...
+- slow but live: 🐢 Lentezza rilevata — ...
+- legitimate external wait: ⏳ Attesa esterna — ...
+- Level 1/3 actual recovery activity: ⚡ Risveglio / recupero — ...
 - Level 2 when strategy must materially change: 🧭 Cambiare approccio — ...
 - Level 4: 🛑 Stop di sicurezza / blocco reale — ...
 - small bounded issue discovered during diagnosis: ⚠️ Piccolo problema risolvibile — ...
-- healthy confirmation when useful: 👍🏻 Procede tutto bene — ...
 
 6. TWO-STRIKE NO-PROGRESS RULE
 After two materially identical ineffective write/retry/recovery attempts with no progress/new evidence, a third identical attempt is prohibited. First distinguish healthy external waiting. Otherwise diagnose, narrow the substep, change strategy, use an approved alternate executor only when justified, or safe-stop.
@@ -65,12 +70,10 @@ At the first available execution cycle:
 - preserve completed work, highest coherent verified progress and single-writer ownership;
 - keep salvage bounded/fast; never perform a heavy full backup merely because lightning was sent;
 - classify health;
-- if stalled/interrupted, continue the smallest safe pending step compatible with the floor;
+- if healthy but slow, report 🐢 Lentezza rilevata and keep the same live operation;
+- if legitimately waiting externally, report ⏳ Attesa esterna and keep the same live operation;
+- if stalled/interrupted, report ⚡ Risveglio / recupero and continue the smallest safe pending step compatible with the floor;
 - never duplicate/cancel healthy external work.
-
-Visible response format:
-⚡ Risveglio / recupero — <concise current recovery status>.
-The user's input may remain a bare `⚡`; MotorLab output may not.
 
 8. NON-INTERRUPTION RULE
 First response is observation, not cancellation. Verify provider/process state before destructive recovery when possible. If state cannot be safely verified, preserve the operation rather than launch a conflicting writer.
@@ -88,14 +91,14 @@ Retries are targeted and bounded. Deterministic code/config failures go to diagn
 12. BACKGROUND / PARALLEL WORK
 While one writer waits, independent safe read-only diagnostics may continue. Do not launch conflicting writes/build/promotion work.
 
-13. CHAT VISIBILITY
-When Watchdog acts, Bruno sees:
+13. CHAT VISIBILITY + PERCENTAGE
+When Watchdog surfaces a meaningful status during a substantial quantified operation, Bruno sees:
 - the canonical emoji + canonical label;
-- what is being checked/recovered;
+- what is being checked/recovered/waited on;
 - whether completed work is preserved;
 - checkpoint/recovery information when relevant;
-- current verified percentage/recovery floor when available.
-If the approach must change, use 🧭 Cambiare approccio. If continuation is unsafe, use 🛑 Stop di sicurezza / blocco reale.
+- the classic `Progresso MotorLab: N%` whenever a verified percentage exists.
+Do not hide the percentage just because the same N% was already shown; repetition is correct when state changes without new verified progress.
 
 14. PROGRESS / MONOTONIC FLOOR
 Watchdog does not invent progress. Keep highest coherent verified percentage for the same operation unless material evidence invalidates it. Older checkpoints, interrupted chat, failed/queued lightning, elapsed time or conversation-load failure are not invalidation evidence.
@@ -103,6 +106,7 @@ A real regression requires material evidence such as verified rollback/reset, mi
 
 15. GITHUB-SPECIFIC BEHAVIOR
 Prefer commit/ref identity, workflow/job/step transitions and artifacts. Do not duplicate an active workflow because chat appears idle. For manual salvage prefer targeted current ref/job/artifact state over broad traversal.
+A GitHub job that remains alive but slow may use 🐢; a queued/running job legitimately awaiting provider progress may use ⏳; use ⚡ only when a real health/recovery check is warranted.
 
 16. PLATFORM LIMIT
 MotorLab cannot self-inject while the host exposes no execution cycle, and the manual lightning command also requires delivery of the user message. It cannot retroactively snapshot hidden model reasoning that was never persisted to a recoverable state surface.
@@ -116,9 +120,10 @@ Internal Watchdog levels remain fully active and must not be inferred from emoji
 Watchdog is control-plane infrastructure and must not alter application logic/UI/package/signing/lifecycle merely to add monitoring.
 
 SUCCESS CRITERIA
-Watchdog is active when stalls/loops are evidence-based, two-strike protection is enforced, manual lightning saves/reconciles then resumes, monotonic recovery is preserved, single-writer safety holds, and every visible Watchdog status uses the canonical labeled Visual Status language.
+Watchdog is active when stalls/loops are evidence-based, slow work and external waiting are distinguished from recovery, two-strike protection is enforced, manual lightning saves/reconciles then resumes, monotonic recovery is preserved, single-writer safety holds, and every meaningful visible status carries canonical readable language plus the verified numeric progress percentage when available.
 
 VERSION
-MOTORLAB-WATCHDOG-V1.4
+MOTORLAB-WATCHDOG-V1.5
 Established: 2026-09-28
-Revision 1.4: user-facing Watchdog events aligned with the permanent labeled visual legend; internal recovery levels remain technical metadata and no longer use repeated lightning counts as a visible code.
+Revision 1.4: user-facing Watchdog events aligned with permanent labeled visual legend; internal levels remain technical metadata.
+Revision 1.5: adds explicit 🐢 slow-but-live and ⏳ external-wait states, keeps ⚡ for real recovery/health action, and makes numeric progress highly visible on meaningful Watchdog updates.
