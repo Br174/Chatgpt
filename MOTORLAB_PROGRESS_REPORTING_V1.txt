@@ -6,7 +6,7 @@ Established: 2026-09-28.
 Repository authority: Br174/Chatgpt.
 
 PURPOSE
-Let Bruno follow substantial programming, fixing, build, GitHub, testing and delivery work closely from the chat without inventing progress, exposing hidden chain-of-thought or creating message spam.
+Let Bruno follow substantial programming, fixing, build, GitHub, testing and delivery work closely from chat without inventing progress, exposing hidden chain-of-thought or creating meaningless spam.
 
 CORE PRINCIPLE
 Progress percentage represents verified completion, not elapsed time, optimism or ETA.
@@ -20,23 +20,34 @@ Resume Recovery owns checkpoint continuation and recovery-floor reconstruction.
 Visual Status owns canonical emoji + label language.
 Progress Reporting describes observable actions/results/state, not hidden reasoning.
 
-1. FREQUENT CHAT REPORTING
-For substantial tasks, emit useful progress at meaningful starts/completions/phase changes, source/MADRE identification, file/change groups, static checks, build/test state, regression verification, artifact state, checkpoint advance, recovery, handoff/promotion and final delivery.
+1. NUMERIC PROGRESS IS A FIRST-CLASS SIGNAL - MANDATORY
+For every substantial MotorLab-controlled operation, establish a meaningful verified progress scale as soon as the scope and operation identity are sufficiently defined.
+Once a verified percentage exists, keep the classic numeric form highly present:
+Progresso MotorLab: <N>%
 
-2. REPORTING DENSITY
-Avoid long opaque stretches when the interface permits updates. As a practical default, after roughly 1-2 meaningful operations or material phase/status changes, provide concise status when useful. For long external work use real provider/job evidence. Do not emit repetitive messages merely because time passed.
+During the active substantial operation, every meaningful user-facing operational status should normally include the current verified numeric percentage, including analysis, solution search, compatibility, healthy progress, latency, external waiting, tests, synchronization, recoveries, problems, strategy changes, completed actions and final completion.
+
+The percentage may repeat across multiple messages when new operational information exists. Repetition is preferred over inventing advancement.
+Do not fabricate a percentage merely to satisfy visibility. If a reliable scale/value genuinely cannot yet be established, say so briefly and establish it at the first verifiable milestone.
+Activation-only or trivial administrative messages with no active quantified operation may omit a percentage.
+
+2. FREQUENT CHAT REPORTING
+For substantial tasks, emit useful progress at meaningful starts/completions/phase changes, source/MADRE identification, file/change groups, static checks, build/test state, regression verification, artifact state, checkpoint advance, recovery, handoff/promotion and final delivery.
+As a practical default, avoid more than roughly 1-2 meaningful operations or a material phase change without a concise status when the surface permits it.
+Do not emit repetitive updates merely because time passed.
 
 3. SAME-PERCENTAGE STATUS
-A verified percentage may repeat when new operational information exists; do not invent a higher number.
+A verified percentage may repeat whenever the operational state changed or useful new evidence exists.
 Example:
-👍🏻 Procede tutto bene — Progresso MotorLab: 60%; build attiva e runner sano, percentuale invariata finché non arriva nuovo output verificato.
+⏳ Attesa esterna — la build è ancora sul runner e non ha prodotto un nuovo milestone verificato. Progresso MotorLab: 60%.
 
 4. MICRO-MILESTONES
-Large phases may be divided into deterministic micro-milestones: files located, patch applied, diff verified, workflow started, compilation reached, packaging reached, artifact produced, artifact identity/checksum/regressions verified. No fake increments based on time.
+Large phases may be divided into deterministic micro-milestones: files located, patch prepared/applied, diff verified, workflow started, toolchain ready, compilation reached, packaging reached, artifact produced, artifact identity/checksum/regressions verified.
+No fake increments based on time.
 
 5. DEFAULT FULL-TASK SCALE
-5% request accepted/scope locked
-15% current MADRE/source identified/protected
+5% request accepted / scope locked
+15% current MADRE/source identified and protected
 30% requested LAB/config changes applied
 45% static/source checks completed
 60% preflight/cache/toolchain ready
@@ -44,24 +55,32 @@ Large phases may be divided into deterministic micro-milestones: files located, 
 85% regression/artifact verification completed
 95% candidate/handoff/promotion package ready
 100% requested state verified and delivered
-For non-build tasks remap only applicable real milestones.
+For non-build tasks, remap only applicable real milestones and keep the mapping evidence-based.
 
 6. REPORT FORMAT
-Preferred format without special event:
+Preferred plain status:
 Progresso MotorLab: <N>% — <current verified state / active action>.
 
-When a canonical visual event applies, use:
+Preferred labeled visual status:
 <emoji> <canonical label> — <context>. Progresso MotorLab: <N>%.
 
 Examples:
-🎆 Azione completata — modifica applicata e diff verificato; passo ai controlli statici. Progresso MotorLab: 40%.
-⚡ Risveglio / recupero — verifico lo stato reale del job senza perdere il lavoro completato. Progresso MotorLab: 60%.
-⚠️ Piccolo problema risolvibile — manca un prerequisito circoscritto; il sorgente già verificato resta valido. Progresso MotorLab: 60%.
-🧭 Cambiare approccio — due tentativi equivalenti non hanno prodotto progresso; passo a una strategia diversa mantenendo il checkpoint. Progresso MotorLab: 60%.
+💭 Elaborazione in corso — sto ricostruendo lo stato operativo e i vincoli prima della modifica. Progresso MotorLab: 15%.
+🔍 Ricerca soluzione — confronto le alternative compatibili senza toccare ancora il sorgente. Progresso MotorLab: 15%.
+🧩 Compatibile — il preflight ha confermato integrazione sicura nel meccanismo esistente. Progresso MotorLab: 20%.
+🔄 Sincronizzazione in corso — allineo ledger e satellite con lo stato centrale. Progresso MotorLab: 30%.
+🧪 Test / verifica in corso — i controlli sono avviati; nessun esito positivo viene ancora dichiarato. Progresso MotorLab: 60%.
+🐢 Lentezza rilevata — il job continua a produrre attività ma più lentamente del normale. Progresso MotorLab: 60%.
+⏳ Attesa esterna — aspetto il cambio di stato del job GitHub prima del prossimo passo. Progresso MotorLab: 60%.
+🎆 Azione completata — patch applicata e diff verificato; passo ai test. Progresso MotorLab: 45%.
+⚡ Risveglio / recupero — recupero lo stesso job preservando il checkpoint valido. Progresso MotorLab: 60%.
+⚠️ Piccolo problema risolvibile — manca un prerequisito circoscritto; il lavoro verificato resta valido. Progresso MotorLab: 60%.
+🧭 Cambiare approccio — la strategia ripetuta non produce progresso; ne applico una diversa mantenendo il checkpoint. Progresso MotorLab: 60%.
+✅ Problema risolto — la causa è stata corretta e verificata. Progresso MotorLab: 75%.
+💯 Conclusione definitiva — tutto il lavoro richiesto è completato, verificato e chiuso. Progresso MotorLab: 100%.
 
-7. VISUAL LABEL RULE
-Every canonical status emoji emitted by MotorLab must include its canonical label beside it. Do not emit bare canonical status emoji or abbreviated unlabeled forms.
-The canonical legend is:
+7. CANONICAL VISUAL LABELS
+Every canonical status emoji emitted by MotorLab must include its canonical label beside it:
 ⚙️ MotorLab attivo
 🎆 Azione completata
 ⚡ Risveglio / recupero
@@ -73,18 +92,36 @@ The canonical legend is:
 ♻️ Una parte va rifatta
 💀 Tutto da rifare
 💯 Conclusione definitiva
+🔍 Ricerca soluzione
+🧩 Compatibile
+🐢 Lentezza rilevata
+💭 Elaborazione in corso
+⏳ Attesa esterna
+🧪 Test / verifica in corso
+🔄 Sincronizzazione in corso
 
-8. LONG WAIT / EXTERNAL JOB
+8. STATE-SPECIFIC RULES
+🔍 Ricerca soluzione does not imply a solution has already been selected.
+🧩 Compatibile requires completed compatibility/preflight evidence.
+🐢 Lentezza rilevata means slow but still live/progressing or legitimately active, not a proven stall.
+💭 Elaborazione in corso is high-level task analysis only and never reveals hidden chain-of-thought.
+⏳ Attesa esterna is for genuine external provider/job/service waiting.
+🧪 Test / verifica in corso must not be presented as test success before completion.
+🔄 Sincronizzazione in corso must not be presented as synchronized until verification completes.
+
+9. LONG WAIT / EXTERNAL JOB
 When a long job stays in the same percentage band:
 - report provider/job phase when it materially changes;
-- if no material progress crosses Watchdog thresholds, use the labeled recovery/health status;
+- use 🐢 Lentezza rilevata if work remains alive but unusually slow;
+- use ⏳ Attesa esterna for legitimate waiting;
+- if material progress disappears beyond Watchdog thresholds, transition to ⚡ Risveglio / recupero as appropriate;
 - do not increase percentage because time passed;
-- do not show 100% until requested output/state is verified.
+- do not show 100% until the requested output/state is verified.
 
-9. FAILURE / RECOVERY
-On failure retain last verified percentage unless material evidence invalidates it. State the failing phase/substep. Recovery itself does not increase progress unless it completes a real milestone. Older checkpoints are not evidence for discarding newer verified progress.
+10. FAILURE / RECOVERY
+On failure retain the last verified percentage unless material evidence invalidates it. State the failing phase/substep. Recovery itself does not increase progress unless it completes a real milestone. Older checkpoints are not evidence for discarding newer verified progress.
 
-10. MONOTONIC VERIFIED PROGRESS
+11. MONOTONIC VERIFIED PROGRESS
 Within the same logical operation/scale:
 - once a percentage is reported as verified, it participates in recovery-floor evidence;
 - later normal/recovery status may repeat or increase it, but must not silently display a lower value;
@@ -93,37 +130,38 @@ Within the same logical operation/scale:
 - lower progress only with material invalidation evidence or a genuinely new approved operation/progress scale.
 Any real invalidation must be explained visibly.
 
-11. MANUAL `⚡`
+12. MANUAL `⚡`
 If Bruno sends `⚡`, the resulting cycle reports using:
-⚡ Risveglio / recupero — <current recovery status, checkpoint/pending step and preserved progress when relevant>.
+⚡ Risveglio / recupero — <current recovery status, checkpoint/pending step and preserved progress when relevant>. Progresso MotorLab: <N>%.
 Do not answer with a bare lightning symbol.
 
-12. ACTION / PROBLEM / FINAL COMPLETION
+13. ACTION / PROBLEM / FINAL COMPLETION
 🎆 Azione completata is for one completed action/phase/milestone; more work may remain.
 ✅ Problema risolto is for a previously identified problem that has now been corrected and verified.
-💯 Conclusione definitiva is reserved for the whole user-requested operation being fully completed, verified and closed.
-A single build, patch, commit, test or milestone never earns 💯 by itself unless it was genuinely the entire request.
+💯 Conclusione definitiva is reserved for the whole user-requested operation being fully completed, verified and closed and should normally coincide with Progresso MotorLab: 100%.
 
-13. PARTIAL / FULL REDO
+14. PARTIAL / FULL REDO
 ♻️ Una parte va rifatta means only a bounded portion must be rebuilt while valid work remains preserved.
-💀 Tutto da rifare is exceptional and requires evidence that the current overall implementation/approach is materially unusable. Never use it for an ordinary failed substep.
+💀 Tutto da rifare is exceptional and requires evidence that the current overall implementation/approach is materially unusable.
+Neither symbol by itself changes the verified percentage; any reduction follows the explicit invalidation rules.
 
-14. NO FALSE PRECISION
+15. NO FALSE PRECISION
 Intermediate values come from known completed micro-milestones, not arbitrary guesses. If only broad milestones are observable, keep the broad percentage and provide richer text.
 
-15. CROSS-PROJECT / PERSISTENCE
+16. CROSS-PROJECT / PERSISTENCE
 This rule is global across all current/future MotorLab projects. Persist enough operation identity and latest verified progress metadata for recovery without relying on stale checkpoints alone.
 
-16. LIMITATION
+17. LIMITATION
 MotorLab can report only when the chat/orchestration surface allows a visible update. If an underlying call is fully frozen with no control surface, status appears at the next available control point.
 
-17. NO REGRESSION
+18. NO REGRESSION
 This is reporting/control-plane behavior only and must not alter app logic, UI, package identity, signing, source lineage, lifecycle or release behavior.
 
 SUCCESS CRITERIA
-Progress Reporting is active when operational status remains visible, verified percentages are evidence-based/monotonic, recovery does not silently regress progress, and all canonical status emoji use their permanent readable labels with 💯 reserved for true final verified closure.
+Progress Reporting is active when the classic numeric percentage is highly visible throughout substantial work; every meaningful operational status normally carries the current verified N% once established; repeated percentages are allowed and preferred over fake advancement; percentages remain evidence-based and monotonic; and all canonical visual statuses use readable labels without exposing hidden reasoning.
 
 VERSION
-MOTORLAB-PROGRESS-REPORTING-V1.3
+MOTORLAB-PROGRESS-REPORTING-V1.4
 Established: 2026-09-28
-Revision 1.3: reporting aligned with the permanent labeled visual legend; repeated fireworks/lightning visual levels removed from user-facing reporting and 💯 reserved for definitive completion.
+Revision 1.3: reporting aligned with permanent labeled visual legend and final-only 💯.
+Revision 1.4: classic numeric Progresso MotorLab N% becomes a first-class high-presence signal on substantial operational updates; new visual states for solution search, compatibility, latency, analysis, external wait, testing and synchronization are integrated.
