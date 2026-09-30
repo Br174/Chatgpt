@@ -51,10 +51,10 @@ test('validateSnapshot accepts the bounded schema', () => {
 });
 
 test('health exposes only non-sensitive bridge metadata', async () => {
-  const response = await worker.fetch(new Request('https://example.test/health'), { ENGINE_VERSION: '1.0.0' });
+  const response = await worker.fetch(new Request('https://example.test/health'), { ENGINE_VERSION: '1.1.0' });
   assert.equal(response.status, 200);
   const body = await response.json();
-  assert.deepEqual(body, { status: 'ok', service: 'motorlab-state-bridge', engine_version: '1.0.0', schema_version: 1 });
+  assert.deepEqual(body, { status: 'ok', service: 'motorlab-state-bridge', engine_version: '1.1.0', schema_version: 1 });
 });
 
 test('relay rejects unsigned requests', async () => {
@@ -65,7 +65,7 @@ test('relay rejects unsigned requests', async () => {
 });
 
 test('relay writes D1 and verifies KV when signature is valid', async () => {
-  const env = { DB: new MockDB(), CACHE: new MockKV(), RELAY_SECRET: 'secret', ENGINE_VERSION: '1.0.0' };
+  const env = { DB: new MockDB(), CACHE: new MockKV(), RELAY_SECRET: 'secret', ENGINE_VERSION: '1.1.0' };
   const body = JSON.stringify(snapshot);
   const timestamp = String(Math.floor(Date.now() / 1000));
   const response = await worker.fetch(new Request('https://example.test/relay', {
@@ -131,25 +131,25 @@ test('verify endpoint returns only hash/version/time and not operational payload
   assert.equal('payload' in result, false);
 });
 
-test('github webhook rejects unsigned push events', async () => {
-  const payload = JSON.stringify({ ref: 'refs/heads/motorlab/cloudflare-state-r16', repository: { full_name: 'Br174/Chatgpt' }, head_commit: { message: 'no snapshot' } });
-  const env = { DB: new MockDB(), CACHE: new MockKV(), GITHUB_WEBHOOK_SECRET: 'secret', ALLOWED_REPOSITORY: 'Br174/Chatgpt', ALLOWED_REFS: 'refs/heads/main,refs/heads/motorlab/cloudflare-state-r16' };
-  const response = await worker.fetch(new Request('https://example.test/github-webhook', { method: 'POST', body: payload, headers: { 'x-github-event': 'push' } }), env);
+test('github webhook rejects unsigned events', async () => {
+  const payload = JSON.stringify({ action: 'edited', repository: { full_name: 'Br174/Chatgpt' }, issue: { number: 1, body: 'no snapshot' } });
+  const env = { DB: new MockDB(), CACHE: new MockKV(), GITHUB_WEBHOOK_SECRET: 'secret', ALLOWED_REPOSITORY: 'Br174/Chatgpt', RELAY_ISSUE_NUMBER: '1' };
+  const response = await worker.fetch(new Request('https://example.test/github-webhook', { method: 'POST', body: payload, headers: { 'x-github-event': 'issues' } }), env);
   assert.equal(response.status, 401);
   assert.equal(env.DB.batches.length, 0);
 });
 
-test('github webhook accepts signed MotorLab snapshot and bootstraps D1 schema', async () => {
+test('github issues webhook accepts signed dedicated relay issue and bootstraps D1 schema', async () => {
   const encoded = Buffer.from(JSON.stringify(snapshot)).toString('base64url');
   const payload = JSON.stringify({
-    ref: 'refs/heads/motorlab/cloudflare-state-r16',
+    action: 'edited',
     repository: { full_name: 'Br174/Chatgpt' },
-    head_commit: { message: `MotorLab checkpoint\n\nMOTORLAB_SNAPSHOT_B64:${encoded}` }
+    issue: { number: 1, body: `MotorLab relay\n\nMOTORLAB_SNAPSHOT_B64:${encoded}` }
   });
-  const env = { DB: new MockDB(), CACHE: new MockKV(), GITHUB_WEBHOOK_SECRET: 'secret', ALLOWED_REPOSITORY: 'Br174/Chatgpt', ALLOWED_REFS: 'refs/heads/main,refs/heads/motorlab/cloudflare-state-r16' };
+  const env = { DB: new MockDB(), CACHE: new MockKV(), GITHUB_WEBHOOK_SECRET: 'secret', ALLOWED_REPOSITORY: 'Br174/Chatgpt', RELAY_ISSUE_NUMBER: '1' };
   const response = await worker.fetch(new Request('https://example.test/github-webhook', {
     method: 'POST', body: payload,
-    headers: { 'x-github-event': 'push', 'x-hub-signature-256': signGitHub('secret', payload) }
+    headers: { 'x-github-event': 'issues', 'x-hub-signature-256': signGitHub('secret', payload) }
   }), env);
   assert.equal(response.status, 200);
   const result = await response.json();
