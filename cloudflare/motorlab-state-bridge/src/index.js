@@ -1,8 +1,12 @@
+import { SCHEMA_SQL } from './schema.js';
+
 const SCHEMA_VERSION = 1;
 const MAX_BODY_BYTES = 256 * 1024;
 const MAX_RECORDS_PER_KIND = 100;
 const SIGNATURE_WINDOW_SECONDS = 300;
 const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+const initializedDbs = new WeakSet();
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -143,7 +147,6 @@ export function validateSnapshot(input) {
 
   const total = projects.length + operations.length + approvals.length + checkpoints.length + locks.length + artifacts.length + root_causes.length + events.length;
   if (total === 0 || total > MAX_RECORDS_PER_KIND) throw new Error('invalid_record_count');
-
   return { schema_version: SCHEMA_VERSION, snapshot_id, sent_at: input.sent_at, projects, operations, approvals, checkpoints, locks, artifacts, root_causes, events };
 }
 
@@ -167,96 +170,57 @@ async function verifySignature(secret, timestamp, signatureHex, rawBody, now = D
   return crypto.subtle.verify('HMAC', key, signature, textEncoder.encode(`${timestamp}.${rawBody}`));
 }
 
+async function verifyGitHubSignature(secret, signatureHeader, rawBody) {
+  if (!secret || typeof signatureHeader !== 'string' || !signatureHeader.startsWith('sha256=')) return false;
+  const signature = hexToBytes(signatureHeader.slice(7));
+  if (!signature) return false;
+  const key = await crypto.subtle.importKey('raw', textEncoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
+  return crypto.subtle.verify('HMAC', key, signature, textEncoder.encode(rawBody));
+}
+
+async function ensureSchema(db) {
+  if (!db || typeof db.exec !== 'function') throw new Error('d1_not_configured');
+  if (initializedDbs.has(db)) return;
+  await db.exec(SCHEMA_SQL);
+  initializedDbs.add(db);
+}
+
+function decodeBase64Url(value) {
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+  const binary = atob(padded);
+  return textDecoder.decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)));
+}
+
+function snapshotFromCommitMessage(message) {
+  if (typeof message !== 'string') return null;
+  const match = message.match(/(?:^|\n)MOTORLAB_SNAPSHOT_B64:([A-Za-z0-9_-]+)(?:\n|$)/);
+  if (!match) return null;
+  return decodeBase64Url(match[1]);
+}
+
 function buildStatements(db, snapshot, payloadHash, receivedAt) {
-  const statements = [
-    db.prepare('INSERT INTO relay_snapshots (snapshot_id, payload_hash, schema_version, sent_at, received_at) VALUES (?, ?, ?, ?, ?)')
-      .bind(snapshot.snapshot_id, payloadHash, snapshot.schema_version, snapshot.sent_at, receivedAt)
-  ];
+  const statements = [db.prepare('INSERT INTO relay_snapshots (snapshot_id, payload_hash, schema_version, sent_at, received_at) VALUES (?, ?, ?, ?, ?)').bind(snapshot.snapshot_id, payloadHash, snapshot.schema_version, snapshot.sent_at, receivedAt)];
 
-  for (const p of snapshot.projects) statements.push(db.prepare(`INSERT INTO projects
-    (project_id, repository, lifecycle_stage, source_ref, source_head, local_satellite_release_state, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(project_id) DO UPDATE SET repository=excluded.repository, lifecycle_stage=excluded.lifecycle_stage,
-      source_ref=excluded.source_ref, source_head=excluded.source_head,
-      local_satellite_release_state=excluded.local_satellite_release_state, updated_at=excluded.updated_at`)
-    .bind(p.project_id, p.repository, p.lifecycle_stage, p.source_ref, p.source_head, p.local_satellite_release_state, p.updated_at));
-
-  for (const o of snapshot.operations) statements.push(db.prepare(`INSERT INTO operations
-    (operation_id, project_id, title, type, requested_scope, approved_scope, approval_status, lifecycle_stage, risk_class,
-     status, phase, artifact_progress, overall_progress, source_ref, source_head, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(operation_id) DO UPDATE SET project_id=excluded.project_id, title=excluded.title, type=excluded.type,
-      requested_scope=excluded.requested_scope, approved_scope=excluded.approved_scope, approval_status=excluded.approval_status,
-      lifecycle_stage=excluded.lifecycle_stage, risk_class=excluded.risk_class, status=excluded.status, phase=excluded.phase,
-      artifact_progress=excluded.artifact_progress, overall_progress=excluded.overall_progress, source_ref=excluded.source_ref,
-      source_head=excluded.source_head, updated_at=excluded.updated_at`)
-    .bind(o.operation_id, o.project_id, o.title, o.type, o.requested_scope, o.approved_scope, o.approval_status, o.lifecycle_stage,
-      o.risk_class, o.status, o.phase, o.artifact_progress, o.overall_progress, o.source_ref, o.source_head, o.created_at, o.updated_at));
-
-  for (const a of snapshot.approvals) statements.push(db.prepare(`INSERT INTO approvals
-    (approval_id, operation_id, scope_hash, approval_state, approved_at, evidence_ref, superseded_by)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(approval_id) DO UPDATE SET operation_id=excluded.operation_id, scope_hash=excluded.scope_hash,
-      approval_state=excluded.approval_state, approved_at=excluded.approved_at, evidence_ref=excluded.evidence_ref,
-      superseded_by=excluded.superseded_by`)
-    .bind(a.approval_id, a.operation_id, a.scope_hash, a.approval_state, a.approved_at, a.evidence_ref, a.superseded_by));
-
-  for (const c of snapshot.checkpoints) statements.push(db.prepare(`INSERT INTO checkpoints
-    (checkpoint_id, operation_id, phase, verified_progress, completed_steps, next_safe_step, lock_state, external_wait_state, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(checkpoint_id) DO UPDATE SET operation_id=excluded.operation_id, phase=excluded.phase,
-      verified_progress=excluded.verified_progress, completed_steps=excluded.completed_steps, next_safe_step=excluded.next_safe_step,
-      lock_state=excluded.lock_state, external_wait_state=excluded.external_wait_state`)
-    .bind(c.checkpoint_id, c.operation_id, c.phase, c.verified_progress, c.completed_steps, c.next_safe_step, c.lock_state, c.external_wait_state, c.created_at));
-
-  for (const l of snapshot.locks) statements.push(db.prepare(`INSERT INTO locks
-    (lock_key, operation_id, owner, acquired_at, heartbeat_at, released_at, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(lock_key) DO UPDATE SET operation_id=excluded.operation_id, owner=excluded.owner, acquired_at=excluded.acquired_at,
-      heartbeat_at=excluded.heartbeat_at, released_at=excluded.released_at, status=excluded.status`)
-    .bind(l.lock_key, l.operation_id, l.owner, l.acquired_at, l.heartbeat_at, l.released_at, l.status));
-
-  for (const a of snapshot.artifacts) statements.push(db.prepare(`INSERT INTO artifacts
-    (artifact_id, operation_id, name, source_ref, source_head, checksums, verification_state, delivery_state, immutable_under_test, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(artifact_id) DO UPDATE SET operation_id=excluded.operation_id, name=excluded.name, source_ref=excluded.source_ref,
-      source_head=excluded.source_head, checksums=excluded.checksums, verification_state=excluded.verification_state,
-      delivery_state=excluded.delivery_state, immutable_under_test=excluded.immutable_under_test`)
-    .bind(a.artifact_id, a.operation_id, a.name, a.source_ref, a.source_head, a.checksums, a.verification_state, a.delivery_state, a.immutable_under_test ? 1 : 0, a.created_at));
-
-  for (const r of snapshot.root_causes) statements.push(db.prepare(`INSERT INTO root_causes
-    (root_cause_id, operation_id, defect, immediate_repair, status, evidence_refs, recurrence_surfaces, prevention_step,
-     approval_scope_status, associated_artifact, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(root_cause_id) DO UPDATE SET operation_id=excluded.operation_id, defect=excluded.defect,
-      immediate_repair=excluded.immediate_repair, status=excluded.status, evidence_refs=excluded.evidence_refs,
-      recurrence_surfaces=excluded.recurrence_surfaces, prevention_step=excluded.prevention_step,
-      approval_scope_status=excluded.approval_scope_status, associated_artifact=excluded.associated_artifact, updated_at=excluded.updated_at`)
-    .bind(r.root_cause_id, r.operation_id, r.defect, r.immediate_repair, r.status, r.evidence_refs, r.recurrence_surfaces,
-      r.prevention_step, r.approval_scope_status, r.associated_artifact, r.updated_at));
-
-  for (const e of snapshot.events) statements.push(db.prepare(`INSERT OR IGNORE INTO operation_events
-    (event_id, operation_id, event_type, event_summary, created_at) VALUES (?, ?, ?, ?, ?)`)
-    .bind(e.event_id, e.operation_id, e.event_type, e.event_summary, e.created_at));
-
+  for (const p of snapshot.projects) statements.push(db.prepare(`INSERT INTO projects (project_id, repository, lifecycle_stage, source_ref, source_head, local_satellite_release_state, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(project_id) DO UPDATE SET repository=excluded.repository, lifecycle_stage=excluded.lifecycle_stage, source_ref=excluded.source_ref, source_head=excluded.source_head, local_satellite_release_state=excluded.local_satellite_release_state, updated_at=excluded.updated_at`).bind(p.project_id, p.repository, p.lifecycle_stage, p.source_ref, p.source_head, p.local_satellite_release_state, p.updated_at));
+  for (const o of snapshot.operations) statements.push(db.prepare(`INSERT INTO operations (operation_id, project_id, title, type, requested_scope, approved_scope, approval_status, lifecycle_stage, risk_class, status, phase, artifact_progress, overall_progress, source_ref, source_head, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(operation_id) DO UPDATE SET project_id=excluded.project_id, title=excluded.title, type=excluded.type, requested_scope=excluded.requested_scope, approved_scope=excluded.approved_scope, approval_status=excluded.approval_status, lifecycle_stage=excluded.lifecycle_stage, risk_class=excluded.risk_class, status=excluded.status, phase=excluded.phase, artifact_progress=excluded.artifact_progress, overall_progress=excluded.overall_progress, source_ref=excluded.source_ref, source_head=excluded.source_head, updated_at=excluded.updated_at`).bind(o.operation_id, o.project_id, o.title, o.type, o.requested_scope, o.approved_scope, o.approval_status, o.lifecycle_stage, o.risk_class, o.status, o.phase, o.artifact_progress, o.overall_progress, o.source_ref, o.source_head, o.created_at, o.updated_at));
+  for (const a of snapshot.approvals) statements.push(db.prepare(`INSERT INTO approvals (approval_id, operation_id, scope_hash, approval_state, approved_at, evidence_ref, superseded_by) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(approval_id) DO UPDATE SET operation_id=excluded.operation_id, scope_hash=excluded.scope_hash, approval_state=excluded.approval_state, approved_at=excluded.approved_at, evidence_ref=excluded.evidence_ref, superseded_by=excluded.superseded_by`).bind(a.approval_id, a.operation_id, a.scope_hash, a.approval_state, a.approved_at, a.evidence_ref, a.superseded_by));
+  for (const c of snapshot.checkpoints) statements.push(db.prepare(`INSERT INTO checkpoints (checkpoint_id, operation_id, phase, verified_progress, completed_steps, next_safe_step, lock_state, external_wait_state, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(checkpoint_id) DO UPDATE SET operation_id=excluded.operation_id, phase=excluded.phase, verified_progress=excluded.verified_progress, completed_steps=excluded.completed_steps, next_safe_step=excluded.next_safe_step, lock_state=excluded.lock_state, external_wait_state=excluded.external_wait_state`).bind(c.checkpoint_id, c.operation_id, c.phase, c.verified_progress, c.completed_steps, c.next_safe_step, c.lock_state, c.external_wait_state, c.created_at));
+  for (const l of snapshot.locks) statements.push(db.prepare(`INSERT INTO locks (lock_key, operation_id, owner, acquired_at, heartbeat_at, released_at, status) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(lock_key) DO UPDATE SET operation_id=excluded.operation_id, owner=excluded.owner, acquired_at=excluded.acquired_at, heartbeat_at=excluded.heartbeat_at, released_at=excluded.released_at, status=excluded.status`).bind(l.lock_key, l.operation_id, l.owner, l.acquired_at, l.heartbeat_at, l.released_at, l.status));
+  for (const a of snapshot.artifacts) statements.push(db.prepare(`INSERT INTO artifacts (artifact_id, operation_id, name, source_ref, source_head, checksums, verification_state, delivery_state, immutable_under_test, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(artifact_id) DO UPDATE SET operation_id=excluded.operation_id, name=excluded.name, source_ref=excluded.source_ref, source_head=excluded.source_head, checksums=excluded.checksums, verification_state=excluded.verification_state, delivery_state=excluded.delivery_state, immutable_under_test=excluded.immutable_under_test`).bind(a.artifact_id, a.operation_id, a.name, a.source_ref, a.source_head, a.checksums, a.verification_state, a.delivery_state, a.immutable_under_test ? 1 : 0, a.created_at));
+  for (const r of snapshot.root_causes) statements.push(db.prepare(`INSERT INTO root_causes (root_cause_id, operation_id, defect, immediate_repair, status, evidence_refs, recurrence_surfaces, prevention_step, approval_scope_status, associated_artifact, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(root_cause_id) DO UPDATE SET operation_id=excluded.operation_id, defect=excluded.defect, immediate_repair=excluded.immediate_repair, status=excluded.status, evidence_refs=excluded.evidence_refs, recurrence_surfaces=excluded.recurrence_surfaces, prevention_step=excluded.prevention_step, approval_scope_status=excluded.approval_scope_status, associated_artifact=excluded.associated_artifact, updated_at=excluded.updated_at`).bind(r.root_cause_id, r.operation_id, r.defect, r.immediate_repair, r.status, r.evidence_refs, r.recurrence_surfaces, r.prevention_step, r.approval_scope_status, r.associated_artifact, r.updated_at));
+  for (const e of snapshot.events) statements.push(db.prepare('INSERT OR IGNORE INTO operation_events (event_id, operation_id, event_type, event_summary, created_at) VALUES (?, ?, ?, ?, ?)').bind(e.event_id, e.operation_id, e.event_type, e.event_summary, e.created_at));
   return statements;
 }
 
-async function relay(request, env) {
-  if (!env.DB || !env.RELAY_SECRET) return json({ error: 'relay_not_configured' }, 503);
-  const rawBody = await request.text();
-  if (textEncoder.encode(rawBody).byteLength > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
-  const timestamp = request.headers.get('x-motorlab-timestamp');
-  const signature = request.headers.get('x-motorlab-signature');
-  if (!(await verifySignature(env.RELAY_SECRET, timestamp, signature, rawBody))) return json({ error: 'unauthorized' }, 401);
-
-  let snapshot;
-  try { snapshot = validateSnapshot(JSON.parse(rawBody)); }
-  catch (error) { return json({ error: error.message || 'invalid_payload' }, 400); }
-
-  const payloadHash = await sha256Hex(rawBody);
-  const existing = await env.DB.prepare('SELECT payload_hash, schema_version, received_at FROM relay_snapshots WHERE snapshot_id = ?')
-    .bind(snapshot.snapshot_id).first();
+async function persistSnapshot(snapshot, rawSnapshot, env) {
+  const payloadHash = await sha256Hex(rawSnapshot);
+  let existing;
+  try {
+    existing = await env.DB.prepare('SELECT payload_hash, schema_version, received_at FROM relay_snapshots WHERE snapshot_id = ?').bind(snapshot.snapshot_id).first();
+  } catch {
+    return json({ error: 'd1_unavailable', snapshot_id: snapshot.snapshot_id }, 503);
+  }
   if (existing) {
     if (existing.payload_hash !== payloadHash) return json({ error: 'snapshot_conflict', snapshot_id: snapshot.snapshot_id }, 409);
     return json({ snapshot_id: snapshot.snapshot_id, payload_hash: payloadHash, schema_version: existing.schema_version, received_at: existing.received_at, idempotent: true, cache_verified: null });
@@ -271,32 +235,63 @@ async function relay(request, env) {
     try {
       for (const project of snapshot.projects) {
         const currentOperation = snapshot.operations.find((operation) => operation.project_id === project.project_id) ?? null;
-        await env.CACHE.put(`project:${project.project_id}:current`, JSON.stringify({
-          schema_version: snapshot.schema_version,
-          snapshot_id: snapshot.snapshot_id,
-          payload_hash: payloadHash,
-          project_id: project.project_id,
-          source_ref: project.source_ref,
-          source_head: project.source_head,
-          operation_id: currentOperation?.operation_id ?? null,
-          phase: currentOperation?.phase ?? null,
-          overall_progress: currentOperation?.overall_progress ?? null,
-          updated_at: project.updated_at
-        }), { expirationTtl: 86400 });
+        await env.CACHE.put(`project:${project.project_id}:current`, JSON.stringify({ schema_version: snapshot.schema_version, snapshot_id: snapshot.snapshot_id, payload_hash: payloadHash, project_id: project.project_id, source_ref: project.source_ref, source_head: project.source_head, operation_id: currentOperation?.operation_id ?? null, phase: currentOperation?.phase ?? null, overall_progress: currentOperation?.overall_progress ?? null, updated_at: project.updated_at }), { expirationTtl: 86400 });
       }
       await env.CACHE.put(`snapshot:${snapshot.snapshot_id}`, JSON.stringify({ payload_hash: payloadHash, schema_version: snapshot.schema_version, received_at: receivedAt }), { expirationTtl: 86400 });
       cacheVerified = true;
-    } catch {
-      cacheVerified = false;
-    }
+    } catch { cacheVerified = false; }
   }
-
   return json({ snapshot_id: snapshot.snapshot_id, payload_hash: payloadHash, schema_version: snapshot.schema_version, received_at: receivedAt, idempotent: false, cache_verified: cacheVerified });
+}
+
+async function relay(request, env) {
+  if (!env.DB || !env.RELAY_SECRET) return json({ error: 'relay_not_configured' }, 503);
+  const rawBody = await request.text();
+  if (textEncoder.encode(rawBody).byteLength > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
+  const timestamp = request.headers.get('x-motorlab-timestamp');
+  const signature = request.headers.get('x-motorlab-signature');
+  if (!(await verifySignature(env.RELAY_SECRET, timestamp, signature, rawBody))) return json({ error: 'unauthorized' }, 401);
+  let snapshot;
+  try { snapshot = validateSnapshot(JSON.parse(rawBody)); }
+  catch (error) { return json({ error: error.message || 'invalid_payload' }, 400); }
+  try { await ensureSchema(env.DB); }
+  catch { return json({ error: 'd1_unavailable' }, 503); }
+  return persistSnapshot(snapshot, rawBody, env);
+}
+
+async function githubWebhook(request, env) {
+  if (!env.DB || !env.GITHUB_WEBHOOK_SECRET) return json({ error: 'github_webhook_not_configured' }, 503);
+  const rawBody = await request.text();
+  if (textEncoder.encode(rawBody).byteLength > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
+  if (!(await verifyGitHubSignature(env.GITHUB_WEBHOOK_SECRET, request.headers.get('x-hub-signature-256'), rawBody))) return json({ error: 'unauthorized' }, 401);
+
+  let payload;
+  try { payload = JSON.parse(rawBody); }
+  catch { return json({ error: 'invalid_github_payload' }, 400); }
+
+  const repository = env.ALLOWED_REPOSITORY || 'Br174/Chatgpt';
+  if (payload?.repository?.full_name !== repository) return json({ error: 'repository_not_allowed' }, 403);
+  const allowedRefs = new Set((env.ALLOWED_REFS || 'refs/heads/main').split(',').map((value) => value.trim()).filter(Boolean));
+  if (payload.ref && !allowedRefs.has(payload.ref)) return json({ ignored: true, reason: 'ref_not_allowed' }, 202);
+
+  const event = request.headers.get('x-github-event');
+  if (event !== 'push') return json({ ignored: true, reason: 'event_not_supported' }, 202);
+  const rawSnapshot = snapshotFromCommitMessage(payload?.head_commit?.message);
+  if (!rawSnapshot) return json({ ignored: true, reason: 'no_snapshot' }, 202);
+
+  let snapshot;
+  try { snapshot = validateSnapshot(JSON.parse(rawSnapshot)); }
+  catch (error) { return json({ error: error.message || 'invalid_snapshot' }, 400); }
+  try { await ensureSchema(env.DB); }
+  catch { return json({ error: 'd1_unavailable' }, 503); }
+  return persistSnapshot(snapshot, rawSnapshot, env);
 }
 
 async function verifySnapshot(snapshotId, env) {
   if (!env.DB) return json({ error: 'd1_not_configured' }, 503);
   if (!/^[A-Za-z0-9._:/-]{1,128}$/.test(snapshotId)) return json({ error: 'invalid_snapshot_id' }, 400);
+  try { await ensureSchema(env.DB); }
+  catch { return json({ error: 'd1_unavailable' }, 503); }
   const row = await env.DB.prepare('SELECT payload_hash, schema_version, received_at FROM relay_snapshots WHERE snapshot_id = ?').bind(snapshotId).first();
   if (!row) return json({ error: 'not_found' }, 404);
   return json({ snapshot_id: snapshotId, payload_hash: row.payload_hash, schema_version: row.schema_version, received_at: row.received_at });
@@ -305,10 +300,9 @@ async function verifySnapshot(snapshotId, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (request.method === 'GET' && url.pathname === '/health') {
-      return json({ status: 'ok', service: 'motorlab-state-bridge', engine_version: env.ENGINE_VERSION ?? 'unknown', schema_version: SCHEMA_VERSION });
-    }
+    if (request.method === 'GET' && url.pathname === '/health') return json({ status: 'ok', service: 'motorlab-state-bridge', engine_version: env.ENGINE_VERSION ?? 'unknown', schema_version: SCHEMA_VERSION });
     if (request.method === 'POST' && url.pathname === '/relay') return relay(request, env);
+    if (request.method === 'POST' && url.pathname === '/github-webhook') return githubWebhook(request, env);
     if (request.method === 'GET' && url.pathname.startsWith('/verify/')) return verifySnapshot(decodeURIComponent(url.pathname.slice('/verify/'.length)), env);
     return json({ error: 'not_found' }, 404);
   }
