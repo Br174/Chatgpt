@@ -20,22 +20,24 @@ CHANGE RECORD
 CHANGE_ID=musiclab-20260930-lab19-player-direct-mini-collapse
 DATE=2026-09-30
 TITLE=Player reale collegato direttamente e forzato al mini-player fuori dal lettore
-SEMANTIC_TAGS=player,lettore,mini-player,miniplayer,player persistente,Originali,Cover,artista,album,riproduzione,LAB19
+SEMANTIC_TAGS=player,lettore,mini-player,miniplayer,player persistente,Originali,Cover,artista,album,riproduzione,LAB19,CANDIDATA
 USER_INTENT=LAB18 lasciava ancora il player completo aperto premendo Originali, Cover, Vai all'artista e riproducendo risultati Cover/Originali; correggere il comportamento alla radice.
 CHANGE_SCOPE=COMPOSITE_PLAYER_BEHAVIOR
-LIFECYCLE_ROLE=LAB19
+LIFECYCLE_ROLE=CANDIDATA_FROM_LAB19
 SOURCE_BASE_REF=uab-build/musiclab-player-collapse-18
 SOURCE_BASE_SHA=0dca84c1855dd8c7bb8de021208700b8f72a06fe
 RESULT_REF=uab-build/musiclab-player-direct-collapse-19
 RESULT_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+CANDIDATE_REF=candidate/musiclab-lab19-player-stable
+CANDIDATE_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 IMPLEMENTATION_COMMITS=77745bcf77b4ded698c826b04c08843275d83fa1
 CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/MainActivity.kt,app/src/main/kotlin/com/metrolist/music/ui/component/BottomSheet.kt,app/src/main/kotlin/com/metrolist/music/ui/menu/PlayerMenu.kt,app/src/main/kotlin/com/metrolist/music/ui/menu/MusicLabIntelligenceMenu.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverNavigationBridge.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionNavigationBridge.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionScreen.kt
 BEHAVIOR_SUMMARY=Il bridge del player è legato esplicitamente al vero BottomSheetState di MainActivity; è disponibile un collapse immediato al vero anchor mini-player che interrompe animazioni concorrenti; PlayerMenu passa lo stato reale a MusicLab; SongMenu usa un fallback al bridge esplicitamente legato; Cover/Originali e Artista/Album collassano prima della navigazione; la riproduzione dei risultati Cover/Originali non chiama più expandSoft ma mantiene il mini-player.
-VERIFICATION=GitHub Actions run 36682604681 success; :app:testFossDebugUnitTest e :innertube:testDebugUnitTest passati; UAB preflight 9 OK 0 warning 0 errori; build LAB19/ZIP verificata; applicationId it.verlezza.musiclab.lab.lab19; artifact 11082129447 digest sha256 556414a45b852f22f1d14f20e01159c925aa4a3ec1baf13057009cf239237e75; APK sha256 da84c357b4d812dc51ce12fe719a77914412c87b2fb4ed28db9d18b51c8b8a66; device acceptance pending.
-STATUS=ACTIVE_DEVICE_ACCEPTANCE_PENDING
+VERIFICATION=GitHub Actions run 36682604681 success; :app:testFossDebugUnitTest e :innertube:testDebugUnitTest passati; UAB preflight 9 OK 0 warning 0 errori; build LAB19/ZIP verificata; applicationId it.verlezza.musiclab.lab.lab19; artifact 11082129447 digest sha256 556414a45b852f22f1d14f20e01159c925aa4a3ec1baf13057009cf239237e75; APK sha256 da84c357b4d812dc51ce12fe719a77914412c87b2fb4ed28db9d18b51c8b8a66; device acceptance Bruno 2026-09-30: player funziona abbastanza bene; promossa a CANDIDATA, non ancora MADRE.
+STATUS=CANDIDATA_DEVICE_VERIFIED
 SUPERSEDES=musiclab-20260930-lab18-player-navigation-collapse
-RESTORE_SCOPE_HINTS=Player/navigation behavior only. Prefer implementation commit 77745bcf77b4ded698c826b04c08843275d83fa1 and the eight scoped runtime files/hunks; preserve later AI/search/audio changes. RESULT_SHA includes only later temp-file cleanup and MotorLab control-plane r13 sync after the tested runtime commit.
-SOURCE_CONFIDENCE=VERIFIED_GIT
+RESTORE_SCOPE_HINTS=Player/navigation behavior only. Prefer implementation commit 77745bcf77b4ded698c826b04c08843275d83fa1 and the eight scoped runtime files/hunks; preserve later AI/search/audio changes. CANDIDATE_REF is the stable future-MADRE checkpoint. Promotion to MADRE still requires explicit Bruno approval.
+SOURCE_CONFIDENCE=VERIFIED_GIT_DEVICE_ACCEPTED
 
 CHANGE RECORD
 CHANGE_ID=musiclab-20260930-lab18-player-navigation-collapse
@@ -123,6 +125,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.1
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.2
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
+Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
