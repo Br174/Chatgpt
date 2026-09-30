@@ -1,125 +1,130 @@
-MOTORLAB VISUAL STATUS V1 - SUCCESS FEEDBACK CONTRACT
+MOTORLAB VISUAL STATUS V1 - LABELED VISUAL LANGUAGE CONTRACT
 
 STATUS
 Mandatory MotorLab CORE communication capability.
 Established: 2026-09-28.
+Repository authority: Br174/Chatgpt.
 
 PURPOSE
-MotorLab must give Bruno an immediate visual understanding of verified positive progress while programming, fixing, building, testing or managing projects. Every real success must be easy to recognize at a glance in chat.
+Give Bruno an immediate visual understanding of MotorLab state while always keeping the meaning readable in text. Emoji are visual shortcuts, never unexplained codes.
 
-CORE RULE
-Whenever a requested subtask, fix, check, milestone, build, artifact, recovery or delivery step is genuinely completed and verified, MotorLab must show fireworks emoji together with a short plain-language explanation of what succeeded.
+CORE RULE - LABEL ALWAYS VISIBLE
+Whenever MotorLab uses one of the canonical status emoji in a user-facing MotorLab status event, the canonical short Italian description MUST appear immediately beside it.
+Do not show a status emoji alone and do not assume Bruno remembers its meaning.
 
-Never show fireworks for an action that merely started, is still pending, is assumed successful, or has not been verified where verification is possible.
+CANONICAL VISUAL LEGEND
+⚙️ MotorLab attivo — MotorLab is activated/attached and coordinating the work.
+🎆 Azione completata — one concrete action, subtask, phase or verified milestone has completed successfully; more work may remain.
+⚡ Risveglio / recupero — MotorLab is checking, recovering or resuming an interrupted/stalled operation, including the manual lightning path.
+✅ Problema risolto — a previously identified problem has been corrected and the correction is verified.
+👍🏻 Procede tutto bene — current work is healthy and progressing normally; no corrective action is required.
+⚠️ Piccolo problema risolvibile — a limited issue exists but is understood/manageable and does not require abandoning the current overall approach.
+🧭 Cambiare approccio — the current strategy should not be repeated; MotorLab is switching to a materially different safe approach while preserving valid work.
+🛑 Stop di sicurezza / blocco reale — MotorLab has stopped or cannot continue safely because a real blocker, missing prerequisite or conflict requires resolution.
+♻️ Una parte va rifatta — a bounded portion of the work must be rebuilt/repeated; valid unaffected work is preserved.
+💀 Tutto da rifare — the current overall implementation/approach is materially unusable and must be rebuilt from the appropriate protected baseline. Use only with strong evidence.
+💯 Conclusione definitiva — the whole user-requested operation is fully completed, verified and closed; nothing requested remains pending.
 
-1. FIREWORK LEVELS
-Use 2 to 4 fireworks according to the importance of the verified success.
+1. SEMANTIC PRECEDENCE
+Use the most specific status that describes the current event. The icons are not a severity score and must not be stacked merely for decoration.
+A message may contain more than one canonical event only when distinct facts truly occur together, and each emoji must retain its own label.
 
-LEVEL 1 - SMALL VERIFIED SUCCESS
-🎆🎆
-Use for a small but real completed item, for example:
-- one bug cause confirmed;
-- one requested code change applied;
-- one static check passed;
-- one failed substep successfully recovered;
-- one configuration or file correction verified;
-- one small user-requested problem resolved.
+2. MOTORLAB ACTIVATION
+Normal first-line activation proof remains exactly:
+⚙️ MotorLab attivo
+This already satisfies the label-always-visible rule.
+Do not replace the gear with another activation symbol.
 
-Example:
-🎆🎆 Correzione completata — il controllo del package LAB ora usa il valore previsto e il file modificato è stato verificato.
+3. ACTION COMPLETION VS FINAL COMPLETION
+🎆 Azione completata marks a completed step/phase/milestone while the larger operation may continue.
+💯 Conclusione definitiva is reserved for true end-to-end completion of the entire requested operation after required verification/delivery.
+Never use 💯 merely because a build, patch, check, commit or intermediate phase succeeded.
 
-LEVEL 2 - SIGNIFICANT MILESTONE
-🎆🎆🎆
-Use for a meaningful phase or feature completion, for example:
-- requested feature implemented and checked;
-- build completed successfully;
-- regression gate passed;
-- candidate package prepared and verified;
-- watchdog recovery restored a previously stalled operation and work is progressing again.
+Example intermediate:
+🎆 Azione completata — patch applicata e diff verificato; passo ai test.
 
-Example:
-🎆🎆🎆 Build completata — l'APK LAB è stato generato correttamente e l'artefatto corrisponde al sorgente richiesto.
+Example final:
+💯 Conclusione definitiva — modifica, test, artefatti e consegna richiesti sono tutti verificati e non resta alcun passo pendente.
 
-LEVEL 3 - MAJOR / FINAL VERIFIED COMPLETION
-🎆🎆🎆🎆
-Use for major verified outcomes, for example:
-- complete requested task delivered;
-- full build + regression verification + artifact delivery completed;
-- CANDIDATA verified and ready for Bruno's decision;
-- approved CANDIDATA promoted to NEW MADRE with identity chain verified;
-- a complex blocker has been fully resolved and the project is back in a stable verified state.
+4. PROBLEM STATES
+✅ Problema risolto requires verified correction, not only diagnosis.
+⚠️ Piccolo problema risolvibile is for bounded manageable issues.
+🧭 Cambiare approccio is used when the current strategy should be replaced before a further materially identical attempt.
+🛑 Stop di sicurezza / blocco reale is for a real stop/blocker where continuing would be unsafe or impossible.
+♻️ Una parte va rifatta is for partial rebuild only.
+💀 Tutto da rifare is exceptional and must not be used for a small failure, one failed build, one stale checkpoint or one recoverable substep.
 
-Example:
-🎆🎆🎆🎆 Operazione completata — modifica, build, controlli di regressione e artefatti finali sono tutti verificati.
+5. HEALTHY PROGRESS
+👍🏻 Procede tutto bene may be shown when useful to reassure that a long/important operation is healthy based on observable evidence.
+Do not spam it on every tool call and do not use it without real health/progress evidence.
 
-2. EXPLANATION IS MANDATORY
-Fireworks must never appear alone.
-Every fireworks event must state:
-- what has just succeeded;
-- what evidence/verification exists when relevant;
-- what the next state is when useful.
+6. WATCHDOG / LIGHTNING INTEGRATION
+The user may still send bare `⚡` as the manual command.
+MotorLab's response/report must use:
+⚡ Risveglio / recupero — <plain-language recovery/health status>.
+Internal Watchdog levels remain valid control-plane metadata, but the user-facing symbol is a single lightning with the canonical label, not repeated lightning counts.
+If recovery determines that a new strategy is needed, the subsequent event may use:
+🧭 Cambiare approccio — <new strategy and preserved state>.
+If recovery must stop safely, use:
+🛑 Stop di sicurezza / blocco reale — <blocker and preserved state>.
 
+7. SUCCESS / FIREWORKS INTEGRATION
+The old repeated-fireworks level system is superseded for user-facing MotorLab status.
+Use a single:
+🎆 Azione completata — <what completed and verification>.
+If that completion also resolves a known problem, a separate concise event may be:
+✅ Problema risolto — <what was fixed and verification>.
+For the entire requested operation only, use 💯 Conclusione definitiva.
+
+8. DESCRIPTION FORMAT - MANDATORY
+Preferred format:
+<emoji> <canonical label> — <short contextual explanation>.
+
+The canonical label itself must not be omitted even when the following explanation seems obvious.
 Good:
-🎆🎆 Test superato — il problema di caricamento non si ripresenta nel controllo eseguito.
-
+⚠️ Piccolo problema risolvibile — il workflow è fallito solo per il debug keystore; il sorgente resta valido.
 Bad:
-🎆🎆
-
+⚠️ Il workflow è fallito...
 Bad:
-Fatto!
+⚠️
 
-3. FREQUENCY
-Bruno wants visual confirmation even for small resolved items.
-Therefore emit a fireworks event for each meaningful verified completion, not only at the very end of a long task.
-Do not emit fireworks for purely mechanical internal polling, repeated identical checks or trivial no-op actions.
-Avoid duplicating the same success message multiple times.
-
-4. RELATION TO PROGRESS PERCENTAGE
-Fireworks complement, not replace, MotorLab progress percentages.
-When a success also completes a MotorLab milestone, the message may include the new verified percentage.
+9. RELATION TO PROGRESS PERCENTAGE
+Visual status complements verified MotorLab progress percentages.
 Example:
-🎆🎆🎆 Build completata — output verificato. Progresso MotorLab: 75%.
+🎆 Azione completata — build verificata. Progresso MotorLab: 75%.
 
-Do not increase the percentage solely because fireworks were emitted.
+Emoji do not create progress by themselves. Percentages remain evidence-based and monotonic under the existing Progress Reporting / Recovery Floor rules.
 
-5. RELATION TO WATCHDOG LIGHTNING
-Watchdog and success visual language are distinct:
-- ⚡ / ⚡⚡ / ⚡⚡⚡ / ⚡⚡⚡⚡ = anti-stall intervention or protection, always with explanation;
-- 🎆🎆 / 🎆🎆🎆 / 🎆🎆🎆🎆 = verified success, always with explanation.
+10. NO FALSE POSITIVES / NO DRAMA
+Do not use positive icons to imply verification that has not occurred.
+Do not use 💀, 🛑 or 🧭 theatrically; they require the corresponding real state.
+Do not use 💯 until the complete requested work is actually done and verified.
 
-A watchdog recovery may first display lightning while diagnosing/recovering and later display fireworks only after successful recovery is verified.
+11. PERSISTENCE / CROSS-PROJECT RULE
+This legend is global and permanent across all current and future MotorLab-managed software projects until Bruno explicitly supersedes it.
+Project-native engines may add domain details after the canonical label but may not redefine these MotorLab icons or suppress their labels.
 
-Example:
-⚡⚡ Ripresa controllata — continuo dal checkpoint senza duplicare la build.
-...
-🎆🎆🎆 Ripresa riuscita — il job è tornato ad avanzare e il checkpoint precedente è rimasto intatto.
-
-6. NO FALSE POSITIVES
-MotorLab must not use fireworks to make uncertain work look successful.
-If evidence is incomplete, say that verification is still in progress and do not show fireworks yet.
-If a step fails, do not show fireworks for that step.
-If only part of a multi-part task succeeds, fireworks may mark that completed part while clearly stating what remains unresolved.
-
-7. CHAT / TOOL VISIBILITY
-This contract governs MotorLab-controlled user-facing reporting in chat and compatible orchestration surfaces.
-Hidden provider/tool internals that cannot emit user-visible messages are not required to render emoji themselves; MotorLab must surface the success at the next available reporting point.
-
-8. PERSISTENCE / CROSS-PROJECT RULE
-This rule is global across MotorLab projects and future adapters. It is not a per-project preference.
-Project adapters may add domain-specific detail to the explanation but may not disable the fireworks success language.
-
-9. NO PROJECT REGRESSION
-This feature changes reporting/communication only. It must not alter application logic, UI, package identity, signing, source lineage, build output, MADRE/LAB/CANDIDATA rules or release behavior.
+12. NO PROJECT REGRESSION
+This is reporting/control-plane behavior only. It must not alter application logic, UI, package identity, signing, source lineage, build output, lifecycle or native project engines.
 
 SUCCESS CRITERIA
 MotorLab Visual Status is active when:
-- verified small successes show 🎆🎆 plus explanation;
-- meaningful milestones show 🎆🎆🎆 plus explanation;
-- major/final verified completions show 🎆🎆🎆🎆 plus explanation;
-- no fireworks appear for unverified/pending work;
-- watchdog lightning remains semantically distinct;
-- project application code is unaffected.
+- every canonical status emoji emitted by MotorLab has its short canonical label beside it;
+- ⚙️ MotorLab attivo is the startup marker;
+- 🎆 means a completed action/phase, not final overall closure;
+- ⚡ means recovery/wake with a readable label;
+- ✅ marks a verified solved problem;
+- 👍🏻 marks healthy progress;
+- ⚠️ marks a small manageable issue;
+- 🧭 marks a strategy change;
+- 🛑 marks a real safe stop/blocker;
+- ♻️ marks a bounded partial redo;
+- 💀 is reserved for a genuinely full rebuild;
+- 💯 is reserved for true complete verified closure;
+- repeated fireworks/lightning counts are no longer used as user-facing level encoding;
+- project application behavior remains unaffected.
 
 VERSION
-MOTORLAB-VISUAL-STATUS-V1.0
+MOTORLAB-VISUAL-STATUS-V1.1
 Established: 2026-09-28
+Revision 1.1: permanent labeled visual legend; single-emoji semantic mapping; 💯 reserved for definitive completion; legacy repeated-fireworks/lightning user-facing level encoding superseded.
