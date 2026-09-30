@@ -1,5 +1,5 @@
-MOTORLAB_SATELLITE_BUNDLE
-RELEASE=2026.09.30-r15
+MOTORLAB SATELLITE BUNDLE
+RELEASE=2026.09.30-r16
 CENTRAL_AUTHORITY=Br174/Chatgpt
 PROJECT_NATIVE_ENGINE_POLICY=coexist-preserve
 PRE_RESPONSE_BOOT_GATE=required
@@ -33,6 +33,19 @@ PRE_CHANGE_APPROVAL_GATE=required
 USER_CONFIRMED_RESTORE_REGISTER=required
 SIMPLE_STABLE_RESTORE_NUMBERS=required
 MULTI_CHANGE_ITEM_CONFIRMATION=required
+AUTHORITY_DATA_OWNERSHIP=required
+MOTORLAB_OPERATION_ID=required
+PERSISTENT_OPERATIONAL_STATE=required
+D1_GITHUB_RECONCILIATION=required
+KV_CACHE_NON_AUTHORITATIVE=required
+OPTIONAL_SERVICE_FAILSAFE=required
+OBSERVABILITY_DIAGNOSTICS=required
+POSTHOG_EVIDENCE_ONLY=required
+NOTION_STATUS_PROJECTION_ONLY=required
+GITBOOK_MANUAL_PROJECTION_ONLY=required
+SUPERPOWERS_SUBORDINATE=required
+CONTEXT7_ON_DEMAND=required
+FREE_FIRST_PLUGIN_ROUTING=required
 
 LOCAL FALLBACK CONTRACT
 - First user-visible line: ⚙️ MotorLab attivo
@@ -53,6 +66,22 @@ ARTIFACT-FIRST ROOT CAUSE - R15+
 - Do not use ✅ Problema risolto or 💯 Conclusione definitiva while mandatory causal work is pending.
 - Several deferrable defects encountered on the way to one artifact must not force serial full causal archaeology before packaging.
 
+R16 AUTHORITY / PERSISTENT STATE
+- GitHub is durable technical authority.
+- D1 is live operational authority when connected and reconciled.
+- KV is reconstructible cache only and must never contain unique-only critical state.
+- One MOTORLAB_OPERATION_ID correlates one logical operation across checkpoints, artifacts, diagnostics and projections.
+- Optional service loss must not make MotorLab unusable.
+- Never claim provider/plugin integration is live until the connection/resources are verified.
+
+R16 OBSERVABILITY / KNOWLEDGE ROUTING
+- PostHog supplies runtime evidence only; it cannot authorize changes or lifecycle decisions.
+- Notion is Bruno-facing status projection only.
+- GitBook is architecture/manual projection only.
+- Superpowers may improve engineering method but is subordinate to MotorLab gates and scope.
+- Context7 is used only when current/versioned external documentation materially reduces uncertainty.
+- Auxiliary plugin usage is free-first and quota-aware; no hidden paid upgrade.
+
 TECHNICAL CHANGE HISTORY
 Technical Change History remains Git-backed provenance/search and is separate from the visible Bruno-confirmed restore list.
 
@@ -69,14 +98,14 @@ CENTRAL SYNC
 Compare local release with central manifest only at safe boundaries. Preserve current VERIFIED local bundle as LAST_GOOD before adoption. Never switch release mid active write/build/test/promotion.
 
 FUTURE PROJECTS
-Future projects inherit hard pre-change approval, Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin, technical history and visible restore register.
+Future projects inherit hard pre-change approval, Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin, technical history, visible restore register and r16 multi-service authority/persistent-state/observability/knowledge-routing contracts.
 
 PLATFORM LIMIT
 Repository text cannot wake a host with no execution cycle and cannot continue invisibly without a real durable executor.
 
 NO RUNTIME COUPLING
-This bundle is orchestration metadata only and must not intentionally alter app runtime/UI/package/signing/native engines.
+This bundle is orchestration metadata only and must not intentionally alter app runtime/UI/package/signing/native engines. Project telemetry SDKs and provider bindings require separate approved project changes.
 
 VERSION
-MOTORLAB-SATELLITE-BUNDLE-V2.5
-Revision 2.5: r15 adds Artifact-First delivery, deferred Root Cause queue, delivered-artifact immutability and dual artifact/overall progress.
+MOTORLAB-SATELLITE-BUNDLE-V2.6
+Revision 2.6: r16 adds authority/data ownership, persistent operational state, MOTORLAB_OPERATION_ID, observability boundaries and non-redundant auxiliary-tool routing.
