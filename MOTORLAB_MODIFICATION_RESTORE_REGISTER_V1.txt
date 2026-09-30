@@ -1,0 +1,152 @@
+MOTORLAB MODIFICATION + RESTORE REGISTER V1 - USER-CONFIRMED WORKING RESTORE POINTS
+
+DISPLAY NAME
+Registro Modifiche e Ripristini
+
+STATUS
+Mandatory MotorLab CORE capability.
+Established: 2026-09-30.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Maintain a simple visible register Bruno can ask to see and use by number to identify the latest personally confirmed working implementation of each feature/modification family.
+
+CORE PRINCIPLE
+THE VISIBLE REGISTER CONTAINS ONLY BRUNO-CONFIRMED WORKING RESTORE POINTS.
+Git and the technical Change History remain the complete historical/provenance archive. The visible Registro Modifiche e Ripristini is deliberately short and practical.
+
+1. TWO-LAYER MODEL
+A. Technical history/provenance:
+- immutable Git history plus MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt and project technical change registry;
+- may contain older, superseded, automated-verification-only and historical/backfilled records;
+- is not the visible approved restore list.
+B. Visible Registro Modifiche e Ripristini:
+- contains only entries Bruno has explicitly identified/confirmed as working and intended to be conserved as restore points;
+- is the default meaning when Bruno asks "dammi il registro delle modifiche", "registro ripristini", "registro modifiche e ripristini" or equivalent.
+
+2. SIMPLE FIXED NUMBERS
+Visible entries use plain stable integer numbers: 1, 2, 3, 4 ...
+Do not use zero padding, decimals, subversions or composite numbers such as 001, 01.1, 03.2 in normal visible use.
+A feature family keeps the same number permanently once assigned.
+Numbers are never silently renumbered/reused for another feature.
+
+3. ONE VISIBLE SLOT PER FEATURE FAMILY
+For one logical feature/behavior family there is one visible slot.
+Example: if Player is number 1, later successful Player improvements update number 1 rather than creating Player 7, Player 12, etc.
+The visible slot always points to the latest Bruno-confirmed working implementation for that feature on the then-current project state.
+Older pointers remain recoverable from Git/technical history but are not shown as parallel visible versions by default.
+
+4. MULTIPLE MODIFICATIONS IN ONE LAB/APK
+A LAB/APK/commit may contain many separate requested changes.
+MotorLab must NOT save the whole batch to the visible register merely because the build/test completed.
+After Bruno tests the result, only the specific modification(s) he identifies as working and asks to conserve are eligible for visible registration.
+If ten changes were attempted and only one is confirmed for conservation, register only that one.
+The other nine remain outside the visible register even if their code/commits remain in Git history.
+
+5. AMBIGUOUS USER DESCRIPTION
+Bruno may identify a successful change informally or imprecisely.
+If MotorLab cannot determine exactly which subchange he means, it must reflect back a concise interpretation, e.g. "Intende la modifica che fa X quando apre Y?"
+Do not write/update the visible register until Bruno confirms the intended specific modification.
+This disambiguation is especially mandatory after multi-change LAB/APK work.
+
+6. SAVE GATE
+A visible slot is created/updated only when both are clear:
+- Bruno confirms that the specific modification is working/acceptable; and
+- Bruno indicates that it should be conserved/saved/put in the register, explicitly or through an unambiguous combined phrase such as "questa va bene, conservala".
+Automated tests, successful build, artifact generation, assistant judgment or technical verification alone do not create/update a visible slot.
+
+7. FAILED / UNCONFIRMED ATTEMPTS
+Never place failed, regressed, ambiguous, device-unconfirmed or merely experimental attempts into the visible register.
+Do not create visible version clutter for restore attempts that Bruno has not confirmed as successful.
+Technical Git/history may retain them for diagnosis/provenance.
+
+8. UPDATING AN EXISTING SLOT
+When Bruno confirms a newer working implementation of a feature already registered:
+- keep the same visible number;
+- update CURRENT_CHANGE_ID/source provenance/behavior summary/confirmed date/base identity to the new working point;
+- do not create a new visible number;
+- do not show old slot revisions in the ordinary register view;
+- preserve old state through Git history and technical change history.
+Thus "ripristina 1" always means the latest Bruno-confirmed working restore point for feature 1.
+
+9. RESTORE ATTEMPTS
+A restore operation does not automatically advance/update the visible slot merely because MotorLab produced an artifact.
+If the restored result fails or Bruno does not confirm it, visible slot remains unchanged.
+If Bruno confirms the restored/compatibility-replayed result works and asks to conserve it, update the same feature number to the newly confirmed working provenance.
+
+10. USER-VISIBLE CONFIRMATION AFTER SAVE
+After a successful visible register create/update, MotorLab must explicitly tell Bruno that it was conserved and give the number.
+Canonical concise forms:
+- new slot: "✅ Conservata nel Registro Modifiche e Ripristini — N. 3 — <nome>."
+- existing slot updated: "✅ Registro Modifiche e Ripristini N. 3 aggiornato — <nome>. Questa è ora la versione funzionante da ripristinare."
+Do not claim conservation before the registry write is actually persisted when repository access is available.
+If persistence is blocked, say clearly that confirmation was received but the register has not yet been technically persisted.
+
+11. VISIBLE LIST FORMAT
+When Bruno asks to see the register, show the current visible slots only, normally as a short table/list with:
+- N.;
+- feature/modification name;
+- concise working behavior;
+- last Bruno-confirmed project/LAB/APK/date when useful.
+Do not dump commit hashes, superseded technical records or failed attempts unless Bruno asks for technical detail.
+If no visible entries exist, say the register is empty rather than promoting technical-history records into it.
+
+12. RESTORE BY NUMBER
+When Bruno says "ripristina N":
+- resolve N against the visible project register;
+- verify its current immutable Git/provenance pointer;
+- apply MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt: resolve/read/analyze first, show the proposed restore plan, and wait for post-plan approval before any write;
+- then perform selective restore under Change Compatibility Guard/lifecycle/single-writer rules.
+A number identifies the restore target; it does not bypass pre-change approval.
+
+13. SLOT RECORD FIELDS
+Each visible slot should contain when available:
+RESTORE_NO=<plain integer>
+FEATURE_KEY=<stable semantic key>
+TITLE=<short visible name>
+ALIASES=<Bruno vocabulary>
+BEHAVIOR_SUMMARY=<what the confirmed working point does>
+BRUNO_CONFIRMED_STATUS=WORKING_AND_SAVE_APPROVED
+BRUNO_CONFIRMED_DATE=<date>
+PROJECT/LIFECYCLE_ID=<LAB/APK/MADRE identity as applicable>
+CURRENT_CHANGE_ID=<technical registry link when available>
+SOURCE_REF/SHA/COMMIT=<immutable restore provenance>
+RESTORE_SCOPE_HINTS=<safe selective boundary>
+STATUS=ACTIVE_CONFIRMED
+Secrets are never stored.
+
+14. FEATURE IDENTITY / DUPLICATE PREVENTION
+Before assigning a new number, compare semantic aliases/behavior with existing slots.
+If the new successful modification is a newer implementation of an existing feature family, update that existing slot.
+Assign a new number only for a materially distinct feature/behavior that Bruno would reasonably want to restore independently.
+When uncertain, ask Bruno whether it should replace an existing numbered feature or be a separate restore point.
+
+15. PROJECT FILE
+Each MotorLab-managed project has one canonical central visible register, recommended naming:
+MOTORLAB_MODIFICATION_RESTORE_REGISTER_<PROJECT>_V1.txt
+It contains NEXT_RESTORE_NO plus the current visible slots.
+
+16. CURRENT / FUTURE PROJECTS
+All current and future MotorLab-managed software projects inherit this visible register behavior.
+New project onboarding creates an empty project visible register in addition to Project Continuity and technical Change History.
+Existing technical history is not retroactively promoted to visible slots without Bruno confirmation.
+
+17. NO DELETION OF TECHNICAL HISTORY
+"Overwrite the old visible restore point" means update the visible slot pointer, not delete old Git history/commits.
+The visible register stays simple while technical recovery evidence remains available.
+
+SUCCESS CRITERIA
+The capability is active when:
+- Bruno can ask for one short numbered list of confirmed restore points;
+- plain numbers are easy to remember;
+- one feature has one current visible number;
+- multi-change batches register only explicitly selected successful items;
+- ambiguous descriptions are confirmed before save;
+- failed/unconfirmed attempts never clutter the visible list;
+- newer successful versions replace the visible pointer under the same number;
+- every actual save is explicitly acknowledged with its number;
+- "ripristina N" resolves deterministically while still respecting the pre-change approval gate.
+
+VERSION
+MOTORLAB-MODIFICATION-RESTORE-REGISTER-V1.0
+Established: 2026-09-30
