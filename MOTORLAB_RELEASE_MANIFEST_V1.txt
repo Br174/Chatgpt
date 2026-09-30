@@ -4,13 +4,14 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.30-r14
+CURRENT_RELEASE=2026.09.30-r15
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
+ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
 FAST_ITERATION_NO_SPIN_MODULE=MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
 CHANGE_HISTORY_REGISTRY_MODULE=MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
 PRE_CHANGE_APPROVAL_GATE_MODULE=MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
@@ -25,6 +26,7 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_GOVERNANCE_V1.txt
 - MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt
 - MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
+- MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
 - MOTORLAB_WATCHDOG_V1.txt
 - MOTORLAB_RESUME_RECOVERY_V1.txt
 - MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt
@@ -42,36 +44,45 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_SATELLITE_BUNDLE_V1.txt
 
 SATELLITE LOCAL FILES
-Each registered project should contain MOTORLAB_PROJECT_HOOK.txt, .motorlab/MOTORLAB_LOCAL_CORE.txt, .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt and .motorlab/MOTORLAB_SYNC_STATE.txt. Each project also references one central Project Continuity ledger, one technical Change History registry, and for r14+ one visible Registro Modifiche e Ripristini.
+Each project should contain hook + local core + LAST_GOOD + sync state and reference central Project Continuity, technical Change History and visible Registro Modifiche e Ripristini.
 
 SAFE UPDATE
-Adopt a newer MotorLab release only at a safe boundary, preserve the current verified local bundle as LAST_GOOD, and never switch release mid active write/build/test/promotion.
+Adopt newer MotorLab releases only at a verified safe boundary, preserve current VERIFIED local bundle as LAST_GOOD, and never switch release mid active write/build/test/promotion.
 
-VISIBLE STARTUP RULE
-First user-visible line for MotorLab project work: "⚙️ MotorLab attivo".
+VISIBLE STARTUP
+First user-visible line for project work: `⚙️ MotorLab attivo`.
 
 R11+ ROOT CAUSE
-Contain the symptom, determine why it happened, correct/contain the causal mechanism, inspect recurrence surfaces and add proportionate prevention before definitive closure.
+Every real problem still requires causal investigation, correction/containment and proportionate prevention before definitive closure.
 
 R12+ FAST ITERATION / NO-SPIN
-Risk-scaled LAB iteration is allowed only where eligible. HIGH-risk and CANDIDATA/MADRE keep full gates. Persistent executor handoff must not cause indefinite foreground polling.
+Eligible LOW/MEDIUM LAB work uses risk-scaled iteration; HIGH-risk and CANDIDATA/MADRE keep full gates. Durable handoff must not cause indefinite foreground polling.
 
 R13+ TECHNICAL CHANGE HISTORY
-MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt remains the technical semantic provenance/history layer backed by immutable Git. It can retain historical, superseded and automatically verified records for discovery, diagnosis and selective restore provenance.
+Technical Change History is immutable-Git-backed provenance/search and remains distinct from visible restore slots.
 
-R14+ PRE-CHANGE APPROVAL
-MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt is mandatory. A request to modify/correct/add/remove/restore expresses desired intent but does not authorize the first project/application write. MotorLab first shows a concise pre-change report; only a later Bruno approval of that report authorizes writing. Read-only preparation is allowed before approval. Material scope expansion requires an amended report and new approval.
+R14+ PRE-CHANGE APPROVAL + VISIBLE RESTORE REGISTER
+Initial change wording is intent only; show plan first and wait for Bruno approval before first write. Visible restore slots contain only specific Bruno-confirmed working modifications using stable plain integers.
 
-R14+ REGISTRO MODIFICHE E RIPRISTINI
-MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt is the user-facing restore-point layer. Visible numbers are plain stable integers 1, 2, 3... One feature family keeps one number. Only a specific modification Bruno confirms as working and wants conserved may create/update a visible slot. Automated build/test success alone is insufficient. Failed, ambiguous, experimental or unconfirmed attempts do not enter the visible register. A multi-change LAB/APK registers only the exact item(s) Bruno identifies for conservation. A newer confirmed implementation of the same feature updates the existing number; older provenance remains in Git/technical history. After persistence MotorLab explicitly reports the saved number. Existing pre-r14 technical records are not promoted automatically. "Ripristina N" resolves the visible slot but still requires the pre-change report and Bruno approval before writing.
+R15+ ARTIFACT-FIRST + DEFERRED ROOT CAUSE
+MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt is mandatory.
+When Bruno requests an APK/ZIP/testable artifact for an approved defect/regression:
+- default critical path is REPAIR -> RISK-APPROPRIATE VERIFY -> ARTIFACT -> DELIVER;
+- safely deferrable causal/prevention work is persisted in POST_ARTIFACT_ROOT_CAUSE_QUEUE and continues afterward;
+- Root Cause Closure remains mandatory and cannot be abandoned;
+- non-deferrable safety/security/signing/data-integrity/unreliable-build or equivalent high-risk causes remain before artifact delivery when needed to trust the artifact;
+- delivered artifact identity/ref/checksum is preserved while Bruno tests it;
+- prevention requiring later code changes uses a separate controlled follow-up LAB/ref;
+- `Artefatto: 100%` may coexist with `Progresso MotorLab complessivo: <100%` until causal closure is complete;
+- `✅ Problema risolto` and `💯 Conclusione definitiva` remain unavailable while mandatory causal work is pending.
 
 CURRENT/FUTURE PROJECT RULE
-All current and future MotorLab-managed software projects inherit hard pre-change approval plus a visible user-confirmed Registro Modifiche e Ripristini in addition to Project Continuity and technical Change History.
+All current/future MotorLab software projects inherit r15 Artifact-First ordering in addition to existing approval, lifecycle, restore, Root Cause, progress and safety rules.
 
 NO RUNTIME REGRESSION
-MotorLab control-plane metadata alone must not alter application runtime, UI, package/signing identity, lifecycle or project-native engines.
+MotorLab control-plane metadata alone must not alter application runtime/UI/package/signing/lifecycle/native engines.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.14
+MOTORLAB-RELEASE-MANIFEST-V1.15
 Established: 2026-09-29
-Revision 1.14: r14 adds plan-before-write approval and user-confirmed numbered Registro Modifiche e Ripristini.
+Revision 1.15: r15 adds Artifact-First delivery, deferred Root Cause queue, delivered-artifact immutability and dual artifact/overall progress.
