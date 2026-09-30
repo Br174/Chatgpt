@@ -91,7 +91,7 @@ CENTRAL SERVICE INTEGRATION STATUS
 - Cloudflare central MotorLab D1/KV: CONNECTED_VERIFIED / RESOURCE_READY; end-to-end GitHub webhook -> Worker -> D1 write -> verification read passed on 2026-09-30; GitHub remains authoritative fallback.
 - PostHog: CONNECTED_VERIFIED at ChatGPT/plugin account level; project instrumentation not yet adopted.
 - Notion: CONNECTED_VERIFIED; MotorLab Control Center is derived status projection only.
-- GitBook: CONNECTED_VERIFIED; MotorLab Docs is derived manual/architecture projection only.
+- GitBook: CONNECTED_VERIFIED for read; WRITE AUTH DEGRADED because change-request creation returned HTTP 403 `requires user auth`; no Git Sync bypass is configured.
 - Superpowers: CONNECTED_VERIFIED; subordinate engineering-method layer.
 - Context7: AVAILABLE_NOT_CONNECTED; optional on-demand documentation and never blocking.
 Existing Cloudflare use inside MusicLab/Cover Lab AI remains project-specific and distinct from the verified central MotorLab state store.
@@ -106,5 +106,5 @@ FUTURE PROJECTS
 Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r16 authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.9
-Revision 2.9: central Cloudflare operational state store verified RESOURCE_READY; service connection block reconciled to current r16 live status without changing the r16 release.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.10
+Revision 2.10: Cloudflare central state remains verified RESOURCE_READY; GitBook live status corrected to read-verified/write-auth-degraded without changing the r16 release.
