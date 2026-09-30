@@ -2,137 +2,99 @@ MOTORLAB ROOT CAUSE CLOSURE V1 - SYMPTOM + CAUSE + PREVENTION GATE
 
 STATUS
 Mandatory MotorLab CORE capability.
-Established: 2026-09-30.
 Central authority: Br174/Chatgpt.
 
 PURPOSE
-Ensure that a discovered problem is not treated as fully solved merely because its visible symptom was corrected. MotorLab must also determine why the problem occurred, remove or contain the root cause when technically possible, check for recurrence surfaces, and add prevention/regression protection proportionate to the risk.
+Ensure that defects are not treated as definitively solved merely because the visible symptom was corrected, while allowing a requested testable artifact to be delivered before full causal closure when deferral is safe under MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt.
 
 CORE PRINCIPLE
-FIX THE SYMPTOM, FIND THE CAUSE, PREVENT THE RECURRENCE.
-A local repair is not the same as complete problem closure.
+FIX THE SYMPTOM, DELIVER THE SAFE TEST ARTIFACT WHEN REQUESTED, FIND THE CAUSE, PREVENT THE RECURRENCE.
+Artifact delivery can precede causal closure; definitive problem closure cannot.
 
 1. MANDATORY TWO-TRACK RESPONSE
-For every concrete defect, anomaly, stale state, failed build/test, unexpected trigger, synchronization miss, regression or repeatable operational problem, MotorLab must run both tracks:
+For every concrete defect, anomaly, stale state, failed build/test, unexpected trigger, synchronization miss, regression or repeatable operational problem, MotorLab runs both tracks:
 A. CONTAINMENT / IMMEDIATE REPAIR
 - preserve valid work;
-- correct or bypass the immediate symptom safely;
-- restore a usable/verified state when possible.
+- correct or safely contain the immediate symptom;
+- restore the requested usable/testable behavior when possible.
 B. ROOT-CAUSE / PREVENTION
 - determine why the symptom occurred;
-- identify the failed mechanism, missing trigger, stale state, race, configuration gap, dependency/provider failure or human/external prerequisite;
-- correct the causal mechanism when safe;
-- check whether the same cause can affect sibling paths, workflows, projects or future operations;
-- add a regression check, guard, trigger filter, invariant or explicit fallback when technically justified.
+- identify failed mechanism, missing trigger, stale state, race, configuration gap, dependency/provider failure or external prerequisite;
+- correct/contain the causal mechanism when safe;
+- inspect the relevant recurrence surface;
+- add proportionate prevention/regression protection.
+
+TRACK ORDERING - R15+
+When Bruno requested APK/ZIP/testable artifact, Track A plus risk-appropriate artifact verification is the default critical path. Track B may continue AFTER artifact delivery when MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt classifies it as safely deferrable. This changes ordering, never the obligation to complete Track B.
 
 2. CLOSURE STATES
-Use these internal closure states when useful:
+Useful internal states:
 - SYMPTOM_PRESENT
 - SYMPTOM_CONTAINED
+- ARTIFACT_READY_CAUSE_PENDING
+- ARTIFACT_DELIVERED_CAUSE_PENDING
 - ROOT_CAUSE_UNDER_INVESTIGATION
 - ROOT_CAUSE_CONFIRMED
 - ROOT_CAUSE_CORRECTED
 - PREVENTION_VERIFIED
 - CLOSED_VERIFIED
-
-Do not mark CLOSED_VERIFIED until the immediate symptom is corrected and root-cause handling has reached the strongest technically possible verified state.
+Do not mark CLOSED_VERIFIED until immediate correction plus required causal/prevention handling are complete or honestly blocked by unavailable external evidence/permission.
 
 3. USER-FACING STATUS RULE
-`✅ Problema risolto` is reserved for a problem whose correction is verified and whose causal mechanism has either:
-- been identified and corrected/prevented; or
-- been proven external/non-controllable with a verified containment/fallback and explicit limitation.
-
-If only the symptom has been corrected while the cause remains unknown or unverified, do not present the problem as definitively solved. Prefer:
-`🔍 Ricerca soluzione — sintomo corretto; sto verificando perché si è verificato e come impedirne il ritorno.`
-or another canonical labeled state that accurately represents the current stage.
+`✅ Problema risolto` remains reserved for verified symptom correction plus causal mechanism corrected/prevented, or proven external/non-controllable cause with verified containment/fallback and explicit limitation.
+If artifact is ready while cause remains pending, do NOT use definitive solved status. Prefer:
+`🎆 Azione completata — APK/ZIP pronto e verificato per il test; la chiusura causale continua.`
+with separate artifact and overall progress when useful.
 
 4. ROOT-CAUSE EVIDENCE
-A root cause must be evidence-based. Distinguish:
-- CONFIRMED_CAUSE: supported by repository/provider/job/log/configuration/state evidence;
-- LEADING_HYPOTHESIS: plausible but not yet proven;
-- EXTERNAL_CAUSE: outside MotorLab/project control;
-- UNKNOWN_CAUSE: insufficient evidence.
-
-Do not state a hypothesis as fact.
+Distinguish CONFIRMED_CAUSE, LEADING_HYPOTHESIS, EXTERNAL_CAUSE and UNKNOWN_CAUSE. Never present a hypothesis as fact.
 
 5. RECURRENCE-SURFACE CHECK
-After a cause is confirmed, inspect the smallest relevant blast radius for equivalent exposure, including when applicable:
-- sibling workflows/triggers;
-- other branches/lifecycle stages;
-- related project adapters/satellites;
-- repeated state-write paths;
-- equivalent build/test/release jobs;
-- future project onboarding defaults.
-
-Do not perform an unbounded repository-wide rewrite merely because one issue was found. Scope expansion must remain evidence-driven and compatible with Change Compatibility Guard.
+After a cause is confirmed, inspect the smallest relevant blast radius: sibling workflows/triggers, related branches/lifecycle stages, adapters/satellites, repeated write paths, equivalent jobs and future onboarding defaults when materially exposed. Avoid unbounded rewrites.
 
 6. PREVENTION OPTIONS
-Choose the least invasive effective prevention, such as:
-- trigger/path filter;
-- invariant/assertion;
-- stale-state reconciliation rule;
-- mandatory write-through/checkpoint;
-- regression test;
-- validation gate;
-- idempotency/single-writer protection;
-- bounded retry/change-of-strategy rule;
-- explicit external fallback or blocker state.
+Use the least invasive effective prevention: filters, invariants, reconciliation/write-through rules, regression tests, validation gates, idempotency/single-writer guards, bounded retries/change-of-strategy, or explicit external fallback/blocker state.
 
 7. PROJECT CONTINUITY INTEGRATION
-If a Project Continuity ledger is stale when a material update was expected:
-- reconcile the ledger from newer live evidence first when safe;
-- open a root-cause investigation for the missed write-through/reconciliation event;
-- identify why the expected update did not occur;
-- correct the write-through/bootstrap/reporting path when possible;
-- do not treat a manual ledger refresh alone as complete closure.
-
-A live provider/job event caused only by MotorLab/control-plane metadata must not automatically become a new application lifecycle operation. Classify the trigger source first.
+If a continuity ledger is stale when an update was expected, reconcile from newer live evidence, then investigate and correct the missed write-through path. Manual refresh alone is not causal closure.
+Control-plane-only events must not silently become new application lifecycle operations.
 
 8. WATCHDOG / RECOVERY INTEGRATION
-Watchdog may detect the symptom or repeated failure, but Root Cause Closure owns the problem-closure gate.
-Resume Recovery may restore work safely, but successful recovery alone does not prove the underlying cause has been removed.
-After recovery from a non-transient or repeated fault, route through root-cause closure before declaring the problem definitively solved.
+Watchdog may detect symptoms; Resume Recovery may restore work; Root Cause Closure owns definitive closure. A successful retry/restart/recovery alone is not proof the underlying cause is removed.
 
-9. CHANGE COMPATIBILITY INTEGRATION
-Before applying causal/preventive changes, use Change Compatibility Guard.
-Do not fix recurrence by introducing a competing mechanism, breaking project-native engines, widening build triggers, altering signing/package identity, or changing approved runtime behavior outside scope.
+9. CHANGE COMPATIBILITY / APPROVAL
+Before causal/preventive writes apply Change Compatibility Guard and the current Pre-Change Approval scope. If post-artifact investigation requires a materially broader behavior/component than approved, obtain amended approval before that broadened write. Read-only causal analysis may continue.
 
-10. PROGRESS REPORTING INTEGRATION
-Root-cause work is part of the requested problem-solving operation when the problem was discovered during that operation.
-Visible numeric progress must not jump to 100% merely because the symptom disappeared while root-cause/prevention work remains pending.
-If containment is complete but cause work remains, retain an evidence-based percentage below definitive completion and report the current state.
+10. PROGRESS REPORTING - R15+
+Root-cause work remains part of the overall requested problem-solving operation, but no longer necessarily part of the artifact-delivery subscale.
+Allowed reporting:
+- ARTIFACT_PROGRESS may reach 100% when the requested artifact is built, risk-appropriately verified and delivered;
+- MOTORLAB_OVERALL_PROGRESS remains below 100% while mandatory causal/prevention work remains pending.
+Do not use overall 100%, `✅ Problema risolto`, or `💯 Conclusione definitiva` merely because the artifact was delivered.
 
-11. BOUNDED INVESTIGATION
-Root-cause analysis must be thorough but bounded.
-Stop expanding when:
-- the cause is confirmed and the relevant recurrence surface is protected;
-- the cause is proven external and a safe containment/fallback is verified;
-- further investigation requires unavailable evidence/permission, in which case report the blocker honestly.
-Do not create endless speculative searches.
+11. DEFERRED ROOT-CAUSE QUEUE
+When causal work is safely deferred, persist a bounded POST_ARTIFACT_ROOT_CAUSE_QUEUE with each pending defect, immediate repair, delivered artifact/ref/checksum, evidence/cause status, relevant recurrence surfaces and next causal/prevention step. Process the queue after artifact delivery during available execution cycles or a real durable executor.
 
-12. CURRENT/FUTURE PROJECT RULE
-This gate is global across all current and future MotorLab-managed software projects.
-Project-specific engines remain authoritative for domain behavior; MotorLab coordinates diagnosis, closure and prevention around them.
+12. NON-DEFERRABLE ROOT CAUSE
+MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt controls cases where cause/prevention must remain on the artifact critical path, including material safety/security/signing/data-integrity/unreliable-build risks or where symptom-only containment cannot establish a trustworthy artifact.
 
-13. NO FALSE CLOSURE
-The following are NOT sufficient by themselves for `✅ Problema risolto`:
-- retry succeeded once;
-- stale file manually refreshed;
-- build rerun without understanding repeatable failure;
-- alternate provider happened to work;
-- symptom disappeared after restart;
-- user-visible output looks correct while causal state remains unknown.
+13. BOUNDED INVESTIGATION
+Stop expanding when the cause is confirmed and relevant recurrence surface is protected, the cause is proven external with verified fallback, or further work is blocked by unavailable evidence/permission. Do not create endless speculative searches.
 
-14. SUCCESS CRITERIA
-Root Cause Closure is active when:
-- every real problem receives immediate repair plus cause investigation;
-- root cause/hypothesis/external cause are distinguished honestly;
-- recurrence surfaces are checked proportionately;
-- prevention/regression protection is added when justified;
-- manual alignment alone does not close stale-state problems;
-- `✅ Problema risolto` is not emitted prematurely;
-- project/runtime/lifecycle protections remain intact.
+14. CURRENT/FUTURE PROJECT RULE
+Global across all current/future MotorLab-managed software projects. Project-native engines remain authoritative for domain behavior.
+
+15. NO FALSE CLOSURE
+Not sufficient alone for definitive closure: one successful retry, manual stale-file refresh, rerun build, alternate provider, restart, visually correct output, or artifact delivery while causal work remains pending.
+
+SUCCESS CRITERIA
+- immediate repairs reach testable artifacts quickly when safe;
+- safely deferrable causal work no longer blocks artifact delivery;
+- causal/prevention work remains mandatory and durable;
+- high-risk/non-deferrable causes still block artifact delivery when required for trust;
+- definitive problem/final completion statuses are not emitted prematurely.
 
 VERSION
-MOTORLAB-ROOT-CAUSE-CLOSURE-V1.0
+MOTORLAB-ROOT-CAUSE-CLOSURE-V1.1
 Established: 2026-09-30
+Revision 1.1: r15 integrates Artifact-First ordering, deferred causal queue and dual artifact/overall progress while preserving mandatory causal closure.
