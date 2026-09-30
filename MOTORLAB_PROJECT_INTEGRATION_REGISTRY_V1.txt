@@ -22,8 +22,8 @@ Canonical service connection status: MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
 
 GLOBAL R16 RULES
 - All r15 approval, Artifact-First, Root Cause, lifecycle, restore, progress and safety gates remain mandatory.
-- GitHub remains durable technical authority.
-- Cloudflare D1 is the target live operational authority only after actual central MotorLab resources are provisioned/verified; KV is cache only.
+- GitHub remains durable technical authority and recovery source.
+- Cloudflare D1 is the verified live operational state store for central MotorLab; KV is reconstructible cache only.
 - One MOTORLAB_OPERATION_ID correlates each logical operation across operational state, artifacts, Root Cause, diagnostics and projections.
 - PostHog is runtime diagnostic evidence only and cannot authorize changes.
 - Notion is Bruno-facing status projection only.
@@ -88,13 +88,13 @@ REGISTERED PROJECTS
 
 CENTRAL SERVICE INTEGRATION STATUS
 - GitHub: CONNECTED_VERIFIED.
-- Cloudflare central MotorLab D1/KV: CORE_READY, resources not yet verified/provisioned for MotorLab central state.
-- PostHog: CORE_READY, plugin connection/project instrumentation not yet verified.
-- Notion: CORE_READY, plugin connection not yet verified.
-- GitBook: CORE_READY, plugin connection not yet verified.
-- Superpowers: CORE_READY, plugin connection not yet verified.
-- Context7: CORE_READY, plugin connection not yet verified.
-Existing Cloudflare use inside MusicLab/Cover Lab AI remains project-specific and does not by itself activate the MotorLab central state store.
+- Cloudflare central MotorLab D1/KV: CONNECTED_VERIFIED / RESOURCE_READY; end-to-end GitHub webhook -> Worker -> D1 write -> verification read passed on 2026-09-30; GitHub remains authoritative fallback.
+- PostHog: CONNECTED_VERIFIED at ChatGPT/plugin account level; project instrumentation not yet adopted.
+- Notion: CONNECTED_VERIFIED; MotorLab Control Center is derived status projection only.
+- GitBook: CONNECTED_VERIFIED; MotorLab Docs is derived manual/architecture projection only.
+- Superpowers: CONNECTED_VERIFIED; subordinate engineering-method layer.
+- Context7: AVAILABLE_NOT_CONNECTED; optional on-demand documentation and never blocking.
+Existing Cloudflare use inside MusicLab/Cover Lab AI remains project-specific and distinct from the verified central MotorLab state store.
 
 SAFE ADOPTION RULE
 Never force a release change into active/unknown project work. Projects must be live-reconciled before local r16 adoption. Central r16 remains authoritative whenever central access exists; local satellite versions remain truthfully reported until upgraded.
@@ -106,5 +106,5 @@ FUTURE PROJECTS
 Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r16 authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.8
-Revision 2.8: r16 global multi-service authority/persistent operational state/observability/knowledge routing; live service connection remains separately verified.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.9
+Revision 2.9: central Cloudflare operational state store verified RESOURCE_READY; service connection block reconciled to current r16 live status without changing the r16 release.
