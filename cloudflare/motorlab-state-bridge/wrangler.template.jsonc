@@ -1,12 +1,13 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "motorlab-state-bridge",
-  "main": "src/index.js",
+  "main": "src/entry.js",
   "compatibility_date": "2026-09-30",
   "vars": {
     "ENGINE_VERSION": "1.1.0",
     "ALLOWED_REPOSITORY": "Br174/Chatgpt",
-    "ALLOWED_REFS": "refs/heads/main,refs/heads/motorlab/cloudflare-state-r16"
+    "ALLOWED_REFS": "refs/heads/main,refs/heads/motorlab/cloudflare-state-r16",
+    "RELAY_ISSUE_NUMBER": "1"
   },
   "d1_databases": [
     {
