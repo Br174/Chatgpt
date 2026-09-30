@@ -12,15 +12,17 @@ FEATURE_KEY=player
 TITLE=Player / mini-player fuori dal lettore
 ALIASES=player,lettore,mini-player,miniplayer,player persistente,riproduzione
 BEHAVIOR_SUMMARY=Il player reale viene collegato al vero BottomSheetState e viene portato/mantenuto a mini-player quando si esce dal lettore verso Originali, Cover, artista/album e durante la riproduzione dei risultati Cover/Originali; mantiene anche la protezione globale di navigazione ereditata da LAB18.
-BRUNO_CONFIRMED_STATUS=WORKING_AND_SAVE_APPROVED
+BRUNO_CONFIRMED_STATUS=WORKING_AND_PROMOTED_TO_MOTHER
 BRUNO_CONFIRMED_DATE=2026-09-30
-PROJECT_LIFECYCLE_ID=CANDIDATA candidate/musiclab-lab19-player-stable
+PROJECT_LIFECYCLE_ID=MADRE mother/musiclab-lab19-final
 CURRENT_CHANGE_ID=musiclab-20260930-lab19-player-direct-mini-collapse
-SOURCE_REF=candidate/musiclab-lab19-player-stable
+SOURCE_REF=mother/musiclab-lab19-final
 SOURCE_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+CANDIDATE_SOURCE_REF=candidate/musiclab-lab19-player-stable
+CANDIDATE_SOURCE_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 IMPLEMENTATION_COMMIT=77745bcf77b4ded698c826b04c08843275d83fa1
-RESTORE_SCOPE_HINTS=Restore only player/navigation behavior from the registered LAB19/CANDIDATA provenance; preserve unrelated later AI/search/audio changes. Before any restore write apply the r14 pre-change report/approval gate and current compatibility/lifecycle protections.
-STATUS=ACTIVE_CONFIRMED
+RESTORE_SCOPE_HINTS=Restore only player/navigation behavior from the registered LAB19/CANDIDATA/MADRE provenance; preserve unrelated later AI/search/audio changes. New work starts from the current MADRE unless Bruno explicitly selects another lifecycle base.
+STATUS=ACTIVE_CONFIRMED_MOTHER
 
 RULES
 - Only Bruno-confirmed working modifications explicitly approved for conservation enter this visible register.
@@ -29,5 +31,6 @@ RULES
 - One feature family keeps one plain integer number; later confirmed working Player implementations update RESTORE_NO=1 rather than creating another visible Player entry.
 - Failed/unconfirmed restore attempts do not change this slot.
 
-VERSION=MOTORLAB-MUSICLAB-MODIFICATION-RESTORE-REGISTER-V1.1
+VERSION=MOTORLAB-MUSICLAB-MODIFICATION-RESTORE-REGISTER-V1.2
 REVISION=1.1 first visible confirmed slot: Player from device-accepted LAB19 CANDIDATA.
+REVISION=1.2 Bruno explicitly promoted the tested LAB19 CANDIDATA to MADRE mother/musiclab-lab19-final at identical source SHA.
