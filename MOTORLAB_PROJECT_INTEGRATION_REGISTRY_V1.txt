@@ -21,17 +21,19 @@ GLOBAL PRINCIPLES
 - A real problem is not definitively solved by symptom-only repair; cause/prevention must be investigated and handled under Root Cause Closure.
 - MotorLab/control-plane-only live events must not silently create or advance application lifecycle state.
 - MotorLab-only metadata synchronization should suppress unrelated CI where the provider safely supports it.
+- r12 Fast Iteration + No-Spin is mandatory through MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt without creating a second Watchdog/executor/recovery path.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.09.30-r11
+Release: 2026.09.30-r12
 Schema: 1
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
 Canonical continuity module: MOTORLAB_PROJECT_CONTINUITY_V1.txt
 Canonical root-cause module: MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
-Canonical r11 local-core blob: 09d9a27d216652b1a51a58d6d867a306cb3b17b5
-Canonical r10 LAST_GOOD blob: acb0cfd99e2276a3b80f0a7301d9e9c8ad7ff1f8
+Canonical Fast Iteration / No-Spin module: MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
+MusicLab canonical r12 local-core blob: 17f6dae4d2ec3320ec7493e54c2895b8e398718a
+MusicLab canonical r11 LAST_GOOD blob: 09d9a27d216652b1a51a58d6d867a306cb3b17b5
 Normal startup banner: ⚙️ MotorLab attivo
 PRE_RESPONSE_BOOT_GATE=required
 PROJECT_CONTINUITY=required
@@ -44,6 +46,7 @@ LIVE_EVENT_CLASSIFICATION=required
 CONTROL_PLANE_CI_SUPPRESSION=required
 MANUAL_LIGHTNING_SAVE_THEN_RESUME=required
 MONOTONIC_RECOVERY_FLOOR=required
+FAST_ITERATION_NO_SPIN=required
 
 CANONICAL VISUAL LEGEND
 ⚙️ MotorLab attivo
@@ -84,46 +87,60 @@ R11 NUMERIC PROGRESS RULE
 - same N% may repeat; fake advancement is prohibited;
 - new chat/turn does not reset/suppress same-operation verified progress.
 
-REGISTERED PROJECTS — R11 VERIFIED
+R12 FAST ITERATION + NO-SPIN RULE
+- persistent external work is handed off by durable job/run id + checkpoint + next-safe-step and the ordinary foreground chat must not poll indefinitely waiting for completion;
+- default maximum is two consecutive unchanged foreground job-status probes after durable identity is established;
+- eligible LOW/MEDIUM isolated LAB correction loops use risk-scaled verification rather than automatic promotion-grade full regression;
+- HIGH-risk work and every CANDIDATA/MADRE promotion retain full applicable regression/lifecycle gates;
+- later control cycles reconcile the recorded job id before any duplicate start/write;
+- Fast Iteration coordinates Velocity/Foreground/Background/Watchdog/Resume Recovery without replacing their ownership.
+
+REGISTERED PROJECTS — CURRENT VERIFIED SATELLITES
 1. MusicLab — Br174/MusicLab
    Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED
-   LAST_GOOD: 2026.09.30-r10
+   Local release: 2026.09.30-r12 VERIFIED
+   LAST_GOOD: 2026.09.30-r11
    Native engine: coexist/preserve
-   Root-cause incident 2026-09-30 recorded: MotorLab-only r10 metadata push had triggered APK workflows; MusicLab build.yml/build_quick.yml now exclude `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt`, and fix commits used skip-CI. LAB15 remains the application/upstream-system state because the incident was control-plane-only.
+   Iteration mode: risk-scaled
+   No-Spin handoff: required
+   Background mode: GitHub Actions
+   Foreground unchanged job probes: max 2 by default
+   Full regression: HIGH risk / CANDIDATA / MADRE, or when affected-test evidence requires expansion
+   r12 control-plane commit 70f5c01f3bff257dd6f58887e58f987f09eac71b produced zero workflow runs, verifying CI suppression for metadata-only sync.
+   Prior root-cause incident preserved: MotorLab-only metadata must not launch APK pipelines.
 
 2. GeoVision — Br174/GeoVision-Test
    Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED
+   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
    LAST_GOOD: 2026.09.30-r10
    Native engine: coexist/preserve
    Existing build/test workflows use app-specific path filters for the inspected push triggers.
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Project state: MOTORLAB_PROJECT_STATE_STUDYBOOK_AI_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED
+   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
    LAST_GOOD: 2026.09.30-r10
    Native engine: coexist/preserve
-   Build workflow now excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt` from push-triggered builds.
+   Build workflow excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt` from push-triggered builds.
 
 4. Visionflix / Verlezza Vision source — Br174/Visionflix
    Project state: MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED
+   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
    LAST_GOOD: 2026.09.30-r10
    Native engine: coexist/preserve
    Lifecycle authority: Visionflix source
-   Build workflow now excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt` from push-triggered builds.
+   Build workflow excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt` from push-triggered builds.
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Project state: MOTORLAB_PROJECT_STATE_COVER_LAB_AI_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED
+   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
    LAST_GOOD: 2026.09.30-r10
    Native engine: Cover Lab engine coexist/preserve
-   Main verification workflow now excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt`; Android APK workflow was already path-limited to android/**.
+   Main verification workflow excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt`; Android APK workflow is path-limited to android/**.
 
 6. streamflix-BV delivery adapter — Br174/streamflix-BV
    Project state: MOTORLAB_PROJECT_STATE_STREAMFLIX_BV_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED
+   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
    LAST_GOOD: 2026.09.30-r10
    Native engine: delivery-adapter-coexist-preserve
    Lifecycle authority: NO; Visionflix source remains authority
@@ -133,12 +150,13 @@ Never force a future satellite release change into an active write/build/test/pr
 For MotorLab-only metadata sync commits, use provider-supported CI suppression where safe/available; do not suppress CI when real app/source/config changes require validation.
 
 FUTURE PROJECTS
-Every future concrete software project receives hook + local satellite + central continuity ledger and inherits labeled visual status, hard numeric progress visibility, live-event classification, Root Cause Closure and safe control-plane CI suppression automatically.
+Every future concrete software project receives hook + local satellite + central continuity ledger and inherits labeled visual status, hard numeric progress visibility, live-event classification, Root Cause Closure, safe control-plane CI suppression, Fast Iteration and No-Spin Handoff automatically. Where no project-specific risk map exists, verification remains conservative until actual project evidence supports a reduced LAB path.
 
 HOST LIMITATION
-Repository configuration cannot wake a host with no execution cycle. Once a supported project/software-build signal is exposed, MotorLab boot, continuity reconciliation, visual status, numeric progress and causal closure contracts are mandatory when applicable.
+Repository configuration cannot wake a host with no execution cycle. r12 therefore avoids depending on such a wake after durable handoff: persistent external jobs continue independently and are reconciled at the next available control cycle.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.3
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.4
 Revision 2.2: r10 extended visual legend and high-presence numeric progress.
-Revision 2.3: r11 adds Root Cause Closure, hard progress visibility, live-event classification, control-plane CI suppression and records all six satellites as r11 VERIFIED.
+Revision 2.3: r11 adds Root Cause Closure, hard progress visibility, live-event classification and control-plane CI suppression.
+Revision 2.4: r12 adds Fast Iteration + No-Spin globally and records MusicLab as the first r12 VERIFIED satellite while leaving other satellites pinned to r11 until safe adoption.
