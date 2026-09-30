@@ -12,7 +12,7 @@ BOOT
 2. Use VERIFIED local core immediately as fallback.
 3. When central is reachable, read release manifest and compare releases.
 4. Reconcile Project Continuity/live state before selecting a safe update boundary.
-5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, and r15 Artifact-First + deferred Root Cause.
+5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, and r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing.
 
 SAFE UPDATE
 - pin one MotorLab release during active write/build/test/promotion;
@@ -57,6 +57,32 @@ PRE_CHANGE_APPROVAL_GATE=required
 USER_CONFIRMED_RESTORE_REGISTER=required
 SIMPLE_STABLE_RESTORE_NUMBERS=required
 MULTI_CHANGE_ITEM_CONFIRMATION=required
+AUTHORITY_DATA_OWNERSHIP=required
+MOTORLAB_OPERATION_ID=required
+PERSISTENT_OPERATIONAL_STATE=required
+D1_GITHUB_RECONCILIATION=required
+KV_CACHE_NON_AUTHORITATIVE=required
+OPTIONAL_SERVICE_FAILSAFE=required
+OBSERVABILITY_DIAGNOSTICS=required
+POSTHOG_EVIDENCE_ONLY=required
+NOTION_STATUS_PROJECTION_ONLY=required
+GITBOOK_MANUAL_PROJECTION_ONLY=required
+SUPERPOWERS_SUBORDINATE=required
+CONTEXT7_ON_DEMAND=required
+FREE_FIRST_PLUGIN_ROUTING=required
+
+R16+ AUTHORITY / PERSISTENT STATE / TOOL ROUTING
+Local fallback must preserve:
+- GitHub technical authority;
+- D1 live operational authority only when actually connected and reconciled;
+- KV cache-only status;
+- one MOTORLAB_OPERATION_ID per logical operation;
+- PostHog evidence-only role;
+- Notion/GitBook projection-only roles;
+- Superpowers subordinate methodology;
+- Context7 targeted on-demand documentation;
+- graceful degradation and no hidden paid fallback.
+Local r16 adoption does NOT mean optional provider/plugin connections are active; capability status must be verified separately.
 
 R15+ ARTIFACT-FIRST
 When Bruno requests APK/ZIP/testable artifacts for approved defect/regression work, the local fallback must preserve:
@@ -81,6 +107,7 @@ If newer bundle cannot be verified, keep/restore LAST_GOOD and preserve project 
 
 CENTRAL UNAVAILABLE
 Use previously VERIFIED local release plus live evidence conservatively; do not invent newer rules as locally installed.
+Optional service state must not override verified local/GitHub technical evidence.
 
 FUTURE PROJECTS
 Future projects receive hook + local satellite + Project Continuity + technical history + visible restore register and inherit current release gates.
@@ -89,8 +116,8 @@ AUTOMATIC MEANING
 Synchronization requires an execution cycle with repository access; repository text cannot self-update or wake a frozen host.
 
 NO APP RUNTIME CHANGE
-MotorLab metadata must not intentionally alter app code/UI/package/signing/native engines/runtime dependencies.
+MotorLab metadata must not intentionally alter app code/UI/package/signing/native engines/runtime dependencies. Telemetry SDKs and service bindings remain project changes requiring normal approval.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.11
-Revision 1.11: r15 adds Artifact-First markers, dual progress, deferred Root Cause queue and delivered-artifact immutability to required satellite verification.
+MOTORLAB-SATELLITE-SYNC-V1.12
+Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing markers and explicit separation between policy adoption and live provider/plugin connection.
