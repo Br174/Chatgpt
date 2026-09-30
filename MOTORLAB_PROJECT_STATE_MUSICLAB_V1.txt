@@ -1,89 +1,79 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=13
+STATE_REVISION=14
 STATE_STATUS=COMPLETED_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-lab17-ai-step-player
+ACTIVE_OPERATION_ID=musiclab-lab18-player-collapse
 OPERATION_STATUS=COMPLETED_LAB_READY
-CURRENT_PHASE=LAB17 AI a step + player globale completata, testata, pulita e artefatto pronto per Bruno
-CURRENT_REF=uab-build/musiclab-ai-step-player-17
-CURRENT_HEAD_SHA=33a74544a97330880e935f42e45610cdaf18ea6c
+CURRENT_PHASE=LAB18 correzione strutturale player persistente completata, testata, pulita e artefatto pronto per Bruno
+CURRENT_REF=uab-build/musiclab-player-collapse-18
+CURRENT_HEAD_SHA=0dca84c1855dd8c7bb8de021208700b8f72a06fe
 CURRENT_PROVIDER=GitHub + GitHub Actions
-CURRENT_JOB_ID=36656976169
+CURRENT_JOB_ID=36677968793
 CURRENT_JOB_STATUS=success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB17 runtime commit ffd5243c9ff546695923fcc49b79c8e9d76346ae passed real app+innertube JVM regression tests, UAB preflight, isolated LAB build, ZIP validation and artifact upload; temporary transform/workflow files were removed; final branch head 33a74544a97330880e935f42e45610cdaf18ea6c differs from tested runtime only by temporary-file cleanup; direct APK and ZIP were extracted locally, APK SHA256 matched and ZIP integrity passed.
-NEXT_SAFE_STEP=Bruno installs/tests MusicLab LAB17 side-by-side. If Bruno reports a defect, preserve this LAB17 checkpoint and create a new isolated LAB18 rather than modifying MADRE. Do not promote CANDIDATA or MADRE without Bruno explicit approval.
+LAST_COMPLETED_MATERIAL_STEP=LAB18 runtime commit e30d235dc6658cdbfd396af4659e91f6b5f53cdd passed real app+innertube JVM regression tests, UAB preflight, isolated LAB build, ZIP validation and artifact upload; final branch head 0dca84c1855dd8c7bb8de021208700b8f72a06fe differs from tested runtime only by removal of temporary workflow/script; direct APK and ZIP were extracted and reverified locally.
+NEXT_SAFE_STEP=Bruno installs/tests MusicLab LAB18 side-by-side and specifically verifies that any navigation away from the full player reduces it to mini-player. If Bruno reports a remaining defect, preserve LAB18 and create a new isolated LAB19; never modify MADRE directly. Do not promote CANDIDATA or MADRE without Bruno explicit approval.
 PENDING_VERIFICATION=device acceptance by Bruno only; automated implementation/test/build/delivery verification complete
-ACTIVE_ARTIFACT=MusicLab-LAB-17-APK-ZIP artifact_id=11073137042 digest=sha256:2223847bc0ea3fc270b22f3bed367c708f2a0c94accaab3b7b4e88c8932bc1ea run_id=36656976169 tested_runtime_head=ffd5243c9ff546695923fcc49b79c8e9d76346ae final_branch_head=33a74544a97330880e935f42e45610cdaf18ea6c apk_sha256=e6fc043c63d2e9a092b0fa488e43db20fd812bf1c82f607b32a58495d96dd2ac
+ACTIVE_ARTIFACT=MusicLab-LAB-18-APK-ZIP artifact_id=11079909557 digest=sha256:99a0cc132b233f2cca61bca25d2684c5bc88ace1935482ea413e875d1be3242a run_id=36677968793 tested_runtime_head=e30d235dc6658cdbfd396af4659e91f6b5f53cdd final_branch_head=0dca84c1855dd8c7bb8de021208700b8f72a06fe apk_sha256=8256a68dadf0d3ec364ac17afea8c9f8a25f9b386fc20e4293deb4a7b54b3887 zip_sha256=a45362e8ea98361345e0d47af17bce22162944e6846de0cbc82620184abd9da5
 WRITE_LOCK_SCOPE=released
-LAST_USER_INTENT_SUMMARY=Create isolated LAB17 from verified LAB16. Make expanded player collapse globally on any non-player navigation; redesign Cover/Originali AI as stepwise Gemini+Cloudflare discovery; identify canonical composition first; search YouTube Music first then normal YouTube; self-interrogate with new search strategies until real playable targets are reached or repeated no-progress proves exhaustion; Cover target about 50 real playable studio covers when available; Originali target at least 10 real original-performer versions when available; distinguish Studio/Live; keep list lightweight with thumbnail/title/artist/date/album; thumbnail plays; row/Dettagli opens full information and loads credits only on demand; preserve 10-at-a-time progressive display.
+LAST_USER_INTENT_SUMMARY=LAB17 still showed a persistent expanded player on device. Fix root cause structurally so any app navigation outside the full player minimizes it; preserve all LAB17 Cover/Originali AI work and graphics unchanged.
 
-VERIFIED_LAB17_FINAL_STATE
-- source base: LAB16 final cf62bf9e3d7bf9bbe9f1de5de7f372f0dafbf763
-- LAB17 branch: uab-build/musiclab-ai-step-player-17
-- tested runtime commit: ffd5243c9ff546695923fcc49b79c8e9d76346ae
-- final branch head after cleanup: 33a74544a97330880e935f42e45610cdaf18ea6c
-- compare tested runtime..final: only .github/scripts/lab17_transform.py and .github/workflows/lab17-step-ai-verify-temp.yml removed; no app/runtime changes after test
-- successful full verification run: 36656976169
+VERIFIED_LAB18_FINAL_STATE
+- source base: LAB17 final 33a74544a97330880e935f42e45610cdaf18ea6c
+- LAB18 branch: uab-build/musiclab-player-collapse-18
+- tested runtime commit: e30d235dc6658cdbfd396af4659e91f6b5f53cdd
+- final branch head after cleanup: 0dca84c1855dd8c7bb8de021208700b8f72a06fe
+- compare tested runtime..final: only .github/scripts/lab18_player_collapse_transform.py and .github/workflows/lab18-player-collapse-verify-temp.yml removed; zero app/runtime changes after test
+- successful full verification run: 36677968793
 - real regression JVM tests passed: :app:testFossDebugUnitTest and :innertube:testDebugUnitTest
-- Gradle regression result: BUILD SUCCESSFUL in 5m51s; 67 actionable tasks, 65 executed, 2 from cache
+- Gradle regression result: BUILD SUCCESSFUL in 4m19s; 67 actionable tasks, 65 executed, 2 from cache
 - UAB preflight: 9 OK, 0 warnings, 0 errors
-- UAB build: BUILD SUCCESSFUL in 2m29s
-- isolated applicationId: it.verlezza.musiclab.lab.lab17
-- generated archive: MusicLab-LAB-17-APK.zip
+- UAB build: BUILD SUCCESSFUL in 1m41s
+- isolated applicationId: it.verlezza.musiclab.lab.lab18
+- generated archive: MusicLab-LAB-18-APK.zip
 - ZIP validation: no errors detected
-- artifact id: 11073137042
-- artifact digest: sha256:2223847bc0ea3fc270b22f3bed367c708f2a0c94accaab3b7b4e88c8932bc1ea
-- APK SHA256: e6fc043c63d2e9a092b0fa488e43db20fd812bf1c82f607b32a58495d96dd2ac
-- direct delivery files extracted and reverified locally
+- artifact id: 11079909557
+- artifact digest: sha256:99a0cc132b233f2cca61bca25d2684c5bc88ace1935482ea413e875d1be3242a
+- APK SHA256: 8256a68dadf0d3ec364ac17afea8c9f8a25f9b386fc20e4293deb4a7b54b3887
+- delivery ZIP SHA256: a45362e8ea98361345e0d47af17bce22162944e6846de0cbc82620184abd9da5
 - temporary verification workflow removed
 - temporary transformation script removed
 - no MADRE modified
 - no CANDIDATA created
-- approved general graphics not redesigned
+- no Cover/Originali runtime files changed in LAB18
+- approved general graphics unchanged
 
-LAB17_IMPLEMENTATION_SCOPE
-- Player global behavior: MainActivity collapses expanded player to mini-player on real app destination changes, instead of relying on isolated button-specific collapse calls.
-- Cover canonical identity: Gemini is explicitly told to identify the composition and true original performer first and not assume the current track artist is the original.
-- Cover Cloudflare + Gemini: cloud and direct Gemini discoveries are merged/deduplicated; cloud no longer short-circuits direct Gemini merely because it returned a small answer.
-- Cover discovery steps: essential metadata first; recovery rounds use different strategies and exclude already-known candidates.
-- Cover playable target: target is based on real playable studio covers, not only AI candidate count; approximately 50 when real/localizable versions exist; bounded no-progress stop prevents infinite retries or fabricated filling.
-- Cover audio localization: all YouTube Music search queries are attempted first; if unresolved, normal YouTube video search is used as fallback.
-- Cover UI: lightweight rows with thumbnail/title/artist/date/album/type/source; thumbnail starts playback; row/Dettagli opens larger detail dialog; full credits are fetched only on demand; 10-at-a-time progressive display retained; Studio/Live/Remix/foreign classification retained.
-- Originali canonical identity: Cloudflare + Gemini combined; original performer is distinguished from current performer and from author/composer.
-- Originali search: YouTube Music first, YouTube fallback; Gemini plans additional distinct search queries if fewer than about 10 real playable original-performer versions are found; bounded no-progress stop.
-- Originali UI: Studio and Live separated, specialist secondary categories preserved; lightweight rows, thumbnail playback, details/credits on demand, 10-at-a-time retained.
+ROOT_CAUSE_LAB18_PLAYER_PERSISTENCE_2026_09_30
+INCIDENT_STATUS=CLOSED_IMPLEMENTATION_VERIFIED_DEVICE_ACCEPTANCE_PENDING
+SYMPTOM=On real LAB17 device test, the full player remained persistent over destination screens despite LAB17 global collapse logic.
+ROOT_CAUSE_CONFIRMED=LAB17 navigation logic only called collapse when playerBottomSheetState.isExpanded was exactly true. BottomSheetState uses an animated continuous value, so the full player can still be visibly open/in transition without matching the exact expanded anchor; those navigations bypassed the collapse condition. The same exact-anchor check remained in pre-navigation bottom/rail handlers.
+CORRECTION=MainActivity now collapses on a real destination change whenever the player is neither already collapsed nor dismissed. Bottom-navigation pre-navigation handlers use the same state-independent rule. The existing player-local Album/Artist collapse calls remain compatible.
+REVERIFICATION=Transform reported two pre-navigation replacements; only MainActivity.kt changed at runtime (7 insertions, 3 deletions). Full regression run 36677968793 passed tests, preflight, build, ZIP verification and artifact upload.
+RECURRENCE_PROTECTION=Future navigation-collapse checks must use semantic player state (already mini-player/closed vs not) rather than exact animated anchor equality. Device acceptance remains required before declaring the visible behavior closed.
+
+INHERITED_LAB17_AI_SCOPE
+- Cover/Originali AI remains stepwise and inherited unchanged from LAB17.
+- Canonical composition/original performer identification precedes discovery.
+- Cloudflare + direct Gemini discoveries are merged/deduplicated.
+- YouTube Music localization is attempted first; normal YouTube is fallback.
+- Cover target remains approximately 50 real playable studio covers when available, with bounded no-progress stopping.
+- Originali target remains at least about 10 real playable original-performer versions when available, with bounded no-progress stopping.
+- Studio/Live and specialist categories remain separated.
+- Result lists remain lightweight, 10 at a time; thumbnail plays; details/credits are on demand.
 - MusicLab native playback/search/AI engines remain project-native; MotorLab remains orchestration/control-plane only.
 
-ROOT_CAUSE_LAB17_UAB_OUTPUT_2026_09_30
-INCIDENT_STATUS=CLOSED_VERIFIED
-SYMPTOM=First LAB17 verification built the app successfully but final gate could not find MusicLab-LAB-17-APK.zip.
-ROOT_CAUSE_CONFIRMED=uab-project.env inherited UAB_FILE_VERSION=16 from LAB16. UAB_BUILD_ID=lab17 changed parallel applicationId/app name but UAB_OUTPUT_NAME still derived from UAB_FILE_VERSION=16.
-CORRECTION=uab-project.env UAB_FILE_VERSION advanced to 17 in commit d4554ef990e774318d4640be772add97fc4ca8c7.
-REVERIFICATION=Full second run 36656976169 produced dist/uab/MusicLab-LAB-17-APK.zip, validated it successfully, persisted runtime source and uploaded the final artifact.
-RECURRENCE_PROTECTION=Treat UAB_FILE_VERSION as a required LAB-creation field; final gate verifies the expected versioned archive before delivery.
-
-MANUAL_LIGHTNING_CHECKPOINT_2026_09_30
-- User sent manual lightning after LAB17 verification.
-- Live branch rechecked at 33a74544a97330880e935f42e45610cdaf18ea6c.
-- Verification run 36656976169 rechecked: completed SUCCESS; all material steps including tests, UAB build, output verification, persistence and artifact upload succeeded.
-- Artifact 11073137042 rechecked present and unexpired.
-- Temporary LAB17 verification workflow rechecked absent from final branch (404 as expected).
-- RECOVERY_FLOOR_PERCENT remains 100; no completed work was restarted.
-- NEXT_SAFE_STEP remains device installation/acceptance by Bruno; no app write is required until feedback.
-
 UPSTREAM_GUARDIAN_STATE_PRESERVED
-- permanent Meld Guardian remains inherited from LAB15 through LAB16 into LAB17
+- permanent Meld Guardian inherited from LAB15 through LAB16/LAB17 into LAB18
 - Meld accepted baseline remains v0.9.2 commit dc7a27224acee33fa475ab70e1935dc03d3ef4ef
 - sole upstream remains FrancescoGrazioso/Meld
 - direct MetroList upstream remains disabled
-- no upstream integration/promotion occurred in LAB17 work
+- no upstream integration/promotion occurred in LAB18 work
 
 MOTORLAB_SATELLITE_STATE
 - local MotorLab satellite inherited/current: 2026.09.30-r11
@@ -91,15 +81,15 @@ MOTORLAB_SATELLITE_STATE
 - MotorLab remains control-plane only and must not replace or rewrite MusicLab native/domain engines
 
 CONTINUITY_RULES
-- New MusicLab chats must load this ledger automatically after MotorLab boot and reconcile against newer live GitHub evidence.
-- Current application continuation point is LAB17, not LAB16/LAB15/LAB14 or older historical branches.
-- This completed operation has a 100% recovery floor; do not restart or redo LAB17 merely because a chat changes.
+- New MusicLab chats load this ledger automatically after MotorLab boot and reconcile against newer live GitHub evidence.
+- Current application continuation point is LAB18, not LAB17/LAB16/LAB15/LAB14 or older historical branches.
+- This completed operation has a 100% recovery floor; do not restart or redo LAB18 merely because a chat changes.
 - Device acceptance by Bruno is the only pending acceptance gate; automated implementation/build verification is complete.
-- A Bruno-reported defect after device testing starts a new isolated corrective LAB18 while preserving LAB17.
+- A Bruno-reported defect after LAB18 device testing starts a new isolated LAB19 while preserving LAB18.
 - MotorLab/control-plane-only commits/jobs do not create a new LAB/MADRE/CANDIDATA.
-- Future Meld work uses the Guardian baseline inherited by LAB17.
+- Future Meld work uses the Guardian baseline inherited by LAB18.
 - CANDIDATA -> MADRE requires explicit Bruno approval.
 - Do not require Bruno to paste activation or transfer prompts.
 
-UPDATED_BY=MotorLab r11 LAB17 completion + manual lightning checkpoint
+UPDATED_BY=MotorLab r11 LAB18 player-collapse root-cause closure + delivery verification
 UPDATED_DATE=2026-09-30
