@@ -2,173 +2,79 @@ MOTORLAB FAST ITERATION + NO-SPIN HANDOFF V1
 
 STATUS
 Mandatory MotorLab CORE cross-module policy.
-Established: 2026-09-30.
 Central authority: Br174/Chatgpt.
 
 PURPOSE
-Make iterative LAB correction/testing materially faster and prevent ordinary ChatGPT foreground turns from remaining apparently active after work has been safely handed to a real persistent executor.
+Accelerate iterative LAB correction/testing, deliver requested testable artifacts without unnecessary causal delay, and prevent foreground polling after durable handoff.
 
 ROLE / NON-DUPLICATION
-This file defines binding cross-module invariants only. It does NOT create a second executor, watchdog, recovery loop or lifecycle engine.
-- MOTORLAB_VELOCITY_LAYER_V1.txt remains owner of FAST LAB acceleration, risk classification and verification scaling.
-- MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt remains owner of foreground risk classification, checkpointing and durable handoff preparation.
-- MOTORLAB_BACKGROUND_EXECUTION_V1.txt remains owner of persistent executor/job semantics.
-- MOTORLAB_WATCHDOG_V1.txt remains sole health/no-progress coordinator.
-- MOTORLAB_RESUME_RECOVERY_V1.txt remains owner of continuation/recovery.
-- project-native engines remain authoritative for application/domain behavior.
+Velocity Layer owns FAST LAB/risk scaling. Foreground Stall Guard owns foreground-risk/checkpointing. Background Execution owns durable jobs. Watchdog owns health/no-progress. Resume Recovery owns continuation. Root Cause Closure owns definitive causal closure. MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt owns artifact-before-cause ordering where safe.
 
-CHANGE COMPATIBILITY CLASSIFICATION
-MERGE_REQUIRED + PRECEDENCE_REQUIRED resolved by extending the behavior of the existing owners above. This policy is a binding coordination contract, not a competing implementation.
+1. NO-SPIN HANDOFF
+For a verified durable job with persisted operation/ref/job/checkpoint/lock state, do not poll indefinitely. Default max two unchanged provider probes, then HANDOFF_COMPLETE; next available cycle reconciles the same job id.
 
-ROOT-CAUSE FINDING - PHANTOM LONG PROCESSING
-Confirmed operational pattern: a durable external job may complete successfully while the ordinary ChatGPT foreground turn/client remains apparently processing for much longer. The UI processing state is not a MotorLab heartbeat and a suspended host cannot be self-woken by repository state alone.
-Prevention: once a durable handoff is verified, the foreground turn must stop depending on continuous polling and must transition to HANDOFF_COMPLETE after persisting enough state for deterministic reconciliation.
+2. NO FALSE BACKGROUND PROMISE
+Without a real persistent executor, do not claim work continues while the host is suspended. Use bounded foreground segments/checkpoints.
 
-ROOT-CAUSE FINDING - ITERATION LATENCY
-Repeated LAB correction loops can become unnecessarily slow when every small or medium correction always pays the cost of full-project regression plus full artifact build before Bruno can test the visible behavior. Velocity Layer already permits risk-scaled LAB verification; r12 makes the iterative use of that capability explicit and mandatory where eligibility is proven.
+3. FAST ITERATION LOOP - R15+
+For eligible isolated corrections before Bruno device acceptance, prefer:
+REQUEST -> PRE-CHANGE REPORT -> APPROVAL -> CHANGE CAPSULE -> ISOLATED LAB -> IMMEDIATE REPAIR -> RISK-SCALED VERIFICATION -> TESTABLE APK/ZIP -> BRUNO TEST.
+If a real defect/regression also requires causal work and that work is safely deferrable:
+APK/ZIP DELIVERY -> POST_ARTIFACT_ROOT_CAUSE_QUEUE -> CAUSAL/PREVENTIVE FOLLOW-UP -> DEFINITIVE CLOSURE.
+Do not serialize full causal archaeology before the artifact unless MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt says the cause is non-deferrable.
 
-1. NO-SPIN HANDOFF - MANDATORY
-When a BACKGROUNDABLE phase has been handed to a real persistent executor and the following are known/persisted when available:
-- operation_id;
-- repository/ref/source SHA;
-- executor type;
-- job/run id;
-- current verified progress;
-- checkpoint/next safe step;
-- write lock scope;
-then the ordinary foreground chat MUST NOT remain in an indefinite wait/poll loop merely to watch the job finish.
+4. LOW-RISK LAB
+Scope/diff + appropriate build/static validity + smallest relevant smoke + requested artifact. Full project regression is not mandatory merely because an APK is produced.
 
-Required sequence:
-A. start/hand off the durable job;
-B. verify that the provider accepted the job and capture its durable identity/status;
-C. persist/reconcile the checkpoint and next safe step;
-D. optionally perform one additional bounded status probe when needed to distinguish immediate startup failure from healthy queue/running state;
-E. if the job is healthy/queued/running/waiting externally, terminate the foreground control cycle as HANDOFF_COMPLETE rather than polling to completion;
-F. on the next available chat/control cycle, reconcile the same job id before any duplicate write/start.
+5. MEDIUM-RISK LAB
+LOW checks + targeted affected tests when relevant + adjacent smoke + requested artifact. Do not run unrelated full suites by habit. Expand automatically if evidence raises risk.
 
-2. FOREGROUND STATUS PROBE LIMIT
-For a healthy persistent job, foreground status checking is bounded.
-- Default maximum: two consecutive unchanged provider/job status probes after durable identity is established.
-- A third materially identical foreground poll is prohibited unless new evidence, explicit user live-monitoring intent, or provider semantics make it materially different.
-- Watchdog Two-Strike No-Progress rules remain authoritative for anomaly/recovery classification.
-- This limit does not cancel or interrupt the healthy external job.
+6. HIGH-RISK LAB
+Full applicable verification from the start for signing/package/update identity, auth/security/secrets/payment, destructive migration/data integrity, broad concurrency/background integrity, core runtime engines with broad blast radius, upstream/framework merges, protected areas, or other evidence-backed high-risk changes.
+High-risk causal work remains on the artifact critical path when needed to trust the artifact.
 
-3. NO FALSE BACKGROUND PROMISE
-If no persistent executor/job exists, MotorLab must not claim the task will continue while the host is suspended. Use bounded foreground segments + checkpoints instead.
+7. CANDIDATA / MADRE
+Risk-scaled FAST iteration accelerates LAB only. CANDIDATA/MADRE keep full adapter regression, identity/replay and explicit Bruno approval gates.
 
-4. RETURN / RECONCILIATION
-When Bruno returns to the same project chat or any later MotorLab execution cycle becomes available:
-- load Project Continuity/checkpoint state;
-- inspect the recorded durable job/run id;
-- preserve the monotonic recovery floor;
-- if completed, verify result/artifact and continue the next already-approved autonomous step;
-- if still running, do not start a duplicate writer;
-- if failed/stalled, route through Watchdog + Root Cause Closure as applicable.
+8. AVOID REDUNDANT BUILD WORK
+Do not run expensive duplicate compile/test/build phases unless each has distinct verification value. Reuse safe caches/incremental outputs when compatible.
 
-5. FAST ITERATION LOOP - DEFAULT FOR ELIGIBLE LAB CORRECTIONS
-For an isolated correction/testing loop before Bruno's device/user acceptance, prefer:
-REQUEST/DEFECT -> CHANGE CAPSULE -> ISOLATED LAB -> RISK-SCALED VERIFICATION -> TESTABLE APK/ARTIFACT -> BRUNO TEST -> NEXT ISOLATED LAB IF NEEDED.
+9. MUSICLAB DEFAULT PROFILE
+LOW: isolated copy/style/static UI.
+MEDIUM: bounded navigation/state/UI behavior, Cover/Originali screen logic, contained AI/API orchestration.
+HIGH: core playback service/queue/audio engine, package/signing/update identity, database migration, Meld upstream integration, lifecycle/build infrastructure, concurrency/background integrity.
+MusicLab LOW/MEDIUM iterative path should produce isolated APK/ZIP with only necessary targeted checks; promotion/full-risk paths keep full regression/UAB rules.
 
-Do NOT automatically run promotion-grade full regression on every iteration when the actual change is proven LOW or MEDIUM risk and the project adapter/profile defines sufficient targeted LAB checks.
+10. ARTIFACT-FIRST ROOT CAUSE - R15+
+When Bruno expects APK/ZIP for testing:
+- artifact production is the default critical path;
+- immediate repair plus risk-appropriate verification may reach artifact delivery before full causal closure when safe;
+- multiple deferrable causal items go to a bounded POST_ARTIFACT_ROOT_CAUSE_QUEUE;
+- delivered artifact identity/checksum/ref is preserved while Bruno tests it;
+- prevention requiring later source changes occurs in a new/follow-up controlled LAB/ref, not by silently mutating the artifact under test;
+- non-deferrable causal risks remain blocking.
 
-6. LOW-RISK LAB ITERATION
-Typical examples: isolated copy/text, bounded visual styling/layout, non-sensitive static assets, deterministic isolated config.
-Minimum intent:
-- source/ref identity + diff/scope check;
-- syntax/static/build validity appropriate to the project;
-- smallest relevant smoke check;
-- generate the testable LAB artifact when that is the requested output.
-Full project regression is not mandatory merely because an APK is being produced.
+11. USER-ACCEPTANCE LOOP
+Automated build is not device acceptance. If Bruno reports a defect after testing, preserve prior checkpoint and create the next isolated LAB when required; reuse completed work and risk-scale the new correction.
 
-7. MEDIUM-RISK LAB ITERATION
-Typical examples: bounded feature logic, ordinary navigation/state behavior, contained API/UI integration, non-critical persistence.
-Minimum intent:
-- LOW checks;
-- targeted unit/integration checks when relevant tests exist;
-- adjacent regression smoke for the affected boundary;
-- installable/testable LAB artifact.
-Do not execute unrelated full-suite tests solely by habit. Expand to full regression automatically if actual dependency/blast-radius evidence raises risk.
+12. PROGRESS
+Artifact readiness and overall MotorLab completion may use separate verified scales. Artifact 100% does not imply overall 100% while causal/prevention work remains pending.
 
-8. HIGH-RISK LAB / FULL REGRESSION
-Full applicable verification remains mandatory from the start for HIGH-risk changes such as:
-- signing/package/update identity;
-- auth/security/secrets/payment;
-- destructive migration/data integrity;
-- lifecycle/promotion infrastructure;
-- broad concurrency/background integrity;
-- core playback/runtime/geospatial engines with broad blast radius;
-- upstream/framework merges with wide source impact;
-- protected/blindata areas where failure cost is high.
+13. ROOT-CAUSE CLOSURE
+Artifact-first changes ordering only. It never permits abandoning Root Cause Closure or emitting definitive solved/final status prematurely.
 
-9. CANDIDATA / MADRE GATE UNCHANGED
-Risk-scaled FAST ITERATION applies to obtaining/test-driving LAB results. Before CANDIDATA/MADRE promotion, all canonical adapter-defined full regression, exact identity/replay, artifact verification and Bruno approval rules remain mandatory.
-FAST ITERATION never promotes directly to MADRE.
-
-10. AVOID REDUNDANT BUILD WORK
-Do not perform separate expensive compile/test/build phases that substantially duplicate one another unless each phase has a distinct early-failure or verification value.
-Examples:
-- if the artifact build already performs the required compile gate for a LOW-risk change, a separate full compile may be redundant;
-- if a targeted test can detect a MEDIUM-risk defect before a costly APK build, run it first;
-- safe Gradle/npm/tool caches and incremental outputs should be reused when source/toolchain/dependency identity permits.
-
-11. MUSICLAB DEFAULT PROFILE
-For Br174/MusicLab, unless live evidence justifies another class:
-- isolated copy/style/static UI -> LOW;
-- bounded navigation/state/UI feature behavior, Cover/Originali screen logic, contained AI/API orchestration -> MEDIUM;
-- core playback service/queue/audio engine, package/signing/update identity, database migration, Meld upstream integration, lifecycle/build infrastructure, concurrency/background integrity -> HIGH.
-
-MusicLab iterative LAB policy:
-- LOW: scope/diff + required build validity + relevant smoke + isolated APK/ZIP;
-- MEDIUM: scope/diff + targeted affected checks when they exist + adjacent smoke + isolated APK/ZIP;
-- HIGH: full applicable regression + UAB preflight/build/artifact verification.
-
-For MusicLab, `:app:testFossDebugUnitTest :innertube:testDebugUnitTest` is promotion/high-risk grade by default; it should not be paid on every LOW/MEDIUM iteration unless the changed surface or available test mapping specifically requires it.
-UAB preflight/build remains the canonical path for a requested installable isolated LAB artifact.
-
-12. USER-ACCEPTANCE LOOP
-A completed automated LAB build is not the same as device acceptance.
-If Bruno reports a defect after testing:
-- preserve the prior LAB as checkpoint;
-- create the next isolated LAB when project lifecycle requires it;
-- apply FAST ITERATION based on the new change's actual risk;
-- do not rerun unrelated completed work.
-
-13. PROJECT ADAPTER / HOOK FIELDS
-Projects may declare:
-MOTORLAB_ITERATION_MODE=<risk-scaled|full-always|custom>
-MOTORLAB_NO_SPIN_HANDOFF=<required|conditional|forbidden-with-reason>
-MOTORLAB_FOREGROUND_JOB_PROBES_MAX=<integer, default 2>
-MOTORLAB_FULL_REGRESSION_AT=<high-risk|candidate|madre|custom>
-MOTORLAB_FAST_LAB=<supported|conditional|forbidden>
-MOTORLAB_BACKGROUND_MODE=<none|github-actions|worker|runner|work|hybrid|custom>
-MOTORLAB_REGRESSION_MAP=<path/description|none-with-reason>
-
-Absent explicit fields, r12 default is:
-- no-spin handoff REQUIRED whenever a verified persistent executor exists;
-- risk-scaled iteration allowed only when actual project evidence supports safe targeted checks;
-- otherwise choose the conservative higher verification class.
-
-14. PROGRESS / VISIBILITY
-Before durable handoff, show the current evidence-based MotorLab percentage.
-HANDOFF_COMPLETE does not mean operation 100%; it means foreground dependence ended safely.
-On return, reconcile provider/job/artifact evidence and continue from the highest coherent verified percentage.
-
-15. ROOT-CAUSE CLOSURE FOR HANDOFF FAILURES
-If durable handoff was recorded but later evidence shows no real job existed, wrong job identity was saved, a duplicate writer started, or foreground polling continued indefinitely despite a healthy durable job, treat it as a MotorLab orchestration defect and route through Root Cause Closure.
-
-16. NO APPLICATION REGRESSION
-This policy changes orchestration/test-depth selection only. It does not authorize application UI/runtime/domain changes, package/signing changes, lifecycle promotion, or replacement of native project engines.
+14. NO APPLICATION REGRESSION
+This policy changes orchestration/test-depth/order only. It does not authorize unapproved runtime/UI/package/signing/lifecycle/domain changes.
 
 SUCCESS CRITERIA
-This policy is correctly active when:
-- persistent jobs no longer require an ordinary chat turn to spin until completion;
-- job identity/checkpoint is sufficient for later deterministic reconciliation;
-- unchanged foreground polling is bounded;
-- LOW/MEDIUM LAB correction loops reach testable artifacts without unnecessary promotion-grade full regression;
-- HIGH-risk and CANDIDATA/MADRE safety remains unchanged;
-- no duplicate Watchdog/recovery/executor mechanism is introduced;
-- MusicLab can use the risk-scaled path without changing its native app logic or lifecycle.
+- LOW/MEDIUM LABs reach testable artifacts without unnecessary promotion-grade work;
+- safely deferrable causal work no longer delays requested APK/ZIP;
+- non-deferrable/high-risk causes still block artifact delivery when required;
+- durable jobs avoid foreground spin;
+- delivered artifact identity stays stable during Bruno testing;
+- Root Cause Closure remains mandatory.
 
 VERSION
-MOTORLAB-FAST-ITERATION-NO-SPIN-V1.0
+MOTORLAB-FAST-ITERATION-NO-SPIN-V1.1
 Established: 2026-09-30
+Revision 1.1: r15 integrates Artifact-First ordering and deferred causal queue into the fast LAB loop.
