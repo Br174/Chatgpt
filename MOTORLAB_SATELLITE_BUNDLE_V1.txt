@@ -10,6 +10,7 @@ HIGH_PRESENCE_NUMERIC_PROGRESS=required
 HARD_PROGRESS_VISIBILITY=required
 ROOT_CAUSE_CLOSURE=required
 LIVE_EVENT_CLASSIFICATION=required
+CONTROL_PLANE_CI_SUPPRESSION=required
 CHANGE_COMPATIBILITY_GUARD=required
 WATCHDOG=required
 PREVENTIVE_WATCHDOG=required
@@ -37,6 +38,7 @@ LOCAL FALLBACK CONTRACT
 - Manual ⚡ uses save-then-resume and monotonic recovery-floor rules.
 - Project Continuity updates at material state transitions and safe turn handoff when central write access exists.
 - A missed expected write-through is a Root Cause Closure problem; manual alignment alone is not definitive closure.
+- MotorLab-only control-plane commits should suppress unrelated CI/build triggers when the provider supports a safe skip mechanism, and repository trigger filters should exclude MotorLab-only paths where appropriate.
 - Change Compatibility Guard applies before writes.
 - Foreground Stall Guard applies before substantial/risky phases.
 - Only one writer may mutate the same project/ref/resource scope.
@@ -106,6 +108,13 @@ PROJECT CONTINUITY / LIVE EVENT CLASSIFICATION - R11+
 - MotorLab/control-plane-only commits/jobs do not silently create a new app LAB/MADRE/CANDIDATA or new app progress scale;
 - if control-plane-only changes unexpectedly trigger app build/release workflows, classify the trigger as a causal defect and correct trigger hygiene when safe.
 
+CONTROL-PLANE CI SUPPRESSION - R11+
+For commits that modify only MotorLab control-plane metadata such as `.motorlab/**` or `MOTORLAB_PROJECT_HOOK.txt`:
+- use a provider-supported CI skip marker/mechanism when safe and available (for GitHub push workflows, e.g. a supported skip-CI commit marker);
+- prefer repository path filters that exclude MotorLab-only metadata from application build/release workflows;
+- do not suppress CI when the same commit also changes application source/configuration that legitimately requires validation;
+- verify that prevention does not hide required tests for real app changes.
+
 CENTRAL SYNC
 Compare local release with MOTORLAB_RELEASE_MANIFEST_V1.txt at safe boundaries only. Never switch release mid active write/build/test/promotion. Preserve current verified local bundle as LAST_GOOD before adoption.
 
@@ -119,7 +128,6 @@ NO RUNTIME COUPLING
 This is development/orchestration metadata only; it must not intentionally alter app runtime, UI, package/signing identity or source lifecycle.
 
 VERSION
-MOTORLAB-SATELLITE-BUNDLE-V2.0
-Revision 1.8: r9 permanent readable visual status.
-Revision 1.9: r10 extended statuses and high-presence numeric progress.
+MOTORLAB-SATELLITE-BUNDLE-V2.1
 Revision 2.0: r11 adds ROOT_CAUSE_CLOSURE, LIVE_EVENT_CLASSIFICATION and HARD_PROGRESS_VISIBILITY.
+Revision 2.1: r11 adds CONTROL_PLANE_CI_SUPPRESSION to prevent metadata-only MotorLab sync from launching unrelated app pipelines.
