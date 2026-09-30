@@ -1,0 +1,105 @@
+MOTORLAB PROJECT CHANGE REGISTRY V1
+PROJECT_NAME=MusicLab
+PROJECT_REPOSITORY=Br174/MusicLab
+REGISTRY_STATUS=ACTIVE_VERIFIED
+REGISTRY_SCHEMA=1
+CENTRAL_MODULE=MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
+BACKFILL_MODE=verified-on-demand
+AUTO_CAPTURE_NEW_CHANGES=required
+
+PURPOSE
+Semantic index of Bruno-approved MusicLab modifications. Exact source remains immutable Git evidence in Br174/MusicLab. This file is an index for fast natural-language lookup and safe selective restore.
+
+SEARCH_ALIASES
+player=player,lettore,mini-player,miniplayer,full player,player globale,player persistente,riproduzione
+cover=cover,copertine,copertina
+originali=originali,versione originale,versioni originali
+ai=ai,gemini,intelligenza artificiale
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20260930-lab18-player-navigation-collapse
+DATE=2026-09-30
+TITLE=Player completo minimizzato su ogni navigazione esterna
+SEMANTIC_TAGS=player,lettore,mini-player,player persistente,navigazione,collapse,LAB18
+USER_INTENT=Correggere il player completo che restava aperto sopra le altre pagine; ogni navigazione esterna deve ridurlo al mini-player.
+CHANGE_SCOPE=ATOMIC
+LIFECYCLE_ROLE=LAB18
+SOURCE_BASE_REF=uab-build/musiclab-ai-step-player-17
+SOURCE_BASE_SHA=33a74544a97330880e935f42e45610cdaf18ea6c
+RESULT_REF=uab-build/musiclab-player-collapse-18
+RESULT_SHA=0dca84c1855dd8c7bb8de021208700b8f72a06fe
+IMPLEMENTATION_COMMITS=e30d235dc6658cdbfd396af4659e91f6b5f53cdd
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/MainActivity.kt
+BEHAVIOR_SUMMARY=Navigation collapse uses semantic player state: collapse when not already collapsed/dismissed instead of requiring exact isExpanded animated anchor.
+VERIFICATION=GitHub Actions run 36677968793 success; real JVM regression passed; UAB preflight/build/ZIP verified; artifact 11079909557; APK sha256 8256a68dadf0d3ec364ac17afea8c9f8a25f9b386fc20e4293deb4a7b54b3887
+STATUS=ACTIVE
+RESTORE_SCOPE_HINTS=MainActivity navigation collapse only; preserve Cover/Originali and unrelated player/audio engine changes.
+SOURCE_CONFIDENCE=VERIFIED_GIT
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20260930-lab17-player-global-collapse
+DATE=2026-09-30
+TITLE=Player globale ridotto a mini-player quando cambia pagina
+SEMANTIC_TAGS=player,lettore,mini-player,player globale,navigazione,LAB17
+USER_INTENT=Il player completo non deve restare persistente sopra le pagine dell'app.
+CHANGE_SCOPE=SUBSCOPE_OF_COMPOSITE
+LIFECYCLE_ROLE=LAB17
+RESULT_REF=uab-build/musiclab-ai-step-player-17
+RESULT_SHA=33a74544a97330880e935f42e45610cdaf18ea6c
+IMPLEMENTATION_COMMITS=ffd5243c9ff546695923fcc49b79c8e9d76346ae
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/MainActivity.kt
+BEHAVIOR_SUMMARY=LAB17 broadened collapse from equalizer-only to any navigation route while playerBottomSheetState.isExpanded.
+VERIFICATION=Implementation commit is immutable Git evidence; LAB17 workflow/build was successful before cleanup; later LAB18 proved this exact-anchor condition insufficient on device.
+STATUS=SUPERSEDED
+SUPERSEDED_BY=musiclab-20260930-lab18-player-navigation-collapse
+RESTORE_SCOPE_HINTS=Only MainActivity player/navigation hunk from composite commit; do not replay Cover/Originali portions when query is only player.
+SOURCE_CONFIDENCE=VERIFIED_GIT
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20260930-lab17-ai-step-cover-originali
+DATE=2026-09-30
+TITLE=Cover e Originali AI a step con dettagli on demand
+SEMANTIC_TAGS=cover,copertine,originali,ai,gemini,dettagli,crediti,YouTube Music,LAB17
+USER_INTENT=Rendere Cover/Originali più rapidi e progressivi, con ricerca a step, risultati riproducibili, dettagli e crediti caricati solo su richiesta.
+CHANGE_SCOPE=COMPOSITE_VERIFIED
+LIFECYCLE_ROLE=LAB17
+RESULT_REF=uab-build/musiclab-ai-step-player-17
+RESULT_SHA=33a74544a97330880e935f42e45610cdaf18ea6c
+IMPLEMENTATION_COMMITS=ffd5243c9ff546695923fcc49b79c8e9d76346ae
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/AiCoverSearchEngine.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt,app/src/main/kotlin/com/metrolist/music/ui/component/GeminiAiCoverDiscovery.kt,app/src/main/kotlin/com/metrolist/music/ui/component/GeminiOriginalDiscovery.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionSearchEngine.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionScreen.kt
+BEHAVIOR_SUMMARY=YouTube Music-first localization, broader bounded recovery for playable covers, details/credits on demand, lightweight paginated lists and stepwise Originali/Cover discovery.
+VERIFICATION=Implementation commit immutable; LAB17 build/test/artifact workflow completed successfully before temporary workflow/script cleanup.
+STATUS=ACTIVE_INHERITED_BY_LAB18
+RESTORE_SCOPE_HINTS=Composite feature; allow file/subscope selective restore only when boundaries are proven. Do not include MainActivity player hunk unless requested.
+SOURCE_CONFIDENCE=VERIFIED_GIT
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20260930-lab16-originali-coroutine-scope-fix
+DATE=2026-09-30
+TITLE=Correzione scope coroutine resolver date Originali
+SEMANTIC_TAGS=originali,date,coroutine,resolver,LAB16
+USER_INTENT=Correggere il resolver Originali nella LAB16 mantenendo il comportamento verificato.
+CHANGE_SCOPE=ATOMIC
+LIFECYCLE_ROLE=LAB16
+RESULT_REF=uab-build/musiclab-originali-cover-player-16
+IMPLEMENTATION_COMMITS=8f909764fb077ff6a89531699cb58872995cffa2
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionSearchEngine.kt
+BEHAVIOR_SUMMARY=Correzione strutturale del coroutine scope/flow nel resolver Originali con refactoring del percorso di ricerca e risoluzione date.
+VERIFICATION=Commit immutable Git; LAB16 full verification completed before temporary workflow cleanup b14f2f83de31be491d409b0b263cd12022d96930.
+STATUS=HISTORICAL
+RESTORE_SCOPE_HINTS=OriginalVersionSearchEngine only; compatibility-check against later LAB17 stepwise Originali before replay.
+SOURCE_CONFIDENCE=VERIFIED_GIT
+
+HISTORICAL BACKFILL NOTE
+MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
+
+REGISTRY RULES
+- Never delete old records; update STATUS and links.
+- Every new verified Bruno-requested material MusicLab change is appended automatically.
+- Every restore creates a new change record with RESTORED_FROM=<CHANGE_ID>.
+- A query such as "player" may return several records; exact semantic match + date/LAB/status determine the candidates.
+- Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
+
+VERSION
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.0
+Established: 2026-09-30

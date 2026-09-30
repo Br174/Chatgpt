@@ -1,0 +1,13 @@
+MOTORLAB PROJECT CHANGE REGISTRY V1
+PROJECT_NAME=GeoVision
+PROJECT_REPOSITORY=Br174/GeoVision-Test
+REGISTRY_STATUS=ACTIVE_EMPTY_BACKFILL_ON_DEMAND
+REGISTRY_SCHEMA=1
+CENTRAL_MODULE=MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
+BACKFILL_MODE=verified-on-demand
+AUTO_CAPTURE_NEW_CHANGES=required
+
+No pre-r13 records are asserted without Git/ledger verification. On first semantic historical query, MotorLab must perform bounded verified backfill, persist the proven record, and then use immutable Git provenance for selective restore. Every new verified Bruno-requested material change is indexed automatically.
+
+VERSION
+MOTORLAB-GEOVISION-CHANGE-REGISTRY-V1.0

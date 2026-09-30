@@ -1,162 +1,114 @@
 MOTORLAB PROJECT INTEGRATION REGISTRY V1
 
 STATUS
-Canonical registry of MotorLab-managed projects, persistent hooks, verified local satellites and cross-chat continuity ledgers.
+Canonical registry of MotorLab-managed projects, persistent hooks, verified local satellites, cross-chat continuity ledgers and r13 semantic Change History registries.
 Established: 2026-09-29.
 Central authority: Br174/Chatgpt.
 
 GLOBAL PRINCIPLES
 - MotorLab activation is implicit/persistent for recognized projects.
-- PRE_RESPONSE_BOOT_GATE is mandatory: MotorLab starts before substantive software-project work and the first user-visible line is "⚙️ MotorLab attivo".
+- PRE_RESPONSE_BOOT_GATE is mandatory; first user-visible line is "⚙️ MotorLab attivo".
 - Br174/Chatgpt is the single central MotorLab authority.
-- Each registered project has one canonical Project Continuity ledger in Br174/Chatgpt.
-- New chats reconcile that ledger with newer live project evidence before choosing a starting point.
+- Each registered project has one canonical Project Continuity ledger and, r13+, one canonical semantic Change History registry.
+- New chats reconcile continuity with newer live evidence before choosing a starting point.
+- Change History is used for historical semantic lookup/restoration and never overrides newer live/current state.
 - No recurring activation or chat-transfer prompt is required.
-- Authority: explicit current Bruno instruction > newer live project evidence > Project Continuity ledger > checkpoint/pending ledger > older registries > memory/copied summaries.
-- Watchdog remains sole health/intervention coordinator; Resume Recovery owns continuation; Project Continuity owns durable cross-chat state; Root Cause Closure owns causal problem closure.
+- Watchdog remains sole health/intervention coordinator; Resume Recovery owns continuation; Project Continuity owns cross-chat current state; Root Cause Closure owns causal closure; Change History owns historical semantic index/provenance/restore routing.
 - Project-native/domain engines remain preserved.
-- Change Compatibility Guard is mandatory before writes.
-- Every canonical MotorLab status emoji carries its readable label.
-- Numeric MotorLab progress is mandatory on meaningful substantial statuses once an evidence-based scale/value exists.
-- A real problem is not definitively solved by symptom-only repair; cause/prevention must be investigated and handled under Root Cause Closure.
-- MotorLab/control-plane-only live events must not silently create or advance application lifecycle state.
-- MotorLab-only metadata synchronization should suppress unrelated CI where the provider safely supports it.
-- r12 Fast Iteration + No-Spin is mandatory through MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt without creating a second Watchdog/executor/recovery path.
+- Change Compatibility Guard is mandatory before writes/restores.
+- MotorLab/control-plane-only activity must not silently create or advance application lifecycle state.
+- Metadata-only MotorLab/history synchronization should suppress unrelated CI.
+- r12 Fast Iteration + No-Spin remains mandatory.
+- r13 semantic Change History + selective exact restore is mandatory.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.09.30-r12
+Release: 2026.09.30-r13
 Schema: 1
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
-Canonical continuity module: MOTORLAB_PROJECT_CONTINUITY_V1.txt
-Canonical root-cause module: MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
-Canonical Fast Iteration / No-Spin module: MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
-MusicLab canonical r12 local-core blob: 17f6dae4d2ec3320ec7493e54c2895b8e398718a
-MusicLab canonical r11 LAST_GOOD blob: 09d9a27d216652b1a51a58d6d867a306cb3b17b5
+Canonical continuity: MOTORLAB_PROJECT_CONTINUITY_V1.txt
+Canonical root-cause: MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
+Canonical Fast Iteration/No-Spin: MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
+Canonical Change History: MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
 Normal startup banner: ⚙️ MotorLab attivo
 PRE_RESPONSE_BOOT_GATE=required
 PROJECT_CONTINUITY=required
-LABELED_VISUAL_STATUS=required
-EXTENDED_VISUAL_STATUS=required
-HIGH_PRESENCE_NUMERIC_PROGRESS=required
-HARD_PROGRESS_VISIBILITY=required
 ROOT_CAUSE_CLOSURE=required
-LIVE_EVENT_CLASSIFICATION=required
-CONTROL_PLANE_CI_SUPPRESSION=required
-MANUAL_LIGHTNING_SAVE_THEN_RESUME=required
-MONOTONIC_RECOVERY_FLOOR=required
 FAST_ITERATION_NO_SPIN=required
+CHANGE_HISTORY_REGISTRY=required
+SEMANTIC_CHANGE_LOOKUP=required
+SELECTIVE_EXACT_RESTORE=required
+HISTORICAL_BACKFILL_ON_DEMAND=required
 
-CANONICAL VISUAL LEGEND
-⚙️ MotorLab attivo
-🎆 Azione completata
-⚡ Risveglio / recupero
-✅ Problema risolto
-👍🏻 Procede tutto bene
-⚠️ Piccolo problema risolvibile
-🧭 Cambiare approccio
-🛑 Stop di sicurezza / blocco reale
-♻️ Una parte va rifatta
-💀 Tutto da rifare
-💯 Conclusione definitiva
-🔍 Ricerca soluzione
-🧩 Compatibile
-🐢 Lentezza rilevata
-💭 Elaborazione in corso
-⏳ Attesa esterna
-🧪 Test / verifica in corso
-🔄 Sincronizzazione in corso
+R13 CHANGE HISTORY RULE
+- Every verified material Bruno-requested project change is indexed automatically when technically possible.
+- Each record points to immutable Git provenance and semantic aliases Bruno may naturally use.
+- Natural query such as "player" searches project registry before raw Git archaeology.
+- Multiple materially different matches are disambiguated unless Bruno already identified one.
+- Default restore is selective into a new isolated LAB from current proper baseline and preserves unrelated later work.
+- Whole-version rollback is separate and requires explicit whole-version intent.
+- Pre-r13 history is backfilled from verified Git/ledger evidence on demand and then persisted.
+- Successful restore writes a new record with RESTORED_FROM provenance.
 
-R11 PROBLEM-CLOSURE RULE
-For a real defect/anomaly/stale state/unexpected trigger/failure:
-1. contain/correct the immediate symptom safely;
-2. determine why it occurred using evidence;
-3. distinguish confirmed cause / leading hypothesis / external cause / unknown cause;
-4. correct or contain the causal mechanism when possible;
-5. inspect the smallest relevant recurrence surface;
-6. add prevention/regression protection when justified;
-7. do not use ✅ Problema risolto merely because a retry/restart/manual alignment worked once.
-Root-cause/prevention work remains part of the operation and may keep progress below 100%.
-
-R11 NUMERIC PROGRESS RULE
-- classic format remains `Progresso MotorLab: <N>%`;
-- after the activation banner, active/pending/new substantial work establishes/reconstructs and displays an evidence-based N% before long opaque execution;
-- meaningful visible statuses carry the current N% when the surface permits;
-- long provider/job phase changes repeat or advance N% rather than remaining silent;
-- same N% may repeat; fake advancement is prohibited;
-- new chat/turn does not reset/suppress same-operation verified progress.
-
-R12 FAST ITERATION + NO-SPIN RULE
-- persistent external work is handed off by durable job/run id + checkpoint + next-safe-step and the ordinary foreground chat must not poll indefinitely waiting for completion;
-- default maximum is two consecutive unchanged foreground job-status probes after durable identity is established;
-- eligible LOW/MEDIUM isolated LAB correction loops use risk-scaled verification rather than automatic promotion-grade full regression;
-- HIGH-risk work and every CANDIDATA/MADRE promotion retain full applicable regression/lifecycle gates;
-- later control cycles reconcile the recorded job id before any duplicate start/write;
-- Fast Iteration coordinates Velocity/Foreground/Background/Watchdog/Resume Recovery without replacing their ownership.
-
-REGISTERED PROJECTS — CURRENT VERIFIED SATELLITES
+REGISTERED PROJECTS
 1. MusicLab — Br174/MusicLab
    Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt
-   Local release: 2026.09.30-r12 VERIFIED
-   LAST_GOOD: 2026.09.30-r11
+   Change registry: MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
+   Local satellite before r13 adoption: 2026.09.30-r12 VERIFIED; r13 adoption allowed at safe boundary because LAB18 automated work is complete and write lock released.
    Native engine: coexist/preserve
    Iteration mode: risk-scaled
    No-Spin handoff: required
    Background mode: GitHub Actions
-   Foreground unchanged job probes: max 2 by default
-   Full regression: HIGH risk / CANDIDATA / MADRE, or when affected-test evidence requires expansion
-   r12 control-plane commit 70f5c01f3bff257dd6f58887e58f987f09eac71b produced zero workflow runs, verifying CI suppression for metadata-only sync.
-   Prior root-cause incident preserved: MotorLab-only metadata must not launch APK pipelines.
+   Change registry seeded with verified recent LAB16/LAB17/LAB18 entries, including distinct player LAB17 and LAB18 records.
 
 2. GeoVision — Br174/GeoVision-Test
    Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
-   LAST_GOOD: 2026.09.30-r10
+   Change registry: MOTORLAB_CHANGE_REGISTRY_GEOVISION_V1.txt
+   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
    Native engine: coexist/preserve
-   Existing build/test workflows use app-specific path filters for the inspected push triggers.
+   Historical registry: active, verified-on-demand backfill
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Project state: MOTORLAB_PROJECT_STATE_STUDYBOOK_AI_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
-   LAST_GOOD: 2026.09.30-r10
+   Change registry: MOTORLAB_CHANGE_REGISTRY_STUDYBOOK_AI_V1.txt
+   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
    Native engine: coexist/preserve
-   Build workflow excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt` from push-triggered builds.
+   Historical registry: active, verified-on-demand backfill
 
 4. Visionflix / Verlezza Vision source — Br174/Visionflix
    Project state: MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
-   LAST_GOOD: 2026.09.30-r10
+   Change registry: MOTORLAB_CHANGE_REGISTRY_VISIONFLIX_V1.txt
+   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
    Native engine: coexist/preserve
    Lifecycle authority: Visionflix source
-   Build workflow excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt` from push-triggered builds.
+   Historical registry: active, verified-on-demand backfill
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Project state: MOTORLAB_PROJECT_STATE_COVER_LAB_AI_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
-   LAST_GOOD: 2026.09.30-r10
+   Change registry: MOTORLAB_CHANGE_REGISTRY_COVER_LAB_AI_V1.txt
+   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
    Native engine: Cover Lab engine coexist/preserve
-   Main verification workflow excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt`; Android APK workflow is path-limited to android/**.
+   Historical registry: active, verified-on-demand backfill
 
 6. streamflix-BV delivery adapter — Br174/streamflix-BV
    Project state: MOTORLAB_PROJECT_STATE_STREAMFLIX_BV_V1.txt
-   Local release: 2026.09.30-r11 VERIFIED; r12 adoption pending next safe boundary
-   LAST_GOOD: 2026.09.30-r10
+   Change registry: MOTORLAB_CHANGE_REGISTRY_STREAMFLIX_BV_V1.txt
+   Local satellite: r11 VERIFIED; newer release adoption pending safe boundary
    Native engine: delivery-adapter-coexist-preserve
    Lifecycle authority: NO; Visionflix source remains authority
+   Historical registry: active, verified-on-demand backfill
 
 SAFE ADOPTION RULE
-Never force a future satellite release change into an active write/build/test/promotion operation. Pin the operation release and adopt a newer release only at a safe boundary under MOTORLAB_SATELLITE_SYNC_V1.txt.
-For MotorLab-only metadata sync commits, use provider-supported CI suppression where safe/available; do not suppress CI when real app/source/config changes require validation.
+Never force release change into active write/build/test/promotion. Pin current release until safe boundary. Preserve verified local bundle as LAST_GOOD before adoption. Metadata-only sync/registry commits use CI suppression/path filters where safe.
 
 FUTURE PROJECTS
-Every future concrete software project receives hook + local satellite + central continuity ledger and inherits labeled visual status, hard numeric progress visibility, live-event classification, Root Cause Closure, safe control-plane CI suppression, Fast Iteration and No-Spin Handoff automatically. Where no project-specific risk map exists, verification remains conservative until actual project evidence supports a reduced LAB path.
+Every future concrete software project receives hook + local satellite + central continuity ledger + central semantic Change History registry. Where no historical records exist, registry starts empty and future changes auto-capture; older imported history may be backfilled only from verified immutable evidence.
 
 HOST LIMITATION
-Repository configuration cannot wake a host with no execution cycle. r12 therefore avoids depending on such a wake after durable handoff: persistent external jobs continue independently and are reconciled at the next available control cycle.
+Repository state cannot wake a host with no execution cycle. Persistent external jobs and historical registries remain durable and are reconciled/read at next available control cycle.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.4
-Revision 2.2: r10 extended visual legend and high-presence numeric progress.
-Revision 2.3: r11 adds Root Cause Closure, hard progress visibility, live-event classification and control-plane CI suppression.
-Revision 2.4: r12 adds Fast Iteration + No-Spin globally and records MusicLab as the first r12 VERIFIED satellite while leaving other satellites pinned to r11 until safe adoption.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.5
+Revision 2.4: r12 Fast Iteration + No-Spin globally; MusicLab first r12 satellite.
+Revision 2.5: r13 adds canonical per-project semantic Change History registries, automatic change capture, verified historical backfill and selective exact restore.
