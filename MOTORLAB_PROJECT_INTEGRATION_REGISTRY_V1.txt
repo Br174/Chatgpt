@@ -5,7 +5,7 @@ Canonical registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.09.30-r15
+Release: 2026.09.30-r16
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
@@ -14,8 +14,26 @@ Canonical Artifact-First policy: MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
 Canonical technical history: MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
 Canonical pre-change approval: MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
 Canonical visible restore register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
+Canonical authority/data ownership: MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
+Canonical persistent operational state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
+Canonical observability: MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
+Canonical knowledge/tool routing: MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
+Canonical service connection status: MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
 
-GLOBAL R15 RULES
+GLOBAL R16 RULES
+- All r15 approval, Artifact-First, Root Cause, lifecycle, restore, progress and safety gates remain mandatory.
+- GitHub remains durable technical authority.
+- Cloudflare D1 is the target live operational authority only after actual central MotorLab resources are provisioned/verified; KV is cache only.
+- One MOTORLAB_OPERATION_ID correlates each logical operation across operational state, artifacts, Root Cause, diagnostics and projections.
+- PostHog is runtime diagnostic evidence only and cannot authorize changes.
+- Notion is Bruno-facing status projection only.
+- GitBook is architecture/manual projection only.
+- Superpowers is a subordinate engineering-method layer and cannot override MotorLab.
+- Context7 is quota-aware on-demand documentation only.
+- Optional services must fail safely and never silently trigger paid usage.
+- CORE readiness must not be confused with live plugin/provider connection; MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt tracks that distinction.
+
+R15 RULES PRESERVED
 - Initial change request is intent only; pre-change report + later Bruno approval precedes first write.
 - For approved defect/regression work where Bruno expects APK/ZIP/testable artifact, default critical path is repair -> risk-appropriate verify -> artifact -> deliver.
 - Safely deferrable causal/prevention work is persisted in POST_ARTIFACT_ROOT_CAUSE_QUEUE and continues afterward.
@@ -35,49 +53,58 @@ REGISTERED PROJECTS
    Local satellite: 2026.09.30-r15 VERIFIED on uab-build/musiclab-player-direct-collapse-19
    r15 control-plane head: dcf20dcb00f9b20ed8a1cdfc59864f0052fd636a
    LAST_GOOD: r14
-   r15 compare from r14: only local core, LAST_GOOD, sync state and project hook changed
-   CI verification: zero workflow runs for r15 control-plane head
-   Candidate ref unchanged; application runtime impact NONE.
+   Central r16 authoritative; local r16 adoption pending next verified safe boundary.
+   Candidate ref unchanged; application runtime impact from central r16: NONE.
 
 2. GeoVision — Br174/GeoVision-Test
    Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_GEOVISION_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_GEOVISION_V1.txt
-   Local satellite: r11 VERIFIED; r15 adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Project state: MOTORLAB_PROJECT_STATE_STUDYBOOK_AI_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_STUDYBOOK_AI_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_STUDYBOOK_AI_V1.txt
-   Local satellite: r11 VERIFIED; r15 adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
 
 4. Visionflix / Verlezza Vision — Br174/Visionflix
    Project state: MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_VISIONFLIX_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_VISIONFLIX_V1.txt
-   Local satellite: r11 VERIFIED; r15 adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Project state: MOTORLAB_PROJECT_STATE_COVER_LAB_AI_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_COVER_LAB_AI_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_COVER_LAB_AI_V1.txt
-   Local satellite: r11 VERIFIED; r15 adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
 
 6. streamflix-BV — Br174/streamflix-BV
    Project state: MOTORLAB_PROJECT_STATE_STREAMFLIX_BV_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_STREAMFLIX_BV_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_STREAMFLIX_BV_V1.txt
-   Local satellite: r11 VERIFIED; r15 adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
+
+CENTRAL SERVICE INTEGRATION STATUS
+- GitHub: CONNECTED_VERIFIED.
+- Cloudflare central MotorLab D1/KV: CORE_READY, resources not yet verified/provisioned for MotorLab central state.
+- PostHog: CORE_READY, plugin connection/project instrumentation not yet verified.
+- Notion: CORE_READY, plugin connection not yet verified.
+- GitBook: CORE_READY, plugin connection not yet verified.
+- Superpowers: CORE_READY, plugin connection not yet verified.
+- Context7: CORE_READY, plugin connection not yet verified.
+Existing Cloudflare use inside MusicLab/Cover Lab AI remains project-specific and does not by itself activate the MotorLab central state store.
 
 SAFE ADOPTION RULE
-Never force a release change into active/unknown project work. BOOT_RECONCILE_REQUIRED projects must be live-reconciled before local r15 adoption. Central r15 remains authoritative whenever central access exists.
+Never force a release change into active/unknown project work. Projects must be live-reconciled before local r16 adoption. Central r16 remains authoritative whenever central access exists; local satellite versions remain truthfully reported until upgraded.
 
 SYNC CLOSURE
-MOTORLAB_SATELLITE_SYNC_V1.txt v1.11 requires r15 Artifact-First, dual progress, deferred Root Cause queue and delivered-artifact immutability markers.
+MOTORLAB_SATELLITE_SYNC_V1.txt v1.12 requires r16 authority/data ownership, MOTORLAB_OPERATION_ID, persistent-state fallback, observability boundaries and knowledge/tool routing markers in addition to prior release gates.
 
 FUTURE PROJECTS
-Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r15 approval, Artifact-First and Root Cause policies.
+Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r16 authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.7
-Revision 2.7: r15 global Artifact-First delivery with deferred mandatory Root Cause closure and MusicLab first verified r15 satellite.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.8
+Revision 2.8: r16 global multi-service authority/persistent operational state/observability/knowledge routing; live service connection remains separately verified.
