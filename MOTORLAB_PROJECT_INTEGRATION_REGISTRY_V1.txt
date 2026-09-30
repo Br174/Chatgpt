@@ -13,28 +13,35 @@ GLOBAL PRINCIPLES
 - New chats reconcile that ledger with newer live project evidence before choosing a starting point.
 - No recurring activation or chat-transfer prompt is required.
 - Authority: explicit current Bruno instruction > newer live project evidence > Project Continuity ledger > checkpoint/pending ledger > older registries > memory/copied summaries.
-- Watchdog remains sole health/intervention coordinator; Resume Recovery owns continuation; Project Continuity owns durable cross-chat state.
+- Watchdog remains sole health/intervention coordinator; Resume Recovery owns continuation; Project Continuity owns durable cross-chat state; Root Cause Closure owns causal problem closure.
 - Project-native/domain engines remain preserved.
 - Change Compatibility Guard is mandatory before writes.
-- LABELED_VISUAL_STATUS is global/permanent: every MotorLab status emoji carries its canonical readable label.
-- EXTENDED_VISUAL_STATUS and HIGH_PRESENCE_NUMERIC_PROGRESS are global/permanent from r10 onward.
+- Every canonical MotorLab status emoji carries its readable label.
+- Numeric MotorLab progress is mandatory on meaningful substantial statuses once an evidence-based scale/value exists.
+- A real problem is not definitively solved by symptom-only repair; cause/prevention must be investigated and handled under Root Cause Closure.
+- MotorLab/control-plane-only live events must not silently create or advance application lifecycle state.
+- MotorLab-only metadata synchronization should suppress unrelated CI where the provider safely supports it.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.09.30-r10
+Release: 2026.09.30-r11
 Schema: 1
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
 Canonical continuity module: MOTORLAB_PROJECT_CONTINUITY_V1.txt
-Canonical r10 local-core blob: acb0cfd99e2276a3b80f0a7301d9e9c8ad7ff1f8
-Canonical r9 rollback blob: 457a0ed2ed4282fbfb0b1f57b581c895398421fe
-Canonical r8 rollback blob: a97bc4468df7d9dc4bb12856a33042a9a3e78d8a
+Canonical root-cause module: MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
+Canonical r11 local-core blob: 09d9a27d216652b1a51a58d6d867a306cb3b17b5
+Canonical r10 LAST_GOOD blob: acb0cfd99e2276a3b80f0a7301d9e9c8ad7ff1f8
 Normal startup banner: ⚙️ MotorLab attivo
 PRE_RESPONSE_BOOT_GATE=required
 PROJECT_CONTINUITY=required
 LABELED_VISUAL_STATUS=required
 EXTENDED_VISUAL_STATUS=required
 HIGH_PRESENCE_NUMERIC_PROGRESS=required
+HARD_PROGRESS_VISIBILITY=required
+ROOT_CAUSE_CLOSURE=required
+LIVE_EVENT_CLASSIFICATION=required
+CONTROL_PLANE_CI_SUPPRESSION=required
 MANUAL_LIGHTNING_SAVE_THEN_RESUME=required
 MONOTONIC_RECOVERY_FLOOR=required
 
@@ -58,65 +65,80 @@ CANONICAL VISUAL LEGEND
 🧪 Test / verifica in corso
 🔄 Sincronizzazione in corso
 
-VISUAL / PROGRESS RULES
-- every canonical status emoji is accompanied by its label;
-- preferred form is `<emoji> <label> — <context>`;
-- repeated fireworks/lightning are not user-facing level codes;
-- 🎆 is an action/phase completion; 💯 is only true full verified closure;
-- 🔍 is solution search, 🧩 is verified compatibility, 🐢 is slow-but-live, 💭 is high-level task analysis, ⏳ is legitimate external waiting, 🧪 is test/verification in progress, 🔄 is synchronization in progress;
-- classic percentage remains `Progresso MotorLab: <N>%`;
-- once a verified percentage exists in a substantial operation, meaningful operational statuses normally include the current N% even when unchanged;
-- percentages remain evidence-based and monotonic and are never invented for visibility;
-- 💭 never exposes or implies private chain-of-thought.
+R11 PROBLEM-CLOSURE RULE
+For a real defect/anomaly/stale state/unexpected trigger/failure:
+1. contain/correct the immediate symptom safely;
+2. determine why it occurred using evidence;
+3. distinguish confirmed cause / leading hypothesis / external cause / unknown cause;
+4. correct or contain the causal mechanism when possible;
+5. inspect the smallest relevant recurrence surface;
+6. add prevention/regression protection when justified;
+7. do not use ✅ Problema risolto merely because a retry/restart/manual alignment worked once.
+Root-cause/prevention work remains part of the operation and may keep progress below 100%.
 
-REGISTERED PROJECTS — R10 VERIFIED
+R11 NUMERIC PROGRESS RULE
+- classic format remains `Progresso MotorLab: <N>%`;
+- after the activation banner, active/pending/new substantial work establishes/reconstructs and displays an evidence-based N% before long opaque execution;
+- meaningful visible statuses carry the current N% when the surface permits;
+- long provider/job phase changes repeat or advance N% rather than remaining silent;
+- same N% may repeat; fake advancement is prohibited;
+- new chat/turn does not reset/suppress same-operation verified progress.
+
+REGISTERED PROJECTS — R11 VERIFIED
 1. MusicLab — Br174/MusicLab
    Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt
-   Local release: 2026.09.30-r10 VERIFIED
-   LAST_GOOD: 2026.09.30-r9
+   Local release: 2026.09.30-r11 VERIFIED
+   LAST_GOOD: 2026.09.30-r10
    Native engine: coexist/preserve
+   Root-cause incident 2026-09-30 recorded: MotorLab-only r10 metadata push had triggered APK workflows; MusicLab build.yml/build_quick.yml now exclude `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt`, and fix commits used skip-CI. LAB15 remains the application/upstream-system state because the incident was control-plane-only.
 
 2. GeoVision — Br174/GeoVision-Test
    Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
-   Local release: 2026.09.30-r10 VERIFIED
-   LAST_GOOD: 2026.09.30-r8
+   Local release: 2026.09.30-r11 VERIFIED
+   LAST_GOOD: 2026.09.30-r10
    Native engine: coexist/preserve
+   Existing build/test workflows use app-specific path filters for the inspected push triggers.
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Project state: MOTORLAB_PROJECT_STATE_STUDYBOOK_AI_V1.txt
-   Local release: 2026.09.30-r10 VERIFIED
-   LAST_GOOD: 2026.09.30-r8
+   Local release: 2026.09.30-r11 VERIFIED
+   LAST_GOOD: 2026.09.30-r10
    Native engine: coexist/preserve
+   Build workflow now excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt` from push-triggered builds.
 
 4. Visionflix / Verlezza Vision source — Br174/Visionflix
    Project state: MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt
-   Local release: 2026.09.30-r10 VERIFIED
-   LAST_GOOD: 2026.09.30-r8
+   Local release: 2026.09.30-r11 VERIFIED
+   LAST_GOOD: 2026.09.30-r10
    Native engine: coexist/preserve
    Lifecycle authority: Visionflix source
+   Build workflow now excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt` from push-triggered builds.
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Project state: MOTORLAB_PROJECT_STATE_COVER_LAB_AI_V1.txt
-   Local release: 2026.09.30-r10 VERIFIED
-   LAST_GOOD: 2026.09.30-r8
+   Local release: 2026.09.30-r11 VERIFIED
+   LAST_GOOD: 2026.09.30-r10
    Native engine: Cover Lab engine coexist/preserve
+   Main verification workflow now excludes `.motorlab/**` and `MOTORLAB_PROJECT_HOOK.txt`; Android APK workflow was already path-limited to android/**.
 
 6. streamflix-BV delivery adapter — Br174/streamflix-BV
    Project state: MOTORLAB_PROJECT_STATE_STREAMFLIX_BV_V1.txt
-   Local release: 2026.09.30-r10 VERIFIED
-   LAST_GOOD: 2026.09.30-r8
+   Local release: 2026.09.30-r11 VERIFIED
+   LAST_GOOD: 2026.09.30-r10
    Native engine: delivery-adapter-coexist-preserve
    Lifecycle authority: NO; Visionflix source remains authority
 
 SAFE ADOPTION RULE
 Never force a future satellite release change into an active write/build/test/promotion operation. Pin the operation release and adopt a newer release only at a safe boundary under MOTORLAB_SATELLITE_SYNC_V1.txt.
+For MotorLab-only metadata sync commits, use provider-supported CI suppression where safe/available; do not suppress CI when real app/source/config changes require validation.
 
 FUTURE PROJECTS
-Every future concrete software project receives hook + local satellite + central continuity ledger and inherits the current labeled visual legend plus high-presence numeric progress automatically.
+Every future concrete software project receives hook + local satellite + central continuity ledger and inherits labeled visual status, hard numeric progress visibility, live-event classification, Root Cause Closure and safe control-plane CI suppression automatically.
 
 HOST LIMITATION
-Repository configuration cannot wake a host with no execution cycle. Once a supported project/software-build signal is exposed, MotorLab boot, continuity reconciliation, visual status and progress contracts are mandatory.
+Repository configuration cannot wake a host with no execution cycle. Once a supported project/software-build signal is exposed, MotorLab boot, continuity reconciliation, visual status, numeric progress and causal closure contracts are mandatory when applicable.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.2
-Revision 2.2: r10 extends the permanent visual legend with solution/compatibility/latency/analysis/wait/test/sync states, makes classic numeric progress highly present, and records all six registered satellites as r10 VERIFIED.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.3
+Revision 2.2: r10 extended visual legend and high-presence numeric progress.
+Revision 2.3: r11 adds Root Cause Closure, hard progress visibility, live-event classification, control-plane CI suppression and records all six satellites as r11 VERIFIED.
