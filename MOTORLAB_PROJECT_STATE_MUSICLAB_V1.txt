@@ -1,7 +1,7 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=8
+STATE_REVISION=9
 STATE_STATUS=COMPLETED_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
@@ -45,7 +45,23 @@ VERIFIED_FINAL_STATE
 - no CANDIDATA created
 - no MADRE modified
 - MusicLab native playback/search/AI/runtime engine and approved UI were not changed by this LAB15 operation
-- MotorLab r8 control-plane present with r7 LAST_GOOD
+
+ROOT_CAUSE_INCIDENT_2026_09_30
+INCIDENT_STATUS=CLOSED_VERIFIED
+INCIDENT_CLASS=MOTORLAB_CONTROL_PLANE_TRIGGER_LEAK
+SYMPTOM=MotorLab r10 metadata-only sync on main unexpectedly launched Build APKs and Quick Test Build; user-visible MotorLab reporting did not show the expected numeric progress/status during that external build activity.
+TRIGGER_COMMIT=ea7c05dbba07f935d789de2a622e33b0f53ba22c
+TRIGGER_CHANGED_PATH=.motorlab/MOTORLAB_SYNC_STATE.txt only
+UNEXPECTED_RUNS=36650282610 Build APKs; 36650282469 Quick Test Build
+ROOT_CAUSE_CONFIRMED_1=.github/workflows/build.yml and build_quick.yml listened to push on all branches and did not ignore .motorlab/** or MOTORLAB_PROJECT_HOOK.txt, so control-plane-only pushes were allowed to launch application APK workflows.
+ROOT_CAUSE_CONFIRMED_2=r10 numeric progress language was high-presence but still permissive enough that an active external build could be observed without a hard first-visible percentage/status gate in the chat.
+ROOT_CAUSE_CONFIRMED_3=Project Continuity previously treated build/workflow starts broadly without first classifying whether the live event was application work or MotorLab control-plane activity, creating ambiguity about whether a ledger/app operation should advance.
+CORRECTION_1=build.yml now ignores .motorlab/** and MOTORLAB_PROJECT_HOOK.txt for push-triggered APK builds; commit 95db766487d6d3087ddb2a62f4fd11794d5d6916.
+CORRECTION_2=build_quick.yml now ignores .motorlab/** and MOTORLAB_PROJECT_HOOK.txt for push-triggered quick APK builds; commit bb14684c8c0a13f8504f8125606b36f8dc7cc2fe.
+CORRECTION_3=Both correction commits used [skip ci]; verification shows no newer APK workflow runs were created after them. Latest relevant runs remain the old r10-triggered runs on ea7c05dbba07f935d789de2a622e33b0f53ba22c.
+CORRECTION_4=MotorLab r11 introduces Root Cause Closure, hard numeric progress visibility after boot, live-event classification, and stale-write-through causal handling.
+LIFECYCLE_DECISION=The r10-triggered runs are classified MOTORLAB_CONTROL_PLANE side effects, not a new application LAB. LAB15 remains the verified application/upstream-system state. Do not invent LAB16 from this incident.
+RECURRENCE_PROTECTION=Future .motorlab/** or MOTORLAB_PROJECT_HOOK.txt-only pushes must not trigger Build APKs/Quick Test Build; future MotorLab problems cannot be closed by manual alignment alone; active substantial work must show evidence-based numeric progress when the chat surface permits.
 
 MANUAL_LIGHTNING_RECOVERY_HISTORY
 - manual lightning salvage preserved the same operation and 93% monotonic recovery floor through signing and test-gate recovery
@@ -57,11 +73,14 @@ MANUAL_LIGHTNING_RECOVERY_HISTORY
 CONTINUITY_RULES
 - New MusicLab chats must load this ledger automatically after MotorLab boot.
 - Live repository/provider/artifact evidence newer than this ledger wins and must refresh it when safe.
-- This completed operation must not restart from LAB12/LAB13/LAB14 or from stale historical UAB registries.
+- Classify newer live events before treating them as application lifecycle changes.
+- MotorLab/control-plane-only commits/jobs do not create a new LAB/MADRE/CANDIDATA or reset the application progress scale.
+- An unexpected missed write-through or trigger leak must route through Root Cause Closure; manual realignment alone is not definitive closure.
+- This completed LAB15 operation must not restart from LAB12/LAB13/LAB14 or from stale historical UAB registries.
 - Future Meld work starts from the last accepted baseline recorded by the Guardian lineage, not from v0.8.9.
 - CANDIDATA -> MADRE remains an explicit Bruno approval gate.
 - MotorLab remains control-plane only and must not replace or rewrite MusicLab native/domain engines merely because it is active.
 - Do not require Bruno to paste an activation or transfer prompt.
 
-UPDATED_BY=MotorLab r8 verified completion
+UPDATED_BY=MotorLab r11 Root Cause Closure incident verification
 UPDATED_DATE=2026-09-30
