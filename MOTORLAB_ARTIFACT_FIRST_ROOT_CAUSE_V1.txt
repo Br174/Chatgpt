@@ -1,0 +1,130 @@
+MOTORLAB ARTIFACT FIRST + DEFERRED ROOT CAUSE V1
+
+STATUS
+Mandatory MotorLab CORE orchestration policy.
+Central authority: Br174/Chatgpt.
+Established: 2026-09-30.
+
+PURPOSE
+Reduce time-to-test for APK/ZIP and other testable artifacts without weakening Root Cause Closure. For approved defect/regression work, MotorLab should deliver the requested safe testable artifact as soon as the immediate requested behavior is repaired and sufficiently verified, then continue causal/prevention work afterward when that work is not required for artifact safety or correctness.
+
+CORE PRINCIPLE
+REPAIR -> VERIFY -> ARTIFACT -> DELIVER -> ROOT CAUSE -> PREVENTION -> DEFINITIVE CLOSURE.
+Root cause remains mandatory. It is removed from the artifact critical path only when safe to defer.
+
+1. TWO PHASES, ONE OPERATION
+Every qualifying defect/regression operation has two linked phases:
+A. ARTIFACT DELIVERY PHASE
+- repair/contain the requested visible defect within approved scope;
+- run risk-appropriate verification needed to trust the artifact;
+- build/package requested APK/ZIP/artifact;
+- verify artifact identity/integrity;
+- deliver/identify the testable artifact for Bruno.
+B. CAUSAL CLOSURE PHASE
+- determine why the defect/regression occurred;
+- correct/contain the causal mechanism when needed;
+- inspect the relevant recurrence surface;
+- add proportionate prevention/regression protection;
+- reach definitive Root Cause Closure.
+
+2. DEFAULT PRIORITY
+When Bruno requested an APK/ZIP or testable artifact, artifact delivery is the default critical path. Root-cause/prevention work that can safely be deferred MUST NOT unnecessarily block artifact delivery.
+
+3. DEFERRAL ELIGIBILITY
+Root-cause work may be deferred until after artifact delivery only when all are true:
+- the immediate requested behavior is repaired/contained sufficiently for the requested test;
+- the artifact can be built and verified without knowing the deeper cause;
+- deferral does not create material safety, security, signing/update identity, destructive data, integrity, production-state or irreversible risk;
+- the artifact is clearly identified as a test artifact/current LAB state, not definitive causal closure;
+- causal work remains persisted as pending work in the same logical operation.
+
+4. NON-DEFERRABLE CAUSES
+Root-cause/prevention stays on the artifact critical path when evidence indicates it is necessary to trust the artifact or avoid material harm, including as applicable:
+- package/signing/update identity;
+- authentication/authorization/security/secrets/payment;
+- destructive migration/data corruption/integrity;
+- unreliable/reproducibly broken build or artifact generation;
+- production/external-state mutation;
+- a cause likely to make the produced artifact invalid, non-installable, unsafe or immediately self-regressing;
+- high-risk core runtime/concurrency faults where symptom-only containment cannot establish a trustworthy test build.
+Use actual evidence/risk, not category labels alone.
+
+5. MULTIPLE DEFECTS
+If several defects/regressions are encountered while producing one requested artifact:
+- repair/contain the specific defects necessary for the requested artifact and its risk-appropriate verification;
+- do not serialize full causal archaeology for every defect before packaging when those investigations are safely deferrable;
+- create a bounded POST_ARTIFACT_ROOT_CAUSE_QUEUE containing each pending causal item, evidence, affected scope and next step;
+- deliver the artifact when the delivery phase is complete;
+- process the causal queue afterward without losing provenance or state.
+
+6. ARTIFACT IMMUTABILITY DURING BRUNO TEST
+Once an artifact is delivered for Bruno testing, later causal/prevention work MUST NOT silently change that already-delivered artifact identity.
+If prevention requires source changes:
+- preserve the delivered artifact/ref/checksum as the exact test checkpoint;
+- perform prevention in the next controlled LAB/ref or explicitly identified follow-up state;
+- do not pretend the new prevention build is the same artifact Bruno is already testing.
+
+7. PROGRESS MODEL
+MotorLab may show two progress signals:
+- ARTIFACT_PROGRESS: readiness of the requested APK/ZIP/artifact, allowed to reach 100% when the artifact is built, verified and delivered;
+- MOTORLAB_OVERALL_PROGRESS: end-to-end operation including pending Root Cause Closure, which remains below 100% until the causal queue is closed or honestly blocked.
+Example:
+ARTIFACT_PROGRESS=100%
+MOTORLAB_OVERALL_PROGRESS=94%
+PENDING_ROOT_CAUSE_ITEMS=2
+Never use overall 100% or definitive closure while mandatory causal work remains pending.
+
+8. USER-FACING STATUS
+After artifact delivery with pending causal work, preferred meaning:
+"🎆 Azione completata — APK/ZIP pronto e verificato per il test. Artefatto: 100%. Progresso MotorLab complessivo: <N>%. Restano <n> chiusure causali/preventive."
+Do not use `✅ Problema risolto` for a defect whose causal closure remains pending.
+Do not use `💯 Conclusione definitiva` until the full operation is causally closed or formally blocked with an explicit limitation.
+
+9. ROOT CAUSE QUEUE DURABILITY
+Each deferred causal item should persist enough information for continuation:
+- incident/defect identifier or concise title;
+- symptom and immediate repair/containment;
+- artifact/ref/checksum that was delivered;
+- known evidence and current cause status;
+- recurrence surfaces still to inspect;
+- next causal/prevention step;
+- whether future source writes are already inside approved scope or require amended approval under Pre-Change Approval Gate.
+Project Continuity/checkpoint state owns active continuation. Technical Change History may preserve provenance when appropriate.
+
+10. APPROVAL INTERACTION
+The approved pre-change report may explicitly include both immediate repair/artifact delivery and causal follow-up for the same defect scope.
+Causal/preventive writes inside that described scope do not require repeated approval.
+If post-artifact investigation reveals a materially different component/behavior must be modified outside approved scope, present an amended pre-change report and obtain Bruno approval before that broadened write.
+Read-only diagnosis may continue meanwhile.
+
+11. FAST ITERATION INTERACTION
+LOW/MEDIUM eligible LAB work should combine with Fast Iteration:
+REQUEST -> APPROVAL -> ISOLATED LAB -> IMMEDIATE REPAIR -> RISK-SCALED CHECKS -> APK/ZIP -> BRUNO TEST
+then, in the same logical operation:
+DEFERRED ROOT CAUSE -> PREVENTION -> FOLLOW-UP LAB IF SOURCE CHANGE NEEDED -> DEFINITIVE CLOSURE.
+Do not run promotion-grade full regression merely because post-artifact causal work exists unless risk/promotion rules require it.
+
+12. ROOT CAUSE CLOSURE INTERACTION
+This policy changes ordering, not obligation.
+MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt remains authoritative for what constitutes causal closure. Symptom-only artifact delivery is an intermediate milestone, not a definitive solved state.
+
+13. WATCHDOG / NO-SPIN / BACKGROUND
+After artifact delivery, causal work continues only during available execution cycles or real persistent executor jobs. Do not promise invisible background work without a durable executor. No-Spin and checkpoint/recovery rules remain mandatory.
+
+14. CURRENT/FUTURE PROJECT RULE
+All current and future MotorLab software projects inherit this policy. Project adapters may tighten non-deferrable risk conditions but may not weaken the requirement to eventually close root cause.
+
+15. NO RUNTIME COUPLING
+This is orchestration policy only. It does not authorize application behavior changes beyond the approved project scope.
+
+SUCCESS CRITERIA
+- requested test artifacts reach Bruno without avoidable delay from safely deferrable causal archaeology;
+- artifact 100% is distinct from overall MotorLab 100%;
+- every deferred cause is durably queued and later processed;
+- delivered artifact identity remains stable while Bruno tests it;
+- high-risk/non-deferrable causes still block artifact delivery when necessary for trust/safety;
+- Root Cause Closure remains mandatory and cannot be silently abandoned.
+
+VERSION
+MOTORLAB-ARTIFACT-FIRST-ROOT-CAUSE-V1.0
+Established: 2026-09-30
