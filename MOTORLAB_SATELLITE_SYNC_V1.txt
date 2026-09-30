@@ -2,33 +2,31 @@ MOTORLAB SATELLITE SYNC V1
 
 STATUS
 Mandatory MotorLab synchronization capability.
-Established: 2026-09-29.
 Central authority: Br174/Chatgpt.
 
 PURPOSE
-Each registered project keeps a verified local MotorLab satellite while Br174/Chatgpt remains the single authoritative MotorLab source.
+Keep one verified local MotorLab satellite in each registered project while Br174/Chatgpt remains authoritative, with safe release adoption and no silent loss of newer CORE gates.
 
 BOOT
 1. Read project MOTORLAB_PROJECT_HOOK.txt.
-2. Read .motorlab/MOTORLAB_SYNC_STATE.txt.
-3. Read .motorlab/MOTORLAB_LOCAL_CORE.txt.
-4. Verified local core is immediately available as fallback.
-5. When central is reachable, read MOTORLAB_RELEASE_MANIFEST_V1.txt and compare local/central releases.
-6. Resolve the project-specific Project Continuity ledger pointer and reconcile current state before choosing a work starting point.
-7. Load Root Cause Closure, live-event classification and hard numeric-progress visibility requirements for r11+.
+2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
+3. Verified local core is immediately available as fallback.
+4. When central is reachable, read MOTORLAB_RELEASE_MANIFEST_V1.txt and compare local/central releases.
+5. Reconcile project Project Continuity/live state before selecting a safe update boundary.
+6. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History/selective restore, and r14 Pre-Change Approval + user-confirmed Registro Modifiche e Ripristini.
 
 SAFE UPDATE
-- pin a MotorLab release for the whole active operation;
-- never update during active write/build/test/promotion/release;
-- update only at a safe boundary;
-- preserve current verified local bundle as LAST_GOOD before adopting newer bundle;
+- pin one MotorLab release during an active write/build/test/promotion;
+- adopt newer release only at a verified safe boundary;
+- preserve current verified bundle as LAST_GOOD;
 - fetch MOTORLAB_SATELLITE_BUNDLE_V1.txt;
-- validate release id and required markers;
+- validate release id and all required markers;
 - replace only MotorLab control-plane files;
-- when the commit changes only MotorLab control-plane metadata and the provider supports safe CI suppression, use the provider's skip-CI mechanism so the synchronization itself does not launch unrelated app builds/tests/releases;
-- do not use CI suppression if the same commit contains app/source/config changes that legitimately require validation;
-- update sync state;
-- re-read local files and verify before declaring success.
+- metadata-only synchronization uses safe CI suppression/path filters where supported;
+- never suppress validation when real app/source/config changes are in the same commit;
+- update sync state and project hook as needed;
+- re-read/verify local files before declaring adoption complete;
+- update central continuity/integration state so local adoption cannot remain silently stale.
 
 REQUIRED BUNDLE MARKERS
 MOTORLAB_SATELLITE_BUNDLE
@@ -37,89 +35,54 @@ CENTRAL_AUTHORITY=Br174/Chatgpt
 PROJECT_NATIVE_ENGINE_POLICY=coexist-preserve
 PRE_RESPONSE_BOOT_GATE=required
 PROJECT_CONTINUITY=required
-LABELED_VISUAL_STATUS=required
-EXTENDED_VISUAL_STATUS=required
-HIGH_PRESENCE_NUMERIC_PROGRESS=required
-HARD_PROGRESS_VISIBILITY=required
 ROOT_CAUSE_CLOSURE=required
-LIVE_EVENT_CLASSIFICATION=required
 CONTROL_PLANE_CI_SUPPRESSION=required
 CHANGE_COMPATIBILITY_GUARD=required
 WATCHDOG=required
-PREVENTIVE_WATCHDOG=required
-MANUAL_LIGHTNING_RECOVERY=required
-MANUAL_LIGHTNING_SAVE_THEN_RESUME=required
-MONOTONIC_RECOVERY_FLOOR=required
-TWO_STRIKE_NO_PROGRESS=required
 RESUME_RECOVERY=required
 FOREGROUND_STALL_GUARD=required
 PROGRESS_REPORTING=required
 VISUAL_STATUS=required
 SINGLE_WRITER=required
 CHECKPOINT_RECOVERY=required
+FAST_ITERATION_NO_SPIN=required
+RISK_SCALED_LAB_ITERATION=required
+CHANGE_HISTORY_REGISTRY=required
+SEMANTIC_CHANGE_LOOKUP=required
+SELECTIVE_EXACT_RESTORE=required
+HISTORICAL_BACKFILL_ON_DEMAND=required
+PRE_CHANGE_APPROVAL_GATE=required
+USER_CONFIRMED_RESTORE_REGISTER=required
+SIMPLE_STABLE_RESTORE_NUMBERS=required
+MULTI_CHANGE_ITEM_CONFIRMATION=required
 
-R4+ CHANGE COMPATIBILITY
-CHANGE_COMPATIBILITY_GUARD=required
+R12+ FAST ITERATION / NO-SPIN
+Eligible LOW/MEDIUM isolated LAB iteration may use risk-scaled checks. HIGH-risk and CANDIDATA/MADRE retain full gates. Durable executor handoff must not cause indefinite foreground polling.
 
-R5+ CONTINUITY / ANTI-LOOP
-PREVENTIVE_WATCHDOG=required
-MANUAL_LIGHTNING_RECOVERY=required
-TWO_STRIKE_NO_PROGRESS=required
+R13+ TECHNICAL CHANGE HISTORY
+Technical Change History is a Git-backed semantic provenance/search layer. It may auto-capture verified technical records and preserve superseded/backfilled history. It is not the r14 visible confirmed restore list.
 
-R6+ MANUAL SAVE-THEN-RESUME
-MANUAL_LIGHTNING_SAVE_THEN_RESUME=required
+R14+ HARD PRE-CHANGE APPROVAL
+Initial user wording requesting a new modification is intent only. Before first application/project write, perform read-only preparation, show the concise pre-change report, and wait for Bruno approval of that report. Material scope expansion requires amended approval. Resume Recovery may continue already-approved unchanged scope without re-asking.
 
-R7+ MONOTONIC RECOVERY
-MONOTONIC_RECOVERY_FLOOR=required
-Stale lower checkpoints cannot silently lower same-operation verified recovery progress.
-
-R8+ FIRST BOOT + CROSS-CHAT CONTINUITY
-PRE_RESPONSE_BOOT_GATE=required
-PROJECT_CONTINUITY=required
-Recognized project/software-build activation occurs before substantive work and new chats reconcile durable project state with newer live evidence without transfer prompts.
-
-R9+ LABELED VISUAL STATUS
-LABELED_VISUAL_STATUS=required
-Every canonical MotorLab status emoji must carry its readable canonical label; repeated fireworks/lightning counts are not user-facing severity codes; 💯 is final-only.
-
-R10+ EXTENDED VISUAL STATUS / NUMERIC PROGRESS
-EXTENDED_VISUAL_STATUS=required
-HIGH_PRESENCE_NUMERIC_PROGRESS=required
-Preserve additional labeled states 🔍 🧩 🐢 💭 ⏳ 🧪 🔄 and classic `Progresso MotorLab: <N>%` with evidence-based monotonic progress.
-
-R11+ ROOT CAUSE / HARD PROGRESS / EVENT CLASSIFICATION / CI SUPPRESSION
-ROOT_CAUSE_CLOSURE=required
-HARD_PROGRESS_VISIBILITY=required
-LIVE_EVENT_CLASSIFICATION=required
-CONTROL_PLANE_CI_SUPPRESSION=required
-A valid r11+ local fallback must preserve:
-- immediate symptom containment plus evidence-based root-cause investigation for real problems;
-- no definitive ✅ closure from a one-off retry/manual alignment alone;
-- proportional recurrence-surface and prevention/regression checks;
-- stale/missed continuity write-through routed through Root Cause Closure;
-- classification of live events before app lifecycle identity changes;
-- MotorLab-control-plane-only activity not silently becoming a new LAB/MADRE/CANDIDATA;
-- after banner, active substantial work shows an evidence-based numeric percentage before long opaque execution;
-- meaningful statuses carry/repeat current N% when the surface permits;
-- long provider/job phase changes do not go silent merely because N% is unchanged;
-- MotorLab-only metadata sync uses provider-supported CI suppression where safe/available and project workflow path filters should exclude MotorLab-only paths where appropriate.
+R14+ REGISTRO MODIFICHE E RIPRISTINI
+Visible restore slots use plain stable integers 1,2,3... One feature family has one current slot. Only a specific modification Bruno confirms as working and wants conserved may create/update the visible slot. Multi-change batches never auto-register as a whole. Ambiguous subchange identity is confirmed before saving. Failed/unconfirmed attempts stay out. After persistence, MotorLab explicitly reports the number. Pre-r14 technical records are not auto-promoted. "Ripristina N" identifies a target but does not bypass the approval gate.
 
 ROLLBACK
-If newer bundle cannot be verified, keep/restore LAST_GOOD, preserve project and report fallback.
+If a newer bundle cannot be verified, keep/restore LAST_GOOD, preserve project state and report fallback.
 
 CENTRAL UNAVAILABLE
-Use previously VERIFIED local release plus live repository/provider evidence. Do not invent continuity state. Recheck central at a later safe cycle.
-
-NO APP RUNTIME CHANGE
-.motorlab is development/orchestration metadata and must not intentionally alter app code, UI, package identity, signing, native engines or runtime dependencies.
+Use previously VERIFIED local release plus live repository/provider evidence conservatively. Do not invent newer rules as locally installed until synchronization can occur.
 
 FUTURE PROJECTS
-Future MotorLab software projects receive hook + local satellite + central Project Continuity ledger during onboarding and inherit current visual/progress/root-cause/CI-suppression rules.
+Future MotorLab projects receive hook + local satellite + Project Continuity + technical Change History + visible Registro Modifiche e Ripristini during onboarding.
 
 AUTOMATIC MEANING
-Synchronization/continuity writes occur only when an execution cycle with repository access exists. Repository text cannot self-update or wake a frozen host without an executor.
+Synchronization happens only when an execution cycle with repository access exists; repository text cannot self-update or wake a frozen host.
+
+NO APP RUNTIME CHANGE
+.motorlab/control metadata must not intentionally alter app code/UI/package/signing/native engines/runtime dependencies.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.9
-Revision 1.8: r11 requires ROOT_CAUSE_CLOSURE, HARD_PROGRESS_VISIBILITY and LIVE_EVENT_CLASSIFICATION.
-Revision 1.9: r11 also requires CONTROL_PLANE_CI_SUPPRESSION for metadata-only MotorLab synchronization where safely supported.
+MOTORLAB-SATELLITE-SYNC-V1.10
+Revision 1.10: closes the r12/r13 synchronization-marker gap and adds r14 hard approval plus user-confirmed restore-register markers and mandatory central write-through verification.
