@@ -1,0 +1,47 @@
+MOTORLAB CHECKPOINT — MUSICLAB LAB20 AI BRAIN DESIGN
+DATE=2026-09-30
+STATUS=DESIGN_PENDING_USER_APPROVAL
+BASE_REF=mother/musiclab-lab19-final
+BASE_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+RUNTIME_WRITES=NONE
+
+USER_INTENT
+- Preserve the existing MusicLab AI/search engine and expand it; do not replace it.
+- Build a new Cover/Originali/Crediti brain with three pillars: COSA cercare, DOVE cercare, COME cercare.
+- AI is the final editorial judge and may contradict sources; external services provide evidence, never hard vetoes.
+- Prefer wide discovery and later classification over early strict filtering.
+- Cover target: up to about 100 useful results; Originali: dynamic count, all plausible distinct versions by the original artist.
+- Strong multilingual cover discovery, including adapted titles and related/derived works; do not rely on literal title translation.
+- YouTube roles: direct basic title search on title tap; final playback resolver; last-resort discovery/evidence source when other sources are sparse.
+- One progressive cloud archive: reuse and evolve current MusicLab D1; absorb the best Cover-Lab-AI schema concepts.
+- Preserve uncertain candidates rather than delete them; user can listen, approve, reject, or request deeper verification.
+- Add selectable coverage/strictness modes; discovery pool remains broad while display threshold changes.
+- Use parallel specialized search missions, but not 100 simultaneous LLM calls; planner generates many strategies, workers execute bounded parallel waves.
+- Zero-cost runtime constraint: no paid fallback, no credit-card-required dependency for core operation.
+
+EXISTING ASSETS TO PRESERVE
+- MusicLab cloudflare/music-intelligence with D1 works/versions/playback_bindings/artists/albums/research_state/requests_log.
+- Existing CloudMusicDiscovery, GeminiAiCoverDiscovery, OriginalVersionSearchEngine, AiCoverSearchEngine and YouTube resolver behavior.
+- Cover-Lab-AI concepts worth importing: composizioni/versioni, fonti_verifica, affidabilita, stato_verifica, opere_collegate, derivazioni/traduzioni, ricerca progressiva.
+
+PROPOSED MODULES
+1 Identity Engine / Work Signature
+2 Discovery Planner + Coverage Map
+3 Source Router
+4 Candidate/Evidence Archive in D1
+5 AI Judge + confidence/status model
+6 Credit Engine
+7 Language Adaptation Engine
+8 YouTube Title Search / Resolver / Last-resort Discovery
+9 User Review loop
+10 Progressive parallel execution + quota guard
+
+FREE STACK CANDIDATES
+- Cloudflare Workers + D1 (core)
+- Gemini free tier where available/configured
+- Groq Free as optional reviewer/fallback only if usable without billing setup
+- Tavily free 1000 credits/month, no credit card, as deep web-search reserve
+- MusicBrainz / Wikidata / Discogs / Last.fm / Cover.info / SecondHandSongs as modular evidence sources where lawful/available; no single source mandatory.
+
+NEXT_SAFE_STEP
+Present consolidated architecture/design to Bruno. Do NOT create LAB20 or modify product runtime until Bruno explicitly approves the consolidated design. After approval, write the project spec and implementation plan, then create an isolated LAB20 from the canonical MADRE.
