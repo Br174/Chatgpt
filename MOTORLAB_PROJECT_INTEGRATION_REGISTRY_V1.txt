@@ -5,83 +5,77 @@ Canonical registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.09.30-r14
+Release: 2026.09.30-r15
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
+Canonical Root Cause: MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
+Canonical Artifact-First policy: MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
 Canonical technical history: MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
 Canonical pre-change approval: MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
 Canonical visible restore register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
 
-GLOBAL R14 RULES
-- Initial request to modify/correct/add/remove/restore is intent only. Show pre-change report first; write only after Bruno approves that report.
-- Read-only preparation before approval is allowed.
-- Material scope expansion requires amended approval.
-- Technical Change History and Git remain provenance/history.
-- Visible Registro Modifiche e Ripristini contains only specific Bruno-confirmed working modifications he wants conserved.
-- Visible numbers are plain stable integers 1,2,3... One feature family keeps one number.
-- Multi-change LAB/APK work registers only the specific successful item(s) Bruno identifies.
-- Failed/unconfirmed/ambiguous attempts never enter the visible list.
-- Existing pre-r14 technical records are not promoted automatically.
-- Restore by number still requires pre-change report + Bruno approval before write.
+GLOBAL R15 RULES
+- Initial change request is intent only; pre-change report + later Bruno approval precedes first write.
+- When Bruno expects an APK/ZIP/testable artifact for approved defect/regression work, artifact delivery is the default critical path: repair -> risk-appropriate verify -> artifact -> deliver.
+- Safely deferrable causal/prevention work moves to durable POST_ARTIFACT_ROOT_CAUSE_QUEUE and continues afterward in the same logical operation.
+- Root Cause Closure remains mandatory; deferral changes order, never obligation.
+- Non-deferrable high-risk causes remain before artifact delivery when required to trust the artifact.
+- Delivered artifact/ref/checksum remains stable while Bruno tests it; later prevention builds are separate controlled states.
+- Artifact progress may reach 100% while overall MotorLab progress remains below 100% until causal closure.
+- Technical Change History remains provenance/search.
+- Visible Registro Modifiche e Ripristini contains only specific Bruno-confirmed working modifications; one stable plain integer per feature family.
 
 REGISTERED PROJECTS
 1. MusicLab — Br174/MusicLab
    Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_MUSICLAB_V1.txt
-   Visible state: N.1 Player / mini-player fuori dal lettore, confirmed from device-accepted LAB19 CANDIDATA
+   Visible state: N.1 Player / mini-player fuori dal lettore from device-accepted LAB19 CANDIDATA
    Stable CANDIDATA: candidate/musiclab-lab19-player-stable @ 6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-   r14 local control-plane adoption: VERIFIED on uab-build/musiclab-player-direct-collapse-19
-   r14 control-plane head: 97cd0ad605e73c5a895ea08f9ccbbf7e9b29aa2e
-   LAST_GOOD: r13
-   CI verification: zero workflow runs for r14 control-plane head
-   Candidate ref remains unchanged.
+   Local satellite before r15 adoption: r14 VERIFIED on LAB19 control-plane branch
+   r15 local adoption: pending/being verified at safe control-plane boundary
+   Candidate ref must remain unchanged.
 
 2. GeoVision — Br174/GeoVision-Test
    Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_GEOVISION_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_GEOVISION_V1.txt
-   Visible state: empty confirmed-only
-   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r15 local adoption pending live reconcile/safe boundary.
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Project state: MOTORLAB_PROJECT_STATE_STUDYBOOK_AI_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_STUDYBOOK_AI_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_STUDYBOOK_AI_V1.txt
-   Visible state: empty confirmed-only
-   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r15 local adoption pending live reconcile/safe boundary.
 
 4. Visionflix / Verlezza Vision — Br174/Visionflix
    Project state: MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_VISIONFLIX_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_VISIONFLIX_V1.txt
-   Visible state: empty confirmed-only
-   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r15 local adoption pending live reconcile/safe boundary.
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Project state: MOTORLAB_PROJECT_STATE_COVER_LAB_AI_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_COVER_LAB_AI_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_COVER_LAB_AI_V1.txt
-   Visible state: empty confirmed-only
-   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r15 local adoption pending live reconcile/safe boundary.
 
 6. streamflix-BV — Br174/streamflix-BV
    Project state: MOTORLAB_PROJECT_STATE_STREAMFLIX_BV_V1.txt
    Technical registry: MOTORLAB_CHANGE_REGISTRY_STREAMFLIX_BV_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_STREAMFLIX_BV_V1.txt
-   Visible state: empty confirmed-only
-   Local satellite: r11 VERIFIED; r14 local adoption pending live reconcile/safe boundary.
+   Local satellite: r11 VERIFIED; r15 local adoption pending live reconcile/safe boundary.
 
 SAFE ADOPTION RULE
-Never force a release change into active/unknown project work. Projects marked BOOT_RECONCILE_REQUIRED must be live-reconciled before local r14 satellite adoption. Central r14 remains authoritative whenever central access exists.
+Never force release change into active/unknown project work. BOOT_RECONCILE_REQUIRED projects must be live-reconciled before local r15 adoption. Central r15 remains authoritative whenever central access exists.
 
 SYNC CLOSURE
-MOTORLAB_SATELLITE_SYNC_V1.txt is now v1.10 and explicitly includes r12/r13/r14 markers so future release closure reconciles manifest + entrypoint + bundle + sync + continuity/integration.
+MOTORLAB_SATELLITE_SYNC_V1.txt v1.11 requires r15 Artifact-First, dual progress, deferred Root Cause queue and delivered-artifact immutability markers in local bundle verification.
 
 FUTURE PROJECTS
-Every future project receives hook + local satellite + Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherits r14 pre-change approval.
+Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r15 approval, Artifact-First and Root Cause policies.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.6
-Revision 2.6: r14 global pre-change approval + user-confirmed numbered restore registers + MusicLab r14 control-plane adoption.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.7
+Revision 2.7: r15 global Artifact-First delivery with deferred mandatory Root Cause closure and dual progress.
