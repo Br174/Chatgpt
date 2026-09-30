@@ -1,0 +1,133 @@
+MOTORLAB AUTHORITY & DATA OWNERSHIP V1
+
+STATUS
+Mandatory MotorLab CORE contract for multi-service operation.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Prevent split-brain state, conflicting writes, redundant copies and ambiguous authority when MotorLab uses GitHub, Cloudflare D1/KV, PostHog, Notion, GitBook, Superpowers and Context7.
+
+CORE RULE
+Every datum has exactly one authoritative owner. Other services may reference, cache, project or observe that datum, but may not silently become a competing authority.
+
+AUTHORITY MATRIX
+1. MOTORLAB
+Role: orchestration, lifecycle decisions, approval enforcement, routing, recovery and policy.
+Authority: procedural authority.
+MotorLab decides what operation is active, which policy applies and which source is authoritative for each data class.
+
+2. GITHUB
+Role: technical source of truth.
+Owns authoritatively:
+- source code;
+- MotorLab CORE modules and release manifests;
+- project lifecycle refs/branches/tags;
+- commits and immutable code provenance;
+- verified technical registries;
+- visible Registro Modifiche e Ripristini;
+- artifact provenance/checksums when persisted in technical state;
+- stable release/candidate history.
+GitHub must not be used as a high-frequency transient event bus when D1 is available.
+
+3. CLOUDFLARE D1
+Role: persistent operational state.
+Owns authoritatively while available:
+- active operation records;
+- MOTORLAB_OPERATION_ID registry;
+- active approvals and approved scope metadata;
+- checkpoints and resume state;
+- live lock state;
+- active artifact workflow state;
+- deferred Root Cause queue state;
+- transient/recoverable synchronization state;
+- operation/event ledger needed for continuity.
+D1 must never become the sole copy of permanent code, release truth or restore history.
+
+4. CLOUDFLARE KV
+Role: acceleration/cache only.
+May contain:
+- hot status snapshots;
+- cached lookups;
+- derived pointers;
+- short-lived read models;
+- recoverable materialized views.
+KV is NEVER authoritative. Every KV datum must be reconstructible from D1, GitHub or another declared authority.
+
+5. POSTHOG
+Role: runtime evidence and observability.
+Owns observational telemetry only:
+- runtime errors/exceptions;
+- crash/event telemetry;
+- app behavior evidence;
+- diagnostic traces/events within configured limits.
+PostHog may support a Root Cause conclusion but may not change project lifecycle, approval state, source truth or restore slots.
+
+6. NOTION
+Role: human-readable status dashboard.
+Notion is a projection, never an authority.
+It may display current project state, artifact state, root-cause counts, release/candidate pointers and summaries.
+Manual Notion edits must not silently mutate MotorLab technical state unless a future explicit, separately approved command channel is designed.
+
+7. GITBOOK
+Role: architecture/manual documentation.
+GitBook contains stable human-facing explanations of how MotorLab works.
+It is not an operation ledger and not the source of executable policy.
+If GitBook conflicts with GitHub CORE, GitHub CORE wins.
+
+8. SUPERPOWERS
+Role: engineering methodology assistant.
+Superpowers may propose planning, debugging, TDD, review and verification methods.
+It is subordinate to MotorLab lifecycle, approval, Artifact-First, Root Cause, safety and single-writer rules.
+If methodology conflicts with MotorLab policy, MotorLab policy wins.
+
+9. CONTEXT7
+Role: just-in-time external technical documentation.
+Context7 may supply current/versioned library or framework documentation when needed.
+It is advisory evidence only and may not override verified project state or explicit MotorLab policy.
+Use only when it materially reduces uncertainty; do not spend quota on routine known operations.
+
+UNIFIED OPERATION ID
+Every write-capable logical operation should receive one MOTORLAB_OPERATION_ID as early as practical after scope identification.
+Preferred form may include project/date/sequence or another collision-resistant stable identifier.
+The same ID should correlate, where applicable:
+- D1 operation/checkpoint records;
+- GitHub technical history/commit metadata or state ledgers;
+- PostHog diagnostic events;
+- Notion dashboard projection;
+- Root Cause records;
+- artifact metadata.
+Correlation by ID is preferred over copying full records across services.
+
+NO DUAL WRITER
+Only one authoritative writer may mutate one owned datum at a time.
+Single-writer lock remains mandatory for project/source/resource writes.
+Mirrors and projections must consume authoritative state; they may not race to define it.
+
+CONFLICT RESOLUTION ORDER
+When sources disagree:
+1. live immutable repository/ref/artifact evidence for technical facts;
+2. GitHub canonical CORE/technical registry for durable policy/history;
+3. D1 authoritative operational record for current operation state;
+4. PostHog for observed runtime evidence;
+5. KV cache only if consistent with its authority source;
+6. Notion/GitBook projections;
+7. chat memory or stale summaries.
+Newer verified evidence outranks older summaries.
+
+FAIL-SAFE RULE
+No external service other than GitHub technical authority may become a single point of failure.
+If D1/KV/PostHog/Notion/GitBook/Superpowers/Context7 is unavailable, MotorLab must degrade gracefully, preserve work, and continue where safe using GitHub plus verified local/project evidence.
+
+COST RULE
+No integration may silently enable a paid tier, paid overage or billable fallback. Free-first/cost-aware behavior remains mandatory and requires Bruno approval for paid use.
+
+SECURITY
+Never store raw secrets in GitHub, Notion, GitBook, PostHog event properties, diagnostics or user-visible logs.
+Use provider-native secret storage/authorized connections.
+
+SUCCESS CRITERIA
+This contract is satisfied when every important data class has one owner, all mirrors are non-authoritative, operation correlation is explicit, loss of optional services does not corrupt state, and MotorLab remains the sole procedural orchestrator.
+
+VERSION
+MOTORLAB-AUTHORITY-DATA-OWNERSHIP-V1.0
+Established: 2026-09-30
