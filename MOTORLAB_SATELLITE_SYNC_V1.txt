@@ -35,6 +35,8 @@ PROJECT_NATIVE_ENGINE_POLICY=coexist-preserve
 PRE_RESPONSE_BOOT_GATE=required
 PROJECT_CONTINUITY=required
 LABELED_VISUAL_STATUS=required
+EXTENDED_VISUAL_STATUS=required
+HIGH_PRESENCE_NUMERIC_PROGRESS=required
 CHANGE_COMPATIBILITY_GUARD=required
 WATCHDOG=required
 PREVENTIVE_WATCHDOG=required
@@ -71,19 +73,27 @@ Recognized project/software-build activation occurs before substantive work and 
 
 R9+ LABELED VISUAL STATUS
 LABELED_VISUAL_STATUS=required
-A valid r9+ local fallback must preserve the canonical readable legend:
-⚙️ MotorLab attivo
-🎆 Azione completata
-⚡ Risveglio / recupero
-✅ Problema risolto
-👍🏻 Procede tutto bene
-⚠️ Piccolo problema risolvibile
-🧭 Cambiare approccio
-🛑 Stop di sicurezza / blocco reale
-♻️ Una parte va rifatta
-💀 Tutto da rifare
-💯 Conclusione definitiva
-Every MotorLab status emoji must carry its label beside it. Repeated fireworks/lightning counts are not user-facing severity codes. 💯 is reserved for full verified completion.
+Every canonical MotorLab status emoji must carry its readable canonical label; repeated fireworks/lightning counts are not user-facing severity codes; 💯 is final-only.
+
+R10+ EXTENDED VISUAL STATUS / NUMERIC PROGRESS
+EXTENDED_VISUAL_STATUS=required
+HIGH_PRESENCE_NUMERIC_PROGRESS=required
+A valid r10+ local fallback must preserve these additional canonical labeled states:
+🔍 Ricerca soluzione
+🧩 Compatibile
+🐢 Lentezza rilevata
+💭 Elaborazione in corso
+⏳ Attesa esterna
+🧪 Test / verifica in corso
+🔄 Sincronizzazione in corso
+
+It must also preserve:
+- classic `Progresso MotorLab: <N>%` format;
+- high presence of the current verified percentage on meaningful substantial operational statuses once a verified value exists;
+- same-percentage repetition when state changes without new verified progress;
+- no fabricated percentage advancement;
+- distinction between 🐢 slow-but-live, ⏳ legitimate external wait and ⚡ actual recovery/health action;
+- no hidden chain-of-thought disclosure under 💭.
 
 ROLLBACK
 If newer bundle cannot be verified, keep/restore LAST_GOOD, preserve project and report fallback.
@@ -95,11 +105,12 @@ NO APP RUNTIME CHANGE
 .motorlab is development/orchestration metadata and must not intentionally alter app code, UI, package identity, signing, native engines or runtime dependencies.
 
 FUTURE PROJECTS
-Future MotorLab software projects receive hook + local satellite + central Project Continuity ledger during onboarding and inherit the current labeled visual status rule.
+Future MotorLab software projects receive hook + local satellite + central Project Continuity ledger during onboarding and inherit current visual/progress rules.
 
 AUTOMATIC MEANING
 Synchronization/continuity writes occur only when an execution cycle with repository access exists. Repository text cannot self-update or wake a frozen host without an executor.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.6
-Revision 1.6: r9 requires LABELED_VISUAL_STATUS and the permanent readable emoji legend with 💯 reserved for definitive completion.
+MOTORLAB-SATELLITE-SYNC-V1.7
+Revision 1.6: r9 labeled visual status contract.
+Revision 1.7: r10 requires EXTENDED_VISUAL_STATUS and HIGH_PRESENCE_NUMERIC_PROGRESS.
