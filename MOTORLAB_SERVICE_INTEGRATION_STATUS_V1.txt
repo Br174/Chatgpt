@@ -57,8 +57,9 @@ ROLE TARGET: stable architecture/manual projection only.
 6. Superpowers
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 PLUGIN: available in ChatGPT
-CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+CONNECTION: CONNECTED_VERIFIED
 ROLE TARGET: subordinate engineering methodology.
+NOTES: Connection verified in the 2026-09-30 r16 integration session; Superpowers skills are readable/usable through ChatGPT. MotorLab remains procedurally superior.
 
 7. Context7
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
@@ -79,5 +80,6 @@ FAIL-SAFE
 No AVAILABLE_NOT_CONNECTED or DEGRADED optional integration blocks MotorLab core operation.
 
 VERSION
-MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.0
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.1
 Established: 2026-09-30
+Revision 1.1: Superpowers connection verified during r16 integration.
