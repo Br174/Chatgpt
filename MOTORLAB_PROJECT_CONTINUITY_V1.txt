@@ -14,6 +14,7 @@ ROLE / PRECEDENCE
 - Resume Recovery owns continuation/recovery from pending state once loaded.
 - Watchdog owns health/stall/recovery-level decisions.
 - Progress Reporting owns user-visible verified percentages.
+- Root Cause Closure owns causal investigation/closure when expected continuity write-through or reconciliation fails.
 - Live repository/provider/job state is authoritative when newer than the ledger.
 This module must not become a second recovery engine or a replacement for project-native engines.
 
@@ -66,6 +67,29 @@ During MotorLab-controlled work, update the project continuity ledger whenever c
 
 Do not write merely because time passed. Coalesce updates when several adjacent tool results belong to one material transition.
 
+2A. WRITE-THROUGH FAILURE IS A PROBLEM, NOT JUST A STALE FILE - MANDATORY
+If live evidence proves that a continuation-relevant material transition occurred but the ledger did not receive the expected update:
+- reconcile the ledger from the freshest coherent live evidence when safe;
+- classify the missed write-through/reconciliation as a real MotorLab problem;
+- invoke MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt;
+- determine why the update path failed, was skipped, was overwritten, was misclassified or lacked an execution/write surface;
+- correct or contain that causal mechanism when technically possible;
+- verify recurrence protection proportionate to the blast radius.
+
+Manual ledger refresh alone is containment, not complete problem closure.
+Do not emit `✅ Problema risolto` merely because the stale file now matches reality while the reason it became stale remains unaddressed.
+
+2B. LIVE EVENT CLASSIFICATION BEFORE OPERATION CREATION - MANDATORY
+A newer GitHub/provider event does not automatically mean the application lifecycle has advanced.
+Before creating/replacing ACTIVE_OPERATION_ID or changing MADRE/LAB/CANDIDATA identity, classify the live event source:
+- APPLICATION_WORK: app/source/config/build/test/release work that belongs to the user-requested project operation;
+- MOTORLAB_CONTROL_PLANE: hook/.motorlab/continuity/reporting metadata only;
+- EXTERNAL_AUTOMATION: provider/dependency event not itself an approved app lifecycle change;
+- UNKNOWN_NEEDS_RECONCILE.
+
+Control-plane-only commits/workflows may be recorded as operational evidence but MUST NOT silently create a new application LAB/MADRE/CANDIDATA or reset the project progress scale.
+If a control-plane-only change unexpectedly triggers application builds/tests/releases, treat that as a root-cause problem in the triggering workflow/configuration and correct trigger hygiene when safe.
+
 3. TERMINATION FLUSH - MANDATORY
 Before a substantial MotorLab turn ends in COMPLETED, BLOCKED_EXTERNAL, BLOCKED_USER, SAFE_STOP or HANDOFF_COMPLETE, persist the freshest coherent continuation state when technically possible.
 If central persistence is unavailable, preserve the best available local/checkpoint state and mark continuity sync pending for the next safe cycle.
@@ -75,11 +99,13 @@ After MotorLab activation and before unrelated project work, a recognized projec
 A. read its project hook;
 B. load the referenced canonical project continuity ledger;
 C. inspect live repository/ref/head and provider/job/artifact state that can materially supersede the ledger;
-D. compare ledger evidence with live state;
-E. if live state is newer/coherent, update the ledger before proceeding when safe;
-F. reconstruct current operation, phase, verified progress floor, pending verification and next safe step;
-G. if unfinished work exists, route continuation through Resume Recovery/Watchdog rather than restarting from a historical prompt;
-H. only after reconciliation begin unrelated write-capable work.
+D. classify newer live events before treating them as application lifecycle changes;
+E. compare ledger evidence with live state;
+F. if live state is newer/coherent, update the ledger before proceeding when safe;
+G. if an expected prior write-through is missing, invoke Root Cause Closure rather than silently treating refresh as complete;
+H. reconstruct current operation, phase, verified progress floor, pending verification and next safe step;
+I. if unfinished work exists, route continuation through Resume Recovery/Watchdog rather than restarting from a historical prompt;
+J. only after reconciliation begin unrelated write-capable work.
 
 5. AUTHORITY / STALENESS ORDER
 For continuation decisions use this precedence:
@@ -95,14 +121,16 @@ Older registries remain useful history but must not roll a project backward when
 6. SAME-OPERATION IDENTITY
 Preserve ACTIVE_OPERATION_ID across chat boundaries while the logical task remains the same.
 A new chat is not a new operation merely because the conversation id changed.
-Create a new operation id only for a genuinely new approved operation or an explicitly superseding task.
+Create a new operation id only for a genuinely new approved operation, a verified new application-work event, or an explicitly superseding task.
+Control-plane-only activity is not sufficient by itself to create a new app operation.
 
 7. PROGRESS CONTINUITY
 The project continuity ledger carries the latest coherent verified progress evidence into the next chat.
 It must integrate with MOTORLAB_RESUME_RECOVERY_V1.txt and the r7+ MONOTONIC_RECOVERY_FLOOR:
 - a new chat must not reset verified progress to an older value merely because its conversational context is fresh;
 - stale checkpoints/registries cannot override newer coherent ledger/live progress;
-- any material invalidation/regression must be evidenced and visibly explained.
+- any material invalidation/regression must be evidenced and visibly explained;
+- control-plane-only jobs do not reset an already completed application-operation percentage or fabricate a new project percentage without a real new app operation.
 
 8. CHAT PROMPT INDEPENDENCE
 Bruno must not be required to request or paste a handoff prompt when opening a new chat in a recognized project.
@@ -126,7 +154,7 @@ If the central ledger cannot be read:
 - do not invent missing state;
 - do not roll back solely because continuity data is unavailable;
 - report the continuity limitation only if it materially affects safe continuation.
-If the ledger can be read but is stale, live state wins and the ledger must be refreshed at the next safe write.
+If the ledger can be read but is stale, live state wins, the ledger must be refreshed at the next safe write, and an unexpected missed write-through must be routed through Root Cause Closure.
 
 13. PLATFORM BOUNDARY
 This module cannot make a completely context-free host expose a project that the host does not identify, nor can it wake a frozen host with no execution cycle.
@@ -137,12 +165,16 @@ Project Continuity is active when:
 - new recognized project chats load the canonical project ledger automatically;
 - continuation does not depend on a copied prompt;
 - live repo/provider state supersedes stale ledger/history safely;
+- live events are classified before app lifecycle identity changes;
 - the same operation id/progress floor survives chat changes;
 - newest verified modifications and next safe step are available to the next chat;
+- unexpected missed write-through is investigated and fixed at the cause, not merely manually aligned;
+- control-plane-only commits cannot silently create new app lifecycle state;
 - older registries cannot silently move the project backward;
 - project-native engines remain preserved;
 - app source/lifecycle identity is not mutated merely to persist chat continuity.
 
 VERSION
-MOTORLAB-PROJECT-CONTINUITY-V1.0
+MOTORLAB-PROJECT-CONTINUITY-V1.1
 Established: 2026-09-30
+Revision 1.1: r11 adds mandatory root-cause handling for missed write-through and live-event classification so control-plane activity cannot masquerade as application lifecycle progress.
