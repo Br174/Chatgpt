@@ -1,7 +1,7 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=12
+STATE_REVISION=13
 STATE_STATUS=COMPLETED_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
@@ -69,6 +69,15 @@ CORRECTION=uab-project.env UAB_FILE_VERSION advanced to 17 in commit d4554ef990e
 REVERIFICATION=Full second run 36656976169 produced dist/uab/MusicLab-LAB-17-APK.zip, validated it successfully, persisted runtime source and uploaded the final artifact.
 RECURRENCE_PROTECTION=Treat UAB_FILE_VERSION as a required LAB-creation field; final gate verifies the expected versioned archive before delivery.
 
+MANUAL_LIGHTNING_CHECKPOINT_2026_09_30
+- User sent manual lightning after LAB17 verification.
+- Live branch rechecked at 33a74544a97330880e935f42e45610cdaf18ea6c.
+- Verification run 36656976169 rechecked: completed SUCCESS; all material steps including tests, UAB build, output verification, persistence and artifact upload succeeded.
+- Artifact 11073137042 rechecked present and unexpired.
+- Temporary LAB17 verification workflow rechecked absent from final branch (404 as expected).
+- RECOVERY_FLOOR_PERCENT remains 100; no completed work was restarted.
+- NEXT_SAFE_STEP remains device installation/acceptance by Bruno; no app write is required until feedback.
+
 UPSTREAM_GUARDIAN_STATE_PRESERVED
 - permanent Meld Guardian remains inherited from LAB15 through LAB16 into LAB17
 - Meld accepted baseline remains v0.9.2 commit dc7a27224acee33fa475ab70e1935dc03d3ef4ef
@@ -92,5 +101,5 @@ CONTINUITY_RULES
 - CANDIDATA -> MADRE requires explicit Bruno approval.
 - Do not require Bruno to paste activation or transfer prompts.
 
-UPDATED_BY=MotorLab r11 LAB17 completion + artifact delivery verification
+UPDATED_BY=MotorLab r11 LAB17 completion + manual lightning checkpoint
 UPDATED_DATE=2026-09-30
