@@ -7,6 +7,10 @@ function sign(secret, timestamp, body) {
   return createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
 }
 
+function signGitHub(secret, body) {
+  return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
+}
+
 class MockStatement {
   constructor(db, sql) { this.db = db; this.sql = sql; this.args = []; }
   bind(...args) { this.args = args; return this; }
@@ -17,8 +21,9 @@ class MockStatement {
   }
 }
 class MockDB {
-  constructor() { this.batches = []; this.firstCalls = []; this.existingSnapshot = null; }
+  constructor() { this.batches = []; this.firstCalls = []; this.execCalls = []; this.existingSnapshot = null; }
   prepare(sql) { return new MockStatement(this, sql); }
+  async exec(sql) { this.execCalls.push(sql); return { count: 1, duration: 0 }; }
   async batch(statements) {
     this.batches.push(statements.map(s => ({ sql: s.sql, args: s.args })));
     return statements.map(() => ({ success: true }));
@@ -124,4 +129,32 @@ test('verify endpoint returns only hash/version/time and not operational payload
   const result = await response.json();
   assert.deepEqual(result, { snapshot_id: 'snap-001', payload_hash: 'hash123', schema_version: 1, received_at: '2026-09-30T16:30:01.000Z' });
   assert.equal('payload' in result, false);
+});
+
+test('github webhook rejects unsigned push events', async () => {
+  const payload = JSON.stringify({ ref: 'refs/heads/motorlab/cloudflare-state-r16', repository: { full_name: 'Br174/Chatgpt' }, head_commit: { message: 'no snapshot' } });
+  const env = { DB: new MockDB(), CACHE: new MockKV(), GITHUB_WEBHOOK_SECRET: 'secret', ALLOWED_REPOSITORY: 'Br174/Chatgpt', ALLOWED_REFS: 'refs/heads/main,refs/heads/motorlab/cloudflare-state-r16' };
+  const response = await worker.fetch(new Request('https://example.test/github-webhook', { method: 'POST', body: payload, headers: { 'x-github-event': 'push' } }), env);
+  assert.equal(response.status, 401);
+  assert.equal(env.DB.batches.length, 0);
+});
+
+test('github webhook accepts signed MotorLab snapshot and bootstraps D1 schema', async () => {
+  const encoded = Buffer.from(JSON.stringify(snapshot)).toString('base64url');
+  const payload = JSON.stringify({
+    ref: 'refs/heads/motorlab/cloudflare-state-r16',
+    repository: { full_name: 'Br174/Chatgpt' },
+    head_commit: { message: `MotorLab checkpoint\n\nMOTORLAB_SNAPSHOT_B64:${encoded}` }
+  });
+  const env = { DB: new MockDB(), CACHE: new MockKV(), GITHUB_WEBHOOK_SECRET: 'secret', ALLOWED_REPOSITORY: 'Br174/Chatgpt', ALLOWED_REFS: 'refs/heads/main,refs/heads/motorlab/cloudflare-state-r16' };
+  const response = await worker.fetch(new Request('https://example.test/github-webhook', {
+    method: 'POST', body: payload,
+    headers: { 'x-github-event': 'push', 'x-hub-signature-256': signGitHub('secret', payload) }
+  }), env);
+  assert.equal(response.status, 200);
+  const result = await response.json();
+  assert.equal(result.snapshot_id, 'snap-001');
+  assert.equal(env.DB.execCalls.length, 1);
+  assert.equal(env.DB.batches.length, 1);
+  assert.ok(env.CACHE.items.has('project:motorlab:current'));
 });
