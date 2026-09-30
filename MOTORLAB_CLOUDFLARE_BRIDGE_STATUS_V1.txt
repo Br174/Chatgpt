@@ -1,0 +1,49 @@
+MOTORLAB CLOUDFLARE BRIDGE STATUS V1
+
+STATUS
+LAB_IMPLEMENTED_ACTIVATION_PENDING
+
+BRANCH
+motorlab/cloudflare-state-r16
+
+DEDICATED RESOURCES (target)
+- Worker: motorlab-state-bridge
+- D1: motorlab-operational-state-db
+- KV: motorlab-operational-cache
+- Existing project Cloudflare resources MUST NOT be reused or modified.
+
+PRIMARY TRANSPORT
+A single private GitHub issue in Br174/Chatgpt is used only as a low-frequency outbox for material MotorLab state transitions. GitHub webhook delivery is HMAC-signed. The issue is transport, not authority.
+
+AUTHORITY
+- GitHub repository: technical truth.
+- D1: live operational state after activation.
+- KV: cache only.
+
+CURRENT IMPLEMENTATION
+- bounded snapshot validator
+- D1 schema for projects, operations, approvals, checkpoints, locks, artifacts, root causes and material events
+- idempotent snapshot ledger
+- best-effort KV cache
+- public non-sensitive health/verification endpoints
+- signed direct relay fallback
+- signed GitHub webhook endpoint
+- automatic D1 schema bootstrap
+- no GitHub Actions dependency
+
+ACTIVATION STILL REQUIRED
+1. Create dedicated D1 and KV in Bruno's existing Cloudflare account.
+2. Deploy Worker with those dedicated bindings.
+3. Configure GITHUB_WEBHOOK_SECRET in Cloudflare.
+4. Create/configure repository webhook in Br174/Chatgpt pointing to /github-webhook and subscribe to Issues events.
+5. Set the dedicated relay issue number in Worker configuration.
+6. Send one bootstrap snapshot and verify D1 + KV + /verify response.
+
+COST RULE
+Free-first. No automatic paid tier, overage or card addition.
+
+SECURITY
+No raw tokens/secrets in D1, KV, GitHub issue body, Notion, GitBook or logs.
+
+PROMOTION
+Do not merge/promote this LAB or mark Cloudflare CONNECTED_VERIFIED until the real remote resources and end-to-end relay have been verified.
