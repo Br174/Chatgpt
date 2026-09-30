@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.30-r15
+CURRENT_RELEASE=2026.09.30-r16
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -16,6 +16,10 @@ FAST_ITERATION_NO_SPIN_MODULE=MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
 CHANGE_HISTORY_REGISTRY_MODULE=MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
 PRE_CHANGE_APPROVAL_GATE_MODULE=MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
 MODIFICATION_RESTORE_REGISTER_MODULE=MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
+AUTHORITY_DATA_OWNERSHIP_MODULE=MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
+PERSISTENT_OPERATIONAL_STATE_MODULE=MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
+OBSERVABILITY_DIAGNOSTICS_MODULE=MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
+KNOWLEDGE_TOOL_ROUTING_MODULE=MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 
 CURRENT REQUIRED CORE MODULES
 - MOTORLAB_CORE_ENTRYPOINT_V1.txt
@@ -40,6 +44,10 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
 - MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
 - MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt
+- MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
+- MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
+- MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
+- MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 - MOTORLAB_SATELLITE_SYNC_V1.txt
 - MOTORLAB_SATELLITE_BUNDLE_V1.txt
 
@@ -76,13 +84,28 @@ When Bruno requests an APK/ZIP/testable artifact for an approved defect/regressi
 - `Artefatto: 100%` may coexist with `Progresso MotorLab complessivo: <100%` until causal closure is complete;
 - `✅ Problema risolto` and `💯 Conclusione definitiva` remain unavailable while mandatory causal work is pending.
 
+R16+ MULTI-SERVICE AUTHORITY + PERSISTENT STATE
+MotorLab r16 adds a non-conflicting service architecture:
+- GitHub = durable technical authority;
+- Cloudflare D1 = persistent live operational state target;
+- Cloudflare KV = reconstructible cache only;
+- PostHog = runtime observability/evidence only;
+- Notion = human-readable status projection only;
+- GitBook = stable architecture/manual projection only;
+- Superpowers = subordinate engineering-method layer;
+- Context7 = on-demand version-aware documentation.
+Every logical operation should use one MOTORLAB_OPERATION_ID for cross-service correlation.
+No optional service may become a single point of failure or silently enable paid usage.
+Actual provider/plugin connection is capability-gated and must not be claimed until verified.
+Existing project instrumentation/adoption occurs only at safe approved boundaries.
+
 CURRENT/FUTURE PROJECT RULE
-All current/future MotorLab software projects inherit r15 Artifact-First ordering in addition to existing approval, lifecycle, restore, Root Cause, progress and safety rules.
+All current/future MotorLab software projects inherit r16 authority/data-ownership, persistent-state/fallback, observability and knowledge-routing rules in addition to existing approval, lifecycle, restore, Root Cause, Artifact-First, progress and safety rules.
 
 NO RUNTIME REGRESSION
 MotorLab control-plane metadata alone must not alter application runtime/UI/package/signing/lifecycle/native engines.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.15
+MOTORLAB-RELEASE-MANIFEST-V1.16
 Established: 2026-09-29
-Revision 1.15: r15 adds Artifact-First delivery, deferred Root Cause queue, delivered-artifact immutability and dual artifact/overall progress.
+Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics and non-redundant knowledge/plugin routing while preserving all r15 gates.
