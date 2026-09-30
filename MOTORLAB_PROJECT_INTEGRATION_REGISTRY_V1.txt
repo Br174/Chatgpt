@@ -17,20 +17,24 @@ GLOBAL PRINCIPLES
 - Project-native/domain engines remain preserved.
 - Change Compatibility Guard is mandatory before writes.
 - LABELED_VISUAL_STATUS is global/permanent: every MotorLab status emoji carries its canonical readable label.
+- EXTENDED_VISUAL_STATUS and HIGH_PRESENCE_NUMERIC_PROGRESS are global/permanent from r10 onward.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.09.30-r9
+Release: 2026.09.30-r10
 Schema: 1
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
 Canonical continuity module: MOTORLAB_PROJECT_CONTINUITY_V1.txt
-Canonical r9 local-core blob: 457a0ed2ed4282fbfb0b1f57b581c895398421fe
-Canonical r8 LAST_GOOD blob: a97bc4468df7d9dc4bb12856a33042a9a3e78d8a
+Canonical r10 local-core blob: acb0cfd99e2276a3b80f0a7301d9e9c8ad7ff1f8
+Canonical r9 rollback blob: 457a0ed2ed4282fbfb0b1f57b581c895398421fe
+Canonical r8 rollback blob: a97bc4468df7d9dc4bb12856a33042a9a3e78d8a
 Normal startup banner: ⚙️ MotorLab attivo
 PRE_RESPONSE_BOOT_GATE=required
 PROJECT_CONTINUITY=required
 LABELED_VISUAL_STATUS=required
+EXTENDED_VISUAL_STATUS=required
+HIGH_PRESENCE_NUMERIC_PROGRESS=required
 MANUAL_LIGHTNING_SAVE_THEN_RESUME=required
 MONOTONIC_RECOVERY_FLOOR=required
 
@@ -46,63 +50,73 @@ CANONICAL VISUAL LEGEND
 ♻️ Una parte va rifatta
 💀 Tutto da rifare
 💯 Conclusione definitiva
+🔍 Ricerca soluzione
+🧩 Compatibile
+🐢 Lentezza rilevata
+💭 Elaborazione in corso
+⏳ Attesa esterna
+🧪 Test / verifica in corso
+🔄 Sincronizzazione in corso
 
-VISUAL RULES
-- canonical status emoji are always accompanied by their label;
+VISUAL / PROGRESS RULES
+- every canonical status emoji is accompanied by its label;
 - preferred form is `<emoji> <label> — <context>`;
 - repeated fireworks/lightning are not user-facing level codes;
-- 🎆 is an action/phase completion;
-- 💯 is only true full verified closure;
-- internal technical levels remain internal and do not redefine the legend.
+- 🎆 is an action/phase completion; 💯 is only true full verified closure;
+- 🔍 is solution search, 🧩 is verified compatibility, 🐢 is slow-but-live, 💭 is high-level task analysis, ⏳ is legitimate external waiting, 🧪 is test/verification in progress, 🔄 is synchronization in progress;
+- classic percentage remains `Progresso MotorLab: <N>%`;
+- once a verified percentage exists in a substantial operation, meaningful operational statuses normally include the current N% even when unchanged;
+- percentages remain evidence-based and monotonic and are never invented for visibility;
+- 💭 never exposes or implies private chain-of-thought.
 
-REGISTERED PROJECTS
+REGISTERED PROJECTS — R10 VERIFIED
 1. MusicLab — Br174/MusicLab
    Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt
-   Local release: 2026.09.30-r9 VERIFIED
-   LAST_GOOD: 2026.09.30-r8
+   Local release: 2026.09.30-r10 VERIFIED
+   LAST_GOOD: 2026.09.30-r9
    Native engine: coexist/preserve
 
 2. GeoVision — Br174/GeoVision-Test
    Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
-   Local release last verified: 2026.09.30-r8
-   r9 adoption: next safe reconciled boundary
+   Local release: 2026.09.30-r10 VERIFIED
+   LAST_GOOD: 2026.09.30-r8
    Native engine: coexist/preserve
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Project state: MOTORLAB_PROJECT_STATE_STUDYBOOK_AI_V1.txt
-   Local release last verified: 2026.09.30-r8
-   r9 adoption: next safe reconciled boundary
+   Local release: 2026.09.30-r10 VERIFIED
+   LAST_GOOD: 2026.09.30-r8
    Native engine: coexist/preserve
 
 4. Visionflix / Verlezza Vision source — Br174/Visionflix
    Project state: MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt
-   Local release last verified: 2026.09.30-r8
-   r9 adoption: next safe reconciled boundary
+   Local release: 2026.09.30-r10 VERIFIED
+   LAST_GOOD: 2026.09.30-r8
    Native engine: coexist/preserve
    Lifecycle authority: Visionflix source
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Project state: MOTORLAB_PROJECT_STATE_COVER_LAB_AI_V1.txt
-   Local release last verified: 2026.09.30-r8
-   r9 adoption: next safe reconciled boundary
+   Local release: 2026.09.30-r10 VERIFIED
+   LAST_GOOD: 2026.09.30-r8
    Native engine: Cover Lab engine coexist/preserve
 
 6. streamflix-BV delivery adapter — Br174/streamflix-BV
    Project state: MOTORLAB_PROJECT_STATE_STREAMFLIX_BV_V1.txt
-   Local release last verified: 2026.09.30-r8
-   r9 adoption: next safe reconciled boundary
+   Local release: 2026.09.30-r10 VERIFIED
+   LAST_GOOD: 2026.09.30-r8
    Native engine: delivery-adapter-coexist-preserve
    Lifecycle authority: NO; Visionflix source remains authority
 
 SAFE ADOPTION RULE
-Do not force a satellite release change into a project whose current operation state has not yet been reconciled or that is actively writing/building/testing/promoting. The central r9 rule is authoritative immediately; local satellite adoption occurs at the first safe boundary under MOTORLAB_SATELLITE_SYNC_V1.txt.
+Never force a future satellite release change into an active write/build/test/promotion operation. Pin the operation release and adopt a newer release only at a safe boundary under MOTORLAB_SATELLITE_SYNC_V1.txt.
 
 FUTURE PROJECTS
-Every future concrete software project receives hook + local satellite + central continuity ledger and inherits the current labeled visual legend automatically.
+Every future concrete software project receives hook + local satellite + central continuity ledger and inherits the current labeled visual legend plus high-presence numeric progress automatically.
 
 HOST LIMITATION
-Repository configuration cannot wake a host with no execution cycle. Once a supported project/software-build signal is exposed, MotorLab boot, continuity reconciliation and the visual-status contract are mandatory.
+Repository configuration cannot wake a host with no execution cycle. Once a supported project/software-build signal is exposed, MotorLab boot, continuity reconciliation, visual status and progress contracts are mandatory.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.1
-Revision 2.1: r9 permanent labeled visual legend registered globally; MusicLab synchronized immediately at safe boundary and other satellites adopt at their next safe reconciled boundary.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.2
+Revision 2.2: r10 extends the permanent visual legend with solution/compatibility/latency/analysis/wait/test/sync states, makes classic numeric progress highly present, and records all six registered satellites as r10 VERIFIED.
