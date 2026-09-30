@@ -1,0 +1,9 @@
+MOTORLAB MODIFICATION + RESTORE REGISTER - GeoVision
+PROJECT=GeoVision
+REPOSITORY=Br174/GeoVision-Test
+REGISTER_STATUS=ACTIVE_CONFIRMED_ONLY
+DISPLAY_NAME=Registro Modifiche e Ripristini
+NEXT_RESTORE_NO=1
+VISIBLE_SLOTS=0
+RULE=Only Bruno-confirmed working modifications explicitly approved for conservation enter this register. Technical history remains in Git/MOTORLAB_CHANGE_REGISTRY_GEOVISION_V1.txt. Existing pre-r14 technical records are not promoted automatically.
+VERSION=MOTORLAB-GEOVISION-MODIFICATION-RESTORE-REGISTER-V1.0
