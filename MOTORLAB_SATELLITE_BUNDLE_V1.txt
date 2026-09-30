@@ -46,6 +46,7 @@ GITBOOK_MANUAL_PROJECTION_ONLY=required
 SUPERPOWERS_SUBORDINATE=required
 CONTEXT7_ON_DEMAND=required
 FREE_FIRST_PLUGIN_ROUTING=required
+SERVICE_INTEGRATION_STATUS=required
 
 LOCAL FALLBACK CONTRACT
 - First user-visible line: ⚙️ MotorLab attivo
@@ -73,6 +74,7 @@ R16 AUTHORITY / PERSISTENT STATE
 - One MOTORLAB_OPERATION_ID correlates one logical operation across checkpoints, artifacts, diagnostics and projections.
 - Optional service loss must not make MotorLab unusable.
 - Never claim provider/plugin integration is live until the connection/resources are verified.
+- MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt tracks CORE_READY vs real connection/resource/project adoption.
 
 R16 OBSERVABILITY / KNOWLEDGE ROUTING
 - PostHog supplies runtime evidence only; it cannot authorize changes or lifecycle decisions.
@@ -108,4 +110,4 @@ This bundle is orchestration metadata only and must not intentionally alter app 
 
 VERSION
 MOTORLAB-SATELLITE-BUNDLE-V2.6
-Revision 2.6: r16 adds authority/data ownership, persistent operational state, MOTORLAB_OPERATION_ID, observability boundaries and non-redundant auxiliary-tool routing.
+Revision 2.6: r16 adds authority/data ownership, persistent operational state, MOTORLAB_OPERATION_ID, observability boundaries, service connection-status tracking and non-redundant auxiliary-tool routing.
