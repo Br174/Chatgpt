@@ -1,71 +1,79 @@
 MOTORLAB CORE ENTRYPOINT V1 - CENTRAL + LOCAL SATELLITE BOOT
 
 STATUS
-Canonical MotorLab entrypoint for registered software projects and future project onboarding.
+Canonical MotorLab entrypoint for registered software projects and future onboarding.
 Central authority: Br174/Chatgpt.
 
 PURPOSE
-Start MotorLab first, reconcile verified current state, preserve project-native engines/lifecycle, prevent unapproved writes, keep progress visible, close root causes, accelerate safe LAB work, and provide both technical change history and a simple Bruno-confirmed restore register.
+Start MotorLab first, reconcile verified current state, prevent unapproved writes, accelerate safe artifact delivery, preserve mandatory causal closure, keep progress visible, preserve project-native engines/lifecycle, and provide both technical change history and a Bruno-confirmed restore register.
 
 REGISTERED PROJECT BOOT ORDER - MANDATORY
-0. PRE-RESPONSE GATE: when registered project context is identifiable, emit "⚙️ MotorLab attivo" as the first user-visible line before substantive work.
+0. Emit `⚙️ MotorLab attivo` before substantive work when project context is identifiable.
 1. Read MOTORLAB_PROJECT_HOOK.txt.
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
-3. If local state is VERIFIED, MotorLab is immediately available from local satellite.
-4. When central access is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
-5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt and MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt.
-6. Read project Project Continuity ledger.
-7. Read project technical Change History registry when present.
-8. Read project visible Registro Modifiche e Ripristini when present.
-9. Reconcile continuity with newer live repo/ref/head/provider/job/artifact evidence; reconstruct active operation/progress/lock/next safe step.
-10. If substantial work is active, show evidence-based `Progresso MotorLab: <N>%` before long opaque execution.
-11. If unfinished already-approved work exists, Resume Recovery + Watchdog continue that same scope before unrelated writes.
-12. If a real anomaly/missed write-through exists, apply Root Cause Closure.
-13. Preserve project-native/domain engine authority and application lifecycle identity.
-14. For EVERY NEW write-capable application/project modification request, apply the hard pre-change approval gate before first write: initial mutation wording is intent only; perform read-only preparation, present the concise pre-change report, then wait for Bruno approval of that report.
-15. After valid approval, apply Change Compatibility Guard before writing and hold single-writer safety.
-16. Apply Foreground Stall Guard and Fast Iteration/No-Spin where eligible.
-17. Execute only the approved scope; material scope expansion requires an amended pre-change report and new approval before broadened writes.
-18. Update technical Change History at appropriate verified boundaries when technically possible.
-19. Update the visible Registro Modifiche e Ripristini ONLY when Bruno identifies the specific working modification and wants it conserved; never infer visible save from automated verification.
-20. Refresh Project Continuity at continuation-relevant material transitions.
+3. Use VERIFIED local core immediately as fallback.
+4. When central is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
+5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt and MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt.
+6. Read Project Continuity ledger.
+7. Read technical Change History registry when present.
+8. Read visible Registro Modifiche e Ripristini when present.
+9. Reconcile live repo/ref/head/provider/job/artifact evidence and reconstruct operation/progress/lock/next step.
+10. If substantial work is active, show verified numeric progress before long opaque work.
+11. Resume unfinished already-approved scope through Resume Recovery + Watchdog before unrelated writes.
+12. Preserve project-native/domain engine authority and lifecycle identity.
+13. For EVERY NEW write-capable application/project modification request, apply hard pre-change approval: initial mutation wording is intent only; perform read-only preparation, present the pre-change report, then wait for Bruno approval.
+14. After approval apply Change Compatibility Guard and single-writer safety.
+15. For defect/regression operations that request APK/ZIP/testable artifacts, apply Artifact-First ordering: repair/contain + risk-appropriate verification + artifact delivery first when safe; defer eligible causal/prevention work into POST_ARTIFACT_ROOT_CAUSE_QUEUE.
+16. Non-deferrable high-risk causes remain on the artifact critical path.
+17. Apply Foreground Stall Guard and Fast Iteration/No-Spin where eligible.
+18. Execute only approved scope; material expansion requires amended report/approval before broadened writes.
+19. Update technical Change History at verified boundaries when appropriate.
+20. Update visible Registro Modifiche e Ripristini ONLY when Bruno identifies a specific working modification and wants it conserved.
+21. Refresh Project Continuity at material transitions, including artifact-delivered/cause-pending states.
 
 HARD PRE-CHANGE APPROVAL - R14+
-A phrase such as "modifica", "correggi", "aggiungi", "togli", "sistema" or "ripristina" does not authorize the first write, even if the initial request also says "procedi". MotorLab must first explain the intended modification. Only approval after that explanation starts writing. Read-only analysis may occur beforehand. Approval continuity applies only inside that described scope.
+A phrase such as modifica/correggi/aggiungi/togli/sistema/ripristina does not authorize the first write. Read-only preparation is allowed. Only approval after the pre-change report authorizes writing. Approval continuity applies only inside the described scope.
 
-MULTI-CHANGE RULE
-When several modifications are requested together, separate them clearly in the pre-change report. They may be implemented under one later approval, but their success/registration remains independent. A LAB/APK containing many attempts does not become one approved restore entry automatically.
-
-VISIBLE REGISTRO MODIFICHE E RIPRISTINI - R14+
-Default visible register queries show only current Bruno-confirmed restore slots using simple stable integers 1,2,3... One logical feature family has one current number. A newer confirmed working implementation updates the same visible number; old provenance remains in Git/technical history. If Bruno's successful-item description is ambiguous, reflect the likely subchange and wait for confirmation before saving. After persistence, explicitly state the number saved/updated.
-
-RESTORE BY NUMBER
-For "ripristina N": resolve N read-only against the visible project register, verify immutable provenance/current compatibility, present the restore plan, wait for Bruno approval, then perform selective restore into the proper isolated LAB unless Bruno explicitly requests whole-version rollback. A restore attempt does not update the visible slot until Bruno confirms the result works and wants it conserved.
-
-TECHNICAL CHANGE HISTORY - R13+
-Technical Change History remains distinct from the visible register. It may contain older/superseded/backfilled/automatically verified records for provenance and diagnosis. It never becomes the visible confirmed restore list automatically.
-
-CROSS-CHAT CONTINUITY
-A new chat is not a new project state. Current-state authority order: explicit current Bruno instruction; newer live evidence; Project Continuity; current checkpoint/pending ledger; older registries; memory/copied summaries. Technical history and visible restore register identify historical/restore targets but do not override newer current application state.
+ARTIFACT-FIRST ROOT CAUSE - R15+
+When Bruno expects an APK/ZIP/testable artifact:
+- default critical path is REPAIR -> VERIFY -> ARTIFACT -> DELIVER;
+- safely deferrable causal/prevention work follows afterward as the same logical operation;
+- cause work is never abandoned;
+- high-risk/non-deferrable causes stay before delivery when needed to trust the artifact;
+- a delivered artifact/ref/checksum is preserved unchanged while Bruno tests it;
+- prevention requiring new source changes occurs in a follow-up controlled LAB/ref;
+- `Artefatto: 100%` may coexist with `Progresso MotorLab complessivo: <100%` while causal items remain.
 
 ROOT CAUSE CLOSURE
-When a concrete problem is discovered: contain/repair, determine why, correct/contain the causal mechanism, inspect recurrence surfaces, and add proportionate prevention before definitive closure.
+Definitive problem closure still requires evidence-based cause handling and proportionate prevention/fallback. Symptom-only repair or artifact delivery is not `✅ Problema risolto`.
+
+MULTI-DEFECT RULE
+Several defects encountered on the way to one requested artifact do not require serial full causal archaeology before packaging when those investigations are safely deferrable. Persist each deferred item in POST_ARTIFACT_ROOT_CAUSE_QUEUE with repair/evidence/artifact/next-step provenance.
 
 FAST ITERATION / NO-SPIN
-Eligible LOW/MEDIUM isolated LAB correction/restoration loops use risk-scaled verification. HIGH-risk and CANDIDATA/MADRE retain full gates. Persistent executor handoff is checkpointed; foreground chat must not poll indefinitely.
+Eligible LOW/MEDIUM LAB corrections use risk-scaled verification and rapid artifact generation. HIGH-risk and CANDIDATA/MADRE retain full gates. Durable executor handoff is checkpointed and must not cause indefinite foreground polling.
+
+VISIBLE REGISTRO MODIFICHE E RIPRISTINI - R14+
+Visible slots contain only Bruno-confirmed working modifications using stable plain integers 1,2,3... One feature family keeps one current number. Failed/unconfirmed attempts stay out.
+
+RESTORE BY NUMBER
+Resolve N read-only, verify provenance/current compatibility, present restore plan, await Bruno approval, then selectively restore into proper LAB unless whole-version rollback is explicitly requested.
+
+CROSS-CHAT CONTINUITY
+A new chat is not a new project state. Live newer evidence and Project Continuity outrank old registries/memory. Persist artifact-delivered/cause-pending states so later cycles continue the same causal queue instead of restarting.
 
 SAFE VERSION PINNING
-The MotorLab release used by an active operation is pinned until valid terminal/safe boundary. A newer release is adopted only at the next safe boundary.
+The MotorLab release used by active work is pinned until a safe boundary; adopt newer releases only at verified safe boundaries.
 
 FUTURE PROJECTS
-New concrete software project onboarding installs hook + local satellite + sync state + central Project Continuity + central technical Change History + central visible Registro Modifiche e Ripristini. Future projects inherit Root Cause Closure, numeric progress, Fast Iteration/No-Spin, hard pre-change approval and numbered user-confirmed restore points.
+New projects receive hook + local satellite + sync state + central Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherit Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin and hard pre-change approval.
 
 NO RUNTIME REGRESSION
-MotorLab metadata alone does not authorize application runtime/UI/package/signing/native-engine changes.
+MotorLab metadata/policies do not authorize application runtime/UI/package/signing/native-engine changes outside approved scope.
 
 PLATFORM BOUNDARY
-MotorLab cannot wake a host with no execution cycle. Once a supported project/software-build signal is visible, the mandatory gates apply.
+MotorLab cannot wake a host with no execution cycle or claim invisible continuation without a real durable executor.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.6
-Revision 1.6: r14 adds mandatory plan-before-write approval and the user-confirmed numbered Registro Modifiche e Ripristini, separate from technical Change History.
+MOTORLAB-CORE-ENTRYPOINT-V1.7
+Revision 1.7: r15 adds Artifact-First delivery, deferred Root Cause queue and dual artifact/overall progress while preserving mandatory causal closure.
