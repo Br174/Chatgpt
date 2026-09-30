@@ -5,13 +5,14 @@ Canonical MotorLab release/version manifest.
 Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.30-r11
+CURRENT_RELEASE=2026.09.30-r12
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
+FAST_ITERATION_NO_SPIN_MODULE=MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
 
 PURPOSE
 Provide one authoritative MotorLab release identity and required capabilities for persistent project orchestration.
@@ -33,6 +34,7 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_BACKGROUND_EXECUTION_V1.txt
 - MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt
 - MOTORLAB_VELOCITY_LAYER_V1.txt
+- MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
 - MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt
 - MOTORLAB_SATELLITE_SYNC_V1.txt
 - MOTORLAB_SATELLITE_BUNDLE_V1.txt
@@ -94,6 +96,19 @@ For release 2026.09.30-r11 and later:
 - long/provider jobs repeat the same percentage on material phase changes instead of going silent;
 - root-cause/prevention work is part of the operation and prevents premature 100% closure.
 
+R12+ FAST ITERATION + NO-SPIN HANDOFF
+For release 2026.09.30-r12 and later:
+- MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt is mandatory;
+- a verified persistent executor handoff must not leave an ordinary foreground chat polling indefinitely;
+- after job identity/checkpoint/next-safe-step are captured and provider acceptance is verified, foreground execution transitions to HANDOFF_COMPLETE instead of waiting for job completion;
+- healthy persistent-job foreground polling is bounded; by default no more than two consecutive unchanged status probes after durable identity is known;
+- on the next available control cycle, the recorded job/run id is reconciled before any duplicate start/write;
+- eligible LOW/MEDIUM isolated LAB correction loops use risk-scaled verification and do not automatically pay promotion-grade full regression on every iteration;
+- HIGH-risk LAB work and every CANDIDATA/MADRE promotion retain full applicable regression and lifecycle protections;
+- duplicate compile/test/build work is avoided when it adds no distinct verification value;
+- MusicLab default profile treats isolated copy/style as LOW, bounded navigation/state/UI/AI/API orchestration as MEDIUM, and core playback/package/signing/database/upstream/lifecycle/concurrency work as HIGH unless live evidence justifies another class;
+- this policy does not create a second watchdog, executor or recovery coordinator.
+
 FULL CANONICAL LEGEND
 ⚙️ MotorLab attivo
 🎆 Azione completata
@@ -123,13 +138,14 @@ STATE AUTHORITY ORDER
 6. memory/copied summaries.
 
 FUTURE PROJECT RULE
-Every future concrete MotorLab software project receives hook + local satellite + central Project Continuity ledger and inherits Root Cause Closure, labeled visual status and the hard numeric-progress visibility gate automatically.
+Every future concrete MotorLab software project receives hook + local satellite + central Project Continuity ledger and inherits Root Cause Closure, labeled visual status, hard numeric-progress visibility, Fast Iteration and No-Spin Handoff automatically. Risk-scaled verification never weakens HIGH-risk or CANDIDATA/MADRE gates.
 
 NO RUNTIME REGRESSION
 MotorLab control-plane/reporting metadata must not intentionally alter application runtime, UI, package/signing identity, source lifecycle or native engines.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.11
+MOTORLAB-RELEASE-MANIFEST-V1.12
 Revision 1.9: r9 permanent labeled visual status and final-only 💯.
 Revision 1.10: r10 extended visual status and high-presence classic numeric progress.
 Revision 1.11: r11 adds mandatory Root Cause Closure, live-event classification and hard first/ongoing numeric progress visibility.
+Revision 1.12: r12 adds mandatory Fast Iteration + No-Spin Handoff, bounded foreground polling and risk-scaled LAB correction loops without weakening promotion safety.
