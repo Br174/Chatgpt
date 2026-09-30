@@ -68,18 +68,22 @@ NOTES: Initial MotorLab Control Center created and verified on 2026-09-30. The c
 5. GitBook
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 PLUGIN: installed in ChatGPT
-CONNECTION: CONNECTED_VERIFIED for read access
-WRITE CAPABILITY: DEGRADED — change-request creation returned HTTP 403 `requires user auth` on 2026-09-30
+CONNECTION: CONNECTED_VERIFIED for read and write access
+WRITE CAPABILITY: CONNECTED_VERIFIED — user-authenticated OAuth Full access granted and harmless draft change-request creation passed on 2026-09-30
 ROLE TARGET: stable architecture/manual projection only.
 OFFICIAL ORGANIZATION: A9usorLUOQqSZkfpTNSC — MotorLab
 OFFICIAL SITE: site_Sa5jX — MotorLab Docs
 RESOURCE READ CHECK: PASSED; site and private spaces readable through GitBook connector
-WRITE CHECK: FAILED at create_change_request; current connector can read but cannot publish content changes until user-authenticated write access is restored.
-GIT SYNC CHECK: no Git sync configured for the Documentation space, so there is no safe GitHub-side bypass.
+WRITE CHECK: PASSED; draft change request #1 `MotorLab write-auth verification` created in Documentation space, id Om35NPWJOlL2sYvHGNgm. No page publication or merge performed.
+AUTH MODE: ChatGPT -> GitBook OAuth with Full access explicitly authorized by Bruno on 2026-09-30.
+ROOT CAUSE: the earlier OAuth connection was authorized as Read only. Read operations therefore worked while write-required change-request creation returned HTTP 403 `requires user auth`.
+RECURRENCE SURFACE: a connection check that validates only reads can misclassify a read-only OAuth connection as fully writable.
+PREVENTION: before marking GitBook read/write CONNECTED_VERIFIED, verify both a read operation and one harmless draft change-request creation. Capability tests must not publish, merge, delete, or alter live pages. The verification change request remains draft unless Bruno explicitly authorizes a later action.
+GIT SYNC CHECK: no Git sync configured for the Documentation space; direct authenticated GitBook write is now verified and Git Sync is not required for this connection.
 DELETE SAFETY: MotorLab must never delete GitBook pages/spaces/resources without explicit Bruno approval
 DUPLICATE ORGANIZATION: b4kJ1c9U3q9PiotBhFW4 — MotorLab — DO_NOT_USE; created seconds earlier during onboarding duplication
 PLAN STATE: official and duplicate organizations currently report active Pro trial through 2026-10-14; Free is the intended steady-state plan. Do not assume downgrade complete until separately verified.
-NOTES: Official organization selection fixed on 2026-09-30 after read-only comparison of both duplicates. GitBook remains optional and non-blocking; GitHub remains authoritative while GitBook write auth is degraded.
+NOTES: Official organization selection fixed on 2026-09-30 after read-only comparison of both duplicates. GitBook remains a derived, optional projection; GitHub remains technical authority. Full OAuth access is a technical capability, not permission for MotorLab to delete, publish, merge, or otherwise exceed approved scope.
 
 6. Superpowers
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
@@ -102,7 +106,7 @@ CLOUDFLARE RULE
 Central MotorLab D1/KV is RESOURCE_READY only while actual resources, bindings and read/write/recovery behavior remain verified. GitHub remains technical authority and recovery source; Cloudflare never becomes a competing technical source of truth.
 
 GITBOOK RULE
-GitBook is a derived manual/architecture projection, never technical authority. GitHub remains authoritative. The official GitBook organization/site identifiers above must be used for future MotorLab documentation work unless Bruno explicitly changes them. OAuth permission to delete does not constitute approval to delete. A GitBook plan/trial state must not silently create paid usage; MotorLab must remain free-first. If write auth is unavailable, MotorLab records the degradation and continues without blocking core work.
+GitBook is a derived manual/architecture projection, never technical authority. GitHub remains authoritative. The official GitBook organization/site identifiers above must be used for future MotorLab documentation work unless Bruno explicitly changes them. OAuth permission to delete does not constitute approval to delete. A GitBook plan/trial state must not silently create paid usage; MotorLab must remain free-first. Read and write capability must be verified separately; a successful read alone must never be treated as proof of write authorization.
 
 NOTION RULE
 Notion is a derived Bruno-facing control view, never technical authority. GitHub remains authoritative. The official dashboard identifier and URL above must be used for future MotorLab status projection unless Bruno explicitly changes them. No Notion page/database deletion is authorized by connection or write access alone.
@@ -114,6 +118,6 @@ FAIL-SAFE
 No AVAILABLE_NOT_CONNECTED or DEGRADED optional integration blocks MotorLab core operation.
 
 VERSION
-MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.5
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.6
 Established: 2026-09-30
-Revision 1.5: Cloudflare remains CONNECTED_VERIFIED / RESOURCE_READY; GitBook read access verified but write capability truthfully marked DEGRADED after HTTP 403 user-auth requirement and absence of Git Sync bypass.
+Revision 1.6: GitBook OAuth write authorization restored and verified. Root cause closed as prior Read only OAuth scope; prevention now requires independent read plus harmless draft-write verification before declaring read/write CONNECTED_VERIFIED. Central r16 release unchanged.
