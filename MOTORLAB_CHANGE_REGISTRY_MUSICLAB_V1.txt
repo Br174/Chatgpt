@@ -17,6 +17,27 @@ originali=originali,versione originale,versioni originali
 ai=ai,gemini,intelligenza artificiale
 
 CHANGE RECORD
+CHANGE_ID=musiclab-20260930-lab19-player-direct-mini-collapse
+DATE=2026-09-30
+TITLE=Player reale collegato direttamente e forzato al mini-player fuori dal lettore
+SEMANTIC_TAGS=player,lettore,mini-player,miniplayer,player persistente,Originali,Cover,artista,album,riproduzione,LAB19
+USER_INTENT=LAB18 lasciava ancora il player completo aperto premendo Originali, Cover, Vai all'artista e riproducendo risultati Cover/Originali; correggere il comportamento alla radice.
+CHANGE_SCOPE=COMPOSITE_PLAYER_BEHAVIOR
+LIFECYCLE_ROLE=LAB19
+SOURCE_BASE_REF=uab-build/musiclab-player-collapse-18
+SOURCE_BASE_SHA=0dca84c1855dd8c7bb8de021208700b8f72a06fe
+RESULT_REF=uab-build/musiclab-player-direct-collapse-19
+RESULT_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+IMPLEMENTATION_COMMITS=77745bcf77b4ded698c826b04c08843275d83fa1
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/MainActivity.kt,app/src/main/kotlin/com/metrolist/music/ui/component/BottomSheet.kt,app/src/main/kotlin/com/metrolist/music/ui/menu/PlayerMenu.kt,app/src/main/kotlin/com/metrolist/music/ui/menu/MusicLabIntelligenceMenu.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverNavigationBridge.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionNavigationBridge.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionScreen.kt
+BEHAVIOR_SUMMARY=Il bridge del player è legato esplicitamente al vero BottomSheetState di MainActivity; è disponibile un collapse immediato al vero anchor mini-player che interrompe animazioni concorrenti; PlayerMenu passa lo stato reale a MusicLab; SongMenu usa un fallback al bridge esplicitamente legato; Cover/Originali e Artista/Album collassano prima della navigazione; la riproduzione dei risultati Cover/Originali non chiama più expandSoft ma mantiene il mini-player.
+VERIFICATION=GitHub Actions run 36682604681 success; :app:testFossDebugUnitTest e :innertube:testDebugUnitTest passati; UAB preflight 9 OK 0 warning 0 errori; build LAB19/ZIP verificata; applicationId it.verlezza.musiclab.lab.lab19; artifact 11082129447 digest sha256 556414a45b852f22f1d14f20e01159c925aa4a3ec1baf13057009cf239237e75; APK sha256 da84c357b4d812dc51ce12fe719a77914412c87b2fb4ed28db9d18b51c8b8a66; device acceptance pending.
+STATUS=ACTIVE_DEVICE_ACCEPTANCE_PENDING
+SUPERSEDES=musiclab-20260930-lab18-player-navigation-collapse
+RESTORE_SCOPE_HINTS=Player/navigation behavior only. Prefer implementation commit 77745bcf77b4ded698c826b04c08843275d83fa1 and the eight scoped runtime files/hunks; preserve later AI/search/audio changes. RESULT_SHA includes only later temp-file cleanup and MotorLab control-plane r13 sync after the tested runtime commit.
+SOURCE_CONFIDENCE=VERIFIED_GIT
+
+CHANGE RECORD
 CHANGE_ID=musiclab-20260930-lab18-player-navigation-collapse
 DATE=2026-09-30
 TITLE=Player completo minimizzato su ogni navigazione esterna
@@ -31,9 +52,10 @@ RESULT_SHA=0dca84c1855dd8c7bb8de021208700b8f72a06fe
 IMPLEMENTATION_COMMITS=e30d235dc6658cdbfd396af4659e91f6b5f53cdd
 CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/MainActivity.kt
 BEHAVIOR_SUMMARY=Navigation collapse uses semantic player state: collapse when not already collapsed/dismissed instead of requiring exact isExpanded animated anchor.
-VERIFICATION=GitHub Actions run 36677968793 success; real JVM regression passed; UAB preflight/build/ZIP verified; artifact 11079909557; APK sha256 8256a68dadf0d3ec364ac17afea8c9f8a25f9b386fc20e4293deb4a7b54b3887
-STATUS=ACTIVE
-RESTORE_SCOPE_HINTS=MainActivity navigation collapse only; preserve Cover/Originali and unrelated player/audio engine changes.
+VERIFICATION=GitHub Actions run 36677968793 success; real JVM regression passed; UAB preflight/build/ZIP verified; artifact 11079909557; APK sha256 8256a68dadf0d3ec364ac17afea8c9f8a25f9b386fc20e4293deb4a7b54b3887; later device test showed remaining paths still persistent.
+STATUS=SUPERSEDED
+SUPERSEDED_BY=musiclab-20260930-lab19-player-direct-mini-collapse
+RESTORE_SCOPE_HINTS=MainActivity navigation collapse only; preserve Cover/Originali and unrelated player/audio engine changes. LAB19 is the newer restore candidate for the same user intent.
 SOURCE_CONFIDENCE=VERIFIED_GIT
 
 CHANGE RECORD
@@ -69,7 +91,7 @@ IMPLEMENTATION_COMMITS=ffd5243c9ff546695923fcc49b79c8e9d76346ae
 CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/AiCoverSearchEngine.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt,app/src/main/kotlin/com/metrolist/music/ui/component/GeminiAiCoverDiscovery.kt,app/src/main/kotlin/com/metrolist/music/ui/component/GeminiOriginalDiscovery.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionSearchEngine.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionScreen.kt
 BEHAVIOR_SUMMARY=YouTube Music-first localization, broader bounded recovery for playable covers, details/credits on demand, lightweight paginated lists and stepwise Originali/Cover discovery.
 VERIFICATION=Implementation commit immutable; LAB17 build/test/artifact workflow completed successfully before temporary workflow/script cleanup.
-STATUS=ACTIVE_INHERITED_BY_LAB18
+STATUS=ACTIVE_INHERITED_BY_LAB19
 RESTORE_SCOPE_HINTS=Composite feature; allow file/subscope selective restore only when boundaries are proven. Do not include MainActivity player hunk unless requested.
 SOURCE_CONFIDENCE=VERIFIED_GIT
 
@@ -101,5 +123,6 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.0
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.1
 Established: 2026-09-30
+Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
