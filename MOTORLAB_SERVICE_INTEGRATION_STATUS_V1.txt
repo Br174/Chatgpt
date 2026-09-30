@@ -1,0 +1,83 @@
+MOTORLAB SERVICE INTEGRATION STATUS V1
+
+STATUS
+Canonical capability/connection-status registry for MotorLab auxiliary services.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Distinguish clearly between:
+A. MotorLab policy/contract support;
+B. provider/plugin availability in ChatGPT;
+C. actual account/resource connection;
+D. project-level instrumentation/adoption.
+Never claim a service is operational merely because its CORE contract exists.
+
+STATUS VALUES
+- CORE_READY: MotorLab contract exists.
+- AVAILABLE_NOT_CONNECTED: plugin/provider is available but connection not verified.
+- CONNECTED_VERIFIED: account/tool connection verified and usable.
+- RESOURCE_READY: required external resources/bindings verified.
+- PROJECT_ADOPTED: a specific project safely adopted the integration.
+- DEGRADED: connected but temporarily unavailable/quota-limited.
+- DISABLED: intentionally not used.
+
+CURRENT GLOBAL STATUS — 2026-09-30
+
+1. GitHub
+CORE: READY
+CONNECTION: CONNECTED_VERIFIED
+ROLE: durable technical authority
+NOTES: Br174/Chatgpt central authority and project repositories are accessible through the installed GitHub connector.
+
+2. Cloudflare D1/KV for MotorLab central operational state
+CORE: READY via MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt and MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
+CONNECTION/RESOURCE: AVAILABLE_NOT_CONNECTED / central MotorLab D1+KV resources not yet provisioned or verified in this release operation
+ROLE TARGET: persistent operational state + cache
+NOTES: Existing project Cloudflare usage (for example MusicLab backend and Cover Lab AI preparation) is distinct from the new MotorLab central state store. Do not conflate them.
+
+3. PostHog
+CORE: READY via MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
+PLUGIN: available in ChatGPT
+CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+ROLE TARGET: runtime error/diagnostic evidence
+PROJECT INSTRUMENTATION: none implied by r16; requires approved project changes.
+
+4. Notion
+CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
+PLUGIN: available in ChatGPT
+CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+ROLE TARGET: Bruno-facing status projection only.
+
+5. GitBook
+CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
+PLUGIN: available in ChatGPT
+CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+ROLE TARGET: stable architecture/manual projection only.
+
+6. Superpowers
+CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
+PLUGIN: available in ChatGPT
+CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+ROLE TARGET: subordinate engineering methodology.
+
+7. Context7
+CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
+PLUGIN: available in ChatGPT
+CONNECTION: AVAILABLE_NOT_CONNECTED unless later verified
+ROLE TARGET: quota-aware, on-demand current/versioned technical documentation.
+
+CONNECTION RULE
+Connecting/installing a ChatGPT plugin requires explicit user action. Once connected, update this registry only after a real tool capability check verifies access.
+
+CLOUDFLARE RULE
+Central MotorLab D1/KV becomes RESOURCE_READY only after actual resources, schema/bindings and read/write/recovery checks are verified. Existing Cloudflare resources owned by application projects do not automatically satisfy this requirement.
+
+PROJECT ADOPTION RULE
+PostHog instrumentation or other runtime integration inside an app is PROJECT_ADOPTED only after normal MotorLab pre-change approval, isolated LAB change, verification and project-specific safe adoption.
+
+FAIL-SAFE
+No AVAILABLE_NOT_CONNECTED or DEGRADED optional integration blocks MotorLab core operation.
+
+VERSION
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.0
+Established: 2026-09-30
