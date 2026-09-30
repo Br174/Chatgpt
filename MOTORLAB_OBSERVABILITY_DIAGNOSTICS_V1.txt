@@ -1,0 +1,83 @@
+MOTORLAB OBSERVABILITY & DIAGNOSTICS V1
+
+STATUS
+Mandatory MotorLab CORE contract for runtime evidence and diagnostic correlation.
+Central authority: Br174/Chatgpt.
+Primary optional observability provider target: PostHog.
+
+PURPOSE
+Give MotorLab trustworthy runtime evidence for crashes, exceptions, regressions and behavior failures without making observability a single point of failure or a competing source of technical truth.
+
+ROLE
+PostHog or equivalent observability is an evidence source, not an authority over code, lifecycle, approval or restore state.
+
+CORRELATION FIELDS
+Where technically and privacy-appropriately available, runtime events should include or be correlatable to:
+- MOTORLAB_OPERATION_ID;
+- project id/name;
+- app/build version;
+- source commit/ref or release identity;
+- artifact checksum/id where practical;
+- feature/component identifier;
+- environment (LAB/CANDIDATA/MADRE/test/prod as applicable);
+- timestamp/session correlation.
+Do not include raw secrets or unnecessary personal data.
+
+MINIMUM EVENT CLASSES
+- APP_ERROR / exception;
+- CRASH;
+- NETWORK_FAILURE;
+- PROVIDER_RATE_LIMIT / quota-pressure evidence where safe;
+- FEATURE_FAILURE;
+- PERFORMANCE_ANOMALY when materially useful;
+- RELEASE/BUILD_MARKER for correlation when supported.
+
+ROOT CAUSE INTEGRATION
+Runtime evidence may:
+- confirm symptom frequency;
+- identify affected versions/components;
+- reveal stack/error context;
+- compare before/after behavior;
+- support recurrence prevention verification.
+It must not by itself authorize source changes or definitive closure.
+MotorLab Root Cause Closure still requires evidence-based causal reasoning and verification.
+
+ARTIFACT-FIRST INTEGRATION
+Observability must not unnecessarily delay testable APK/ZIP delivery.
+For LOW/MEDIUM work, if scoped verification is sufficient for artifact trust, deliver first and use runtime evidence during post-artifact causal closure.
+For HIGH-risk/safety/security/data-integrity conditions, diagnostics may remain on the critical path when needed for trust.
+
+NO-INSTRUMENTATION-REGRESSION
+Adding telemetry to an app is an app/runtime change and therefore requires normal project approval and lifecycle rules.
+The r16 central control-plane may define the standard without silently injecting SDKs into existing apps.
+Project instrumentation is incremental and only at a safe, approved boundary.
+
+FAILURE MODE
+If PostHog is unavailable, quota-limited or disconnected:
+- application functionality must continue;
+- MotorLab uses local logs, GitHub/CI evidence, screenshots/user reports and provider diagnostics;
+- mark OBSERVABILITY_DEGRADED when relevant;
+- do not block unrelated approved work solely because telemetry is absent.
+
+QUOTA SAFETY
+Use sampling, event filtering, deduplication and meaningful event classes.
+Do not emit high-volume noisy events solely to fill dashboards.
+Observability must obey External Service Guard and free-first cost policy.
+
+PRIVACY/SECURITY
+- no passwords/tokens/API keys;
+- avoid full request/response bodies when they may contain sensitive information;
+- mask credentials/identifiers where possible;
+- collect only data necessary for diagnostics;
+- follow project/provider policies.
+
+POSTHOG ROLE BOUNDARY
+PostHog may expose analytics, error tracking, logs, feature flags and experiments, but MotorLab initially uses it only for approved diagnostic/observability purposes.
+Feature-flag changes that alter app behavior are writes and require separate explicit scope/approval.
+
+SUCCESS CRITERIA
+Observability is successful when MotorLab can correlate a runtime problem to a concrete project/build/artifact/operation, use evidence to accelerate diagnosis, and continue safely when the observability provider is unavailable.
+
+VERSION
+MOTORLAB-OBSERVABILITY-DIAGNOSTICS-V1.0
+Established: 2026-09-30
