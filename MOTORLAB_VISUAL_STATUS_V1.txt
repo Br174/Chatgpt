@@ -6,15 +6,15 @@ Established: 2026-09-28.
 Repository authority: Br174/Chatgpt.
 
 PURPOSE
-Give Bruno an immediate visual understanding of MotorLab state while always keeping the meaning readable in text. Emoji are visual shortcuts, never unexplained codes.
+Give Bruno an immediate visual understanding of MotorLab state while always keeping the meaning readable in text. Emoji are visual shortcuts, never unexplained codes. Numeric MotorLab progress remains a separate first-class signal and should accompany substantial operational statuses whenever a verified percentage exists.
 
 CORE RULE - LABEL ALWAYS VISIBLE
 Whenever MotorLab uses one of the canonical status emoji in a user-facing MotorLab status event, the canonical short Italian description MUST appear immediately beside it.
-Do not show a status emoji alone and do not assume Bruno remembers its meaning.
+Do not show a canonical status emoji alone and do not assume Bruno remembers its meaning.
 
 CANONICAL VISUAL LEGEND
 ⚙️ MotorLab attivo — MotorLab is activated/attached and coordinating the work.
-🎆 Azione completata — one concrete action, subtask, phase or verified milestone has completed successfully; more work may remain.
+🎆 Azione completata — one concrete action, subtask, phase or verified milestone completed successfully; more work may remain.
 ⚡ Risveglio / recupero — MotorLab is checking, recovering or resuming an interrupted/stalled operation, including the manual lightning path.
 ✅ Problema risolto — a previously identified problem has been corrected and the correction is verified.
 👍🏻 Procede tutto bene — current work is healthy and progressing normally; no corrective action is required.
@@ -24,9 +24,16 @@ CANONICAL VISUAL LEGEND
 ♻️ Una parte va rifatta — a bounded portion of the work must be rebuilt/repeated; valid unaffected work is preserved.
 💀 Tutto da rifare — the current overall implementation/approach is materially unusable and must be rebuilt from the appropriate protected baseline. Use only with strong evidence.
 💯 Conclusione definitiva — the whole user-requested operation is fully completed, verified and closed; nothing requested remains pending.
+🔍 Ricerca soluzione — MotorLab is actively examining viable ways to solve a concrete problem before selecting the next safe approach.
+🧩 Compatibile — compatibility with the existing MotorLab/project architecture has been established by the required preflight; the change can be safely integrated under the declared merge/precedence plan.
+🐢 Lentezza rilevata — observable work is still alive/progressing, but materially slower than normal for the current phase; this is not by itself a stall.
+💭 Elaborazione in corso — MotorLab is analyzing observable requirements/state and preparing the next action; this label never exposes or implies access to private chain-of-thought.
+⏳ Attesa esterna — MotorLab is waiting for an external provider/job/build/API/service state that must complete or change before the next safe action.
+🧪 Test / verifica in corso — tests, validation or regression checks are currently running or being evaluated; success is not yet claimed.
+🔄 Sincronizzazione in corso — MotorLab is reconciling/synchronizing control-plane, project continuity, repository or satellite state; completion is not yet claimed.
 
 1. SEMANTIC PRECEDENCE
-Use the most specific status that describes the current event. The icons are not a severity score and must not be stacked merely for decoration.
+Use the most specific status that describes the current event. Icons are not a severity score and must not be stacked merely for decoration.
 A message may contain more than one canonical event only when distinct facts truly occur together, and each emoji must retain its own label.
 
 2. MOTORLAB ACTIVATION
@@ -40,91 +47,76 @@ Do not replace the gear with another activation symbol.
 💯 Conclusione definitiva is reserved for true end-to-end completion of the entire requested operation after required verification/delivery.
 Never use 💯 merely because a build, patch, check, commit or intermediate phase succeeded.
 
-Example intermediate:
-🎆 Azione completata — patch applicata e diff verificato; passo ai test.
-
-Example final:
-💯 Conclusione definitiva — modifica, test, artefatti e consegna richiesti sono tutti verificati e non resta alcun passo pendente.
-
-4. PROBLEM STATES
+4. PROBLEM / STRATEGY STATES
 ✅ Problema risolto requires verified correction, not only diagnosis.
 ⚠️ Piccolo problema risolvibile is for bounded manageable issues.
-🧭 Cambiare approccio is used when the current strategy should be replaced before a further materially identical attempt.
+🔍 Ricerca soluzione is appropriate while viable solutions are being evaluated but no strategy change has yet been selected.
+🧭 Cambiare approccio is used once the current strategy should be replaced before a further materially identical attempt.
 🛑 Stop di sicurezza / blocco reale is for a real stop/blocker where continuing would be unsafe or impossible.
 ♻️ Una parte va rifatta is for partial rebuild only.
 💀 Tutto da rifare is exceptional and must not be used for a small failure, one failed build, one stale checkpoint or one recoverable substep.
 
-5. HEALTHY PROGRESS
-👍🏻 Procede tutto bene may be shown when useful to reassure that a long/important operation is healthy based on observable evidence.
-Do not spam it on every tool call and do not use it without real health/progress evidence.
+5. COMPATIBILITY STATE
+🧩 Compatibile is shown only after compatibility/preflight evidence exists. It must not be used as an optimistic prediction before the Change Compatibility Guard has classified/resolved relevant overlap.
+It means the proposed/current integration is compatible with existing protections and native-engine ownership under the declared resolution/precedence.
 
-6. WATCHDOG / LIGHTNING INTEGRATION
+6. HEALTH / LATENCY / WAITING
+👍🏻 Procede tutto bene may be shown when observable evidence confirms healthy progress.
+🐢 Lentezza rilevata means the operation is alive and making or plausibly making legitimate progress more slowly than normal; it does not automatically trigger recovery.
+⏳ Attesa esterna means MotorLab is waiting on a real external system/job/provider transition. Do not confuse legitimate waiting with a stall.
+If material progress disappears beyond Watchdog thresholds, use ⚡ Risveglio / recupero as appropriate.
+
+7. ANALYSIS / TEST / SYNC STATES
+💭 Elaborazione in corso is a high-level operational state only. It may say what is being analyzed at a task level, but must never reveal hidden reasoning or chain-of-thought.
+🧪 Test / verifica in corso means validation is underway; do not combine it with ✅ Problema risolto or 🎆 Azione completata for the same check until the result is verified.
+🔄 Sincronizzazione in corso means state reconciliation/synchronization is underway; when finished use 🎆 Azione completata or ✅ Problema risolto only if the corresponding success/problem condition is actually met.
+
+8. WATCHDOG / LIGHTNING INTEGRATION
 The user may still send bare `⚡` as the manual command.
-MotorLab's response/report must use:
+MotorLab's report must use:
 ⚡ Risveglio / recupero — <plain-language recovery/health status>.
 Internal Watchdog levels remain valid control-plane metadata, but the user-facing symbol is a single lightning with the canonical label, not repeated lightning counts.
-If recovery determines that a new strategy is needed, the subsequent event may use:
-🧭 Cambiare approccio — <new strategy and preserved state>.
-If recovery must stop safely, use:
-🛑 Stop di sicurezza / blocco reale — <blocker and preserved state>.
+If recovery determines a new strategy is needed, use 🧭 Cambiare approccio.
+If recovery must stop safely, use 🛑 Stop di sicurezza / blocco reale.
+Legitimate slow-but-live work may use 🐢 Lentezza rilevata; legitimate external waiting may use ⏳ Attesa esterna without pretending recovery is occurring.
 
-7. SUCCESS / FIREWORKS INTEGRATION
+9. SUCCESS INTEGRATION
 The old repeated-fireworks level system is superseded for user-facing MotorLab status.
-Use a single:
-🎆 Azione completata — <what completed and verification>.
-If that completion also resolves a known problem, a separate concise event may be:
-✅ Problema risolto — <what was fixed and verification>.
-For the entire requested operation only, use 💯 Conclusione definitiva.
+Use a single 🎆 Azione completata for a completed action/phase/milestone.
+Use ✅ Problema risolto when a known problem is corrected and verified.
+Use 💯 Conclusione definitiva only for the entire requested operation.
 
-8. DESCRIPTION FORMAT - MANDATORY
+10. DESCRIPTION FORMAT - MANDATORY
 Preferred format:
 <emoji> <canonical label> — <short contextual explanation>.
+The canonical label must not be omitted even when the explanation seems obvious.
 
-The canonical label itself must not be omitted even when the following explanation seems obvious.
-Good:
-⚠️ Piccolo problema risolvibile — il workflow è fallito solo per il debug keystore; il sorgente resta valido.
-Bad:
-⚠️ Il workflow è fallito...
-Bad:
-⚠️
+11. NUMERIC PROGRESS PRESENCE - MANDATORY
+The visual language complements, never replaces, the classic numeric progress format:
+Progresso MotorLab: <N>%
+During a substantial MotorLab operation, once a verified progress scale/value exists, every meaningful user-facing operational status should normally include the current numeric percentage, even when unchanged.
+Preferred combined form:
+<emoji> <canonical label> — <context>. Progresso MotorLab: <N>%.
+Do not use an emoji as a substitute for the percentage. Do not invent a percentage merely to satisfy visibility; Progress Reporting remains authoritative for progress math.
+Activation-only administrative messages may omit percentage when no active quantified operation exists.
 
-9. RELATION TO PROGRESS PERCENTAGE
-Visual status complements verified MotorLab progress percentages.
-Example:
-🎆 Azione completata — build verificata. Progresso MotorLab: 75%.
-
-Emoji do not create progress by themselves. Percentages remain evidence-based and monotonic under the existing Progress Reporting / Recovery Floor rules.
-
-10. NO FALSE POSITIVES / NO DRAMA
+12. NO FALSE POSITIVES / NO DRAMA
 Do not use positive icons to imply verification that has not occurred.
 Do not use 💀, 🛑 or 🧭 theatrically; they require the corresponding real state.
 Do not use 💯 until the complete requested work is actually done and verified.
 
-11. PERSISTENCE / CROSS-PROJECT RULE
+13. PERSISTENCE / CROSS-PROJECT RULE
 This legend is global and permanent across all current and future MotorLab-managed software projects until Bruno explicitly supersedes it.
-Project-native engines may add domain details after the canonical label but may not redefine these MotorLab icons or suppress their labels.
+Project-native engines may add domain details after the canonical label but may not redefine these MotorLab icons, suppress their labels or suppress numeric progress when Progress Reporting requires it.
 
-12. NO PROJECT REGRESSION
+14. NO PROJECT REGRESSION
 This is reporting/control-plane behavior only. It must not alter application logic, UI, package identity, signing, source lineage, build output, lifecycle or native project engines.
 
 SUCCESS CRITERIA
-MotorLab Visual Status is active when:
-- every canonical status emoji emitted by MotorLab has its short canonical label beside it;
-- ⚙️ MotorLab attivo is the startup marker;
-- 🎆 means a completed action/phase, not final overall closure;
-- ⚡ means recovery/wake with a readable label;
-- ✅ marks a verified solved problem;
-- 👍🏻 marks healthy progress;
-- ⚠️ marks a small manageable issue;
-- 🧭 marks a strategy change;
-- 🛑 marks a real safe stop/blocker;
-- ♻️ marks a bounded partial redo;
-- 💀 is reserved for a genuinely full rebuild;
-- 💯 is reserved for true complete verified closure;
-- repeated fireworks/lightning counts are no longer used as user-facing level encoding;
-- project application behavior remains unaffected.
+MotorLab Visual Status is active when every canonical status emoji has its readable label; the new search/compatibility/latency/analysis/wait/test/sync states are used only under their defined evidence conditions; repeated fireworks/lightning counts are not user-facing level codes; 💯 remains final-only; and substantial operational status keeps the classic numeric MotorLab percentage highly visible whenever a verified value exists.
 
 VERSION
-MOTORLAB-VISUAL-STATUS-V1.1
+MOTORLAB-VISUAL-STATUS-V1.2
 Established: 2026-09-28
-Revision 1.1: permanent labeled visual legend; single-emoji semantic mapping; 💯 reserved for definitive completion; legacy repeated-fireworks/lightning user-facing level encoding superseded.
+Revision 1.1: permanent labeled visual legend; single-emoji semantic mapping; 💯 final-only; legacy repeated-fireworks/lightning user-facing levels superseded.
+Revision 1.2: adds 🔍 Ricerca soluzione, 🧩 Compatibile, 🐢 Lentezza rilevata, 💭 Elaborazione in corso, ⏳ Attesa esterna, 🧪 Test / verifica in corso and 🔄 Sincronizzazione in corso; numeric MotorLab percentage becomes a high-presence companion to substantial visual status.
