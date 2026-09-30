@@ -1,0 +1,118 @@
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS relay_snapshots (
+  snapshot_id TEXT PRIMARY KEY,
+  payload_hash TEXT NOT NULL,
+  schema_version INTEGER NOT NULL,
+  sent_at TEXT NOT NULL,
+  received_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS projects (
+  project_id TEXT PRIMARY KEY,
+  repository TEXT NOT NULL,
+  lifecycle_stage TEXT NOT NULL,
+  source_ref TEXT,
+  source_head TEXT,
+  local_satellite_release_state TEXT,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS operations (
+  operation_id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  type TEXT NOT NULL,
+  requested_scope TEXT NOT NULL,
+  approved_scope TEXT,
+  approval_status TEXT NOT NULL,
+  lifecycle_stage TEXT NOT NULL,
+  risk_class TEXT NOT NULL,
+  status TEXT NOT NULL,
+  phase TEXT NOT NULL,
+  artifact_progress INTEGER NOT NULL CHECK (artifact_progress BETWEEN 0 AND 100),
+  overall_progress INTEGER NOT NULL CHECK (overall_progress BETWEEN 0 AND 100),
+  source_ref TEXT,
+  source_head TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (project_id) REFERENCES projects(project_id)
+);
+
+CREATE TABLE IF NOT EXISTS approvals (
+  approval_id TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL,
+  scope_hash TEXT NOT NULL,
+  approval_state TEXT NOT NULL,
+  approved_at TEXT NOT NULL,
+  evidence_ref TEXT,
+  superseded_by TEXT,
+  FOREIGN KEY (operation_id) REFERENCES operations(operation_id)
+);
+
+CREATE TABLE IF NOT EXISTS checkpoints (
+  checkpoint_id TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL,
+  phase TEXT NOT NULL,
+  verified_progress INTEGER NOT NULL CHECK (verified_progress BETWEEN 0 AND 100),
+  completed_steps TEXT NOT NULL,
+  next_safe_step TEXT NOT NULL,
+  lock_state TEXT,
+  external_wait_state TEXT,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY (operation_id) REFERENCES operations(operation_id)
+);
+
+CREATE TABLE IF NOT EXISTS locks (
+  lock_key TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL,
+  owner TEXT NOT NULL,
+  acquired_at TEXT NOT NULL,
+  heartbeat_at TEXT,
+  released_at TEXT,
+  status TEXT NOT NULL,
+  FOREIGN KEY (operation_id) REFERENCES operations(operation_id)
+);
+
+CREATE TABLE IF NOT EXISTS artifacts (
+  artifact_id TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  source_ref TEXT NOT NULL,
+  source_head TEXT NOT NULL,
+  checksums TEXT NOT NULL,
+  verification_state TEXT NOT NULL,
+  delivery_state TEXT NOT NULL,
+  immutable_under_test INTEGER NOT NULL CHECK (immutable_under_test IN (0, 1)),
+  created_at TEXT NOT NULL,
+  FOREIGN KEY (operation_id) REFERENCES operations(operation_id)
+);
+
+CREATE TABLE IF NOT EXISTS root_causes (
+  root_cause_id TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL,
+  defect TEXT NOT NULL,
+  immediate_repair TEXT NOT NULL,
+  status TEXT NOT NULL,
+  evidence_refs TEXT,
+  recurrence_surfaces TEXT,
+  prevention_step TEXT,
+  approval_scope_status TEXT NOT NULL,
+  associated_artifact TEXT,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (operation_id) REFERENCES operations(operation_id)
+);
+
+CREATE TABLE IF NOT EXISTS operation_events (
+  event_id TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL,
+  event_type TEXT NOT NULL,
+  event_summary TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY (operation_id) REFERENCES operations(operation_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_operations_project_status ON operations(project_id, status);
+CREATE INDEX IF NOT EXISTS idx_checkpoints_operation_created ON checkpoints(operation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_events_operation_created ON operation_events(operation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_root_causes_operation_status ON root_causes(operation_id, status);
