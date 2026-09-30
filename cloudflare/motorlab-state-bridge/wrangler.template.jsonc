@@ -4,7 +4,9 @@
   "main": "src/index.js",
   "compatibility_date": "2026-09-30",
   "vars": {
-    "ENGINE_VERSION": "1.0.0"
+    "ENGINE_VERSION": "1.1.0",
+    "ALLOWED_REPOSITORY": "Br174/Chatgpt",
+    "ALLOWED_REFS": "refs/heads/main,refs/heads/motorlab/cloudflare-state-r16"
   },
   "d1_databases": [
     {
