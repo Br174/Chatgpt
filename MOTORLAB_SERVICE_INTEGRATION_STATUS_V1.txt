@@ -21,7 +21,7 @@ STATUS VALUES
 - DEGRADED: connected but temporarily unavailable/quota-limited.
 - DISABLED: intentionally not used.
 
-CURRENT GLOBAL STATUS — 2026-09-30
+CURRENT GLOBAL STATUS — 2026-10-01
 
 1. GitHub
 CORE: READY
@@ -94,13 +94,26 @@ NOTES: Connection verified in the 2026-09-30 r16 integration session; Superpower
 
 7. Context7
 CORE: READY via MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
-PLUGIN: available in ChatGPT
-CONNECTION: AVAILABLE_NOT_CONNECTED
+CONNECTION SURFACE: custom MCP app in ChatGPT
+APP: Context7 Free
+CONNECTION: CONNECTED_VERIFIED
+ENDPOINT: https://mcp.context7.com/mcp
+AUTH MODE: anonymous / no authentication; official free endpoint
 ROLE TARGET: quota-aware, on-demand current/versioned technical documentation.
-NOTES: Initial 2026-09-30 mobile connection attempt failed on Context7 client-side page load; MotorLab remains fully usable without it.
+CAPABILITY CHECK: PASSED on 2026-10-01. Two end-to-end chat tests completed successfully: Cloudflare documentation retrieval; Next.js library resolution as `/vercel/next.js` followed by current official documentation and code retrieval.
+PUBLIC CATALOG PLUGIN: NOT INSTALLED (`installed:false`). This is expected and is not an error because the catalog plugin is distinct from the connected custom MCP app.
+FAILED PROTOTYPE: the prior OAuth-based custom app was removed on 2026-10-01 after connection failed with `invalid_scope openid`; only Context7 Free remains connected.
+ROOT CAUSE: the OAuth endpoint path was incompatible with the ChatGPT custom-app authorization request, while the anonymous MCP endpoint is usable without OAuth.
+PREVENTION: for the free Context7 integration, use exactly `https://mcp.context7.com/mcp` with no authentication; track the catalog plugin and custom MCP app separately; require a real library-resolution plus documentation-retrieval check before declaring CONNECTED_VERIFIED.
+AUTHORITY: advisory documentation only; never replaces MotorLab, verified project source or GitHub CORE.
+COST: free-first anonymous connection; no paid fallback may be enabled silently.
+NOTES: MotorLab uses Context7 only when current/versioned external documentation materially reduces uncertainty.
 
 CONNECTION RULE
-Connecting/installing a ChatGPT plugin requires explicit user action. Once connected, update this registry only after a real tool capability check verifies access.
+Connecting/installing a ChatGPT plugin or custom MCP app requires explicit user action. Once connected, update this registry only after a real tool capability check verifies access.
+
+CONTEXT7 SURFACE RULE
+The public catalog plugin `Context7` and the custom MCP app `Context7 Free` are separate connection surfaces. An `installed:false` catalog value must not override a verified custom-app connection. Determine operational status from the exact configured surface and its capability check.
 
 CLOUDFLARE RULE
 Central MotorLab D1/KV is RESOURCE_READY only while actual resources, bindings and read/write/recovery behavior remain verified. GitHub remains technical authority and recovery source; Cloudflare never becomes a competing technical source of truth.
@@ -118,6 +131,7 @@ FAIL-SAFE
 No AVAILABLE_NOT_CONNECTED or DEGRADED optional integration blocks MotorLab core operation.
 
 VERSION
-MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.6
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.7
 Established: 2026-09-30
 Revision 1.6: GitBook OAuth write authorization restored and verified. Root cause closed as prior Read only OAuth scope; prevention now requires independent read plus harmless draft-write verification before declaring read/write CONNECTED_VERIFIED. Central r16 release unchanged.
+Revision 1.7: Context7 Free custom MCP app moved to CONNECTED_VERIFIED after two functional checks. Public catalog `installed:false` is explicitly separated from custom-app status; failed OAuth prototype removed; anonymous free endpoint and recurrence-prevention rule recorded. Central r16 release unchanged.
