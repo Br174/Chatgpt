@@ -1,0 +1,55 @@
+name: MotorLab operational snapshot relay
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'MOTORLAB_CLOUDFLARE_OUTBOX.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motorlab-operational-snapshot-relay
+  cancel-in-progress: false
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      MOTORLAB_RELAY_SECRET: ${{ secrets.MOTORLAB_RELAY_SECRET }}
+      WORKER_URL: https://motorlab-state-bridge.brunoverlezza.workers.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preflight relay secret
+        run: test -n "$MOTORLAB_RELAY_SECRET"
+      - name: Validate snapshot schema
+        working-directory: cloudflare/motorlab-state-bridge
+        run: node scripts/validate-outbox.mjs ../../MOTORLAB_CLOUDFLARE_OUTBOX.json
+      - name: Relay signed snapshot and verify D1 receipt
+        shell: bash
+        working-directory: cloudflare/motorlab-state-bridge
+        run: |
+          set -euo pipefail
+          payload="$(cat ../../MOTORLAB_CLOUDFLARE_OUTBOX.json)"
+          timestamp="$(date +%s)"
+          signature="$(printf '%s' "$payload" | MOTORLAB_TIMESTAMP="$timestamp" node scripts/sign-stdin.mjs)"
+          response="$(curl --fail-with-body --silent --show-error \
+            -H 'content-type: application/json' \
+            -H "x-motorlab-timestamp: $timestamp" \
+            -H "x-motorlab-signature: $signature" \
+            --data "$payload" \
+            "$WORKER_URL/relay")"
+          snapshot_id="$(jq -r '.snapshot_id' <<<"$response")"
+          payload_hash="$(jq -r '.payload_hash' <<<"$response")"
+          test -n "$snapshot_id"
+          test -n "$payload_hash"
+          verify="$(curl --fail-with-body --silent --show-error "$WORKER_URL/verify/$snapshot_id")"
+          test "$(jq -r '.payload_hash' <<<"$verify")" = "$payload_hash"
+          test "$(jq -r '.schema_version' <<<"$verify")" = "1"
