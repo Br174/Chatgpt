@@ -10,92 +10,99 @@ GLOBAL PRINCIPLES
 - PRE_RESPONSE_BOOT_GATE is mandatory: MotorLab starts before substantive software-project work and the first user-visible line is "⚙️ MotorLab attivo".
 - Br174/Chatgpt is the single central MotorLab authority.
 - Each registered project has one canonical Project Continuity ledger in Br174/Chatgpt.
-- New chats load/reconcile that ledger with newer live repository/provider/job/artifact evidence before choosing a starting point.
-- No recurring activation prompt or chat-transfer prompt is required.
+- New chats reconcile that ledger with newer live project evidence before choosing a starting point.
+- No recurring activation or chat-transfer prompt is required.
 - Authority: explicit current Bruno instruction > newer live project evidence > Project Continuity ledger > checkpoint/pending ledger > older registries > memory/copied summaries.
-- Same logical operation/progress/next-safe-step survive chat changes.
 - Watchdog remains sole health/intervention coordinator; Resume Recovery owns continuation; Project Continuity owns durable cross-chat state.
-- Project-native/domain engines remain preserved and authoritative for domain behavior.
-- Change Compatibility Guard is mandatory before write-capable changes.
+- Project-native/domain engines remain preserved.
+- Change Compatibility Guard is mandatory before writes.
+- LABELED_VISUAL_STATUS is global/permanent: every MotorLab status emoji carries its canonical readable label.
 
-CURRENT VERIFIED RELEASE
-Release: 2026.09.30-r8
+CURRENT CENTRAL RELEASE
+Release: 2026.09.30-r9
 Schema: 1
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
 Canonical continuity module: MOTORLAB_PROJECT_CONTINUITY_V1.txt
-Canonical r8 local-core blob: a97bc4468df7d9dc4bb12856a33042a9a3e78d8a
-Canonical r7 LAST_GOOD blob: 02a0931db8c12414c19acfd1c7aa80d896e032f2
+Canonical r9 local-core blob: 457a0ed2ed4282fbfb0b1f57b581c895398421fe
+Canonical r8 LAST_GOOD blob: a97bc4468df7d9dc4bb12856a33042a9a3e78d8a
 Normal startup banner: ⚙️ MotorLab attivo
 PRE_RESPONSE_BOOT_GATE=required
 PROJECT_CONTINUITY=required
+LABELED_VISUAL_STATUS=required
 MANUAL_LIGHTNING_SAVE_THEN_RESUME=required
 MONOTONIC_RECOVERY_FLOOR=required
 
-REGISTERED PROJECTS — R8 VERIFIED
+CANONICAL VISUAL LEGEND
+⚙️ MotorLab attivo
+🎆 Azione completata
+⚡ Risveglio / recupero
+✅ Problema risolto
+👍🏻 Procede tutto bene
+⚠️ Piccolo problema risolvibile
+🧭 Cambiare approccio
+🛑 Stop di sicurezza / blocco reale
+♻️ Una parte va rifatta
+💀 Tutto da rifare
+💯 Conclusione definitiva
+
+VISUAL RULES
+- canonical status emoji are always accompanied by their label;
+- preferred form is `<emoji> <label> — <context>`;
+- repeated fireworks/lightning are not user-facing level codes;
+- 🎆 is an action/phase completion;
+- 💯 is only true full verified closure;
+- internal technical levels remain internal and do not redefine the legend.
+
+REGISTERED PROJECTS
 1. MusicLab — Br174/MusicLab
    Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt
-   Local release: 2026.09.30-r8 VERIFIED
-   LAST_GOOD: 2026.09.30-r7
+   Local release: 2026.09.30-r9 VERIFIED
+   LAST_GOOD: 2026.09.30-r8
    Native engine: coexist/preserve
 
 2. GeoVision — Br174/GeoVision-Test
    Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
-   Local release: 2026.09.30-r8 VERIFIED
-   LAST_GOOD: 2026.09.30-r7
+   Local release last verified: 2026.09.30-r8
+   r9 adoption: next safe reconciled boundary
    Native engine: coexist/preserve
 
 3. StudyBook-AI — Br174/StudyBook-AI
    Project state: MOTORLAB_PROJECT_STATE_STUDYBOOK_AI_V1.txt
-   Local release: 2026.09.30-r8 VERIFIED
-   LAST_GOOD: 2026.09.30-r7
+   Local release last verified: 2026.09.30-r8
+   r9 adoption: next safe reconciled boundary
    Native engine: coexist/preserve
 
 4. Visionflix / Verlezza Vision source — Br174/Visionflix
    Project state: MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt
-   Local release: 2026.09.30-r8 VERIFIED
-   LAST_GOOD: 2026.09.30-r7
+   Local release last verified: 2026.09.30-r8
+   r9 adoption: next safe reconciled boundary
    Native engine: coexist/preserve
    Lifecycle authority: Visionflix source
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
    Project state: MOTORLAB_PROJECT_STATE_COVER_LAB_AI_V1.txt
-   Local release: 2026.09.30-r8 VERIFIED
-   LAST_GOOD: 2026.09.30-r7
+   Local release last verified: 2026.09.30-r8
+   r9 adoption: next safe reconciled boundary
    Native engine: Cover Lab engine coexist/preserve
 
 6. streamflix-BV delivery adapter — Br174/streamflix-BV
    Project state: MOTORLAB_PROJECT_STATE_STREAMFLIX_BV_V1.txt
-   Local release: 2026.09.30-r8 VERIFIED
-   LAST_GOOD: 2026.09.30-r7
+   Local release last verified: 2026.09.30-r8
+   r9 adoption: next safe reconciled boundary
    Native engine: delivery-adapter-coexist-preserve
    Lifecycle authority: NO; Visionflix source remains authority
 
-BOOTSTRAP REQUIREMENT
-For every recognized project session:
-1. activate MotorLab first and show banner first;
-2. load project hook/local verified satellite/current central CORE;
-3. load the mapped Project Continuity ledger;
-4. reconcile against newer live repository/ref/head/provider/job/artifact state;
-5. reconstruct operation id, phase, verified progress floor, completed step, pending verification and next safe step;
-6. restore/preserve the project-native engine relationship;
-7. if unfinished work exists, Resume Recovery/Watchdog continue it before unrelated writes;
-8. apply Change Compatibility Guard before writes.
+SAFE ADOPTION RULE
+Do not force a satellite release change into a project whose current operation state has not yet been reconciled or that is actively writing/building/testing/promoting. The central r9 rule is authoritative immediately; local satellite adoption occurs at the first safe boundary under MOTORLAB_SATELLITE_SYNC_V1.txt.
 
-WRITE-THROUGH CONTINUITY
-At material continuation-relevant transitions and before valid substantial-turn termination/handoff, refresh the project state ledger when a safe central write surface exists. A chat-id change never creates a new project operation by itself.
-
-MUSICLAB R8 LIVE PROOF
-Cross-chat write-through has been observed in real use: while another chat continued MusicLab LAB15, MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt advanced independently from the original seed to a newer head/run while preserving the 93% recovery floor. Subsequent readers must use that newer ledger/live state rather than the older bootstrap seed.
+FUTURE PROJECTS
+Every future concrete software project receives hook + local satellite + central continuity ledger and inherits the current labeled visual legend automatically.
 
 HOST LIMITATION
-If the host exposes no project identity, persistent instruction, repository identity, conversational context or software-build intent, repository files cannot physically self-activate. Once a supported signal is exposed, pre-response activation and continuity reconciliation are mandatory.
-
-NEW PROJECTS
-Every future concrete software project receives project hook/local satellite, registry entry, central Project Continuity ledger, pre-response MotorLab boot gate and current CORE rules.
+Repository configuration cannot wake a host with no execution cycle. Once a supported project/software-build signal is exposed, MotorLab boot, continuity reconciliation and the visual-status contract are mandatory.
 
 VERSION
 MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.1
-Established: 2026-09-29
-Revision 2.1: r8 deployment verified across all six registered satellites; canonical r8/r7 blob identities recorded; real MusicLab cross-chat write-through observed.
+Revision 2.1: r9 permanent labeled visual legend registered globally; MusicLab synchronized immediately at safe boundary and other satellites adopt at their next safe reconciled boundary.
