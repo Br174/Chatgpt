@@ -3,43 +3,60 @@ DATE=2026-10-01
 BRANCH=motorlab/live-control-r17-work
 ACTIVE_OPERATION=MOTORLAB_LIVE_CONTROL_R17_NATIVE_IMPLEMENTATION
 STATUS=WAITING_EXTERNAL
-VERIFIED_PROGRESS_FLOOR=97
-CURRENT_TASK=Task 5 — end-to-end central channel verification
+VERIFIED_PROGRESS_FLOOR=99
+CURRENT_TASK=Task 5 — live central channel deployment/readback verification
 
 COMPLETED
 - Task 1 CORE Live Control + micro-progress contract implemented on isolated branch.
 - Task 1 TDD evidence: historical RED 0/4; GREEN 4/4.
 - Task 2/3 bridge storage/read + signed GitHub issue relay implemented through dedicated live-control module.
-- Task 2/3 TDD evidence: RED 0/3; GREEN 6/6; Node syntax checks pass.
-- Task 4 Codex safe-point hook template implemented using official SessionStart + PostToolUse hooks.
-- Task 4 TDD evidence: RED 0/3; GREEN 3/3; Python py_compile passes.
-- MusicLab app/runtime/source has not been modified or interrupted.
+- Fresh local verification: bridge/relay suite 8/8 PASS, including signed GitHub issue -> D1-compatible persistence -> GET directive read and foreign-repository rejection.
+- Task 4 Codex safe-point hook template implemented using current official SessionStart + PostToolUse hook contract.
+- Fresh local verification: Codex hook suite 3/3 PASS; network failure falls back safely, same directive is deduplicated, unsupported events emit nothing.
+- Current Codex runtime source confirms matcher, timeout, statusMessage and additionalContextLimit are supported hook config fields.
+- MusicLab app/runtime/source has not been modified or interrupted by this operation.
+- Current central MusicLab continuity on main reports LAB20 artifact delivered, write lock released, device test pending; this is a safe future control-plane adoption boundary, but adoption remains blocked until central Live Control is live-verified.
 
 RULINGS
 - Bridge implementation uses dedicated cloudflare/motorlab-state-bridge/src/live-control.js plus entry.js routing instead of modifying the large index.js snapshot validator. Reason: same approved Live Control architecture, smaller regression surface, keeps the existing signed Issue #1 webhook as the only directive write transport, and exposes only a read-only /control/v1/directives endpoint. Cost if wrong: bridge integration would need to be refactored before deployment; no app/runtime state has been changed.
 
 BLOCKER
 - New Worker code is not yet deployed to the real motorlab-state-bridge Cloudflare Worker.
-- Local/container environment has no working wrangler/network path for deployment.
-- No direct Cloudflare plugin is available in this chat.
+- Ordinary web/container paths available in this chat cannot reach/deploy the workers.dev service.
+- Repository contains no existing GitHub Actions deploy workflow for this central Worker.
+- Historical motorlab/cloudflare-state-r16 branch was a dashboard bootstrap path, not an active automatic deployment path.
+- Direct Cloudflare credentials/binding IDs are not stored in the repository and must not be guessed or exposed.
 - TinyFish browser automation is metered; MotorLab cost guard forbids spending wallet/paid credits silently.
-- Therefore live GitHub -> D1 -> GET endpoint -> Codex hook E2E proof is still pending.
+- Therefore live GitHub -> Worker -> D1 -> GET endpoint -> Codex hook E2E proof is still pending.
 
 NEXT_SAFE_STEP
 1. Resume this same active operation first on the next execution cycle.
-2. Resolve a no-extra-cost Cloudflare deployment path or obtain explicit authorization for a metered/manual external path.
-3. Deploy branch Worker code and run live E2E directive proof.
-4. Only after E2E success consider MusicLab pilot adoption at a verified safe boundary.
+2. Resolve a no-extra-cost authorized Cloudflare deployment path (preferred) without exposing secrets.
+3. Deploy the verified branch Worker code and run live E2E directive proof.
+4. Only after live E2E success adopt the tested Codex hook metadata into MusicLab at the already verified safe boundary.
 5. Do not promote central r17 before live proof.
 
 SINGLE_WRITER=central MotorLab branch only
-MUSICLAB_ACTIVE_TASK=DO_NOT_INTERRUPT
+MUSICLAB_RUNTIME=DO_NOT_TOUCH_DURING_THIS_BLOCKED_PHASE
+
+COMMAND_QUEUE_RULE
+- Every ordinary Bruno request acts as an automatic wake/checkpoint event.
+- Checkpoint the active operation immediately, assimilate the new request, preserve the current operation/progress floor, then resume the current operation.
+- Ordinary new requests never preempt by recency.
+- Queue is FIFO: earlier request before later request.
+- Only explicit Bruno priority wording may preempt at the first safe checkpoint.
+- After a priority task finishes, resume the paused operation automatically unless explicitly cancelled or unsafe.
 
 QUEUED_REQUESTS
 1. STATUS=QUEUED
    PRIORITY_OVERRIDE=false
-   REQUEST=Every user request acts as an automatic wake/checkpoint event: checkpoint current active operation immediately, assimilate the new request, keep it FIFO queued unless Bruno explicitly gives it priority, resume active operation from last checkpoint, and drain queued requests in arrival order after active work completes.
    ORDER=1
+   REQUEST=Make MotorLab reliably activate and contribute at 100% in MusicLab and every registered/current/future project, with all applicable MotorLab features actually loaded rather than merely documented.
+
+2. STATUS=QUEUED
+   PRIORITY_OVERRIDE=false
+   ORDER=2
+   REQUEST=Replace the prior timed-approval scale with an Approval Countdown shown beside each approval: BANAL=10 seconds; LESS_BANAL=20 seconds; IMPORTANT=60 seconds; VERY_IMPORTANT=300 seconds. At expiry auto-approve exactly as if Bruno approved, unless Bruno has expressed rejection/disagreement such as no/non approvo/equivalent before the protected write. Preserve the manual-only safety ceiling for irreversible/security/production/billing/secret-sensitive actions and do not falsely claim countdown execution when no durable executor/control cycle exists.
 
 RECOVERY_RULE
-Every ordinary user request must first checkpoint/wake the active operation, assimilate the request, keep the active operation first, and resume from the latest verified checkpoint. New ordinary requests append FIFO behind existing queued requests. Only explicit Bruno priority wording may preempt at a safe checkpoint. A frozen host does not imply completion; resume from this checkpoint on the next available execution cycle.
+A frozen/suspended host never means the task is finished. On every later user request, first treat it as wake+checkpoint, reconcile this file/live evidence, preserve VERIFIED_PROGRESS_FLOOR=99 unless newer evidence changes it, append the request FIFO unless explicit priority was given, then resume ACTIVE_OPERATION before unrelated queued writes.
