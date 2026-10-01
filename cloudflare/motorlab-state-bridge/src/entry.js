@@ -1,4 +1,5 @@
 import core, { sha256Hex, validateSnapshot } from './index.js';
+import { directiveFromIssueBody, persistLiveDirective, readLiveDirectives } from './live-control.js';
 
 export { sha256Hex, validateSnapshot };
 
@@ -64,6 +65,14 @@ async function issueRelay(request, env) {
   if (payload?.repository?.full_name !== allowedRepository) return json({ error: 'repository_not_allowed' }, 403);
   if (String(payload?.issue?.number ?? '') !== String(env.RELAY_ISSUE_NUMBER)) return json({ ignored: true, reason: 'issue_not_allowed' }, 202);
 
+  let directive = null;
+  try { directive = directiveFromIssueBody(payload?.issue?.body); }
+  catch (error) { return json({ error: error.message || 'invalid_directive' }, 400); }
+  if (directive) {
+    try { return json({ directive: await persistLiveDirective(env, directive), stored: true }); }
+    catch (error) { return json({ error: error.message === 'd1_not_configured' ? 'd1_unavailable' : (error.message || 'd1_unavailable') }, 503); }
+  }
+
   const rawSnapshot = snapshotFromIssueBody(payload?.issue?.body);
   if (!rawSnapshot) return json({ ignored: true, reason: 'no_snapshot' }, 202);
   try { validateSnapshot(JSON.parse(rawSnapshot)); }
@@ -86,6 +95,9 @@ async function issueRelay(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (request.method === 'GET' && url.pathname === '/control/v1/directives') {
+      return readLiveDirectives(request, env);
+    }
     if (request.method === 'POST' && url.pathname === '/github-webhook' && request.headers.get('x-github-event') === 'issues') {
       return issueRelay(request, env);
     }
