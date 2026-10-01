@@ -92,9 +92,24 @@ Append-oriented operational history for material transitions only.
 Examples: request parsed, pre-change report emitted, approval captured, write started, checkpoint reached, artifact verified, artifact delivered, causal queue opened/closed, operation closed.
 Do not log every low-value internal thought/tool call.
 
+9. live_directives
+- directive_id
+- project_id
+- operation_id/session_id when known
+- directive_type
+- value
+- priority
+- created_at
+- expires_at or durable flag
+- issued_by
+- applied_checkpoint
+- status: pending/applied/superseded/rejected
+Live directives contain orchestration metadata only: no raw API keys, access tokens, credentials or secrets.
+
 WRITE DISCIPLINE
 - D1 writes must be bounded and meaningful; avoid polling/event spam.
 - Persist at material transitions and checkpoints.
+- Live directive writes are transition-based and deduplicated; safe-point reads must not create event spam.
 - Use idempotent keys where possible so Resume Recovery does not duplicate state.
 - One logical operation uses one MOTORLAB_OPERATION_ID.
 - Approval records must preserve scope identity so old approval cannot authorize broadened scope.
@@ -104,12 +119,13 @@ KV may cache:
 - current operation summary per project;
 - latest verified progress snapshot;
 - quick project status cards;
-- frequently-read reference pointers.
+- frequently-read reference pointers;
+- reconstructible active-directive summaries when useful.
 KV values must include freshness/version metadata where useful.
 Loss or staleness of KV must not lose authoritative state.
 
 GITHUB CHECKPOINT BACKSTOP
-At major durable boundaries, especially artifact delivery, promotion, definitive closure, or long-lived external wait, persist enough technical state in GitHub Project Continuity/technical registries so the operation can still be reconstructed if D1 is unavailable.
+At major durable boundaries, especially artifact delivery, promotion, definitive closure, long-lived external wait or material Live Control state transition, persist enough technical state in GitHub Project Continuity/technical registries so the operation can still be reconstructed if D1 is unavailable.
 Do not mirror every D1 event into GitHub.
 
 FALLBACK MODE
@@ -117,12 +133,14 @@ If D1 is unavailable:
 1. do not invent D1 state;
 2. use GitHub canonical technical state + project live evidence + verified local satellite;
 3. preserve new operational changes in an in-turn checkpoint and, where appropriate, GitHub continuity backstop;
-4. mark D1_RECONCILE_PENDING;
-5. when D1 returns, reconcile from authoritative evidence before accepting cached state.
+4. use repository Live Control fallback metadata conservatively when available;
+5. mark D1_RECONCILE_PENDING;
+6. when D1 returns, reconcile from authoritative evidence before accepting cached state.
 
 RECONCILIATION
 On D1 recovery:
 - compare operation ids, source refs/heads, artifact checksums and durable GitHub transitions;
+- reconcile live directive ids/status without re-applying superseded/expired directives;
 - never overwrite newer verified GitHub technical truth with stale D1 data;
 - merge only non-conflicting operational records;
 - stale locks must be validated before release/reuse;
@@ -134,7 +152,7 @@ Use cache, deduplication, batch writes and transition-based persistence to minim
 Never auto-enable paid billing.
 
 SECURITY
-Store no raw API keys, access tokens or secrets in D1/KV operational records.
+Store no raw API keys, access tokens, credentials or secrets in D1/KV operational records or live directives.
 Only identifiers/masked references permitted where needed.
 
 IMPLEMENTATION PHASES
@@ -147,10 +165,12 @@ SUCCESS CRITERIA
 - interrupted approved work can resume from durable state;
 - approval scope is not forgotten;
 - active locks/checkpoints/artifacts/root-cause queues survive chat changes;
+- applicable Live Control directives survive/reconcile without becoming write authority;
 - optional cache loss is harmless;
 - D1 outage does not make MotorLab unusable;
 - GitHub remains the durable technical backstop.
 
 VERSION
-MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.0
+MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.1
 Established: 2026-09-30
+Revision 1.1: adds secret-free live_directives persistence and repository fallback semantics for Live Control.
