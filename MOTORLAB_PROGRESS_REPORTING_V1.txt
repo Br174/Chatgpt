@@ -5,19 +5,31 @@ Mandatory MotorLab CORE communication capability.
 Repository authority: Br174/Chatgpt.
 
 PURPOSE
-Let Bruno follow substantial programming, fixing, build, testing, artifact delivery and causal closure work closely without invented progress or meaningless spam.
+Let Bruno follow ALL MotorLab-controlled modifications, from micro-changes through substantial programming, fixing, build, testing, artifact delivery and causal closure work, without invented progress or meaningless spam.
 
 CORE PRINCIPLE
 Progress represents verified completion, not elapsed time or ETA. Same-scale verified progress is monotonic unless material evidence invalidates prior work.
 
 ROLE / PRECEDENCE
-Progress Reporting owns user-visible percentages. Visual Status owns emoji labels. Watchdog owns health/stall. Resume Recovery owns continuation. Root Cause Closure owns definitive problem closure. MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt owns artifact-vs-causal phase ordering.
+Progress Reporting owns user-visible percentages. Visual Status owns emoji labels. Watchdog owns health/stall. Resume Recovery owns continuation. Root Cause Closure owns definitive problem closure. MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt owns artifact-vs-causal phase ordering. MOTORLAB_LIVE_CONTROL_V1.txt may increase presentation frequency at supported safe control points but cannot fabricate progress.
 
 1. NUMERIC PROGRESS - MANDATORY
-For substantial MotorLab operations establish a meaningful verified scale early and keep `Progresso MotorLab: <N>%` visible at material transitions. Repeating the same value with new state is better than inventing advancement.
+For ALL MotorLab-controlled modifications establish a meaningful verified scale as early as the execution surface permits and keep `Progresso MotorLab: <N>%` visible at required status boundaries. This applies to small/micro changes as well as substantial operations. Repeating the same verified value with new state is better than inventing advancement.
 
 2. FIRST-STATUS GATE
-After `⚙️ MotorLab attivo`, if substantial work is active/pending/newly accepted, establish/reconstruct and display a verified percentage before long opaque work. Use live provider/repository/checkpoint evidence; do not reset because a chat/turn changed.
+After `⚙️ MotorLab attivo`, if work is active, pending or newly accepted, establish/reconstruct and display a verified percentage before opaque work. Use live provider/repository/checkpoint evidence; do not reset because a chat/turn changed.
+
+2A. MICRO-PROGRESS - MANDATORY
+Small one-step change minimum visible sequence:
+- opening status with `Progresso MotorLab: <N>%`;
+- verified closing status.
+
+Small change containing a material tool, write or test boundary minimum visible sequence:
+- opening percentage;
+- intermediate percentage/status at the first material tool/write/test boundary when the execution surface can emit one;
+- verified closing percentage.
+
+A compact evidence-backed scale such as 20% -> 60% -> 100% is permitted when those values map to real milestones. Do not invent precision merely to create movement.
 
 3. LONG / EXTERNAL OPERATION VISIBILITY
 Before a long build/test/provider phase show current percentage and what is starting. Report material provider/job transitions at the next available control point. Healthy durable jobs follow No-Spin rather than endless foreground polling.
@@ -93,20 +105,25 @@ Use only observable milestones. If exact percentage cannot yet be established, k
 15. CROSS-PROJECT / PERSISTENCE
 Global across current/future MotorLab projects. Persist enough operation identity, latest verified overall progress, artifact progress when active, and pending causal queue for deterministic recovery.
 
-16. LIMITATION
+16. LIVE CONTROL INTEGRATION
+When `FORCE_PROGRESS_DISPLAY=ON`, every user-visible MotorLab status emitted during active work includes numeric progress. When `PROGRESS_PRESENCE=HIGH`, micro-changes use at least opening and closing progress and emit an intermediate update at a material boundary when supported. A presentation-only directive never advances the verified percentage by itself.
+
+17. LIMITATION
 Progress can be reported only when the execution surface provides a control point. No invisible progress claims during a frozen host.
 
-17. NO RUNTIME REGRESSION
+18. NO RUNTIME REGRESSION
 Reporting behavior does not authorize app/runtime/package/signing/lifecycle changes.
 
 SUCCESS CRITERIA
-- meaningful numeric progress remains visible;
+- meaningful numeric progress remains visible for small and large changes;
+- micro-changes show opening/closing progress and intermediate progress when a material boundary exists;
 - APK/ZIP can honestly be 100% while MotorLab overall remains below 100%;
 - pending causal work is explicit, durable and not mistaken for completed closure;
 - final/solved labels are not premature;
 - percentages remain evidence-based and monotonic.
 
 VERSION
-MOTORLAB-PROGRESS-REPORTING-V1.6
+MOTORLAB-PROGRESS-REPORTING-V1.7
 Established: 2026-09-28
 Revision 1.6: r15 adds dual Artifact/Overall progress and post-artifact Root Cause queue semantics.
+Revision 1.7: numeric progress becomes mandatory for ALL MotorLab-controlled modifications, including micro-changes, and integrates safe-point Live Control presentation directives.
