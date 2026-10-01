@@ -1,0 +1,33 @@
+{
+  "description": "MotorLab Live Control safe-point pickup",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_live_control.py\"",
+            "timeout": 5,
+            "statusMessage": "Checking MotorLab Live Control",
+            "additionalContextLimit": 1500
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_live_control.py\"",
+            "timeout": 5,
+            "statusMessage": "Checking MotorLab Live Control",
+            "additionalContextLimit": 1500
+          }
+        ]
+      }
+    ]
+  }
+}
