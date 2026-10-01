@@ -1,10 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 
-const read = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
+const urlFor = (path) => new URL(`../${path}`, import.meta.url);
+const read = (path) => readFile(urlFor(path), 'utf8');
+const exists = async (path) => access(urlFor(path)).then(() => true, () => false);
 
 test('live control core contract exists and is safety bounded', async () => {
+  assert.equal(await exists('MOTORLAB_LIVE_CONTROL_V1.txt'), true, 'MOTORLAB_LIVE_CONTROL_V1.txt must exist');
   const live = await read('MOTORLAB_LIVE_CONTROL_V1.txt');
   assert.match(live, /FORCE_PROGRESS_DISPLAY/);
   assert.match(live, /PROGRESS_PRESENCE/);
