@@ -1,0 +1,88 @@
+MOTORLAB LIVE CONTROL V1 - SAFE-POINT DIRECTIVES
+
+STATUS
+Mandatory MotorLab CORE capability for lightweight live orchestration directives.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Allow a running supported MotorLab executor to receive lightweight behavioral/presentation corrections at a safe control point without restarting the active task, resetting verified progress, changing branch/ref, creating a second writer, or mutating application runtime.
+
+PRIMARY CHANNEL
+Cloudflare D1 operational state is the primary live directive channel when connected and reconciled. Repository MotorLab metadata is the fallback. GitHub remains durable technical authority for policy/release definitions.
+
+DIRECTIVE MODEL
+Minimum fields:
+- directive_id
+- project_id
+- operation_id and/or session_id when known
+- directive_type
+- value
+- priority
+- created_at
+- expires_at or durable flag
+- issued_by
+- applied_checkpoint
+- status: pending | applied | superseded | rejected
+
+INITIAL DIRECTIVE TYPES
+- FORCE_PROGRESS_DISPLAY
+- PROGRESS_PRESENCE
+- STATUS_DETAIL_LEVEL
+- FORCE_CHECKPOINT_STATUS
+
+INITIAL REQUIRED VALUES
+FORCE_PROGRESS_DISPLAY=ON
+PROGRESS_PRESENCE=HIGH
+
+SAFE CONTROL POINTS
+A supported executor checks Live Control only at a safe control point:
+- after a tool call returns;
+- after a test/build/provider job transition;
+- after a checkpoint is persisted;
+- before beginning a new material phase;
+- before user-visible status output;
+- after recovery/resume.
+
+NON-INTERRUPTION
+A presentation directive MUST NOT interrupt an in-flight tool/build/process solely to change presentation. It applies at the first available safe control point.
+
+NO WRITE AUTHORITY
+Live Control never grants approval to modify application/project source. It cannot bypass Pre-Change Approval, lifecycle gates, Root Cause Closure, single-writer, cost/security rules, or promotion rules.
+
+SINGLE-WRITER
+A live directive does not create or transfer a writer lock. It may alter only supported orchestration/presentation behavior at the current writer's next safe control point.
+
+PROGRESS DIRECTIVES
+When FORCE_PROGRESS_DISPLAY=ON, every user-visible MotorLab status emitted during active work includes verified numeric progress when the execution surface can emit status.
+When PROGRESS_PRESENCE=HIGH, small changes use opening and closing progress, and a tool/test/write boundary emits an intermediate progress status when visible.
+No directive may fabricate progress. Preserve the last verified monotonic floor.
+
+UNKNOWN / EXPIRED DIRECTIVES
+Unknown, expired, superseded or malformed directive types are ignored safely and reported at the next appropriate status boundary. They never authorize writes.
+
+PERSISTENCE / RECOVERY
+Persist the last applied directive id, active operation/session identity, last verified progress floor, last checkpoint and next safe step. Resume Recovery reconciles live directives before continuing from the saved checkpoint.
+
+UNSUPPORTED / ALREADY-RUNNING EXECUTOR LIMIT
+A directive cannot be injected retroactively into the middle of an already-running opaque operation that was launched without Live Control support. Such an in-flight execution is explicitly unsupported for live pickup until it reaches a control point capable of reading the channel or a later supported resume/run. MotorLab must never claim the directive was applied without evidence.
+
+FALLBACK
+If D1/live channel is unavailable, use repository MotorLab fallback metadata conservatively. Failure to fetch a presentation directive must fail open: do not stop otherwise safe approved work.
+
+SECURITY / COST
+Directives contain orchestration metadata only, never raw API keys, tokens, credentials or secrets. Reads are checkpoint-driven, not continuous busy polling. No paid service/overage is enabled silently.
+
+NO RUNTIME COUPLING
+This capability is MotorLab control-plane behavior only. It must not intentionally change app runtime/UI/package/signing/native engines.
+
+SUCCESS CRITERIA
+- a supported executor can apply a presentation directive at its next safe control point without task reset;
+- verified progress floor and writer identity are preserved;
+- micro-progress can be forced without changing app behavior;
+- unsupported in-flight executions are reported honestly;
+- unknown/expired directives fail safely;
+- Live Control never bypasses approval or single-writer rules.
+
+VERSION
+MOTORLAB-LIVE-CONTROL-V1.0
+Established: 2026-10-01
