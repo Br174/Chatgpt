@@ -85,6 +85,13 @@ MotorLab metadata/policies do not authorize application runtime/UI/package/signi
 PLATFORM BOUNDARY
 MotorLab cannot wake a host with no execution cycle or claim invisible continuation without a real durable executor.
 
+LIVE CONTROL - R17 CANDIDATE
+Load `MOTORLAB_LIVE_CONTROL_V1.txt` when present. A supported executor reconciles applicable directives at a safe control point before user-visible status and after resume/recovery. Live Control never interrupts an in-flight tool solely for presentation, never grants write authority, and preserves the current verified progress floor.
+
+MICRO-PROGRESS - R17 CANDIDATE
+Numeric progress applies to small MotorLab-controlled modifications as well as substantial work. Opening and verified closing progress are mandatory when visible execution exists; a material tool/write/test boundary adds an intermediate update when supported.
+
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.8
+MOTORLAB-CORE-ENTRYPOINT-V1.9
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
+Revision 1.9: adds Live Control safe-point reconciliation before user-visible status and after resume/recovery plus micro-progress boot semantics.
