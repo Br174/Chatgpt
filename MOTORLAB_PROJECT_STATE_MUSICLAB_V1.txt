@@ -1,30 +1,61 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=20
-STATE_STATUS=MADRE_VERIFIED
+STATE_REVISION=21
+STATE_STATUS=LAB20_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-lab19-player-direct-collapse
-OPERATION_STATUS=MADRE_PROMOTED
-CURRENT_PHASE=LAB19 device-accepted CANDIDATA promoted by explicit Bruno approval to immutable MADRE at the exact same source SHA.
-CURRENT_REF=mother/musiclab-lab19-final
-CURRENT_HEAD_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-CURRENT_PROVIDER=GitHub + GitHub Actions
-CURRENT_JOB_ID=36682604681
+ACTIVE_OPERATION_ID=musiclab-ai-brain-lab20
+OPERATION_STATUS=LAB_VERIFIED_ARTIFACT_DELIVERED
+CURRENT_PHASE=LAB20 AI Brain implementation complete and exact-SHA APK+ZIP verified; waiting only for Bruno device test before any CANDIDATA construction.
+CURRENT_REF=uab-build/musiclab-ai-brain-20
+CURRENT_HEAD_SHA=dd585c75b9feb98723858fd7f7bdf6b20c20bae8
+CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
+CURRENT_JOB_ID=36921304999
 CURRENT_JOB_STATUS=success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
 WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=none for MADRE promotion; exact Candidate SHA was preserved
-NEXT_SAFE_STEP=Use mother/musiclab-lab19-final as the canonical base for future LAB work. Preserve this MADRE unchanged. Any new application change starts in a new isolated LAB and follows the pre-change approval gate.
-LAST_USER_INTENT_SUMMARY=Bruno explicitly promoted the already tested LAB19 CANDIDATA directly to MADRE; no method replay, no rebuild, no runtime modification during promotion.
+PENDING_VERIFICATION=Bruno device test of exact LAB20 APK artifact
+NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-20.apk. If explicitly approved, construct a new isolated CANDIDATA from the exact current MADRE by replaying the approved LAB20 change-set; build APK+ZIP for that CANDIDATA and require a second Bruno device approval before MADRE promotion.
+LAST_USER_INTENT_SUMMARY=Complete MusicLab AI Brain LAB20 end-to-end, always showing verified percentage, produce verified APK+ZIP, and do not touch/promote MADRE before Bruno device testing and explicit approval.
+
+CURRENT_LAB20
+REF=uab-build/musiclab-ai-brain-20
+SHA=dd585c75b9feb98723858fd7f7bdf6b20c20bae8
+FINAL_GATE_RUN=36921304999
+FINAL_GATE_STATUS=success
+ARTIFACT_ID=11192970609
+ARTIFACT_NAME=MusicLab-LAB-20
+ARTIFACT_DIGEST=sha256:b080e89658352f35db74b3cf27d2a5d9877de5e226723ee3a8f2c129765c8478
+APK_NAME=MusicLab-LAB-20.apk
+APK_SHA256=85564e9228817331aa89e4f1fc79c2a096c3f5c34b0ea049d813a75948c54e01
+ZIP_NAME=MusicLab-LAB-20-APK.zip
+BUILD_SHA_FILE=dd585c75b9feb98723858fd7f7bdf6b20c20bae8
+FINAL_GATE_BRAIN=success
+FINAL_GATE_D1=success
+FINAL_GATE_ANDROID=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno test
+CANDIDATA_CREATED=no
+MADRE_PROMOTION=no
+
+LAB20_ROOT_CAUSE_CLOSURES
+- Originali title-search regression: closed by wiring every OriginalVersionRow call-site and permanent call-site contract test.
+- Runtime structured source lanes: closed by actual MusicBrainz/Wikidata evidence integration as non-veto Brain context after D1 memory.
+- Permanent benchmark gap: closed with approved 7-scenario MusicLab Brain regression corpus.
+- GitHub runner missing Android debug.keystore: closed in Universal APK Builder itself with automatic standard debug keystore generation before Gradle; permanent UAB contract test added and builder changes now trigger that contract.
+- Final exact-SHA gate unifies Brain tests, D1 migrations, Android tests, UAB diagnostics, APK+ZIP build, SHA stamping, deliverable integrity and artifact upload.
 
 CURRENT_MADRE
 REF=mother/musiclab-lab19-final
 SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+STATUS=UNCHANGED_DURING_LAB20
 PROMOTED_FROM=candidate/musiclab-lab19-player-stable
 PROMOTED_FROM_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 PROMOTION_MODE=exact approved Candidate ref -> new immutable Mother ref
@@ -51,38 +82,31 @@ CANDIDATE_LIFECYCLE_RULE_PERMANENT
 - Normal CANDIDATA creation starts from the exact current MADRE, then replays/transplants the approved LAB method/change-set onto that MADRE.
 - Every newly constructed CANDIDATA must receive its own isolated identity plus APK + ZIP and must be tested by Bruno before MADRE promotion.
 - Only after Bruno explicitly approves a tested CANDIDATA may it be promoted to MADRE.
-- CANDIDATA -> MADRE promotion is different: it preserves the exact approved Candidate source SHA and creates/moves the new immutable Mother reference without replaying the LAB method again.
+- CANDIDATA -> MADRE promotion preserves the exact approved Candidate source SHA and creates/moves the new immutable Mother reference without replaying the LAB method again.
 - Existing historical MADRI remain preserved and are never overwritten merely because a newer MADRE is promoted.
 
 PLAYER_ROOT_CAUSE
 STATUS=CLOSED_DEVICE_VERIFIED
-SUMMARY=LAB19 fixed player re-expansion/ownership/collapse race and is now preserved in current MADRE mother/musiclab-lab19-final.
+SUMMARY=LAB19 fixed player re-expansion/ownership/collapse race and remains preserved in current MADRE mother/musiclab-lab19-final.
 
-MOTORLAB_R15_SYNC
+MOTORLAB_R16_SYNC
 SYNC_STATUS=VERIFIED_CONTROL_PLANE_ONLY
-CENTRAL_RELEASE=2026.09.30-r15
-LOCAL_RELEASE=2026.09.30-r15
-LAST_GOOD_RELEASE=2026.09.30-r14
-LOCAL_CORE_BLOB=673b79c3954c1150c1fea470a9ad40a90409f855
-LAST_GOOD_BLOB=f9add06e85890f6a1e9d270c98c10c4fc6566b40
-SYNC_STATE_BLOB=2443e97fb4e33dbb6e2630d4072c6396c8f69f9b
-HOOK_BLOB=288a96c706a46db970b4880e1f2090659ba1446e
+CENTRAL_RELEASE=2026.09.30-r16
+LOCAL_RELEASE=2026.09.30-r16
+LAST_GOOD_RELEASE=2026.09.30-r13
 APPLICATION_RUNTIME_IMPACT=NONE
 
-R15_ARTIFACT_FIRST
-POLICY=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
+ARTIFACT_FIRST
 DEFAULT_ORDER=repair -> risk-appropriate verify -> artifact -> deliver -> causal/prevention follow-up -> definitive closure
 ROOT_CAUSE_OBLIGATION=mandatory
-POST_ARTIFACT_ROOT_CAUSE_QUEUE=required for safely deferred causal items
-NON_DEFERRABLE_CAUSE=must remain before artifact when required for trust/safety/integrity
-DUAL_PROGRESS=artifact may reach 100%; overall remains below 100% while mandatory causal work remains
-DELIVERED_ARTIFACT_IMMUTABILITY=preserve exact ref/checksum while Bruno tests; later prevention builds are separate controlled states
+DELIVERED_ARTIFACT_IMMUTABILITY=preserve exact LAB20 ref/checksum while Bruno tests; later CANDIDATA builds are separate controlled states
 
-R14_APPROVAL_GATE_PRESERVED
+APPROVAL_GATE_PRESERVED
 INITIAL_CHANGE_REQUEST=not write approval
-PRE_CHANGE_REPORT=required
-POST_REPORT_BRUNO_APPROVAL=required
+PRE_CHANGE_REPORT=required for materially new out-of-scope changes
+ALREADY_APPROVED_LAB20_SCOPE=completed
 MATERIAL_SCOPE_EXPANSION=requires amended approval
+DEVICE_TEST_GATE=mandatory before CANDIDATA construction/promotion flow
 
 VISIBLE_RESTORE_REGISTER
 PATH=MOTORLAB_MODIFICATION_RESTORE_REGISTER_MUSICLAB_V1.txt
@@ -96,13 +120,14 @@ RULE=only Bruno-confirmed working modifications enter; same feature updates same
 TECHNICAL_CHANGE_HISTORY=MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
 
 CONTINUITY_RULES
-- Canonical application continuation point is mother/musiclab-lab19-final.
-- Preserve current MADRE unchanged as stable production baseline/rollback point.
-- Future LABs start from current MADRE unless Bruno explicitly selects another base.
-- Future CANDIDATE creation uses the permanent Mother -> replay approved LAB method -> isolated Candidate APK+ZIP -> Bruno test workflow.
+- Current stable production baseline remains mother/musiclab-lab19-final until Bruno approves a separately built/tested CANDIDATA.
+- LAB20 exact technical continuation/test point is uab-build/musiclab-ai-brain-20 at dd585c75b9feb98723858fd7f7bdf6b20c20bae8.
+- Preserve LAB20 artifact immutably while Bruno performs device testing.
+- Do not modify or promote current MADRE as part of LAB20 device testing.
+- If LAB20 is approved, CANDIDATA creation follows permanent Mother -> replay approved LAB20 change-set -> isolated Candidate APK+ZIP -> Bruno test workflow.
 - Candidate -> Mother promotion preserves exact approved Candidate SHA.
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r15 LAB19 CANDIDATA -> MADRE exact promotion
-UPDATED_DATE=2026-09-30
+UPDATED_BY=MotorLab r16 MusicLab AI Brain LAB20 exact-SHA verified delivery
+UPDATED_DATE=2026-10-01
