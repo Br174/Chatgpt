@@ -1,0 +1,20 @@
+MOTORLAB CHECKPOINT — LIVE CONTROL R17 ACTIVE
+DATE=2026-10-01
+BRANCH=motorlab/live-control-r17-work
+ACTIVE_OPERATION=MOTORLAB_LIVE_CONTROL_R17_NATIVE_IMPLEMENTATION
+STATUS=RUNNING
+VERIFIED_PROGRESS_FLOOR=88
+CURRENT_TASK=Task 1 — CORE policy contract and micro-progress semantics
+LAST_COMPLETED_STEP=Task 1 RED test written and corrected; 4 expected capability failures confirmed
+NEXT_SAFE_STEP=Implement minimal GREEN for Task 1 on isolated branch
+SINGLE_WRITER=central MotorLab branch only
+MUSICLAB_ACTIVE_TASK=DO_NOT_INTERRUPT
+
+QUEUED_REQUESTS
+1. STATUS=QUEUED
+   PRIORITY_OVERRIDE=false
+   REQUEST=Every user request acts as an automatic wake/checkpoint event: checkpoint current active operation immediately, assimilate the new request, keep it FIFO queued unless Bruno explicitly gives it priority, resume active operation from last checkpoint, and drain queued requests in arrival order after active work completes.
+   ORDER=1
+
+RECOVERY_RULE
+Any subsequent ordinary user request checkpoints this active operation and is appended FIFO; it does not preempt unless explicit priority wording is present.
