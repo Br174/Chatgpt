@@ -2,11 +2,36 @@ MOTORLAB CHECKPOINT — LIVE CONTROL R17 ACTIVE
 DATE=2026-10-01
 BRANCH=motorlab/live-control-r17-work
 ACTIVE_OPERATION=MOTORLAB_LIVE_CONTROL_R17_NATIVE_IMPLEMENTATION
-STATUS=RUNNING
-VERIFIED_PROGRESS_FLOOR=88
-CURRENT_TASK=Task 1 — CORE policy contract and micro-progress semantics
-LAST_COMPLETED_STEP=Task 1 RED test written and corrected; 4 expected capability failures confirmed
-NEXT_SAFE_STEP=Implement minimal GREEN for Task 1 on isolated branch
+STATUS=WAITING_EXTERNAL
+VERIFIED_PROGRESS_FLOOR=97
+CURRENT_TASK=Task 5 — end-to-end central channel verification
+
+COMPLETED
+- Task 1 CORE Live Control + micro-progress contract implemented on isolated branch.
+- Task 1 TDD evidence: historical RED 0/4; GREEN 4/4.
+- Task 2/3 bridge storage/read + signed GitHub issue relay implemented through dedicated live-control module.
+- Task 2/3 TDD evidence: RED 0/3; GREEN 6/6; Node syntax checks pass.
+- Task 4 Codex safe-point hook template implemented using official SessionStart + PostToolUse hooks.
+- Task 4 TDD evidence: RED 0/3; GREEN 3/3; Python py_compile passes.
+- MusicLab app/runtime/source has not been modified or interrupted.
+
+RULINGS
+- Bridge implementation uses dedicated cloudflare/motorlab-state-bridge/src/live-control.js plus entry.js routing instead of modifying the large index.js snapshot validator. Reason: same approved Live Control architecture, smaller regression surface, keeps the existing signed Issue #1 webhook as the only directive write transport, and exposes only a read-only /control/v1/directives endpoint. Cost if wrong: bridge integration would need to be refactored before deployment; no app/runtime state has been changed.
+
+BLOCKER
+- New Worker code is not yet deployed to the real motorlab-state-bridge Cloudflare Worker.
+- Local/container environment has no working wrangler/network path for deployment.
+- No direct Cloudflare plugin is available in this chat.
+- TinyFish browser automation is metered; MotorLab cost guard forbids spending wallet/paid credits silently.
+- Therefore live GitHub -> D1 -> GET endpoint -> Codex hook E2E proof is still pending.
+
+NEXT_SAFE_STEP
+1. Resume this same active operation first on the next execution cycle.
+2. Resolve a no-extra-cost Cloudflare deployment path or obtain explicit authorization for a metered/manual external path.
+3. Deploy branch Worker code and run live E2E directive proof.
+4. Only after E2E success consider MusicLab pilot adoption at a verified safe boundary.
+5. Do not promote central r17 before live proof.
+
 SINGLE_WRITER=central MotorLab branch only
 MUSICLAB_ACTIVE_TASK=DO_NOT_INTERRUPT
 
@@ -17,4 +42,4 @@ QUEUED_REQUESTS
    ORDER=1
 
 RECOVERY_RULE
-Any subsequent ordinary user request checkpoints this active operation and is appended FIFO; it does not preempt unless explicit priority wording is present.
+Every ordinary user request must first checkpoint/wake the active operation, assimilate the request, keep the active operation first, and resume from the latest verified checkpoint. New ordinary requests append FIFO behind existing queued requests. Only explicit Bruno priority wording may preempt at a safe checkpoint. A frozen host does not imply completion; resume from this checkpoint on the next available execution cycle.
