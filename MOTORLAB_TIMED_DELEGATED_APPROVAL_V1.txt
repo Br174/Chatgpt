@@ -1,0 +1,93 @@
+MOTORLAB TIMED DELEGATED APPROVAL V1 - COUNTDOWN AUTO-APPROVAL
+
+STATUS
+Mandatory MotorLab CORE governance capability.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Avoid unnecessary stalls when Bruno is temporarily unavailable while preserving scope, safety, auditability and explicit rejection precedence.
+
+APPROVAL CATEGORIES - EXACT
+BANAL=10 seconds
+LESS_BANAL=20 seconds
+IMPORTANT=60 seconds
+VERY_IMPORTANT=300 seconds
+
+VISIBLE COUNTDOWN
+Every eligible MotorLab approval report MUST show:
+Prova ⏱ MM:SS
+using the initial duration for its category.
+On execution surfaces that can stream command output, the approval helper may refresh the remaining time once per second.
+A normal chat message cannot be edited once per second; never fake an animated countdown. In that case show the initial timer and the final approval/rejection state at the next visible control point.
+
+TIMER START GATE
+The timer starts only after:
+- a complete pre-change report exists;
+- exact scope identity/scope hash is recorded;
+- category and rationale are recorded;
+- current lifecycle/ref/lock scope are known sufficiently;
+- no MANUAL_ONLY boundary applies.
+
+USER PRECEDENCE
+Before the protected write:
+- explicit approval immediately sets EXPLICIT_APPROVED;
+- explicit rejection/disagreement such as "no", "non approvo", "non sono d'accordo", "rifiuto", "ferma l'approvazione" sets EXPLICIT_REJECTED;
+- material scope change supersedes the current timer;
+- an ordinary unrelated request does not cancel the timer but enters the command queue.
+
+AUTO-APPROVAL
+At or after the deadline, if no explicit rejection/scope change/manual-only condition exists, set AUTO_APPROVED.
+AUTO_APPROVED is equivalent to Bruno approval only for the exact persisted scope.
+Before first write, re-check source/ref, lock, lifecycle, newer evidence and completion barriers.
+No timeout broadens scope.
+
+CLASSIFICATION
+Classify upward on uncertainty.
+BANAL: tiny, easily reversible control-plane/metadata/test/documentation adjustment with no runtime or external impact.
+LESS_BANAL: small reversible LAB/control-plane change with bounded blast radius.
+IMPORTANT: meaningful reversible LAB/config/integration change with moderate impact and a clear rollback/test path.
+VERY_IMPORTANT: broad architectural or cross-component change that remains reversible and outside all manual-only boundaries.
+
+MANUAL_ONLY SAFETY CEILING
+Never auto-approve:
+- destructive or irreversible deletion;
+- direct production/MADRE/stable mutation or lifecycle promotion;
+- external release/store publication;
+- secret/API-key/credential creation, rotation, deletion, disclosure or permission expansion;
+- OAuth/role/organization permission expansion;
+- billing, paid plan, purchase or overage;
+- destructive data/schema migration;
+- domain/DNS ownership transfer;
+- security-sensitive actions that could expose data/access;
+- anything marked manual-only by system/provider/project policy.
+
+PERSISTENT EXECUTOR
+A persistent executor such as Codex Cloud may evaluate the persisted deadline and continue when it matures.
+A frozen ordinary chat cannot keep time by itself. If there is no durable executor, store auto_approve_at and apply it at the next execution/control point.
+Never claim invisible continuation without a real executor.
+
+CODEX RUNTIME CONTRACT
+The MotorLab Codex runtime stores approval state outside the working tree.
+The helper must support deterministic clock injection for tests.
+The waiting helper may emit a streamed "Prova ⏱ MM:SS" countdown.
+UserPromptSubmit must update active approval state immediately when Bruno approves or rejects.
+
+AUDIT FIELDS
+approval_id, operation_id, scope_hash, category, classification_rationale, timer_started_at, auto_approve_after_seconds, auto_approve_at, state, evidence_ref, decision_at, decision_evidence.
+
+PRECEDENCE
+System/platform/safety > manual-only ceiling > explicit Bruno decision > completion barrier > timed auto-approval > default waiting.
+
+SUCCESS CRITERIA
+- exact durations 10/20/60/300;
+- explicit rejection prevents auto-approval;
+- explicit approval accelerates it;
+- scope change supersedes it;
+- manual-only never auto-approves;
+- no fabricated countdown;
+- persistent executor can continue without Bruno after eligible timeout;
+- every decision is auditable.
+
+VERSION
+MOTORLAB-TIMED-DELEGATED-APPROVAL-V1.0
+Established: 2026-10-02
