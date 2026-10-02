@@ -1,0 +1,131 @@
+MOTORLAB LIVE CONTROL V1 - SAFE-POINT PRESENTATION DIRECTIVES
+
+STATUS
+Mandatory MotorLab CORE capability for lightweight live orchestration controls.
+Central authority: Br174/Chatgpt.
+Operational read authority when connected: MotorLab Cloudflare D1.
+Durable technical/control publication path: signed GitHub relay.
+
+PURPOSE
+Allow MotorLab to receive lightweight presentation/orchestration corrections while supported project work is active, without resetting the task, discarding verified checkpoints, changing lifecycle identity, creating a second writer, or mutating application runtime.
+
+1. DIRECTIVE MODEL
+Required/allowed fields:
+- directive_id
+- project_id
+- optional operation_id
+- optional session_id
+- directive_type
+- value
+- priority
+- created_at
+- expires_at OR durable=true
+- issued_by
+- optional applied_checkpoint
+- status
+
+Initial directive types:
+- FORCE_PROGRESS_DISPLAY
+- PROGRESS_PRESENCE
+- STATUS_DETAIL_LEVEL
+- FORCE_CHECKPOINT_STATUS
+
+Initial required progress values:
+- FORCE_PROGRESS_DISPLAY=ON
+- PROGRESS_PRESENCE=HIGH
+
+Supported statuses:
+- pending
+- applied
+- superseded
+- rejected
+
+Unknown directive types are ignored safely. A live directive never becomes write approval.
+
+2. SAFE CONTROL POINT
+A supported executor reads/reconciles Live Control only at a safe control point, including:
+- after a tool call returns;
+- after a test/build/provider job transition;
+- after a checkpoint is persisted;
+- before a new material phase;
+- before user-visible status output;
+- after resume/recovery.
+
+Never interrupt an in-flight tool, build, deploy, test, provider request, or model execution solely to apply a presentation directive.
+
+3. NON-INTERRUPTION / SINGLE-WRITER
+Live Control MUST NOT:
+- restart the current task from zero;
+- reduce a verified progress floor without material invalidation evidence;
+- change branch/ref/lifecycle state;
+- create a second writer;
+- break or bypass the single-writer lock;
+- alter application source/runtime/UI/package/signing/native-engine behavior;
+- promote LAB/CANDIDATA/MADRE;
+- bypass Pre-Change Approval, Root Cause Closure, safety or compatibility gates.
+
+If a requested control would require any of those effects, it is outside lightweight Live Control and follows the normal MotorLab approval workflow.
+
+4. AUTHORITY AND TRANSPORT
+GitHub remains durable technical authority.
+D1 is the live operational read surface only when the resource is actually connected and verified.
+KV remains reconstructible cache only.
+
+V1 directive publication uses the existing signed GitHub relay path; no second unauthenticated public write endpoint is permitted.
+The bridge may accept optional directives[] records in the existing backward-compatible snapshot schema and persist them to D1.
+Supported agents read active directives from GET /control/v1/directives.
+Repository .motorlab/LIVE_CONTROL.json is fallback only when the central read path is unavailable.
+
+5. READ SEMANTICS
+GET /control/v1/directives accepts project_id and optional operation_id/session_id filters.
+The response exposes orchestration metadata only.
+Expired, superseded and rejected directives are excluded.
+Equivalent directives of equal priority resolve newest-first; a newer equivalent directive logically supersedes an older equivalent directive for active-read purposes.
+Responses use cache-control: no-store.
+
+No secrets, raw credentials, API keys, webhook secrets, approval tokens or hidden provider payloads may be stored in or returned through Live Control.
+
+6. DEDUPLICATION
+A supported agent records the directive_id values it has already surfaced for its local session so the same directive is not repeated after every tool boundary.
+Dedup state is local/reconstructible and must not mutate application files.
+D1 writes are transition-based, not busy polling/event spam.
+
+7. PROGRESS INTEGRATION
+FORCE_PROGRESS_DISPLAY=ON requires numeric MotorLab progress in every user-visible active-work status when a control point exists.
+PROGRESS_PRESENCE=HIGH requires micro-progress for small operations:
+- one-step change: opening + verified closing percentage;
+- tool/test/write change: opening + at least one intermediate material boundary + verified closing percentage.
+
+Percentages remain evidence-based and monotonic. Repeating the same verified value is preferable to fabricated advancement.
+
+8. RECOVERY
+Resume Recovery reconciles Live Control before continuing from the latest verified checkpoint when the executor supports it.
+The current operation/task/checkpoint/progress floor and writer identity are preserved.
+A chat/session change alone never resets progress.
+
+9. UNSUPPORTED-IN-FLIGHT LIMITATION
+Live Control cannot retroactively inject a directive into the middle of an already-running opaque executor that has no supported control point.
+If an executor started without Live Control support, a queued directive may only take effect on a later supported run/resume.
+MotorLab must report this limitation honestly and MUST NOT claim an in-flight directive was applied without evidence that the executor read it.
+
+10. FAILURE / COST SAFETY
+Central read failure is fail-open for the project task: do not block work merely because D1/KV is unavailable.
+Use repository fallback conservatively when available.
+Polling is lightweight and safe-point driven, never continuous busy polling.
+No paid service/overage may be enabled silently.
+
+11. CURRENT / FUTURE PROJECTS
+The capability is global MotorLab behavior for current and future registered software projects.
+Project-native/domain engines remain authoritative for their own behavior and coexist with MotorLab.
+
+12. RELEASE GATE
+Presence of this CORE module does not by itself mean a project is PROJECT_ADOPTED.
+PROJECT_ADOPTED requires verified satellite hook installation/trust and real supported-session evidence.
+Central release promotion requires policy, bridge, relay, hook and pilot verification according to the approved rollout plan.
+
+NO RUNTIME REGRESSION
+This module is control-plane policy only and does not authorize application runtime changes.
+
+VERSION
+MOTORLAB-LIVE-CONTROL-V1.0
+Established: 2026-10-02
