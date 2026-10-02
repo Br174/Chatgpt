@@ -236,6 +236,16 @@ MotorLab Background Execution is correctly active when:
 - no duplicate writer starts when the chat is reopened;
 - unsupported normal-chat-only execution is never falsely described as background-capable.
 
+
+R17 NON-PREEMPTIVE QUEUE / CODEX CONTINUATION
+When a supported Codex executor is active, UserPromptSubmit is an automatic lightning checkpoint/wake event.
+An ordinary new Bruno request queues FIFO and the previous active operation remains logically prior even if the foreground turn was interrupted by the new prompt.
+Only explicit Bruno priority wording may pause the active operation at a safe checkpoint; after the priority task completes, Resume Recovery restores the paused operation before ordinary FIFO work.
+Stop hooks may return a continuation decision while the active operation is unfinished or a completion barrier remains open.
+The queue advances only after verified terminal completion, with no open blocking barrier and valid approval/single-writer/lifecycle state.
+Runtime queue/checkpoint state is stored outside application working-tree files.
+A persistent executor may drain eligible queued work autonomously; a frozen ordinary chat cannot.
+
 VERSION
 MOTORLAB-BACKGROUND-EXECUTION-V1.0
 Established: 2026-09-28
