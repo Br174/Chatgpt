@@ -222,6 +222,29 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 RESTORE_SCOPE_HINTS=Preserve current MADRE and LAB23 Cover/search behavior. LAB24 changes only playback performance infrastructure, mini-player title tapping, CI/tests and delivery version. Device acceptance is required before CANDIDATA/MADRE lifecycle.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261002-lab25-instant-playback-cover
+DATE=2026-10-02
+TITLE=LAB25 Play Now immediato, preload singolo, Cover senza Copertura e ricerca titolo nativa MusicLab
+SEMANTIC_TAGS=player,riproduzione,latency,PlayNow,preload,next-one,Cover,Copertura,qualità,evidenze,anno,searchSummary,titolo,MusicLab,LAB25
+USER_INTENT=Trattare il tempo tap->audio come priorità assoluta; precaricare soltanto la canzone successiva; eliminare la sezione Copertura Precisa/Selezionata/Ampia/Esplora/Tutto; mantenere Qualità come ordinamento per evidenze; mostrare l'anno; fare arrivare quasi subito in Cover i risultati della ricerca MusicLab per solo titolo.
+CHANGE_SCOPE=PLAYBACK_LATENCY_AND_COVER_FIRST_PAINT_CLEANUP
+LIFECYCLE_ROLE=LAB25_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-playback-smooth-24
+SOURCE_BASE_SHA=d3d458576929009b9878a125db3528bfa097ece9
+RESULT_REF=uab-build/musiclab-playback-title-cover-25
+RESULT_SHA=c92314ed1c846f209e12d0806898d7f47a8a0eff
+SOURCE_SHA=1ab2d0a2bf3d946ff6b89269c39b2df88e2ea645
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/playback/MusicService.kt,app/src/main/kotlin/com/metrolist/music/playback/PlayerConnection.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt,app/src/main/kotlin/com/metrolist/music/ui/component/MusicLabTitleSearch.kt,cloudflare/music-intelligence/test/android-brain-contract-source.test.mjs,cloudflare/music-intelligence/test/device-regression-contract.test.mjs,cloudflare/music-intelligence/test/lab24-playback-smooth-contract.test.mjs,uab-project.env,.github/workflows/lab20-android-brain-tests.yml,.github/workflows/lab20-uab-build-gate.yml
+BEHAVIOR_SUMMARY=Cover usa un percorso Play Now dedicato anziché playNext+seekToNext. Il cambio brano annulla subito i preload precedenti e mette il nuovo MediaItem in riproduzione senza re-prepare del player già attivo. Smart preload è limitato alla sola traccia successiva e non innesca più full-song pre-cache. La sezione Copertura è rimossa sia dalla UI sia dalla proiezione dei risultati; la ricerca profonda rimane automatica in background. Qualità ordina per evidenze indipendenti e usa il titolo soltanto come tie-break semantico. Ogni riga mostra Anno. La corsia Cover solo-titolo usa la stessa YouTube.searchSummary della ricerca nativa MusicLab; il caricamento dei metadati dell'originale attende il first paint.
+PERFORMANCE_SUMMARY=Il percorso critico tap->audio elimina la doppia operazione Play Next/seek; nessun preload completo concorre con il brano selezionato; un solo prefisso bounded della traccia successiva viene scaldato dopo buffer stabile; native title first-paint ha timeout breve e nessuna chiamata Brain/Spotify davanti ai primi risultati.
+ROOT_CAUSE=Il percorso Cover era ancora queue-oriented e il preload LAB24 manteneva due future track più una possibile full pre-cache. In parallelo Cover manteneva un secondo filtro di copertura e la corsia title-first non riutilizzava esattamente il native searchSummary path di MusicLab.
+VERIFICATION=LAB25 Instant Playback Cover Contract run 37068866620 success sul source checkpoint 1ab2d0a2bf3d946ff6b89269c39b2df88e2ea645; final exact-SHA UAB Delivery Gate run 37068985480 success sul commit c92314ed1c846f209e12d0806898d7f47a8a0eff; complete Brain/device regression suite success; D1 migrations success; deployed LAB20 backend dependency verified; Android contracts success; UAB diagnostics success; APK+ZIP build success; exact BUILD_SHA stamp success; deliverable integrity success; artifact upload success. Artifact 11254600561 digest sha256:ff8a8e2d58c8ba71f6c073bb49cb33edc7af582c1a98502ce5b56ea6ef3d1c85; APK sha256 2237823e63d49e4308f1b27da2d0e64f87dc108304b638bbdd0b531ff92a5e81; ZIP sha256 5b7ffbdd09911b8452a5a6f9b7d6d9c55ca40fe3b5fbd11346542d8492c0f5c2.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+RESTORE_SCOPE_HINTS=Preserve current MADRE. LAB25 is based on LAB24 and includes playback infrastructure plus Cover search/UI behavior; Bruno device acceptance is required before CANDIDATA/MADRE lifecycle.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -233,7 +256,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.6
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.7
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -241,4 +264,5 @@ Revision 1.3: registra LAB21 Deep Playback Locator tecnicamente verificato, con 
 Revision 1.4: registra LAB22 Cover-only con vero YouTube Web, Tutto operativo e conferma immediata; device acceptance pendente.
 Revision 1.5: registra LAB23 title-first/Tutto/quality-year/native title navigation/Spotify assist; device acceptance pendente.
 Revision 1.6: registra LAB24 playback-priority, smart next-two preload e mini-player senza title tap; device acceptance pendente.
+Revision 1.7: registra LAB25 Play Now, preload singolo, Cover senza Copertura e native MusicLab title-first; device acceptance pendente.
 Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device acceptance ancora pendente.
