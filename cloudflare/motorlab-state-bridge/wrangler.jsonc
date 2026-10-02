@@ -3,6 +3,19 @@
   "name": "motorlab-state-bridge",
   "main": "src/entry.js",
   "compatibility_date": "2026-09-30",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "motorlab-operational-state-db",
+      "database_id": "9d94db34-2d3d-45be-8335-eae1b75d60b4"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "987774db498241aba75e6e30880dbb10"
+    }
+  ],
   "vars": {
     "ENGINE_VERSION": "1.2.0",
     "ALLOWED_REPOSITORY": "Br174/Chatgpt",
