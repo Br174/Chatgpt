@@ -1,26 +1,61 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=21
-STATE_STATUS=LAB20_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=22
+STATE_STATUS=LAB21_DEEP_LOCATOR_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-ai-brain-lab20
+ACTIVE_OPERATION_ID=musiclab-deep-locator-lab21
 OPERATION_STATUS=LAB_VERIFIED_ARTIFACT_DELIVERED
-CURRENT_PHASE=LAB20 AI Brain implementation complete and exact-SHA APK+ZIP verified; waiting only for Bruno device test before any CANDIDATA construction.
-CURRENT_REF=uab-build/musiclab-ai-brain-20
-CURRENT_HEAD_SHA=dd585c75b9feb98723858fd7f7bdf6b20c20bae8
+CURRENT_PHASE=LAB21 Deep Locator implementation complete and exact-SHA APK+ZIP verified; waiting for Bruno device test of cover-to-YouTube localization before any CANDIDATA construction.
+CURRENT_REF=uab-build/musiclab-deep-locator-21
+CURRENT_HEAD_SHA=138a7f4877e3124a25eb89e796f7e015309c7df8
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=36921304999
+CURRENT_JOB_ID=37013964295
 CURRENT_JOB_STATUS=success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
 WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact LAB20 APK artifact
-NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-20.apk. If explicitly approved, construct a new isolated CANDIDATA from the exact current MADRE by replaying the approved LAB20 change-set; build APK+ZIP for that CANDIDATA and require a second Bruno device approval before MADRE promotion.
-LAST_USER_INTENT_SUMMARY=Complete MusicLab AI Brain LAB20 end-to-end, always showing verified percentage, produce verified APK+ZIP, and do not touch/promote MADRE before Bruno device testing and explicit approval.
+PENDING_VERIFICATION=Bruno device test of exact LAB21 APK artifact, especially cover localization/playback yield versus LAB20
+NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-21.apk with the same cover cases that exposed 60 admitted-but-unlocalized candidates. If explicitly approved after device acceptance, construct a new isolated CANDIDATA from the exact current MADRE by replaying the approved LAB20+LAB21 change-set; build APK+ZIP for that CANDIDATA and require a second Bruno device approval before MADRE promotion.
+LAST_USER_INTENT_SUMMARY=Improve the LAB20 cover playback locator so AI-accepted covers are found and played through YouTube/YTM using deeper search, richer metadata and less brittle uploader matching; produce a verified LAB21 APK+ZIP without touching MADRE.
+
+
+CURRENT_LAB21
+REF=uab-build/musiclab-deep-locator-21
+BASE_LAB20_SHA=cdd1f11ae5287140d95174a53ef33a715db1b83d
+SHA=138a7f4877e3124a25eb89e796f7e015309c7df8
+ANDROID_CONTRACT_RUN=37013732861
+ANDROID_CONTRACT_STATUS=success
+FINAL_GATE_RUN=37013964295
+FINAL_GATE_STATUS=success
+ARTIFACT_ID=11229666800
+ARTIFACT_NAME=MusicLab-LAB-21
+ARTIFACT_DIGEST=sha256:e8f93b68474f594cbdc22dced736a219f3ead69d17b8274603e3b40ab1e9a41d
+APK_NAME=MusicLab-LAB-21.apk
+APK_SHA256=c634101ae31b0c80001870225234f3d34592ee6833f6fea1b8e0447c33c5a7ab
+ZIP_NAME=MusicLab-LAB-21-APK.zip
+ZIP_SHA256=8a69ddce07ccd56c95427480a77ad914b10386443ee07dcb86467e7c2f0b51f7
+BUILD_SHA_FILE=138a7f4877e3124a25eb89e796f7e015309c7df8
+FINAL_GATE_BRAIN=success
+FINAL_GATE_D1=success
+FINAL_GATE_ANDROID=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno test
+CANDIDATA_CREATED=no
+MADRE_PROMOTION=no
+
+LAB21_ROOT_CAUSE_CLOSURES
+- Playback locator coverage gap: LAB20 searched only the first result page; LAB21 follows YouTube/YTM continuation pages on the deep path.
+- Uploader/channel mismatch veto: LAB20 rejected exact-title videos when the parsed artist/channel differed; LAB21 adds a bounded exact-title uploader fallback for top video results while preserving title and category guards.
+- Brain metadata underuse: LAB21 expands retrieval queries with album, year, language/category and available composer/songwriter/lyricist hints without transferring editorial authority to YouTube.
+- Regression prevention: dedicated LAB21 tests cover metadata query expansion, uploader mismatch recovery, album evidence and the permanent rejection of longer different titles such as "Il mondo che vorrei".
+- Delivery gate drift: LAB21 corrected branch/artifact/backend dependency references and passed the exact-SHA UAB delivery gate.
 
 CURRENT_LAB20
 REF=uab-build/musiclab-ai-brain-20
@@ -55,7 +90,7 @@ LAB20_ROOT_CAUSE_CLOSURES
 CURRENT_MADRE
 REF=mother/musiclab-lab19-final
 SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-STATUS=UNCHANGED_DURING_LAB20
+STATUS=UNCHANGED_DURING_LAB20_AND_LAB21
 PROMOTED_FROM=candidate/musiclab-lab19-player-stable
 PROMOTED_FROM_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 PROMOTION_MODE=exact approved Candidate ref -> new immutable Mother ref
@@ -99,12 +134,13 @@ APPLICATION_RUNTIME_IMPACT=NONE
 ARTIFACT_FIRST
 DEFAULT_ORDER=repair -> risk-appropriate verify -> artifact -> deliver -> causal/prevention follow-up -> definitive closure
 ROOT_CAUSE_OBLIGATION=mandatory
-DELIVERED_ARTIFACT_IMMUTABILITY=preserve exact LAB20 ref/checksum while Bruno tests; later CANDIDATA builds are separate controlled states
+DELIVERED_ARTIFACT_IMMUTABILITY=preserve exact LAB20 and LAB21 refs/checksums while Bruno tests; later CANDIDATA builds are separate controlled states
 
 APPROVAL_GATE_PRESERVED
 INITIAL_CHANGE_REQUEST=not write approval
 PRE_CHANGE_REPORT=required for materially new out-of-scope changes
 ALREADY_APPROVED_LAB20_SCOPE=completed
+ALREADY_APPROVED_LAB21_DEEP_LOCATOR_SCOPE=completed
 MATERIAL_SCOPE_EXPANSION=requires amended approval
 DEVICE_TEST_GATE=mandatory before CANDIDATA construction/promotion flow
 
@@ -121,13 +157,14 @@ TECHNICAL_CHANGE_HISTORY=MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
 
 CONTINUITY_RULES
 - Current stable production baseline remains mother/musiclab-lab19-final until Bruno approves a separately built/tested CANDIDATA.
-- LAB20 exact technical continuation/test point is uab-build/musiclab-ai-brain-20 at dd585c75b9feb98723858fd7f7bdf6b20c20bae8.
-- Preserve LAB20 artifact immutably while Bruno performs device testing.
-- Do not modify or promote current MADRE as part of LAB20 device testing.
-- If LAB20 is approved, CANDIDATA creation follows permanent Mother -> replay approved LAB20 change-set -> isolated Candidate APK+ZIP -> Bruno test workflow.
+- LAB21 exact technical continuation/test point is uab-build/musiclab-deep-locator-21 at 138a7f4877e3124a25eb89e796f7e015309c7df8.
+- LAB20 remains preserved as the immediate predecessor baseline; LAB21 was branched from live LAB20 cdd1f11ae5287140d95174a53ef33a715db1b83d.
+- Preserve LAB20 and LAB21 artifacts immutably while Bruno performs device testing.
+- Do not modify or promote current MADRE as part of LAB21 device testing.
+- If LAB21 is approved, CANDIDATA creation follows permanent Mother -> replay approved LAB20+LAB21 change-set -> isolated Candidate APK+ZIP -> Bruno test workflow.
 - Candidate -> Mother promotion preserves exact approved Candidate SHA.
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r16 MusicLab AI Brain LAB20 exact-SHA verified delivery
-UPDATED_DATE=2026-10-01
+UPDATED_BY=MotorLab r16 MusicLab LAB21 Deep Locator exact-SHA verified delivery
+UPDATED_DATE=2026-10-02
