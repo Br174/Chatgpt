@@ -80,3 +80,5 @@ PREVENTION
 UPDATED_BY=MotorLab Resume Recovery
 
 EXECUTION_CONTINUITY_RULE=MOTORLAB_EXECUTION_CONTINUITY_V1.txt active; legacy timed-continuation queue retired.
+
+CI_REFRESH_REQUEST=2026-10-02 normal push requested after identifying skip-ci as deployment blocker.
