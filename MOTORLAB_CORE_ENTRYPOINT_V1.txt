@@ -13,7 +13,7 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
 3. Use VERIFIED local core immediately as fallback.
 4. When central is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
-5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt and MOTORLAB_LIVE_CONTROL_V1.txt.
+5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt and MOTORLAB_EXECUTION_CONTINUITY_V1.txt.
 6. Read Project Continuity ledger.
 7. Read technical Change History registry when present.
 8. Read visible Registro Modifiche e Ripristini when present.
@@ -24,14 +24,14 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 13. Resume unfinished already-approved scope through Resume Recovery + Watchdog before unrelated writes.
 14. Preserve project-native/domain engine authority and lifecycle identity.
 15. For EVERY NEW write-capable application/project modification request, apply hard pre-change approval: initial mutation wording is intent only; perform read-only preparation, present the pre-change report, then wait for Bruno approval.
-16. After approval apply Change Compatibility Guard and single-writer safety.
+16. After approval apply Change Compatibility Guard + single-writer safety, then MOTORLAB_EXECUTION_CONTINUITY_V1.txt: continue the agreed operation through implementation/recovery/deploy/verification until verified completion or a genuine external blocker, without repeated intermediate confirmation requests.
 17. Assign/reuse one MOTORLAB_OPERATION_ID for the logical operation and use it to correlate checkpoints, artifacts, Root Cause records and optional observability/dashboard projections.
 18. For defect/regression operations that request APK/ZIP/testable artifacts, apply Artifact-First ordering: repair/contain + risk-appropriate verification + artifact delivery first when safe; defer eligible causal/prevention work into POST_ARTIFACT_ROOT_CAUSE_QUEUE.
 19. Non-deferrable high-risk causes remain on the artifact critical path.
 20. Apply Foreground Stall Guard and Fast Iteration/No-Spin where eligible.
 21. Route optional auxiliary services through Knowledge & Tool Routing: Superpowers for methodology only, Context7 only when current/versioned documentation materially reduces uncertainty, Notion for status projection, GitBook for stable documentation.
 22. Use PostHog/observability only as diagnostic evidence; absence of telemetry must not block otherwise safe work.
-23. Execute only approved scope; material expansion requires amended report/approval before broadened writes.
+23. Execute continuously toward the approved outcome. Reopen the decision only for a material change to the agreed objective, an explicit protected boundary, an unrelated destructive action, or new paid usage; ordinary technical substeps do not pause execution.
 24. Update technical Change History at verified boundaries when appropriate.
 25. Update visible Registro Modifiche e Ripristini ONLY when Bruno identifies a specific working modification and wants it conserved.
 26. Refresh Project Continuity at material transitions, including artifact-delivered/cause-pending states.
@@ -74,6 +74,9 @@ Resolve N read-only, verify provenance/current compatibility, present restore pl
 CROSS-CHAT CONTINUITY
 A new chat is not a new project state. Live newer evidence and Project Continuity outrank old registries/memory. When D1 is connected, verified current operational state also participates under the authority matrix. Persist artifact-delivered/cause-pending states so later cycles continue the same causal queue instead of restarting.
 
+EXECUTION CONTINUITY
+MOTORLAB_EXECUTION_CONTINUITY_V1.txt owns post-approval continuation to verified completion and permanently retires the former 10s / 20s / 1 min / 5 min approval-countdown proposal.
+
 LIVE CONTROL
 MOTORLAB_LIVE_CONTROL_V1.txt owns lightweight safe-point presentation directives. Live Control never grants write approval, never creates a second writer, never interrupts an in-flight tool/build solely for presentation, and never authorizes runtime/lifecycle changes. If the active executor did not load Live Control, report that honestly and apply the directive only at a later supported run/resume.
 
@@ -90,6 +93,7 @@ PLATFORM BOUNDARY
 MotorLab cannot wake a host with no execution cycle or claim invisible continuation without a real durable executor.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.9
+MOTORLAB-CORE-ENTRYPOINT-V1.10
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
+Revision 1.10: adds post-approval execution continuity to verified completion and retires the former approval-countdown proposal.
