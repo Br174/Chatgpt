@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.30-r16
+CURRENT_RELEASE=2026.10.02-r17
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -21,6 +21,10 @@ PERSISTENT_OPERATIONAL_STATE_MODULE=MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
 OBSERVABILITY_DIAGNOSTICS_MODULE=MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
 KNOWLEDGE_TOOL_ROUTING_MODULE=MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 SERVICE_INTEGRATION_STATUS_MODULE=MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
+LIVE_CONTROL_MODULE=MOTORLAB_LIVE_CONTROL_V1.txt
+TIMED_DELEGATED_APPROVAL_MODULE=MOTORLAB_TIMED_DELEGATED_APPROVAL_V1.txt
+NON_PREEMPTIVE_COMMAND_QUEUE_MODULE=MOTORLAB_NON_PREEMPTIVE_COMMAND_QUEUE_V1.txt
+COMPLETION_BARRIER_MODULE=MOTORLAB_COMPLETION_BARRIER_V1.txt
 
 CURRENT REQUIRED CORE MODULES
 - MOTORLAB_CORE_ENTRYPOINT_V1.txt
@@ -50,6 +54,10 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
 - MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 - MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
+- MOTORLAB_LIVE_CONTROL_V1.txt
+- MOTORLAB_TIMED_DELEGATED_APPROVAL_V1.txt
+- MOTORLAB_NON_PREEMPTIVE_COMMAND_QUEUE_V1.txt
+- MOTORLAB_COMPLETION_BARRIER_V1.txt
 - MOTORLAB_SATELLITE_SYNC_V1.txt
 - MOTORLAB_SATELLITE_BUNDLE_V1.txt
 
@@ -102,13 +110,26 @@ Actual provider/plugin connection is capability-gated and must not be claimed un
 MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt is the required registry separating CORE readiness from real connection/resource readiness.
 Existing project instrumentation/adoption occurs only at safe approved boundaries.
 
+
+R17+ LIVE RUNTIME GOVERNANCE
+MotorLab r17 adds:
+- Live Control at safe control points;
+- numeric micro-progress for all MotorLab-controlled modifications when a visible execution cycle exists;
+- timed delegated approval with exact eligible countdowns 10/20/60/300 seconds and explicit-rejection precedence;
+- every user request as an automatic ⚡ checkpoint/wake event;
+- non-preemptive FIFO request queue with explicit-priority override only;
+- completion barrier: known blocking structural defects must reach evidence-backed 100% before unrelated write work proceeds;
+- Codex lifecycle runtime using SessionStart/UserPromptSubmit/PostToolUse/Stop/Interrupt where supported and trusted;
+- runtime state outside application working-tree files.
+Manual-only safety boundaries remain explicit and are never auto-approved.
+
 CURRENT/FUTURE PROJECT RULE
-All current/future MotorLab software projects inherit r16 authority/data-ownership, persistent-state/fallback, observability and knowledge-routing rules in addition to existing approval, lifecycle, restore, Root Cause, Artifact-First, progress and safety rules.
+All current/future MotorLab software projects inherit r17 authority/data-ownership, persistent-state/fallback, observability and knowledge-routing rules in addition to existing approval, lifecycle, restore, Root Cause, Artifact-First, progress and safety rules.
 
 NO RUNTIME REGRESSION
 MotorLab control-plane metadata alone must not alter application runtime/UI/package/signing/lifecycle/native engines.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.16
+MOTORLAB-RELEASE-MANIFEST-V1.17
 Established: 2026-09-29
-Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
+Revision 1.17: r17 adds Live Control, micro-progress, 10/20/60/300 timed delegated approval, every-request checkpoints, FIFO non-preemption, completion barriers and Codex runtime hooks.
