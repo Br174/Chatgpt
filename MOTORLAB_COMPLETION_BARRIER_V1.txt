@@ -1,0 +1,61 @@
+MOTORLAB COMPLETION BARRIER V1 - ZERO UNRESOLVED STRUCTURAL DEBT
+
+STATUS
+Mandatory MotorLab CORE quality/continuity capability.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Prevent MotorLab from carrying known structural defects, stale paths, wrong refs, failed bootstrap/sync or duplicate repair debt into unrelated work.
+
+HARD BARRIER
+When MotorLab detects a real defect/anomaly that materially affects the active operation or MotorLab infrastructure, open one blocking barrier with a stable fingerprint.
+No unrelated write-capable modification may start and no queued request may become active until that barrier is CLOSED_VERIFIED.
+
+100 PERCENT MEANING
+A barrier reaches 100% only when:
+- immediate defect is corrected/contained;
+- root cause is identified to the evidence available;
+- wrong path/ref/main/release state is corrected;
+- smallest relevant recurrence surface is checked;
+- prevention/regression protection is added when justified;
+- verification proves the intended state;
+- no equivalent duplicate open barrier remains.
+Do not use 99% as a handoff point for a known unresolved blocking defect.
+
+DEDUPLICATION
+Same causal defect uses one fingerprint and one barrier record.
+Repeated symptoms attach evidence to the existing barrier rather than creating redundant backlog items.
+If a second record is discovered for the same cause, merge/reconcile it before proceeding.
+
+ORDERING
+System/safety/manual-only can stop execution.
+Otherwise:
+ACTIVE BLOCKING BARRIER > active operation completion > paused priority operation > FIFO queue > new unrelated work.
+
+EXPECTED TEST FAILURES
+An intentionally failing RED test in an active TDD cycle is not automatically a structural barrier when it is expected evidence and the implementation loop is actively correcting it.
+Unexpected tool/build/deploy failure or stale/misaligned authority state is a candidate barrier and must be classified immediately.
+
+ROOT CAUSE
+A manual alignment that leaves the cause of wrong main/path/release unresolved is not definitive closure.
+MotorLab must correct the source of recurrence, not only today's instance.
+
+PERSISTENCE
+Store barrier fingerprint, operation_id, defect, cause/evidence, status, opened_at, progress, repair, prevention, verification and closed_at.
+Resume Recovery reconstructs open barriers before unrelated writes.
+
+STOP HOOK
+Codex Stop must block final stop while a blocking barrier is open and autonomous repair can still proceed.
+If the barrier genuinely requires Bruno/manual-only/external action, persist the blocker and report it rather than loop indefinitely.
+
+SUCCESS CRITERIA
+- no known structural defect is carried into unrelated writes;
+- barriers are deduplicated;
+- 100% is evidence-backed;
+- queue does not drain through an open barrier;
+- root cause/prevention are not skipped;
+- genuine external/manual blockers do not cause fake progress loops.
+
+VERSION
+MOTORLAB-COMPLETION-BARRIER-V1.0
+Established: 2026-10-02
