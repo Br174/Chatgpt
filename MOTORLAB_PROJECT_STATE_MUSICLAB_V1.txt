@@ -93,6 +93,42 @@ LAB21_ROOT_CAUSE_CLOSURE
 - Permanent regression contracts prove that “Il mondo che vorrei” remains rejected for target “Il mondo”, while exact-title uploader mismatches and matching-album evidence can be recovered.
 - Device acceptance is still required to measure the real admitted->localized improvement and confirm playback behavior on Bruno's phone.
 
+CURRENT_LAB21
+REF=uab-build/musiclab-deep-locator-21
+BASE_LAB20_REF=uab-build/musiclab-ai-brain-20
+BASE_LAB20_LIVE_SHA=cdd1f11ae5287140d95174a53ef33a715db1b83d
+SHA=138a7f4877e3124a25eb89e796f7e015309c7df8
+ANDROID_CONTRACT_RUN=37013732861
+ANDROID_CONTRACT_STATUS=success
+FINAL_GATE_RUN=37013964295
+FINAL_GATE_STATUS=success
+ARTIFACT_ID=11229666800
+ARTIFACT_NAME=MusicLab-LAB-21
+ARTIFACT_DIGEST=sha256:e8f93b68474f594cbdc22dced736a219f3ead69d17b8274603e3b40ab1e9a41d
+APK_NAME=MusicLab-LAB-21.apk
+APK_SHA256=c634101ae31b0c80001870225234f3d34592ee6833f6fea1b8e0447c33c5a7ab
+ZIP_NAME=MusicLab-LAB-21-APK.zip
+ZIP_SHA256=8a69ddce07ccd56c95427480a77ad914b10386443ee07dcb86467e7c2f0b51f7
+BUILD_SHA_FILE=138a7f4877e3124a25eb89e796f7e015309c7df8
+FINAL_GATE_BRAIN=success
+FINAL_GATE_D1=success
+FINAL_GATE_ANDROID=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno test
+CANDIDATA_CREATED=no
+MADRE_PROMOTION=no
+
+LAB21_ROOT_CAUSE_CLOSURE
+STATUS=IMPLEMENTED_AND_TECHNICALLY_VERIFIED_DEVICE_CONFIRMATION_PENDING
+CAUSE_1=LAB20 playback locator evaluated only the first search page for each query, so valid YouTube results beyond page one were never considered.
+CAUSE_2=LAB20 treated artist/uploader mismatch as a hard veto, discarding valid user/channel uploads whose title matched the AI-approved cover but whose YouTube artist field represented the uploader/channel.
+CAUSE_3=LAB20 underused Brain metadata such as album, year and credits as retrieval hints.
+CORRECTION=LAB21 adds bounded continuation-page search, deterministic metadata-expanded queries, and a constrained uploader fallback for exact-title top video results while preserving title/category guards.
+PREVENTION=AiCoverSearchEngine unit contracts now cover longer-title rejection, metadata query expansion, uploader fallback recovery, album evidence and preservation of unrelated-title rejection.
+
 CURRENT_LAB20
 REF=uab-build/musiclab-ai-brain-20
 SHA=dd585c75b9feb98723858fd7f7bdf6b20c20bae8
@@ -126,7 +162,7 @@ LAB20_ROOT_CAUSE_CLOSURES
 CURRENT_MADRE
 REF=mother/musiclab-lab19-final
 SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-STATUS=UNCHANGED_DURING_LAB20_AND_LAB21_AND_LAB21
+STATUS=UNCHANGED_DURING_LAB20_AND_LAB21_AND_LAB21_AND_LAB21
 PROMOTED_FROM=candidate/musiclab-lab19-player-stable
 PROMOTED_FROM_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 PROMOTION_MODE=exact approved Candidate ref -> new immutable Mother ref
