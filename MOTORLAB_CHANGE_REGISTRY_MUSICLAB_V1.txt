@@ -241,8 +241,36 @@ BEHAVIOR_SUMMARY=Cover usa un percorso Play Now dedicato anziché playNext+seekT
 PERFORMANCE_SUMMARY=Il percorso critico tap->audio elimina la doppia operazione Play Next/seek; nessun preload completo concorre con il brano selezionato; un solo prefisso bounded della traccia successiva viene scaldato dopo buffer stabile; native title first-paint ha timeout breve e nessuna chiamata Brain/Spotify davanti ai primi risultati.
 ROOT_CAUSE=Il percorso Cover era ancora queue-oriented e il preload LAB24 manteneva due future track più una possibile full pre-cache. In parallelo Cover manteneva un secondo filtro di copertura e la corsia title-first non riutilizzava esattamente il native searchSummary path di MusicLab.
 VERIFICATION=LAB25 Instant Playback Cover Contract run 37068866620 success sul source checkpoint 1ab2d0a2bf3d946ff6b89269c39b2df88e2ea645; final exact-SHA UAB Delivery Gate run 37068985480 success sul commit c92314ed1c846f209e12d0806898d7f47a8a0eff; complete Brain/device regression suite success; D1 migrations success; deployed LAB20 backend dependency verified; Android contracts success; UAB diagnostics success; APK+ZIP build success; exact BUILD_SHA stamp success; deliverable integrity success; artifact upload success. Artifact 11254600561 digest sha256:ff8a8e2d58c8ba71f6c073bb49cb33edc7af582c1a98502ce5b56ea6ef3d1c85; APK sha256 2237823e63d49e4308f1b27da2d0e64f87dc108304b638bbdd0b531ff92a5e81; ZIP sha256 5b7ffbdd09911b8452a5a6f9b7d6d9c55ca40fe3b5fbd11346542d8492c0f5c2.
-STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
-RESTORE_SCOPE_HINTS=Preserve current MADRE. LAB25 is based on LAB24 and includes playback infrastructure plus Cover search/UI behavior; Bruno device acceptance is required before CANDIDATA/MADRE lifecycle.
+STATUS=DEVICE_ACCEPTED_FOR_CANDIDATA
+RESTORE_SCOPE_HINTS=LAB25 device behavior was accepted by Bruno as good enough to enter Candidate lifecycle. Preserve exact LAB25 and the separately constructed Candidate; MADRE remains unchanged until Candidate device approval.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261003-candidate-lab25
+DATE=2026-10-03
+TITLE=CANDIDATA LAB25 costruita dalla MADRE con runtime LAB25 verificato
+SEMANTIC_TAGS=candidata,candidate,MADRE,LAB25,replay,player,Cover,Spotify,Brain,PlayNow,preload,APK,ZIP
+USER_INTENT=Bruno ha testato LAB25 e l'ha giudicata abbastanza buona per diventare CANDIDATA; creare quindi una vera Candidate separata, senza rinominare il LAB e senza modificare la MADRE.
+CHANGE_SCOPE=LIFECYCLE_CANDIDATE_CONSTRUCTION_AND_DELIVERY
+LIFECYCLE_ROLE=CANDIDATE_DEVICE_PENDING
+SOURCE_MOTHER_REF=mother/musiclab-lab19-final
+SOURCE_MOTHER_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+APPROVED_LAB_REF=uab-build/musiclab-playback-title-cover-25
+APPROVED_LAB_SHA=c92314ed1c846f209e12d0806898d7f47a8a0eff
+REPLAY_CONTENT_COMMIT=8ee3d3b1ea82d81349616974cd393807108f223e
+REPLAY_CONTENT_TREE=4455dc6a7b96e45c27a63b578ade2c3e10502c70
+REPLAY_PARENT_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+RESULT_REF=candidate/musiclab-lab25-playback-cover
+RESULT_SHA=01a4793f99628473854884753d783ba8ca6bd51b
+RESULT_TREE=68de433d4123c31029498d8fdc889369ef46371b
+CONSTRUCTION_METHOD=Created a new commit using the exact verified LAB25 tree with current MADRE LAB19 as direct parent, then created Candidate-only provenance/build-identity commits. Candidate was not a renamed/repointed LAB branch.
+APP_RUNTIME_DIFF_FROM_LAB25=NONE
+ONLY_TREE_DIFF_FROM_LAB25=.github/workflows/lab20-android-brain-tests.yml,.github/workflows/lab20-uab-build-gate.yml,uab-project.env,.uab/candidates/CANDIDATE_LAB25_2026-10-02.txt
+BEHAVIOR_SUMMARY=Runtime/application behavior is the device-accepted LAB25 behavior: direct Play Now for Cover, one-track lightweight preload, native MusicLab title-first Cover search, no secondary Cover Copertura selector, evidence-first Qualità ordering, year display, LAB23 Spotify assist and LAB20-LAB22 Brain/locator stack. Candidate-specific changes only provide isolated identity, provenance and delivery workflow.
+VERIFICATION=Candidate Android contract run 37072539964 success; exact-SHA Candidate UAB Delivery Gate run 37072545456 success on 01a4793f99628473854884753d783ba8ca6bd51b; complete Brain/device regressions success; D1 migrations success; deployed backend dependency verified; Android tests success; UAB diagnostics success; Candidate APK+ZIP build success; BUILD_SHA exact; deliverable integrity success; artifact upload success. Artifact 11255672178 digest sha256:3083fe3e4e6deeb61b25442b0f4961df767aaabf2771b34f304e6389cf7b85b1. APK sha256 f65b987e5d86ba7396098621c49f47b728f5baf898cb140f13b6f294f094d738. ZIP sha256 60f8766647ddd43d5543dabc4362655fa9155b5f4973c2381a5c8fd771dd90c2.
+STATUS=CANDIDATE_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno must test the exact Candidate APK. Only explicit device approval may promote this exact Candidate lifecycle to a new MADRE.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
 HISTORICAL BACKFILL NOTE
@@ -256,7 +284,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.7
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.8
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -265,4 +293,5 @@ Revision 1.4: registra LAB22 Cover-only con vero YouTube Web, Tutto operativo e 
 Revision 1.5: registra LAB23 title-first/Tutto/quality-year/native title navigation/Spotify assist; device acceptance pendente.
 Revision 1.6: registra LAB24 playback-priority, smart next-two preload e mini-player senza title tap; device acceptance pendente.
 Revision 1.7: registra LAB25 Play Now, preload singolo, Cover senza Copertura e native MusicLab title-first; device acceptance pendente.
+Revision 1.8: registra CANDIDATA LAB25 costruita dalla MADRE con runtime LAB25 identico; test dispositivo Candidate pendente.
 Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device acceptance ancora pendente.
