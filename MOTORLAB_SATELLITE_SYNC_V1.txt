@@ -12,7 +12,7 @@ BOOT
 2. Use VERIFIED local core immediately as fallback.
 3. When central is reachable, read release manifest and compare releases.
 4. Reconcile Project Continuity/live state before selecting a safe update boundary.
-5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, and r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status.
+5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status, and r17 Live Control + Micro-Progress + Timed Approval + Every-Request Checkpoint/FIFO Queue + Completion Barrier + Codex Runtime Hooks.
 
 SAFE UPDATE
 - pin one MotorLab release during active write/build/test/promotion;
@@ -71,6 +71,31 @@ SUPERPOWERS_SUBORDINATE=required
 CONTEXT7_ON_DEMAND=required
 FREE_FIRST_PLUGIN_ROUTING=required
 SERVICE_INTEGRATION_STATUS=required
+LIVE_CONTROL=required
+MICRO_PROGRESS=required
+TIMED_DELEGATED_APPROVAL=required
+APPROVAL_COUNTDOWN_10_20_60_300=required
+EVERY_REQUEST_CHECKPOINT=required
+NON_PREEMPTIVE_COMMAND_QUEUE=required
+FIFO_QUEUE_DRAIN=required
+EXPLICIT_PRIORITY_OVERRIDE_ONLY=required
+COMPLETION_BARRIER=required
+ZERO_UNRESOLVED_STRUCTURAL_DEBT=required
+CODEX_RUNTIME_HOOKS=required
+
+
+R17+ LIVE RUNTIME GOVERNANCE
+Local fallback must preserve:
+- every-request automatic checkpoint/wake;
+- ordinary FIFO queue without implicit preemption/cancellation;
+- explicit priority override only, with checkpoint + resume;
+- Stop continuation while autonomous active work remains unfinished;
+- completion barrier blocking unrelated writes until evidence-backed 100%;
+- timed eligible approvals 10/20/60/300 with explicit rejection precedence and manual-only ceiling;
+- Live Control safe-point reconciliation;
+- numeric micro-progress for small and large modifications;
+- runtime state outside the application working tree.
+A local project is not PROJECT_ADOPTED for Codex runtime merely because files exist: non-managed project hooks must also be trusted and real execution evidence must be observed.
 
 R16+ AUTHORITY / PERSISTENT STATE / TOOL ROUTING
 Local fallback must preserve:
@@ -96,7 +121,7 @@ When Bruno requests APK/ZIP/testable artifacts for approved defect/regression wo
 - no definitive solved/final status while causal work remains pending.
 
 R14+ HARD APPROVAL / VISIBLE RESTORE
-Initial mutation wording is intent only. Show pre-change report and wait for Bruno approval before first write. Visible restore slots contain only specific Bruno-confirmed working modifications using stable plain integers.
+Initial mutation wording is intent only. Show the pre-change report before first write. Under r17 an eligible reversible scope may become AUTO_APPROVED after its classified 10/20/60/300-second countdown; explicit rejection wins and manual-only boundaries never auto-approve. Visible restore slots contain only specific Bruno-confirmed working modifications using stable plain integers.
 
 R13+ TECHNICAL HISTORY
 Technical Change History is Git-backed provenance/search and remains distinct from the visible restore register.
@@ -121,5 +146,5 @@ NO APP RUNTIME CHANGE
 MotorLab metadata must not intentionally alter app code/UI/package/signing/native engines/runtime dependencies. Telemetry SDKs and service bindings remain project changes requiring normal approval.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.12
-Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
+MOTORLAB-SATELLITE-SYNC-V1.13
+Revision 1.13: r17 adds required markers and adoption rules for Live Control, micro-progress, timed approval, every-request FIFO checkpoint queue, completion barriers and Codex runtime hooks.
