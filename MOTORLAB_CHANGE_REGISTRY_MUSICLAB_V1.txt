@@ -200,6 +200,28 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 RESTORE_SCOPE_HINTS=Preserve current MADRE. LAB23 is based on LAB22 and includes shared title-navigation changes plus Spotify assist; device acceptance is required before entering any CANDIDATA/MADRE lifecycle.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261002-lab24-playback-smooth
+DATE=2026-10-02
+TITLE=LAB24 playback priority, preload intelligente next-two e mini-player senza title tap
+SEMANTIC_TAGS=player,riproduzione,buffer,buffering,preload,precache,next,next-two,fluidità,velocità,mini-player,miniplayer,LAB24
+USER_INTENT=Mantenere i buoni risultati Cover di LAB23 ma rendere la musica molto più veloce e fluida: la nuova canzone deve partire subito, niente scatti o fermate, le due successive vanno preparate in background senza rubare risorse al brano corrente; rimuovere il click sul titolo nel mini-player perché interferisce con l'ingrandimento.
+CHANGE_SCOPE=PLAYBACK_PERFORMANCE_AND_MINIPLAYER_ERGONOMICS
+LIFECYCLE_ROLE=LAB24_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-spotify-fast-23
+SOURCE_BASE_SHA=193c6f630c618401fea93c06633faf2635b551e0
+RESULT_REF=uab-build/musiclab-playback-smooth-24
+RESULT_SHA=d3d458576929009b9878a125db3528bfa097ece9
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/playback/MusicService.kt,app/src/main/kotlin/com/metrolist/music/ui/player/MiniPlayer.kt,cloudflare/music-intelligence/test/lab24-playback-smooth-contract.test.mjs,uab-project.env,.github/workflows/lab20-android-brain-tests.yml,.github/workflows/lab20-uab-build-gate.yml
+BEHAVIOR_SUMMARY=Il brano corrente ha priorità assoluta. Su cambio traccia o BUFFERING vengono cancellati smart preload e full pre-cache; quando il player è READY con riserva stabile, MusicLab prepara in sequenza al massimo le due tracce successive risolvendo lo stream e mettendo in cache solo un prefisso di 384KB. Il full pre-cache opzionale parte solo più tardi con riserva ampia. playNext non forza più prepare() su un player già preparato. Nel mini-player il titolo non apre più la ricerca; nel player grande il title-search resta attivo.
+PERFORMANCE_SUMMARY=Preload limitato a due elementi, sequenziale e bounded; nessun download completo concorrente durante la fase critica; stop immediato su BUFFERING; vecchio preload invalidato a ogni cambio canzone; riuso di songUrlCache e playerCache; rimosso un re-prepare ridondante nel percorso Cover playNext→seekToNext.
+ROOT_CAUSE=Il vecchio triggerPreCache poteva iniziare il download completo delle tracce successive subito durante la transizione, contendendo rete/cache al brano attivo; playNext re-preparava il player prima del salto immediato; il title tap del mini-player riduceva l'area ergonomica per espandere il player.
+VERIFICATION=LAB24 Playback Smooth Contract run 37060648258 success; final exact-SHA UAB Delivery Gate run 37061366277 success sul commit d3d458576929009b9878a125db3528bfa097ece9; complete Brain/device regression suite success; D1 migrations success; deployed LAB20 backend dependency verified; Android contracts success; UAB diagnostics success; APK+ZIP build success; exact BUILD_SHA stamp success; deliverable integrity success; artifact upload success. Artifact 11250547918 digest sha256:defecdebd47e28db9d0958235cff794a3f1fdfb156d11009558e50a387d59de1; APK sha256 b9495f172165d3ad79965ae08620b3392eafddd116080c659d986ec72ff889d2; ZIP sha256 c637acdf963fe4170386ebb35b41270ec70a26fcc8ed113bc3924a10d2ca83ae.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+RESTORE_SCOPE_HINTS=Preserve current MADRE and LAB23 Cover/search behavior. LAB24 changes only playback performance infrastructure, mini-player title tapping, CI/tests and delivery version. Device acceptance is required before CANDIDATA/MADRE lifecycle.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -211,11 +233,12 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.5
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.6
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
 Revision 1.3: registra LAB21 Deep Playback Locator tecnicamente verificato, con device acceptance ancora pendente.
 Revision 1.4: registra LAB22 Cover-only con vero YouTube Web, Tutto operativo e conferma immediata; device acceptance pendente.
 Revision 1.5: registra LAB23 title-first/Tutto/quality-year/native title navigation/Spotify assist; device acceptance pendente.
+Revision 1.6: registra LAB24 playback-priority, smart next-two preload e mini-player senza title tap; device acceptance pendente.
 Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device acceptance ancora pendente.
