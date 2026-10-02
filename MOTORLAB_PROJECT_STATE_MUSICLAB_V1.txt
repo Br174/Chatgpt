@@ -1,7 +1,7 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=29
+STATE_REVISION=30
 STATE_STATUS=MOTHER_LAB25_PROMOTED_DEVICE_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
@@ -90,10 +90,10 @@ FINAL_GATE_DELIVERABLE_VERIFY=success
 FINAL_GATE_UPLOAD=success
 DEVICE_ACCEPTANCE=accepted by Bruno 2026-10-03 as good enough for CANDIDATA
 CANDIDATA_CREATED=yes -> candidate/musiclab-lab25-playback-cover
-MADRE_PROMOTION=no
+MADRE_PROMOTION=yes -> mother/musiclab-lab25-final
 
 LAB25_ROOT_CAUSE_CLOSURE
-STATUS=IMPLEMENTED_AND_TECHNICALLY_VERIFIED_DEVICE_CONFIRMATION_PENDING
+STATUS=CLOSED_DEVICE_VERIFIED_AND_PRESERVED_IN_MOTHER_LAB25
 CAUSE_1=Cover still played a selected result through playNext()+seekToNext(), a queue-oriented path with extra choreography before the selected audio became current.
 CAUSE_2=LAB24 smart preload still targeted two tracks and could later chain optional full-song pre-cache, creating unnecessary background work for the user's priority of immediate current-track playback.
 CAUSE_3=Cover still exposed a second coverage projection (Precisa/Selezionata/Ampia/Esplora/Tutto) even though category selection plus evidence-first ordering already covered the user's navigation model.
@@ -427,14 +427,13 @@ TECHNICAL_CHANGE_HISTORY=MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
 
 CONTINUITY_RULES
 - Current stable production baseline is mother/musiclab-lab25-final at exact device-approved Candidate SHA 01a4793f99628473854884753d783ba8ca6bd51b.
-- LAB21 exact technical continuation/test point is uab-build/musiclab-deep-locator-21 at 138a7f4877e3124a25eb89e796f7e015309c7df8.
-- LAB20 remains preserved as the immediate predecessor baseline; LAB21 was branched from live LAB20 cdd1f11ae5287140d95174a53ef33a715db1b83d.
-- Preserve LAB20 and LAB21 artifacts immutably while Bruno performs device testing.
-- Do not modify or promote current MADRE as part of LAB21 device testing.
-- If LAB21 is approved, CANDIDATA creation follows permanent Mother -> replay approved LAB20+LAB21 change-set -> isolated Candidate APK+ZIP -> Bruno test workflow.
-- Candidate -> Mother promotion preserves exact approved Candidate SHA.
+- Previous Mother mother/musiclab-lab19-final remains preserved and immutable as rollback provenance.
+- Candidate candidate/musiclab-lab25-playback-cover remains preserved at the same SHA as current Mother.
+- LAB25 technical branch and artifact remain preserved independently from Candidate/Mother lifecycle.
+- All new MusicLab LAB work starts from current Mother unless Bruno explicitly selects another lifecycle base.
+- Candidate -> Mother promotion always preserves the exact approved Candidate SHA; no replay or source mutation is allowed during promotion.
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
-- New chats reconcile live evidence against this ledger; no transfer prompt required.
+- New chats reconcile live GitHub evidence against this ledger; no transfer prompt required.
 
 UPDATED_BY=MotorLab r16 MusicLab LAB25 exact Candidate -> MADRE promotion
 UPDATED_DATE=2026-10-03
