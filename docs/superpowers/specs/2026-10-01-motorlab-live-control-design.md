@@ -1,7 +1,7 @@
 # MotorLab Live Control + Micro-Progress — Design
 
 Date: 2026-10-01
-Status: DESIGN APPROVED IN CHAT; IMPLEMENTATION NOT YET AUTHORIZED
+Status: IMPLEMENTATION AUTHORIZED; CORE/BRIDGE CODE COMPLETE; LIVE DEPLOY + REAL CODEX PILOT PENDING
 Authority: Br174/Chatgpt
 Scope: MotorLab control plane only. No app/runtime/package/signing/lifecycle mutation.
 
@@ -235,4 +235,4 @@ New module: MOTORLAB-LIVE-CONTROL-V1
 Progress Reporting revision: V1.7 or next available revision
 Central release: next MotorLab release after implementation and verification
 
-Implementation requires a separate reviewed plan and explicit execution approval after this written specification is reviewed.
+Implementation was explicitly approved by Bruno and resumed on 2026-10-02. Repository CORE/bridge/template work is complete; canonical release promotion remains gated on live Worker deployment, end-to-end directive verification and a real supported Codex pilot.
