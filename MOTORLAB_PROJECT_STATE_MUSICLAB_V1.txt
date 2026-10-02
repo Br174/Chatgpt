@@ -1,27 +1,64 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=23
-STATE_STATUS=LAB22_COVER_WEB_LOCATOR_IN_PROGRESS
+STATE_REVISION=24
+STATE_STATUS=LAB22_COVER_WEB_LOCATOR_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-cover-web-locator-lab22
-OPERATION_STATUS=IMPLEMENTED_ANDROID_VERIFICATION_IN_PROGRESS
-CURRENT_PHASE=LAB22 Cover-only Web Locator implemented; source contracts green; Android unit/compile verification running before exact-SHA UAB delivery gate.
+OPERATION_STATUS=LAB_VERIFIED_ARTIFACT_DELIVERED
+CURRENT_PHASE=LAB22 Cover Web Locator implementation complete and exact-SHA APK+ZIP verified; waiting for Bruno device test before any CANDIDATA construction.
 CURRENT_REF=uab-build/musiclab-cover-web-locator-22
-CURRENT_HEAD_SHA=55baa965c34a368fa8963e72b4395edfb1e49752
+CURRENT_HEAD_SHA=104a950ff9b283d7e492132460eda2a2348ce860
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37026184269
-CURRENT_JOB_STATUS=in_progress
-LAST_VERIFIED_PROGRESS_PERCENT=70
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=70
-RECOVERY_FLOOR_PERCENT=70
-WRITE_LOCK_SCOPE=Br174/MusicLab:uab-build/musiclab-cover-web-locator-22 (single writer; CI verification active)
-PENDING_VERIFICATION=LAB22 Android contract completion, then exact-SHA UAB APK+ZIP gate and Bruno device test
-NEXT_SAFE_STEP=Read workflow 37026184269. If success, trigger LAB22 exact-SHA delivery gate on final head; if failure, inspect job log and repair only the failing scoped substep. Do not touch Originali or MADRE.
-LAST_USER_INTENT_SUMMARY=Cover only: add real www.youtube.com playback localization, make Studio default plus Studio/Live/Remix/Straniere/Tutto tabs, make coverage Tutto actively attempt every non-rejected AI candidate, chronological ordering, and immediate Conferma move to Confermate with background memory persistence.
+CURRENT_JOB_ID=37026925832
+CURRENT_JOB_STATUS=success
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=released
+PENDING_VERIFICATION=Bruno device test of exact LAB22 APK, focusing on Italian cover localization, Studio/Tutto behavior and confirmation movement
+NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-22.apk. If device-approved, preserve LAB22 and decide the next lifecycle step without touching MADRE before explicit approval.
+LAST_USER_INTENT_SUMMARY=Cover only: real www.youtube.com localization, Studio default plus Studio/Live/Remix/Straniere/Tutto tabs, operational coverage Tutto for every non-rejected AI candidate, chronological ordering, and immediate Conferma move to Confermate with background memory persistence.
 
+
+
+CURRENT_LAB22
+REF=uab-build/musiclab-cover-web-locator-22
+BASE_LAB21_REF=uab-build/musiclab-deep-locator-21
+BASE_LAB21_SHA=138a7f4877e3124a25eb89e796f7e015309c7df8
+SHA=104a950ff9b283d7e492132460eda2a2348ce860
+ANDROID_CONTRACT_RUN=37026184269
+ANDROID_CONTRACT_STATUS=success
+FINAL_GATE_RUN=37026925832
+FINAL_GATE_STATUS=success
+ARTIFACT_ID=11235622550
+ARTIFACT_NAME=MusicLab-LAB-22
+ARTIFACT_DIGEST=sha256:7e8dc67f297c3a177b6ff714083f356633d4f36a34f7910a582bf3661fb42ff9
+APK_NAME=MusicLab-LAB-22.apk
+APK_SHA256=df526e18699d53dd9d2c6ade7d34b3121b0b3c2d25bd1dbde3869b000656ad60
+ZIP_NAME=MusicLab-LAB-22-APK.zip
+ZIP_SHA256=9ec286db34a0e8a4599faaa6b3a6d6bd99b90b0811b6944e4d19aac8379d2c12
+BUILD_SHA_FILE=104a950ff9b283d7e492132460eda2a2348ce860
+FINAL_GATE_BRAIN=success
+FINAL_GATE_D1=success
+FINAL_GATE_ANDROID=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno test
+CANDIDATA_CREATED=no
+MADRE_PROMOTION=no
+
+LAB22_ROOT_CAUSE_CLOSURE
+STATUS=IMPLEMENTED_AND_TECHNICALLY_VERIFIED_DEVICE_CONFIRMATION_PENDING
+CAUSE_1=LAB21's lane labelled YouTube still called YouTube.search through WEB_REMIX while the InnerTube HTTP base remained https://music.youtube.com/youtubei/v1/, so it did not search the full regular youtube.com catalogue.
+CAUSE_2=Cover coverage mode Tutto previously projected already-resolved playables only; it did not actively re-run localization for all unresolved non-rejected Brain candidates.
+CAUSE_3=Manual Conferma waited for cloud persistence before local UI state changed, so the item appeared not to move when persistence was slow or failed.
+CORRECTION=LAB22 adds a separate anonymous www.youtube.com WEB search lane with public runtime client config and continuation parsing; Cover Tutto invokes exhaustive localization for unresolved non-rejected candidates; Studio/Live/Remix/Straniere/Tutto category tabs are explicit; confirmation updates UI immediately and persists in background with rollback on failure.
+PREVENTION=Source regression contracts assert real www.youtube.com endpoint use, operational exhaustive Tutto, Studio/Tutto chips, confirmed-section split, optimistic confirmation rollback; YouTubeWebSearch unit tests validate regular WEB video parsing, continuation, deduplication and malformed-response safety.
 
 CURRENT_LAB21
 REF=uab-build/musiclab-deep-locator-21
@@ -239,5 +276,5 @@ CONTINUITY_RULES
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r16 MusicLab LAB22 active checkpoint
+UPDATED_BY=MotorLab r16 MusicLab LAB22 Cover Web Locator exact-SHA verified delivery
 UPDATED_DATE=2026-10-02
