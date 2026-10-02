@@ -40,16 +40,22 @@ VERIFICATION EVIDENCE
   Therefore repository target 1.2.0 is NOT YET DEPLOYED.
 
 CURRENT BLOCKER
-Cloudflare Worker deployment of repository bridge target 1.2.0 has not been performed/verified. Do not claim Live Control RESOURCE_READY until deployment succeeds.
+Cloudflare Worker deployment of repository bridge target 1.2.0 has not been performed/verified.
+Browser verification on 2026-10-02 confirmed Cloudflare Continuous Deployment is connected to Br174/Chatgpt/main, but the configured Root directory is `/cloudflare/motorlab-state-bridge`.
+The repository path is `cloudflare/motorlab-state-bridge` (no leading slash).
+Cloudflare Build #95fce428 failed during repository preparation with "root directory not found".
+The Cloudflare page showed the last attempted deployment at commit 815af864; current GitHub main is newer, so CI/CD has not successfully consumed current main.
+Do not claim Live Control RESOURCE_READY until the build root is corrected, deployment succeeds and live endpoints are re-verified.
 
 NEXT SAFE STEPS — ORDERED
-1. Deploy motorlab-state-bridge target 1.2.0 to the existing Cloudflare Worker without changing D1/KV bindings/secrets.
-2. Verify /health reports 1.2.0 and GET /control/v1/directives returns a valid no-store JSON response.
-3. Publish a synthetic FORCE_PROGRESS_DISPLAY=ON + PROGRESS_PRESENCE=HIGH directive through existing signed GitHub Issue #1 relay and verify D1 readback.
-4. Run a supported real Codex MusicLab session, prove hook trust/load and same-operation safe-point pickup without restart/progress reset.
-5. Only after that mark central Live Control RESOURCE_READY and MusicLab PROJECT_ADOPTED.
-6. Promote the verified capability into the next MotorLab release (expected r17 unless superseded by a newer verified release).
-7. After Live Control reaches its terminal gate, continue the preserved queue item: approval countdown 10s / 20s / 1 min / 5 min.
+1. After explicit approval for this newly discovered deployment-config change, correct Cloudflare CI/CD Root directory from `/cloudflare/motorlab-state-bridge` to `cloudflare/motorlab-state-bridge` only; preserve all other build/deploy settings and D1/KV/secrets/bindings.
+2. Trigger/allow the existing GitHub Continuous Deployment from current Br174/Chatgpt main and verify the Worker reaches target 1.2.0.
+3. Verify /health reports 1.2.0 and GET /control/v1/directives returns a valid no-store JSON response.
+4. Publish a synthetic FORCE_PROGRESS_DISPLAY=ON + PROGRESS_PRESENCE=HIGH directive through existing signed GitHub Issue #1 relay and verify D1 readback.
+5. Run a supported real Codex MusicLab session, prove hook trust/load and same-operation safe-point pickup without restart/progress reset.
+6. Only after that mark central Live Control RESOURCE_READY and MusicLab PROJECT_ADOPTED.
+7. Promote the verified capability into the next MotorLab release (expected r17 unless superseded by a newer verified release).
+8. After Live Control reaches its terminal gate, continue the preserved queue item: approval countdown 10s / 20s / 1 min / 5 min.
 
 RELEASE STATE
 CURRENT_CANONICAL_RELEASE=2026.09.30-r16
