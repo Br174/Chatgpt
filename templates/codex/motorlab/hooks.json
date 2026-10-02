@@ -1,10 +1,17 @@
 {
-  "description": "MotorLab Live Control safe-point pickup",
+  "description": "MotorLab r17 bootstrap, live control, checkpoint queue and completion governance",
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|resume|compact",
+        "matcher": "startup|resume|clear|compact",
         "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_runtime.py\"",
+            "timeout": 5,
+            "statusMessage": "Loading MotorLab runtime",
+            "additionalContextLimit": 4000
+          },
           {
             "type": "command",
             "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_live_control.py\"",
@@ -15,16 +22,60 @@
         ]
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_runtime.py\"",
+            "timeout": 5,
+            "statusMessage": "Saving MotorLab checkpoint",
+            "additionalContextLimit": 4000
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": ".*",
         "hooks": [
           {
             "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_runtime.py\"",
+            "timeout": 5,
+            "statusMessage": "Saving MotorLab safe point",
+            "additionalContextLimit": 2000
+          },
+          {
+            "type": "command",
             "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_live_control.py\"",
             "timeout": 5,
             "statusMessage": "Checking MotorLab Live Control",
             "additionalContextLimit": 1500
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_runtime.py\"",
+            "timeout": 5,
+            "statusMessage": "Checking MotorLab completion and queue"
+          }
+        ]
+      }
+    ],
+    "Interrupt": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_runtime.py\"",
+            "timeout": 5,
+            "statusMessage": "Saving MotorLab interruption checkpoint"
           }
         ]
       }
