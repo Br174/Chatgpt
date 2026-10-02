@@ -1,26 +1,68 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=26
-STATE_STATUS=LAB24_PLAYBACK_SMOOTH_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=27
+STATE_STATUS=LAB25_INSTANT_PLAYBACK_COVER_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-playback-smooth-lab24
+ACTIVE_OPERATION_ID=musiclab-instant-playback-cover-lab25
 OPERATION_STATUS=LAB_VERIFIED_ARTIFACT_DELIVERED
-CURRENT_PHASE=LAB24 playback-priority smart preload implementation complete; exact-SHA APK+ZIP verified; waiting for Bruno device test of startup speed, continuity and next-track switching before any CANDIDATA construction.
-CURRENT_REF=uab-build/musiclab-playback-smooth-24
-CURRENT_HEAD_SHA=d3d458576929009b9878a125db3528bfa097ece9
+CURRENT_PHASE=LAB25 instant Cover playback, one-track preload, native MusicLab title-first Cover search and coverage-filter removal complete; exact-SHA APK+ZIP verified; waiting for Bruno device test before any CANDIDATA construction.
+CURRENT_REF=uab-build/musiclab-playback-title-cover-25
+CURRENT_HEAD_SHA=c92314ed1c846f209e12d0806898d7f47a8a0eff
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37061366277
+CURRENT_JOB_ID=37068985480
 CURRENT_JOB_STATUS=success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
 WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact LAB24 APK, focusing on immediate start when selecting a song, absence of stutter/rebuffer interruptions, fast next-track changes after next-two prewarm, and mini-player tap ergonomics
-NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-24.apk. If playback is device-approved, preserve LAB24 and decide the next lifecycle step without touching MADRE before explicit approval.
-LAST_USER_INTENT_SUMMARY=Keep LAB23 Cover search quality but make playback feel like a rocket: new song should start immediately, music must stay fluid, prewarm the next two songs in background without stealing resources from the current song, cancel background work on buffering/track changes, and remove title-click from the mini-player while preserving it elsewhere.
+PENDING_VERIFICATION=Bruno device test of exact LAB25 APK, focusing on tap-to-audio latency, playback continuity, single-next-track preload behavior, Cover native title-search first paint, absence of the old Copertura selector, evidence-first quality ordering and year display
+NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-25.apk. If device-approved, preserve LAB25 and decide the next lifecycle step without touching MADRE before explicit approval.
+LAST_USER_INTENT_SUMMARY=Make song start latency the top priority: Cover taps must use direct Play Now; preload only the single next track; remove the old Precisa/Selezionata/Ampia/Esplora/Tutto coverage section; keep quality ordering evidence-first; show year on every Cover row; use the native MusicLab title search path for near-immediate Cover first results and keep deeper discovery in background.
+
+
+
+CURRENT_LAB25
+REF=uab-build/musiclab-playback-title-cover-25
+BASE_LAB24_REF=uab-build/musiclab-playback-smooth-24
+BASE_LAB24_SHA=d3d458576929009b9878a125db3528bfa097ece9
+SHA=c92314ed1c846f209e12d0806898d7f47a8a0eff
+SOURCE_SHA=1ab2d0a2bf3d946ff6b89269c39b2df88e2ea645
+ANDROID_CONTRACT_RUN=37068866620
+ANDROID_CONTRACT_STATUS=success
+FINAL_GATE_RUN=37068985480
+FINAL_GATE_STATUS=success
+ARTIFACT_ID=11254600561
+ARTIFACT_NAME=MusicLab-LAB-25
+ARTIFACT_DIGEST=sha256:ff8a8e2d58c8ba71f6c073bb49cb33edc7af582c1a98502ce5b56ea6ef3d1c85
+APK_NAME=MusicLab-LAB-25.apk
+APK_SHA256=2237823e63d49e4308f1b27da2d0e64f87dc108304b638bbdd0b531ff92a5e81
+ZIP_NAME=MusicLab-LAB-25-APK.zip
+ZIP_SHA256=5b7ffbdd09911b8452a5a6f9b7d6d9c55ca40fe3b5fbd11346542d8492c0f5c2
+BUILD_SHA_FILE=c92314ed1c846f209e12d0806898d7f47a8a0eff
+FINAL_GATE_BRAIN=success
+FINAL_GATE_D1=success
+FINAL_GATE_ANDROID=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno test
+CANDIDATA_CREATED=no
+MADRE_PROMOTION=no
+
+LAB25_ROOT_CAUSE_CLOSURE
+STATUS=IMPLEMENTED_AND_TECHNICALLY_VERIFIED_DEVICE_CONFIRMATION_PENDING
+CAUSE_1=Cover still played a selected result through playNext()+seekToNext(), a queue-oriented path with extra choreography before the selected audio became current.
+CAUSE_2=LAB24 smart preload still targeted two tracks and could later chain optional full-song pre-cache, creating unnecessary background work for the user's priority of immediate current-track playback.
+CAUSE_3=Cover still exposed a second coverage projection (Precisa/Selezionata/Ampia/Esplora/Tutto) even though category selection plus evidence-first ordering already covered the user's navigation model.
+CAUSE_4=Cover fast title discovery used a direct FILTER_SONG call rather than the same native searchSummary path used by MusicLab's standard search screen, and original-row metadata could race that first-paint request.
+CAUSE_5=Fast title results often carried no year into visible rows even when later Brain/Spotify enrichment learned it.
+CORRECTION=LAB25 adds a direct Play Now service/connection path; cancels all old preload work before switching; prewarms only one next track and never chains full-song cache from that path; removes the Cover coverage selector/filter entirely while preserving automatic exhaustive background recovery; ranks Qualità by evidence strength with title semantics as a tie-break; shows Anno on every row; uses YouTube.searchSummary for the native MusicLab title-first Cover lane; delays source-row metadata until first paint; propagates enriched candidate metadata back into already visible playables.
+PERFORMANCE_GUARD=Selected playback cancels smart/full pre-cache before seek; already prepared player is not re-prepared; only one bounded prefix is warmed after current audio reaches a safe reserve; no full-song download is chained; first Cover request uses the native MusicLab summary endpoint with a short bounded timeout and unrelated metadata waits until after initial rows are visible.
+PREVENTION=LAB25 source/device contracts enforce Play Now usage, single-next preload, no Cover coverage selector/filter, native searchSummary first lane, year row presence, evidence-first quality ordering and retained automatic exhaustive background recovery.
 
 
 
@@ -278,7 +320,7 @@ LAB20_ROOT_CAUSE_CLOSURES
 CURRENT_MADRE
 REF=mother/musiclab-lab19-final
 SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-STATUS=UNCHANGED_DURING_LAB20_LAB21_LAB22_LAB23_LAB24
+STATUS=UNCHANGED_DURING_LAB20_LAB21_LAB22_LAB23_LAB24_LAB25
 PROMOTED_FROM=candidate/musiclab-lab19-player-stable
 PROMOTED_FROM_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 PROMOTION_MODE=exact approved Candidate ref -> new immutable Mother ref
@@ -355,5 +397,5 @@ CONTINUITY_RULES
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r16 MusicLab LAB24 playback-smooth exact-SHA verified delivery
+UPDATED_BY=MotorLab r16 MusicLab LAB25 instant-playback Cover exact-SHA verified delivery
 UPDATED_DATE=2026-10-02
