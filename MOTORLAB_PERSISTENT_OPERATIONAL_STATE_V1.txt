@@ -106,6 +106,29 @@ Do not log every low-value internal thought/tool call.
 - status: pending/applied/superseded/rejected
 Live directives contain orchestration metadata only: no raw API keys, access tokens, credentials or secrets.
 
+
+10. command_queue
+- queue_id/project_id/source user turn or message reference
+- requested scope summary
+- arrival order
+- priority_override flag
+- status
+- target operation id once active
+- paused/resume relation when applicable
+
+11. completion_barriers
+- stable fingerprint
+- operation_id/project_id
+- defect/cause/evidence
+- status OPEN | CLOSED_VERIFIED
+- progress
+- repair/prevention/verification
+- opened_at/closed_at
+
+R17 APPROVAL FIELDS
+Approval records additionally persist category, classification rationale, timer_started_at, auto_approve_after_seconds, auto_approve_at, decision state/evidence and manual-only status.
+Exact eligible durations are 10/20/60/300 seconds.
+
 WRITE DISCIPLINE
 - D1 writes must be bounded and meaningful; avoid polling/event spam.
 - Persist at material transitions and checkpoints.
@@ -171,6 +194,6 @@ SUCCESS CRITERIA
 - GitHub remains the durable technical backstop.
 
 VERSION
-MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.1
+MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.2
 Established: 2026-09-30
-Revision 1.1: adds secret-free live_directives persistence and repository fallback semantics for Live Control.
+Revision 1.2: r17 adds FIFO queue, paused-priority state, completion barriers and timed approval persistence.
