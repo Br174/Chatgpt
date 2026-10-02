@@ -13,13 +13,14 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
 3. Use VERIFIED local core immediately as fallback.
 4. When central is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
-5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt and MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt.
+5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt and MOTORLAB_LIVE_CONTROL_V1.txt.
 6. Read Project Continuity ledger.
 7. Read technical Change History registry when present.
 8. Read visible Registro Modifiche e Ripristini when present.
 9. Reconcile live repo/ref/head/provider/job/artifact evidence and reconstruct operation/progress/lock/next step.
 10. When a persistent operational backend is connected, reconcile D1 current operation/checkpoint state against newer GitHub/live evidence; never let stale D1 override newer technical truth.
-11. If substantial work is active, show verified numeric progress before long opaque work.
+11. Reconcile MotorLab Live Control at boot/resume and at supported safe control points; apply presentation directives before user-visible status when supported, without interrupting in-flight work or changing write authority.
+27. For ALL MotorLab-controlled modifications, reconstruct/show evidence-based numeric progress at the first available visible control point; micro-changes use opening/closing progress and an intermediate material boundary when tools/tests/writes occur.
 12. Resume unfinished already-approved scope through Resume Recovery + Watchdog before unrelated writes.
 13. Preserve project-native/domain engine authority and lifecycle identity.
 14. For EVERY NEW write-capable application/project modification request, apply hard pre-change approval: initial mutation wording is intent only; perform read-only preparation, present the pre-change report, then wait for Bruno approval.
@@ -73,6 +74,9 @@ Resolve N read-only, verify provenance/current compatibility, present restore pl
 CROSS-CHAT CONTINUITY
 A new chat is not a new project state. Live newer evidence and Project Continuity outrank old registries/memory. When D1 is connected, verified current operational state also participates under the authority matrix. Persist artifact-delivered/cause-pending states so later cycles continue the same causal queue instead of restarting.
 
+LIVE CONTROL
+MOTORLAB_LIVE_CONTROL_V1.txt owns lightweight safe-point presentation directives. Live Control never grants write approval, never creates a second writer, never interrupts an in-flight tool/build solely for presentation, and never authorizes runtime/lifecycle changes. If the active executor did not load Live Control, report that honestly and apply the directive only at a later supported run/resume.
+
 SAFE VERSION PINNING
 The MotorLab release used by active work is pinned until a safe boundary; adopt newer releases only at verified safe boundaries.
 
@@ -86,5 +90,6 @@ PLATFORM BOUNDARY
 MotorLab cannot wake a host with no execution cycle or claim invisible continuation without a real durable executor.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.8
+MOTORLAB-CORE-ENTRYPOINT-V1.9
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
+Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
