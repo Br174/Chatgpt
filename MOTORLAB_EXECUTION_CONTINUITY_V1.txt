@@ -1,0 +1,58 @@
+MOTORLAB EXECUTION CONTINUITY V1
+
+STATUS
+Mandatory MotorLab CORE workflow rule for approved operations.
+Central authority: Br174/Chatgpt.
+Established: 2026-10-02.
+
+PURPOSE
+Ensure that once Bruno has reviewed the proposed plan and given clear approval to proceed, MotorLab carries the agreed work through to verified completion without repeatedly interrupting the process for intermediate confirmations.
+
+1. CONTINUITY AFTER APPROVAL
+After the initial approved plan is active, MotorLab continues through all technical steps reasonably required to complete that same agreed outcome:
+- implementation;
+- diagnosis and root-cause correction;
+- configuration;
+- build and test;
+- deployment;
+- provider/tool transitions;
+- retries and recovery;
+- artifact creation and verification;
+- operational checkpoint/status persistence.
+
+Intermediate technical discoveries that are necessary to achieve the same agreed outcome do not create a new pause for confirmation.
+
+2. COMPLETION TARGET
+Continue until:
+A. the entire agreed modification/project outcome reaches verified 100% completion; or
+B. a genuine external blocker makes further progress impossible without information/action that MotorLab cannot supply itself.
+
+A tool timeout, retry, provider navigation step, failed build caused by a correctable configuration detail, or change of technical method is not by itself a reason to stop and ask again.
+
+3. PROTECTED BOUNDARIES
+Continuity never changes the user's agreed objective or explicit protected boundaries.
+A new decision is needed only if execution would:
+- materially change the agreed user-facing objective;
+- cross an explicit protected/no-touch boundary;
+- perform an unrelated destructive action;
+- enable new paid usage or cost that was not already approved.
+
+4. NO COUNTDOWN
+The former proposal for waiting 10 seconds / 20 seconds / 1 minute / 5 minutes before continuing is permanently retired.
+MotorLab has no approval countdown and no timed continuation rule.
+Continuation is based only on the already approved outcome, current verified checkpoint, safety constraints, and actual technical progress.
+
+5. RECOVERY
+Resume Recovery, Watchdog and Live Control preserve the existing approval, operation id, progress floor, checkpoint and single-writer state.
+A chat/tool/provider interruption does not reset approval or require a new confirmation for the same agreed outcome.
+
+6. CURRENT AND FUTURE PROJECTS
+This rule applies structurally to MotorLab itself and to all current/future MotorLab-managed software projects.
+Project-specific engines continue to coexist with MotorLab and are not replaced.
+
+7. PRECEDENCE
+For post-approval execution continuity, this module overrides older MotorLab wording that would pause merely because a new in-scope technical substep was discovered.
+The initial plan-before-write gate still applies before the first write of a genuinely new modification.
+
+VERSION
+MOTORLAB-EXECUTION-CONTINUITY-V1.0
