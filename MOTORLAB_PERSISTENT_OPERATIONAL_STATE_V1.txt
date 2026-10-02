@@ -92,8 +92,25 @@ Append-oriented operational history for material transitions only.
 Examples: request parsed, pre-change report emitted, approval captured, write started, checkpoint reached, artifact verified, artifact delivered, causal queue opened/closed, operation closed.
 Do not log every low-value internal thought/tool call.
 
+9. live_directives
+- directive_id
+- project_id
+- optional operation_id
+- optional session_id
+- directive_type
+- value
+- priority
+- created_at
+- expires_at or durable flag
+- issued_by
+- optional applied_checkpoint
+- status
+Live directives contain orchestration/presentation metadata only and MUST NOT contain secrets, API keys, access tokens, webhook secrets, approval tokens, raw credentials or hidden provider payloads.
+
 WRITE DISCIPLINE
 - D1 writes must be bounded and meaningful; avoid polling/event spam.
+- Live-directive writes occur only on meaningful directive transitions/publication; safe-point reads do not create D1 event spam.
+- Use directive_id plus project/operation/session identity for deduplication; agents may keep reconstructible local seen-ID state.
 - Persist at material transitions and checkpoints.
 - Use idempotent keys where possible so Resume Recovery does not duplicate state.
 - One logical operation uses one MOTORLAB_OPERATION_ID.
@@ -120,6 +137,12 @@ If D1 is unavailable:
 4. mark D1_RECONCILE_PENDING;
 5. when D1 returns, reconcile from authoritative evidence before accepting cached state.
 
+LIVE CONTROL READ/FALLBACK
+- D1 is the primary live-directive read surface only while resource readiness is verified.
+- Active directive reads are cache-control no-store and exclude expired/superseded/rejected directives.
+- Repository .motorlab/LIVE_CONTROL.json is fallback only when the central read path is unavailable.
+- Live Control failure must not block otherwise safe project work or grant new write authority.
+
 RECONCILIATION
 On D1 recovery:
 - compare operation ids, source refs/heads, artifact checksums and durable GitHub transitions;
@@ -145,6 +168,7 @@ No project may be forced onto Phase C during active/unsafe work; adoption occurs
 
 SUCCESS CRITERIA
 - interrupted approved work can resume from durable state;
+- live presentation directives survive chat changes and are deduplicated without storing secrets;
 - approval scope is not forgotten;
 - active locks/checkpoints/artifacts/root-cause queues survive chat changes;
 - optional cache loss is harmless;
@@ -152,5 +176,6 @@ SUCCESS CRITERIA
 - GitHub remains the durable technical backstop.
 
 VERSION
-MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.0
+MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.1
 Established: 2026-09-30
+Revision 1.1: adds secret-free live_directives persistence, transition-only writes, deduplication and fail-open read/fallback semantics.
