@@ -36,6 +36,17 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 25. Refresh Project Continuity at material transitions, including artifact-delivered/cause-pending states.
 26. Persist major operational transitions to D1 when connected; use GitHub continuity as durable backstop and KV only as reconstructible cache.
 
+
+R17 LIVE RUNTIME GOVERNANCE - MANDATORY
+- Reconcile Live Control at supported safe points and before visible status/resume.
+- Every UserPromptSubmit is an automatic ⚡ checkpoint/wake event.
+- If work is already active, an ordinary new request queues FIFO and the active operation resumes from the saved checkpoint.
+- Only explicit Bruno priority wording may preempt; pause safely and auto-resume prior work afterward.
+- Open completion barriers block unrelated writes and queue drain until CLOSED_VERIFIED at evidence-backed 100%.
+- Eligible approvals use Timed Delegated Approval: BANAL 10s, LESS_BANAL 20s, IMPORTANT 60s, VERY_IMPORTANT 300s with visible `Prova ⏱ MM:SS`; explicit rejection wins and manual-only safety boundaries never auto-approve.
+- On supported Codex surfaces, Stop continues unfinished autonomous work instead of silently abandoning it.
+- Runtime state must remain outside application working-tree files and must not create a second writer.
+
 HARD PRE-CHANGE APPROVAL - R14+
 A phrase such as modifica/correggi/aggiungi/togli/sistema/ripristina does not authorize the first write. Read-only preparation is allowed. Only approval after the pre-change report authorizes writing. Approval continuity applies only inside the described scope.
 
