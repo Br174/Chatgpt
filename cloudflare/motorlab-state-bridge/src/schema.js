@@ -9,8 +9,10 @@ CREATE TABLE IF NOT EXISTS locks (lock_key TEXT PRIMARY KEY,operation_id TEXT NO
 CREATE TABLE IF NOT EXISTS artifacts (artifact_id TEXT PRIMARY KEY,operation_id TEXT NOT NULL,name TEXT NOT NULL,source_ref TEXT NOT NULL,source_head TEXT NOT NULL,checksums TEXT NOT NULL,verification_state TEXT NOT NULL,delivery_state TEXT NOT NULL,immutable_under_test INTEGER NOT NULL CHECK (immutable_under_test IN (0,1)),created_at TEXT NOT NULL,FOREIGN KEY (operation_id) REFERENCES operations(operation_id));
 CREATE TABLE IF NOT EXISTS root_causes (root_cause_id TEXT PRIMARY KEY,operation_id TEXT NOT NULL,defect TEXT NOT NULL,immediate_repair TEXT NOT NULL,status TEXT NOT NULL,evidence_refs TEXT,recurrence_surfaces TEXT,prevention_step TEXT,approval_scope_status TEXT NOT NULL,associated_artifact TEXT,updated_at TEXT NOT NULL,FOREIGN KEY (operation_id) REFERENCES operations(operation_id));
 CREATE TABLE IF NOT EXISTS operation_events (event_id TEXT PRIMARY KEY,operation_id TEXT NOT NULL,event_type TEXT NOT NULL,event_summary TEXT NOT NULL,created_at TEXT NOT NULL,FOREIGN KEY (operation_id) REFERENCES operations(operation_id));
+CREATE TABLE IF NOT EXISTS live_directives (directive_id TEXT PRIMARY KEY,project_id TEXT NOT NULL,operation_id TEXT,session_id TEXT,directive_type TEXT NOT NULL,value TEXT NOT NULL,priority INTEGER NOT NULL,created_at TEXT NOT NULL,expires_at TEXT,durable INTEGER NOT NULL CHECK (durable IN (0,1)),issued_by TEXT NOT NULL,applied_checkpoint TEXT,status TEXT NOT NULL,FOREIGN KEY (project_id) REFERENCES projects(project_id));
 CREATE INDEX IF NOT EXISTS idx_operations_project_status ON operations(project_id,status);
 CREATE INDEX IF NOT EXISTS idx_checkpoints_operation_created ON checkpoints(operation_id,created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_events_operation_created ON operation_events(operation_id,created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_root_causes_operation_status ON root_causes(operation_id,status);
+CREATE INDEX IF NOT EXISTS idx_live_directives_project_status_created ON live_directives(project_id,status,created_at DESC);
 `;
