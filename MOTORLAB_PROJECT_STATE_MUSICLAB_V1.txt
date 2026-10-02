@@ -1,26 +1,65 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=25
-STATE_STATUS=LAB23_FAST_TITLE_SPOTIFY_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=26
+STATE_STATUS=LAB24_PLAYBACK_SMOOTH_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-fast-title-spotify-lab23
+ACTIVE_OPERATION_ID=musiclab-playback-smooth-lab24
 OPERATION_STATUS=LAB_VERIFIED_ARTIFACT_DELIVERED
-CURRENT_PHASE=LAB23 fast title-first Cover, ranked native title search and Spotify assist implementation complete; exact-SHA APK+ZIP verified; waiting for Bruno device test before any CANDIDATA construction.
-CURRENT_REF=uab-build/musiclab-spotify-fast-23
-CURRENT_HEAD_SHA=193c6f630c618401fea93c06633faf2635b551e0
+CURRENT_PHASE=LAB24 playback-priority smart preload implementation complete; exact-SHA APK+ZIP verified; waiting for Bruno device test of startup speed, continuity and next-track switching before any CANDIDATA construction.
+CURRENT_REF=uab-build/musiclab-playback-smooth-24
+CURRENT_HEAD_SHA=d3d458576929009b9878a125db3528bfa097ece9
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37052121824
+CURRENT_JOB_ID=37061366277
 CURRENT_JOB_STATUS=success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
 WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact LAB23 APK, focusing on immediate title-first Cover results, Tutto default, category separation, quality/year ordering, title-click native search and Spotify-assisted discovery
-NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-23.apk. If device-approved, preserve LAB23 and decide the next lifecycle step without touching MADRE before explicit approval.
-LAST_USER_INTENT_SUMMARY=Build on LAB22: Cover opens with Tutto selected and shows lightweight title-only MusicLab results first; Studio/Live/Mix/Straniere remain category views; quality ranking is default with optional year ascending/descending; clicking song titles across common UI opens the native MusicLab search with exact/decorated matches first and similar results later; Spotify is additive discovery/metadata support for Cover and Originali; keep UI/runtime light and deduplicated.
+PENDING_VERIFICATION=Bruno device test of exact LAB24 APK, focusing on immediate start when selecting a song, absence of stutter/rebuffer interruptions, fast next-track changes after next-two prewarm, and mini-player tap ergonomics
+NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-24.apk. If playback is device-approved, preserve LAB24 and decide the next lifecycle step without touching MADRE before explicit approval.
+LAST_USER_INTENT_SUMMARY=Keep LAB23 Cover search quality but make playback feel like a rocket: new song should start immediately, music must stay fluid, prewarm the next two songs in background without stealing resources from the current song, cancel background work on buffering/track changes, and remove title-click from the mini-player while preserving it elsewhere.
+
+
+
+CURRENT_LAB24
+REF=uab-build/musiclab-playback-smooth-24
+BASE_LAB23_REF=uab-build/musiclab-spotify-fast-23
+BASE_LAB23_SHA=193c6f630c618401fea93c06633faf2635b551e0
+SHA=d3d458576929009b9878a125db3528bfa097ece9
+ANDROID_CONTRACT_RUN=37060648258
+ANDROID_CONTRACT_STATUS=success
+FINAL_GATE_RUN=37061366277
+FINAL_GATE_STATUS=success
+ARTIFACT_ID=11250547918
+ARTIFACT_NAME=MusicLab-LAB-24
+ARTIFACT_DIGEST=sha256:defecdebd47e28db9d0958235cff794a3f1fdfb156d11009558e50a387d59de1
+APK_NAME=MusicLab-LAB-24.apk
+APK_SHA256=b9495f172165d3ad79965ae08620b3392eafddd116080c659d986ec72ff889d2
+ZIP_NAME=MusicLab-LAB-24-APK.zip
+ZIP_SHA256=c637acdf963fe4170386ebb35b41270ec70a26fcc8ed113bc3924a10d2ca83ae
+BUILD_SHA_FILE=d3d458576929009b9878a125db3528bfa097ece9
+FINAL_GATE_BRAIN=success
+FINAL_GATE_D1=success
+FINAL_GATE_ANDROID=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno test
+CANDIDATA_CREATED=no
+MADRE_PROMOTION=no
+
+LAB24_ROOT_CAUSE_CLOSURE
+STATUS=IMPLEMENTED_AND_TECHNICALLY_VERIFIED_DEVICE_CONFIRMATION_PENDING
+CAUSE_1=The existing optional pre-cache could download full upcoming tracks and was triggered directly on media transitions, allowing background network work to compete with the current stream and contribute to audible buffering/stutter.
+CAUSE_2=Cover playback inserted the selected track with playNext(), whose implementation called player.prepare() even when the player was already prepared; the immediate seekToNext() then paid avoidable re-prepare work.
+CAUSE_3=LAB23 made the mini-player song title clickable for title-search, but the mini-player has limited touch area and this interfered with the user's intent to expand the player.
+CORRECTION=LAB24 gives current playback absolute priority; cancels smart/full pre-cache on transition or BUFFERING; waits for READY plus a healthy current buffer; resolves and caches only a small 384KB prefix for at most the next two tracks, sequentially; defers optional full pre-cache until a larger reserve exists; removes redundant prepare() from live playNext insertion; removes title-search taps from both mini-player variants while keeping full-player title search.
+PERFORMANCE_GUARD=No parallel full-song downloads for next tracks; at most two bounded prefix prewarms; old preload is cancelled on song change; prewarm stops immediately on BUFFERING and resumes only after current audio recovers; local cached prefixes/stream URLs are reused by the normal player path.
+PREVENTION=LAB24 source contract verifies next-two limit, bounded prefix length, BUFFERING cancellation, stable-buffer guard, no re-prepare between playNext insertion and shuffle handling, mini-player title-search removal and full-player title-search preservation.
 
 
 
@@ -239,7 +278,7 @@ LAB20_ROOT_CAUSE_CLOSURES
 CURRENT_MADRE
 REF=mother/musiclab-lab19-final
 SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-STATUS=UNCHANGED_DURING_LAB20_LAB21_LAB22_LAB23
+STATUS=UNCHANGED_DURING_LAB20_LAB21_LAB22_LAB23_LAB24
 PROMOTED_FROM=candidate/musiclab-lab19-player-stable
 PROMOTED_FROM_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 PROMOTION_MODE=exact approved Candidate ref -> new immutable Mother ref
@@ -316,5 +355,5 @@ CONTINUITY_RULES
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r16 MusicLab LAB23 fast-title Spotify exact-SHA verified delivery
+UPDATED_BY=MotorLab r16 MusicLab LAB24 playback-smooth exact-SHA verified delivery
 UPDATED_DATE=2026-10-02
