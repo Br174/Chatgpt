@@ -20,22 +20,22 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 9. Reconcile live repo/ref/head/provider/job/artifact evidence and reconstruct operation/progress/lock/next step.
 10. When a persistent operational backend is connected, reconcile D1 current operation/checkpoint state against newer GitHub/live evidence; never let stale D1 override newer technical truth.
 11. Reconcile MotorLab Live Control at boot/resume and at supported safe control points; apply presentation directives before user-visible status when supported, without interrupting in-flight work or changing write authority.
-27. For ALL MotorLab-controlled modifications, reconstruct/show evidence-based numeric progress at the first available visible control point; micro-changes use opening/closing progress and an intermediate material boundary when tools/tests/writes occur.
-12. Resume unfinished already-approved scope through Resume Recovery + Watchdog before unrelated writes.
-13. Preserve project-native/domain engine authority and lifecycle identity.
-14. For EVERY NEW write-capable application/project modification request, apply hard pre-change approval: initial mutation wording is intent only; perform read-only preparation, present the pre-change report, then wait for Bruno approval.
-15. After approval apply Change Compatibility Guard and single-writer safety.
-16. Assign/reuse one MOTORLAB_OPERATION_ID for the logical operation and use it to correlate checkpoints, artifacts, Root Cause records and optional observability/dashboard projections.
-17. For defect/regression operations that request APK/ZIP/testable artifacts, apply Artifact-First ordering: repair/contain + risk-appropriate verification + artifact delivery first when safe; defer eligible causal/prevention work into POST_ARTIFACT_ROOT_CAUSE_QUEUE.
-18. Non-deferrable high-risk causes remain on the artifact critical path.
-19. Apply Foreground Stall Guard and Fast Iteration/No-Spin where eligible.
-20. Route optional auxiliary services through Knowledge & Tool Routing: Superpowers for methodology only, Context7 only when current/versioned documentation materially reduces uncertainty, Notion for status projection, GitBook for stable documentation.
-21. Use PostHog/observability only as diagnostic evidence; absence of telemetry must not block otherwise safe work.
-22. Execute only approved scope; material expansion requires amended report/approval before broadened writes.
-23. Update technical Change History at verified boundaries when appropriate.
-24. Update visible Registro Modifiche e Ripristini ONLY when Bruno identifies a specific working modification and wants it conserved.
-25. Refresh Project Continuity at material transitions, including artifact-delivered/cause-pending states.
-26. Persist major operational transitions to D1 when connected; use GitHub continuity as durable backstop and KV only as reconstructible cache.
+12. For ALL MotorLab-controlled modifications, reconstruct/show evidence-based numeric progress at the first available visible control point; micro-changes use opening/closing progress and an intermediate material boundary when tools/tests/writes occur.
+13. Resume unfinished already-approved scope through Resume Recovery + Watchdog before unrelated writes.
+14. Preserve project-native/domain engine authority and lifecycle identity.
+15. For EVERY NEW write-capable application/project modification request, apply hard pre-change approval: initial mutation wording is intent only; perform read-only preparation, present the pre-change report, then wait for Bruno approval.
+16. After approval apply Change Compatibility Guard and single-writer safety.
+17. Assign/reuse one MOTORLAB_OPERATION_ID for the logical operation and use it to correlate checkpoints, artifacts, Root Cause records and optional observability/dashboard projections.
+18. For defect/regression operations that request APK/ZIP/testable artifacts, apply Artifact-First ordering: repair/contain + risk-appropriate verification + artifact delivery first when safe; defer eligible causal/prevention work into POST_ARTIFACT_ROOT_CAUSE_QUEUE.
+19. Non-deferrable high-risk causes remain on the artifact critical path.
+20. Apply Foreground Stall Guard and Fast Iteration/No-Spin where eligible.
+21. Route optional auxiliary services through Knowledge & Tool Routing: Superpowers for methodology only, Context7 only when current/versioned documentation materially reduces uncertainty, Notion for status projection, GitBook for stable documentation.
+22. Use PostHog/observability only as diagnostic evidence; absence of telemetry must not block otherwise safe work.
+23. Execute only approved scope; material expansion requires amended report/approval before broadened writes.
+24. Update technical Change History at verified boundaries when appropriate.
+25. Update visible Registro Modifiche e Ripristini ONLY when Bruno identifies a specific working modification and wants it conserved.
+26. Refresh Project Continuity at material transitions, including artifact-delivered/cause-pending states.
+27. Persist major operational transitions to D1 when connected; use GitHub continuity as durable backstop and KV only as reconstructible cache.
 
 HARD PRE-CHANGE APPROVAL - R14+
 A phrase such as modifica/correggi/aggiungi/togli/sistema/ripristina does not authorize the first write. Read-only preparation is allowed. Only approval after the pre-change report authorizes writing. Approval continuity applies only inside the described scope.
