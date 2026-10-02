@@ -1,15 +1,15 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=28
-STATE_STATUS=CANDIDATE_LAB25_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=29
+STATE_STATUS=MOTHER_LAB25_PROMOTED_DEVICE_VERIFIED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-candidate-lab25-playback-cover
-OPERATION_STATUS=CANDIDATE_VERIFIED_ARTIFACT_READY
-CURRENT_PHASE=LAB25 accepted by Bruno for Candidate lifecycle. New Candidate was constructed from exact MADRE LAB19 with the approved LAB20-LAB25 application tree replayed, then given separate Candidate build identity. Exact-SHA Candidate APK+ZIP verified; waiting for Bruno device test before any MADRE promotion.
-CURRENT_REF=candidate/musiclab-lab25-playback-cover
+ACTIVE_OPERATION_ID=musiclab-mother-lab25-promotion
+OPERATION_STATUS=MOTHER_PROMOTION_COMPLETE
+CURRENT_PHASE=Bruno tested the exact LAB25 Candidate on device and explicitly approved promotion. The immutable Mother ref mother/musiclab-lab25-final now points to the exact approved Candidate SHA with zero runtime/source difference. Previous Mother LAB19 remains preserved.
+CURRENT_REF=mother/musiclab-lab25-final
 CURRENT_HEAD_SHA=01a4793f99628473854884753d783ba8ca6bd51b
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
 CURRENT_JOB_ID=37072545456
@@ -18,9 +18,9 @@ LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
 WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact MusicLab CANDIDATA LAB25 APK. Candidate app/runtime code is identical to approved LAB25; only Candidate CI/build identity and provenance trace differ. Verify real playback/search behavior before any MADRE promotion.
-NEXT_SAFE_STEP=Bruno installs and tests MusicLab-CANDIDATA-LAB25.apk. If he explicitly approves this Candidate on device, promote the exact Candidate source lifecycle to a new MADRE without replaying changes again. Current MADRE stays untouched until that approval.
-LAST_USER_INTENT_SUMMARY=Bruno considers LAB25 good enough to become CANDIDATA and explicitly requested Candidate construction. Candidate must start from current MADRE, preserve approved LAB25 application behavior, have its own identity/APK+ZIP, and remain separate from MADRE until device approval.
+PENDING_VERIFICATION=none for LAB25 promotion; exact Candidate was device-tested and promoted unchanged
+NEXT_SAFE_STEP=All future MusicLab LAB work starts from mother/musiclab-lab25-final unless Bruno explicitly requests another lifecycle base. Preserve previous Mother and Candidate refs immutably.
+LAST_USER_INTENT_SUMMARY=Bruno tested the exact LAB25 Candidate and explicitly approved it as the new MADRE.
 
 
 
@@ -57,8 +57,8 @@ FINAL_GATE_APK_ZIP_BUILD=success
 FINAL_GATE_DELIVERABLE_VERIFY=success
 FINAL_GATE_UPLOAD=success
 LAB25_DEVICE_ACCEPTANCE=Bruno explicitly said LAB25 is good enough to become Candidate
-CANDIDATE_DEVICE_ACCEPTANCE=pending Bruno test of exact Candidate APK
-MADRE_PROMOTION=no
+CANDIDATE_DEVICE_ACCEPTANCE=accepted by Bruno on device 2026-10-03
+MADRE_PROMOTION=yes -> mother/musiclab-lab25-final
 CANDIDATE_CONSTRUCTION_RULE=Started from exact current MADRE; replayed approved LAB20-LAB25 tree into a new commit whose direct parent is MADRE; did not rename/repoint LAB25 as Candidate.
 
 
@@ -357,29 +357,29 @@ LAB20_ROOT_CAUSE_CLOSURES
 - Final exact-SHA gate unifies Brain tests, D1 migrations, Android tests, UAB diagnostics, APK+ZIP build, SHA stamping, deliverable integrity and artifact upload.
 
 CURRENT_MADRE
-REF=mother/musiclab-lab19-final
-SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-STATUS=UNCHANGED_DURING_LAB20_LAB21_LAB22_LAB23_LAB24_LAB25_AND_CANDIDATE25
-PROMOTED_FROM=candidate/musiclab-lab19-player-stable
-PROMOTED_FROM_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+REF=mother/musiclab-lab25-final
+SHA=01a4793f99628473854884753d783ba8ca6bd51b
+STATUS=CURRENT_DEVICE_VERIFIED_MOTHER
+PROMOTED_FROM=candidate/musiclab-lab25-playback-cover
+PROMOTED_FROM_SHA=01a4793f99628473854884753d783ba8ca6bd51b
 PROMOTION_MODE=exact approved Candidate ref -> new immutable Mother ref
 RUNTIME_DIFF_FROM_CANDIDATE=NONE
-DEVICE_ACCEPTANCE=Bruno accepted LAB19/CANDIDATA on device as sufficiently working
-PROMOTION_APPROVAL=explicit Bruno approval 2026-09-30
-PREVIOUS_CANONICAL_MOTHER=mother/musiclab-112726
-PREVIOUS_CANONICAL_MOTHER_SHA=770849ff543289de3adffe5bab62bc09528d19f4
-UAB_MAIN_POINTER_UPDATED=yes
-PROMOTION_TRACE=.uab/promotions/MOTHER_LAB19_2026-09-30.txt
+DEVICE_ACCEPTANCE=Bruno tested exact Candidate APK and approved it as new MADRE
+PROMOTION_APPROVAL=explicit Bruno approval 2026-10-03
+PREVIOUS_CANONICAL_MOTHER=mother/musiclab-lab19-final
+PREVIOUS_CANONICAL_MOTHER_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+PROMOTION_TRACE=Br174/Chatgpt MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt + MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
 
 STABLE_CANDIDATA_HISTORY
-REF=candidate/musiclab-lab19-player-stable
-SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-TESTED_RUNTIME_COMMIT=77745bcf77b4ded698c826b04c08843275d83fa1
-ARTIFACT_ID=11082129447
-APK_SHA256=da84c357b4d812dc51ce12fe719a77914412c87b2fb4ed28db9d18b51c8b8a66
-ZIP_SHA256=ebb10eee36a363c2280ec9d2f0a4036c6d6db1421e908775ec43bff5975f90f1
-DEVICE_ACCEPTANCE=Bruno accepted on device before Mother promotion
-MADRE_PROMOTION=yes -> mother/musiclab-lab19-final
+REF=candidate/musiclab-lab25-playback-cover
+SHA=01a4793f99628473854884753d783ba8ca6bd51b
+ARTIFACT_ID=11255672178
+APK_SHA256=f65b987e5d86ba7396098621c49f47b728f5baf898cb140f13b6f294f094d738
+ZIP_SHA256=60f8766647ddd43d5543dabc4362655fa9155b5f4973c2381a5c8fd771dd90c2
+DEVICE_ACCEPTANCE=Bruno accepted exact Candidate on device 2026-10-03
+MADRE_PROMOTION=yes -> mother/musiclab-lab25-final
+PREVIOUS_MOTHER_REF=mother/musiclab-lab19-final
+PREVIOUS_MOTHER_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 
 CANDIDATE_LIFECYCLE_RULE_PERMANENT
 - A CANDIDATA is NOT a renamed LAB and must not be created by simply relabeling a LAB branch.
@@ -391,7 +391,7 @@ CANDIDATE_LIFECYCLE_RULE_PERMANENT
 
 PLAYER_ROOT_CAUSE
 STATUS=CLOSED_DEVICE_VERIFIED
-SUMMARY=LAB19 fixed player re-expansion/ownership/collapse race and remains preserved in current MADRE mother/musiclab-lab19-final.
+SUMMARY=LAB19 player stability remains preserved; LAB25 adds device-approved Play Now/single-next preload behavior and is now preserved in current MADRE mother/musiclab-lab25-final.
 
 MOTORLAB_R16_SYNC
 SYNC_STATUS=VERIFIED_CONTROL_PLANE_ONLY
@@ -419,14 +419,14 @@ PATH=MOTORLAB_MODIFICATION_RESTORE_REGISTER_MUSICLAB_V1.txt
 VISIBLE_SLOTS=1
 NEXT_RESTORE_NO=2
 RESTORE_NO_1=Player / mini-player fuori dal lettore
-RESTORE_NO_1_SOURCE_REF=mother/musiclab-lab19-final
-RESTORE_NO_1_SOURCE_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
+RESTORE_NO_1_SOURCE_REF=mother/musiclab-lab25-final
+RESTORE_NO_1_SOURCE_SHA=01a4793f99628473854884753d783ba8ca6bd51b
 RULE=only Bruno-confirmed working modifications enter; same feature updates same number; failed/unconfirmed attempts stay out
 
 TECHNICAL_CHANGE_HISTORY=MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
 
 CONTINUITY_RULES
-- Current stable production baseline remains mother/musiclab-lab19-final until Bruno approves a separately built/tested CANDIDATA.
+- Current stable production baseline is mother/musiclab-lab25-final at exact device-approved Candidate SHA 01a4793f99628473854884753d783ba8ca6bd51b.
 - LAB21 exact technical continuation/test point is uab-build/musiclab-deep-locator-21 at 138a7f4877e3124a25eb89e796f7e015309c7df8.
 - LAB20 remains preserved as the immediate predecessor baseline; LAB21 was branched from live LAB20 cdd1f11ae5287140d95174a53ef33a715db1b83d.
 - Preserve LAB20 and LAB21 artifacts immutably while Bruno performs device testing.
@@ -436,5 +436,5 @@ CONTINUITY_RULES
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r16 MusicLab CANDIDATA LAB25 exact-SHA verified delivery
-UPDATED_DATE=2026-10-02
+UPDATED_BY=MotorLab r16 MusicLab LAB25 exact Candidate -> MADRE promotion
+UPDATED_DATE=2026-10-03
