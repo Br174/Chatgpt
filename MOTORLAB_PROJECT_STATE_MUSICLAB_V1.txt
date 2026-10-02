@@ -1,26 +1,26 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=22
-STATE_STATUS=LAB21_DEEP_LOCATOR_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=23
+STATE_STATUS=LAB22_COVER_WEB_LOCATOR_IN_PROGRESS
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-deep-locator-lab21
-OPERATION_STATUS=LAB_VERIFIED_ARTIFACT_DELIVERED
-CURRENT_PHASE=LAB21 Deep Locator implementation complete and exact-SHA APK+ZIP verified; waiting for Bruno device test of cover-to-YouTube localization before any CANDIDATA construction.
-CURRENT_REF=uab-build/musiclab-deep-locator-21
-CURRENT_HEAD_SHA=138a7f4877e3124a25eb89e796f7e015309c7df8
+ACTIVE_OPERATION_ID=musiclab-cover-web-locator-lab22
+OPERATION_STATUS=IMPLEMENTED_ANDROID_VERIFICATION_IN_PROGRESS
+CURRENT_PHASE=LAB22 Cover-only Web Locator implemented; source contracts green; Android unit/compile verification running before exact-SHA UAB delivery gate.
+CURRENT_REF=uab-build/musiclab-cover-web-locator-22
+CURRENT_HEAD_SHA=55baa965c34a368fa8963e72b4395edfb1e49752
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37013964295
-CURRENT_JOB_STATUS=success
-LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
-RECOVERY_FLOOR_PERCENT=100
-WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact LAB21 APK artifact, especially cover localization/playback yield versus LAB20
-NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-21.apk with the same cover cases that exposed 60 admitted-but-unlocalized candidates. If explicitly approved after device acceptance, construct a new isolated CANDIDATA from the exact current MADRE by replaying the approved LAB20+LAB21 change-set; build APK+ZIP for that CANDIDATA and require a second Bruno device approval before MADRE promotion.
-LAST_USER_INTENT_SUMMARY=Improve the LAB20 cover playback locator so AI-accepted covers are found and played through YouTube/YTM using deeper search, richer metadata and less brittle uploader matching; produce a verified LAB21 APK+ZIP without touching MADRE.
+CURRENT_JOB_ID=37026184269
+CURRENT_JOB_STATUS=in_progress
+LAST_VERIFIED_PROGRESS_PERCENT=70
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=70
+RECOVERY_FLOOR_PERCENT=70
+WRITE_LOCK_SCOPE=Br174/MusicLab:uab-build/musiclab-cover-web-locator-22 (single writer; CI verification active)
+PENDING_VERIFICATION=LAB22 Android contract completion, then exact-SHA UAB APK+ZIP gate and Bruno device test
+NEXT_SAFE_STEP=Read workflow 37026184269. If success, trigger LAB22 exact-SHA delivery gate on final head; if failure, inspect job log and repair only the failing scoped substep. Do not touch Originali or MADRE.
+LAST_USER_INTENT_SUMMARY=Cover only: add real www.youtube.com playback localization, make Studio default plus Studio/Live/Remix/Straniere/Tutto tabs, make coverage Tutto actively attempt every non-rejected AI candidate, chronological ordering, and immediate Conferma move to Confermate with background memory persistence.
 
 
 CURRENT_LAB21
@@ -239,5 +239,5 @@ CONTINUITY_RULES
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r16 MusicLab LAB21 Deep Locator exact-SHA verified delivery
+UPDATED_BY=MotorLab r16 MusicLab LAB22 active checkpoint
 UPDATED_DATE=2026-10-02
