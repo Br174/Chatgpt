@@ -157,6 +157,27 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 RESTORE_SCOPE_HINTS=Playback locator only. Preserve Brain editorial admission semantics and later unrelated UI/player changes. Do not promote to CANDIDATA/MADRE until Bruno confirms device behavior.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261002-lab22-cover-youtube-web-all-confirm
+DATE=2026-10-02
+TITLE=Cover LAB22 con vero YouTube Web, Tutto operativo e Confermate immediate
+SEMANTIC_TAGS=cover,studio,YouTube,YouTube Web,YouTube Music,locator,Tutto,conferma,confermate,cronologia,LAB22
+USER_INTENT=Concentrarsi solo sulle Cover: localizzare molte più versioni italiane realmente presenti su YouTube, rendere Tutto operativo sui candidati AI, rinominare Cover in Studio con categorie Studio/Live/Remix/Straniere/Tutto, ordinare dalla più vecchia alla più nuova e spostare subito le versioni confermate nella sezione superiore con memoria in background.
+CHANGE_SCOPE=COMPOSITE_COVER_ONLY
+LIFECYCLE_ROLE=LAB22_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-deep-locator-21
+SOURCE_BASE_SHA=138a7f4877e3124a25eb89e796f7e015309c7df8
+RESULT_REF=uab-build/musiclab-cover-web-locator-22
+RESULT_SHA=104a950ff9b283d7e492132460eda2a2348ce860
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/AiCoverSearchEngine.kt,app/src/main/kotlin/com/metrolist/music/ui/component/AiCoverageMode.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt,app/src/main/kotlin/com/metrolist/music/ui/component/YouTubeWebSearch.kt,app/src/test/kotlin/com/metrolist/music/ui/component/YouTubeWebSearchTest.kt,cloudflare/music-intelligence/test/android-brain-contract-source.test.mjs,cloudflare/music-intelligence/test/device-regression-contract.test.mjs,uab-project.env,.github/workflows/lab20-android-brain-tests.yml,.github/workflows/lab20-uab-build-gate.yml
+BEHAVIOR_SUMMARY=Il locator Cover conserva YouTube Music per i match catalogo ma aggiunge una corsia separata www.youtube.com WEB con configurazione pubblica runtime, risultati video normali e continuation; Tutto nella copertura rilancia in modalità exhaustive ogni candidato AI non rifiutato ancora non localizzato; le categorie sono Studio/Live/Remix/Straniere/Tutto con Studio predefinito; i risultati restano ordinati per anno crescente con date mancanti in fondo; Conferma sposta subito il risultato in Confermate e salva su memoria MusicLab/D1 in background, con rollback se il salvataggio fallisce.
+ROOT_CAUSE=La corsia LAB21 etichettata YouTube usava WEB_REMIX ma il trasporto di ricerca restava radicato su music.youtube.com; inoltre Tutto agiva soltanto come filtro sui playables già risolti e Conferma aspettava il round-trip cloud prima di cambiare UI.
+VERIFICATION=LAB22 Android Cover Web Locator Contract run 37026184269 success; final UAB Delivery Gate run 37026925832 success; complete Brain/device regression suite success; D1 migrations success; LAB20 backend dependency verified; Android tests incl YouTubeWebSearchTest success; UAB diagnostics/build/deliverable integrity/upload success; artifact 11235622550 digest sha256:7e8dc67f297c3a177b6ff714083f356633d4f36a34f7910a582bf3661fb42ff9; APK sha256 df526e18699d53dd9d2c6ade7d34b3121b0b3c2d25bd1dbde3869b000656ad60; ZIP sha256 9ec286db34a0e8a4599faaa6b3a6d6bd99b90b0811b6944e4d19aac8379d2c12.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+RESTORE_SCOPE_HINTS=Cover only. Do not apply to Originali until separately approved/tested. Preserve LAB21 Brain semantics, player behavior and current MADRE. Do not promote to CANDIDATA/MADRE before Bruno device acceptance.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -168,9 +189,10 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.3
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.4
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
 Revision 1.3: registra LAB21 Deep Playback Locator tecnicamente verificato, con device acceptance ancora pendente.
+Revision 1.4: registra LAB22 Cover-only con vero YouTube Web, Tutto operativo e conferma immediata; device acceptance pendente.
 Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device acceptance ancora pendente.
