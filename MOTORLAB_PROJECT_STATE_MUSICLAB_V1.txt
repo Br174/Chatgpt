@@ -1,26 +1,66 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=24
-STATE_STATUS=LAB22_COVER_WEB_LOCATOR_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=25
+STATE_STATUS=LAB23_FAST_TITLE_SPOTIFY_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-cover-web-locator-lab22
+ACTIVE_OPERATION_ID=musiclab-fast-title-spotify-lab23
 OPERATION_STATUS=LAB_VERIFIED_ARTIFACT_DELIVERED
-CURRENT_PHASE=LAB22 Cover Web Locator implementation complete and exact-SHA APK+ZIP verified; waiting for Bruno device test before any CANDIDATA construction.
-CURRENT_REF=uab-build/musiclab-cover-web-locator-22
-CURRENT_HEAD_SHA=104a950ff9b283d7e492132460eda2a2348ce860
+CURRENT_PHASE=LAB23 fast title-first Cover, ranked native title search and Spotify assist implementation complete; exact-SHA APK+ZIP verified; waiting for Bruno device test before any CANDIDATA construction.
+CURRENT_REF=uab-build/musiclab-spotify-fast-23
+CURRENT_HEAD_SHA=193c6f630c618401fea93c06633faf2635b551e0
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37026925832
+CURRENT_JOB_ID=37052121824
 CURRENT_JOB_STATUS=success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
 WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact LAB22 APK, focusing on Italian cover localization, Studio/Tutto behavior and confirmation movement
-NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-22.apk. If device-approved, preserve LAB22 and decide the next lifecycle step without touching MADRE before explicit approval.
-LAST_USER_INTENT_SUMMARY=Cover only: real www.youtube.com localization, Studio default plus Studio/Live/Remix/Straniere/Tutto tabs, operational coverage Tutto for every non-rejected AI candidate, chronological ordering, and immediate Conferma move to Confermate with background memory persistence.
+PENDING_VERIFICATION=Bruno device test of exact LAB23 APK, focusing on immediate title-first Cover results, Tutto default, category separation, quality/year ordering, title-click native search and Spotify-assisted discovery
+NEXT_SAFE_STEP=Bruno installs and tests MusicLab-LAB-23.apk. If device-approved, preserve LAB23 and decide the next lifecycle step without touching MADRE before explicit approval.
+LAST_USER_INTENT_SUMMARY=Build on LAB22: Cover opens with Tutto selected and shows lightweight title-only MusicLab results first; Studio/Live/Mix/Straniere remain category views; quality ranking is default with optional year ascending/descending; clicking song titles across common UI opens the native MusicLab search with exact/decorated matches first and similar results later; Spotify is additive discovery/metadata support for Cover and Originali; keep UI/runtime light and deduplicated.
+
+
+
+CURRENT_LAB23
+REF=uab-build/musiclab-spotify-fast-23
+BASE_LAB22_REF=uab-build/musiclab-cover-web-locator-22
+BASE_LAB22_SHA=104a950ff9b283d7e492132460eda2a2348ce860
+SHA=193c6f630c618401fea93c06633faf2635b551e0
+ANDROID_CONTRACT_RUN=37049354879
+ANDROID_CONTRACT_STATUS=success
+FINAL_GATE_RUN=37052121824
+FINAL_GATE_STATUS=success
+ARTIFACT_ID=11246988101
+ARTIFACT_NAME=MusicLab-LAB-23
+ARTIFACT_DIGEST=sha256:244bf721cda163297581860bd251f14c32df2018cf11c517a8b837be87e8fa6a
+APK_NAME=MusicLab-LAB-23.apk
+APK_SHA256=e7909060a1335460224c26ed9bfcbea86194757166a0b40b4ad268474df20041
+ZIP_NAME=MusicLab-LAB-23-APK.zip
+ZIP_SHA256=e9649638b5a382d3ef319cf3d128eb55235e6211f2c0cd63fba108be858aad91
+BUILD_SHA_FILE=193c6f630c618401fea93c06633faf2635b551e0
+FINAL_GATE_BRAIN=success
+FINAL_GATE_D1=success
+FINAL_GATE_ANDROID=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno test
+CANDIDATA_CREATED=no
+MADRE_PROMOTION=no
+
+LAB23_ROOT_CAUSE_CLOSURE
+STATUS=IMPLEMENTED_AND_TECHNICALLY_VERIFIED_DEVICE_CONFIRMATION_PENDING
+CAUSE_1=Cover startup still depended on AI/Brain discovery before the first useful rows, even though MusicLab already had a much lighter native title search path.
+CAUSE_2=Cover category selection and ordering were coupled to earlier Studio-first/chronological behavior instead of the requested Tutto-first discovery view with independent quality/year ordering.
+CAUSE_3=Song-title taps were inconsistent across player/list/grid surfaces, and the native search did not have an explicit title-click ranking contract that keeps exact/decorated matches first without deleting later similar results.
+CAUSE_4=Spotify support existed in the project but was not used as a bounded positive-only discovery/metadata assist in the Cover and Originali version pipelines.
+CORRECTION=LAB23 adds a lightweight MusicLab title-only first-paint lane, merges all later Brain/YouTube/Spotify evidence into one deduplicated pool, opens Cover on Tutto, exposes Studio/Live/Mix/Straniere, adds local Quality/Anno up/Anno down ordering, introduces a ranked native title-search route used by common title surfaces, and adds non-blocking Spotify assist for Cover plus Originali.
+PERFORMANCE_GUARD=First paint avoids per-result AI calls; ranking and category classification are local; expensive lanes continue in background; merge/deduplication is centralized by stable/video identity; superseded fast-AI startup code was removed before final build.
+PREVENTION=LAB23 source/device contracts plus Lab23TitleSearchTest cover semantic title identity, local category classification, non-filtering quality ordering, Spotify positive-only discovery, Tutto default, sort controls, native title-search routing, and additive merge behavior.
 
 
 
@@ -199,7 +239,7 @@ LAB20_ROOT_CAUSE_CLOSURES
 CURRENT_MADRE
 REF=mother/musiclab-lab19-final
 SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-STATUS=UNCHANGED_DURING_LAB20_AND_LAB21_AND_LAB21_AND_LAB21
+STATUS=UNCHANGED_DURING_LAB20_LAB21_LAB22_LAB23
 PROMOTED_FROM=candidate/musiclab-lab19-player-stable
 PROMOTED_FROM_SHA=6f3efabd77d6e0a918b91091bb1862986d1dc5fc
 PROMOTION_MODE=exact approved Candidate ref -> new immutable Mother ref
@@ -276,5 +316,5 @@ CONTINUITY_RULES
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r16 MusicLab LAB22 Cover Web Locator exact-SHA verified delivery
+UPDATED_BY=MotorLab r16 MusicLab LAB23 fast-title Spotify exact-SHA verified delivery
 UPDATED_DATE=2026-10-02
