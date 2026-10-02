@@ -7,6 +7,8 @@ const SIGNATURE_WINDOW_SECONDS = 300;
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 const initializedDbs = new WeakSet();
+const LIVE_DIRECTIVE_TYPES = new Set(['FORCE_PROGRESS_DISPLAY','PROGRESS_PRESENCE','STATUS_DETAIL_LEVEL','FORCE_CHECKPOINT_STATUS']);
+const LIVE_DIRECTIVE_STATUSES = new Set(['pending','applied','superseded','rejected']);
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -145,9 +147,37 @@ export function validateSnapshot(input) {
     created_at: isIsoDate(e.created_at) ? e.created_at : (() => { throw new Error('invalid_event_created_at'); })()
   }));
 
-  const total = projects.length + operations.length + approvals.length + checkpoints.length + locks.length + artifacts.length + root_causes.length + events.length;
+  const directives = arrayOf(input.directives, 'directives').map((d) => {
+    const directive_type = boundedString(d.directive_type, 'directive_type', 64);
+    if (!LIVE_DIRECTIVE_TYPES.has(directive_type)) throw new Error('invalid_directive_type');
+    const status = boundedString(d.status ?? 'pending', 'directive_status', 32);
+    if (!LIVE_DIRECTIVE_STATUSES.has(status)) throw new Error('invalid_directive_status');
+    const priority = Number(d.priority);
+    if (!Number.isInteger(priority) || priority < -1000 || priority > 1000) throw new Error('invalid_directive_priority');
+    const created_at = isIsoDate(d.created_at) ? d.created_at : (() => { throw new Error('invalid_directive_created_at'); })();
+    const expires_at = d.expires_at == null ? null : (isIsoDate(d.expires_at) ? d.expires_at : (() => { throw new Error('invalid_directive_expires_at'); })());
+    const durable = d.durable === true;
+    if (!durable && !expires_at) throw new Error('invalid_directive_expiry');
+    return {
+      directive_id: boundedId(d.directive_id, 'directive_id'),
+      project_id: boundedId(d.project_id, 'directive_project_id'),
+      operation_id: d.operation_id == null ? null : boundedId(d.operation_id, 'directive_operation_id'),
+      session_id: d.session_id == null ? null : boundedId(d.session_id, 'directive_session_id'),
+      directive_type,
+      value: boundedString(d.value, 'directive_value', 512),
+      priority,
+      created_at,
+      expires_at,
+      durable,
+      issued_by: boundedString(d.issued_by, 'directive_issued_by', 128),
+      applied_checkpoint: boundedString(d.applied_checkpoint, 'directive_applied_checkpoint', 128, { required: false }),
+      status
+    };
+  });
+
+  const total = projects.length + operations.length + approvals.length + checkpoints.length + locks.length + artifacts.length + root_causes.length + events.length + directives.length;
   if (total === 0 || total > MAX_RECORDS_PER_KIND) throw new Error('invalid_record_count');
-  return { schema_version: SCHEMA_VERSION, snapshot_id, sent_at: input.sent_at, projects, operations, approvals, checkpoints, locks, artifacts, root_causes, events };
+  return { schema_version: SCHEMA_VERSION, snapshot_id, sent_at: input.sent_at, projects, operations, approvals, checkpoints, locks, artifacts, root_causes, events, directives };
 }
 
 function hexToBytes(hex) {
@@ -210,6 +240,7 @@ function buildStatements(db, snapshot, payloadHash, receivedAt) {
   for (const a of snapshot.artifacts) statements.push(db.prepare(`INSERT INTO artifacts (artifact_id, operation_id, name, source_ref, source_head, checksums, verification_state, delivery_state, immutable_under_test, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(artifact_id) DO UPDATE SET operation_id=excluded.operation_id, name=excluded.name, source_ref=excluded.source_ref, source_head=excluded.source_head, checksums=excluded.checksums, verification_state=excluded.verification_state, delivery_state=excluded.delivery_state, immutable_under_test=excluded.immutable_under_test`).bind(a.artifact_id, a.operation_id, a.name, a.source_ref, a.source_head, a.checksums, a.verification_state, a.delivery_state, a.immutable_under_test ? 1 : 0, a.created_at));
   for (const r of snapshot.root_causes) statements.push(db.prepare(`INSERT INTO root_causes (root_cause_id, operation_id, defect, immediate_repair, status, evidence_refs, recurrence_surfaces, prevention_step, approval_scope_status, associated_artifact, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(root_cause_id) DO UPDATE SET operation_id=excluded.operation_id, defect=excluded.defect, immediate_repair=excluded.immediate_repair, status=excluded.status, evidence_refs=excluded.evidence_refs, recurrence_surfaces=excluded.recurrence_surfaces, prevention_step=excluded.prevention_step, approval_scope_status=excluded.approval_scope_status, associated_artifact=excluded.associated_artifact, updated_at=excluded.updated_at`).bind(r.root_cause_id, r.operation_id, r.defect, r.immediate_repair, r.status, r.evidence_refs, r.recurrence_surfaces, r.prevention_step, r.approval_scope_status, r.associated_artifact, r.updated_at));
   for (const e of snapshot.events) statements.push(db.prepare('INSERT OR IGNORE INTO operation_events (event_id, operation_id, event_type, event_summary, created_at) VALUES (?, ?, ?, ?, ?)').bind(e.event_id, e.operation_id, e.event_type, e.event_summary, e.created_at));
+  for (const d of snapshot.directives) statements.push(db.prepare(`INSERT INTO live_directives (directive_id, project_id, operation_id, session_id, directive_type, value, priority, created_at, expires_at, durable, issued_by, applied_checkpoint, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(directive_id) DO UPDATE SET project_id=excluded.project_id, operation_id=excluded.operation_id, session_id=excluded.session_id, directive_type=excluded.directive_type, value=excluded.value, priority=excluded.priority, created_at=excluded.created_at, expires_at=excluded.expires_at, durable=excluded.durable, issued_by=excluded.issued_by, applied_checkpoint=excluded.applied_checkpoint, status=excluded.status`).bind(d.directive_id, d.project_id, d.operation_id, d.session_id, d.directive_type, d.value, d.priority, d.created_at, d.expires_at, d.durable ? 1 : 0, d.issued_by, d.applied_checkpoint, d.status));
   return statements;
 }
 
@@ -287,6 +318,71 @@ async function githubWebhook(request, env) {
   return persistSnapshot(snapshot, rawSnapshot, env);
 }
 
+export function selectActiveDirectives(rows, { operationId = null, sessionId = null } = {}, now = Date.now()) {
+  const candidates = (Array.isArray(rows) ? rows : [])
+    .filter((row) => row && (row.status === 'pending' || row.status === 'applied'))
+    .filter((row) => {
+      if (!row.durable) {
+        const expiry = Date.parse(row.expires_at ?? '');
+        if (!Number.isFinite(expiry) || expiry <= now) return false;
+      }
+      if (row.operation_id && row.operation_id !== operationId) return false;
+      if (!operationId && row.operation_id) return false;
+      if (row.session_id && row.session_id !== sessionId) return false;
+      if (!sessionId && row.session_id) return false;
+      return true;
+    })
+    .sort((a, b) => (Number(b.priority) - Number(a.priority)) || (Date.parse(b.created_at) - Date.parse(a.created_at)));
+
+  const seen = new Set();
+  const selected = [];
+  for (const row of candidates) {
+    const key = `${row.directive_type}\u0000${row.operation_id ?? ''}\u0000${row.session_id ?? ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    selected.push(row);
+  }
+  return selected;
+}
+
+async function activeDirectives(url, env) {
+  if (!env.DB) return json({ error: 'd1_not_configured' }, 503);
+  const projectId = url.searchParams.get('project_id');
+  const operationId = url.searchParams.get('operation_id');
+  const sessionId = url.searchParams.get('session_id');
+  if (!projectId || !/^[A-Za-z0-9._:/-]{1,128}$/.test(projectId)) return json({ error: 'invalid_project_id' }, 400);
+  if (operationId && !/^[A-Za-z0-9._:/-]{1,128}$/.test(operationId)) return json({ error: 'invalid_operation_id' }, 400);
+  if (sessionId && !/^[A-Za-z0-9._:/-]{1,128}$/.test(sessionId)) return json({ error: 'invalid_session_id' }, 400);
+
+  try { await ensureSchema(env.DB); }
+  catch { return json({ error: 'd1_unavailable' }, 503); }
+
+  let result;
+  try {
+    result = await env.DB.prepare(`SELECT directive_id, project_id, operation_id, session_id, directive_type, value, priority, created_at, expires_at, durable, issued_by, applied_checkpoint, status FROM live_directives WHERE project_id = ? AND status IN ('pending','applied') ORDER BY priority DESC, created_at DESC`).bind(projectId).all();
+  } catch {
+    return json({ error: 'd1_unavailable' }, 503);
+  }
+
+  const rows = (result?.results ?? []).map((row) => ({ ...row, durable: Boolean(row.durable) }));
+  const directives = selectActiveDirectives(rows, { operationId, sessionId }).map((row) => ({
+    directive_id: row.directive_id,
+    project_id: row.project_id,
+    operation_id: row.operation_id ?? null,
+    session_id: row.session_id ?? null,
+    directive_type: row.directive_type,
+    value: row.value,
+    priority: Number(row.priority),
+    created_at: row.created_at,
+    expires_at: row.expires_at ?? null,
+    durable: Boolean(row.durable),
+    issued_by: row.issued_by,
+    applied_checkpoint: row.applied_checkpoint ?? null,
+    status: row.status
+  }));
+  return json({ directives });
+}
+
 async function verifySnapshot(snapshotId, env) {
   if (!env.DB) return json({ error: 'd1_not_configured' }, 503);
   if (!/^[A-Za-z0-9._:/-]{1,128}$/.test(snapshotId)) return json({ error: 'invalid_snapshot_id' }, 400);
@@ -301,6 +397,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === 'GET' && url.pathname === '/health') return json({ status: 'ok', service: 'motorlab-state-bridge', engine_version: env.ENGINE_VERSION ?? 'unknown', schema_version: SCHEMA_VERSION });
+    if (request.method === 'GET' && url.pathname === '/control/v1/directives') return activeDirectives(url, env);
     if (request.method === 'POST' && url.pathname === '/relay') return relay(request, env);
     if (request.method === 'POST' && url.pathname === '/github-webhook') return githubWebhook(request, env);
     if (request.method === 'GET' && url.pathname.startsWith('/verify/')) return verifySnapshot(decodeURIComponent(url.pathname.slice('/verify/'.length)), env);
