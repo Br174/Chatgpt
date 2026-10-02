@@ -101,6 +101,18 @@ The gate is active when:
 - routine metadata persistence does not create approval spam;
 - current and future projects inherit the same behavior.
 
+
+R17 TIMED DELEGATED APPROVAL - HARD PRECEDENCE
+The pre-change report remains mandatory, but an eligible report no longer waits indefinitely for a manual reply.
+After the report, MotorLab classifies the approval as BANAL (10s), LESS_BANAL (20s), IMPORTANT (60s), or VERY_IMPORTANT (300s) and shows `Prova ⏱ MM:SS`.
+A persisted AUTO_APPROVED decision created by MOTORLAB_TIMED_DELEGATED_APPROVAL_V1.txt is a valid post-report approval for the exact persisted scope.
+Explicit Bruno approval wins immediately; explicit rejection/disagreement before protected write cancels/supersedes auto-approval.
+Manual-only safety boundaries never auto-approve: destructive/irreversible actions, production/MADRE/promotion, secrets/permission expansion, billing/purchase/overage, destructive migrations and equivalent security-sensitive provider actions.
+A material scope change supersedes the timer and requires a new report/classification.
+Before any timeout-authorized write, re-check current ref/head, single-writer lock, lifecycle, newer evidence and open completion barriers.
+This section supersedes older wording that could be read as requiring an indefinite explicit reply for every reversible eligible change.
+
 VERSION
-MOTORLAB-PRE-CHANGE-APPROVAL-GATE-V1.0
+MOTORLAB-PRE-CHANGE-APPROVAL-GATE-V1.1
 Established: 2026-09-30
+Revision 1.1: r17 adds bounded timed delegated approval 10/20/60/300 with explicit-rejection precedence and manual-only ceiling.
