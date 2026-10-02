@@ -60,3 +60,18 @@ QUEUED_REQUESTS
 
 RECOVERY_RULE
 A frozen/suspended host never means the task is finished. On every later user request, first treat it as wake+checkpoint, reconcile this file/live evidence, preserve VERIFIED_PROGRESS_FLOOR=99 unless newer evidence changes it, append the request FIFO unless explicit priority was given, then resume ACTIVE_OPERATION before unrelated queued writes.
+
+
+RECOVERY_UPDATE_2026-10-02
+- Wake/checkpoint resumed from verified floor 99% without resetting active operation.
+- Reconfirmed Cloudflare deployment blocker: live Worker bindings DB/CACHE were created from dashboard; exact D1/KV IDs are not present in repository/history, and current wrangler.jsonc does not declare those bindings. Current Cloudflare docs confirm Wrangler config should be treated as source of truth, so blind deploy was rejected as unsafe.
+- Repository fallback path from approved Live Control design was used instead of risking existing D1/KV bindings.
+- MusicLab main safe control-plane adoption completed with no app/runtime/Kotlin/UI/package/signing changes:
+  * .codex/hooks.json preserves mandatory motorlab_boot.py SessionStart bootstrap and adds motorlab_live_control.py on SessionStart + PostToolUse.
+  * .codex/hooks/motorlab_live_control.py blob SHA f54d8d127abfbaa1f3597f3c13f5c952d0d215e5 exactly matches the centrally tested template.
+  * .motorlab/LIVE_CONTROL.json enables durable FORCE_PROGRESS_DISPLAY=ON and PROGRESS_PRESENCE=HIGH fallback directives.
+- MusicLab readback verification passed: bootstrap_present=true; live_session_start=true; live_post_tool=true; script_matches_template=true; both fallback directives present.
+- Existing in-flight Codex/ChatGPT sessions that were launched before hook loading are still not falsely claimed as retroactively controlled.
+- Remaining proof for definitive Live Control closure: observe a real supported Codex session load/trust the project hook and emit/apply the directive at a safe point; central Cloudflare primary channel redeploy remains infrastructure follow-up until binding IDs/authorized deployment surface can be obtained safely.
+- VERIFIED_PROGRESS_FLOOR remains 99.
+- QUEUED_REQUESTS remain FIFO and are not preempted: (1) 100% global MotorLab activation/contribution across ChatGPT projects; (2) approval countdown scale 10s/20s/60s/300s.
