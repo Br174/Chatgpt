@@ -1,0 +1,74 @@
+MOTORLAB CHECKPOINT — LIVE CONTROL CORE + BRIDGE IMPLEMENTATION
+DATE=2026-10-02
+STATUS=CODE_COMPLETE_DEPLOY_AND_PILOT_PENDING
+MOTORLAB_OPERATION_ID=motorlab-live-control-r17-20261002
+OVERALL_MOTORLAB_PROGRESS_FLOOR=99
+LIVE_CONTROL_IMPLEMENTATION_PROGRESS=100
+APPLICATION_RUNTIME_WRITES=NONE
+
+SCOPE
+Complete the approved MotorLab Live Control + micro-progress control plane without changing MusicLab app/runtime/UI/package/signing/native engines or MADRE lifecycle state.
+
+VERIFIED COMPLETED
+- Canonical MOTORLAB_LIVE_CONTROL_V1.txt created.
+- MOTORLAB_PROGRESS_REPORTING_V1.txt revised to V1.7 with mandatory micro-progress for all MotorLab-controlled modifications.
+- MOTORLAB_CORE_ENTRYPOINT_V1.txt revised to V1.9 with Live Control boot/resume safe-point reconciliation.
+- MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt revised to V1.1 with secret-free live_directives entity, transition-only writes and dedup/fallback rules.
+- D1 bridge schema contains live_directives and project/status/created index.
+- Snapshot schema_version remains 1; directives[] is optional/backward-compatible.
+- Directive validation rejects unknown type/status/bad IDs/bad timestamps and enforces expiry for non-durable directives.
+- GET /control/v1/directives implemented as read-only endpoint.
+- Active selector excludes expired/scoped mismatches and resolves higher priority/newer equivalent directive deterministically.
+- Existing signed GitHub relay remains the only V1 directive write path; no public directive mutation endpoint was added.
+- Central Codex Live Control template and hook contract tests added.
+- MusicLab main already contains SessionStart + PostToolUse Live Control hook and repository fallback directives.
+- Boot-order numbering regression introduced during this operation was detected by regression inspection and corrected before checkpoint.
+- Service integration registry now separates code readiness from live deployment/project adoption.
+
+VERIFICATION EVIDENCE
+- In-process JS syntax/factory verification: PASS for current bridge index after import/export neutralization.
+- Backward-compatible snapshot without directives: PASS.
+- Valid directives snapshot: PASS.
+- Invalid directive type: rejected.
+- Expired directive: excluded.
+- Equal-priority equivalent directives: newest selected.
+- CORE required markers: Live Control module, before-user-visible-status reconciliation, all-modifications numeric progress, live_directives persistence, signed relay: present.
+- Boot order verified sequential 0..27 after correction.
+- Public Worker live check on 2026-10-02:
+  * /health => engine_version 1.1.0
+  * /control/v1/directives?project_id=MusicLab => HTTP 404
+  Therefore repository target 1.2.0 is NOT YET DEPLOYED.
+
+CURRENT BLOCKER
+Cloudflare Worker deployment of repository bridge target 1.2.0 has not been performed/verified. Do not claim Live Control RESOURCE_READY until deployment succeeds.
+
+NEXT SAFE STEPS — ORDERED
+1. Deploy motorlab-state-bridge target 1.2.0 to the existing Cloudflare Worker without changing D1/KV bindings/secrets.
+2. Verify /health reports 1.2.0 and GET /control/v1/directives returns a valid no-store JSON response.
+3. Publish a synthetic FORCE_PROGRESS_DISPLAY=ON + PROGRESS_PRESENCE=HIGH directive through existing signed GitHub Issue #1 relay and verify D1 readback.
+4. Run a supported real Codex MusicLab session, prove hook trust/load and same-operation safe-point pickup without restart/progress reset.
+5. Only after that mark central Live Control RESOURCE_READY and MusicLab PROJECT_ADOPTED.
+6. Promote the verified capability into the next MotorLab release (expected r17 unless superseded by a newer verified release).
+7. After Live Control reaches its terminal gate, continue the preserved queue item: approval countdown 10s / 20s / 1 min / 5 min.
+
+RELEASE STATE
+CURRENT_CANONICAL_RELEASE=2026.09.30-r16
+R17_PROMOTION=NOT_YET_ALLOWED
+REASON=live Worker deployment + real Codex pilot evidence still pending
+
+MUSICLAB PROTECTION
+- Br174/MusicLab application code untouched by this operation.
+- Current MADRE untouched.
+- Existing LAB20/device-test state remains separate and unchanged.
+- MotorLab control-plane commits do not create a new MusicLab LAB/CANDIDATA/MADRE.
+
+ROOT CAUSE
+The prior 99% state existed because MusicLab satellite hooks/fallback had been installed before the central canonical Live Control contract and operational D1 read endpoint were implemented/deployed. Repository-only fallback could not prove true live central directive pickup.
+
+PREVENTION
+- CORE contract and policy tests now require the canonical module and micro-progress markers.
+- Bridge contract includes persistent live_directives plus a read-only endpoint.
+- Service registry must distinguish CODE_READY, RESOURCE_READY and PROJECT_ADOPTED.
+- Release promotion is blocked until deployment + E2E + real executor trust proof.
+
+UPDATED_BY=MotorLab Resume Recovery
