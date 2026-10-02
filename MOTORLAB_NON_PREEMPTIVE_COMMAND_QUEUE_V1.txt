@@ -1,0 +1,71 @@
+MOTORLAB NON-PREEMPTIVE COMMAND QUEUE V1 - EVERY REQUEST IS A CHECKPOINT
+
+STATUS
+Mandatory MotorLab CORE continuity capability.
+Central authority: Br174/Chatgpt.
+
+CORE RULE
+Every new Bruno request is also an automatic ⚡ checkpoint/wake event.
+A new ordinary request MUST NOT silently replace, cancel or preempt the active operation.
+
+EVERY REQUEST - MANDATORY SEQUENCE
+1. persist the active operation id, source/ref/head when known, progress floor, completed step, next safe step and lock state;
+2. record the incoming request with queue identity and arrival order;
+3. classify explicit priority/cancellation/approval-rejection signals;
+4. if ordinary and another operation is active, append FIFO and resume the active operation from its checkpoint;
+5. if no operation is active, make the request active;
+6. at operation completion, automatically start the oldest eligible queued request;
+7. continue until queue is drained or a genuine blocker/manual-only gate is reached.
+
+FOREGROUND INTERRUPTION RECOVERY
+If sending a new user prompt technically stops/suspends the current model turn, the logical MotorLab operation remains active.
+At UserPromptSubmit the hook checkpoints before processing the new prompt.
+The model receives developer context instructing it to resume the prior active operation unless Bruno explicitly gave the new request priority.
+
+FIFO
+Ordinary requests execute in arrival order: first received, first executed.
+One, two, three, four or more requests may accumulate, but no request may be lost or silently reordered.
+Queueing does not acquire a writer lock.
+
+EXPLICIT PRIORITY OVERRIDE
+Only unambiguous wording such as "questa ha priorità", "prima fai questo", "ferma quello attuale e fai questo", "interrompi e fai questo", or equivalent may preempt.
+At the first safe checkpoint:
+- preserve current operation/progress/lock/next step;
+- move it to PAUSED_BY_PRIORITY;
+- run the priority request through normal approval/safety gates;
+- after priority completion, resume the paused operation before ordinary FIFO work unless Bruno cancelled it.
+
+EXPLICIT CANCELLATION
+Only clear cancellation such as "annulla quello precedente", "non farlo più", "cancella quel task" cancels work.
+A new feature/change request is not cancellation.
+
+STOP / AUTO-CONTINUE
+On Codex Stop, if the current operation is not truly terminal and is not blocked by a genuine manual/external condition, MotorLab returns a continuation decision and resumes the same operation.
+When the current operation is complete, paused priority work resumes first, then FIFO queue drains automatically.
+Stop MUST NOT be used to invent progress or bypass approval/safety.
+
+WAITING STATES
+WAITING_USER/WAITING_EXTERNAL are not terminal.
+Independent read-only preparation may occur when safe, but no conflicting second writer starts.
+
+PERSISTENCE
+Persist active operation, paused stack, queue order, checkpoints, progress floor, lock state, completion-barrier state and approval state outside ephemeral chat context.
+Runtime hook state must not dirty application working-tree files.
+
+SINGLE-WRITER
+At most one writer per project/ref/resource lock scope.
+No queue drain or priority switch creates concurrent conflicting writers.
+
+SUCCESS CRITERIA
+- every prompt checkpoints;
+- ordinary new prompt queues and prior work resumes;
+- FIFO drains deterministically;
+- explicit priority safely preempts and later resumes old work;
+- no new prompt implicitly cancels prior work;
+- Stop continues unfinished work;
+- interruption/recovery preserves progress floor;
+- no second conflicting writer.
+
+VERSION
+MOTORLAB-NON-PREEMPTIVE-COMMAND-QUEUE-V1.0
+Established: 2026-10-02
