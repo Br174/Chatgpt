@@ -48,14 +48,14 @@ The Cloudflare page showed the last attempted deployment at commit 815af864; cur
 Do not claim Live Control RESOURCE_READY until the build root is corrected, deployment succeeds and live endpoints are re-verified.
 
 NEXT SAFE STEPS — ORDERED
-1. After explicit approval for this newly discovered deployment-config change, correct Cloudflare CI/CD Root directory from `/cloudflare/motorlab-state-bridge` to `cloudflare/motorlab-state-bridge` only; preserve all other build/deploy settings and D1/KV/secrets/bindings.
+1. Continue under the already-approved operation: correct Cloudflare CI/CD Root directory from `/cloudflare/motorlab-state-bridge` to `cloudflare/motorlab-state-bridge` only; preserve all other build/deploy settings and D1/KV/secrets/bindings.
 2. Trigger/allow the existing GitHub Continuous Deployment from current Br174/Chatgpt main and verify the Worker reaches target 1.2.0.
 3. Verify /health reports 1.2.0 and GET /control/v1/directives returns a valid no-store JSON response.
 4. Publish a synthetic FORCE_PROGRESS_DISPLAY=ON + PROGRESS_PRESENCE=HIGH directive through existing signed GitHub Issue #1 relay and verify D1 readback.
 5. Run a supported real Codex MusicLab session, prove hook trust/load and same-operation safe-point pickup without restart/progress reset.
 6. Only after that mark central Live Control RESOURCE_READY and MusicLab PROJECT_ADOPTED.
 7. Promote the verified capability into the next MotorLab release (expected r17 unless superseded by a newer verified release).
-8. After Live Control reaches its terminal gate, continue the preserved queue item: approval countdown 10s / 20s / 1 min / 5 min.
+8. Legacy timed-continuation queue retired; MOTORLAB_EXECUTION_CONTINUITY_V1.txt is now authoritative for post-approval continuation.
 
 RELEASE STATE
 CURRENT_CANONICAL_RELEASE=2026.09.30-r16
@@ -78,3 +78,5 @@ PREVENTION
 - Release promotion is blocked until deployment + E2E + real executor trust proof.
 
 UPDATED_BY=MotorLab Resume Recovery
+
+EXECUTION_CONTINUITY_RULE=MOTORLAB_EXECUTION_CONTINUITY_V1.txt active; legacy timed-continuation queue retired.
