@@ -178,6 +178,28 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 RESTORE_SCOPE_HINTS=Cover only. Do not apply to Originali until separately approved/tested. Preserve LAB21 Brain semantics, player behavior and current MADRE. Do not promote to CANDIDATA/MADRE before Bruno device acceptance.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261002-lab23-fast-title-spotify
+DATE=2026-10-02
+TITLE=LAB23 Cover title-first, Tutto predefinito, ranking qualità/anno, ricerca titolo nativa e Spotify assist
+SEMANTIC_TAGS=cover,titolo,ricerca,MusicLab,Spotify,Tutto,Studio,Live,Mix,Straniere,qualità,anno,player,miniplayer,liste,griglie,Originali,LAB23
+USER_INTENT=Mostrare subito i risultati più leggeri cercati per solo titolo dentro MusicLab; lasciare in background le ricerche più profonde; aprire Cover con Tutto selezionato; mantenere categorie Studio/Live/Mix/Straniere; ordinare per qualità senza perdere risultati e permettere anno crescente/decrescente; rendere cliccabile il titolo nelle superfici comuni aprendo la ricerca nativa ripulita; usare Spotify come fonte aggiuntiva senza appesantire o bloccare l'app.
+CHANGE_SCOPE=COMPOSITE_COVER_SEARCH_AND_SHARED_TITLE_NAVIGATION_WITH_SPOTIFY_ASSIST
+LIFECYCLE_ROLE=LAB23_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-cover-web-locator-22
+SOURCE_BASE_SHA=104a950ff9b283d7e492132460eda2a2348ce860
+RESULT_REF=uab-build/musiclab-spotify-fast-23
+RESULT_SHA=193c6f630c618401fea93c06633faf2635b551e0
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/AiCoverFlowResolver.kt,app/src/main/kotlin/com/metrolist/music/ui/component/AiCoverSearchEngine.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverSearchScreen.kt,app/src/main/kotlin/com/metrolist/music/ui/component/GeminiAiCoverDiscovery.kt,app/src/main/kotlin/com/metrolist/music/ui/component/GeminiOriginalDiscovery.kt,app/src/main/kotlin/com/metrolist/music/ui/component/Items.kt,app/src/main/kotlin/com/metrolist/music/ui/component/MusicLabTitleSearch.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionScreen.kt,app/src/main/kotlin/com/metrolist/music/ui/component/OriginalVersionSearchEngine.kt,app/src/main/kotlin/com/metrolist/music/ui/component/SpotifyMusicAssist.kt,app/src/main/kotlin/com/metrolist/music/ui/component/TitleMeaningResolver.kt,app/src/main/kotlin/com/metrolist/music/ui/player/MiniPlayer.kt,app/src/main/kotlin/com/metrolist/music/ui/player/Player.kt,app/src/main/kotlin/com/metrolist/music/utils/SearchRoutes.kt,app/src/main/kotlin/com/metrolist/music/viewmodels/OnlineSearchViewModel.kt,app/src/test/kotlin/com/metrolist/music/ui/component/Lab23TitleSearchTest.kt,cloudflare/music-intelligence/test/android-brain-contract-source.test.mjs,cloudflare/music-intelligence/test/device-regression-contract.test.mjs,cloudflare/music-intelligence/test/task5-app-integration.test.mjs,uab-project.env,.github/workflows/lab20-android-brain-tests.yml,.github/workflows/lab20-uab-build-gate.yml
+BEHAVIOR_SUMMARY=Cover esegue per prima una ricerca interna MusicLab solo-titolo e mostra i risultati senza aspettare il Brain; in background aggiunge YouTube Web/YTM, Brain, evidenze e Spotify nello stesso pool deduplicato. La scheda apre su Tutto e le categorie visibili sono Tutto/Studio/Live/Mix/Straniere. L'ordinamento predefinito è Qualità e può essere sostituito localmente da Anno crescente o decrescente senza rilanciare le ricerche. Il click sul titolo in player grande, entrambi i mini-player e componenti lista/griglia comuni apre la schermata nativa MusicLab con ranking titolo: exact/decorated prima, risultati simili dopo, senza filtro distruttivo. Spotify viene usato come assist positivo e non bloccante anche in Originali.
+PERFORMANCE_SUMMARY=Un'unica corsia leggera title-only anticipa il first paint; nessuna chiamata AI per ogni risultato; ranking e categorizzazione sono locali; corsie costose in background; merge centralizzato per evitare liste duplicate; rimosso il precedente helper fast-AI ormai superseded prima della build finale.
+ROOT_CAUSE=LAB22 continuava a mostrare i primi risultati soltanto dopo il percorso Brain/locator; l'ordinamento era cronologico e il tab iniziale Studio; il comportamento click-titolo era frammentato e la ricerca nativa non aveva ranking semantico dedicato; Spotify non contribuiva in modo bounded ai flussi Cover/Originali.
+VERIFICATION=LAB23 Android Spotify Fast Title Contract run 37049354879 success sul checkpoint pulito; final exact-SHA UAB Delivery Gate run 37052121824 success sul commit 193c6f630c618401fea93c06633faf2635b551e0; complete Brain/device regression suite success; D1 migrations success; deployed LAB20 backend dependency verified; Android contracts success; UAB diagnostics success; APK+ZIP build success; exact BUILD_SHA stamp success; deliverable integrity success; artifact upload success. Artifact 11246988101 digest sha256:244bf721cda163297581860bd251f14c32df2018cf11c517a8b837be87e8fa6a; APK sha256 e7909060a1335460224c26ed9bfcbea86194757166a0b40b4ad268474df20041; ZIP sha256 e9649638b5a382d3ef319cf3d128eb55235e6211f2c0cd63fba108be858aad91.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+RESTORE_SCOPE_HINTS=Preserve current MADRE. LAB23 is based on LAB22 and includes shared title-navigation changes plus Spotify assist; device acceptance is required before entering any CANDIDATA/MADRE lifecycle.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -189,10 +211,11 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.4
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.5
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
 Revision 1.3: registra LAB21 Deep Playback Locator tecnicamente verificato, con device acceptance ancora pendente.
 Revision 1.4: registra LAB22 Cover-only con vero YouTube Web, Tutto operativo e conferma immediata; device acceptance pendente.
+Revision 1.5: registra LAB23 title-first/Tutto/quality-year/native title navigation/Spotify assist; device acceptance pendente.
 Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device acceptance ancora pendente.
