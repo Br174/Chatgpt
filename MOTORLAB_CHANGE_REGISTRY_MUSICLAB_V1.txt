@@ -347,6 +347,26 @@ STATUS=CANDIDATE_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device test of exact Candidate APK; no MADRE promotion before explicit approval.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261003-lab27-token-api-center
+DATE=2026-10-03
+TITLE=LAB27 centro Token e API per YouTube Music, Last.fm e Discogs
+SEMANTIC_TAGS=LAB27,token,API,YouTube Music,Last.fm,Discogs,API Key,Shared Secret,Personal Access Token,credenziali,integrazioni
+USER_INTENT=Raccogliere nella stessa area di MusicLab il token YouTube Music esistente, la API Key e lo Shared Secret Last.fm e il Personal Access Token Discogs, con valori nascosti e salvati localmente.
+CHANGE_SCOPE=ACCOUNT_CREDENTIALS_UI_AND_LASTFM_RUNTIME_INITIALIZATION
+LIFECYCLE_ROLE=LAB27_DEVICE_PENDING
+SOURCE_BASE_REF=candidate/musiclab-lab26-ui-italian-years
+SOURCE_BASE_SHA=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
+RESULT_REF=uab-build/musiclab-token-api-center-27
+RESULT_SHA=eb597fb995b7643c66412782d9b38b7bb06cb50c
+BEHAVIOR_SUMMARY=Account settings now contains a Token e API group for YouTube Music, Last.fm and Discogs. Last.fm exposes masked API Key and Shared Secret fields stored locally; saved values initialize LastFM immediately and are preferred at startup, with existing build-time credentials retained as fallback. Discogs exposes a masked Personal Access Token stored locally for future Compilation API integration. No Discogs network client or Compilation behavior was added in this scope.
+COMPATIBILITY=Preserves existing YouTube Music token/session flow, current Last.fm session/scrobbling behavior, LAB26 UI/artwork/year/title-tap behavior, and LAB25 playback baseline. CANDIDATA LAB26 and MADRE were not mutated.
+VERIFICATION=LAB27 gate run 37112717837 success on exact SHA eb597fb995b7643c66412782d9b38b7bb06cb50c. Source contract success; Android unit tests success; UAB diagnostics success; APK+ZIP build success; deliverable integrity success; artifact upload success. Artifact 11270124963 digest sha256:13ea1f147488063d3dd8658f0d3fc93b76fe66d80d1185ad02af8f4911888568. APK sha256 63d418a172a8ecfec3eea07e7a8cbca4cbf9df8307006618cc027d615ad4dc86. ZIP sha256 e5331c059b6bb63e61f86f432948564ccd0944f676611b2437141c65f1acb6a3.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test of exact LAB27 APK. No Candidate or Madre promotion without explicit approval.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -358,7 +378,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.11
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.12
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -374,3 +394,4 @@ Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device ac
 Revision 1.10: registra LAB26 recuperato e tecnicamente verificato con locandine, protezioni Home/Album, UI italiana, anni Cover e switch title-tap; device acceptance pendente.
 
 Revision 1.11: registra CANDIDATA LAB26 costruita dalla MADRE con runtime LAB26 identico; test dispositivo Candidate pendente.
+Revision 1.12: registra LAB27 Token e API tecnicamente verificato per YouTube Music, Last.fm e Discogs; test dispositivo pendente.
