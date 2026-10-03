@@ -1,25 +1,25 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=49
-STATE_STATUS=LAB32_PLAYER_VELOCE_GRID_API_GATE_IN_PROGRESS_LAB31_PRESERVED
+STATE_REVISION=50
+STATE_STATUS=LAB32_PLAYER_VELOCE_GRID_API_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab32-player-veloce-grid-api
-OPERATION_STATUS=IMPLEMENTED_SOURCE_CONTRACT_VERIFIED_GATE_RUNNING
-CURRENT_PHASE=LAB32 created from exact LAB31. Approved fixes implemented: Player Veloce 2 extends priority through real stream resolution by checking ready cache/URL state before optional providers and skipping Qobuz discovery during explicit playback bursts; InnerTube extraction runtime is prepared at service startup. Player thumbnail carousel keys are now unique per queue position to prevent duplicate-mediaId LazyGrid crashes, and mixed LibraryMix keys are namespaced by item type. Duplicate Last.fm/Discogs settings entries are merged into one shared Last.fm + Discogs entry without changing stored credentials. Source contract passed; Android unit tests are running.
+OPERATION_STATUS=LAB32_VERIFIED_ARTIFACT_READY
+CURRENT_PHASE=LAB32 technically complete. Initial gate 37139215984 passed source contract but failed Android compile because Thumbnail.kt used an unsupported itemsIndexed call in that LazyHorizontalGrid context. The implementation was converted to count-based items while preserving index+mediaId unique keys; the next gate exposed only a stale source-contract expectation and the contract was aligned. Final exact SHA bd284100d3068a8ef6bcac2973743c09a3489cf5 passed source contract, Android tests, UAB diagnostics, APK+ZIP build, integrity verification and artifact upload in run 37139588229. Waiting only for Bruno device acceptance of playback latency/continuity and crash elimination.
 CURRENT_REF=uab-build/musiclab-player-veloce-grid-api-32
-CURRENT_HEAD_SHA=9eaacfccaeaaea8d94cf6f3b683ff9bc2270e0cb
+CURRENT_HEAD_SHA=bd284100d3068a8ef6bcac2973743c09a3489cf5
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37139215984
-CURRENT_JOB_STATUS=in_progress
-LAST_VERIFIED_PROGRESS_PERCENT=74
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=74
-RECOVERY_FLOOR_PERCENT=74
-WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB32 if gate fails
-PENDING_VERIFICATION=Android unit tests, UAB diagnostics, LAB32 APK+ZIP build/integrity, then Bruno device test of playback latency/continuity and duplicate-key crash reproduction.
-NEXT_SAFE_STEP=Reconcile run 37139215984. On failure inspect logs and repair only LAB32 on the same branch; on success record artifact/checksums and deliver APK+ZIP.
+CURRENT_JOB_ID=37139588229
+CURRENT_JOB_STATUS=success
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=released
+PENDING_VERIFICATION=Bruno device test of exact MusicLab-LAB32.apk: playback startup latency/continuity, Next/Previous responsiveness, duplicate-key crash elimination, and single Last.fm + Discogs settings entry.
+NEXT_SAFE_STEP=Bruno installs exact LAB32 APK and performs device acceptance. If Player Veloce 2 is explicitly confirmed good, update the visible Player restore slot; otherwise leave the current approved LAB25 restore unchanged.
 LAST_USER_INTENT_SUMMARY=Fix the real duplicate settings entry for Last.fm/Discogs, eliminate the LazyGrid duplicate-key crash shown on device, and make playback priority reach the actual stream resolver so taps start music faster and more reliably.
 
 PRESERVED_LAB31
@@ -32,9 +32,9 @@ CURRENT_LAB32
 REF=uab-build/musiclab-player-veloce-grid-api-32
 BASE_REF=uab-build/musiclab-player-veloce-compilation-ui-31
 BASE_SHA=43ec3ae9d5b311dd152d6976b52f337636346a49
-SHA=9eaacfccaeaaea8d94cf6f3b683ff9bc2270e0cb
-GATE_RUN=37139215984
-GATE_STATUS=in_progress
+SHA=bd284100d3068a8ef6bcac2973743c09a3489cf5
+GATE_RUN=37139588229
+GATE_STATUS=success
 SOURCE_CONTRACT=success
 FEATURE_1=Player Veloce 2 prepares InnerTube extraction runtime at service startup and checks ready download/player cache and cached stream URLs before any optional provider discovery during a playback-priority burst.
 FEATURE_2=Qobuz discovery is skipped while explicit playback priority is active, so optional lossless-provider lookup cannot add up to multi-second delay before YouTube playback starts.
@@ -47,6 +47,31 @@ LAB31_MUTATED=no
 LAB30_MUTATED=no
 CANDIDATA_LAB26_MUTATED=no
 MADRE_MUTATED=no
+FIRST_GATE_RUN=37139215984
+FIRST_GATE_STATUS=failure
+FIRST_GATE_ROOT_CAUSE=Thumbnail.kt duplicate-key hardening used itemsIndexed in the player LazyHorizontalGrid, but that overload was not resolved in this compile context, producing unresolved-reference/type-inference errors.
+FIRST_GATE_CORRECTION=Replaced itemsIndexed with count-based items(count=mediaItems.size), preserving the same index+mediaId unique key and removing the problematic overload. Same LAB32 branch preserved.
+SECOND_GATE_RUN=37139531557
+SECOND_GATE_STATUS=failure
+SECOND_GATE_ROOT_CAUSE=Source contract still expected itemsIndexed syntax even though the implementation had correctly moved to count-based items.
+SECOND_GATE_CORRECTION=Updated only the source contract to verify count-based items plus index+mediaId uniqueness. Functional implementation unchanged.
+FINAL_GATE_RUN=37139588229
+ARTIFACT_ID=11279993986
+ARTIFACT_NAME=MusicLab-LAB32
+ARTIFACT_DIGEST=sha256:815c3071d22ef7e7eca10c596bf540af850919f979cf5c80f9b448a582cffabb
+APK_NAME=MusicLab-LAB32.apk
+APK_SHA256=2f061e39cd1eb4b9a9199328359a1bf4d6b17bf5bc9b9c67e32a2d54a35c719b
+ZIP_NAME=MusicLab-LAB32-APK.zip
+ZIP_SHA256=337d6c28a98c02788d7f4b8e44211550d80072342c4054dbd70df193d5b4c331
+BUILD_SHA_FILE=bd284100d3068a8ef6bcac2973743c09a3489cf5
+FINAL_GATE_SOURCE_CONTRACT=success
+FINAL_GATE_ANDROID_TESTS=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+RESTORE_REGISTER_ACTION=none; Player Veloce 2 remains unapproved until Bruno device confirmation
+DEVICE_ACCEPTANCE=pending Bruno test
 
 PRESERVED_LAB30
 REF=uab-build/musiclab-nav-cover-memory-playback-30
