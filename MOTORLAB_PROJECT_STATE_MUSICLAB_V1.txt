@@ -8,7 +8,7 @@ STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab32-player-veloce-grid-api
 OPERATION_STATUS=IMPLEMENTED_SOURCE_CONTRACT_VERIFIED_GATE_RUNNING
-CURRENT_PHASE=LAB32 created from exact final LAB31. Source changes complete: Player Veloce 2 priority reaches stream resolution, checks ready cache/URL first, skips Qobuz/provider discovery during explicit playback burst, and prepares the stream extraction runtime before first tap; player thumbnail carousel keys are index+mediaId so duplicate queue songs cannot crash LazyGrid; LibraryMix keys are namespaced by item type; duplicate Last.fm/Discogs settings entries are merged into one shared editor without changing stored credentials. Source contract passed; Android compile/tests and UAB delivery gate are running.
+CURRENT_PHASE=LAB32 created from exact LAB31. Approved fixes implemented: Player Veloce 2 extends priority through real stream resolution by checking ready cache/URL state before optional providers and skipping Qobuz discovery during explicit playback bursts; InnerTube extraction runtime is prepared at service startup. Player thumbnail carousel keys are now unique per queue position to prevent duplicate-mediaId LazyGrid crashes, and mixed LibraryMix keys are namespaced by item type. Duplicate Last.fm/Discogs settings entries are merged into one shared Last.fm + Discogs entry without changing stored credentials. Source contract passed; Android unit tests are running.
 CURRENT_REF=uab-build/musiclab-player-veloce-grid-api-32
 CURRENT_HEAD_SHA=9eaacfccaeaaea8d94cf6f3b683ff9bc2270e0cb
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
@@ -18,14 +18,14 @@ LAST_VERIFIED_PROGRESS_PERCENT=74
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=74
 RECOVERY_FLOOR_PERCENT=74
 WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB32 if gate fails
-PENDING_VERIFICATION=Android unit tests, UAB diagnostics, LAB32 APK+ZIP build/integrity, then Bruno device test of duplicate-key crash, settings box merge and tap-to-audio latency.
-NEXT_SAFE_STEP=Reconcile run 37139215984. On failure inspect compiler/logs and repair only LAB32 on the same branch; on success record artifact/checksums and deliver APK+ZIP.
-LAST_USER_INTENT_SUMMARY=Fix the duplicate Last.fm/Discogs settings box, the Compose crash shown on device, and the still-slow/blocked player by extending playback priority through the real stream-resolution path.
+PENDING_VERIFICATION=Android unit tests, UAB diagnostics, LAB32 APK+ZIP build/integrity, then Bruno device test of playback latency/continuity and duplicate-key crash reproduction.
+NEXT_SAFE_STEP=Reconcile run 37139215984. On failure inspect logs and repair only LAB32 on the same branch; on success record artifact/checksums and deliver APK+ZIP.
+LAST_USER_INTENT_SUMMARY=Fix the real duplicate settings entry for Last.fm/Discogs, eliminate the LazyGrid duplicate-key crash shown on device, and make playback priority reach the actual stream resolver so taps start music faster and more reliably.
 
 PRESERVED_LAB31
 REF=uab-build/musiclab-player-veloce-compilation-ui-31
 SHA=43ec3ae9d5b311dd152d6976b52f337636346a49
-STATUS=technically verified but device test failed for player reliability and exposed duplicate-key crash; immutable while LAB32 is developed
+STATUS=technically verified but device-rejected for playback reliability and crash; immutable while LAB32 is developed
 MUTATED_BY_LAB32=no
 
 CURRENT_LAB32
@@ -36,15 +36,15 @@ SHA=9eaacfccaeaaea8d94cf6f3b683ff9bc2270e0cb
 GATE_RUN=37139215984
 GATE_STATUS=in_progress
 SOURCE_CONTRACT=success
-FEATURE_1=Player Veloce 2 initializes/prepares InnerTubeX stream runtime before first tap.
-FEATURE_2=During playback-priority burst, MusicService checks download cache, player cache and cached stream URL before optional providers.
-FEATURE_3=During the burst, Qobuz discovery is skipped entirely so explicit Play/PlayNow/Next/Previous goes directly to cached or YouTube stream resolution.
-FEATURE_4=Player thumbnail LazyHorizontalGrid now uses unique index+mediaId keys, preventing duplicate songs in queue from throwing Compose duplicate-key IllegalArgumentException like the device report key M8XD...
-FEATURE_5=LibraryMix mixed Song/Playlist/Album/Artist keys are namespaced by item type as additional structural hardening.
-FEATURE_6=Token e API contains one shared Last.fm + Discogs entry that opens the existing unified editor; LastFMApiKeyKey, LastFMSecretKey and DiscogsTokenKey values remain unchanged.
+FEATURE_1=Player Veloce 2 prepares InnerTube extraction runtime at service startup and checks ready download/player cache and cached stream URLs before any optional provider discovery during a playback-priority burst.
+FEATURE_2=Qobuz discovery is skipped while explicit playback priority is active, so optional lossless-provider lookup cannot add up to multi-second delay before YouTube playback starts.
+FEATURE_3=Player thumbnail LazyHorizontalGrid uses index+mediaId composite keys, so duplicate songs in the queue no longer produce duplicate Compose keys such as the device crash key M8XD...
+FEATURE_4=LibraryMix mixed-item lazy keys are namespaced by Song/Playlist/Album/Artist type for additional duplicate-key protection.
+FEATURE_5=Last.fm and Discogs settings now expose one shared Last.fm + Discogs entry that opens the existing combined editor; saved API key, secret and Discogs token storage semantics are unchanged.
 APK_IDENTITY=MusicLab LAB32 / it.verlezza.musiclab.lab32
-RESTORE_REGISTER_ACTION=none; Player Veloce 1 remains unconfirmed and current visible Player restore slot remains LAB25 until Bruno explicitly approves a newer player
+RESTORE_REGISTER_ACTION=none; Player Veloce 1 remains unapproved and current visible restore slot stays on LAB25 until device acceptance
 LAB31_MUTATED=no
+LAB30_MUTATED=no
 CANDIDATA_LAB26_MUTATED=no
 MADRE_MUTATED=no
 
