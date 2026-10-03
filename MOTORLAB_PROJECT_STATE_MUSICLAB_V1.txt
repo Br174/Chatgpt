@@ -1,25 +1,25 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=45
-STATE_STATUS=LAB30_NAV_COVER_MEMORY_PLAYBACK_GATE_IN_PROGRESS_LAB29_PRESERVED
+STATE_REVISION=46
+STATE_STATUS=LAB30_NAV_COVER_MEMORY_PLAYBACK_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab30-nav-cover-memory-playback
-OPERATION_STATUS=IMPLEMENTED_SOURCE_CONTRACT_VERIFIED_GATE_RUNNING
-CURRENT_PHASE=LAB30 created from exact verified LAB29. Approved source changes complete: Cover and Compilation added to bottom navigation with icon-only microphone/disc-search controls; legacy current-song Cover remains with microphone icon while legacy Compilation action is removed; one shared Cover screen now accepts manual title search; Compilation session/results/pagination/detail and exact LazyList index+pixel offset persist across navigation; Spotify and YouTube Music account actions keep fixed layout positions while disconnected; player current-song reserve and prewarm thresholds were hardened against audible stutter. Source contract passed; Android tests/UAB delivery gate are running.
+OPERATION_STATUS=LAB30_VERIFIED_ARTIFACT_READY
+CURRENT_PHASE=LAB30 navigation/Cover/Compilation-memory/provider-layout/playback-stability change technically complete. First gate found one missing CoverSearchRequest import; corrected on the same LAB30 branch. Exact final SHA 358830342a9a1ec5ee441322c607fbf07ded278e passed source contract, Android unit tests, UAB diagnostics, APK+ZIP build, integrity verification and artifact upload. Waiting only for Bruno device acceptance.
 CURRENT_REF=uab-build/musiclab-nav-cover-memory-playback-30
-CURRENT_HEAD_SHA=7ce0287c68075198eb58ea6bc43b3f2efe39abcc
+CURRENT_HEAD_SHA=358830342a9a1ec5ee441322c607fbf07ded278e
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37129369568
-CURRENT_JOB_STATUS=in_progress
-LAST_VERIFIED_PROGRESS_PERCENT=74
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=74
-RECOVERY_FLOOR_PERCENT=74
-WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB30 if gate fails
-PENDING_VERIFICATION=Android unit tests, UAB diagnostics, LAB30 APK+ZIP build/integrity, then Bruno device test of bottom nav, Cover manual/current-song entries, Compilation exact-position restore, stable provider actions and playback continuity.
-NEXT_SAFE_STEP=Reconcile run 37129369568. If failure, repair only LAB30 on the same branch; if success, record artifact/checksums and deliver APK+ZIP.
+CURRENT_JOB_ID=37129620549
+CURRENT_JOB_STATUS=success
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=released
+PENDING_VERIFICATION=Bruno device test of exact MusicLab-LAB30.apk: bottom navigation icons, current-song and manual Cover entry, Compilation exact scroll/session restore, fixed Spotify/YouTube Music layout positions and playback continuity.
+NEXT_SAFE_STEP=Bruno installs exact LAB30 APK and performs device acceptance. Preserve LAB29/LAB28/LAB27, CANDIDATA LAB26 and MADRE unchanged until explicit acceptance.
 LAST_USER_INTENT_SUMMARY=Keep old current-song Cover entry but change its icon to the supplied microphone style; also add icon-only Cover and Compilation to bottom main navigation, with both Cover entries opening the same Cover screen and bottom Cover supporting typed-title search. Remove only the legacy Compilation intelligence action. Preserve Compilation search/results/pages and exact scroll position on return. Keep Spotify/YouTube Music controls visually fixed when disconnected. Reduce brief playback stalls without changing approved queue/play-now behavior.
 
 PRESERVED_LAB29
@@ -32,9 +32,9 @@ CURRENT_LAB30
 REF=uab-build/musiclab-nav-cover-memory-playback-30
 BASE_REF=uab-build/musiclab-compilation-pagination-29
 BASE_SHA=b7d7f129f6e0bdaaa6dfe765e4579f3ce40aa13f
-SHA=7ce0287c68075198eb58ea6bc43b3f2efe39abcc
-GATE_RUN=37129369568
-GATE_STATUS=in_progress
+SHA=358830342a9a1ec5ee441322c607fbf07ded278e
+GATE_RUN=37129620549
+GATE_STATUS=success
 SOURCE_CONTRACT=success
 FEATURE_1=Bottom main navigation includes icon-only Cover microphone and Compilation disc-search entries around Search while Home/Search/Library retain their labels.
 FEATURE_2=Legacy current-song Cover action remains and uses the same microphone icon; legacy Compilation intelligence action is removed.
@@ -47,6 +47,26 @@ LAB29_MUTATED=no
 LAB28_MUTATED=no
 CANDIDATA_LAB26_MUTATED=no
 MADRE_MUTATED=no
+FIRST_GATE_RUN=37129369568
+FIRST_GATE_STATUS=failure
+FIRST_GATE_ROOT_CAUSE=NavigationBuilder used CoverSearchRequest for bottom-nav manual Cover entry but did not import the type, causing one Kotlin unresolved-reference compile error.
+FIRST_GATE_CORRECTION=Added the missing CoverSearchRequest import on the same LAB30 branch; no feature restart, branch recreation or rollback.
+FINAL_GATE_RUN=37129620549
+ARTIFACT_ID=11275829285
+ARTIFACT_NAME=MusicLab-LAB30
+ARTIFACT_DIGEST=sha256:a47b4abd2fbde92ab88f71f5b91bdce87d78c0f9d6b8ecb17ed99d4b4a89d446
+APK_NAME=MusicLab-LAB30.apk
+APK_SHA256=af3329e4df5f7e5e54084f921f05e02b846a325ff041e59b4d08529de0dcfce0
+ZIP_NAME=MusicLab-LAB30-APK.zip
+ZIP_SHA256=8225f7242d505bce417a96a5e727ad5bce9ff324df4cd68fc1fc99d32cbc2191
+BUILD_SHA_FILE=358830342a9a1ec5ee441322c607fbf07ded278e
+FINAL_GATE_SOURCE_CONTRACT=success
+FINAL_GATE_ANDROID_TESTS=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno test
 
 PRESERVED_LAB28
 REF=uab-build/musiclab-compilation-discogs-28
