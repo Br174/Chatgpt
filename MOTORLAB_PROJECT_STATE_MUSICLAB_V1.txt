@@ -2,25 +2,48 @@ MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
 STATE_REVISION=39
-STATE_STATUS=CANDIDATE_LAB26_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_STATUS=LAB27_TOKEN_API_CENTER_BUILD_IN_PROGRESS_CANDIDATE_LAB26_PRESERVED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-candidate-lab26
-OPERATION_STATUS=CANDIDATE_VERIFIED_ARTIFACT_READY
-CURRENT_PHASE=CANDIDATA LAB26 completed from current MADRE LAB25 plus verified LAB26 tree. Exact-SHA gate 37093328949 succeeded on 81095e2cb7c2f52f429da8f99c4fbb0a713a6726; APK+ZIP integrity verified. Waiting only for Bruno device test before any MADRE promotion.
-CURRENT_REF=candidate/musiclab-lab26-ui-italian-years
-CURRENT_HEAD_SHA=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
+ACTIVE_OPERATION_ID=musiclab-lab27-token-api-center
+OPERATION_STATUS=IMPLEMENTED_GATE_RUNNING
+CURRENT_PHASE=LAB27 created from immutable CANDIDATA LAB26 and implements one Token e API section for YouTube Music, Last.fm API Key + Shared Secret, and Discogs Personal Access Token. Last.fm runtime credentials now override build-time fallback and are applied immediately after save. LAB27 isolated UAB gate is running.
+CURRENT_REF=uab-build/musiclab-token-api-center-27
+CURRENT_HEAD_SHA=eb597fb995b7643c66412782d9b38b7bb06cb50c
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37093328949
-CURRENT_JOB_STATUS=success
-LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
-RECOVERY_FLOOR_PERCENT=100
-WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact MusicLab-CANDIDATA-LAB26.apk before any MADRE promotion.
-NEXT_SAFE_STEP=Bruno installs and tests exact Candidate APK. Preserve Candidate immutable during device test. Promote to MADRE only after explicit Bruno acceptance.
-LAST_USER_INTENT_SUMMARY=Create a true CANDIDATA from verified LAB26 without touching current MADRE; build and verify isolated Candidate APK+ZIP.
+CURRENT_JOB_ID=37112717837
+CURRENT_JOB_STATUS=in_progress
+LAST_VERIFIED_PROGRESS_PERCENT=86
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=86
+RECOVERY_FLOOR_PERCENT=86
+WRITE_LOCK_SCOPE=GitHub Actions build owns execution; no competing application writes
+PENDING_VERIFICATION=LAB27 Android unit tests, UAB build, APK/ZIP integrity, then Bruno device test.
+NEXT_SAFE_STEP=Reconcile GitHub Actions run 37112717837. If success, record exact artifact identity/checksums and deliver LAB27 APK+ZIP. If failure, repair only LAB27 and rerun without touching CANDIDATA LAB26 or MADRE.
+LAST_USER_INTENT_SUMMARY=Centralize YouTube Music token, Last.fm API credentials and Discogs personal token in one MusicLab Token e API section; keep secrets masked and stored locally; make Last.fm work with manually entered credentials.
+
+PRESERVED_CANDIDATA_LAB26
+REF=candidate/musiclab-lab26-ui-italian-years
+SHA=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
+STATUS=immutable while LAB27 is developed
+DEVICE_ACCEPTANCE=pending
+MADRE_PROMOTION=no
+
+CURRENT_LAB27
+REF=uab-build/musiclab-token-api-center-27
+BASE_REF=candidate/musiclab-lab26-ui-italian-years
+BASE_SHA=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
+SHA=eb597fb995b7643c66412782d9b38b7bb06cb50c
+GATE_RUN=37112717837
+GATE_STATUS=in_progress
+CHANGE_1=Account popup now contains a dedicated Token e API group with YouTube Music token plus Last.fm and Discogs credential entries.
+CHANGE_2=Last.fm manual fields store API Key and Shared Secret locally with password-style masking and initialize LastFM immediately on save.
+CHANGE_3=App startup prefers saved Last.fm credentials and falls back to build-time LASTFM_API_KEY/LASTFM_SECRET when manual values are blank.
+CHANGE_4=Last.fm login gate now checks LastFM runtime initialization instead of requiring build-time secrets.
+CHANGE_5=Discogs Personal Access Token is stored locally and ready for the future Compilation API client; no Discogs network behavior has been added in this scope.
+APK_IDENTITY=MusicLab LAB27 / it.verlezza.musiclab.lab27
+CANDIDATA_LAB26_MUTATED=no
+MADRE_MUTATED=no
 
 LAB26_RECOVERY_ROOT_CAUSE
 STATUS=CLOSED_RECOVERY_SUCCESS_SINGLE_BRANCH_PRESERVED
