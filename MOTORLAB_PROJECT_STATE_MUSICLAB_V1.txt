@@ -1,25 +1,25 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=43
-STATE_STATUS=LAB29_COMPILATION_PAGINATION_GATE_IN_PROGRESS_LAB28_PRESERVED
+STATE_REVISION=44
+STATE_STATUS=LAB29_COMPILATION_PAGINATION_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab29-compilation-pagination
-OPERATION_STATUS=IMPLEMENTED_SOURCE_CONTRACT_VERIFIED_GATE_RUNNING
-CURRENT_PHASE=LAB29 created from exact verified LAB28. Pagination implementation complete: Discogs pagination metadata, per-page up to 100, every returned release edition preserved, infinite footer loading, frozen search criteria across pages, live loaded/total counter, and explicit end-of-results state. Source contract passed; Android compile/tests and UAB delivery gate are running.
+OPERATION_STATUS=LAB29_VERIFIED_ARTIFACT_READY
+CURRENT_PHASE=LAB29 pagination/counting enhancement complete and technically verified. Exact SHA b7d7f129f6e0bdaaa6dfe765e4579f3ce40aa13f passed source contract, Android unit tests, UAB diagnostics, APK+ZIP build, integrity verification and artifact upload. Waiting only for Bruno device test of infinite scrolling and loaded/total counters.
 CURRENT_REF=uab-build/musiclab-compilation-pagination-29
 CURRENT_HEAD_SHA=b7d7f129f6e0bdaaa6dfe765e4579f3ce40aa13f
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
 CURRENT_JOB_ID=37124480958
-CURRENT_JOB_STATUS=in_progress
-LAST_VERIFIED_PROGRESS_PERCENT=74
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=74
-RECOVERY_FLOOR_PERCENT=74
-WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB29 if gate fails
-PENDING_VERIFICATION=Android unit tests, UAB diagnostics, LAB29 APK+ZIP build/integrity, then Bruno device test of automatic pagination and counters.
-NEXT_SAFE_STEP=Reconcile run 37124480958. On failure inspect compiler/logs and repair only LAB29 on the same branch; on success record artifact/checksums and deliver APK+ZIP.
+CURRENT_JOB_STATUS=success
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=released
+PENDING_VERIFICATION=Bruno device test of exact MusicLab-LAB29.apk: scroll to the end repeatedly, verify automatic next-page loading, increasing loaded count, Discogs total count and final end-of-results state.
+NEXT_SAFE_STEP=Bruno installs exact LAB29 APK and tests a broad Compilation search through multiple pages. Preserve LAB28, LAB27, CANDIDATA LAB26 and MADRE unchanged until explicit acceptance.
 LAST_USER_INTENT_SUMMARY=Keep the working Discogs Compilation integration unchanged except for automatic loading of subsequent result pages while scrolling, inclusion of every release Discogs returns, and a live counter showing loaded compilations plus the Discogs total.
 
 PRESERVED_LAB28
@@ -34,7 +34,7 @@ BASE_REF=uab-build/musiclab-compilation-discogs-28
 BASE_SHA=09db48d3fe71b75e27487350fdab42884e5b1305
 SHA=b7d7f129f6e0bdaaa6dfe765e4579f3ce40aa13f
 GATE_RUN=37124480958
-GATE_STATUS=in_progress
+GATE_STATUS=success
 SOURCE_CONTRACT=success
 FEATURE_1=Discogs search returns pagination metadata page/pages/per_page/items and permits up to 100 results per API page when no MusicLab language filter is active.
 FEATURE_2=No Master-level deduplication remains; every distinct Discogs Release ID returned by the query is eligible for display.
@@ -46,6 +46,21 @@ APK_IDENTITY=MusicLab LAB29 / it.verlezza.musiclab.lab29
 LAB28_MUTATED=no
 CANDIDATA_LAB26_MUTATED=no
 MADRE_MUTATED=no
+ARTIFACT_ID=11274960032
+ARTIFACT_NAME=MusicLab-LAB29
+ARTIFACT_DIGEST=sha256:c0f6b72c15b5007052becddc2bce7997623d26e2352625df86d15fb81fb9fe87
+APK_NAME=MusicLab-LAB29.apk
+APK_SHA256=3ae7a93820687bcb5a25ada294cff7d56946934317f55e2b82e9f7a6560fe707
+ZIP_NAME=MusicLab-LAB29-APK.zip
+ZIP_SHA256=ebc2e5d7f9ae27d53fb3610913c95b2d36f9b949ac23b7e90f7a6a3d6635fe19
+BUILD_SHA_FILE=b7d7f129f6e0bdaaa6dfe765e4579f3ce40aa13f
+FINAL_GATE_SOURCE_CONTRACT=success
+FINAL_GATE_ANDROID_TESTS=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno pagination/count test
 
 PRESERVED_LAB27
 REF=uab-build/musiclab-token-api-center-27
