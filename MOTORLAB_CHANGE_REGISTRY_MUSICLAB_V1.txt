@@ -473,6 +473,28 @@ RESTORE_POLICY=Do not replace the visible Player restore slot yet. If Bruno expl
 NEXT_LIFECYCLE_GATE=Bruno device acceptance of LAB32. No CANDIDATA/MADRE promotion before explicit confirmation.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261003-lab32-player-veloce-grid-api
+DATE=2026-10-03
+TITLE=LAB32 Player Veloce 2, crash LazyGrid duplicate-key e voce unica Last.fm + Discogs
+SEMANTIC_TAGS=LAB32,Player Veloce 2,stream resolution,Qobuz,cache,LazyGrid,duplicate key,player carousel,LibraryMix,Last.fm,Discogs,Token e API,crash
+USER_INTENT=Correggere il player ancora lento/bloccato e il crash mostrato sul dispositivo, eliminando anche il doppione grafico delle credenziali Last.fm/Discogs che apriva due volte lo stesso editor.
+CHANGE_SCOPE=STREAM_PRIORITY_DUPLICATE_KEY_CRASH_AND_API_SETTINGS_DEDUP
+LIFECYCLE_ROLE=LAB32_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-player-veloce-compilation-ui-31
+SOURCE_BASE_SHA=43ec3ae9d5b311dd152d6976b52f337636346a49
+RESULT_REF=uab-build/musiclab-player-veloce-grid-api-32
+RESULT_SHA=bd284100d3068a8ef6bcac2973743c09a3489cf5
+BEHAVIOR_SUMMARY=Player Veloce 2 extends the explicit playback priority burst through actual stream resolution. During the burst MusicService checks download/player caches and songUrlCache before optional provider discovery, skips Qobuz discovery entirely, and starts from the YouTube/InnerTube stream path when no ready cache exists. InnerTubeX extraction runtime is initialized/prepared at service startup. The crash report key shaped like a YouTube media ID was traced to the player thumbnail LazyHorizontalGrid using mediaId as its sole key; duplicate queue songs can therefore collide. LAB32 uses count-based items and key=index+mediaId, allowing repeated songs without duplicate Compose keys. LibraryMix keys are additionally namespaced by Song/Playlist/Album/Artist type. Account settings now expose one Last.fm + Discogs item that opens the existing shared editor; the existing LastFMApiKeyKey, LastFMSecretKey and DiscogsTokenKey storage and values are unchanged.
+ROOT_CAUSE_CLOSURE=The duplicate Last.fm/Discogs boxes were a real UI duplication but not the device crash. The crash stack showed IllegalArgumentException for a key matching a media ID inside Compose LazyGrid; the player thumbnail carousel used mediaId directly as a key and could receive the same song twice in a queue. That key design was corrected at the source. Player Veloce 1 stopped secondary jobs but optional Qobuz stream discovery could still block the resolver before YouTube for up to the provider timeout; LAB32 bypasses that optional discovery during explicit priority startup. Run 1 failed on an intermediate itemsIndexed implementation compile issue; the implementation moved to count-based items. Run 2 was cancelled by the newer branch write. Run 3 failed only because its contract still expected itemsIndexed; the contract was aligned. Run 4 passed fully.
+COMPATIBILITY=LAB32 descends from exact LAB31 and preserves LAB31 Compilation UI/player-priority framework, LAB30 navigation/session behavior, LAB29 pagination, LAB28 Discogs integration, LAB27 credentials, CANDIDATA LAB26 and MADRE. Preserved refs were not mutated.
+VERIFICATION=Final exact-SHA run 37139588229 succeeded on bd284100d3068a8ef6bcac2973743c09a3489cf5. Source contract, Android unit tests, UAB diagnostics, APK+ZIP build, ZIP integrity and artifact upload all succeeded. Artifact 11279993986 digest sha256:815c3071d22ef7e7eca10c596bf540af850919f979cf5c80f9b448a582cffabb. APK sha256 2f061e39cd1eb4b9a9199328359a1bf4d6b17bf5bc9b9c67e32a2d54a35c719b. ZIP sha256 337d6c28a98c02788d7f4b8e44211550d80072342c4054dbd70df193d5b4c331.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+RESTORE_POLICY=Do not replace visible Player restore slot yet. Keep approved LAB25 until Bruno explicitly confirms Player Veloce 2 on device.
+NEXT_LIFECYCLE_GATE=Bruno device acceptance of LAB32. No CANDIDATA/MADRE promotion before explicit approval.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
