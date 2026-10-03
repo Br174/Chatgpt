@@ -1,27 +1,33 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=35
+STATE_REVISION=36
 STATE_STATUS=LAB26_IN_PROGRESS_RECOVERED_FROM_ADVANCED_CHECKPOINT
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-ui-italian-years-lab26
 OPERATION_STATUS=LAB26_ACTIVE_RECOVERED
-CURRENT_PHASE=LAB26 recovered from advanced checkpoint, compile blockers fixed, title-switch closure added, Android contract run succeeded, and final exact-SHA delivery gate was triggered on 96cb5d0b. Continue only from this SHA or verified descendants.
+CURRENT_PHASE=LAB26 recovered from the most advanced real checkpoint. Previous final gate 37091416436 stalled on the Android contract step despite an already successful LAB26 Android contract; MotorLab performed a CI-only recovery on the SAME branch with identical application tree and triggered replacement gate 37091764757. Continue only from 2003db167ed3f994a8323ce54cbd86db9395847f or verified descendants; never recreate LAB26 on another branch.
 CURRENT_REF=uab-build/musiclab-ui-italian-years-26
-CURRENT_HEAD_SHA=96cb5d0b7b65551da649b1598fa60c2d10329e8a
+CURRENT_HEAD_SHA=2003db167ed3f994a8323ce54cbd86db9395847f
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37091416436
-CURRENT_JOB_STATUS=final_exact_sha_gate_in_progress_android_contract_step
+CURRENT_JOB_ID=37091764757
+CURRENT_JOB_STATUS=recovery_final_exact_sha_gate_in_progress
 LAST_VERIFIED_PROGRESS_PERCENT=84
 LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=84
 RECOVERY_FLOOR_PERCENT=84
 WRITE_LOCK_SCOPE=Br174/MusicLab:uab-build/musiclab-ui-italian-years-26
-PENDING_VERIFICATION=Final exact-SHA LAB26 gate 37091416436 is live on 96cb5d0b; Brain/device regression suite, D1 migration check and deployed backend verification already passed in this gate. Android contract step is running; then UAB preflight/build/APK+ZIP/integrity/upload remain.
-NEXT_SAFE_STEP=Resume only from live final gate 37091416436 on exact SHA 96cb5d0b7b65551da649b1598fa60c2d10329e8a. If it fails, repair only the failing step on the same LAB26 branch; if green, retrieve and verify APK+ZIP. Never create a replacement LAB26 branch.
+PENDING_VERIFICATION=Replacement final exact-SHA LAB26 gate 37091764757 is live on 2003db167ed3f994a8323ce54cbd86db9395847f after the previous GitHub runner stalled. Application tree is unchanged from the recovered 84% checkpoint; finish gate, then verify/download APK+ZIP.
+NEXT_SAFE_STEP=Resume only from live replacement gate 37091764757 on exact SHA 2003db167ed3f994a8323ce54cbd86db9395847f. If it fails, repair only the failing step on the same LAB26 branch; if green, retrieve and verify APK+ZIP. Never create a replacement LAB26 branch.
 LAST_USER_INTENT_SUMMARY=Resume LAB26 from the most advanced real checkpoint instead of restarting. LAB26 includes larger 4-level artwork with Home and album protection, complete Italian UI, required Cover years with source-first then AI fallback, and a switch to disable title-tap search.
 
+LAB26_RECOVERY_ROOT_CAUSE
+STATUS=ACTIVE_RECOVERY_LOCKED_TO_SINGLE_BRANCH
+SYMPTOM=LAB26 had been started multiple times on different similarly named branches and progress appeared to reset around 60%.
+CAUSE=Earlier interrupted sessions created/reused multiple LAB26 branch-name variants before the durable state ledger was reconciled. The current authoritative branch later reached an 84% verified checkpoint, but its final GitHub Actions runner stalled on an Android contract step even though the standalone LAB26 Android contract had already succeeded.
+CORRECTION=Authoritative LAB26 is permanently pinned to uab-build/musiclab-ui-italian-years-26. Recovery used a CI-only descendant commit with identical application tree to trigger a replacement final gate; no feature work was restarted and no new LAB26 branch was created.
+PREVENTION=On every resume read MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt plus live branch/run evidence first; preserve RECOVERY_FLOOR_PERCENT=84; never recreate LAB26; retry only the failing CI step or trigger a same-branch CI-only descendant when a runner is provably stalled.
 
 
 CURRENT_CANDIDATA_LAB25
