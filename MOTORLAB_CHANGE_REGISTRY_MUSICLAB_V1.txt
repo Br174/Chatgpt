@@ -408,6 +408,27 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device test of multiple automatic Discogs pages and counters; no Candidate/Madre promotion before explicit approval.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261003-lab30-nav-cover-memory-playback
+DATE=2026-10-03
+TITLE=LAB30 barra principale Cover/Compilation, memoria Compilation, Cover manuale, provider stabili e anti-stutter
+SEMANTIC_TAGS=LAB30,Cover,Compilation,bottom navigation,microfono,disco,lente,scroll memory,session persistence,Spotify,YouTube Music,buffer,stutter,preload
+USER_INTENT=Aggiungere Cover e Compilation nella barra principale con sole icone, mantenendo anche il vecchio ingresso Cover legato al brano corrente e usando la stessa pagina Cover con ricerca manuale; rimuovere solo il vecchio pulsante Compilation; ricordare esattamente posizione e stato Compilation quando si torna indietro; evitare spostamenti grafici dei comandi Spotify/YouTube Music quando scollegati; ridurre le brevi interruzioni audio.
+CHANGE_SCOPE=NAVIGATION_COVER_COMPILATION_STATE_PROVIDER_LAYOUT_PLAYBACK_STABILITY
+LIFECYCLE_ROLE=LAB30_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-compilation-pagination-29
+SOURCE_BASE_SHA=b7d7f129f6e0bdaaa6dfe765e4579f3ce40aa13f
+RESULT_REF=uab-build/musiclab-nav-cover-memory-playback-30
+RESULT_SHA=358830342a9a1ec5ee441322c607fbf07ded278e
+BEHAVIOR_SUMMARY=Main navigation now places icon-only Cover microphone and Compilation disc-search around Search. The existing current-song Cover intelligence action remains and uses the same microphone icon; the legacy Compilation intelligence action is removed. Both Cover entry paths use the same CoverSearchScreen, which now supports typed-title search and can open without a current-song request. Compilation preserves filters, search/results, pagination, Discogs total, detail/full-audio/resolved tracks and exact LazyList item+pixel offset across navigation, resetting only on an explicit new search. Spotify add-to-playlist actions stay rendered but disabled while unauthenticated, and the YouTube Music switch-account setting stays rendered but disabled while logged out. Playback start/rebuffer reserves were raised from 1.25s/4s to 3s/8s and next-track smart prewarm was made more conservative (25s stable, 20s resume, 256KB prefix) to prioritize the current stream while preserving LAB25 Play Now/queue behavior.
+ROOT_CAUSE_CLOSURE=First gate run 37129369568 failed only because NavigationBuilder referenced CoverSearchRequest without importing it. The missing import was added on the same branch; replacement gate passed fully. Playback stutter mitigation targets the verified low start/rebuffer reserve and early background prewarm contention path; device confirmation remains required.
+COMPATIBILITY=LAB30 descends from exact LAB29 and preserves LAB29 Discogs pagination/counters plus LAB28 Compilation functionality, LAB27 credentials, CANDIDATA LAB26 and MADRE. No preserved ref was mutated.
+VERIFICATION=LAB30 source contract passed. Android unit tests passed. UAB diagnostics passed. Exact-SHA delivery run 37129620549 succeeded on 358830342a9a1ec5ee441322c607fbf07ded278e. APK+ZIP build and ZIP integrity passed; artifact upload passed. Artifact 11275829285 digest sha256:a47b4abd2fbde92ab88f71f5b91bdce87d78c0f9d6b8ecb17ed99d4b4a89d446. APK sha256 af3329e4df5f7e5e54084f921f05e02b846a325ff041e59b4d08529de0dcfce0. ZIP sha256 8225f7242d505bce417a96a5e727ad5bce9ff324df4cd68fc1fc99d32cbc2191.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device acceptance of LAB30; no Candidate/Madre promotion before explicit approval.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -419,7 +440,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.14
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.15
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -435,4 +456,4 @@ Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device ac
 Revision 1.10: registra LAB26 recuperato e tecnicamente verificato con locandine, protezioni Home/Album, UI italiana, anni Cover e switch title-tap; device acceptance pendente.
 
 Revision 1.11: registra CANDIDATA LAB26 costruita dalla MADRE con runtime LAB26 identico; test dispositivo Candidate pendente.
-Revision 1.12: registra LAB27 Token e API tecnicamente verificato per YouTube Music, Last.fm e Discogs; test dispositivo pendente.\nRevision 1.13: registra LAB28 Compilation Discogs tecnicamente verificato con ricerca/filtri, tracklist/video, resolver, audio completo e salvataggio; test dispositivo/API pendente.\nRevision 1.14: registra LAB29 con paginazione infinita Discogs, tutte le Release restituite e contatore caricate/totale; test dispositivo pendente.
+Revision 1.12: registra LAB27 Token e API tecnicamente verificato per YouTube Music, Last.fm e Discogs; test dispositivo pendente.\nRevision 1.13: registra LAB28 Compilation Discogs tecnicamente verificato con ricerca/filtri, tracklist/video, resolver, audio completo e salvataggio; test dispositivo/API pendente.\nRevision 1.14: registra LAB29 con paginazione infinita Discogs, tutte le Release restituite e contatore caricate/totale; test dispositivo pendente.\nRevision 1.15: registra LAB30 con nuova barra Cover/Compilation, Cover manuale condivisa, memoria esatta Compilation, provider UI stabili e anti-stutter; test dispositivo pendente.
