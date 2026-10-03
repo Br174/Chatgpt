@@ -1,26 +1,51 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=42
-STATE_STATUS=LAB28_COMPILATION_DISCOGS_TECHNICALLY_VERIFIED_DEVICE_API_TEST_PENDING
+STATE_REVISION=43
+STATE_STATUS=LAB29_COMPILATION_PAGINATION_GATE_IN_PROGRESS_LAB28_PRESERVED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-lab28-compilation-discogs
-OPERATION_STATUS=LAB28_VERIFIED_ARTIFACT_READY
-CURRENT_PHASE=LAB28 Discogs Compilation V1 technically complete. Exact SHA 09db48d3fe71b75e27487350fdab42884e5b1305 passed source contract, Android unit tests, UAB diagnostics, APK+ZIP build, integrity verification and artifact upload. Waiting only for Bruno device/live Discogs API test with the Personal Access Token stored locally in MusicLab.
-CURRENT_REF=uab-build/musiclab-compilation-discogs-28
-CURRENT_HEAD_SHA=09db48d3fe71b75e27487350fdab42884e5b1305
+ACTIVE_OPERATION_ID=musiclab-lab29-compilation-pagination
+OPERATION_STATUS=IMPLEMENTED_SOURCE_CONTRACT_VERIFIED_GATE_RUNNING
+CURRENT_PHASE=LAB29 created from exact verified LAB28. Pagination implementation complete: Discogs pagination metadata, per-page up to 100, every returned release edition preserved, infinite footer loading, frozen search criteria across pages, live loaded/total counter, and explicit end-of-results state. Source contract passed; Android compile/tests and UAB delivery gate are running.
+CURRENT_REF=uab-build/musiclab-compilation-pagination-29
+CURRENT_HEAD_SHA=b7d7f129f6e0bdaaa6dfe765e4579f3ce40aa13f
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37118163517
-CURRENT_JOB_STATUS=success
-LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
-RECOVERY_FLOOR_PERCENT=100
-WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device/live API test of exact MusicLab-LAB28.apk with his locally entered Discogs token.
-NEXT_SAFE_STEP=Bruno installs exact LAB28 APK, opens Compilation, runs a real Discogs search and tests one compilation/track/full-audio/save path. Preserve LAB27, CANDIDATA LAB26 and MADRE unchanged until explicit acceptance.
-LAST_USER_INTENT_SUMMARY=Integrate a full-screen MusicLab Compilation section powered primarily by Discogs, with native filters, covers/tracklists/videos, Discogs YouTube links when present, MusicLab fallback resolution, possible one-file full compilation audio, per-song playback and saving the compilation locally.
+CURRENT_JOB_ID=37124480958
+CURRENT_JOB_STATUS=in_progress
+LAST_VERIFIED_PROGRESS_PERCENT=74
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=74
+RECOVERY_FLOOR_PERCENT=74
+WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB29 if gate fails
+PENDING_VERIFICATION=Android unit tests, UAB diagnostics, LAB29 APK+ZIP build/integrity, then Bruno device test of automatic pagination and counters.
+NEXT_SAFE_STEP=Reconcile run 37124480958. On failure inspect compiler/logs and repair only LAB29 on the same branch; on success record artifact/checksums and deliver APK+ZIP.
+LAST_USER_INTENT_SUMMARY=Keep the working Discogs Compilation integration unchanged except for automatic loading of subsequent result pages while scrolling, inclusion of every release Discogs returns, and a live counter showing loaded compilations plus the Discogs total.
+
+PRESERVED_LAB28
+REF=uab-build/musiclab-compilation-discogs-28
+SHA=09db48d3fe71b75e27487350fdab42884e5b1305
+STATUS=technically verified and device-tested positively for search, filters, covers and tracklists; immutable while LAB29 is developed
+MUTATED_BY_LAB29=no
+
+CURRENT_LAB29
+REF=uab-build/musiclab-compilation-pagination-29
+BASE_REF=uab-build/musiclab-compilation-discogs-28
+BASE_SHA=09db48d3fe71b75e27487350fdab42884e5b1305
+SHA=b7d7f129f6e0bdaaa6dfe765e4579f3ce40aa13f
+GATE_RUN=37124480958
+GATE_STATUS=in_progress
+SOURCE_CONTRACT=success
+FEATURE_1=Discogs search returns pagination metadata page/pages/per_page/items and permits up to 100 results per API page when no MusicLab language filter is active.
+FEATURE_2=No Master-level deduplication remains; every distinct Discogs Release ID returned by the query is eligible for display.
+FEATURE_3=Result footer automatically requests page N+1 when reached and appends without clearing already visible results.
+FEATURE_4=Active search criteria are frozen for pagination so changing filter controls does not corrupt pages already being loaded until a new Search is started.
+FEATURE_5=Counter displays loaded results versus Discogs total immediately from pagination.items and page N of total pages; language-assisted searches explicitly label Discogs total before MusicLab language filtering.
+FEATURE_6=End-of-results state is visible after the final Discogs page and pagination errors offer retry without discarding loaded results.
+APK_IDENTITY=MusicLab LAB29 / it.verlezza.musiclab.lab29
+LAB28_MUTATED=no
+CANDIDATA_LAB26_MUTATED=no
+MADRE_MUTATED=no
 
 PRESERVED_LAB27
 REF=uab-build/musiclab-token-api-center-27
