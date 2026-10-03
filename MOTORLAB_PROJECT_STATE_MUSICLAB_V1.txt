@@ -1,26 +1,54 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=46
-STATE_STATUS=LAB30_NAV_COVER_MEMORY_PLAYBACK_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=47
+STATE_STATUS=LAB31_PLAYER_VELOCE_COMPILATION_UI_GATE_IN_PROGRESS_LAB30_PRESERVED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-lab30-nav-cover-memory-playback
-OPERATION_STATUS=LAB30_VERIFIED_ARTIFACT_READY
-CURRENT_PHASE=LAB30 navigation/Cover/Compilation-memory/provider-layout/playback-stability change technically complete. First gate found one missing CoverSearchRequest import; corrected on the same LAB30 branch. Exact final SHA 358830342a9a1ec5ee441322c607fbf07ded278e passed source contract, Android unit tests, UAB diagnostics, APK+ZIP build, integrity verification and artifact upload. Waiting only for Bruno device acceptance.
-CURRENT_REF=uab-build/musiclab-nav-cover-memory-playback-30
-CURRENT_HEAD_SHA=358830342a9a1ec5ee441322c607fbf07ded278e
+ACTIVE_OPERATION_ID=musiclab-lab31-player-veloce-compilation-ui
+OPERATION_STATUS=IMPLEMENTED_SOURCE_CONTRACT_VERIFIED_GATE_RUNNING
+CURRENT_PHASE=LAB31 created from exact verified LAB30. Player Veloce 1 trial implementation complete: LAB25 fast-start buffers restored, bounded priority burst cancels smart preload/precache/SponsorBlock/crossfade work during explicit playback startup and resumes helpers after buffer recovery; Play/PlayNow/Next/Previous trigger priority; Compilation track resolver uses a bounded fast-first race before deep fallback; next track is warmed only after the burst. Compilation UI now keeps search always visible, filters collapsible, prefetches Discogs pages before list end, reserves bottom space above mini-player/navigation, and highlights selected tracks. Source contract passed; Android compile/tests and UAB delivery gate are running.
+CURRENT_REF=uab-build/musiclab-player-veloce-compilation-ui-31
+CURRENT_HEAD_SHA=31469404c5484f1ed34a841bbbe74920f3760683
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37129620549
-CURRENT_JOB_STATUS=success
-LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
-RECOVERY_FLOOR_PERCENT=100
-WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact MusicLab-LAB30.apk: bottom navigation icons, current-song and manual Cover entry, Compilation exact scroll/session restore, fixed Spotify/YouTube Music layout positions and playback continuity.
-NEXT_SAFE_STEP=Bruno installs exact LAB30 APK and performs device acceptance. Preserve LAB29/LAB28/LAB27, CANDIDATA LAB26 and MADRE unchanged until explicit acceptance.
-LAST_USER_INTENT_SUMMARY=Keep old current-song Cover entry but change its icon to the supplied microphone style; also add icon-only Cover and Compilation to bottom main navigation, with both Cover entries opening the same Cover screen and bottom Cover supporting typed-title search. Remove only the legacy Compilation intelligence action. Preserve Compilation search/results/pages and exact scroll position on return. Keep Spotify/YouTube Music controls visually fixed when disconnected. Reduce brief playback stalls without changing approved queue/play-now behavior.
+CURRENT_JOB_ID=37135387130
+CURRENT_JOB_STATUS=in_progress
+LAST_VERIFIED_PROGRESS_PERCENT=74
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=74
+RECOVERY_FLOOR_PERCENT=74
+WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB31 if gate fails
+PENDING_VERIFICATION=Android unit tests, UAB diagnostics, LAB31 APK+ZIP build/integrity, then Bruno device test of tap-to-audio latency, Next/Previous responsiveness, page/scroll fluidity and Compilation layout.
+NEXT_SAFE_STEP=Reconcile run 37135387130. On failure inspect compiler/logs and repair only LAB31 on the same branch; on success record artifact/checksums and deliver APK+ZIP.
+LAST_USER_INTENT_SUMMARY=Apply the agreed Player Veloce 1 priority approach plus the Compilation UI refinements: explicit playback gets absolute short-lived priority, fast resolver path, one-next-track warmup after stability; fixed search bar with collapsible filters; no content hidden under mini-player; selected song highlighting; smoother result pagination.
+
+PRESERVED_LAB30
+REF=uab-build/musiclab-nav-cover-memory-playback-30
+SHA=358830342a9a1ec5ee441322c607fbf07ded278e
+STATUS=technically verified; immutable while LAB31 is developed
+MUTATED_BY_LAB31=no
+
+CURRENT_LAB31
+REF=uab-build/musiclab-player-veloce-compilation-ui-31
+BASE_REF=uab-build/musiclab-nav-cover-memory-playback-30
+BASE_SHA=358830342a9a1ec5ee441322c607fbf07ded278e
+SHA=31469404c5484f1ed34a841bbbe74920f3760683
+GATE_RUN=37135387130
+GATE_STATUS=in_progress
+SOURCE_CONTRACT=success
+FEATURE_1=Player Veloce 1 trial restores LAB25 start/rebuffer profile 1.25s/4s and one-next-track 384KB smart preload at 12s stable/8s resume thresholds.
+FEATURE_2=Explicit PlayNow/Play/Next/Previous starts a 2s-min/8s-max playback-priority burst that cancels smart preload, pre-cache, SponsorBlock lookup and crossfade background work, then resumes deferred helpers after current playback has buffer.
+FEATURE_3=Compilation track resolution checks Discogs direct YouTube first then races native MusicLab/YTM song lookup within about 3.05s before deeper fallbacks.
+FEATURE_4=Tapped track highlights immediately; Compilation-side pagination/full-audio/next warm jobs are cancelled before the selected track is resolved and played.
+FEATURE_5=After priority burst releases, only the next Compilation track is resolved and inserted next in queue so Next can feel pre-warmed without competing with startup.
+FEATURE_6=Compilation search/header is fixed above the independently scrolling result list; filters collapse to a single search row; both result and detail lists reserve 176dp bottom safe space above mini-player/navigation.
+FEATURE_7=Discogs next page begins loading when the user is within about 12 visible items of the current end, reducing end-of-page stalls.
+FEATURE_8=Selected Compilation track uses a subtle theme-primary highlight and selection state is preserved in the Compilation session.
+APK_IDENTITY=MusicLab LAB31 / it.verlezza.musiclab.lab31
+RESTORE_REGISTER_ACTION=none yet; visible Player restore slot must not be changed until Bruno confirms LAB31 works on device
+LAB30_MUTATED=no
+CANDIDATA_LAB26_MUTATED=no
+MADRE_MUTATED=no
 
 PRESERVED_LAB29
 REF=uab-build/musiclab-compilation-pagination-29
