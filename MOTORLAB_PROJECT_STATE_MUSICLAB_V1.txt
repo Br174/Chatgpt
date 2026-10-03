@@ -1,25 +1,25 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=41
-STATE_STATUS=LAB28_COMPILATION_DISCOGS_GATE_IN_PROGRESS_LAB27_PRESERVED
+STATE_REVISION=42
+STATE_STATUS=LAB28_COMPILATION_DISCOGS_TECHNICALLY_VERIFIED_DEVICE_API_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab28-compilation-discogs
-OPERATION_STATUS=IMPLEMENTED_SOURCE_CONTRACT_VERIFIED_GATE_RUNNING
-CURRENT_PHASE=LAB28 created from exact verified LAB27. Discogs Compilation V1 source implementation complete: authenticated API search fixed to Compilation, year/genre/style/country filters, MusicLab language assist, release/master detail and videos, full-screen UI, per-track Discogs-YouTube-first resolver with MusicLab fallbacks, possible full-compilation audio, MusicLab playback and playlist saving. Source contract passed; Android compile/tests and UAB delivery gate are running.
+OPERATION_STATUS=LAB28_VERIFIED_ARTIFACT_READY
+CURRENT_PHASE=LAB28 Discogs Compilation V1 technically complete. Exact SHA 09db48d3fe71b75e27487350fdab42884e5b1305 passed source contract, Android unit tests, UAB diagnostics, APK+ZIP build, integrity verification and artifact upload. Waiting only for Bruno device/live Discogs API test with the Personal Access Token stored locally in MusicLab.
 CURRENT_REF=uab-build/musiclab-compilation-discogs-28
-CURRENT_HEAD_SHA=6fd17d8c0c49c3ed31e6e9bfa828e79631744e05
+CURRENT_HEAD_SHA=09db48d3fe71b75e27487350fdab42884e5b1305
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37117931007
-CURRENT_JOB_STATUS=in_progress
-LAST_VERIFIED_PROGRESS_PERCENT=74
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=74
-RECOVERY_FLOOR_PERCENT=74
-WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB28 if gate fails
-PENDING_VERIFICATION=Android unit tests, UAB diagnostics, LAB28 APK+ZIP build and integrity, then Bruno device/API test with his locally entered Discogs token.
-NEXT_SAFE_STEP=Reconcile run 37117931007. On failure inspect compiler/logs and repair only LAB28 on the same branch; on success record artifact/checksums and deliver APK+ZIP.
+CURRENT_JOB_ID=37118163517
+CURRENT_JOB_STATUS=success
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=released
+PENDING_VERIFICATION=Bruno device/live API test of exact MusicLab-LAB28.apk with his locally entered Discogs token.
+NEXT_SAFE_STEP=Bruno installs exact LAB28 APK, opens Compilation, runs a real Discogs search and tests one compilation/track/full-audio/save path. Preserve LAB27, CANDIDATA LAB26 and MADRE unchanged until explicit acceptance.
 LAST_USER_INTENT_SUMMARY=Integrate a full-screen MusicLab Compilation section powered primarily by Discogs, with native filters, covers/tracklists/videos, Discogs YouTube links when present, MusicLab fallback resolution, possible one-file full compilation audio, per-song playback and saving the compilation locally.
 
 PRESERVED_LAB27
@@ -32,9 +32,9 @@ CURRENT_LAB28
 REF=uab-build/musiclab-compilation-discogs-28
 BASE_REF=uab-build/musiclab-token-api-center-27
 BASE_SHA=eb597fb995b7643c66412782d9b38b7bb06cb50c
-SHA=6fd17d8c0c49c3ed31e6e9bfa828e79631744e05
-GATE_RUN=37117931007
-GATE_STATUS=in_progress
+SHA=09db48d3fe71b75e27487350fdab42884e5b1305
+GATE_RUN=37118163517
+GATE_STATUS=success
 SOURCE_CONTRACT=success
 FEATURE_1=Discogs official API client uses the locally stored Personal Access Token and fixes search to type=release plus format=Compilation.
 FEATURE_2=Search UI includes free text plus Anno 1900-current/Tutto, Genere, Stile, Nazione and MusicLab-assisted Lingua.
@@ -45,6 +45,25 @@ FEATURE_6=Single track and play-all use the existing MusicLab player; Save compi
 APK_IDENTITY=MusicLab LAB28 / it.verlezza.musiclab.lab28
 CANDIDATA_LAB26_MUTATED=no
 MADRE_MUTATED=no
+FIRST_GATE_RUN=37117931007
+FIRST_GATE_STATUS=failure
+FIRST_GATE_ROOT_CAUSE=Nullable Int result in Discogs duration parser called takeIf directly; compiler rejected operator use on nullable receiver.
+FIRST_GATE_CORRECTION=Stored nullable duration in local seconds then applied seconds?.takeIf. Same LAB28 branch preserved; no restart or replacement branch.
+ARTIFACT_ID=11271954603
+ARTIFACT_NAME=MusicLab-LAB28
+ARTIFACT_DIGEST=sha256:4908ae2f407f6928b07a39553c1b46d3487b31b75bdd233799ad50366f7fe6c2
+APK_NAME=MusicLab-LAB28.apk
+APK_SHA256=7b5d99de7e4db2de1db7ff6b8c3a0b219d4aefa587193db1ad233759b5f0b22d
+ZIP_NAME=MusicLab-LAB28-APK.zip
+ZIP_SHA256=2584a02fffe5f65055fcf73cb9edcaafe0847a6f9484823979a101e7bff51381
+BUILD_SHA_FILE=09db48d3fe71b75e27487350fdab42884e5b1305
+FINAL_GATE_SOURCE_CONTRACT=success
+FINAL_GATE_ANDROID_TESTS=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_API_ACCEPTANCE=pending Bruno live test
 
 PRESERVED_CANDIDATA_LAB26
 REF=candidate/musiclab-lab26-ui-italian-years
