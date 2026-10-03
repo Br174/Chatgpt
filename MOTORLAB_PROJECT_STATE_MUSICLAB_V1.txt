@@ -1,25 +1,25 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=37
-STATE_STATUS=LAB26_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=38
+STATE_STATUS=CANDIDATE_LAB26_BUILD_IN_PROGRESS
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-ui-italian-years-lab26
-OPERATION_STATUS=LAB26_VERIFIED_ARTIFACT_READY
-CURRENT_PHASE=LAB26 recovered from the most advanced real checkpoint and completed without restart. Replacement exact-SHA final gate 37091764757 succeeded on 2003db167ed3f994a8323ce54cbd86db9395847f; APK+ZIP were built, integrity-checked and uploaded. Waiting only for Bruno device test before any Candidate lifecycle.
-CURRENT_REF=uab-build/musiclab-ui-italian-years-26
-CURRENT_HEAD_SHA=2003db167ed3f994a8323ce54cbd86db9395847f
+ACTIVE_OPERATION_ID=musiclab-candidate-lab26
+OPERATION_STATUS=CANDIDATE_BUILD_GATE_RUNNING
+CURRENT_PHASE=CANDIDATA LAB26 constructed from current MADRE LAB25 using verified LAB26 tree; isolated Candidate identity/provenance/gates applied. Exact-SHA delivery gate 37093328949 is running on 81095e2cb7c2f52f429da8f99c4fbb0a713a6726.
+CURRENT_REF=candidate/musiclab-lab26-ui-italian-years
+CURRENT_HEAD_SHA=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37091764757
-CURRENT_JOB_STATUS=success
-LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
-RECOVERY_FLOOR_PERCENT=100
-WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact MusicLab-LAB-26.apk: verify four artwork sizes, protected Home/Album sizing, Italian UI, required Cover years and title-tap search switch.
-NEXT_SAFE_STEP=Bruno installs and tests exact MusicLab-LAB-26.apk. Preserve LAB26 immutable during device test. Only after explicit acceptance consider Candidate construction from current MADRE LAB25 plus approved LAB26 changes.
+CURRENT_JOB_ID=37093328949
+CURRENT_JOB_STATUS=in_progress
+LAST_VERIFIED_PROGRESS_PERCENT=76
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=76
+RECOVERY_FLOOR_PERCENT=76
+WRITE_LOCK_SCOPE=candidate/musiclab-lab26-ui-italian-years
+PENDING_VERIFICATION=Exact-SHA Candidate gate completion, APK+ZIP integrity, then Bruno device test.
+NEXT_SAFE_STEP=Do not mutate Candidate while run 37093328949 is live; on success verify artifact/BUILD_SHA/checksums and deliver APK+ZIP. No MADRE promotion before Bruno device acceptance.
 LAST_USER_INTENT_SUMMARY=Resume LAB26 from the most advanced real checkpoint instead of restarting. LAB26 includes larger 4-level artwork with Home and album protection, complete Italian UI, required Cover years with source-first then AI fallback, and a switch to disable title-tap search.
 
 LAB26_RECOVERY_ROOT_CAUSE
@@ -482,3 +482,17 @@ CONTINUITY_RULES
 
 UPDATED_BY=MotorLab r16 MusicLab LAB25 exact Candidate -> MADRE promotion
 UPDATED_DATE=2026-10-03
+
+
+CURRENT_CANDIDATE_LAB26
+REF=candidate/musiclab-lab26-ui-italian-years
+BASE_MOTHER_REF=mother/musiclab-lab25-final
+BASE_MOTHER_SHA=01a4793f99628473854884753d783ba8ca6bd51b
+APPROVED_LAB_REF=uab-build/musiclab-ui-italian-years-26
+APPROVED_LAB_SHA=2003db167ed3f994a8323ce54cbd86db9395847f
+REPLAY_CONTENT_COMMIT=b9a7da38e6670b57caebb5f44a0713ed813c9647
+CANDIDATE_HEAD_SHA=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
+FINAL_GATE_RUN=37093328949
+FINAL_GATE_STATUS=in_progress
+CANDIDATA_DEVICE_ACCEPTANCE=pending Bruno test
+MADRE_PROMOTION=no
