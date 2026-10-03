@@ -367,6 +367,27 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device test of exact LAB27 APK. No Candidate or Madre promotion without explicit approval.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261003-lab28-compilation-discogs
+DATE=2026-10-03
+TITLE=LAB28 Compilation Discogs full-screen con filtri, tracklist, video YouTube, resolver e salvataggio
+SEMANTIC_TAGS=LAB28,Compilation,Discogs,API,filtri,anno,genere,stile,nazione,lingua,tracklist,cover,YouTube,YouTube Music,audio completo,playlist,salvataggio
+USER_INTENT=Integrare Discogs in MusicLab come motore primario per una sezione Compilation a schermo intero, sfruttando filtri e dati Discogs, link YouTube già presenti quando disponibili, ricerca MusicLab quando mancanti, riproduzione per singolo brano o audio completo e salvataggio dell'intera compilation.
+CHANGE_SCOPE=DISCOGS_COMPILATION_DISCOVERY_RESOLUTION_PLAYBACK_SAVE
+LIFECYCLE_ROLE=LAB28_DEVICE_API_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-token-api-center-27
+SOURCE_BASE_SHA=eb597fb995b7643c66412782d9b38b7bb06cb50c
+RESULT_REF=uab-build/musiclab-compilation-discogs-28
+RESULT_SHA=09db48d3fe71b75e27487350fdab42884e5b1305
+BEHAVIOR_SUMMARY=Adds a large Compilation action alongside Cover/Originali and a dedicated full-screen route. Discogs authenticated search is fixed to release + format=Compilation and supports free text plus year, genre, style and country; language is a non-destructive MusicLab heuristic. Release detail carries primary artwork, labels, genres/styles, full tracklist and associated videos, falling back to Master videos when release videos are empty. Each track prefers a compatible Discogs YouTube association then falls back through YouTube Music summary/song search, real YouTube web search and YTM video search. A conservative detector surfaces a one-file complete compilation audio when plausible. Single tracks and play-all use the existing MusicLab player. Save Compilation creates/updates a local MusicLab playlist from resolved songs.
+ROOT_CAUSE_CLOSURE=First gate run 37117931007 failed only because the Discogs duration parser applied takeIf to a nullable Int expression. The parser was corrected at the source on the same LAB28 branch using seconds?.takeIf; no branch recreation or feature restart. Replacement gate succeeded.
+COMPATIBILITY=LAB28 descends from exact LAB27 and preserves LAB27 Token e API, LAB26 Candidate behavior and current MADRE. No Candidate/Madre refs were mutated.
+VERIFICATION=Source contract 9/9 passed. Android unit tests passed. UAB diagnostics passed. Exact-SHA delivery run 37118163517 passed on 09db48d3fe71b75e27487350fdab42884e5b1305. APK+ZIP build and ZIP integrity passed; artifact upload passed. Artifact 11271954603 digest sha256:4908ae2f407f6928b07a39553c1b46d3487b31b75bdd233799ad50366f7fe6c2. APK sha256 7b5d99de7e4db2de1db7ff6b8c3a0b219d4aefa587193db1ad233759b5f0b22d. ZIP sha256 2584a02fffe5f65055fcf73cb9edcaafe0847a6f9484823979a101e7bff51381.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_API_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device/live Discogs API test with locally entered Personal Access Token; no Candidate/Madre promotion before explicit approval.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_API_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -378,7 +399,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.12
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.13
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -394,4 +415,4 @@ Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device ac
 Revision 1.10: registra LAB26 recuperato e tecnicamente verificato con locandine, protezioni Home/Album, UI italiana, anni Cover e switch title-tap; device acceptance pendente.
 
 Revision 1.11: registra CANDIDATA LAB26 costruita dalla MADRE con runtime LAB26 identico; test dispositivo Candidate pendente.
-Revision 1.12: registra LAB27 Token e API tecnicamente verificato per YouTube Music, Last.fm e Discogs; test dispositivo pendente.
+Revision 1.12: registra LAB27 Token e API tecnicamente verificato per YouTube Music, Last.fm e Discogs; test dispositivo pendente.\nRevision 1.13: registra LAB28 Compilation Discogs tecnicamente verificato con ricerca/filtri, tracklist/video, resolver, audio completo e salvataggio; test dispositivo/API pendente.
