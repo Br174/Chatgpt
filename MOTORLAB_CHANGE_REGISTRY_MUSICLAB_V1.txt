@@ -429,6 +429,28 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device acceptance of LAB30; no Candidate/Madre promotion before explicit approval.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261003-lab31-player-veloce-compilation-ui
+DATE=2026-10-03
+TITLE=LAB31 Player Veloce 1 in prova + Compilation sticky search, filtri richiudibili e UI scroll-safe
+SEMANTIC_TAGS=LAB31,Player Veloce 1,playback,priority burst,PlayNow,buffer,preload,next-track,Compilation,sticky search,filtri,scroll,mini-player,highlight,pagination
+USER_INTENT=Dare priorità assoluta per pochi secondi a ogni Play/PlayNow/Avanti/Indietro, fermando lavori secondari che possono competere con l'avvio audio; partire con il profilo rapido LAB25, poi ripristinare i lavori e preriscaldare una sola traccia successiva. In Compilation mantenere sempre visibile la ricerca, rendere i filtri richiudibili, anticipare il caricamento pagina, lasciare spazio reale sopra mini-player/navigation ed evidenziare la traccia selezionata.
+CHANGE_SCOPE=PLAYBACK_PRIORITY_BURST_FAST_RESOLUTION_AND_COMPILATION_UI
+LIFECYCLE_ROLE=LAB31_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-nav-cover-memory-playback-30
+SOURCE_BASE_SHA=358830342a9a1ec5ee441322c607fbf07ded278e
+RESULT_REF=uab-build/musiclab-player-veloce-compilation-ui-31
+RESULT_SHA=43ec3ae9d5b311dd152d6976b52f337636346a49
+BEHAVIOR_SUMMARY=Player Veloce 1 trial restores the device-approved LAB25 1.25s start/4s rebuffer profile and one-next-track 384KB prewarm at 12s stable/8s resume. Explicit PlayNow, Play, Next and Previous enter a bounded priority burst (minimum 2s, maximum 8s, early release after READY with >=8s buffered) that cancels smart preload, optional pre-cache, SponsorBlock network lookup and crossfade background work; helpers resume after release. Compilation track taps also cancel Compilation pagination/full-audio/next-track background jobs before resolving the selected track. Discogs direct YouTube remains first; otherwise native MusicLab/YTM song lookup races for about 3.05s before deeper fallbacks. After the selected track is playing and the burst releases, only the next track is resolved and inserted next. Compilation search remains fixed above an independently scrolling list, filters collapse to a compact search row, next Discogs page prefetch starts around 12 items before the end, result/detail lists reserve 176dp below content, and the tapped track gets a subtle theme-primary highlight.
+ROOT_CAUSE_CLOSURE=LAB30 raised startup/rebuffer thresholds to 3s/8s and delayed next-track prewarm to 25s/20s in an attempt to suppress micro-stalls, but Bruno's real-device test showed that this over-prioritized reserve over tap-to-audio latency while Compilation could still spend seconds in sequential resolver/network work. LAB31 restores the proven LAB25 fast-start profile and adds explicit cancellation/priority orchestration plus a fast resolver lane instead of merely lowering buffer numbers. First LAB31 gate compile failed due to one extra closing brace introduced during UI restructuring; fixed on the same branch and replacement gate passed.
+COMPATIBILITY=LAB31 descends from exact LAB30 and preserves LAB30 Cover/navigation, provider-layout stability and Compilation session memory plus LAB29 pagination/counters, LAB28 Discogs integration, LAB27 tokens, CANDIDATA LAB26 and current MADRE. Language-filter behavior is intentionally unchanged in this scope. Preserved refs were not mutated.
+VERIFICATION=LAB31 source contract passed. First gate run 37135387130 failed only on one Kotlin syntax brace after source contract success. Corrected on the same branch. Final exact-SHA gate run 37135662817 passed on 43ec3ae9d5b311dd152d6976b52f337636346a49: source contract, Android unit tests, UAB diagnostics, APK+ZIP build, ZIP integrity and artifact upload all success. Artifact 11278393789 digest sha256:76ff7d92ab5a80ea7b4113f676bd82bfd1a847337d6d59d907406b478d3ca98a. APK sha256 7111be675c6713a136f5dd7890d3929344aef76090ea7af801d47199a8033e87. ZIP sha256 e508c7e92ea67566451a092cec20365a9c9a24d7500c17c0f0e579d11e1ef462.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+RESTORE_POLICY=Do not change visible RESTORE_NO=1 yet. If Bruno explicitly confirms this Player Veloce 1 implementation works well on device, update the existing Player restore slot to the confirmed implementation rather than creating a duplicate slot.
+NEXT_LIFECYCLE_GATE=Bruno device acceptance of LAB31. No CANDIDATA/MADRE promotion and no visible restore-register replacement before explicit confirmation.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -440,7 +462,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.15
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.16
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -456,4 +478,4 @@ Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device ac
 Revision 1.10: registra LAB26 recuperato e tecnicamente verificato con locandine, protezioni Home/Album, UI italiana, anni Cover e switch title-tap; device acceptance pendente.
 
 Revision 1.11: registra CANDIDATA LAB26 costruita dalla MADRE con runtime LAB26 identico; test dispositivo Candidate pendente.
-Revision 1.12: registra LAB27 Token e API tecnicamente verificato per YouTube Music, Last.fm e Discogs; test dispositivo pendente.\nRevision 1.13: registra LAB28 Compilation Discogs tecnicamente verificato con ricerca/filtri, tracklist/video, resolver, audio completo e salvataggio; test dispositivo/API pendente.\nRevision 1.14: registra LAB29 con paginazione infinita Discogs, tutte le Release restituite e contatore caricate/totale; test dispositivo pendente.\nRevision 1.15: registra LAB30 con nuova barra Cover/Compilation, Cover manuale condivisa, memoria esatta Compilation, provider UI stabili e anti-stutter; test dispositivo pendente.
+Revision 1.12: registra LAB27 Token e API tecnicamente verificato per YouTube Music, Last.fm e Discogs; test dispositivo pendente.\nRevision 1.13: registra LAB28 Compilation Discogs tecnicamente verificato con ricerca/filtri, tracklist/video, resolver, audio completo e salvataggio; test dispositivo/API pendente.\nRevision 1.14: registra LAB29 con paginazione infinita Discogs, tutte le Release restituite e contatore caricate/totale; test dispositivo pendente.\nRevision 1.15: registra LAB30 con nuova barra Cover/Compilation, Cover manuale condivisa, memoria esatta Compilation, provider UI stabili e anti-stutter; test dispositivo pendente.\nRevision 1.16: registra LAB31 Player Veloce 1 in prova con priority burst, fast resolver e Compilation sticky/collapsible/scroll-safe; test dispositivo e conferma restore pendenti.
