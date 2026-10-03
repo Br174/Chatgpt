@@ -1,25 +1,25 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=33
+STATE_REVISION=34
 STATE_STATUS=LAB26_IN_PROGRESS_RECOVERED_FROM_ADVANCED_CHECKPOINT
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-ui-italian-years-lab26
 OPERATION_STATUS=LAB26_ACTIVE_RECOVERED
-CURRENT_PHASE=LAB26 recovered and protected from restart. Compile blockers yearSource/Home grid were fixed; title-tap toggle was also closed on MediaMetadataListItem and protected by contract. Continue only from exact head a979f91a or later descendants.
+CURRENT_PHASE=LAB26 recovered from advanced checkpoint, compile blockers fixed, title-switch closure added, Android contract run succeeded, and final exact-SHA delivery gate was triggered on 96cb5d0b. Continue only from this SHA or verified descendants.
 CURRENT_REF=uab-build/musiclab-ui-italian-years-26
-CURRENT_HEAD_SHA=a979f91a3cedcefde5ef72b2a0ddd014bf5894d8
+CURRENT_HEAD_SHA=96cb5d0b7b65551da649b1598fa60c2d10329e8a
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
 CURRENT_JOB_ID=37090871778
-CURRENT_JOB_STATUS=in_progress_after_compile_fixes
-LAST_VERIFIED_PROGRESS_PERCENT=74
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=74
-RECOVERY_FLOOR_PERCENT=74
+CURRENT_JOB_STATUS=android_contract_success_final_gate_triggered
+LAST_VERIFIED_PROGRESS_PERCENT=82
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=82
+RECOVERY_FLOOR_PERCENT=82
 WRITE_LOCK_SCOPE=Br174/MusicLab:uab-build/musiclab-ui-italian-years-26
 PENDING_VERIFICATION=Fix current LAB26 compile blockers, rerun Android contract, then exact-SHA UAB gate and APK+ZIP. Do not restart LAB26 from MADRE.
-NEXT_SAFE_STEP=Continue exclusively from uab-build/musiclab-ui-italian-years-26@a979f91a3cedcefde5ef72b2a0ddd014bf5894d8 or a verified descendant; run/fix Android contract, then exact-SHA UAB gate and APK+ZIP. Never create a replacement LAB26 branch.
+NEXT_SAFE_STEP=Monitor/fix exact-SHA LAB26 UAB gate on 96cb5d0b7b65551da649b1598fa60c2d10329e8a, then deliver APK+ZIP and checkpoint final artifact. Never create a replacement LAB26 branch.
 LAST_USER_INTENT_SUMMARY=Resume LAB26 from the most advanced real checkpoint instead of restarting. LAB26 includes larger 4-level artwork with Home and album protection, complete Italian UI, required Cover years with source-first then AI fallback, and a switch to disable title-tap search.
 
 
