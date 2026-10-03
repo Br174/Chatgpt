@@ -1,33 +1,72 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=36
-STATE_STATUS=LAB26_IN_PROGRESS_RECOVERED_FROM_ADVANCED_CHECKPOINT
+STATE_REVISION=37
+STATE_STATUS=LAB26_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-ui-italian-years-lab26
-OPERATION_STATUS=LAB26_ACTIVE_RECOVERED
-CURRENT_PHASE=LAB26 recovered from the most advanced real checkpoint. Previous final gate 37091416436 stalled on the Android contract step despite an already successful LAB26 Android contract; MotorLab performed a CI-only recovery on the SAME branch with identical application tree and triggered replacement gate 37091764757. Continue only from 2003db167ed3f994a8323ce54cbd86db9395847f or verified descendants; never recreate LAB26 on another branch.
+OPERATION_STATUS=LAB26_VERIFIED_ARTIFACT_READY
+CURRENT_PHASE=LAB26 recovered from the most advanced real checkpoint and completed without restart. Replacement exact-SHA final gate 37091764757 succeeded on 2003db167ed3f994a8323ce54cbd86db9395847f; APK+ZIP were built, integrity-checked and uploaded. Waiting only for Bruno device test before any Candidate lifecycle.
 CURRENT_REF=uab-build/musiclab-ui-italian-years-26
 CURRENT_HEAD_SHA=2003db167ed3f994a8323ce54cbd86db9395847f
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
 CURRENT_JOB_ID=37091764757
-CURRENT_JOB_STATUS=recovery_final_exact_sha_gate_in_progress
-LAST_VERIFIED_PROGRESS_PERCENT=84
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=84
-RECOVERY_FLOOR_PERCENT=84
-WRITE_LOCK_SCOPE=Br174/MusicLab:uab-build/musiclab-ui-italian-years-26
-PENDING_VERIFICATION=Replacement final exact-SHA LAB26 gate 37091764757 is live on 2003db167ed3f994a8323ce54cbd86db9395847f after the previous GitHub runner stalled. Application tree is unchanged from the recovered 84% checkpoint; finish gate, then verify/download APK+ZIP.
-NEXT_SAFE_STEP=Resume only from live replacement gate 37091764757 on exact SHA 2003db167ed3f994a8323ce54cbd86db9395847f. If it fails, repair only the failing step on the same LAB26 branch; if green, retrieve and verify APK+ZIP. Never create a replacement LAB26 branch.
+CURRENT_JOB_STATUS=success
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=released
+PENDING_VERIFICATION=Bruno device test of exact MusicLab-LAB-26.apk: verify four artwork sizes, protected Home/Album sizing, Italian UI, required Cover years and title-tap search switch.
+NEXT_SAFE_STEP=Bruno installs and tests exact MusicLab-LAB-26.apk. Preserve LAB26 immutable during device test. Only after explicit acceptance consider Candidate construction from current MADRE LAB25 plus approved LAB26 changes.
 LAST_USER_INTENT_SUMMARY=Resume LAB26 from the most advanced real checkpoint instead of restarting. LAB26 includes larger 4-level artwork with Home and album protection, complete Italian UI, required Cover years with source-first then AI fallback, and a switch to disable title-tap search.
 
 LAB26_RECOVERY_ROOT_CAUSE
-STATUS=ACTIVE_RECOVERY_LOCKED_TO_SINGLE_BRANCH
+STATUS=CLOSED_RECOVERY_SUCCESS_SINGLE_BRANCH_PRESERVED
 SYMPTOM=LAB26 had been started multiple times on different similarly named branches and progress appeared to reset around 60%.
 CAUSE=Earlier interrupted sessions created/reused multiple LAB26 branch-name variants before the durable state ledger was reconciled. The current authoritative branch later reached an 84% verified checkpoint, but its final GitHub Actions runner stalled on an Android contract step even though the standalone LAB26 Android contract had already succeeded.
 CORRECTION=Authoritative LAB26 is permanently pinned to uab-build/musiclab-ui-italian-years-26. Recovery used a CI-only descendant commit with identical application tree to trigger a replacement final gate; no feature work was restarted and no new LAB26 branch was created.
-PREVENTION=On every resume read MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt plus live branch/run evidence first; preserve RECOVERY_FLOOR_PERCENT=84; never recreate LAB26; retry only the failing CI step or trigger a same-branch CI-only descendant when a runner is provably stalled.
+PREVENTION=On every resume read MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt plus live branch/run evidence first; LAB26 recovery floor is now 100 and the authoritative branch remains uab-build/musiclab-ui-italian-years-26. Never recreate LAB26 or fall back to MADRE25 while this verified LAB exists.
+
+
+CURRENT_LAB26
+REF=uab-build/musiclab-ui-italian-years-26
+BASE_MOTHER_REF=mother/musiclab-lab25-final
+BASE_MOTHER_SHA=01a4793f99628473854884753d783ba8ca6bd51b
+SHA=2003db167ed3f994a8323ce54cbd86db9395847f
+ANDROID_CONTRACT_RUN=37091073179
+ANDROID_CONTRACT_STATUS=success
+FINAL_GATE_RUN=37091764757
+FINAL_GATE_STATUS=success
+ARTIFACT_ID=11262830714
+ARTIFACT_NAME=MusicLab-LAB-26
+ARTIFACT_DIGEST=sha256:256c4e164ecddd65d5a25f2a71a996dff3f4f3e4ee23ba98fee85f4259835caf
+APK_NAME=MusicLab-LAB-26.apk
+APK_SHA256=5e53b350690a3f7ce6e630a97747bb37d03a116946764defbd24f9d3f38e39d3
+ZIP_NAME=MusicLab-LAB-26-APK.zip
+ZIP_SHA256=7aec54037c25fd7df4ffc9835ab12d9515ed2ba400906b499897a36fafe8c6b9
+BUILD_SHA_FILE=2003db167ed3f994a8323ce54cbd86db9395847f
+FINAL_GATE_BRAIN=success
+FINAL_GATE_D1=success
+FINAL_GATE_BACKEND=success
+FINAL_GATE_ANDROID=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+DEVICE_ACCEPTANCE=pending Bruno test
+CANDIDATA_CREATED=no
+MADRE_PROMOTION=no
+
+LAB26_CHANGE_SUMMARY
+ARTWORK=Four levels restored and enlarged: SMALL 124dp, MEDIUM 152dp, LARGE 184dp, VERY_LARGE 224dp; persisted and synchronized at runtime.
+PROTECTED_SURFACES=Home artwork remains fixed; album grid artwork remains fixed and does not follow global artwork selector.
+ITALIAN_UI=Italian locale enforced for app UI, missing Italian resources completed, dynamic known Home/provider headings normalized to Italian while media titles/names remain original.
+COVER_YEAR=Missing years enrich after first paint using provider metadata first, existing Spotify/Brain metadata, cloud Brain AI, then batched direct Gemini final fallback; year provenance carried by candidate.
+TITLE_TAP_SWITCH=Settings switch defaults ON and disables manual song-title search taps across common rows/player/Cover while mini-player stays non-clickable; automatic Cover title discovery remains independent.
+PLAYER_BASELINE=LAB25 playback behavior preserved; LAB26 does not intentionally redesign the approved Play Now/single-next-preload baseline.
+
 
 
 CURRENT_CANDIDATA_LAB25
