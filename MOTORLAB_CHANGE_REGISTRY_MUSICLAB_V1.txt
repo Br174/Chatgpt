@@ -299,6 +299,28 @@ VERIFICATION=GitHub candidate and mother refs both resolve to exact SHA 01a4793f
 STATUS=CURRENT_DEVICE_VERIFIED_MOTHER
 SOURCE_CONFIDENCE=VERIFIED_GIT_AND_DEVICE
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261003-lab26-ui-italian-years
+DATE=2026-10-03
+TITLE=LAB26 locandine 4 livelli, Home/Album protetti, UI italiana, anni Cover obbligatori e switch ricerca titolo
+SEMANTIC_TAGS=LAB26,locandine,artwork,dimensioni,Home,album,italiano,traduzioni,Cover,anno,year,Spotify,YouTube,Brain,Gemini,ricerca titolo,switch,title-tap
+USER_INTENT=Ripristinare e migliorare il ridimensionamento locandine con Piccola/Media/Grande/Grandissima più grandi di prima; lasciare Home e copertine album indipendenti dalla scala; rendere tutta l'interfaccia italiana; garantire un anno per ogni risultato Cover usando prima fonti reali e poi AI; aggiungere un interruttore per disattivare la ricerca manuale toccando il titolo, lasciando invariata la ricerca automatica Cover.
+CHANGE_SCOPE=UI_ARTWORK_LOCALIZATION_COVER_YEAR_TITLE_TAP_CONTROL
+LIFECYCLE_ROLE=LAB26_DEVICE_PENDING
+SOURCE_BASE_REF=mother/musiclab-lab25-final
+SOURCE_BASE_SHA=01a4793f99628473854884753d783ba8ca6bd51b
+RESULT_REF=uab-build/musiclab-ui-italian-years-26
+RESULT_SHA=2003db167ed3f994a8323ce54cbd86db9395847f
+BEHAVIOR_SUMMARY=Artwork selector uses four persistent runtime-synchronized levels SMALL 124dp, MEDIUM 152dp, LARGE 184dp, VERY_LARGE 224dp. Home uses fixed Home artwork sizes and album grids use fixed album artwork size. Italian UI resources were completed and known dynamic Home/provider section headings are normalized in Italian while media titles and proper names remain untouched. Cover missing years are enriched after first paint using YouTube/YTM metadata first, existing Spotify/Brain data, MusicLab cloud Brain AI, then batched direct Gemini final fallback with year provenance. TitleTapSearchEnabledKey defaults ON and gates manual title-search taps across common rows, grids, full player and Cover; mini-player remains non-clickable and automatic Cover title discovery is independent.
+RECOVERY_SUMMARY=Two interrupted attempts had created multiple similarly named LAB26 branches while the durable MotorLab state still pointed to MADRE25, making progress appear to reset around 60%. Recovery reconciled live Git evidence, selected uab-build/musiclab-ui-italian-years-26 as the authoritative most advanced branch, fixed only its compile blockers, pinned checkpoints at 68/72/74/84%, and completed on the same branch. No replacement LAB26 branch was created during recovery.
+ROOT_CAUSE=Durable project state had not been checkpointed to active LAB26 before interruption; later resumes therefore saw MADRE25 as authoritative and created/reused alternate LAB26 branch names. A later final runner also stalled and was recovered with a workflow-only descendant on the same branch.
+PREVENTION=MotorLab project state now records LAB26 exact ref/SHA and a 100% recovery floor. Future resumes must reconcile that ledger with live Git before any branch creation; never recreate LAB26 or reset to MADRE25 while this verified LAB exists.
+VERIFICATION=Standalone LAB26 Android contract run 37091073179 success after compile closure; exact-SHA replacement UAB Delivery Gate run 37091764757 success on 2003db167ed3f994a8323ce54cbd86db9395847f. Complete Brain/device regression suite success; D1 migrations success; deployed backend dependency success; Android contract tests success; UAB diagnostics success; APK+ZIP build success; BUILD_SHA exact; deliverable integrity success; upload success. Artifact 11262830714 digest sha256:256c4e164ecddd65d5a25f2a71a996dff3f4f3e4ee23ba98fee85f4259835caf. APK sha256 5e53b350690a3f7ce6e630a97747bb37d03a116946764defbd24f9d3f38e39d3. ZIP sha256 7aec54037c25fd7df4ffc9835ab12d9515ed2ba400906b499897a36fafe8c6b9.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+RESTORE_SCOPE_HINTS=Preserve current MADRE LAB25. LAB26 is a verified isolated LAB and must be device-tested before Candidate construction.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -310,7 +332,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.9
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.10
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -322,3 +344,5 @@ Revision 1.7: registra LAB25 Play Now, preload singolo, Cover senza Copertura e 
 Revision 1.8: registra CANDIDATA LAB25 costruita dalla MADRE con runtime LAB25 identico; test dispositivo Candidate pendente.
 Revision 1.9: promuove CANDIDATA LAB25 testata a nuova MADRE exact-SHA mother/musiclab-lab25-final.
 Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device acceptance ancora pendente.
+
+Revision 1.10: registra LAB26 recuperato e tecnicamente verificato con locandine, protezioni Home/Album, UI italiana, anni Cover e switch title-tap; device acceptance pendente.
