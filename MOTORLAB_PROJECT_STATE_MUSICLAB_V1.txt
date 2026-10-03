@@ -1,26 +1,26 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=38
-STATE_STATUS=CANDIDATE_LAB26_BUILD_IN_PROGRESS
+STATE_REVISION=39
+STATE_STATUS=CANDIDATE_LAB26_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-candidate-lab26
-OPERATION_STATUS=CANDIDATE_BUILD_GATE_RUNNING
-CURRENT_PHASE=CANDIDATA LAB26 constructed from current MADRE LAB25 using verified LAB26 tree; isolated Candidate identity/provenance/gates applied. Exact-SHA delivery gate 37093328949 is running on 81095e2cb7c2f52f429da8f99c4fbb0a713a6726.
+OPERATION_STATUS=CANDIDATE_VERIFIED_ARTIFACT_READY
+CURRENT_PHASE=CANDIDATA LAB26 completed from current MADRE LAB25 plus verified LAB26 tree. Exact-SHA gate 37093328949 succeeded on 81095e2cb7c2f52f429da8f99c4fbb0a713a6726; APK+ZIP integrity verified. Waiting only for Bruno device test before any MADRE promotion.
 CURRENT_REF=candidate/musiclab-lab26-ui-italian-years
 CURRENT_HEAD_SHA=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
 CURRENT_JOB_ID=37093328949
-CURRENT_JOB_STATUS=in_progress
-LAST_VERIFIED_PROGRESS_PERCENT=76
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=76
-RECOVERY_FLOOR_PERCENT=76
-WRITE_LOCK_SCOPE=candidate/musiclab-lab26-ui-italian-years
-PENDING_VERIFICATION=Exact-SHA Candidate gate completion, APK+ZIP integrity, then Bruno device test.
-NEXT_SAFE_STEP=Do not mutate Candidate while run 37093328949 is live; on success verify artifact/BUILD_SHA/checksums and deliver APK+ZIP. No MADRE promotion before Bruno device acceptance.
-LAST_USER_INTENT_SUMMARY=Resume LAB26 from the most advanced real checkpoint instead of restarting. LAB26 includes larger 4-level artwork with Home and album protection, complete Italian UI, required Cover years with source-first then AI fallback, and a switch to disable title-tap search.
+CURRENT_JOB_STATUS=success
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=released
+PENDING_VERIFICATION=Bruno device test of exact MusicLab-CANDIDATA-LAB26.apk before any MADRE promotion.
+NEXT_SAFE_STEP=Bruno installs and tests exact Candidate APK. Preserve Candidate immutable during device test. Promote to MADRE only after explicit Bruno acceptance.
+LAST_USER_INTENT_SUMMARY=Create a true CANDIDATA from verified LAB26 without touching current MADRE; build and verify isolated Candidate APK+ZIP.
 
 LAB26_RECOVERY_ROOT_CAUSE
 STATUS=CLOSED_RECOVERY_SUCCESS_SINGLE_BRANCH_PRESERVED
@@ -480,7 +480,7 @@ CONTINUITY_RULES
 - MotorLab-only commits do not create a new application LAB/MADRE/CANDIDATA.
 - New chats reconcile live GitHub evidence against this ledger; no transfer prompt required.
 
-UPDATED_BY=MotorLab r16 MusicLab LAB25 exact Candidate -> MADRE promotion
+UPDATED_BY=MotorLab r16 MusicLab CANDIDATA LAB26 exact-SHA technical verification
 UPDATED_DATE=2026-10-03
 
 
@@ -492,7 +492,27 @@ APPROVED_LAB_REF=uab-build/musiclab-ui-italian-years-26
 APPROVED_LAB_SHA=2003db167ed3f994a8323ce54cbd86db9395847f
 REPLAY_CONTENT_COMMIT=b9a7da38e6670b57caebb5f44a0713ed813c9647
 CANDIDATE_HEAD_SHA=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
+CANDIDATE_TREE=3e308bd98b859be8fdd28bf975fd39cef8fe8d3e
+APP_RUNTIME_DIFF_FROM_LAB26=NONE
+ONLY_TREE_DIFF_FROM_LAB26=.github/workflows/lab20-android-brain-tests.yml,.github/workflows/lab20-uab-build-gate.yml,.uab/candidates/CANDIDATE_LAB26_2026-10-03.txt,uab-project.env
 FINAL_GATE_RUN=37093328949
-FINAL_GATE_STATUS=in_progress
-CANDIDATA_DEVICE_ACCEPTANCE=pending Bruno test
+FINAL_GATE_STATUS=success
+ARTIFACT_ID=11262703124
+ARTIFACT_NAME=MusicLab-CANDIDATA-LAB26
+ARTIFACT_DIGEST=sha256:164b0c46dcdd8715d6d46b5696c852b9aaf66643eceacccc4090b2e43ffa135c
+APK_NAME=MusicLab-CANDIDATA-LAB26.apk
+APK_SHA256=b432a846f2119dfb3e0c3c8df2a9ed3ab1eb328128e1be5881185e691f9240a7
+ZIP_NAME=MusicLab-CANDIDATA-LAB26-APK.zip
+ZIP_SHA256=dd7139c991fe63d695cce58131de0eb7838172795e266f4d82faa59cf03582ee
+BUILD_SHA_FILE=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
+FINAL_GATE_BRAIN=success
+FINAL_GATE_D1=success
+FINAL_GATE_BACKEND=success
+FINAL_GATE_ANDROID=success
+FINAL_GATE_UAB_DIAGNOSTICS=success
+FINAL_GATE_APK_ZIP_BUILD=success
+FINAL_GATE_DELIVERABLE_VERIFY=success
+FINAL_GATE_UPLOAD=success
+CANDIDATE_DEVICE_ACCEPTANCE=pending Bruno test
 MADRE_PROMOTION=no
+
