@@ -1,26 +1,26 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=30
-STATE_STATUS=MOTHER_LAB25_PROMOTED_DEVICE_VERIFIED
+STATE_REVISION=31
+STATE_STATUS=LAB26_IN_PROGRESS_RECOVERED_FROM_ADVANCED_CHECKPOINT
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-mother-lab25-promotion
-OPERATION_STATUS=MOTHER_PROMOTION_COMPLETE
-CURRENT_PHASE=Bruno tested the exact LAB25 Candidate on device and explicitly approved promotion. The immutable Mother ref mother/musiclab-lab25-final now points to the exact approved Candidate SHA with zero runtime/source difference. Previous Mother LAB19 remains preserved.
-CURRENT_REF=mother/musiclab-lab25-final
-CURRENT_HEAD_SHA=01a4793f99628473854884753d783ba8ca6bd51b
+ACTIVE_OPERATION_ID=musiclab-ui-italian-years-lab26
+OPERATION_STATUS=LAB26_ACTIVE_RECOVERED
+CURRENT_PHASE=LAB26 recovered from the most advanced live branch after two false restarts. Artwork scaling/Home+Album protection, Italian UI work, required Cover year enrichment and title-tap switch are already materially implemented. Fast source contracts pass. Current blocker is Kotlin compile cleanup on yearSource propagation and protected Home constants before rerunning Android/gate.
+CURRENT_REF=uab-build/musiclab-ui-italian-years-26
+CURRENT_HEAD_SHA=70a8c90dc5a55404196784a76b67d9018945b954
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37072545456
-CURRENT_JOB_STATUS=success
-LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
-RECOVERY_FLOOR_PERCENT=100
-WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=none for LAB25 promotion; exact Candidate was device-tested and promoted unchanged
-NEXT_SAFE_STEP=All future MusicLab LAB work starts from mother/musiclab-lab25-final unless Bruno explicitly requests another lifecycle base. Preserve previous Mother and Candidate refs immutably.
-LAST_USER_INTENT_SUMMARY=Bruno tested the exact LAB25 Candidate and explicitly approved it as the new MADRE.
+CURRENT_JOB_ID=37089880820
+CURRENT_JOB_STATUS=failure_compile_blocker_identified
+LAST_VERIFIED_PROGRESS_PERCENT=68
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=68
+RECOVERY_FLOOR_PERCENT=68
+WRITE_LOCK_SCOPE=Br174/MusicLab:uab-build/musiclab-ui-italian-years-26
+PENDING_VERIFICATION=Fix current LAB26 compile blockers, rerun Android contract, then exact-SHA UAB gate and APK+ZIP. Do not restart LAB26 from MADRE.
+NEXT_SAFE_STEP=Continue exclusively from uab-build/musiclab-ui-italian-years-26@70a8c90dc5a55404196784a76b67d9018945b954; fix compile errors in yearSource/Home grid constants; preserve all existing LAB26 work; then build/verify.
+LAST_USER_INTENT_SUMMARY=Resume LAB26 from the most advanced real checkpoint instead of restarting. LAB26 includes larger 4-level artwork with Home and album protection, complete Italian UI, required Cover years with source-first then AI fallback, and a switch to disable title-tap search.
 
 
 
