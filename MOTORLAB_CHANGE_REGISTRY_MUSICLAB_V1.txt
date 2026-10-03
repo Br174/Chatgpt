@@ -321,6 +321,32 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 RESTORE_SCOPE_HINTS=Preserve current MADRE LAB25. LAB26 is a verified isolated LAB and must be device-tested before Candidate construction.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261003-candidate-lab26
+DATE=2026-10-03
+TITLE=CANDIDATA LAB26 costruita dalla MADRE con runtime LAB26 verificato
+SEMANTIC_TAGS=candidata,candidate,LAB26,MADRE,locandine,italiano,Cover,anno,title-tap,APK,ZIP
+USER_INTENT=Creare una vera CANDIDATA usando LAB26, senza rinominare il LAB26 e senza modificare la MADRE corrente.
+CHANGE_SCOPE=LIFECYCLE_CANDIDATE_CONSTRUCTION_AND_DELIVERY
+LIFECYCLE_ROLE=CANDIDATE_DEVICE_PENDING
+SOURCE_MOTHER_REF=mother/musiclab-lab25-final
+SOURCE_MOTHER_SHA=01a4793f99628473854884753d783ba8ca6bd51b
+APPROVED_LAB_REF=uab-build/musiclab-ui-italian-years-26
+APPROVED_LAB_SHA=2003db167ed3f994a8323ce54cbd86db9395847f
+REPLAY_CONTENT_COMMIT=b9a7da38e6670b57caebb5f44a0713ed813c9647
+RESULT_REF=candidate/musiclab-lab26-ui-italian-years
+RESULT_SHA=81095e2cb7c2f52f429da8f99c4fbb0a713a6726
+RESULT_TREE=3e308bd98b859be8fdd28bf975fd39cef8fe8d3e
+CONSTRUCTION_METHOD=Created a new commit using the exact verified LAB26 tree with current MADRE LAB25 as direct parent, then applied Candidate-only build identity, provenance and CI targeting commits. LAB26 was not renamed or repointed.
+APP_RUNTIME_DIFF_FROM_LAB26=NONE
+ONLY_TREE_DIFF_FROM_LAB26=.github/workflows/lab20-android-brain-tests.yml,.github/workflows/lab20-uab-build-gate.yml,.uab/candidates/CANDIDATE_LAB26_2026-10-03.txt,uab-project.env
+BEHAVIOR_SUMMARY=Runtime/application behavior is the verified LAB26 behavior: four artwork sizes with protected Home/Album sizing, complete Italian UI, Cover year enrichment using source-first then AI fallback, title-tap search switch with mini-player excluded, and preserved LAB25 playback baseline.
+VERIFICATION=Exact-SHA Candidate UAB Delivery Gate run 37093328949 success on 81095e2cb7c2f52f429da8f99c4fbb0a713a6726; complete Brain/device regression suite success; D1 migrations success; deployed backend dependency success; Android tests success; UAB diagnostics success; Candidate APK+ZIP build success; BUILD_SHA exact; deliverable integrity success; artifact upload success. Artifact 11262703124 digest sha256:164b0c46dcdd8715d6d46b5696c852b9aaf66643eceacccc4090b2e43ffa135c. APK sha256 b432a846f2119dfb3e0c3c8df2a9ed3ab1eb328128e1be5881185e691f9240a7. ZIP sha256 dd7139c991fe63d695cce58131de0eb7838172795e266f4d82faa59cf03582ee.
+STATUS=CANDIDATE_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test of exact Candidate APK; no MADRE promotion before explicit approval.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -332,7 +358,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.10
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.11
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -346,3 +372,5 @@ Revision 1.9: promuove CANDIDATA LAB25 testata a nuova MADRE exact-SHA mother/mu
 Revision 1.3: registra LAB21 Deep Locator tecnicamente verificato, con device acceptance ancora pendente.
 
 Revision 1.10: registra LAB26 recuperato e tecnicamente verificato con locandine, protezioni Home/Album, UI italiana, anni Cover e switch title-tap; device acceptance pendente.
+
+Revision 1.11: registra CANDIDATA LAB26 costruita dalla MADRE con runtime LAB26 identico; test dispositivo Candidate pendente.
