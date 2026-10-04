@@ -1,22 +1,22 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=53
+STATE_REVISION=54
 STATE_STATUS=LAB34_DIRECT_DISCOGS_COVER_ORIGINALI_GATE_IN_PROGRESS_LAB33_PRESERVED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab34-direct-discogs-cover-originali
 OPERATION_STATUS=IMPLEMENTED_GATE_RUNNING
-CURRENT_PHASE=LAB34 created from exact verified LAB33. Cover and Originali runtime entry points now use one shared direct Discogs browser with no AI confirmation/rejection workflow. Both pages share native Discogs filters, 20-release paging, prefetch near list end, automatic skip of empty/deduplicated pages, session/scroll restoration and 176dp bottom safe area above mini-player/navigation. Originali locks one singer in the Discogs artist query and filters every returned track to that singer; Cover excludes the starting/original singer while optionally allowing a native Discogs artist filter. Duplicate UI keys are structurally prevented with count-based index+releaseId+fingerprint keys, replacing the old ALL-* runtime list path. Identical studio recordings are deduplicated across equivalent releases; live/remix/acoustic retain release context. First source-contract run failed only on an overly order-specific regex; contract corrected without production-code change. Second gate is running.
+CURRENT_PHASE=LAB34 direct Discogs runtime implemented. Second gate run 37175409186 has passed checkout, exact-SHA check, Node setup and LAB34 source contract; Android unit tests are currently in progress. Cover and Originali both use the same shared direct Discogs page with native filters, pagination/prefetch, 176dp bottom safe area and duplicate-safe index+releaseId+fingerprint keys. Originali locks one singer; Cover excludes the starting/original singer. No production error is currently reported.
 CURRENT_REF=uab-build/musiclab-direct-discogs-cover-originali-34
 CURRENT_HEAD_SHA=066fa81aee857cb8f865a236782bb8c4ed1e8171
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
 CURRENT_JOB_ID=37175409186
 CURRENT_JOB_STATUS=in_progress
-LAST_VERIFIED_PROGRESS_PERCENT=70
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=70
-RECOVERY_FLOOR_PERCENT=70
+LAST_VERIFIED_PROGRESS_PERCENT=76
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=76
+RECOVERY_FLOOR_PERCENT=76
 WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB34 if gate fails
 PENDING_VERIFICATION=LAB34 source contract second run, Android unit tests including direct Discogs dedup tests, UAB diagnostics, APK+ZIP build/integrity, then Bruno device test of Cover/Originali direct Discogs paging, mini-player clearance and crash elimination.
 NEXT_SAFE_STEP=Reconcile run 37175409186. If failure, repair only LAB34 on the same branch. If success, record artifact/checksums and deliver verified APK+ZIP.
