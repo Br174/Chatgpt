@@ -610,3 +610,23 @@ SUPERSEDES=musiclab LAB36 behavior for Cover/Originali result admission, viewpor
 RESTORE_SCOPE_HINTS=Restore only the LAB37 Cover/Originali verification/video/context changes onto the then-current proper LAB baseline. Do not overwrite Player core, MADRE or CANDIDATA; player interaction is through existing ListQueue/PlayerConnection API only.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
 
+CHANGE RECORD
+CHANGE_ID=musiclab-20261004-lab39-video-artwork-lastfm
+DATE=2026-10-04
+TITLE=LAB39 video corretti, locandine persistenti e Last.fm resistente alle chiavi mancanti in build
+SEMANTIC_TAGS=cover,originali,video,YouTube,YouTube Music,interprete,Fiorello,Raf,locandine,artwork,Last.fm,LRCLIB,cloud,D1,playback,LAB39
+USER_INTENT=Correggere i problemi osservati da Bruno sulla LAB38B: Last.fm dichiarato senza chiave nonostante configurazione utente, video non trovati, video con interprete sbagliato, locandine mancanti e diagnostica LRCLIB ambigua.
+CHANGE_SCOPE=COMPOSITE_COVER_RUNTIME_CORRECTION
+LIFECYCLE_ROLE=LAB39_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-cloud-archive-coverinfo-38b
+SOURCE_BASE_SHA=4066b568c12f44b05b10cbf24a483d8724376f81
+RESULT_REF=uab-build/musiclab-video-artwork-lastfm-39
+RESULT_SHA=d7c7ce4f1e52ed976724e7721058f32fb76fd366
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/discogs/CompilationTrackResolver.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsVersionSource.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverDiscoverySources.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CloudMusicDiscovery.kt,app/src/main/kotlin/com/metrolist/music/ui/component/GeminiAiCoverDiscovery.kt,app/src/test/kotlin/com/metrolist/music/discogs/CompilationTrackResolverTest.kt,app/src/test/kotlin/com/metrolist/music/ui/component/DiscogsVersionSourceTest.kt,cloudflare/music-intelligence/src/worker-v20.js,cloudflare/music-intelligence/migrations/0004_lab39_cover_artwork.sql,cloudflare/music-intelligence/wrangler.lab39.jsonc,cloudflare/music-intelligence/test/lab39-video-artwork-lastfm-contract.test.mjs,uab-project.env,.github/workflows/lab39-final-runtime-gate.yml
+BEHAVIOR_SUMMARY=Il resolver video penalizza in modo forte un interprete esplicitamente diverso anche nel fallback rilassato, ma conserva il recupero di upload di canale quando il vero interprete compare nel titolo; dopo le corsie normali usa una ricerca profonda limitata. La locandina usa prima i provider e, se manca, la thumbnail del video YouTube verificato. D1/cloud memorizzano cover e binding playback per riuso. Last.fm usa l'API ufficiale quando la key è realmente presente nel BuildConfig, altrimenti passa a una ricerca pubblica no-key senza spegnere la corsia. LRCLIB ritenta una volta e distingue no-match da rete non disponibile.
+ROOT_CAUSE=Tre cause indipendenti: relaxedArtist consentiva un match di titolo con artista esplicitamente sbagliato; coverUrl/playback binding non erano persistiti in modo completo nella memoria cloud; le credenziali Last.fm configurate dall'utente non risultavano visibili al runner GitHub e quindi BuildConfig restava vuoto. LRCLIB confondeva inoltre zero risultati e failure di rete.
+VERIFICATION=LAB39 Final Runtime Gate run 37226024454 success su exact SHA d7c7ce4f1e52ed976724e7721058f32fb76fd366; reusable core/LAB39 contracts success; Android unit tests success; UAB diagnostics success; APK+ZIP build/integrity/upload success; D1 migration success; Cloudflare dry-run/deploy success; published runtime/archive/playback-binding verification success. Artifact 11312167650 digest sha256:4d407b5e802bd3e38e6b0ce057f0a7cf50a3d6ade802f2b32f36710dedac78ae; APK sha256 b5229b0a0ebb78c5fc1b1d41168054e6b5ec9e035b05a389732b829320a0facb; ZIP sha256 e29a4c9e73f8a44f5c8db8715cb4a54d1acc053584a6eee70e2cbc26ab10c598; device acceptance pending.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+RESTORE_SCOPE_HINTS=Restore only the LAB39 correction family onto a compatible later baseline: performer-consistent video resolver, artwork/playback cloud persistence, Last.fm public fallback and LRCLIB diagnostics. Preserve later unrelated UI/player/search changes and do not treat this LAB as CANDIDATA/MADRE until Bruno confirms device behavior.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
