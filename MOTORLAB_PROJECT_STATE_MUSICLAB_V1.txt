@@ -1,26 +1,54 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=50
-STATE_STATUS=LAB32_PLAYER_VELOCE_GRID_API_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=51
+STATE_STATUS=LAB33_DISCOGS_FIRST_PLAYER_GATE_IN_PROGRESS_LAB32_PRESERVED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-lab32-player-veloce-grid-api
-OPERATION_STATUS=LAB32_VERIFIED_ARTIFACT_READY
-CURRENT_PHASE=LAB32 Player Veloce 2, duplicate-key crash fix and unified Last.fm/Discogs settings technically complete. Final exact SHA bd284100d3068a8ef6bcac2973743c09a3489cf5 passed source contract, Android unit tests, UAB diagnostics, APK+ZIP build, ZIP integrity verification and artifact upload in run 37139588229. Player carousel duplicate media IDs now have unique index+mediaId keys; mixed Library keys are type-namespaced; the duplicate API settings entry was merged without changing stored credentials; playback-priority burst now reaches the stream-resolution path and skips optional Qobuz discovery during explicit startup. Waiting only for Bruno device acceptance.
-CURRENT_REF=uab-build/musiclab-player-veloce-grid-api-32
-CURRENT_HEAD_SHA=bd284100d3068a8ef6bcac2973743c09a3489cf5
+ACTIVE_OPERATION_ID=musiclab-lab33-discogs-first-player
+OPERATION_STATUS=IMPLEMENTED_SOURCE_CONTRACT_VERIFIED_GATE_RUNNING
+CURRENT_PHASE=LAB33 created from exact verified LAB32. Player Veloce 3 lowers only startup reserve from 1.25s to 900ms while keeping 4s rebuffer and all LAB32 stream-priority/Qobuz-skip/cache behavior. Shared Discogs Version Source now powers Cover and Originali first: advanced release search fields, release/master metadata, exact released date parsing, live/remix/acoustic/studio classification and semantic version fingerprinting. Equivalent reissues/duplicate localizations collapse while distinct same-title versions remain separate. Cover and Originali display and sort by exact Discogs publication date when available, with existing AI/MusicBrainz/Spotify/YouTube sources retained as verification/fallback. Source contract passed; Android tests/UAB delivery gate are running.
+CURRENT_REF=uab-build/musiclab-discogs-first-player-33
+CURRENT_HEAD_SHA=021fbe8e409f01bd202f72b26d9141f7c6db8009
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37139588229
-CURRENT_JOB_STATUS=success
-LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
-RECOVERY_FLOOR_PERCENT=100
-WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact MusicLab-LAB32.apk: playback startup latency/continuity, Next/Previous responsiveness, duplicate-key crash elimination, and single Last.fm + Discogs settings entry.
-NEXT_SAFE_STEP=Bruno installs exact LAB32 APK and performs device acceptance. If Player Veloce 2 is explicitly confirmed good, update the visible Player restore slot; otherwise leave the current approved LAB25 restore unchanged.
-LAST_USER_INTENT_SUMMARY=Fix the real duplicate settings entry for Last.fm/Discogs, eliminate the LazyGrid duplicate-key crash shown on device, and make playback priority reach the actual stream resolver so taps start music faster and more reliably.
+CURRENT_JOB_ID=37170772013
+CURRENT_JOB_STATUS=in_progress
+LAST_VERIFIED_PROGRESS_PERCENT=72
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=72
+RECOVERY_FLOOR_PERCENT=72
+WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB33 if gate fails
+PENDING_VERIFICATION=Android unit tests including Discogs semantic dedup/date tests, UAB diagnostics, LAB33 APK+ZIP build/integrity, then Bruno device test of tap-to-audio latency and Discogs-first Cover/Originali quality/date/dedup behavior.
+NEXT_SAFE_STEP=Reconcile run 37170772013. On failure inspect exact compiler/test logs and repair only LAB33 on the same branch; on success record artifact/checksums and deliver APK+ZIP.
+LAST_USER_INTENT_SUMMARY=Make Discogs the primary structured resource for Cover and Originali using its filters/release/master metadata, show the publication date of each individual version, avoid duplicate copies of the exact same recording while allowing genuinely distinct same-title studio/live/remix/etc versions, and reduce remaining playback startup latency.
+
+PRESERVED_LAB32
+REF=uab-build/musiclab-player-veloce-grid-api-32
+SHA=bd284100d3068a8ef6bcac2973743c09a3489cf5
+STATUS=technically verified; device feedback says playback improved but still a few fractions too slow; immutable while LAB33 is developed
+MUTATED_BY_LAB33=no
+
+CURRENT_LAB33
+REF=uab-build/musiclab-discogs-first-player-33
+BASE_REF=uab-build/musiclab-player-veloce-grid-api-32
+BASE_SHA=bd284100d3068a8ef6bcac2973743c09a3489cf5
+SHA=021fbe8e409f01bd202f72b26d9141f7c6db8009
+GATE_RUN=37170772013
+GATE_STATUS=in_progress
+SOURCE_CONTRACT=success
+FEATURE_1=Player Veloce 3 startup buffer is 900ms while rebuffer remains 4s; LAB32 priority burst, cache-first resolution, InnerTube warm runtime and Qobuz skip during explicit startup are preserved.
+FEATURE_2=DiscogsClient exposes shared advanced Release search with track, artist, release_title, year, format, country, label, genre, style and catno filters plus sort/pagination.
+FEATURE_3=Discogs release detail parses exact released date including partial year/month precision plus format names/descriptions, while preserving Compilation fields.
+FEATURE_4=Shared DiscogsVersionSource supplies Cover and Originali; it groups release/master data, classifies studio/live/remix/acoustic and creates semantic version fingerprints.
+FEATURE_5=Exact same musical version from equivalent releases/localizations is deduplicated; genuinely distinct same-title versions remain separate by kind/master/qualifier/duration context.
+FEATURE_6=Cover uses Discogs seeds before AI/MusicBrainz enrichment, gives Discogs metadata higher evidence weight, displays Data pubblicazione and sorts chronology by exact date.
+FEATURE_7=Originali queries Discogs before YouTube Music/YouTube, can derive/enrich identity from Discogs, carries exact release dates and uses Discogs metadata to classify Live/Remix.
+FEATURE_8=Other sources remain fallback/verification and YouTube/YTM remain playback locators rather than publication authorities.
+APK_IDENTITY=MusicLab LAB33 / it.verlezza.musiclab.lab33
+RESTORE_REGISTER_ACTION=none; Player Veloce 3 remains trial until Bruno device acceptance
+LAB32_MUTATED=no
+CANDIDATA_LAB26_MUTATED=no
+MADRE_MUTATED=no
 
 PRESERVED_LAB31
 REF=uab-build/musiclab-player-veloce-compilation-ui-31
