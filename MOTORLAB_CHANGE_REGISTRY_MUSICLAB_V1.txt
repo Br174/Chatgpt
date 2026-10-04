@@ -495,6 +495,47 @@ RESTORE_POLICY=Do not replace visible Player restore slot yet. Keep approved LAB
 NEXT_LIFECYCLE_GATE=Bruno device acceptance of LAB32. No CANDIDATA/MADRE promotion before explicit approval.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+CHANGE RECORD
+CHANGE_ID=musiclab-20261004-lab33-discogs-first-player
+DATE=2026-10-04
+TITLE=LAB33 Discogs-first ibrido per Cover/Originali + Player Veloce 3
+SEMANTIC_TAGS=LAB33,Discogs,Cover,Originali,release date,dedup,Player Veloce 3
+USER_INTENT=Usare Discogs come prima risorsa per Cover e Originali, mantenere date di pubblicazione precise, evitare doppioni identici e ridurre ancora il ritardo di avvio audio.
+CHANGE_SCOPE=DISCOGS_FIRST_HYBRID_AND_PLAYER_STARTUP
+LIFECYCLE_ROLE=LAB33_DEVICE_REJECTED_FOR_HYBRID_GOVERNANCE
+SOURCE_BASE_REF=uab-build/musiclab-player-veloce-grid-api-32
+SOURCE_BASE_SHA=bd284100d3068a8ef6bcac2973743c09a3489cf5
+RESULT_REF=uab-build/musiclab-discogs-first-player-33
+RESULT_SHA=021fbe8e409f01bd202f72b26d9141f7c6db8009
+BEHAVIOR_SUMMARY=Discogs became the first structured version source with exact release-date parsing and semantic deduplication, while legacy AI/MusicBrainz/YouTube discovery remained active as enrichment/fallback. Player Veloce startup reserve moved to 900ms with 4s rebuffer.
+ROOT_CAUSE_CLOSURE=Technically verified, but Bruno device testing showed Cover/Originali were still governed by the legacy AI/review architecture and exposed another duplicate-key crash in the old Cover ALL-* list.
+VERIFICATION=Exact-SHA run 37170772013 succeeded on 021fbe8e409f01bd202f72b26d9141f7c6db8009. Artifact 11291008251. APK sha256 5ebf59dbacf8883592b747012429808cb20efa484aa543e0245a05f9819bc829.
+STATUS=SUPERSEDED_BY_LAB34
+SUPERSEDED_BY=musiclab-20261004-lab34-direct-discogs-cover-originali
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_REJECTED_FOR_ARCHITECTURE
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261004-lab34-direct-discogs-cover-originali
+DATE=2026-10-04
+TITLE=LAB34 Cover e Originali diretti Discogs con paginazione, safe-area e key anti-crash
+SEMANTIC_TAGS=LAB34,Discogs,Cover,Originali,pagination,infinite scroll,mini-player,dedup,duplicate key,one singer,filters
+USER_INTENT=Rimuovere AI/review da Cover e Originali; usare direttamente Discogs come Compilation con soli filtri Discogs, caricamento progressivo di altre pagine, spazio sopra mini-player, niente doppioni/crash; Originali deve restare vincolato a un solo cantante e mostrare tutte le sue versioni distinte.
+CHANGE_SCOPE=DIRECT_DISCOGS_COVER_ORIGINALI_SHARED_RUNTIME
+LIFECYCLE_ROLE=LAB34_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-discogs-first-player-33
+SOURCE_BASE_SHA=021fbe8e409f01bd202f72b26d9141f7c6db8009
+RESULT_REF=uab-build/musiclab-direct-discogs-cover-originali-34
+RESULT_SHA=066fa81aee857cb8f865a236782bb8c4ed1e8171
+BEHAVIOR_SUMMARY=Public Cover and Originali routes now use one shared direct Discogs browser; legacy AI composables are unreachable. Both pages expose native Discogs search filters, load 20 releases per page, prefetch within 8 visible rows from the end, auto-skip empty filtered pages, preserve filters/results/page/scroll state and reserve 176dp below content for mini-player/navigation. Cover excludes the starting singer; Originali locks server query and local results to one singer. Lazy keys include mode+index+releaseId+fingerprint hash to eliminate the prior ALL-* duplicate-key crash path. Equivalent identical studio recordings dedupe while distinct live/remix/acoustic versions remain separate. Playback resolution occurs only when the selected Discogs version is tapped.
+ROOT_CAUSE_CLOSURE=LAB33 still routed through AI/review state and used semantic candidate keys in a LazyColumn, so duplicate candidates could reproduce IllegalArgumentException Key ALL-*. LAB34 removes that public runtime path entirely and uses direct Discogs rows plus index-qualified unique lazy keys. The first LAB34 gate failure was only an over-specific source-contract ordering regex; runtime code was unchanged and the relaxed contract passed.
+COMPATIBILITY=Player Veloce 3 remains unchanged at 900ms startup/4s rebuffer. LAB33, LAB32, CANDIDATA LAB26 and MADRE were not mutated.
+VERIFICATION=Final exact-SHA run 37175409186 succeeded on 066fa81aee857cb8f865a236782bb8c4ed1e8171: source contract, Android unit tests, UAB diagnostics, APK+ZIP build, ZIP integrity and artifact upload all success. Artifact 11293361543 digest sha256:02a9c6845311e504d3892fad4d76221603bf92be1664a4f86b90d8107165f85d. APK sha256 3935e6293edea002a30976792aa30c78513b58b97d9db593976a58d74abaf235. ZIP sha256 4703656e82c2bcd614340312b3a88701a632c09ad13d26025962c383f5ce4312.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device acceptance of direct Discogs paging, safe-area, one-singer Originali and crash elimination.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
+
+
 HISTORICAL BACKFILL NOTE
 MusicLab contains many older upstream/native/player commits before MotorLab r13. They remain recoverable from Git but are not all indexed here yet. On a query not covered above, MotorLab must search immutable MusicLab Git history, distinguish Bruno-specific project modifications from upstream/general history using branch/ledger evidence, verify the exact source, persist a new record, then use it for future searches. Do not treat a raw keyword match as an approved Bruno-specific change without provenance evidence.
 
@@ -506,7 +547,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.17
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.19
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -523,3 +564,5 @@ Revision 1.10: registra LAB26 recuperato e tecnicamente verificato con locandine
 
 Revision 1.11: registra CANDIDATA LAB26 costruita dalla MADRE con runtime LAB26 identico; test dispositivo Candidate pendente.
 Revision 1.12: registra LAB27 Token e API tecnicamente verificato per YouTube Music, Last.fm e Discogs; test dispositivo pendente.\nRevision 1.13: registra LAB28 Compilation Discogs tecnicamente verificato con ricerca/filtri, tracklist/video, resolver, audio completo e salvataggio; test dispositivo/API pendente.\nRevision 1.14: registra LAB29 con paginazione infinita Discogs, tutte le Release restituite e contatore caricate/totale; test dispositivo pendente.\nRevision 1.15: registra LAB30 con nuova barra Cover/Compilation, Cover manuale condivisa, memoria esatta Compilation, provider UI stabili e anti-stutter; test dispositivo pendente.\nRevision 1.16: registra LAB31 Player Veloce 1 in prova con priority burst, fast resolver e Compilation sticky/collapsible/scroll-safe; test dispositivo e conferma restore pendenti.\nRevision 1.17: registra LAB32 Player Veloce 2 con priorità fino allo stream, fix duplicate-key LazyGrid e singolo ingresso Last.fm + Discogs; test dispositivo pendente.
+Revision 1.18: recupera e registra LAB33 Discogs-first ibrido + Player Veloce 3; tecnicamente verificato ma superato da LAB34 dopo feedback dispositivo.
+Revision 1.19: registra LAB34 con Cover/Originali diretti Discogs, paginazione condivisa, safe-area mini-player, one-singer Originali e key anti-crash; test dispositivo pendente.
