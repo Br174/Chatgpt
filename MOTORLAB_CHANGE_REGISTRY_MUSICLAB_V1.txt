@@ -654,3 +654,29 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device acceptance focused first on tap-to-first-sound, no search at tap, exact-video correctness, COVER.INFO foreign/niche discovery and artwork coverage. No CANDIDATA/MADRE promotion before explicit approval.
 RESTORE_SCOPE_HINTS=Restore LAB40 selectively onto a later compatible baseline: prepared SongItem cache, selected-first queue hydration, exact-recording hard gate, performer-preserving query ladder and COVER.INFO primary relationship resolver. Preserve later unrelated UI/player logic and never overwrite MADRE/CANDIDATA directly.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261005-lab41-lab07-fast-player-restore
+DATE=2026-10-05
+TITLE=LAB41 ripristino selettivo player veloce da Originali 07 ispeed
+SEMANTIC_TAGS=LAB41,player,velocità,ispeed,LAB07,Originali 07,first sound,InnerTubeX,PoToken,WebView,fast-first,fallback
+USER_INTENT=Mantenere integralmente la LAB40 ma far tornare soltanto il player al comportamento molto veloce osservato da Bruno nella versione MusicLab LAB Originali 07 ispeed.
+CHANGE_SCOPE=SELECTIVE_PLAYER_STREAM_RESOLVER_RESTORE
+LIFECYCLE_ROLE=LAB41_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-exact-video-playback-40
+SOURCE_BASE_SHA=7d5e4b5bb240903d4c2a77224c3bdc0288d6aaf0
+HISTORICAL_REFERENCE_REF=uab-build/musiclab-originali-speed-tabs-07
+HISTORICAL_REFERENCE_SHA=6900614a785b7b21f7fa9725837ade447a0407c8
+HISTORICAL_PLAYBACK_FIX_SHA=9afbbf9736bf41eecb779ab3a8427d069d4eac5b
+RESULT_REF=uab-build/musiclab-lab07-player-fast-41
+RESULT_SHA=329e663061d46928dc4d58a946c0d3d2f88881b3
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/utils/InnerTubeXPlayer.kt,cloudflare/music-intelligence/test/lab41-lab07-fast-player-contract.test.mjs,uab-project.env,.github/workflows/lab41-lab07-fast-player-gate.yml
+BEHAVIOR_SUMMARY=Il player moderno mantiene InnerTubeX ma prova prima una corsia fast-first limitata a 1800 ms che non espone provider PoToken e non usa WebView. Se questa corsia risolve lo stream, il primo suono può partire senza il percorso completo di compatibilità; se fallisce o scade, il resolver InnerTubeX corrente con WEB_BOTGUARD/WebView/PoToken rimane fallback automatico. Nessun file Cover, Originali, Archivio, fonti o resolver delle versioni è stato modificato.
+ROOT_CAUSE=Il ramo storico LAB07 precede la migrazione del resolver stream successivamente entrata con il resync Metrolist v13.7.0: LAB07 usava YTPlayerUtils, mentre LAB40 usa InnerTubeX con capacità WebView/PoToken e più lavoro di compatibilità. Il confronto Git dimostra che la modifica LAB41 è isolata al resolver player; la maggiore latenza osservata sul dispositivo è coerente con il percorso più pesante, ma la conferma prestazionale definitiva resta il test di Bruno.
+ROOT_CAUSE_CLOSURE=Ripristino comportamentale invece di rollback binario: corsia semplice stile LAB07 davanti al resolver moderno, con timeout stretto e fallback completo. Questo evita di copiare vecchi file incompatibili e preserva le correzioni recenti di compatibilità streaming.
+VERIFICATION=GitHub Actions LAB41 run 37242528581 success su exact SHA 329e663061d46928dc4d58a946c0d3d2f88881b3: active LAB41 contract success; inherited LAB40 exact-recording/selected-first/COVER.INFO/artwork/Last.fm checks success; Android unit tests success; UAB diagnostics success; APK+ZIP build/integrity/upload success. Artifact 11318365788 digest sha256:9514cef8ed927328855091ab095aed072897287513e421976ecac8266529a683; APK sha256 28163be3e678705d0a27b2b12487abe49ee2f18b6ebc5eda77e4245a9a7225ca; ZIP sha256 0c57f528ed02bc49914b62bc400953758045477fd6388dcee12b93fa4a8283c5; embedded APK checksum matched; device acceptance pending.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno deve confrontare tap-to-first-sound LAB41 con Originali 07 ispeed e provare anche alcuni brani difficili/protetti. Solo dopo conferma positiva il ripristino potrà entrare nel registro visibile delle modifiche funzionanti.
+RESTORE_SCOPE_HINTS=Su una futura baseline compatibile ripristinare solo la fast lane del resolver stream prima del fallback InnerTubeX; non sostituire interamente MusicService/PlayerConnection con file LAB07 e non sovrascrivere Cover/Originali/Archivio/MADRE/CANDIDATA.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK_DEVICE_PENDING
+
