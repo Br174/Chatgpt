@@ -1,10 +1,40 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=60
-STATE_STATUS=LAB37_REAL_TRACK_VIDEO_QUEUE_CONTEXT_VERIFIED_ARTIFACT_READY
+STATE_REVISION=61
+STATE_STATUS=LAB38A_COVER_ENGINE_BUILD_IN_PROGRESS
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
+
+ACTIVE_OPERATION_ID=musiclab-lab38a-cover-engine-solid
+OPERATION_STATUS=LAB38A_GATE_RUNNING
+CURRENT_PHASE=LAB38A branched exactly from verified LAB37 SHA 94d8cbc635ff88839c3fa91b6372f72fe9b362b3. Source changes implemented on uab-build/musiclab-cover-engine-solid-38a. Source contract passed in GitHub Actions run 37218615333; Android unit tests currently running under durable GitHub Actions executor. No MADRE/CANDIDATA/LAB37 mutation.
+CURRENT_REF=uab-build/musiclab-cover-engine-solid-38a
+CURRENT_HEAD_SHA=f92f85d1d69b8205ece088e0d85dae7620589a30
+CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
+CURRENT_JOB_ID=37218615333
+CURRENT_JOB_STATUS=in_progress
+ARTIFACT_PROGRESS_PERCENT=55
+LAST_VERIFIED_PROGRESS_PERCENT=55
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=55
+RECOVERY_FLOOR_PERCENT=55
+WRITE_LOCK_SCOPE=GitHub Actions owns LAB38A verification/build lane; no competing writer
+PENDING_VERIFICATION=Android unit tests, UAB diagnostics, APK+ZIP build, exact-SHA artifact integrity and Bruno device acceptance.
+NEXT_SAFE_STEP=Reconcile run 37218615333. If tests fail, repair only LAB38A and rerun gate. If successful, download/recheck exact artifact and deliver APK+ZIP without changing LAB37/MADRE/CANDIDATA.
+LAST_USER_INTENT_SUMMARY=Make the Cover-first MusicLab project solid. Preserve every plausible candidate with a 1-10 evidence score instead of auto-discarding; AI is scout only; Cover and Originali share UI behavior; use stable logical blocks of 20, local sort/filter, Straniere, anti-429, stable scroll; combine Discogs, MusicBrainz, Apple/iTunes, Last.fm, LRCLIB, Spotify, Wikidata and AI discovery with source diagnostics. LAB38B will later add full D1 archive/approve-reject and COVER.INFO expansion.
+LAB38A_FEATURE_1=Shared Cover/Originali browser now uses local sorting/filtering and stable logical 20-result blocks without rerunning network search on sort changes.
+LAB38A_FEATURE_2=Weak Discogs and external candidates remain visible at score 1-10; detailed verification/evidence can raise confidence but does not automatically delete candidates.
+LAB38A_FEATURE_3=AI contributes discovery candidates only and no longer sets a high verification floor.
+LAB38A_FEATURE_4=Discovery lanes include MusicBrainz, Apple/iTunes Search, Last.fm when build key exists, LRCLIB, existing Spotify connection, Wikidata evidence and AI Scout.
+LAB38A_FEATURE_5=Discogs uses one process-wide request gate, minimum pacing, remaining-quota awareness and Retry-After-aware backoff to address 429 at the source.
+LAB38A_FEATURE_6=Source diagnostics UI reports source availability/contribution counts; Straniere is a first-class shared browser filter.
+LAB38A_FEATURE_7=Loaded Discogs candidates are verified in background while stable row identity/order is preserved; external candidates can still be resolved for playback.
+LAB38A_SOURCE_CONTRACT=success
+LAB38A_GATE_RUN=37218615333
+LAB38A_GATE_HEAD_SHA=f92f85d1d69b8205ece088e0d85dae7620589a30
+LAB37_MUTATED_BY_LAB38A=no
+CANDIDATA_LAB26_MUTATED_BY_LAB38A=no
+MADRE_MUTATED_BY_LAB38A=no
 
 ACTIVE_OPERATION_ID=musiclab-lab37-real-track-video-queue-context
 OPERATION_STATUS=LAB37_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
