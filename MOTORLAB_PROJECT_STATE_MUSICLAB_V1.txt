@@ -1,26 +1,58 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=52
-STATE_STATUS=LAB33_DISCOGS_FIRST_PLAYER_TECHNICALLY_VERIFIED_DEVICE_TEST_PENDING
+STATE_REVISION=53
+STATE_STATUS=LAB34_DIRECT_DISCOGS_COVER_ORIGINALI_GATE_IN_PROGRESS_LAB33_PRESERVED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-ACTIVE_OPERATION_ID=musiclab-lab33-discogs-first-player
-OPERATION_STATUS=LAB33_VERIFIED_ARTIFACT_READY
-CURRENT_PHASE=LAB33 technically complete. Exact SHA 021fbe8e409f01bd202f72b26d9141f7c6db8009 passed source contract, Android unit tests including Discogs semantic dedup/publication-date tests, UAB diagnostics, APK+ZIP build, ZIP integrity verification and artifact upload in run 37170772013. Player Veloce 3 uses 900ms startup reserve with 4s rebuffer and preserves LAB32 priority/cache behavior. Discogs is the primary structured source for Cover and Originali; exact release dates are shown when Discogs provides them; equivalent reissues/localizations are deduplicated while genuinely distinct same-title versions remain separate. Waiting only for Bruno device acceptance.
-CURRENT_REF=uab-build/musiclab-discogs-first-player-33
-CURRENT_HEAD_SHA=021fbe8e409f01bd202f72b26d9141f7c6db8009
+ACTIVE_OPERATION_ID=musiclab-lab34-direct-discogs-cover-originali
+OPERATION_STATUS=IMPLEMENTED_GATE_RUNNING
+CURRENT_PHASE=LAB34 created from exact verified LAB33. Cover and Originali runtime entry points now use one shared direct Discogs browser with no AI confirmation/rejection workflow. Both pages share native Discogs filters, 20-release paging, prefetch near list end, automatic skip of empty/deduplicated pages, session/scroll restoration and 176dp bottom safe area above mini-player/navigation. Originali locks one singer in the Discogs artist query and filters every returned track to that singer; Cover excludes the starting/original singer while optionally allowing a native Discogs artist filter. Duplicate UI keys are structurally prevented with count-based index+releaseId+fingerprint keys, replacing the old ALL-* runtime list path. Identical studio recordings are deduplicated across equivalent releases; live/remix/acoustic retain release context. First source-contract run failed only on an overly order-specific regex; contract corrected without production-code change. Second gate is running.
+CURRENT_REF=uab-build/musiclab-direct-discogs-cover-originali-34
+CURRENT_HEAD_SHA=066fa81aee857cb8f865a236782bb8c4ed1e8171
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
-CURRENT_JOB_ID=37170772013
-CURRENT_JOB_STATUS=success
-LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
-RECOVERY_FLOOR_PERCENT=100
-WRITE_LOCK_SCOPE=released
-PENDING_VERIFICATION=Bruno device test of exact MusicLab-LAB33.apk: tap-to-audio latency/continuity, Cover Discogs-first quality/date/dedup behavior, and Originali Discogs-first quality/date/dedup behavior.
-NEXT_SAFE_STEP=Bruno installs exact LAB33 APK and performs device acceptance. Do not promote Player restore slot, CANDIDATA or MADRE until explicit acceptance.
-LAST_USER_INTENT_SUMMARY=Make Discogs the primary structured resource for Cover and Originali using its filters/release/master metadata, show the publication date of each individual version, avoid duplicate copies of the exact same recording while allowing genuinely distinct same-title studio/live/remix/etc versions, and reduce remaining playback startup latency.
+CURRENT_JOB_ID=37175409186
+CURRENT_JOB_STATUS=in_progress
+LAST_VERIFIED_PROGRESS_PERCENT=70
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=70
+RECOVERY_FLOOR_PERCENT=70
+WRITE_LOCK_SCOPE=GitHub Actions build owns execution; repair only LAB34 if gate fails
+PENDING_VERIFICATION=LAB34 source contract second run, Android unit tests including direct Discogs dedup tests, UAB diagnostics, APK+ZIP build/integrity, then Bruno device test of Cover/Originali direct Discogs paging, mini-player clearance and crash elimination.
+NEXT_SAFE_STEP=Reconcile run 37175409186. If failure, repair only LAB34 on the same branch. If success, record artifact/checksums and deliver verified APK+ZIP.
+LAST_USER_INTENT_SUMMARY=Make identical structural changes to Cover and Originali: direct Discogs only, no AI/review controls, native Discogs filters, infinite page-by-page loading, safe bottom space so mini-player never covers cards, no duplicate results/keys, with Originali restricted to one fixed singer and all distinct versions of that singer.
+
+PRESERVED_LAB33
+REF=uab-build/musiclab-discogs-first-player-33
+SHA=021fbe8e409f01bd202f72b26d9141f7c6db8009
+STATUS=technically verified; device feedback rejected hybrid AI governance and exposed ALL-* duplicate-key crash; immutable while LAB34 is developed
+MUTATED_BY_LAB34=no
+
+CURRENT_LAB34
+REF=uab-build/musiclab-direct-discogs-cover-originali-34
+BASE_REF=uab-build/musiclab-discogs-first-player-33
+BASE_SHA=021fbe8e409f01bd202f72b26d9141f7c6db8009
+SHA=066fa81aee857cb8f865a236782bb8c4ed1e8171
+GATE_RUN=37175409186
+GATE_STATUS=in_progress
+FIRST_GATE_RUN=37175376360
+FIRST_GATE_STATUS=failure
+FIRST_GATE_ROOT_CAUSE=Source contract expected empty-results/current-page/load-next conditions in one fixed textual order; production pagination code already contained all three conditions correctly.
+FIRST_GATE_CORRECTION=Relaxed only the source-contract regex into independent implementation-invariant checks; runtime production code unchanged.
+FEATURE_1=Public CoverSearchScreen and OriginalVersionScreen wrappers route exclusively to DiscogsDirectVersionBrowser; legacy AI composables are private and unreachable from navigation.
+FEATURE_2=Shared direct browser uses only Discogs token and native search fields: track, artist, release_title, year, format, country, label, genre, style and catalog number.
+FEATURE_3=Cover excludes original singer; Originali server-query and result-filter lock to exactly one singer.
+FEATURE_4=Both pages load 20 Discogs releases per page, prefetch within 8 visible items of the end and automatically continue empty filtered pages.
+FEATURE_5=Both pages preserve filters/results/page/scroll state and reserve 176dp bottom content space above mini-player/navigation.
+FEATURE_6=Lazy list keys include mode+index+releaseId+fingerprint hash so duplicate data cannot reproduce the old ALL-* Compose key crash.
+FEATURE_7=Identical studio recordings dedupe across equivalent releases; distinct live/remix/acoustic versions preserve release context.
+FEATURE_8=Listing uses lightweight release detail without per-card Master-video fallback; playback uses CompilationTrackResolver only on the selected Discogs version.
+PLAYER_BASELINE=Player Veloce 3 unchanged at 900ms startup / 4s rebuffer.
+APK_IDENTITY=MusicLab LAB34 / it.verlezza.musiclab.lab34
+LAB33_MUTATED=no
+CANDIDATA_LAB26_MUTATED=no
+MADRE_MUTATED=no
+
 
 PRESERVED_LAB32
 REF=uab-build/musiclab-player-veloce-grid-api-32
