@@ -568,7 +568,7 @@ REGISTRY RULES
 - Default restore is selective into a new isolated LAB from the current proper baseline; never direct-edit MADRE.
 
 VERSION
-MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.20
+MOTORLAB-MUSICLAB-CHANGE-REGISTRY-V1.21
 Established: 2026-09-30
 Revision 1.1: registra LAB19 player direct-collapse e collega LAB18 come superseded.
 Revision 1.2: registra accettazione dispositivo Bruno e promozione LAB19 a CANDIDATA stabile per futura MADRE.
@@ -587,6 +587,7 @@ Revision 1.11: registra CANDIDATA LAB26 costruita dalla MADRE con runtime LAB26 
 Revision 1.12: registra LAB27 Token e API tecnicamente verificato per YouTube Music, Last.fm e Discogs; test dispositivo pendente.\nRevision 1.13: registra LAB28 Compilation Discogs tecnicamente verificato con ricerca/filtri, tracklist/video, resolver, audio completo e salvataggio; test dispositivo/API pendente.\nRevision 1.14: registra LAB29 con paginazione infinita Discogs, tutte le Release restituite e contatore caricate/totale; test dispositivo pendente.\nRevision 1.15: registra LAB30 con nuova barra Cover/Compilation, Cover manuale condivisa, memoria esatta Compilation, provider UI stabili e anti-stutter; test dispositivo pendente.\nRevision 1.16: registra LAB31 Player Veloce 1 in prova con priority burst, fast resolver e Compilation sticky/collapsible/scroll-safe; test dispositivo e conferma restore pendenti.\nRevision 1.17: registra LAB32 Player Veloce 2 con priorità fino allo stream, fix duplicate-key LazyGrid e singolo ingresso Last.fm + Discogs; test dispositivo pendente.
 Revision 1.18: recupera e registra LAB33 Discogs-first ibrido + Player Veloce 3; tecnicamente verificato ma superato da LAB34 dopo feedback dispositivo.
 Revision 1.19: registra LAB34 con Cover/Originali diretti Discogs, paginazione condivisa, safe-area mini-player, one-singer Originali e key anti-crash; test dispositivo pendente.\nRevision 1.20: registra LAB35 con anti-429, listing Discogs immediato, filtri Tutto/Studio/Live/Mix, ordinamento rilevanza/anno, paginazione completa e Originali one-singer corretto; test dispositivo pendente.
+Revision 1.21: registra LAB40 con first-sound priority, Exact Recording Resolver, COVER.INFO fonte primaria e artefatto tecnicamente verificato; test dispositivo pendente.
 
 CHANGE RECORD
 CHANGE_ID=musiclab-20261004-lab37-real-track-video-queue-context
@@ -630,3 +631,26 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 RESTORE_SCOPE_HINTS=Restore only the LAB39 correction family onto a compatible later baseline: performer-consistent video resolver, artwork/playback cloud persistence, Last.fm public fallback and LRCLIB diagnostics. Preserve later unrelated UI/player/search changes and do not treat this LAB as CANDIDATA/MADRE until Bruno confirms device behavior.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_DEVICE_PENDING
 
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261004-lab40-exact-video-playback-coverinfo
+DATE=2026-10-04
+TITLE=LAB40 riproduzione prioritaria, Exact Recording Resolver e COVER.INFO fonte primaria
+SEMANTIC_TAGS=LAB40,player,velocità,first sound,preload,YouTube,Exact Recording Resolver,Fiorello,Raf,hard gate,cover.info,cover straniere,cover rare,locandine,Last.fm
+USER_INTENT=Rendere la velocità di riproduzione priorità assoluta, evitare che il tap avvii una ricerca YouTube lunga, trovare esattamente la registrazione richiesta invece di una versione simile, mettere COVER.INFO al primo posto per cover straniere/di nicchia e mantenere Last.fm utile anche quando le chiavi non raggiungono il runner.
+CHANGE_SCOPE=PLAYER_FIRST_SOUND_EXACT_VIDEO_COVERINFO_PRIMARY
+LIFECYCLE_ROLE=LAB40_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-video-artwork-lastfm-39
+SOURCE_BASE_SHA=d7c7ce4f1e52ed976724e7721058f32fb76fd366
+RESULT_REF=uab-build/musiclab-exact-video-playback-40
+RESULT_SHA=7d5e4b5bb240903d4c2a77224c3bdc0288d6aaf0
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/discogs/CompilationTrackResolver.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverDiscoverySources.kt,app/src/test/kotlin/com/metrolist/music/discogs/CompilationTrackResolverTest.kt,cloudflare/music-intelligence/test/lab40-exact-video-playback-contract.test.mjs,uab-project.env,.github/workflows/lab40-exact-video-playback-gate.yml
+BEHAVIOR_SUMMARY=Il preload conserva in memoria i SongItem già risolti e scalda i binding cloud prima del tap. Il tap non invoca più CompilationTrackResolver; se il video è pronto, il player riceve subito la sola traccia selezionata e la coda restante viene idratata/aggiunta dopo. L'Exact Recording Resolver non usa più fallback automatici solo-titolo: tutte le query mantengono l'interprete e ogni candidato deve superare hard gate su titolo, interprete, tipo di versione e durata prima del punteggio. COVER.INFO viene fuso per primo, usa ricerca precisa song=/performer= e segue le pagine relazione per scoprire cover/adattamenti anche con titolo diverso; le relazioni dirette ricevono evidenza 10/10. Artwork provider resta preferito e la thumbnail YouTube verificata resta fallback. Last.fm mantiene API mode quando le credenziali arrivano e fallback pubblico no-key quando non arrivano.
+ROOT_CAUSE=LAB39 poteva ancora eseguire resolver di rete al tap e idratare l'intera coda prima del primo suono; la ricerca profonda includeva titolo-only; COVER.INFO era trattato come fonte peer con parser vicino alla vecchia struttura; le credenziali Last.fm restano vuote nel runner GitHub nonostante la configurazione utente.
+ROOT_CAUSE_CLOSURE=Player e video identity chiusi strutturalmente con preload/caching, selected-first queue e hard compatibility. COVER.INFO corretto alla nuova strategia di ricerca/relazioni e portato in testa. Last.fm credential injection resta un problema di configurazione esterna esplicitamente non chiuso; il fallback pubblico impedisce che diventi un single point of failure.
+VERIFICATION=GitHub Actions LAB40 run 37237008410 success su exact SHA 7d5e4b5bb240903d4c2a77224c3bdc0288d6aaf0: reusable core/LAB40 contract success; Android unit tests success; UAB diagnostics success; APK+ZIP build/integrity/upload success; Last.fm fallback contract success. Artifact 11315648172 digest sha256:61090438795dd9cd04c80d1ec42601512a8d21a11390a63fdca34a8c9500eb7c; APK sha256 fa8c386645da436a1fdbe5430f8a35c380dfb416a464bd4fec8e03098ea1351a; ZIP sha256 d52a3f7774644a3c8cb941ed60bfd1a5190d9629a83a5e6bb022bcbac3663b93.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device acceptance focused first on tap-to-first-sound, no search at tap, exact-video correctness, COVER.INFO foreign/niche discovery and artwork coverage. No CANDIDATA/MADRE promotion before explicit approval.
+RESTORE_SCOPE_HINTS=Restore LAB40 selectively onto a later compatible baseline: prepared SongItem cache, selected-first queue hydration, exact-recording hard gate, performer-preserving query ladder and COVER.INFO primary relationship resolver. Preserve later unrelated UI/player logic and never overwrite MADRE/CANDIDATA directly.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
