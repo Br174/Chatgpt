@@ -1,25 +1,25 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=58
-STATE_STATUS=LAB36_VERSION_IDENTITY_SCORE_VIDEO_LOCK_GATE_RUNNING
+STATE_REVISION=59
+STATE_STATUS=LAB36_VERSION_IDENTITY_SCORE_VIDEO_LOCK_COMPLETE
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 ACTIVE_OPERATION_ID=musiclab-lab36-version-identity-score-video-lock
-OPERATION_STATUS=LAB36_IMPLEMENTED_GATE_RUNNING
-CURRENT_PHASE=LAB36 source changes are committed on uab-build/musiclab-version-identity-score-video-lock-36 at exact SHA 1674ba7e220255e64c66446c80e05fe5e4b19e43. Source contract passed in GitHub Actions run 37193378674; Android unit tests are currently running, followed by UAB diagnostics, APK+ZIP build, deliverable integrity and upload. LAB35 remains immutable.
+OPERATION_STATUS=LAB36_COMPLETE
+CURRENT_PHASE=LAB36 verified complete. GitHub Actions run 37193378674 passed source contract, Android unit tests, UAB diagnostics, APK+ZIP build, deliverable integrity and artifact upload. Artifact 11299828208 downloaded and locally rechecked; APK SHA256 477658350cd9203e5cb59f1ff0a4968ad1f0e86c4b6125c5ea9ae9bd03953461; build SHA 1674ba7e220255e64c66446c80e05fe5e4b19e43. LAB35/CANDIDATA/MADRE remain untouched.
 CURRENT_REF=uab-build/musiclab-version-identity-score-video-lock-36
 CURRENT_HEAD_SHA=1674ba7e220255e64c66446c80e05fe5e4b19e43
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
 CURRENT_JOB_ID=37193378674
-CURRENT_JOB_STATUS=in_progress
-LAST_VERIFIED_PROGRESS_PERCENT=90
-LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=90
-RECOVERY_FLOOR_PERCENT=90
-WRITE_LOCK_SCOPE=LAB36 gate executor owns build/test; no app writes while current gate is live
-PENDING_VERIFICATION=Android unit tests, UAB diagnostics, LAB36 APK+ZIP build, integrity verification, artifact upload, then Bruno device acceptance.
-NEXT_SAFE_STEP=Reconcile run 37193378674. If it succeeds, capture exact artifact/checksums and mark LAB36 technically verified. If it fails, inspect the failing job/log, correct only LAB36 from current head, and rerun the gate without mutating LAB35/CANDIDATA/MADRE.
+CURRENT_JOB_STATUS=success
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=none; LAB36 gate complete
+PENDING_VERIFICATION=Bruno device acceptance only
+NEXT_SAFE_STEP=Install/test MusicLab-LAB36.apk on Bruno device. If accepted, promote through the agreed CANDIDATA workflow; if issues appear, patch from LAB36 exact SHA without mutating LAB35/MADRE.
 LAST_USER_INTENT_SUMMARY=Build LAB36 from LAB35 so Cover/Originali represent true musical versions rather than release/compilation duplicates; preserve Discogs artwork and session/scroll persistence; retain weak plausible results with confidence score 1-10 (0 omitted), default sort 10-to-1 with oldest/newest optional; inspect track-level artist/credits so Various is not treated as performer; allow same original singer only for genuinely distinct versions; discover foreign/adapted versions through grounded AI scout then verify on Discogs; pre-resolve exact YouTube/YouTube Music video; permanently exclude a video ID once assigned to another version in the same session; add detailed metadata/credits dialog.
 
 
