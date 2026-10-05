@@ -148,3 +148,14 @@ test('permanent D1 relay uses GitHub OIDC instead of repository secrets', async 
   assert.match(entry,/verifyGitHubActionsOidc/);
   assert.match(entry,/github-oidc-jti/);
 });
+
+test('OIDC relay persists through the canonical D1 writer without a legacy shared secret', async () => {
+  const entry = await readFile(resolve(bridge,'src/entry.js'),'utf8');
+  const index = await readFile(resolve(bridge,'src/index.js'),'utf8');
+  assert.match(entry,/import core, \{ sha256Hex, validateSnapshot, persistSnapshot \}/);
+  assert.match(entry,/const response = await persistSnapshot\(snapshot, rawSnapshot, env\)/);
+  const oidcBlock = entry.slice(entry.indexOf('async function oidcRelay'),entry.indexOf('function validId'));
+  assert.doesNotMatch(oidcBlock,/GITHUB_WEBHOOK_SECRET/);
+  assert.match(index,/export async function persistSnapshot/);
+  assert.match(index,/await ensureSchema\(env\.DB\)/);
+});
