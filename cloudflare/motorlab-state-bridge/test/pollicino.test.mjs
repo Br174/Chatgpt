@@ -185,3 +185,11 @@ test('Codex sidecar keeps runtime source head separate from stable enrollment pr
   assert.match(adapter,/"source_head": runtime_head/);
   assert.match(adapter,/"proof_head": proof_head/);
 });
+
+test('Codex sidecar emits an immediate pulse before relying on the detached daemon', async () => {
+  const adapter = await readFile(resolve(bridge,'../../templates/codex/motorlab/motorlab_pollicino.py'),'utf8');
+  const active = adapter.slice(adapter.indexOf('if event in ACTIVE_EVENTS:'),adapter.indexOf('terminal = TERMINAL_EVENTS[event]'));
+  assert.match(active,/first_pulse = _send_pulse\(state\)/);
+  assert.match(active,/initial_pulse_ok/);
+  assert.ok(active.indexOf('_send_pulse(state)') < active.indexOf('_ensure_daemon(path, state)'));
+});
