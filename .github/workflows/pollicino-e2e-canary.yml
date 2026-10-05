@@ -16,9 +16,12 @@ jobs:
     timeout-minutes: 5
     env:
       MOTORLAB_BASE: https://motorlab-state-bridge.brunoverlezza.workers.dev
-      MUSICLAB_PROOF_HEAD: 43a1fca35e54cb05db80f1a18d02f8626f656696
+      MUSICLAB_PROOF_HEAD: dcdca85b504d8738512579fefb8d09cf972b9819
       MUSICLAB_OPERATION_ID: musiclab-lab44-original-first-scoring-coverinfo-video-readiness
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Run Pollicino detector and recovery canary
         env:
           RUN_ID: ${{ github.run_id }}
@@ -170,4 +173,81 @@ jobs:
           print("POST_CANARY_SAFE_STOP=PASSED")
 
           print("POLLICINO_E2E_CANARY=PASSED")
+          PY
+
+      - name: Verify exact Codex Pollicino sidecar lifecycle
+        env:
+          RUN_ID: ${{ github.run_id }}
+          MOTORLAB_PROJECT_ID: MusicLab
+          MOTORLAB_SOURCE_HEAD: dcdca85b504d8738512579fefb8d09cf972b9819
+          MOTORLAB_POLLICINO_PULSE_SECONDS: '5'
+          MOTORLAB_POLLICINO_LEASE_MS: '15000'
+        run: |
+          export MOTORLAB_HOOK_STATE_DIR="$RUNNER_TEMP/motorlab-pollicino-sidecar"
+          mkdir -p "$MOTORLAB_HOOK_STATE_DIR"
+          python3 - <<'PY'
+          import json, os, pathlib, subprocess, time, urllib.parse, urllib.request
+
+          run_id = os.environ["RUN_ID"]
+          session_id = f"adapter-{run_id}"
+          cwd = os.getcwd()
+          adapter = "templates/codex/motorlab/motorlab_pollicino.py"
+          state_path = pathlib.Path(os.environ["MOTORLAB_HOOK_STATE_DIR"]) / f"{session_id}.json"
+          base = "https://motorlab-state-bridge.brunoverlezza.workers.dev/continuity/v1"
+          expected_operation = "musiclab-lab44-original-first-scoring-coverinfo-video-readiness"
+
+          def hook(event):
+              payload = {
+                  "session_id": session_id,
+                  "hook_event_name": event,
+                  "cwd": cwd,
+                  "turn_id": f"{run_id}-{event}",
+              }
+              subprocess.run(
+                  ["python3", adapter],
+                  input=json.dumps(payload),
+                  text=True,
+                  check=True,
+                  env=os.environ.copy(),
+              )
+
+          def remote_status(token, operation_id):
+              q = urllib.parse.urlencode({"project_id":"MusicLab","operation_id":operation_id})
+              req = urllib.request.Request(
+                  f"{base}/status?{q}",
+                  headers={"Authorization":f"Bearer {token}","Accept":"application/json"},
+              )
+              with urllib.request.urlopen(req, timeout=10) as response:
+                  return json.loads(response.read().decode())
+
+          hook("SessionStart")
+          for _ in range(10):
+              if state_path.exists():
+                  state = json.loads(state_path.read_text())
+                  token = state.get("session_token")
+                  operation_id = state.get("operation_id")
+                  if token and operation_id:
+                      try:
+                          status = remote_status(token, operation_id)
+                          if (status.get("session") or {}).get("liveness_state") == "ALIVE":
+                              break
+                      except Exception:
+                          pass
+              time.sleep(1)
+          else:
+              raise SystemExit("Exact sidecar failed to self-enroll/pulse")
+
+          if operation_id != expected_operation:
+              raise SystemExit(f"Unexpected sidecar operation: {operation_id}")
+          print("CODEX_SIDECAR_SELF_ENROLL=PASSED")
+          print("CODEX_SIDECAR_LIVENESS=PASSED")
+
+          hook("SessionEnd")
+          time.sleep(1)
+          status = remote_status(token, operation_id)
+          session = status.get("session") or {}
+          if session.get("terminal_seal") != "HANDOFF_COMPLETE":
+              raise SystemExit(f"Exact sidecar terminal seal failed: {session.get('terminal_seal')}")
+          print("CODEX_SIDECAR_TERMINAL_SEAL=PASSED")
+          print("CODEX_SIDECAR_LIFECYCLE=PASSED")
           PY
