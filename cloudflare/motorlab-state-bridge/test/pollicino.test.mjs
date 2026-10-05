@@ -159,3 +159,10 @@ test('OIDC relay persists through the canonical D1 writer without a legacy share
   assert.match(index,/export async function persistSnapshot/);
   assert.match(index,/await ensureSchema\(env\.DB\)/);
 });
+
+test('source proof accepts an explicit stable satellite proof head before mutable project/operation heads', async () => {
+  const entry = await readFile(resolve(bridge,'src/entry.js'),'utf8');
+  assert.match(entry,/POLLICINO_PROOF_HEAD=/);
+  assert.match(entry,/SATELLITE_PROOF_HEAD/);
+  assert.match(entry,/stableProofHead\(project\.local_satellite_release_state\)/);
+});
