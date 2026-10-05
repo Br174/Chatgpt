@@ -10,6 +10,18 @@ This is the single lifecycle/control model for every Bruno project handled throu
 UNIVERSAL LIFECYCLE
 MADRE -> LAB -> CANDIDATA -> NEW MADRE
 
+
+ANDROID UPDATE-FAMILY MODE
+For Android projects explicitly using Bruno's persistent test-family workflow:
+- one new LAB family is installed/configured once;
+- later visible LAB NN aggiornamento revisions keep the same applicationId and signing certificate and strictly increase versionCode;
+- the immediately previous LAB aggiornamento is the source baseline for the next revision inside that family;
+- CANDIDATA is a new immutable family created from the exact approved LAB state/change-set, never a package-id conversion of the LAB;
+- if a candidate needs changes, return to the LAB family and create the next LAB aggiornamento, then create a new candidate number;
+- approved CANDIDATA -> NEW MADRE promotes the same candidate source identity/family according to project signing policy;
+- package/signing/versionCode compatibility is part of artifact verification;
+- detailed rules are in MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
+
 1. MADRE
 - The MADRE is the last user-approved, verified stable state.
 - It is immutable: do not edit, force-move, overwrite, rebuild in-place or replace its permanent release asset.
@@ -94,7 +106,7 @@ Each project adapter may define only project-specific mechanics:
 - project-specific deterministic progress micro-milestones;
 - background executor/start/status/resume/cancel/checkpoint/lock/notification behavior.
 
-An adapter may not override MADRE immutability, atomic LAB-from-MADRE, exact CANDIDATA reconstruction, approval-before-MADRE, exact candidate-source promotion, permanent history retention, Watchdog safety, visual-status rules, progress-reporting rules, or Background Execution / Single-Chat Continuity rules.
+An adapter may not override MADRE immutability, atomic lifecycle safety, exact CANDIDATA reconstruction, approval-before-MADRE, exact candidate-source promotion, update-family identity/signing/versionCode continuity when enabled, permanent history retention, Watchdog safety, visual-status rules, progress-reporting rules, or Background Execution / Single-Chat Continuity rules.
 
 PROGRESS CONTRACT
 Broad default milestones:
