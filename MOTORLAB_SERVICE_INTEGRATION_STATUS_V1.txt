@@ -186,3 +186,5 @@ Revision 1.14: source-proof enrollment implementation prepared for Worker 1.3.2;
 Revision 1.15: records failed E2E run 37358917563 root cause at legacy webhook delivery and introduces the secretless GitHub Actions OIDC D1 relay target 1.3.3; end-to-end remains pending until live OIDC relay + Pollicino canary pass.
 
 Revision 1.16: records OIDC run 37359874905 HTTP 503 root cause as residual legacy-secret coupling and corrects it by exporting/reusing canonical persistSnapshot directly; Worker target 1.3.4 pending live canary.
+
+Revision 1.16: exact OIDC relay failure isolated to absent GITHUB_WEBHOOK_SECRET; 1.3.4 direct-persist correction reuses the canonical validated D1 writer after OIDC and awaits live relay/E2E pass.
