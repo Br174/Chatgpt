@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "snapshot_id": "pollicino-musiclab-proofhead-342caf3b-fix1",
-  "sent_at": "2026-10-05T19:10:17.178Z",
+  "snapshot_id": "pollicino-r20-final-20261005",
+  "sent_at": "2026-10-05T19:12:20.787Z",
   "projects": [
     {
       "project_id": "MusicLab",
       "repository": "Br174/MusicLab",
       "lifecycle_stage": "LAB",
       "source_ref": "main",
-      "source_head": "43a1fca35e54cb05db80f1a18d02f8626f656696",
-      "local_satellite_release_state": "2026.10.05-r20|VERIFIED|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=43a1fca35e54cb05db80f1a18d02f8626f656696",
-      "updated_at": "2026-10-05T19:10:17.178Z"
+      "source_head": "966c40dbfb3746d56de199c8beb35558bf150a92",
+      "local_satellite_release_state": "2026.10.05-r20|VERIFIED|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92|POLLICINO_E2E_VERIFIED",
+      "updated_at": "2026-10-05T19:12:20.787Z"
     }
   ],
   "operations": [
@@ -31,20 +31,29 @@
       "source_ref": "uab-build/musiclab-scoring-coverinfo-video-44",
       "source_head": "8a458f8f4d1e560736d81f78de551664998619f9",
       "created_at": "2026-10-05T18:57:23.377Z",
-      "updated_at": "2026-10-05T19:10:17.178Z"
+      "updated_at": "2026-10-05T19:12:20.787Z"
     }
   ],
   "checkpoints": [
     {
-      "checkpoint_id": "pollicino-musiclab-oidc-seed-checkpoint-20261005-03",
+      "checkpoint_id": "pollicino-r20-final-checkpoint-20261005",
       "operation_id": "musiclab-lab44-original-first-scoring-coverinfo-video-readiness",
-      "phase": "LAB44 device acceptance pending",
+      "phase": "Pollicino r20 E2E complete; MusicLab LAB44 device acceptance remains independent and pending",
       "verified_progress": 100,
-      "completed_steps": "LAB44 code/build/artifact gates complete; MotorLab r20 Pollicino control-plane adopted.",
-      "next_safe_step": "Resume exact pending device-acceptance step; do not rebuild or promote without Bruno approval.",
+      "completed_steps": "Pollicino Worker 1.3.5 deployed; OIDC D1 relay passed; source-proof enrollment, stall detection, liveness-loss crash detection, terminal seals and preemptive RESUME_READY passed E2E canary 37360730928; MusicLab satellite synced on main 966c40dbfb3746d56de199c8beb35558bf150a92 with zero app-source changes.",
+      "next_safe_step": "For Pollicino: no pending implementation work. For MusicLab app: preserve existing LAB44 device-acceptance next step and lifecycle rules.",
       "lock_state": "none",
-      "external_wait_state": "Bruno device acceptance",
-      "created_at": "2026-10-05T19:10:17.178Z"
+      "external_wait_state": "MusicLab LAB44 device acceptance only; Pollicino complete",
+      "created_at": "2026-10-05T19:12:20.787Z"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "pollicino-r20-e2e-pass-20261005",
+      "operation_id": "musiclab-lab44-original-first-scoring-coverinfo-video-readiness",
+      "event_type": "POLLICINO_E2E_PASSED",
+      "event_summary": "OIDC relay runs 37360391426 and 37360456855 passed; behavioral canary 37360730928 passed source proof, stall, resume, terminal seal, crash/liveness loss, preemptive RESUME_READY and fresh-chat resume read.",
+      "created_at": "2026-10-05T19:12:20.787Z"
     }
   ]
 }
