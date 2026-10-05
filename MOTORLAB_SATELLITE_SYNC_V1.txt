@@ -71,6 +71,10 @@ SUPERPOWERS_SUBORDINATE=required
 CONTEXT7_ON_DEMAND=required
 FREE_FIRST_PLUGIN_ROUTING=required
 SERVICE_INTEGRATION_STATUS=required
+UPDATE_FAMILY_LIFECYCLE=required
+
+R17+ ANDROID UPDATE FAMILY
+Local fallback must preserve MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt when update-family mode is enabled: stable same-family package/signing identity, increasing versionCode, Bruno-facing LAB NN aggiornamento names, new-family immutable CANDIDATA creation and same-candidate CANDIDATA->MADRE promotion.
 
 R16+ AUTHORITY / PERSISTENT STATE / TOOL ROUTING
 Local fallback must preserve:
@@ -121,5 +125,6 @@ NO APP RUNTIME CHANGE
 MotorLab metadata must not intentionally alter app code/UI/package/signing/native engines/runtime dependencies. Telemetry SDKs and service bindings remain project changes requiring normal approval.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.12
+MOTORLAB-SATELLITE-SYNC-V1.13
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
+Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
