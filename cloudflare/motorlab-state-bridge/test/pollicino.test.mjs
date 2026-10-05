@@ -61,6 +61,8 @@ test('Codex Pollicino template stays outside app source and covers lifecycle eve
   }
   const adapter = await readFile(resolve(bridge,'../../templates/codex/motorlab/motorlab_pollicino.py'),'utf8');
   assert.match(adapter,/MOTORLAB_POLLICINO_SECRET/);
+  assert.match(adapter,/_discover_operation/);
+  assert.match(adapter,/continuity\/v1/);
   assert.match(adapter,/PUSH_HEARTBEAT/);
   assert.match(adapter,/HANDOFF_COMPLETE/);
   assert.match(adapter,/CANCELLED_BY_USER/);
@@ -75,4 +77,11 @@ test('sentinel precomputes a resume packet on stall suspicion and supersedes it 
   assert.match(sentinel,/READY_STALL_SUSPECTED/);
   assert.match(sentinel,/SUPERSEDED_PROGRESS_RESUMED/);
   assert.match(sentinel,/prepareResume\(next, iso\(\), 'STALL_SUSPECTED'\)/);
+});
+
+test('signed context endpoint is wired for operation auto-discovery', async () => {
+  const entry = await readFile(resolve(bridge,'src/entry.js'),'utf8');
+  assert.match(entry,/\/continuity\/v1\/context/);
+  assert.match(entry,/pollicinoContext/);
+  assert.match(entry,/status NOT IN \('COMPLETED','FAILED_SAFE','CANCELLED_BY_USER'\)/);
 });
