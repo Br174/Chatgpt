@@ -1,8 +1,8 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=71
-STATE_STATUS=LAB42_COVERINFO_DIAGNOSTICS_VERIFIED_DEVICE_PENDING
+STATE_REVISION=72
+STATE_STATUS=MOTHER_LAB42_CURRENT_BASELINE
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
@@ -21,7 +21,7 @@ LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
 WRITE_LOCK_SCOPE=none; LAB42 gate complete
 PENDING_VERIFICATION=Bruno device acceptance of exact LAB42 APK: verify COVER.INFO shows green/reachable with "nessuna corrispondenza" for a real zero-result case such as Stupida sfortuna / Fulminacci; verify a known COVER.INFO hit is still parsed; verify Player buono remains fast.
-NEXT_SAFE_STEP=Install/test exact MusicLab-LAB42.apk. Keep official MADRE mother/musiclab-lab41-final untouched until Bruno explicitly approves LAB42 lifecycle promotion.
+NEXT_SAFE_STEP=Use official MADRE mother/musiclab-lab42-final as the only baseline for LAB43 and later work until a newer MADRE is explicitly approved.
 LAST_USER_INTENT_SUMMARY=Correct the device-visible COVER.INFO status: screenshot showed "ricerca pubblica non disponibile" even though COVER.INFO is expected to be a primary cover source.
 ROOT_CAUSE_LAB42_1=discoverCoverInfo set searchDocument only when COVER_INFO_SONG_SELECTOR had at least one result. Therefore a valid HTTP/HTML search page containing zero songs fell through the same branch as network/unavailable failure.
 ROOT_CAUSE_LAB42_1_CORRECTION=Track successful public search reachability independently of result count. A parsed zero-result response now returns available=true, found=0 and "raggiungibile · nessuna corrispondenza"; only actual fetch/parse failure returns unavailable.
@@ -40,6 +40,13 @@ LAB42_BASE_MOTHER_REF=mother/musiclab-lab41-final
 LAB42_BASE_MOTHER_SHA=329e663061d46928dc4d58a946c0d3d2f88881b3
 LAB42_PLAYER_BUONO_MUTATED=no
 LAB42_MOTHER_MUTATED=no
+LAB42_MOTHER_REF=mother/musiclab-lab42-final
+LAB42_MOTHER_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+LAB42_MOTHER_COMPARE_STATUS=identical
+LAB42_MOTHER_PROMOTED_DATE=2026-10-05
+ROOT_CAUSE_LAB42_MOTHER_DRIFT=LAB42 had been technically completed and treated conversationally as promoted, but the repository lacked the actual mother/musiclab-lab42-final ref and MotorLab still pointed to LAB41 as official MADRE.
+ROOT_CAUSE_LAB42_MOTHER_DRIFT_CORRECTION=Created mother/musiclab-lab42-final directly at verified LAB42 SHA 43e3168c256f650d63a9b2c86ba18ef1f6cadd71 and verified zero diff.
+ROOT_CAUSE_LAB42_MOTHER_DRIFT_PREVENTION=Before creating any future LAB, reconcile the declared current MADRE against live GitHub refs and SHA; if mismatch exists, stop and repair lifecycle state before branching.
 
 
 ACTIVE_OPERATION_ID=musiclab-lab41-lab07-fast-player-restore
