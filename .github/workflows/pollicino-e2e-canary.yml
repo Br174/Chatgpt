@@ -266,3 +266,4 @@ jobs:
           print("CODEX_SIDECAR_TERMINAL_SEAL=PASSED")
           print("CODEX_SIDECAR_LIFECYCLE=PASSED")
           PY
+# retrigger: provider runner recovered 2026-10-05
