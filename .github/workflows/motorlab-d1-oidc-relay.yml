@@ -1,0 +1,73 @@
+name: MotorLab D1 OIDC Relay
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'relay/MOTORLAB_D1_OUTBOX.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Relay snapshot with GitHub OIDC
+        env:
+          MOTORLAB_BASE: https://motorlab-state-bridge.brunoverlezza.workers.dev
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.parse, urllib.request
+
+          base = os.environ["MOTORLAB_BASE"].rstrip("/")
+          path = "relay/MOTORLAB_D1_OUTBOX.json"
+          with open(path, "rb") as fh:
+              raw = fh.read()
+          snapshot = json.loads(raw.decode("utf-8"))
+          snapshot_id = snapshot["snapshot_id"]
+
+          request_url = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"]
+          request_token = os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]
+          joiner = "&" if "?" in request_url else "?"
+          oidc_url = request_url + joiner + urllib.parse.urlencode({"audience": "motorlab-state-bridge"})
+          token_req = urllib.request.Request(
+              oidc_url,
+              headers={"Authorization": f"bearer {request_token}", "Accept": "application/json"},
+          )
+          with urllib.request.urlopen(token_req, timeout=10) as response:
+              token = json.loads(response.read().decode("utf-8"))["value"]
+
+          relay_req = urllib.request.Request(
+              f"{base}/control/v1/oidc-relay",
+              data=raw,
+              method="POST",
+              headers={
+                  "Authorization": f"Bearer {token}",
+                  "Content-Type": "application/json",
+                  "Accept": "application/json",
+                  "User-Agent": "MotorLab-D1-OIDC-Relay/1.0",
+              },
+          )
+          with urllib.request.urlopen(relay_req, timeout=15) as response:
+              result = json.loads(response.read().decode("utf-8"))
+          if result.get("snapshot_id") != snapshot_id:
+              raise SystemExit("OIDC relay returned unexpected snapshot identity")
+
+          verify_req = urllib.request.Request(
+              f"{base}/verify/{urllib.parse.quote(snapshot_id, safe='')}",
+              headers={"Accept": "application/json", "User-Agent": "MotorLab-D1-OIDC-Relay/1.0"},
+          )
+          with urllib.request.urlopen(verify_req, timeout=10) as response:
+              verified = json.loads(response.read().decode("utf-8"))
+          if verified.get("snapshot_id") != snapshot_id:
+              raise SystemExit("D1 verification failed")
+
+          print(f"MOTORLAB_D1_OIDC_RELAY=PASSED snapshot_id={snapshot_id}")
+          PY
