@@ -172,7 +172,10 @@ test('Codex sidecar prefers the locally adopted stable proof head before mutable
   assert.match(adapter,/def _local_proof_head/);
   assert.match(adapter,/POLLICINO_PROOF_HEAD/);
   assert.match(adapter,/MOTORLAB_POLLICINO_PROOF_HEAD/);
-  assert.match(adapter,/or _local_proof_head\(cwd\)\s*\n\s*or head/);
+  assert.match(adapter,/root \/ "\\.motorlab" \/ "MOTORLAB_SYNC_STATE\\.txt"/);
+  assert.match(adapter,/root \/ "MOTORLAB_PROJECT_HOOK\\.txt"/);
+  assert.match(adapter,/runtime_head = .* or head/);
+  assert.match(adapter,/proof_head = _local_proof_head\(cwd\) or runtime_head/);
   const py = spawnSync('python3',['-m','py_compile',resolve(bridge,'../../templates/codex/motorlab/motorlab_pollicino.py')],{encoding:'utf8'});
   assert.equal(py.status,0,py.stderr || py.stdout);
 });
