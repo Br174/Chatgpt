@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.05-r19
+CURRENT_RELEASE=2026.10.05-r20
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -18,6 +18,7 @@ PRE_CHANGE_APPROVAL_GATE_MODULE=MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
 MODIFICATION_RESTORE_REGISTER_MODULE=MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
 AUTHORITY_DATA_OWNERSHIP_MODULE=MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
 PERSISTENT_OPERATIONAL_STATE_MODULE=MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
+POLLICINO_CONTINUITY_MODULE=MOTORLAB_POLLICINO_CONTINUITY_V1.txt
 OBSERVABILITY_DIAGNOSTICS_MODULE=MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
 KNOWLEDGE_TOOL_ROUTING_MODULE=MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 SERVICE_INTEGRATION_STATUS_MODULE=MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
@@ -49,6 +50,7 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt
 - MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
 - MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
+- MOTORLAB_POLLICINO_CONTINUITY_V1.txt
 - MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
 - MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 - MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
@@ -122,8 +124,16 @@ Every verified LAB NN aggiornamento in update-family mode must also produce LAB 
 R17+ ANDROID UPDATE FAMILIES
 MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt is mandatory for Android projects using Bruno's persistent LAB-update method. Same-family LAB revisions keep applicationId + signing certificate and increase versionCode; LAB -> CANDIDATA creates a new family without mutating LAB; approved CANDIDATA -> MADRE promotes the same candidate family/source identity.
 
+R20+ POLLICINO EXTERNAL CONTINUITY PILLAR
+MOTORLAB_POLLICINO_CONTINUITY_V1.txt is mandatory.
+Pollicino is an external control-plane trace/sentinel, never breadcrumbs injected into application code.
+It combines supported-executor liveness evidence, progress fingerprints, terminal seals, compact session journal and preemptive RESUME_READY preparation.
+Watchdog remains sole stall/recovery-level coordinator; Resume Recovery remains sole continuation coordinator.
+When a supported enrolled session loses liveness without a terminal seal, a durable external sentinel should prepare RESUME_READY before a later Bruno `continua`.
+Opaque ordinary ChatGPT thinking cannot be truthfully pinged unless the host exposes a real side-channel; risky work should therefore use observable persistent executors or bounded recoverable segments.
+
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.19
+MOTORLAB-RELEASE-MANIFEST-V1.20
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -131,3 +141,5 @@ Revision 1.17: r17 adds Android update-family lifecycle with stable package/sign
 Revision 1.18: r18 adds mandatory paired immutable LAB di sicurezza checkpoints for Android update-family revisions.
 
 Revision 1.19: r19 elevates Change Compatibility Guard to a foundational mandatory cross-project pillar for redundancy/overlap/conflict prevention.
+
+Revision 1.20: r20 adds mandatory Pollicino external session continuity, dual liveness/progress evidence, terminal seals, durable interruption sentinel and precomputed RESUME_READY without application-code breadcrumbs.
