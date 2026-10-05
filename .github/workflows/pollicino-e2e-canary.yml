@@ -16,20 +16,32 @@ jobs:
     timeout-minutes: 5
     env:
       MOTORLAB_BASE: https://motorlab-state-bridge.brunoverlezza.workers.dev
-      MUSICLAB_PROOF_HEAD: 43a1fca35e54cb05db80f1a18d02f8626f656696
       MUSICLAB_OPERATION_ID: musiclab-lab44-original-first-scoring-coverinfo-video-readiness
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Run Pollicino detector and recovery canary
         env:
           RUN_ID: ${{ github.run_id }}
         run: |
           python3 - <<'PY'
-          import json, os, time, urllib.error, urllib.parse, urllib.request
+          import json, os, re, time, urllib.error, urllib.parse, urllib.request
 
           base = os.environ["MOTORLAB_BASE"].rstrip("/")
-          proof_head = os.environ["MUSICLAB_PROOF_HEAD"]
           expected_operation = os.environ["MUSICLAB_OPERATION_ID"]
           run_id = os.environ["RUN_ID"]
+
+          with open("relay/MOTORLAB_D1_OUTBOX.json", "r", encoding="utf-8") as fh:
+              outbox = json.load(fh)
+          project = next((p for p in outbox.get("projects", []) if p.get("project_id") == "MusicLab"), None)
+          if not project:
+              raise SystemExit("MusicLab project missing from D1 outbox")
+          state = str(project.get("local_satellite_release_state") or "")
+          match = re.search(r"(?:^|\\|)POLLICINO_PROOF_HEAD=([0-9a-fA-F]{7,64})(?:\\||$)", state)
+          if not match:
+              raise SystemExit("POLLICINO_PROOF_HEAD missing from D1 outbox")
+          proof_head = match.group(1).lower()
 
           def req(method, url, payload=None, headers=None, timeout=10):
               body = None if payload is None else json.dumps(payload, separators=(",", ":")).encode()
