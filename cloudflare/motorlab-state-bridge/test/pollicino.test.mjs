@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const bridge = resolve(here, '..');
@@ -54,17 +55,19 @@ test('worker configuration binds a Durable Object sentinel and migration', async
 });
 
 test('Codex Pollicino template stays outside app source and covers lifecycle events', async () => {
-  const hooks = JSON.parse(await readFile(resolve(bridge,'../../../templates/codex/motorlab/hooks.json'),'utf8'));
+  const hooks = JSON.parse(await readFile(resolve(bridge,'../../templates/codex/motorlab/hooks.json'),'utf8'));
   for (const event of ['SessionStart','UserPromptSubmit','PostToolUse','Stop','Interrupt','SessionEnd']) {
     assert.ok(hooks.hooks[event], `missing ${event}`);
   }
-  const adapter = await readFile(resolve(bridge,'../../../templates/codex/motorlab/motorlab_pollicino.py'),'utf8');
+  const adapter = await readFile(resolve(bridge,'../../templates/codex/motorlab/motorlab_pollicino.py'),'utf8');
   assert.match(adapter,/MOTORLAB_POLLICINO_SECRET/);
   assert.match(adapter,/PUSH_HEARTBEAT/);
   assert.match(adapter,/HANDOFF_COMPLETE/);
   assert.match(adapter,/CANCELLED_BY_USER/);
   assert.match(adapter,/--daemon/);
   assert.doesNotMatch(adapter,/app\/src|src\/main|applicationId/);
+  const py = spawnSync('python3',['-m','py_compile',resolve(bridge,'../../templates/codex/motorlab/motorlab_pollicino.py')],{encoding:'utf8'});
+  assert.equal(py.status,0,py.stderr || py.stdout);
 });
 
 test('sentinel precomputes a resume packet on stall suspicion and supersedes it on progress', async () => {
