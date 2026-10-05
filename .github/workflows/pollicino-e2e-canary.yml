@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 5
     env:
       MOTORLAB_BASE: https://motorlab-state-bridge.brunoverlezza.workers.dev
-      MUSICLAB_PROOF_HEAD: 8a458f8f4d1e560736d81f78de551664998619f9
+      MUSICLAB_PROOF_HEAD: 43a1fca35e54cb05db80f1a18d02f8626f656696
       MUSICLAB_OPERATION_ID: musiclab-lab44-original-first-scoring-coverinfo-video-readiness
     steps:
       - name: Run Pollicino detector and recovery canary
@@ -50,7 +50,7 @@ jobs:
           q = urllib.parse.urlencode({"project_id": "MusicLab", "source_head": proof_head})
           _, context = req("GET", f"{base}/continuity/v1/context?{q}")
           operation_id = context["context"]["operation_id"]
-          if operation_id != expected_operation or context.get("proof") != "OPERATION_HEAD":
+          if operation_id != expected_operation or context.get("proof") != "SATELLITE_PROOF_HEAD":
               raise SystemExit("Source-proof context mismatch")
           print("SOURCE_PROOF_CONTEXT=PASSED")
 
@@ -153,7 +153,7 @@ jobs:
           print("CRASH_DETECTION=PASSED")
           print("PREEMPTIVE_RESUME_READY=PASSED")
 
-          # Fresh-chat style read: no session token; only authoritative operation SHA proof.
+          # Fresh-chat style read: no session token; stable adopted satellite proof head only.
           q = urllib.parse.urlencode({
               "project_id": "MusicLab",
               "operation_id": operation_id,
