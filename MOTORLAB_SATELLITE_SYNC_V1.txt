@@ -40,6 +40,7 @@ POST_ARTIFACT_ROOT_CAUSE_QUEUE=required
 DELIVERED_ARTIFACT_IMMUTABILITY=required
 CONTROL_PLANE_CI_SUPPRESSION=required
 CHANGE_COMPATIBILITY_GUARD=required
+CHANGE_COMPATIBILITY_PILLAR=required
 WATCHDOG=required
 RESUME_RECOVERY=required
 FOREGROUND_STALL_GUARD=required
@@ -73,6 +74,9 @@ FREE_FIRST_PLUGIN_ROUTING=required
 SERVICE_INTEGRATION_STATUS=required
 UPDATE_FAMILY_LIFECYCLE=required
 PAIRED_SAFETY_LAB=required
+
+R19+ FOUNDATIONAL CHANGE COMPATIBILITY PILLAR
+Local fallback must preserve mandatory pre-write overlap/redundancy/conflict preflight for every MotorLab/project modification. ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR. Existing equivalent logic must be reused/extended/merged or explicitly superseded; do not stack competing paths.
 
 R18+ PAIRED SAFETY LAB
 Local fallback must pair every verified LAB NN aggiornamento with immutable LAB di sicurezza NN from the same functional source state, using a distinct package/family and unique test-only signing certificate. Preserve safety checkpoint provenance for recovery into a new active family.
@@ -129,8 +133,10 @@ NO APP RUNTIME CHANGE
 MotorLab metadata must not intentionally alter app code/UI/package/signing/native engines/runtime dependencies. Telemetry SDKs and service bindings remain project changes requiring normal approval.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.14
+MOTORLAB-SATELLITE-SYNC-V1.15
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
 Revision 1.14: r18 adds paired LAB di sicurezza fallback marker and recovery checkpoint semantics.
+
+Revision 1.15: r19 adds foundational Change Compatibility Pillar marker and one-responsibility/one-coordinator fallback invariant.
