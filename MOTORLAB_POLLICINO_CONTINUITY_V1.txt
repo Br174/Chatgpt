@@ -225,7 +225,24 @@ When MOTORLAB_OPERATION_ID plus a provider-native MOTORLAB_POLLICINO_SECRET (or 
 - missing secret/operation identity fails closed/degraded and must not claim enrollment.
 This adapter is MotorLab executor infrastructure and MUST remain outside application/domain code.
 
-17B. STALL PRECOMPUTE
+17B. SOURCE-PROOF SESSION ENROLLMENT
+Provider-native HMAC secrets remain supported and preferred when already available, but they are no longer mandatory for an adopted private project.
+A project may opt into POLLICINO_SOURCE_PROOF_ENABLED through the authenticated GitHub->D1 control-plane.
+For such a project, the executor may bootstrap a session by presenting:
+- project_id;
+- session_id;
+- executor_type;
+- an exact Git source SHA matching either the D1 project source_head or the current active operation source_head.
+The Worker verifies the proof against D1, requires an active operation, then mints a cryptographically random short-lived session token stored only as a hash inside the Durable Object.
+The raw token is returned once to that executor and must live only in ephemeral local session state; never commit it, log it or copy it into project source.
+This token authorizes only Pollicino liveness/status/seal calls for that project/operation/session. It never authorizes application writes, GitHub writes or lifecycle promotion.
+If the repository becomes public or the project cannot maintain a private authoritative SHA capability, disable source-proof enrollment and require a stronger provider-native credential.
+
+17C. FAST RESUME READ WITH SOURCE PROOF
+For an opted-in project, read-only context/RESUME_READY lookup may accept the same verified source-head proof so a fresh canonical chat can consume precomputed state without holding a long-lived HMAC secret.
+The read proof never authorizes mutation; all write-capable continuation still requires normal MotorLab authority, lock and approval rules.
+
+17D. STALL PRECOMPUTE
 When an enrolled executor remains alive but crosses the configured unchanged-fingerprint threshold, Pollicino may prepare RESUME_READY with status READY_STALL_SUSPECTED immediately.
 This is read-only preparation, not cancellation or recovery.
 If later progress resumes, supersede that packet and preserve the newer verified state.
@@ -244,8 +261,10 @@ Pollicino is correctly integrated when:
 - opaque host limits are represented honestly.
 
 VERSION
-MOTORLAB-POLLICINO-CONTINUITY-V1.1
+MOTORLAB-POLLICINO-CONTINUITY-V1.2
 Established: 2026-10-05.
 Release: r20.
 
 Revision 1.1: adds canonical Codex external sidecar adapter contract and precomputed RESUME_READY on alive-but-stalled evidence, with automatic supersession when progress resumes.
+
+Revision 1.2: removes the long-lived-secret blocker for adopted private projects through D1-gated source-proof enrollment, ephemeral per-session tokens, bearer status/seal/pulse, and source-proof read-only RESUME_READY lookup.
