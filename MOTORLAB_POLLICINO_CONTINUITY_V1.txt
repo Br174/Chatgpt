@@ -248,11 +248,23 @@ Proof precedence is:
 3. current active operation.source_head.
 The explicit proof head is not a credential for code or project mutation. It grants only the same narrow Pollicino bootstrap/read capability and is replaced at the next verified satellite adoption boundary.
 
-17D. FAST RESUME READ WITH SOURCE PROOF
+17D. LOCAL ADOPTION PROOF CONSUMPTION
+The stable proof identifies the verified satellite/sidecar adoption boundary, not every later metadata-only repository commit.
+A synchronized private satellite MUST persist the same proof locally as either:
+- POLLICINO_PROOF_HEAD=<sha> in .motorlab/MOTORLAB_SYNC_STATE.txt; or
+- MOTORLAB_POLLICINO_PROOF_HEAD=<sha> in MOTORLAB_PROJECT_HOOK.txt.
+The canonical Codex sidecar resolves enrollment proof in this order:
+1. explicit MOTORLAB_SOURCE_HEAD environment override;
+2. locally persisted stable adoption proof;
+3. current Git HEAD fallback.
+Later metadata/checkpoint/rollback commits therefore do not force proof rotation when the installed sidecar adoption itself did not change.
+A new verified sidecar/satellite adoption MUST rotate both the D1 proof and local proof together at the adoption boundary.
+
+17E. FAST RESUME READ WITH SOURCE PROOF
 For an opted-in project, read-only context/RESUME_READY lookup may accept the same verified source-head proof so a fresh canonical chat can consume precomputed state without holding a long-lived HMAC secret.
 The read proof never authorizes mutation; all write-capable continuation still requires normal MotorLab authority, lock and approval rules.
 
-17E. AUTHENTICATED D1 TRANSPORT
+17F. AUTHENTICATED D1 TRANSPORT
 Central durable operational snapshots must not depend on GitHub webhook delivery alone.
 The canonical fallback/primary free transport is GitHub Actions OIDC:
 - only the private central repository Br174/Chatgpt on main may request the trusted relay role;
@@ -309,3 +321,5 @@ Revision 1.3: adds GitHub Actions OIDC authenticated D1 transport with narrow cl
 Revision 1.4: adds stable satellite POLLICINO_PROOF_HEAD precedence so mutable project operational heads cannot invalidate an adopted private executor's secretless bootstrap.
 
 Revision 1.5: records live OIDC direct-persist success and production E2E Pollicino canary 37360730928 as the r20 acceptance gate; stall/crash/preemptive-resume behavior is VERIFIED.
+
+Revision 1.5: defines the stable proof as the sidecar adoption identity and makes the Codex adapter consume the locally persisted proof before mutable Git HEAD, preventing metadata-only commits from invalidating enrollment.
