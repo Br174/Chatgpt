@@ -218,6 +218,7 @@ Project-native engines remain intact.
 The canonical Codex template may install .codex/hooks/motorlab_pollicino.py outside application source.
 When MOTORLAB_OPERATION_ID plus a provider-native MOTORLAB_POLLICINO_SECRET (or compatible relay secret) are actually available:
 - SessionStart/UserPromptSubmit/PostToolUse refresh local session evidence and send signed pulses;
+- each active hook sends one immediate pulse synchronously before relying on the detached heartbeat daemon, so first liveness does not depend on daemon startup latency;
 - a detached sidecar emits periodic PUSH_HEARTBEAT pulses while the observed host process remains alive;
 - the sidecar hashes tool input/repository/transcript metadata locally and sends only a fingerprint, not raw prompt/tool content;
 - Stop/Interrupt/SessionEnd emit terminal seals;
@@ -308,7 +309,7 @@ Pollicino is correctly integrated when:
 - opaque host limits are represented honestly.
 
 VERSION
-MOTORLAB-POLLICINO-CONTINUITY-V1.6
+MOTORLAB-POLLICINO-CONTINUITY-V1.7
 Established: 2026-10-05.
 Release: r20.
 
@@ -325,3 +326,5 @@ Revision 1.5: records live OIDC direct-persist success and production E2E Pollic
 Revision 1.5: defines the stable proof as the sidecar adoption identity and makes the Codex adapter consume the locally persisted proof before mutable Git HEAD, preventing metadata-only commits from invalidating enrollment.
 
 Revision 1.6: separates the stable enrollment proof anchor from mutable runtime Git HEAD in executor session evidence; proof is used for authentication bootstrap only, while current source revision remains independently observable for exact recovery.
+
+Revision 1.7: requires an immediate synchronous first pulse on every active Codex hook before the detached heartbeat daemon starts, closing the enrollment-to-first-liveness gap.
