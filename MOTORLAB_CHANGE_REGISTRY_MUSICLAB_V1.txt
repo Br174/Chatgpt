@@ -691,3 +691,25 @@ NEXT_LIFECYCLE_GATE=Bruno deve confrontare tap-to-first-sound LAB41 con Original
 RESTORE_SCOPE_HINTS=Su una futura baseline compatibile ripristinare solo la fast lane del resolver stream prima del fallback InnerTubeX; non sostituire interamente MusicService/PlayerConnection con file LAB07 e non sovrascrivere Cover/Originali/Archivio/MADRE/CANDIDATA.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK_DEVICE_PENDING
 
+CHANGE RECORD
+CHANGE_ID=musiclab-20261005-lab42-coverinfo-diagnostics
+DATE=2026-10-05
+TITLE=LAB42 diagnostica corretta COVER.INFO raggiungibile vs nessuna corrispondenza
+SEMANTIC_TAGS=LAB42,COVER.INFO,cover,fonti,diagnostica,no-match,rete,parser,Player buono
+USER_INTENT=Correggere il caso mostrato da Bruno in cui COVER.INFO appariva "ricerca pubblica non disponibile" durante la ricerca Stupida sfortuna / Fulminacci.
+CHANGE_SCOPE=COVERINFO_DIAGNOSTIC_CORRECTION_ONLY
+LIFECYCLE_ROLE=LAB42_DEVICE_PENDING
+SOURCE_BASE_REF=mother/musiclab-lab41-final
+SOURCE_BASE_SHA=329e663061d46928dc4d58a946c0d3d2f88881b3
+RESULT_REF=uab-build/musiclab-coverinfo-diagnostics-42
+RESULT_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/CoverDiscoverySources.kt,cloudflare/music-intelligence/test/lab42-coverinfo-diagnostics-contract.test.mjs,uab-project.env,.github/workflows/lab42-coverinfo-diagnostics-gate.yml
+BEHAVIOR_SUMMARY=COVER.INFO continua a usare ricerca precisa e parser/relazioni esistenti. Una risposta pubblica valida senza canzoni ora viene classificata come fonte raggiungibile con zero corrispondenze; solo un vero errore di fetch/parse è non disponibile. Il Player buono LAB41 non è stato modificato.
+ROOT_CAUSE=Il codice confondeva assenza di anchor canzone con indisponibilità della fonte, perché searchDocument veniva valorizzato solo in presenza di almeno un risultato.
+ROOT_CAUSE_CLOSURE=Separato lo stato di raggiungibilità dal conteggio risultati tramite publicSearchReachable. Verifica live: Stupida sfortuna/Fulminacci restituisce No Songs found; Yesterday/The Beatles restituisce regolarmente un record con URL /en/song/... compatibile col parser.
+VERIFICATION=GitHub Actions run 37249909681 success su exact SHA 43e3168c256f650d63a9b2c86ba18ef1f6cadd71; LAB42 contract, Android tests, UAB diagnostics, APK+ZIP build/integrity/upload tutti success. Artifact 11320118159 digest sha256:307cfb1e2153796cfbe541527849190e19c4da49caa0b767e830958cd3fab61c; APK sha256 844015185b88c90878003d1ec46e7bb21a019d0993d03399a83f25e8d2603627; ZIP sha256 ea137f1f3c64f8779f7a70d91b7e445e76a116f12affe42d2d180f8524517f8b.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test; no CANDIDATA/MADRE promotion before explicit approval.
+RESTORE_SCOPE_HINTS=Restore only COVER.INFO diagnostic reachability/no-match distinction onto a compatible later baseline; preserve Player buono and all unrelated Cover/Originali logic.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_SITE_LOCAL_ARTIFACT_RECHECK
+
