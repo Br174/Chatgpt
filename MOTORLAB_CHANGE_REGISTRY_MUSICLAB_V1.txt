@@ -805,3 +805,30 @@ NEXT_LIFECYCLE_GATE=Bruno device test; no CANDIDATA/MADRE promotion before expli
 RESTORE_SCOPE_HINTS=Restore original-first confidence, COVER.INFO row/relation parser, original-work recovery and progressive green video-ready behavior only onto compatible later baselines; preserve Player buono, Discogs fallback, credential controls and approval memory.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_COVERINFO_LOCAL_ARTIFACT_RECHECK
 
+CHANGE RECORD
+CHANGE_ID=musiclab-20261005-update-family-safety-lifecycle
+DATE=2026-10-05
+TITLE=MotorLab r18 MusicLab LAB aggiornamento + LAB di sicurezza
+SEMANTIC_TAGS=MotorLab,r18,LAB aggiornamento,LAB di sicurezza,famiglia,update,rollback,checkpoint,firma,applicationId
+USER_INTENT=Configurare una LAB una sola volta e ricevere le modifiche successive come aggiornamenti della stessa app, creando contemporaneamente per ogni revisione una LAB di sicurezza immutabile di famiglia diversa per evitare di tornare fino alla MADRE in caso di corruzione dopo molti aggiornamenti.
+CHANGE_SCOPE=ANDROID_UPDATE_FAMILY_PAIRED_IMMUTABLE_SAFETY_CHECKPOINTS
+RESULT_REF=uab-build/musiclab-lab44-aggiornamento-family-01
+RESULT_SHA=cb4a59afa5ec57c492c05a1ab8d845f5264cc7ad
+ACTIVE_FAMILY_ID=01
+ACTIVE_LABEL=LAB 44 aggiornamento
+ACTIVE_APPLICATION_ID=it.verlezza.musiclab.labupdate01
+ACTIVE_VERSION_CODE=4401
+ACTIVE_SIGNING_CERT_SHA256=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
+PAIRED_SAFETY_LABEL=LAB di sicurezza 44
+PAIRED_SAFETY_REF=safety/musiclab-lab-44
+PAIRED_SAFETY_APPLICATION_ID=it.verlezza.musiclab.safety44
+PAIRED_SAFETY_SIGNING_CERT_SHA256=BA18C6DFE97CE2DD145CAF85F3B65BED210375EFB428D60A7A8B6D576E5F94C8
+PAIRED_SAFETY_IMMUTABLE=yes
+NEXT_PAIR=LAB 45 aggiornamento + LAB di sicurezza 45
+BEHAVIOR_SUMMARY=All later LAB aggiornamento revisions continue the active family with stable package/signing and higher versionCode. Every successful revision also creates an independently installable safety LAB from the same functional source state, with different package and unique ephemeral test certificate. Safety checkpoints are never updated. If the active chain later breaks, a new update family can be created from the latest known-good safety source instead of returning to MADRE.
+ROOT_CAUSE=Per-build random applicationId forced full reinstall/reconfiguration, while a single long update chain alone would make rollback difficult because Android updates are forward-only and old APKs cannot safely replace newer versions in place.
+ROOT_CAUSE_CLOSURE=Stable active update family plus immutable paired safety snapshots on every verified revision. Recovery restarts a new active family from a known-good safety checkpoint.
+VERIFICATION=GitHub Actions run 37299811755 success. Main update package/version/certificate verified; paired safety package is distinct and certificate differs; both APK/ZIP artifacts uploaded. App/runtime source proven unchanged from LAB44. Local artifact recheck matched workflow digests/checksums.
+STATUS=VERIFIED_READY_FOR_DEVICE
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
+
