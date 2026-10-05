@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "snapshot_id": "pollicino-musiclab-stable-proof-966c40-20261005",
-  "sent_at": "2026-10-05T19:28:36.589Z",
+  "snapshot_id": "pollicino-musiclab-final-abf77af-20261005",
+  "sent_at": "2026-10-05T19:32:28.255Z",
   "projects": [
     {
       "project_id": "MusicLab",
       "repository": "Br174/MusicLab",
       "lifecycle_stage": "LAB",
       "source_ref": "main",
-      "source_head": "dcdca85b504d8738512579fefb8d09cf972b9819",
-      "local_satellite_release_state": "r20|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92|POLLICINO_E2E_VERIFIED",
-      "updated_at": "2026-10-05T19:28:36.589Z"
+      "source_head": "abf77afc4ae74f629cdf2d5c665211a20ed7b368",
+      "local_satellite_release_state": "r20|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92|POLLICINO_E2E_VERIFIED|LOCAL_BUNDLE=V2.14",
+      "updated_at": "2026-10-05T19:32:28.255Z"
     }
   ],
   "operations": [
@@ -31,7 +31,7 @@
       "source_ref": "uab-build/musiclab-scoring-coverinfo-video-44",
       "source_head": "8a458f8f4d1e560736d81f78de551664998619f9",
       "created_at": "2026-10-05T18:57:23.377Z",
-      "updated_at": "2026-10-05T19:28:36.589Z"
+      "updated_at": "2026-10-05T19:32:28.255Z"
     }
   ],
   "checkpoints": [
@@ -40,7 +40,7 @@
       "operation_id": "musiclab-lab44-original-first-scoring-coverinfo-video-readiness",
       "phase": "Pollicino r20 E2E complete; MusicLab LAB44 device acceptance remains independent and pending",
       "verified_progress": 100,
-      "completed_steps": "Pollicino Worker 1.3.5 deployed; OIDC D1 relay passed; source-proof enrollment, stall detection, liveness-loss crash detection, terminal seals and preemptive RESUME_READY passed E2E canary 37360730928; MusicLab satellite synced on main 966c40dbfb3746d56de199c8beb35558bf150a92 with zero app-source changes.",
+      "completed_steps": "Pollicino Worker 1.3.5 deployed; OIDC D1 relay passed; source-proof enrollment, stall detection, liveness-loss crash detection, terminal seals and preemptive RESUME_READY passed E2E; MusicLab control-plane satellite finalized on main abf77afc4ae74f629cdf2d5c665211a20ed7b368 with stable proof anchor 966c40dbfb3746d56de199c8beb35558bf150a92, V2.14 active, V2.13 LAST_GOOD, and zero application/runtime source changes.",
       "next_safe_step": "For Pollicino: no pending implementation work. For MusicLab app: preserve existing LAB44 device-acceptance next step and lifecycle rules.",
       "lock_state": "none",
       "external_wait_state": "MusicLab LAB44 device acceptance only; Pollicino complete",
