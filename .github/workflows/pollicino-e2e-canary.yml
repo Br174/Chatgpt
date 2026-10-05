@@ -219,6 +219,8 @@ jobs:
                   return json.loads(response.read().decode())
 
           hook("SessionStart")
+          last_remote = None
+          last_status_error = None
           for _ in range(10):
               if state_path.exists():
                   state=json.loads(state_path.read_text())
@@ -227,10 +229,12 @@ jobs:
                   if token and operation_id:
                       try:
                           remote=status(token,operation_id)
+                          last_remote = remote
+                          last_status_error = None
                           if (remote.get("session") or {}).get("liveness_state")=="ALIVE":
                               break
-                      except Exception:
-                          pass
+                      except Exception as exc:
+                          last_status_error = repr(exc)
               time.sleep(1)
           else:
               redacted = {}
@@ -248,7 +252,7 @@ jobs:
                       }
                   except Exception:
                       pass
-              raise SystemExit(f"Exact sidecar failed to self-enroll/pulse: {redacted}")
+              raise SystemExit(f"Exact sidecar failed to self-enroll/pulse: {redacted}; last_remote={last_remote}; last_status_error={last_status_error}")
 
           if operation_id != expected_operation:
               raise SystemExit(f"Unexpected sidecar operation {operation_id}")
