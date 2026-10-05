@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "snapshot_id": "pollicino-r20-final-20261005-02",
-  "sent_at": "2026-10-05T19:13:40.357Z",
+  "snapshot_id": "pollicino-musiclab-final-dcdca85b-20261005",
+  "sent_at": "2026-10-05T19:19:22.621Z",
   "projects": [
     {
       "project_id": "MusicLab",
       "repository": "Br174/MusicLab",
       "lifecycle_stage": "LAB",
       "source_ref": "main",
-      "source_head": "966c40dbfb3746d56de199c8beb35558bf150a92",
-      "local_satellite_release_state": "r20|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92",
-      "updated_at": "2026-10-05T19:13:40.357Z"
+      "source_head": "dcdca85b504d8738512579fefb8d09cf972b9819",
+      "local_satellite_release_state": "r20|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=dcdca85b504d8738512579fefb8d09cf972b9819",
+      "updated_at": "2026-10-05T19:19:22.621Z"
     }
   ],
   "operations": [
@@ -31,7 +31,7 @@
       "source_ref": "uab-build/musiclab-scoring-coverinfo-video-44",
       "source_head": "8a458f8f4d1e560736d81f78de551664998619f9",
       "created_at": "2026-10-05T18:57:23.377Z",
-      "updated_at": "2026-10-05T19:13:40.357Z"
+      "updated_at": "2026-10-05T19:19:22.621Z"
     }
   ],
   "checkpoints": [
@@ -44,7 +44,7 @@
       "next_safe_step": "For Pollicino: no pending implementation work. For MusicLab app: preserve existing LAB44 device-acceptance next step and lifecycle rules.",
       "lock_state": "none",
       "external_wait_state": "MusicLab LAB44 device acceptance only; Pollicino complete",
-      "created_at": "2026-10-05T19:13:40.357Z"
+      "created_at": "2026-10-05T19:19:22.621Z"
     }
   ],
   "events": [
