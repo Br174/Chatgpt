@@ -57,10 +57,17 @@ export class PollicinoSentinel extends DurableObject {
     await this.persistSession(next);
     if (!previous) await this.event(next,'SESSION_OPENED','Pollicino session enrolled',next.progress_fingerprint);
     if (previous?.progress_fingerprint !== next.progress_fingerprint && next.progress_fingerprint) await this.event(next,'FINGERPRINT_CHANGED','Material progress fingerprint changed',next.progress_fingerprint);
-    if (next.progress_state === 'STALL_SUSPECTED' && previous?.progress_state !== 'STALL_SUSPECTED') await this.event(next,'STALL_SUSPECTED','Executor is alive but progress fingerprint remained unchanged while progress was expected',next.progress_fingerprint);
+    if (next.progress_state === 'STALL_SUSPECTED' && previous?.progress_state !== 'STALL_SUSPECTED') {
+      await this.event(next,'STALL_SUSPECTED','Executor is alive but progress fingerprint remained unchanged while progress was expected',next.progress_fingerprint);
+      const packet = await this.prepareResume(next, iso(), 'STALL_SUSPECTED');
+      await this.ctx.storage.put('resume_ready', packet);
+    }
     if (previous?.liveness_state === 'LOST') {
       await this.event(next,'SESSION_REVIVED','A valid liveness pulse arrived after interruption suspicion',next.progress_fingerprint);
       await this.env.DB.prepare("UPDATE pollicino_resume_packets SET status='SUPERSEDED_REVIVED' WHERE session_id=? AND status LIKE 'READY%'").bind(next.session_id).run();
+    } else if (previous?.progress_state === 'STALL_SUSPECTED' && next.progress_state !== 'STALL_SUSPECTED') {
+      await this.event(next,'PROGRESS_RESUMED','Progress resumed after a prior stall suspicion',next.progress_fingerprint);
+      await this.env.DB.prepare("UPDATE pollicino_resume_packets SET status='SUPERSEDED_PROGRESS_RESUMED' WHERE session_id=? AND status='READY_STALL_SUSPECTED'").bind(next.session_id).run();
     }
     await this.ctx.storage.setAlarm(next.last_signal_ms + next.lease_ms);
     return {session_id:next.session_id,liveness_state:next.liveness_state,progress_state:next.progress_state,recommended_action:recommendedAction(next),next_alarm_at:iso(next.last_signal_ms + next.lease_ms)};
@@ -76,7 +83,7 @@ export class PollicinoSentinel extends DurableObject {
     return {session_id:next.session_id,terminal_seal:next.terminal_seal,sealed_at:next.terminal_at};
   }
 
-  async prepareResume(session, observedAt) {
+  async prepareResume(session, observedAt, reason = 'LIVENESS_LOST') {
     await this.ensureSchema();
     const operation = await this.env.DB.prepare('SELECT * FROM operations WHERE operation_id=?').bind(session.operation_id).first();
     const checkpoint = await this.env.DB.prepare('SELECT * FROM checkpoints WHERE operation_id=? ORDER BY created_at DESC LIMIT 1').bind(session.operation_id).first();
@@ -85,14 +92,14 @@ export class PollicinoSentinel extends DurableObject {
     const progressCandidates = [session.verified_progress,operation?.overall_progress,checkpoint?.verified_progress].filter(Number.isInteger);
     const packet = {
       resume_id:`${session.operation_id}:${session.session_id}`,project_id:session.project_id,operation_id:session.operation_id,session_id:session.session_id,
-      status:'READY_PRECOMPUTED',prepared_at:iso(),observed_at:observedAt,verified_progress:progressCandidates.length ? Math.max(...progressCandidates) : null,
+      status:reason === 'STALL_SUSPECTED' ? 'READY_STALL_SUSPECTED' : 'READY_PRECOMPUTED',prepared_at:iso(),observed_at:observedAt,verified_progress:progressCandidates.length ? Math.max(...progressCandidates) : null,
       phase:session.phase ?? operation?.phase ?? checkpoint?.phase ?? null,source_ref:session.source_ref ?? operation?.source_ref ?? null,
       source_head:session.source_head ?? operation?.source_head ?? null,last_completed_action:session.last_completed_action ?? checkpoint?.completed_steps ?? null,
       current_action:session.current_action ?? null,next_action:session.next_action ?? checkpoint?.next_safe_step ?? null,changed_resources:session.changed_resources ?? null,
       test_status:session.test_status ?? null,build_status:session.build_status ?? null,
       artifact_status:session.artifact_status ?? (artifact ? `${artifact.name}:${artifact.verification_state}:${artifact.delivery_state}` : null),
       provider_job_status:session.provider_job_status ?? null,blocker:session.blocker ?? null,root_cause:session.root_cause ?? rootCause?.defect ?? null,
-      evidence_summary:'Prepared automatically from Pollicino session + D1 operation/checkpoint/artifact evidence after liveness loss; GitHub remains technical authority.',
+      evidence_summary:`Prepared automatically from Pollicino session + D1 operation/checkpoint/artifact evidence after ${reason}; GitHub remains technical authority.`,
       live_write_recheck_required:1
     };
     await this.env.DB.prepare(`
@@ -112,7 +119,7 @@ export class PollicinoSentinel extends DurableObject {
       str(packet.next_action),str(packet.changed_resources,8192),str(packet.test_status),str(packet.build_status),str(packet.artifact_status),
       str(packet.provider_job_status),str(packet.blocker),str(packet.root_cause),str(packet.evidence_summary,8192),packet.live_write_recheck_required).run();
     if (this.env.CACHE) { try { await this.env.CACHE.put(`pollicino:${packet.project_id}:resume-ready`,JSON.stringify(packet),{expirationTtl:86400}); } catch {} }
-    await this.event(session,'RESUME_READY_PREPARED','Preemptive RESUME_READY prepared after supported-session liveness loss',session.progress_fingerprint);
+    await this.event(session,'RESUME_READY_PREPARED',`Preemptive RESUME_READY prepared after ${reason}`,session.progress_fingerprint);
     return packet;
   }
 
