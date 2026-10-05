@@ -141,6 +141,10 @@ async function oidcRelay(request, env) {
 
 function validId(value) { return typeof value === 'string' && /^[A-Za-z0-9._:/-]{1,128}$/.test(value); }
 function validSourceHead(value) { return typeof value === 'string' && /^[0-9a-f]{7,64}$/i.test(value); }
+function stableProofHead(state) {
+  const match = String(state || '').match(/(?:^|\|)POLLICINO_PROOF_HEAD=([0-9a-f]{7,64})(?:\||$)/i);
+  return match ? match[1].toLowerCase() : null;
+}
 function bearerToken(request) {
   const value = request.headers.get('authorization');
   return typeof value === 'string' && value.startsWith('Bearer ') ? value.slice(7).trim() : null;
@@ -155,11 +159,15 @@ async function sourceProofProject(env, projectId, sourceHead) {
     "SELECT operation_id, project_id, status, phase, overall_progress, source_ref, source_head, updated_at FROM operations WHERE project_id=? AND status NOT IN ('COMPLETED','FAILED_SAFE','CANCELLED_BY_USER') ORDER BY updated_at DESC LIMIT 1"
   ).bind(projectId).first();
   if (!operation) return null;
-  const proof = String(project.source_head || '').toLowerCase() === sourceHead.toLowerCase()
-    ? 'PROJECT_HEAD'
-    : String(operation.source_head || '').toLowerCase() === sourceHead.toLowerCase()
-      ? 'OPERATION_HEAD'
-      : null;
+  const candidate = sourceHead.toLowerCase();
+  const stableHead = stableProofHead(project.local_satellite_release_state);
+  const proof = stableHead === candidate
+    ? 'SATELLITE_PROOF_HEAD'
+    : String(project.source_head || '').toLowerCase() === candidate
+      ? 'PROJECT_HEAD'
+      : String(operation.source_head || '').toLowerCase() === candidate
+        ? 'OPERATION_HEAD'
+        : null;
   return proof ? { project, operation, proof } : null;
 }
 async function continuityAuth(request, env, rawBody = '') {
