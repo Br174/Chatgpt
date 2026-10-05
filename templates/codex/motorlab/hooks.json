@@ -15,8 +15,7 @@
           {
             "type": "command",
             "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_pollicino.py\"",
-            "timeout": 5,
-            "async": true
+            "timeout": 5
           }
         ]
       }
@@ -27,8 +26,7 @@
           {
             "type": "command",
             "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_pollicino.py\"",
-            "timeout": 5,
-            "async": true
+            "timeout": 5
           }
         ]
       }
@@ -47,8 +45,7 @@
           {
             "type": "command",
             "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_pollicino.py\"",
-            "timeout": 5,
-            "async": true
+            "timeout": 5
           }
         ]
       }
