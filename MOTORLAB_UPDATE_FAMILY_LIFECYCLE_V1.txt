@@ -1,0 +1,73 @@
+MOTORLAB UPDATE FAMILY LIFECYCLE V1
+
+STATUS
+Canonical lifecycle extension for Android test/update families.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Let Bruno install/configure a LAB family once, then receive later LAB revisions as in-place Android updates that preserve accounts, local data, tokens, secrets and settings, while keeping MADRE/CANDIDATA lifecycle isolation and immutable promotion semantics.
+
+BRUNO-FACING NAMES - MANDATORY
+- First install of a new test family: LAB NN.
+- First revision inside that same family: LAB NN aggiornamento.
+- Every later requested LAB revision increments the visible LAB number and keeps the word "aggiornamento".
+  Example: LAB 44 aggiornamento -> LAB 45 aggiornamento -> LAB 46 aggiornamento.
+- Bruno-facing names must remain simple; internal family ids/package ids/signing profiles stay technical metadata.
+
+FAMILY IDENTITY
+Each Android update family owns immutable technical identity:
+- UPDATE_FAMILY_ID
+- APPLICATION_ID / package id
+- SIGNING_PROFILE / signing certificate
+- monotonically increasing Android versionCode
+- family origin source ref/SHA
+- current family head ref/SHA
+Changing package id or signing certificate creates a NEW family and MUST NOT be presented as an update.
+
+LAB FAMILY
+1. A new LAB family is created from the approved source baseline selected for that cycle.
+2. Its first install is a separate Android application from the MADRE.
+3. Bruno may need to configure accounts/tokens/settings once on that first install.
+4. Later LAB aggiornamento builds in that family MUST keep the same applicationId and signing certificate and MUST increase versionCode.
+5. Later LAB aggiornamento source starts from the immediately previous approved/current LAB aggiornamento head, not from an older revision.
+6. Artifact/display names may change to the new visible LAB number without changing technical family identity.
+7. LAB family signing keys are test-only unless an adapter explicitly defines otherwise.
+
+CANDIDATA - NEW FAMILY / METHOD COPY
+1. CANDIDATA is NEVER a package-id conversion of the LAB family.
+2. CANDIDATA is a NEW Android family with a new applicationId/family id.
+3. Candidate source/method must reproduce the exact approved LAB state/change-set according to canonical promotion rules.
+4. Creating CANDIDATA must not mutate, move or invalidate the LAB family.
+5. A created CANDIDATA is immutable. If later changes are needed, return to the LAB family, create the next LAB aggiornamento, then create a NEW CANDIDATA number from the newly approved LAB.
+6. Bruno-facing candidate names are CANDIDATA 01, CANDIDATA 02, etc.
+
+CANDIDATA -> MADRE - CONVERSION/PROMOTION
+1. Once Bruno explicitly approves a CANDIDATA, that SAME candidate source identity becomes the NEW MADRE source.
+2. Do not reconstruct application source during promotion.
+3. For Android, MADRE packaging/signing must preserve the candidate family identity when the project policy declares candidate-as-future-mother.
+4. CANDIDATA -> MADRE is therefore a promotion/conversion of the approved candidate family, unlike LAB -> CANDIDATA which is a new-family method copy.
+5. Historical MADRI remain immutable rollback points.
+
+SIGNING
+- Same-family updates require the same Android signing certificate.
+- LAB test families may use a dedicated stable test-only signing profile managed by the project pipeline, so Bruno does not have to enter another runtime secret.
+- Production/future-MADRE signing material must not be committed as ordinary project source. Use adapter-approved protected signing storage/secrets.
+- Never silently reuse a LAB test signing key as a production/MADRE key.
+
+VERSIONING
+- versionCode MUST strictly increase inside one Android family.
+- versionName/display name may follow Bruno-facing lifecycle names.
+- applicationId and signing identity MUST remain stable inside a family.
+- A build gate for update families must verify package id, versionCode and certificate identity before artifact acceptance.
+
+RECOVERY / CONTINUITY
+- Persist family identity in MotorLab project state/registry.
+- New chat/resume must recover the active family rather than invent a new package id.
+- If family identity or signing provenance cannot be proven, stop before building rather than risk an APK that Android cannot install as an update.
+
+COMPATIBILITY
+This module extends, not replaces, MADRE -> LAB -> CANDIDATA -> NEW MADRE. It changes Android packaging/update mechanics and LAB continuation semantics only where Bruno has explicitly selected update-family mode. Existing historical families remain valid.
+
+VERSION
+MOTORLAB-UPDATE-FAMILY-LIFECYCLE-V1.0
+Established: 2026-10-05
