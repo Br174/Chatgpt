@@ -713,3 +713,25 @@ NEXT_LIFECYCLE_GATE=Bruno device test; no CANDIDATA/MADRE promotion before expli
 RESTORE_SCOPE_HINTS=Restore only COVER.INFO diagnostic reachability/no-match distinction onto a compatible later baseline; preserve Player buono and all unrelated Cover/Originali logic.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_SITE_LOCAL_ARTIFACT_RECHECK
 
+CHANGE RECORD
+CHANGE_ID=musiclab-20261005-lab43-coverinfo-video-acceleration
+DATE=2026-10-05
+TITLE=LAB43 COVER.INFO esteso + video pronti più rapidamente
+SEMANTIC_TAGS=LAB43,COVER.INFO,cover,fonti,video,verifica,YouTube,parallelismo,Player buono
+USER_INTENT=Ridurre drasticamente le schede Cover ferme su Video in verifica e recuperare le molte versioni che COVER.INFO trovava in precedenza, senza modificare Player buono.
+CHANGE_SCOPE=COVERINFO_BREADTH_DIRECT_VIDEO_BINDING_VIDEO_PRELOAD
+LIFECYCLE_ROLE=LAB43_DEVICE_PENDING
+SOURCE_BASE_REF=mother/musiclab-lab42-final
+SOURCE_BASE_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+RESULT_REF=uab-build/musiclab-coverinfo-video-43
+RESULT_SHA=a3e99b83aac4fd8a47273c129bdedcec81e7dfdb
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/CoverDiscoverySources.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsVersionSource.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt,cloudflare/music-intelligence/test/lab43-coverinfo-video-contract.test.mjs,uab-project.env,.github/workflows/lab43-coverinfo-video-gate.yml
+BEHAVIOR_SUMMARY=COVER.INFO non si ferma più al primo match: fonde query precisa, song-only e titolo largo, fino a 200 risultati per pagina, e amplia le relazioni opera/versione. Gli eventuali .youtube-id presenti nella stessa riga COVER.INFO vengono importati come video già risolti e forniscono anche thumbnail fallback. I restanti video vengono verificati in batch 24 con parallelismo 6 anziché 10/3. Player buono è invariato.
+ROOT_CAUSE=Tre colli di bottiglia combinati: first-hit short-circuit su COVER.INFO, perdita degli id YouTube già presenti nelle righe COVER.INFO, e coda resolver residua troppo seriale per result set numerosi.
+ROOT_CAUSE_CLOSURE=Multi-query merge + per-page 200 + row-scoped direct-video binding + batch/parallelism 24/6, mantenendo exact-recording guards e Player buono.
+VERIFICATION=Live COVER.INFO markup verified .youtube-parent/.youtube-id association and La notte dell'addio breadth (precise 1 vs wider 5/11). GitHub Actions run 37253740982 success su exact SHA a3e99b83aac4fd8a47273c129bdedcec81e7dfdb: LAB43 contract, Android unit tests, UAB diagnostics, APK+ZIP build/integrity/upload all success. Artifact 11322133426 digest sha256:b420a9c79c79a8bf70d8651b11b9def3a1b2b4f8d3ebbc77359be7b3822e8e34; APK sha256 d62b191c2ffb6cc70f07f8352cd74f6466357f2a55ee42ab33405945f29fc8ac; ZIP sha256 9074f637abcbc02c7e92c25afae2e07952b4c40192b6eb8491ff5b88fc046fb4.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test. No CANDIDATA/MADRE promotion before explicit approval.
+RESTORE_SCOPE_HINTS=Restore only COVER.INFO multi-query breadth, row-scoped direct video binding and video preload 24/6 onto a compatible later baseline. Preserve Player buono and unrelated Cover/Originali logic.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_SITE_LOCAL_ARTIFACT_RECHECK
+
