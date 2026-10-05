@@ -24,6 +24,18 @@ Each Android update family owns immutable technical identity:
 - current family head ref/SHA
 Changing package id or signing certificate creates a NEW family and MUST NOT be presented as an update.
 
+PAIRED SAFETY LAB - MANDATORY
+For every verified LAB NN aggiornamento artifact, MotorLab must create a paired LAB di sicurezza NN checkpoint from the SAME exact application-source state.
+- Bruno-facing pair example: LAB 45 aggiornamento + LAB di sicurezza 45.
+- The safety LAB is a DIFFERENT Android family/package and uses a DIFFERENT test-only signing certificate from the active update family.
+- The safety LAB is immutable: it is never patched or updated in place.
+- The safety artifact must be independently installable alongside the active update family.
+- The safety source checkpoint/ref must point to the exact same functional source state as its paired update revision; only packaging/signing metadata may differ.
+- Record source SHA, package id, signing certificate fingerprint, checksum and paired update revision.
+- If a later active update family becomes unusable/corrupted, Bruno may choose the latest known-good safety checkpoint. MotorLab then creates a NEW active update family from that safety source state instead of falling all the way back to MADRE.
+- A safety checkpoint is NOT a CANDIDATA and cannot become MADRE directly without the normal CANDIDATA lifecycle.
+- Safety signing private material does not need persistence because safety checkpoints are never updated; generate a unique ephemeral test key per safety artifact and persist only its certificate fingerprint/evidence.
+
 LAB FAMILY
 1. A new LAB family is created from the approved source baseline selected for that cycle.
 2. Its first install is a separate Android application from the MADRE.
@@ -61,7 +73,8 @@ VERSIONING
 - A build gate for update families must verify package id, versionCode and certificate identity before artifact acceptance.
 
 RECOVERY / CONTINUITY
-- Persist family identity in MotorLab project state/registry.
+- Persist active family identity plus all paired safety checkpoints in MotorLab project state/registry.
+- The latest Bruno-confirmed/technically verified safety checkpoint becomes the preferred recovery floor for update-family corruption; MADRE remains the ultimate stable fallback.
 - New chat/resume must recover the active family rather than invent a new package id.
 - If family identity or signing provenance cannot be proven, stop before building rather than risk an APK that Android cannot install as an update.
 
@@ -69,5 +82,6 @@ COMPATIBILITY
 This module extends, not replaces, MADRE -> LAB -> CANDIDATA -> NEW MADRE. It changes Android packaging/update mechanics and LAB continuation semantics only where Bruno has explicitly selected update-family mode. Existing historical families remain valid.
 
 VERSION
-MOTORLAB-UPDATE-FAMILY-LIFECYCLE-V1.0
+MOTORLAB-UPDATE-FAMILY-LIFECYCLE-V1.1
 Established: 2026-10-05
+Revision 1.1: paired immutable LAB di sicurezza checkpoint for every LAB aggiornamento, with distinct family/signing identity and recovery-from-safety semantics.
