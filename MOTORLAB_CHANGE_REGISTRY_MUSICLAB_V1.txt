@@ -735,3 +735,26 @@ NEXT_LIFECYCLE_GATE=Bruno device test. No CANDIDATA/MADRE promotion before expli
 RESTORE_SCOPE_HINTS=Restore only COVER.INFO multi-query breadth, row-scoped direct video binding and video preload 24/6 onto a compatible later baseline. Preserve Player buono and unrelated Cover/Originali logic.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_SITE_LOCAL_ARTIFACT_RECHECK
 
+CHANGE RECORD
+CHANGE_ID=musiclab-20261005-lab43b-discogs-token-approval
+DATE=2026-10-05
+TITLE=LAB43B Discogs resiliente + token gestibili + stato approvazione persistente
+SEMANTIC_TAGS=LAB43B,Discogs,token,Last.fm,credenziali,occhietto,cancella,approvata,Archivio Cloud,Player buono
+USER_INTENT=Ripristinare Discogs nelle Fonti, poter vedere/cancellare/reinserire i token e riconoscere una cover già approvata senza poterla approvare una seconda volta.
+CHANGE_SCOPE=DISCOGS_PUBLIC_FALLBACK_CREDENTIAL_UI_APPROVAL_MEMORY
+LIFECYCLE_ROLE=LAB43B_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-coverinfo-video-43
+SOURCE_BASE_SHA=a3e99b83aac4fd8a47273c129bdedcec81e7dfdb
+OFFICIAL_MOTHER_REF=mother/musiclab-lab42-final
+OFFICIAL_MOTHER_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+RESULT_REF=uab-build/musiclab-coverinfo-video-discogs-43b
+RESULT_SHA=3849c3f833b10ad053b3f46b5ce5b3f0f61d5fe2
+BEHAVIOR_SUMMARY=Discogs public catalogue/release access no longer depends on a working local token; stale/invalid authenticated requests retry publicly and transient errors retry with backoff. Discogs stays visible in source diagnostics on failure. Last.fm API key, Last.fm secret and Discogs token each gain show/hide and clear controls. Cover detail uses Archivio Cloud decisions to show Stato: Approvata/Non approvata; Approva is disabled for already-approved items while Disapprova remains available. LAB43 COVER.INFO breadth/video acceleration and Player buono are preserved.
+ROOT_CAUSE=Hard token guards and missing diagnostics made Discogs disappear even while the live public API worked. Credential fields lacked reveal/clear actions. Approval decisions were saved but not reconstructed into persistent UI state on later searches.
+ROOT_CAUSE_CLOSURE=Optional authenticated/public Discogs path with retries and diagnostics; credential reveal/clear controls; stable approval keys reconstructed from cloud and merged into seed/dialog state.
+VERIFICATION=Final GitHub Actions run 37257265482 success on exact SHA 3849c3f833b10ad053b3f46b5ce5b3f0f61d5fe2: LAB43B contract, Android unit/compile tests, UAB diagnostics, APK+ZIP build/integrity/upload all passed. First run 37256924861 exposed one compile-only helper-scope issue, corrected before final success. Artifact 11323755521 digest sha256:baa622b786b4fa9ba1bb06d6e6767a3be33185c74a3df3a805d4a4d22db1803a; APK sha256 6a80ebcc8676d59190a3916f738bd7e470ead9c91935be3ef19f00389affc420; ZIP sha256 75959b5a06728736f2a75c768587fc25ab5733d6c9b0b93aa611e3c4ed65226a.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test; no CANDIDATA/MADRE promotion before explicit approval.
+RESTORE_SCOPE_HINTS=Restore Discogs optional-auth public fallback, credential reveal/clear UI and persistent approval-state logic onto a compatible later baseline. Preserve Player buono, LAB43 COVER.INFO breadth/video acceleration and unrelated Originali/Archivio behavior.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_DISCOGS_LOCAL_ARTIFACT_RECHECK
+
