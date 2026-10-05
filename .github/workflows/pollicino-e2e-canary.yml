@@ -22,6 +22,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Static Pollicino regression suite
+        run: |
+          node --test cloudflare/motorlab-state-bridge/test/pollicino.test.mjs
+          python3 -m py_compile templates/codex/motorlab/motorlab_pollicino.py
+
       - name: Run Pollicino detector and recovery canary
         env:
           RUN_ID: ${{ github.run_id }}
@@ -225,7 +230,22 @@ jobs:
                           pass
               time.sleep(1)
           else:
-              raise SystemExit("Exact sidecar failed to self-enroll/pulse")
+              redacted = {}
+              if state_path.exists():
+                  try:
+                      current = json.loads(state_path.read_text())
+                      redacted = {
+                          "operation_id": current.get("operation_id"),
+                          "project_id": current.get("project_id"),
+                          "proof_head": current.get("proof_head"),
+                          "source_head": current.get("source_head"),
+                          "token_present": bool(current.get("session_token")),
+                          "initial_pulse_ok": current.get("initial_pulse_ok"),
+                          "daemon_pid_present": bool(current.get("daemon_pid")),
+                      }
+                  except Exception:
+                      pass
+              raise SystemExit(f"Exact sidecar failed to self-enroll/pulse: {redacted}")
 
           if operation_id != expected_operation:
               raise SystemExit(f"Unexpected sidecar operation {operation_id}")
