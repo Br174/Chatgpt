@@ -99,6 +99,10 @@ MOTORLAB_UPDATE_VERSION_CODE=<strictly increasing integer>
 MOTORLAB_UPDATE_VISIBLE_NAME=<Bruno-facing LAB NN aggiornamento / CANDIDATA NN name>
 MOTORLAB_UPDATE_ORIGIN_REF=<family origin ref/SHA>
 MOTORLAB_UPDATE_CURRENT_REF=<current family head ref/SHA>
+MOTORLAB_SAFETY_LAB_MODE=<paired|required|off-with-reason>
+MOTORLAB_SAFETY_LAB_PACKAGE=<distinct package id for paired safety snapshot>
+MOTORLAB_SAFETY_LAB_SIGNING=<unique test-only certificate identity>
+MOTORLAB_SAFETY_LAB_REF=<immutable checkpoint ref/SHA>
 
 Legacy adapters that do not yet declare watchdog/background/service-guard/velocity fields remain usable. MotorLab applies conservative defaults, MUST NOT claim true persistent background continuity unless a durable executor is actually defined and observable, MUST NOT invent provider quota values that have not been established, and MUST NOT use a Velocity optimization that cannot be proven compatible with existing MotorLab safety rules.
 
@@ -156,9 +160,13 @@ MANDATORY ADAPTER BEHAVIOR
 51. If a candidate needs source changes, return to the LAB family, create the next LAB aggiornamento, approve it, then create a new CANDIDATA number; do not patch an existing candidate.
 52. Approved CANDIDATA -> MADRE promotes the same candidate source identity. Android packaging may preserve that candidate family identity as the future MADRE identity according to project policy; no LAB test key may silently become a production key.
 53. Update-family artifact gates MUST verify package/applicationId, monotonically increasing versionCode and signing certificate identity before calling the artifact update-compatible.
+54. Every verified LAB NN aggiornamento in update-family mode MUST produce a paired LAB di sicurezza NN from the exact same functional source state, with a different package/family and different test-only signing certificate.
+55. Paired safety LABs are immutable and are never updated in place. If the active family later becomes unusable, create a new active update family from the selected known-good safety source state.
+56. Safety private signing material need not persist because safety artifacts are not updated; persist only certificate fingerprint, package id, checksum and source/ref evidence.
+57. A paired safety LAB is not a CANDIDATA and cannot bypass the normal CANDIDATA -> MADRE gate.
 
 VERSION
-UAB-ADAPTER-SPEC-V1.6 / MOTORLAB COMPATIBILITY
+UAB-ADAPTER-SPEC-V1.7 / MOTORLAB COMPATIBILITY
 Established: 2026-09-24
 Revision 1.1: atomic LAB and exact same-Mother/same-change Candidate promotion chain.
 Revision 1.2: MotorLab naming compatibility plus mandatory anti-stall watchdog observability, checkpoint, lock and recovery contract.
@@ -166,3 +174,5 @@ Revision 1.3: persistent background execution, durable checkpoints and single-ch
 Revision 1.4: reusable External Service Guard provider/API protection fields and mandatory adapter behavior.
 Revision 1.5: additive-only Velocity Layer fields, project snapshots, Change Capsules, FAST LAB, risk-scaled LAB verification and safe incremental build readiness.
 Revision 1.6: Android update-family fields and stable package/signing/versionCode gates.
+
+Revision 1.7: r18 adds paired immutable LAB di sicurezza adapter fields and recovery checkpoints.
