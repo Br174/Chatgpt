@@ -239,9 +239,9 @@ This token authorizes only Pollicino liveness/status/seal calls for that project
 If the repository becomes public or the project cannot maintain a private authoritative SHA capability, disable source-proof enrollment and require a stronger provider-native credential.
 
 17C. STABLE SATELLITE PROOF HEAD
-The mutable projects.source_head field is operational state and may legitimately be rewritten by later project reconciliation.
+The mutable projects.source_head field and the executor's current Git HEAD are operational state and may legitimately change after normal project work. Neither may be the only long-lived bootstrap proof.
 Therefore it MUST NOT be the only bootstrap proof for a private adopted satellite.
-When source-proof enrollment is enabled, local_satellite_release_state may carry exactly one explicit `POLLICINO_PROOF_HEAD=<git-sha>` marker for the currently adopted control-plane revision.
+When source-proof enrollment is enabled, local_satellite_release_state carries exactly one explicit `POLLICINO_PROOF_HEAD=<git-sha>` marker for a previously verified adopted control-plane revision. The same anchor MUST be available to the external executor sidecar through project control-plane metadata (for example MOTORLAB_PROJECT_HOOK.txt or .motorlab state), never application source. The sidecar uses this stable anchor only for enrollment/context proof while still reporting the real current Git HEAD separately as source evidence.
 Proof precedence is:
 1. POLLICINO_PROOF_HEAD from the verified satellite state;
 2. current projects.source_head;
@@ -296,7 +296,7 @@ Pollicino is correctly integrated when:
 - opaque host limits are represented honestly.
 
 VERSION
-MOTORLAB-POLLICINO-CONTINUITY-V1.5
+MOTORLAB-POLLICINO-CONTINUITY-V1.6
 Established: 2026-10-05.
 Release: r20.
 
@@ -309,3 +309,5 @@ Revision 1.3: adds GitHub Actions OIDC authenticated D1 transport with narrow cl
 Revision 1.4: adds stable satellite POLLICINO_PROOF_HEAD precedence so mutable project operational heads cannot invalidate an adopted private executor's secretless bootstrap.
 
 Revision 1.5: records live OIDC direct-persist success and production E2E Pollicino canary 37360730928 as the r20 acceptance gate; stall/crash/preemptive-resume behavior is VERIFIED.
+
+Revision 1.6: closes the proof-anchor recurrence gap: Codex sidecars must read a stable local POLLICINO_PROOF_HEAD from control-plane metadata for bootstrap, while keeping the real mutable Git HEAD separate for session evidence. Canary proof is read dynamically from the canonical D1 outbox.
