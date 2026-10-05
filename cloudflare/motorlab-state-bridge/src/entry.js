@@ -1,4 +1,5 @@
 import core, { sha256Hex, validateSnapshot } from './index.js';
+import { verifyGitHubActionsOidc } from './github-oidc.js';
 export { PollicinoSentinel } from './pollicino-sentinel.js';
 
 export { sha256Hex, validateSnapshot };
@@ -96,6 +97,56 @@ async function issueRelay(request, env) {
     }
   });
   return core.fetch(relayRequest, { ...env, RELAY_SECRET: env.GITHUB_WEBHOOK_SECRET });
+}
+
+
+async function oidcRelay(request, env) {
+  if (!env.GITHUB_WEBHOOK_SECRET) return json({ error: 'internal_relay_not_configured' }, 503);
+  const rawSnapshot = await request.text();
+  if (textEncoder.encode(rawSnapshot).byteLength > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
+  try { validateSnapshot(JSON.parse(rawSnapshot)); }
+  catch (error) { return json({ error: error.message || 'invalid_snapshot' }, 400); }
+
+  const auth = request.headers.get('authorization');
+  const jwt = typeof auth === 'string' && auth.startsWith('Bearer ') ? auth.slice(7).trim() : null;
+  if (!jwt) return json({ error: 'missing_oidc_token' }, 401);
+
+  let claims;
+  try {
+    claims = await verifyGitHubActionsOidc(jwt, {
+      audience: env.GITHUB_OIDC_AUDIENCE || 'motorlab-state-bridge',
+      repository: env.OIDC_ALLOWED_REPOSITORY || env.ALLOWED_REPOSITORY || 'Br174/Chatgpt',
+      repositoryId: env.OIDC_ALLOWED_REPOSITORY_ID || null,
+      ref: env.OIDC_ALLOWED_REF || 'refs/heads/main',
+      workflowRef: env.OIDC_ALLOWED_WORKFLOW_REF || 'Br174/Chatgpt/.github/workflows/motorlab-d1-oidc-relay.yml@refs/heads/main'
+    });
+  } catch (error) {
+    return json({ error: error?.message || 'invalid_oidc_token' }, 401);
+  }
+
+  if (env.CACHE) {
+    try {
+      const replayKey = `github-oidc-jti:${claims.jti}`;
+      if (await env.CACHE.get(replayKey)) return json({ error: 'oidc_replay' }, 409);
+    } catch {}
+  }
+
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const signature = await signInternalRelay(env.GITHUB_WEBHOOK_SECRET, timestamp, rawSnapshot);
+  const relayRequest = new Request(new URL('/relay', request.url), {
+    method: 'POST',
+    body: rawSnapshot,
+    headers: {
+      'content-type': 'application/json',
+      'x-motorlab-timestamp': timestamp,
+      'x-motorlab-signature': signature
+    }
+  });
+  const response = await core.fetch(relayRequest, { ...env, RELAY_SECRET: env.GITHUB_WEBHOOK_SECRET });
+  if (response.ok && env.CACHE) {
+    try { await env.CACHE.put(`github-oidc-jti:${claims.jti}`, '1', { expirationTtl: 900 }); } catch {}
+  }
+  return response;
 }
 
 
@@ -250,6 +301,7 @@ export default {
     if (request.method === 'POST' && url.pathname === '/github-webhook' && request.headers.get('x-github-event') === 'issues') {
       return issueRelay(request, env);
     }
+    if (request.method === 'POST' && url.pathname === '/control/v1/oidc-relay') return oidcRelay(request, env);
     if (request.method === 'POST' && url.pathname === '/continuity/v1/enroll') return pollicinoEnroll(request, env);
     if (request.method === 'POST' && url.pathname === '/continuity/v1/pulse') return pollicinoPulse(request, env);
     if (request.method === 'POST' && url.pathname === '/continuity/v1/seal') return pollicinoSeal(request, env);
