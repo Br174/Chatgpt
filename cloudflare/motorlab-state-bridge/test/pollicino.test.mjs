@@ -52,3 +52,24 @@ test('worker configuration binds a Durable Object sentinel and migration', async
   assert.match(wrangler,/"PollicinoSentinel"/);
   assert.match(wrangler,/"new_sqlite_classes"/);
 });
+
+test('Codex Pollicino template stays outside app source and covers lifecycle events', async () => {
+  const hooks = JSON.parse(await readFile(resolve(bridge,'../../../templates/codex/motorlab/hooks.json'),'utf8'));
+  for (const event of ['SessionStart','UserPromptSubmit','PostToolUse','Stop','Interrupt','SessionEnd']) {
+    assert.ok(hooks.hooks[event], `missing ${event}`);
+  }
+  const adapter = await readFile(resolve(bridge,'../../../templates/codex/motorlab/motorlab_pollicino.py'),'utf8');
+  assert.match(adapter,/MOTORLAB_POLLICINO_SECRET/);
+  assert.match(adapter,/PUSH_HEARTBEAT/);
+  assert.match(adapter,/HANDOFF_COMPLETE/);
+  assert.match(adapter,/CANCELLED_BY_USER/);
+  assert.match(adapter,/--daemon/);
+  assert.doesNotMatch(adapter,/app\/src|src\/main|applicationId/);
+});
+
+test('sentinel precomputes a resume packet on stall suspicion and supersedes it on progress', async () => {
+  const sentinel = await readFile(resolve(bridge,'src/pollicino-sentinel.js'),'utf8');
+  assert.match(sentinel,/READY_STALL_SUSPECTED/);
+  assert.match(sentinel,/SUPERSEDED_PROGRESS_RESUMED/);
+  assert.match(sentinel,/prepareResume\(next, iso\(\), 'STALL_SUSPECTED'\)/);
+});
