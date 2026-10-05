@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "snapshot_id": "pollicino-musiclab-final-abf77af-v2-20261005",
-  "sent_at": "2026-10-05T19:39:39.669Z",
+  "snapshot_id": "pollicino-musiclab-final-667c65b-20261005",
+  "sent_at": "2026-10-05T19:44:26.092Z",
   "projects": [
     {
       "project_id": "MusicLab",
       "repository": "Br174/MusicLab",
       "lifecycle_stage": "LAB",
       "source_ref": "main",
-      "source_head": "abf77afc4ae74f629cdf2d5c665211a20ed7b368",
+      "source_head": "667c65beaa1040cdcdd10f5e8f8b8c37cab1a6ee",
       "local_satellite_release_state": "r20|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92",
-      "updated_at": "2026-10-05T19:39:39.669Z"
+      "updated_at": "2026-10-05T19:44:26.092Z"
     }
   ],
   "operations": [
@@ -31,7 +31,7 @@
       "source_ref": "uab-build/musiclab-scoring-coverinfo-video-44",
       "source_head": "8a458f8f4d1e560736d81f78de551664998619f9",
       "created_at": "2026-10-05T18:57:23.377Z",
-      "updated_at": "2026-10-05T19:39:39.669Z"
+      "updated_at": "2026-10-05T19:44:26.092Z"
     }
   ],
   "checkpoints": [
