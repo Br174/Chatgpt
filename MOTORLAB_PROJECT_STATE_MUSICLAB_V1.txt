@@ -1,10 +1,51 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=72
-STATE_STATUS=MOTHER_LAB42_CURRENT_BASELINE
+STATE_REVISION=73
+STATE_STATUS=LAB43_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
+
+
+ACTIVE_OPERATION_ID=musiclab-lab43-coverinfo-video-acceleration
+OPERATION_STATUS=LAB43_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB43 exact SHA a3e99b83aac4fd8a47273c129bdedcec81e7dfdb is technically complete from official MADRE LAB42 SHA 43e3168c256f650d63a9b2c86ba18ef1f6cadd71. COVER.INFO now merges all successful precise/title/broad public query lanes instead of stopping at first hit, requests up to 200 song rows, follows up to 12 relation roots, extracts only row-scoped .youtube-id values from the same .youtube-parent result, propagates those ids as already-resolved external video bindings with YouTube thumbnail fallback, and increases unresolved video preload from batch 10/parallel 3 to batch 24/parallel 6. Player buono file app/src/main/kotlin/com/metrolist/music/utils/InnerTubeXPlayer.kt was not modified. GitHub Actions run 37253740982 passed active LAB43 contract, Android unit tests, UAB diagnostics, APK+ZIP build/integrity and upload. Artifact 11322133426 independently rechecked: outer artifact SHA256 b420a9c79c79a8bf70d8651b11b9def3a1b2b4f8d3ebbc77359be7b3822e8e34, APK SHA256 d62b191c2ffb6cc70f07f8352cd74f6466357f2a55ee42ab33405945f29fc8ac, inner ZIP SHA256 9074f637abcbc02c7e92c25afae2e07952b4c40192b6eb8491ff5b88fc046fb4, embedded APK checksum matched and ZIP integrity passed.
+CURRENT_REF=uab-build/musiclab-coverinfo-video-43
+CURRENT_HEAD_SHA=a3e99b83aac4fd8a47273c129bdedcec81e7dfdb
+CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder + live COVER.INFO markup verification
+CURRENT_JOB_ID=37253740982
+CURRENT_JOB_STATUS=success
+ARTIFACT_PROGRESS_PERCENT=100
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=none; LAB43 gate complete
+PENDING_VERIFICATION=Bruno device acceptance of exact LAB43 APK: verify COVER.INFO returns materially more candidates on works such as La notte dell'addio; verify COVER.INFO rows with an embedded video id immediately show Video pronto; verify the percentage of rows stuck on Video in verifica drops sharply; verify no wrong-video regression; verify Player buono remains fast.
+NEXT_SAFE_STEP=Install/test exact MusicLab-LAB43.apk. Keep official MADRE mother/musiclab-lab42-final untouched until Bruno explicitly approves LAB43 lifecycle promotion.
+LAST_USER_INTENT_SUMMARY=Recover the broader COVER.INFO coverage seen in earlier versions and reduce the very high share of Cover cards stuck on Video in verifica, while preserving Player buono.
+ROOT_CAUSE_LAB43_1=discoverCoverInfo stopped at the first query lane returning at least one song. Live COVER.INFO evidence for La notte dell'addio showed the precise query could return 1 result while song-only returned 5 and the broad title query returned 11, so first-hit short-circuit discarded valid covers/adaptations.
+ROOT_CAUSE_LAB43_1_CORRECTION=All successful COVER.INFO query lanes are now merged and deduplicated by COVER.INFO song id; the public per-page-songs selector is set to 200 and relation roots increased to 12.
+ROOT_CAUSE_LAB43_1_PREVENTION=LAB43 contract asserts multi-query accumulation, per-page-songs=200, absence of first-hit break, merged parsing and relation-root limit.
+ROOT_CAUSE_LAB43_2=COVER.INFO exposes associated YouTube ids in the same .youtube-parent search-result row, but MusicLab discarded them and forced CompilationTrackResolver to search YouTube again, leaving many cards in Video in verifica.
+ROOT_CAUSE_LAB43_2_CORRECTION=Parser reads .youtube-id only from the same youtube-parent row as the COVER.INFO song anchor, validates it as an 11-character YouTube id, propagates it through CoverSourceCandidate and externalSeed as resolvedVideoId/source, and uses the YouTube thumbnail as artwork fallback.
+ROOT_CAUSE_LAB43_2_PREVENTION=LAB43 contract asserts row-scoped video extraction and immediate videoResolutionChecked state for direct source bindings.
+ROOT_CAUSE_LAB43_3=Residual unresolved videos were processed in batches of 10 with only 3 concurrent resolver attempts, creating long verification waves on result sets of 40-50+ rows.
+ROOT_CAUSE_LAB43_3_CORRECTION=Background resolver batch raised to 24 and parallelism to 6 while preserving the existing exact-recording resolver and used-video uniqueness guards.
+ROOT_CAUSE_LAB43_3_PREVENTION=LAB43 contract locks batch 24/parallel 6 and separately reasserts Player buono fast-first markers.
+LAB43_FINAL_GATE_RUN=37253740982
+LAB43_FINAL_GATE_STATUS=success
+LAB43_ARTIFACT_ID=11322133426
+LAB43_ARTIFACT_NAME=MusicLab-LAB43
+LAB43_ARTIFACT_DIGEST=sha256:b420a9c79c79a8bf70d8651b11b9def3a1b2b4f8d3ebbc77359be7b3822e8e34
+LAB43_APK_NAME=MusicLab-LAB43.apk
+LAB43_APK_SHA256=d62b191c2ffb6cc70f07f8352cd74f6466357f2a55ee42ab33405945f29fc8ac
+LAB43_ZIP_NAME=MusicLab-LAB43-APK.zip
+LAB43_ZIP_SHA256=9074f637abcbc02c7e92c25afae2e07952b4c40192b6eb8491ff5b88fc046fb4
+LAB43_BUILD_SHA_FILE=a3e99b83aac4fd8a47273c129bdedcec81e7dfdb
+LAB43_BASE_MOTHER_REF=mother/musiclab-lab42-final
+LAB43_BASE_MOTHER_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+LAB43_PLAYER_BUONO_MUTATED=no
+LAB43_MOTHER_MUTATED=no
 
 
 ACTIVE_OPERATION_ID=musiclab-lab42-coverinfo-diagnostics
