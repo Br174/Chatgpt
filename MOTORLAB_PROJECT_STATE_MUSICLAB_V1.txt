@@ -1,10 +1,57 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=73
-STATE_STATUS=LAB43_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
+STATE_REVISION=74
+STATE_STATUS=LAB43B_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
+
+
+ACTIVE_OPERATION_ID=musiclab-lab43b-discogs-token-approval
+OPERATION_STATUS=LAB43B_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB43B exact SHA 3849c3f833b10ad053b3f46b5ce5b3f0f61d5fe2 is technically complete as a correction of LAB43 exact SHA a3e99b83aac4fd8a47273c129bdedcec81e7dfdb, which itself originated from official MADRE LAB42. LAB43B fixes Discogs disappearance by making public catalogue/release calls usable without a local token, retrying 401/403 authenticated requests without Authorization, retrying transient HTTP/network failures, and always exposing a Discogs diagnostic when a request fails. Credential UI now supports reveal/hide plus direct clearing for Last.fm API key, Last.fm shared secret and Discogs token. Cover detail approval state is reconstructed from Archivio Cloud and persisted through seed merging; already-approved items show Stato: Approvata and the Approva button is disabled while Disapprova remains available. Player buono and LAB43 COVER.INFO/video acceleration remain preserved. Final GitHub Actions run 37257265482 passed active contract, Android unit tests, UAB diagnostics, APK+ZIP build/integrity and upload. Artifact 11323755521 independently rechecked: outer artifact SHA256 baa622b786b4fa9ba1bb06d6e6767a3be33185c74a3df3a805d4a4d22db1803a, APK SHA256 6a80ebcc8676d59190a3916f738bd7e470ead9c91935be3ef19f00389affc420, inner ZIP SHA256 75959b5a06728736f2a75c768587fc25ab5733d6c9b0b93aa611e3c4ed65226a, embedded APK checksum matched and ZIP integrity passed.
+CURRENT_REF=uab-build/musiclab-coverinfo-video-discogs-43b
+CURRENT_HEAD_SHA=3849c3f833b10ad053b3f46b5ce5b3f0f61d5fe2
+CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder + live Discogs API verification
+CURRENT_JOB_ID=37257265482
+CURRENT_JOB_STATUS=success
+ARTIFACT_PROGRESS_PERCENT=100
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=none; LAB43B gate complete
+PENDING_VERIFICATION=Bruno device acceptance of exact LAB43B APK: verify Discogs is visible again in Fonti and returns releases with or without a local token; verify clearing and revealing Last.fm/Discogs credentials; verify a previously approved cover shows Stato: Approvata and cannot be approved twice; verify Disapprova remains available; verify COVER.INFO breadth/video acceleration and Player buono remain unchanged.
+NEXT_SAFE_STEP=Install/test exact MusicLab-LAB43B.apk. Keep official MADRE mother/musiclab-lab42-final untouched until Bruno explicitly approves lifecycle promotion.
+LAST_USER_INTENT_SUMMARY=Restore Discogs after it disappeared from Fonti, allow API credentials to be revealed and deleted/re-entered, and make prior cover approvals visible/persistent so the same version cannot be approved twice.
+ROOT_CAUSE_LAB43B_1=MusicLab had several hard token guards around Discogs. When an authenticated Discogs call failed or the token was blank, load/search/verification could abort and Discogs could disappear from the source diagnostics even though live public Discogs search/release endpoints were responding.
+ROOT_CAUSE_LAB43B_1_CORRECTION=DiscogsClient now treats token auth as optional for public catalogue/release requests, retries 401/403 once without Authorization, uses a slower public request cadence, retries transient HTTP/network failures, and DiscogsVersionSource/browser no longer hard-stop solely because the token is blank. Request failures write an explicit Discogs diagnostic instead of silently removing the source.
+ROOT_CAUSE_LAB43B_1_PREVENTION=LAB43B contract asserts no hard token requirement, authenticated-to-public fallback, public pacing, transient retry set, no browser token blank guards and persistent failure diagnostic.
+ROOT_CAUSE_LAB43B_2=External API credential fields were always password-masked and exposed no direct clear affordance, making it difficult to inspect or replace a mistyped token.
+ROOT_CAUSE_LAB43B_2_CORRECTION=Last.fm API key, Last.fm secret and Discogs token each have an independent show/hide control and clear/delete control; saving an empty manual Last.fm value continues to fall back to build credentials.
+ROOT_CAUSE_LAB43B_2_PREVENTION=LAB43B contract asserts three reveal states, visibility icons, delete controls, empty assignment paths and VisualTransformation.None support.
+ROOT_CAUSE_LAB43B_3=Manual APPROVED decisions were written to cloud and boosted locally, but the details dialog did not reconstruct or display persisted approval state on later searches; therefore the UI continued to offer Approva.
+ROOT_CAUSE_LAB43B_3_CORRECTION=Approved memory keys are rebuilt from Archivio Cloud using the same stable title+artist+category key as decisions; DiscogsVersionSeed carries manuallyApproved through merges; detail dialog displays Stato: Approvata/Non approvata and disables Approva when already approved while retaining Disapprova.
+ROOT_CAUSE_LAB43B_3_PREVENTION=LAB43B contract asserts approvedKeys, cloud APPROVED reconstruction, merge persistence, visible state text and disabled duplicate-approve action.
+ROOT_CAUSE_LAB43B_BUILD_1=First LAB43B gate run 37256924861 failed Android compilation because one approval-key path referenced category.cloudName from a scope where that helper was not visible.
+ROOT_CAUSE_LAB43B_BUILD_1_CORRECTION=Replaced that helper call with the explicit category mapping already used by the browser; second run 37257265482 passed.
+ROOT_CAUSE_LAB43B_BUILD_1_PREVENTION=Final Android unit/compile gate remains mandatory after contract tests before artifact acceptance.
+LAB43B_INITIAL_FAILED_GATE_RUN=37256924861
+LAB43B_FINAL_GATE_RUN=37257265482
+LAB43B_FINAL_GATE_STATUS=success
+LAB43B_ARTIFACT_ID=11323755521
+LAB43B_ARTIFACT_NAME=MusicLab-LAB43B
+LAB43B_ARTIFACT_DIGEST=sha256:baa622b786b4fa9ba1bb06d6e6767a3be33185c74a3df3a805d4a4d22db1803a
+LAB43B_APK_NAME=MusicLab-LAB43B.apk
+LAB43B_APK_SHA256=6a80ebcc8676d59190a3916f738bd7e470ead9c91935be3ef19f00389affc420
+LAB43B_ZIP_NAME=MusicLab-LAB43B-APK.zip
+LAB43B_ZIP_SHA256=75959b5a06728736f2a75c768587fc25ab5733d6c9b0b93aa611e3c4ed65226a
+LAB43B_BUILD_SHA_FILE=3849c3f833b10ad053b3f46b5ce5b3f0f61d5fe2
+LAB43B_SOURCE_LAB43_REF=uab-build/musiclab-coverinfo-video-43
+LAB43B_SOURCE_LAB43_SHA=a3e99b83aac4fd8a47273c129bdedcec81e7dfdb
+LAB43B_BASE_MOTHER_REF=mother/musiclab-lab42-final
+LAB43B_BASE_MOTHER_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+LAB43B_PLAYER_BUONO_MUTATED=no
+LAB43B_MOTHER_MUTATED=no
 
 
 ACTIVE_OPERATION_ID=musiclab-lab43-coverinfo-video-acceleration
