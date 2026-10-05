@@ -13,12 +13,13 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
 3. Use VERIFIED local core immediately as fallback.
 4. When central is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
-5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
+5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_POLLICINO_CONTINUITY_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
 6. Read Project Continuity ledger.
 7. Read technical Change History registry when present.
 8. Read visible Registro Modifiche e Ripristini when present.
 9. Reconcile live repo/ref/head/provider/job/artifact evidence and reconstruct operation/progress/lock/next step.
 10. When a persistent operational backend is connected, reconcile D1 current operation/checkpoint state against newer GitHub/live evidence; never let stale D1 override newer technical truth.
+10A. Load any Pollicino RESUME_READY/session evidence before broad recovery archaeology. When a prepared packet exists, use it as the fast operational starting point and perform only the smallest authoritative freshness/lock check required before writes.
 11. Reconcile MotorLab Live Control at boot/resume and at supported safe control points; apply presentation directives before user-visible status when supported, without interrupting in-flight work or changing write authority.
 12. For ALL MotorLab-controlled modifications, reconstruct/show evidence-based numeric progress at the first available visible control point; micro-changes use opening/closing progress and an intermediate material boundary when tools/tests/writes occur.
 13. Resume unfinished already-approved scope through Resume Recovery + Watchdog before unrelated writes.
@@ -36,7 +37,7 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 25. Update technical Change History at verified boundaries when appropriate.
 26. Update visible Registro Modifiche e Ripristini ONLY when Bruno identifies a specific working modification and wants it conserved.
 27. Refresh Project Continuity at material transitions, including artifact-delivered/cause-pending states.
-28. Persist major operational transitions to D1 when connected; use GitHub continuity as durable backstop and KV only as reconstructible cache.
+28. Persist major operational transitions to D1 when connected; use GitHub continuity as durable backstop and KV only as reconstructible cache. Enrolled supported executors also feed the external Pollicino session line; ordinary opaque chat turns must not be falsely described as pingable.
 
 FOUNDATIONAL COMPATIBILITY PILLAR - R19+
 MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is mandatory for MotorLab self-changes and every current/future managed project.
@@ -91,13 +92,13 @@ SAFE VERSION PINNING
 The MotorLab release used by active work is pinned until a safe boundary; adopt newer releases only at verified safe boundaries.
 
 FUTURE PROJECTS
-New projects receive hook + local satellite + sync state + central Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherit Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin, hard pre-change approval, r16 authority/data ownership, persistent-state fallback, observability boundaries and knowledge/tool routing.
+New projects receive hook + local satellite + sync state + central Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherit Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin, hard pre-change approval, r16 authority/data ownership, persistent-state fallback, Pollicino external continuity, observability boundaries and knowledge/tool routing.
 
 NO RUNTIME REGRESSION
 MotorLab metadata/policies do not authorize application runtime/UI/package/signing/native-engine changes outside approved scope. Instrumentation SDKs or provider bindings inside apps require normal project approval.
 
 PLATFORM BOUNDARY
-MotorLab cannot wake a host with no execution cycle or claim invisible continuation without a real durable executor.
+MotorLab cannot wake a host with no execution cycle or claim invisible continuation without a real durable executor. Pollicino may proactively detect enrolled executor/session liveness loss through its external sentinel, but it cannot introspect or ping an opaque ordinary ChatGPT reasoning turn unless the host exposes that capability.
 
 PAIRED SAFETY LAB - R18+
 For every verified LAB NN aggiornamento, produce LAB di sicurezza NN from the exact same functional source state. Safety uses a distinct Android package/family and unique ephemeral test signing certificate, is immutable, and becomes the preferred recovery checkpoint if the active update family later corrupts. A recovery from safety creates a new active LAB update family; safety itself is never patched.
@@ -106,7 +107,7 @@ ANDROID UPDATE FAMILY - R17+
 When Bruno activates update-family mode, load MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt. Do not create random package ids for later revisions of the same LAB family. Preserve stable applicationId + signing certificate, increase versionCode, use Bruno-facing "LAB NN aggiornamento" naming, create CANDIDATA as a new immutable family, and promote an approved CANDIDATA to MADRE without reconstructing app source.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.13
+MOTORLAB-CORE-ENTRYPOINT-V1.14
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -115,3 +116,5 @@ Revision 1.10: adds post-approval execution continuity to verified completion an
 Revision 1.12: r18 adds paired immutable LAB di sicurezza checkpoints and recovery-from-safety family restart.
 
 Revision 1.13: r19 elevates Change Compatibility Guard to foundational mandatory pre-write compatibility/redundancy/conflict pillar for all current/future projects.
+
+Revision 1.14: r20 loads Pollicino external session continuity and prioritizes precomputed RESUME_READY before broad cross-chat reconstruction while preserving Watchdog/Resume ownership and host boundaries.
