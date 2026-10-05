@@ -92,7 +92,32 @@ Append-oriented operational history for material transitions only.
 Examples: request parsed, pre-change report emitted, approval captured, write started, checkpoint reached, artifact verified, artifact delivered, causal queue opened/closed, operation closed.
 Do not log every low-value internal thought/tool call.
 
-9. live_directives
+9. pollicino_sessions
+- session_id
+- operation_id / project_id
+- canonical_chat_ref when exposed
+- executor/liveness mode
+- liveness + progress state
+- progress fingerprint / unchanged pulse count
+- last signal / last material progress
+- adaptive lease
+- terminal seal
+- current/next action + source/job/test/build/artifact summaries
+
+10. pollicino_session_events
+Append-oriented compact session continuity journal for material liveness/progress/terminal/interruption/resume transitions. Heartbeats update the current session row rather than producing unbounded event spam.
+
+11. pollicino_resume_packets
+- resume_id / project_id / operation_id / session_id
+- prepared/observed timestamps
+- verified progress / phase / ref/head
+- last completed/current/next action
+- changed resources/test/build/artifact/provider summaries
+- blocker/root-cause/evidence summary
+- live_write_recheck_required
+Prepared externally after supported-session liveness loss so a later `continua` can start from ready operational state.
+
+12. live_directives
 - directive_id
 - project_id
 - optional operation_id
@@ -109,6 +134,7 @@ Live directives contain orchestration/presentation metadata only and MUST NOT co
 
 WRITE DISCIPLINE
 - D1 writes must be bounded and meaningful; avoid polling/event spam.
+- Pollicino high-frequency liveness updates overwrite/coalesce the current session row; append journal events only for material transitions.
 - Live-directive writes occur only on meaningful directive transitions/publication; safe-point reads do not create D1 event spam.
 - Use directive_id plus project/operation/session identity for deduplication; agents may keep reconstructible local seen-ID state.
 - Persist at material transitions and checkpoints.
@@ -119,6 +145,7 @@ WRITE DISCIPLINE
 KV POLICY
 KV may cache:
 - current operation summary per project;
+- latest Pollicino RESUME_READY pointer/summary;
 - latest verified progress snapshot;
 - quick project status cards;
 - frequently-read reference pointers.
@@ -168,6 +195,7 @@ No project may be forced onto Phase C during active/unsafe work; adoption occurs
 
 SUCCESS CRITERIA
 - interrupted approved work can resume from durable state;
+- supported-session liveness loss can be detected by an external sentinel and prepare RESUME_READY before Bruno's next message;
 - live presentation directives survive chat changes and are deduplicated without storing secrets;
 - approval scope is not forgotten;
 - active locks/checkpoints/artifacts/root-cause queues survive chat changes;
@@ -176,6 +204,8 @@ SUCCESS CRITERIA
 - GitHub remains the durable technical backstop.
 
 VERSION
-MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.1
+MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.2
 Established: 2026-09-30
 Revision 1.1: adds secret-free live_directives persistence, transition-only writes, deduplication and fail-open read/fallback semantics.
+
+Revision 1.2: r20 adds external Pollicino sessions, compact session journal and precomputed RESUME_READY state in D1/KV while keeping GitHub technical authority.
