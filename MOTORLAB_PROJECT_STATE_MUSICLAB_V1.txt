@@ -1,10 +1,62 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=74
-STATE_STATUS=LAB43B_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
+STATE_REVISION=75
+STATE_STATUS=LAB44_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
+
+
+ACTIVE_OPERATION_ID=musiclab-lab44-scoring-coverinfo-video
+OPERATION_STATUS=LAB44_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB44 exact SHA 8a458f8f4d1e560736d81f78de551664998619f9 is technically complete from verified LAB43B SHA 3849c3f833b10ad053b3f46b5ce5b3f0f61d5fe2. LAB44 changes Cover/Originali ranking and source parsing without modifying Player buono: 10/10 is now reserved for the identified original recording (exact title + original performer + studio/original relation), same-performer variants follow below, exact-title covers/adaptations follow after that, non-original results are capped below 10, and RELEVANCE sorting no longer uses year as a tiebreak. Score/original-reference changes rebuild the stable order so newly verified high-score rows can move to the correct position. COVER.INFO parsing is constrained to real .field-title rows, relation query targets initial-details/follow-up-details are interpreted, same-row .field-artists is preferred over root URL slugs, numeric counters such as 1/2/3 are rejected as titles, and Initial Song relations can identify the original performer even when the search began from a cover. A conservative trailing-parenthesis artist hint resolver supports inputs such as Balla balla ballerino (Lucio Dalla) while ignoring technical labels such as (Live). Video verification still uses LAB43B batch 24/parallel 6 but each concurrent result now updates its card immediately rather than waiting for the slowest sibling; Tocca per riprodurre is green only when a resolved video id exists. Player buono app/src/main/kotlin/com/metrolist/music/utils/InnerTubeXPlayer.kt is absent from the LAB43B→LAB44 diff. Final GitHub Actions run 37292734148 passed active LAB44 contract, Android unit tests, UAB diagnostics, APK+ZIP build/integrity and artifact upload. Artifact 11336974698 independently rechecked: outer artifact SHA256 aaf4370ad10d4056472ded2d9c926fd772e72faf6b98050f39f10920ad66bad4, APK SHA256 f22324f4928b5363f78415692d6af3be1df367de235dc0b385aca15c79d92e08, inner ZIP SHA256 dbc26e39ac9306d701173d86c2087d7bd5d26568f7029d78eb0dd2bf9a7628e4, embedded APK checksum matched and ZIP integrity passed.
+CURRENT_REF=uab-build/musiclab-scoring-coverinfo-video-44
+CURRENT_HEAD_SHA=8a458f8f4d1e560736d81f78de551664998619f9
+CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder + live COVER.INFO verification
+CURRENT_JOB_ID=37292734148
+CURRENT_JOB_STATUS=success
+ARTIFACT_PROGRESS_PERCENT=100
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=none; LAB44 gate complete
+PENDING_VERIFICATION=Bruno device acceptance of exact LAB44 APK: verify Tocca per riprodurre turns green only for playable rows; verify video-ready rows appear progressively; verify Punteggio 10→1 puts original performer/original recording first rather than oldest release; verify exact-title original reaches 10/10; verify COVER.INFO no longer shows numeric 1/2/3 titles; verify Balla balla ballerino can recover Lucio Dalla as original and still expose covers/adaptations; verify Player buono, Discogs fallback, credential controls and approval memory remain unchanged.
+NEXT_SAFE_STEP=Install/test exact MusicLab-LAB44.apk. Keep official MADRE mother/musiclab-lab42-final untouched until Bruno explicitly approves LAB44 lifecycle promotion.
+LAST_USER_INTENT_SUMMARY=Make playable status visibly green, make video cards become ready faster, correct the 1-to-10 score so the original recording ranks highest instead of the oldest result, fix COVER.INFO numeric pseudo-titles, and recover cover chains/original performer even when the search starts from a cover or a title containing the original performer.
+ROOT_CAUSE_LAB44_1=Confidence scoring rewarded a different performer in COVER mode and some COVER.INFO direct relations could independently reach 10/10, so a cover could outrank the original recording.
+ROOT_CAUSE_LAB44_1_CORRECTION=Verified and external scoring now center on title identity plus identified original performer. Exact original studio/original relation owns 10/10; same-performer variants are below it; exact-title covers/adaptations follow; non-original candidates are capped at 9.
+ROOT_CAUSE_LAB44_1_PREVENTION=LAB44 contract and Kotlin tests assert original-first 10/10 behavior, exact cover below original and original recovery from COVER.INFO Initial Song evidence.
+ROOT_CAUSE_LAB44_2=RELEVANCE sorting used year ascending after score and stable-order preservation prevented background confidence changes from moving rows, creating the impression that older records were preferred even after stronger evidence arrived.
+ROOT_CAUSE_LAB44_2_CORRECTION=RELEVANCE removes year entirely and ties by original reference, independent source count, verified track and video readiness. Stable order is rebuilt when confidence/original-reference changes.
+ROOT_CAUSE_LAB44_2_PREVENTION=LAB44 contract asserts no .year in the RELEVANCE comparator and asserts score/original-reference reorder logic.
+ROOT_CAUSE_LAB44_3=COVER.INFO relation pages were parsed with a generic song-link selector; relation links may point through the root song URL and contain counters/relationship controls, allowing numeric pseudo-titles and root performer slugs to leak into candidate metadata.
+ROOT_CAUSE_LAB44_3_CORRECTION=Parser is restricted to .field-title song anchors, rejects purely numeric titles, extracts relation target IDs from initial-details/follow-up-details, and reads the performer from the same .youtube-parent row via .field-artists before falling back to the URL slug.
+ROOT_CAUSE_LAB44_3_PREVENTION=LAB44 contract asserts field-title selector, relation target handling, row-scoped performer lookup and numeric-title rejection.
+ROOT_CAUSE_LAB44_4=Cover discovery treated the currently supplied artist as the immutable original performer, so a search launched from a cover could suppress or mis-rank the true original even when the title carried an explicit performer hint or COVER.INFO exposed an Initial Song relation.
+ROOT_CAUSE_LAB44_4_CORRECTION=TitleMeaningResolver extracts conservative trailing performer hints and strips them from the search title; explicit hints have precedence over stale cloud original metadata. COVER.INFO Initial Song evidence can replace the original performer reference when no explicit hint exists. Cover mode discovery keeps the original reference visible rather than filtering it out.
+ROOT_CAUSE_LAB44_4_PREVENTION=Kotlin tests assert Balla balla ballerino (Lucio Dalla) parsing and COVER.INFO Initial Song recovery when starting from Fausto Papetti.
+ROOT_CAUSE_LAB44_5=Concurrent video attempts were awaited as a whole chunk before cards were updated, so fast successes remained visually stuck on Video in verifica until slower siblings finished.
+ROOT_CAUSE_LAB44_5_CORRECTION=Each of the up-to-6 concurrent verification jobs updates its own row immediately. Tocca per riprodurre is green only for a nonblank resolvedVideoId; failed and pending states use separate colors.
+ROOT_CAUSE_LAB44_5_PREVENTION=LAB44 contract asserts launch-based progressive updates and the explicit green ready-state condition.
+ROOT_CAUSE_LAB44_GATE_1=The first LAB44 gate run 37292620108 failed on a contract assertion whose regex was too syntax-specific for the numeric-title guard; the application change itself was not the cause.
+ROOT_CAUSE_LAB44_GATE_1_CORRECTION=The contract assertion was made syntax-agnostic; final run 37292734148 passed contract, Android tests and artifact build.
+LAB44_INITIAL_FAILED_GATE_RUN=37292620108
+LAB44_FINAL_GATE_RUN=37292734148
+LAB44_FINAL_GATE_STATUS=success
+LAB44_ARTIFACT_ID=11336974698
+LAB44_ARTIFACT_NAME=MusicLab-LAB44
+LAB44_ARTIFACT_DIGEST=sha256:aaf4370ad10d4056472ded2d9c926fd772e72faf6b98050f39f10920ad66bad4
+LAB44_APK_NAME=MusicLab-LAB44.apk
+LAB44_APK_SHA256=f22324f4928b5363f78415692d6af3be1df367de235dc0b385aca15c79d92e08
+LAB44_ZIP_NAME=MusicLab-LAB44-APK.zip
+LAB44_ZIP_SHA256=dbc26e39ac9306d701173d86c2087d7bd5d26568f7029d78eb0dd2bf9a7628e4
+LAB44_BUILD_SHA_FILE=8a458f8f4d1e560736d81f78de551664998619f9
+LAB44_SOURCE_LAB43B_REF=uab-build/musiclab-coverinfo-video-discogs-43b
+LAB44_SOURCE_LAB43B_SHA=3849c3f833b10ad053b3f46b5ce5b3f0f61d5fe2
+LAB44_OFFICIAL_MOTHER_REF=mother/musiclab-lab42-final
+LAB44_OFFICIAL_MOTHER_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+LAB44_PLAYER_BUONO_MUTATED=no
+LAB44_MOTHER_MUTATED=no
 
 
 ACTIVE_OPERATION_ID=musiclab-lab43b-discogs-token-approval
