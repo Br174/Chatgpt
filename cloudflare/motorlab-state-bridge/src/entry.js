@@ -1,4 +1,5 @@
 import core, { sha256Hex, validateSnapshot } from './index.js';
+export { PollicinoSentinel } from './pollicino-sentinel.js';
 
 export { sha256Hex, validateSnapshot };
 
@@ -20,6 +21,20 @@ function hexToBytes(hex) {
 
 async function importHmacKey(secret, usages) {
   return crypto.subtle.importKey('raw', textEncoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, usages);
+}
+
+async function verifyMotorLabRequest(secret, request, rawBody, now = Date.now()) {
+  const timestamp = request.headers.get('x-motorlab-timestamp');
+  const signatureHex = request.headers.get('x-motorlab-signature');
+  if (!secret || typeof timestamp !== 'string' || typeof signatureHex !== 'string' || !/^[0-9a-f]{64}$/i.test(signatureHex)) return false;
+  const seconds = Number(timestamp);
+  if (!Number.isInteger(seconds) || Math.abs(Math.floor(now / 1000) - seconds) > 300) return false;
+  const signature = hexToBytes(signatureHex);
+  if (!signature) return false;
+  const url = new URL(request.url);
+  const canonical = `${timestamp}.${request.method}.${url.pathname}${url.search}.${rawBody}`;
+  const key = await importHmacKey(secret, ['verify']);
+  return crypto.subtle.verify('HMAC', key, signature, textEncoder.encode(canonical));
 }
 
 async function verifyGitHubSignature(secret, signatureHeader, rawBody) {
@@ -83,12 +98,57 @@ async function issueRelay(request, env) {
   return core.fetch(relayRequest, { ...env, RELAY_SECRET: env.GITHUB_WEBHOOK_SECRET });
 }
 
+
+function validId(value) { return typeof value === 'string' && /^[A-Za-z0-9._:/-]{1,128}$/.test(value); }
+async function continuityAuth(request, env, rawBody = '') {
+  const secret = env.POLLICINO_SECRET || env.RELAY_SECRET;
+  if (!secret) return false;
+  return verifyMotorLabRequest(secret, request, rawBody);
+}
+async function pollicinoPulse(request, env) {
+  const rawBody = await request.text();
+  if (!(await continuityAuth(request, env, rawBody))) return json({ error: 'unauthorized' }, 401);
+  let payload; try { payload = JSON.parse(rawBody); } catch { return json({ error: 'invalid_payload' }, 400); }
+  if (!validId(payload?.project_id) || !validId(payload?.operation_id) || !validId(payload?.session_id)) return json({ error: 'invalid_identity' }, 400);
+  if (!env.POLLICINO_SENTINEL) return json({ error: 'pollicino_sentinel_not_configured' }, 503);
+  try { return json(await env.POLLICINO_SENTINEL.getByName(`${payload.project_id}:${payload.operation_id}`).pulse(payload)); }
+  catch (error) { return json({ error: error?.message || 'pollicino_pulse_failed' }, 503); }
+}
+async function pollicinoSeal(request, env) {
+  const rawBody = await request.text();
+  if (!(await continuityAuth(request, env, rawBody))) return json({ error: 'unauthorized' }, 401);
+  let payload; try { payload = JSON.parse(rawBody); } catch { return json({ error: 'invalid_payload' }, 400); }
+  if (!validId(payload?.project_id) || !validId(payload?.operation_id)) return json({ error: 'invalid_identity' }, 400);
+  if (!env.POLLICINO_SENTINEL) return json({ error: 'pollicino_sentinel_not_configured' }, 503);
+  try { return json(await env.POLLICINO_SENTINEL.getByName(`${payload.project_id}:${payload.operation_id}`).seal(payload)); }
+  catch (error) { return json({ error: error?.message || 'pollicino_seal_failed' }, 503); }
+}
+async function pollicinoResumeReady(request, env) {
+  if (!(await continuityAuth(request, env, ''))) return json({ error: 'unauthorized' }, 401);
+  if (!env.DB) return json({ error: 'd1_not_configured' }, 503);
+  const url = new URL(request.url);
+  const projectId = url.searchParams.get('project_id');
+  const operationId = url.searchParams.get('operation_id');
+  if (!validId(projectId) || (operationId && !validId(operationId))) return json({ error: 'invalid_identity' }, 400);
+  try {
+    const query = operationId
+      ? env.DB.prepare("SELECT * FROM pollicino_resume_packets WHERE project_id=? AND operation_id=? AND status LIKE 'READY%' ORDER BY prepared_at DESC LIMIT 1").bind(projectId,operationId)
+      : env.DB.prepare("SELECT * FROM pollicino_resume_packets WHERE project_id=? AND status LIKE 'READY%' ORDER BY prepared_at DESC LIMIT 1").bind(projectId);
+    const packet = await query.first();
+    if (!packet) return json({ error: 'not_found' }, 404);
+    return json({ resume_ready: packet });
+  } catch { return json({ error: 'pollicino_state_unavailable' }, 503); }
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === 'POST' && url.pathname === '/github-webhook' && request.headers.get('x-github-event') === 'issues') {
       return issueRelay(request, env);
     }
+    if (request.method === 'POST' && url.pathname === '/continuity/v1/pulse') return pollicinoPulse(request, env);
+    if (request.method === 'POST' && url.pathname === '/continuity/v1/seal') return pollicinoSeal(request, env);
+    if (request.method === 'GET' && url.pathname === '/continuity/v1/resume-ready') return pollicinoResumeReady(request, env);
     return core.fetch(request, env);
   }
 };

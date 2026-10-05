@@ -40,7 +40,8 @@ Owns authoritatively while available:
 - active artifact workflow state;
 - deferred Root Cause queue state;
 - transient/recoverable synchronization state;
-- operation/event ledger needed for continuity.
+- operation/event ledger needed for continuity;
+- Pollicino current session rows, compact session events and RESUME_READY packets for enrolled supported executions.
 D1 must never become the sole copy of permanent code, release truth or restore history.
 
 4. CLOUDFLARE KV
@@ -50,7 +51,8 @@ May contain:
 - cached lookups;
 - derived pointers;
 - short-lived read models;
-- recoverable materialized views.
+- recoverable materialized views;
+- reconstructible Pollicino RESUME_READY pointers/summaries.
 KV is NEVER authoritative. Every KV datum must be reconstructible from D1, GitHub or another declared authority.
 
 5. POSTHOG
@@ -126,8 +128,10 @@ Never store raw secrets in GitHub, Notion, GitBook, PostHog event properties, di
 Use provider-native secret storage/authorized connections.
 
 SUCCESS CRITERIA
-This contract is satisfied when every important data class has one owner, all mirrors are non-authoritative, operation correlation is explicit, loss of optional services does not corrupt state, and MotorLab remains the sole procedural orchestrator.
+This contract is satisfied when every important data class has one owner, all mirrors are non-authoritative, operation correlation is explicit, Pollicino session/resume data remains operational rather than technical authority, loss of optional services does not corrupt state, and MotorLab remains the sole procedural orchestrator.
 
 VERSION
-MOTORLAB-AUTHORITY-DATA-OWNERSHIP-V1.0
+MOTORLAB-AUTHORITY-DATA-OWNERSHIP-V1.1
 Established: 2026-09-30
+
+Revision 1.1: r20 assigns Pollicino session/journal/RESUME_READY operational ownership to D1 and cache-only projections to KV.

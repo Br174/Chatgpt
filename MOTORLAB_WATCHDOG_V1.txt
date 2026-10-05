@@ -17,6 +17,7 @@ Watchdog is the single coordinator for progress-health detection and anti-stall 
 - Visual Status owns canonical user-facing emoji+label language.
 - Root Cause Closure owns symptom/cause/prevention closure after real faults/anomalies.
 - Change Compatibility Guard owns pre-change conflict/overlap/regression checks.
+- Pollicino Continuity owns external supported-session liveness/progress evidence, terminal seals and RESUME_READY packaging; Watchdog remains the sole health/stall/recovery-level coordinator.
 No competing recovery paths are allowed for the same event.
 
 CORE PRINCIPLE
@@ -27,6 +28,15 @@ Maintain when available: operation_id, project, repository/ref, phase, action, p
 
 2. HEARTBEAT / MATERIAL PROGRESS
 Heartbeat means reachable; progress means material state changed. Examples: new job step/status, new commit/ref, artifact, test result, checkpoint, verified milestone. Repeated identical polling is not progress.
+
+2A. POLLICINO DUAL-SIGNAL INPUT
+When Pollicino evidence exists:
+- ALIVE + changing coherent progress fingerprint is strong healthy-progress evidence.
+- ALIVE + repeated unchanged fingerprint while progress is expected is STALL_SUSPECTED evidence, not automatic final diagnosis.
+- WAITING_EXTERNAL suppresses false loop classification while provider/job evidence remains coherent.
+- loss of a real enrolled liveness channel without terminal seal is interruption evidence only after reconciling whether an external executor/job is still alive.
+- ordinary ChatGPT UI spinner/Thinking text and absence of an unsupported hidden ping are not liveness evidence.
+Pollicino may request Watchdog classification; it may not independently select a recovery strategy.
 
 3. PREVENTIVE CHECKS
 During substantial work perform lightweight progress-health checks at meaningful boundaries when progress is unclear, repetitive or unusually slow. Do not interrupt healthy work merely to prove Watchdog exists.
@@ -136,8 +146,10 @@ SUCCESS CRITERIA
 Watchdog is active when stalls/loops are evidence-based, slow work and external waiting are distinguished from recovery, two-strike protection is enforced, manual lightning saves/reconciles then resumes, monotonic recovery is preserved, single-writer safety holds, meaningful visible status carries the verified numeric percentage when available, and real recovered faults pass through Root Cause Closure before being called definitively solved.
 
 VERSION
-MOTORLAB-WATCHDOG-V1.6
+MOTORLAB-WATCHDOG-V1.7
 Established: 2026-09-28
 Revision 1.4: labeled visual Watchdog language.
 Revision 1.5: explicit 🐢 slow-but-live, ⏳ external-wait and high-presence numeric progress.
 Revision 1.6: r11 routes non-trivial recovered faults/anomalies through Root Cause Closure and blocks symptom-only definitive closure.
+
+Revision 1.7: r20 consumes Pollicino dual liveness/progress evidence and interruption signals while retaining exclusive Watchdog health/recovery-level ownership.

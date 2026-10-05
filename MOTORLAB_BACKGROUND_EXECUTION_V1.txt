@@ -50,6 +50,7 @@ Examples may include adapter-approved:
 - another adapter-defined durable execution backend.
 
 A normal chat/model turn by itself is NOT a persistent executor.
+When the chosen persistent executor exposes a supported liveness/status surface, Background Execution should enroll the operation/session in Pollicino so liveness loss and alive-but-no-progress evidence are externally observable.
 
 4. EXECUTOR ROUTING
 MotorLab chooses the safest allowed executor based on project adapter, cost policy, task type and availability.
@@ -108,6 +109,7 @@ Once a backgroundable task is safely handed to a persistent executor, it should 
 While Bruno is away MotorLab should, where the execution environment supports it:
 - continue the current autonomous phase;
 - update heartbeat/progress state;
+- feed supported liveness + progress fingerprint evidence to Pollicino without using application runtime code as the heartbeat transport;
 - create checkpoints;
 - verify intermediate outputs;
 - use Watchdog recovery rules;
@@ -234,8 +236,11 @@ MotorLab Background Execution is correctly active when:
 - returning to the same chat reconciles the latest durable state;
 - executor changes do not require manual context migration;
 - no duplicate writer starts when the chat is reopened;
-- unsupported normal-chat-only execution is never falsely described as background-capable.
+- unsupported normal-chat-only execution is never falsely described as background-capable;
+- supported persistent executors can be externally monitored by Pollicino without changing project application code.
 
 VERSION
-MOTORLAB-BACKGROUND-EXECUTION-V1.0
+MOTORLAB-BACKGROUND-EXECUTION-V1.1
 Established: 2026-09-28
+
+Revision 1.1: r20 enrolls supported persistent executors in Pollicino external liveness/progress monitoring while preserving Background Execution ownership.

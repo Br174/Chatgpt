@@ -1,0 +1,233 @@
+MOTORLAB POLLICINO CONTINUITY V1 - EXTERNAL SESSION SENTINEL + PREEMPTIVE RESUME
+
+STATUS
+Mandatory MotorLab CORE capability from r20.
+Central authority: Br174/Chatgpt.
+Control-plane only: it MUST remain outside application/domain source code.
+
+PURPOSE
+Preserve a lightweight external operational trace while MotorLab works, detect supported-session liveness loss and alive-but-no-progress conditions, and precompute a RESUME_READY packet before Bruno returns so a later `continua` consumes prepared state instead of starting a broad reconstruction.
+
+FOUNDATIONAL INVARIANT
+POLLICINO IS AN EXTERNAL PARALLEL CONTROL-PLANE LINE, NOT BREADCRUMBS INSIDE APP CODE.
+Do not inject Pollicino markers, heartbeat logic, SDKs, comments, timers or recovery code into MusicLab, GeoVision, StudyBook-AI, Verlezza Vision or any other application merely to obtain MotorLab continuity.
+Project .motorlab/ metadata/hook may reference the capability, but application runtime/domain code remains untouched unless a separate approved project change explicitly requires instrumentation.
+
+ROLE / PRECEDENCE - ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR
+- Pollicino owns external session evidence, compact session journal, terminal seals, preemptive read-only reconciliation and RESUME_READY packaging.
+- Watchdog remains the ONLY coordinator that classifies healthy/slow/waiting/stalled and chooses recovery level/strategy.
+- Resume Recovery remains the ONLY coordinator that selects and executes the continuation step.
+- Project Continuity remains the durable cross-chat project-state ledger.
+- Persistent Operational State/D1 owns live operational records while connected.
+- Background Execution owns durable executor/job semantics.
+- Foreground Stall Guard owns prevention/chunking/handoff before risky foreground work.
+Pollicino MUST NOT become a second Watchdog, second recovery engine, second writer or competing source of truth.
+
+1. DUAL SIGNAL MODEL
+Where the execution surface supports it, maintain two independent signals:
+A. LIVENESS SIGNAL — evidence the executor/control cycle is reachable/alive.
+B. PROGRESS FINGERPRINT — evidence material state is actually changing.
+
+Healthy:
+LIVENESS=alive + changing coherent fingerprint.
+
+Alive but possibly stalled:
+LIVENESS=alive + repeated unchanged fingerprint while progress is expected and no legitimate external wait is declared.
+
+No liveness:
+absence/failure of the supported liveness channel is NOT by itself immediate proof of crash. Reconcile terminal seal, executor/job/provider evidence and the capabilities of that execution surface first.
+
+2. SUPPORTED LIVENESS MODES
+Adapters may implement one or both:
+- PUSH_HEARTBEAT: executor/session sends signed pulse records to the MotorLab control-plane.
+- QUERYABLE_STATUS: an adapter can actively query a provider/executor status and publish the observed response into Pollicino.
+
+A normal opaque ChatGPT foreground turn does NOT expose a supported hidden side-channel that MotorLab can silently ping while the model is internally reasoning. UI spinner/Thinking text is not a heartbeat.
+Therefore long/risky work should, when technically possible, be moved to an observable persistent executor before entering an opaque phase; otherwise Foreground Stall Guard must use bounded recoverable segments and frequent material checkpoints.
+
+3. SESSION RECORD
+Maintain a compact current session row when available:
+- session_id
+- MOTORLAB_OPERATION_ID
+- project_id
+- canonical_chat_ref when exposed
+- executor_type / executor_id
+- liveness_mode
+- liveness_state
+- progress_state
+- progress_fingerprint
+- unchanged_pulse_count
+- last_signal_at
+- last_progress_at
+- lease_ms / adaptive liveness policy
+- terminal_seal / terminal_at
+- current phase
+- last_completed_action
+- current_action
+- next_action
+- verified_progress
+- source_ref / source_head
+- provider_job_id/status
+- changed_resources summary
+- test/build/artifact status
+- blocker/root-cause summary
+- updated_at
+
+Do not store private chain-of-thought, hidden reasoning, passwords, raw tokens or unnecessary personal data.
+
+4. EXTERNAL EVENT JOURNAL
+Maintain an append-oriented compact journal for continuation-relevant events only.
+Examples:
+SESSION_OPENED
+MATERIAL_PROGRESS
+FINGERPRINT_CHANGED
+STALL_SUSPECTED
+EXTERNAL_WAIT
+TERMINAL_SEAL
+LIVENESS_LOST
+RESUME_READY_PREPARED
+SESSION_REVIVED
+SESSION_SUPERSEDED
+
+Do not log every internal token, low-value thought or poll. High-frequency heartbeats update the current session row; they do not create unbounded event spam.
+
+5. TERMINAL SEAL
+Before a controlled MotorLab execution surface ends normally, persist a terminal seal whenever technically possible:
+COMPLETED
+BLOCKED_EXTERNAL
+BLOCKED_USER
+SAFE_STOP
+HANDOFF_COMPLETE
+CANCELLED_BY_USER
+
+A valid terminal seal means the session did not disappear unexpectedly.
+Absence of a seal is evidence only when the surface was actually enrolled in Pollicino liveness monitoring.
+
+6. ALIVE-BUT-NO-PROGRESS / LOOP SIGNAL
+Pollicino supplies evidence; Watchdog decides.
+When progress is expected, no legitimate external wait exists and several consecutive supported liveness pulses carry the same coherent progress fingerprint, mark STALL_SUSPECTED and request Watchdog health classification.
+Do not use elapsed time alone as proof of a loop.
+Do not classify a healthy queued/running build, provider wait or known long deterministic step as stalled merely because the fingerprint is temporarily unchanged.
+Adapters may use risk/task-specific thresholds; a fixed universal 15-second rule is prohibited.
+
+7. SOFT NUDGE BOUNDARY
+If a persistent/queryable executor supports a control channel, a Watchdog-authorized soft nudge may request:
+- emit current status/checkpoint;
+- re-evaluate pending substep;
+- continue the smallest safe next action;
+- surface a blocker.
+It must not cancel/restart a healthy job and must not create a competing writer.
+
+A normal opaque ChatGPT thinking turn cannot be silently nudged from outside unless the host explicitly exposes such a control surface. Never claim otherwise.
+
+8. ABRUPT SESSION LOSS
+A session may be classified as interruption-suspected when:
+- it was enrolled in a real supported liveness mode;
+- its liveness lease/probe evidence is no longer valid;
+- no terminal seal exists;
+- no coherent evidence proves the same executor/job is still healthy.
+
+If an external provider/job is still alive, classify CHAT_DETACHED/EXECUTOR_ALIVE or WAITING_EXTERNAL rather than crash and do not duplicate it.
+
+9. PREEMPTIVE RECONCILIATION - DO NOT WAIT FOR `continua`
+When an enrolled session becomes interruption-suspected, the external sentinel must, without waiting for a Bruno message:
+A. freeze no application code and start no second writer;
+B. read the latest D1 operational/session/journal/checkpoint state;
+C. incorporate the newest already-observable executor/provider/ref evidence available to that control-plane;
+D. preserve the monotonic recovery floor;
+E. determine the last completed material action, current/pending action and exact next safe action;
+F. prepare/update RESUME_READY;
+G. cache only a reconstructible pointer/summary in KV when useful;
+H. leave actual write/recovery execution to Resume Recovery + Watchdog.
+
+This phase is read-only reconciliation/preparation unless an already-authorized durable executor is independently continuing its own valid job.
+
+10. RESUME_READY PACKET
+The precomputed packet should contain when available:
+- resume_id
+- project_id
+- operation_id
+- session_id
+- prepared_at / observed_at
+- status / freshness
+- verified_progress / recovery floor
+- phase
+- source_ref / source_head
+- last_completed_action
+- current_action
+- next_action
+- changed_resources
+- test_status
+- build_status
+- artifact_status
+- provider_job_status
+- blocker
+- root_cause
+- evidence_summary
+- live_write_recheck_required
+
+RESUME_READY is operational preparation, not technical authority over GitHub.
+
+11. `CONTINUA` FAST RESUME CONTRACT
+For a recognized project, a later `continua` should:
+1. load the already-prepared RESUME_READY packet first;
+2. perform only the smallest freshness/lock check required before a write;
+3. hand the packet to Resume Recovery/Watchdog;
+4. continue from the exact safe pending step.
+
+Do not start a broad archaeology scan merely because the conversational context is fresh.
+If RESUME_READY is missing/stale/unavailable, fall back to Project Continuity + live authoritative evidence and then repair the Pollicino continuity gap under Root Cause Closure when appropriate.
+
+12. D1 / KV / GITHUB OWNERSHIP
+D1: current sessions, compact session events and RESUME_READY packets.
+KV: reconstructible current/resume cache only.
+GitHub: durable technical authority and major-boundary backstop; never use GitHub as a high-frequency heartbeat bus when D1 is available.
+Application repositories: no Pollicino runtime coupling merely for continuity.
+
+13. DURABLE SENTINEL
+The central Cloudflare bridge may use a Durable Object/Alarm or equivalent persistent executor to notice lease expiry without an incoming Bruno/chat request.
+The alarm may prepare RESUME_READY and record interruption evidence.
+It MUST NOT assume that an opaque ordinary ChatGPT turn can answer hidden pings if the host exposes no such channel.
+
+14. REVIVAL / FALSE POSITIVE PROTECTION
+If a later valid pulse proves the same enrolled session/executor remained alive after an interruption suspicion:
+- mark prior suspicion superseded/revived;
+- do not launch duplicate recovery;
+- preserve any newer verified progress;
+- invalidate or refresh stale RESUME_READY;
+- keep single-writer ownership.
+
+15. FAILURE / DEGRADED MODE
+If D1/Durable Object/control-plane liveness is unavailable:
+- do not claim proactive crash detection;
+- use Project Continuity + GitHub/live evidence + checkpoints;
+- mark POLLICINO_DEGRADED;
+- continue safely under existing Watchdog/Resume rules;
+- reconcile when the external line returns.
+
+16. COST / QUOTA
+Use bounded pulse/session updates, coalesced events and adaptive alarms.
+No hidden paid tier/overage may be enabled.
+Do not turn high-frequency liveness into GitHub commit/issue spam.
+
+17. CURRENT/FUTURE PROJECTS
+All current/future MotorLab-managed software projects inherit this capability through the central release and satellite sync at safe boundaries.
+Project-native engines remain intact.
+
+18. SUCCESS CRITERIA
+Pollicino is correctly integrated when:
+- application code remains free of continuity breadcrumbs;
+- supported executors expose real liveness independent of UI text;
+- progress fingerprint distinguishes alive+moving from alive+unchanged;
+- Watchdog, not Pollicino, owns stall classification/recovery strategy;
+- terminal seals distinguish normal controlled ends from unexplained disappearance;
+- a durable external sentinel can notice enrolled-session liveness loss without a new Bruno message;
+- RESUME_READY is precomputed before a later `continua` whenever the supported external control-plane was active;
+- `continua` consumes prepared state and uses only targeted freshness checks;
+- no second writer/recovery engine/source of truth is introduced;
+- opaque host limits are represented honestly.
+
+VERSION
+MOTORLAB-POLLICINO-CONTINUITY-V1.0
+Established: 2026-10-05.
+Release: r20.

@@ -14,6 +14,7 @@ MANDATORY DEPENDENCIES
 - MOTORLAB_PROJECT_CONTINUITY_V1.txt
 - MOTORLAB_RESUME_RECOVERY_V1.txt
 - MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt
+- MOTORLAB_POLLICINO_CONTINUITY_V1.txt
 - MOTORLAB_PROGRESS_REPORTING_V1.txt
 - MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 - MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt
@@ -57,7 +58,7 @@ For a registered project, bootstrap must:
 - detect/read MOTORLAB_PROJECT_HOOK.txt when available;
 - activate from verified local satellite immediately when valid;
 - consult Br174/Chatgpt canonical MotorLab state;
-- load Global Persistent Activation, Project Continuity, Resume Recovery, Foreground Stall Guard, Progress Reporting and Root Cause Closure;
+- load Global Persistent Activation, Project Continuity, Resume Recovery, Foreground Stall Guard, Pollicino Continuity, Progress Reporting and Root Cause Closure;
 - load current governance/routing/Velocity/External Service Guard modules as relevant;
 - reconcile project continuity ledger with live repository/ref/job/artifact state;
 - classify newer live events before treating them as application lifecycle changes;
@@ -87,7 +88,8 @@ B. load the project-specific central continuity ledger referenced by hook/regist
 C. inspect current live repository/ref/head and relevant provider/job/artifact state;
 D. classify newer live events as application work, MotorLab control-plane activity, external automation or unknown-before-reconcile;
 E. let newer coherent live evidence supersede stale ledger/history without inventing a new app lifecycle operation from control-plane-only activity;
-F. reconstruct ACTIVE_OPERATION_ID, phase, verified progress floor, completed step, pending verification and next safe step;
+F. load an already-prepared Pollicino RESUME_READY packet first when available; use it to reconstruct ACTIVE_OPERATION_ID, phase, verified progress floor, completed step, pending verification and next safe step;
+F1. perform only the smallest live authority/lock freshness check needed before writes; do not begin a broad reconstruction when the prepared packet remains coherent;
 G. if prior work is unfinished, invoke Resume Recovery/Watchdog and continue the same logical operation;
 H. if expected write-through was missed, invoke Root Cause Closure rather than merely refreshing the file;
 I. do not restart from an older copied prompt, older UAB registry, or memory summary when newer evidence exists.
@@ -116,6 +118,8 @@ For FOREGROUND_RISK/BACKGROUNDABLE:
 - prefer a real approved persistent executor for safe backgroundable work;
 - otherwise split work into bounded recoverable segments;
 - never treat ChatGPT UI processing indicators as MotorLab heartbeat/progress;
+- when the next phase is long and an observable persistent executor exists, enroll it in Pollicino liveness/progress monitoring before entering the opaque phase;
+- when no supported external liveness channel exists, do not invent one: use bounded recoverable segments/checkpoints instead;
 - recover at the first later execution cycle under Resume Recovery if host execution is interrupted.
 
 8. REGISTERED-PROJECT BOOT ORDER - MANDATORY
@@ -204,6 +208,7 @@ Auto Bootstrap is active when:
 - the startup banner is the first user-visible line in activated project work;
 - registered project chats require no activation phrase;
 - new chats require no handoff prompt;
+- supported-session interruption can produce RESUME_READY before Bruno sends `continua`, and `continua` consumes that prepared state rather than starting from zero;
 - project continuity ledger + live evidence reconstruct the latest operation automatically;
 - live event source is classified before lifecycle changes;
 - the first substantive status of an active operation contains the evidence-based numeric percentage;
@@ -215,9 +220,11 @@ Auto Bootstrap is active when:
 - platform limits are represented honestly.
 
 VERSION
-MOTORLAB-AUTO-BOOTSTRAP-V1.10
+MOTORLAB-AUTO-BOOTSTRAP-V1.11
 Established: 2026-09-29
 Revision 1.8: pre-response MotorLab gate plus durable cross-chat Project Continuity bootstrap.
 Revision 1.9: r11 adds mandatory first-visible numeric progress and Root Cause Closure routing for stale/missed continuity and discovered problems.
 
 Revision 1.10: r19 makes the Change Compatibility Guard a mandatory bootstrap dependency and foundational pre-write pillar for all registered/future projects.
+
+Revision 1.11: r20 integrates Pollicino preemptive RESUME_READY loading and supported external liveness enrollment without pretending ordinary opaque ChatGPT reasoning exposes a heartbeat side-channel.

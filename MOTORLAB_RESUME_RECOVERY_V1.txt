@@ -9,7 +9,7 @@ PURPOSE
 Prevent a MotorLab-controlled task from appearing to stop after a tool/build/API/GitHub response when requested work is incomplete, and guarantee deterministic recovery at the first execution cycle available after host/model interruption.
 
 ROLE / PRECEDENCE
-Resume Recovery owns continuation from checkpoint/pending-action state.
+Resume Recovery owns continuation from checkpoint/pending-action state. When Pollicino has already prepared RESUME_READY, that packet is the preferred fast operational input before broader reconstruction.
 MOTORLAB_WATCHDOG_V1.txt owns health detection, anti-loop decisions and recovery level.
 MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt owns prevention before risky foreground work.
 Resume Recovery must not independently start a competing second recovery path for the same operation.
@@ -60,6 +60,10 @@ Do not ask Bruno to say "continua" merely to resume a known safe pending action.
 
 5. NEXT-AVAILABLE-CYCLE RECOVERY
 If model/host/client interrupts execution so same-turn continuation cannot occur, the first later execution cycle with access to state must:
+- first load a precomputed Pollicino RESUME_READY packet when present and coherent;
+- use it to avoid broad re-reading/reconstruction;
+- perform only the smallest authoritative freshness/lock check needed before a write;
+and then:
 - detect the unfinished operation when state is available;
 - restore latest verified checkpoint/pending ledger;
 - reconstruct the MONOTONIC RECOVERY FLOOR before choosing a continuation point;
@@ -137,6 +141,11 @@ Manual lightning salvage is a fast recovery pre-step, not an archival backup job
 The manual `⚡` command is a shortcut/fallback, not a prerequisite. Automatic same-turn and next-cycle recovery remain mandatory and unchanged.
 If the host/client is fully suspended and does not deliver the message, `⚡` cannot create an execution cycle by itself.
 
+6E. `CONTINUA` WITH PRECOMPUTED STATE
+When Bruno sends `continua` and a coherent RESUME_READY packet already exists, do not treat the message as the start of recovery archaeology.
+Consume the prepared packet, reconcile only the minimum live authority/lock facts required, then continue the exact safe pending action under Watchdog/single-writer rules.
+If no valid packet exists, fall back to the normal Project Continuity recovery path without inventing state.
+
 7. USER MESSAGE AS RECOVERY OPPORTUNITY, NOT REQUIREMENT
 Messages such as "ti sei bloccato", "continua", `⚡` or another follow-up may provide the first available execution cycle and trigger recovery.
 The architecture must not treat a user message as logically required for correctness.
@@ -184,8 +193,9 @@ Resume Recovery is active when:
 - no false claim is made about capturing hidden model reasoning or awakening a host with no execution cycle.
 
 VERSION
-MOTORLAB-RESUME-RECOVERY-V1.3
+MOTORLAB-RESUME-RECOVERY-V1.4
 Established: 2026-09-29
 Revision 1.1: manual `⚡` high-priority recovery opportunity, explicit Watchdog precedence and two-strike integration.
 Revision 1.2: manual `⚡` becomes rapid SAVE-THEN-RESUME: lightweight salvage checkpoint first, then Watchdog classification and targeted continuation; no heavy backup and no false hidden-reasoning snapshot claim.
 Revision 1.3: monotonic recovery floor added; same-operation recovery selects the highest coherent verified progress across checkpoint, visible verified status and real provider/job/ref evidence, with explicit evidence required for any regression.
+Revision 1.4: r20 consumes precomputed Pollicino RESUME_READY before broad recovery and defines fast `continua` semantics.
