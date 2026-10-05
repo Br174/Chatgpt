@@ -119,6 +119,7 @@ For FOREGROUND_RISK/BACKGROUNDABLE:
 - otherwise split work into bounded recoverable segments;
 - never treat ChatGPT UI processing indicators as MotorLab heartbeat/progress;
 - when the next phase is long and an observable persistent executor exists, enroll it in Pollicino liveness/progress monitoring before entering the opaque phase;
+- for Codex-hook-capable satellites, sync the external `.codex/hooks/motorlab_pollicino.py` adapter plus SessionStart/UserPromptSubmit/PostToolUse/Stop/Interrupt/SessionEnd hooks at a safe boundary; require provider-native secret provisioning before claiming enrollment;
 - when no supported external liveness channel exists, do not invent one: use bounded recoverable segments/checkpoints instead;
 - recover at the first later execution cycle under Resume Recovery if host execution is interrupted.
 
@@ -220,7 +221,7 @@ Auto Bootstrap is active when:
 - platform limits are represented honestly.
 
 VERSION
-MOTORLAB-AUTO-BOOTSTRAP-V1.11
+MOTORLAB-AUTO-BOOTSTRAP-V1.12
 Established: 2026-09-29
 Revision 1.8: pre-response MotorLab gate plus durable cross-chat Project Continuity bootstrap.
 Revision 1.9: r11 adds mandatory first-visible numeric progress and Root Cause Closure routing for stale/missed continuity and discovered problems.
@@ -228,3 +229,5 @@ Revision 1.9: r11 adds mandatory first-visible numeric progress and Root Cause C
 Revision 1.10: r19 makes the Change Compatibility Guard a mandatory bootstrap dependency and foundational pre-write pillar for all registered/future projects.
 
 Revision 1.11: r20 integrates Pollicino preemptive RESUME_READY loading and supported external liveness enrollment without pretending ordinary opaque ChatGPT reasoning exposes a heartbeat side-channel.
+
+Revision 1.12: completes r20 bootstrap with safe Codex Pollicino sidecar/hook adoption and explicit secret-gated enrollment.

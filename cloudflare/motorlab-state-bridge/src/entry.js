@@ -123,6 +123,23 @@ async function pollicinoSeal(request, env) {
   try { return json(await env.POLLICINO_SENTINEL.getByName(`${payload.project_id}:${payload.operation_id}`).seal(payload)); }
   catch (error) { return json({ error: error?.message || 'pollicino_seal_failed' }, 503); }
 }
+async function pollicinoContext(request, env) {
+  if (!(await continuityAuth(request, env, ''))) return json({ error: 'unauthorized' }, 401);
+  if (!env.DB) return json({ error: 'd1_not_configured' }, 503);
+  const url = new URL(request.url);
+  const projectId = url.searchParams.get('project_id');
+  if (!validId(projectId)) return json({ error: 'invalid_identity' }, 400);
+  try {
+    const row = await env.DB.prepare(
+      "SELECT operation_id, project_id, status, phase, overall_progress, source_ref, source_head, updated_at FROM operations WHERE project_id=? AND status NOT IN ('COMPLETED','FAILED_SAFE','CANCELLED_BY_USER') ORDER BY updated_at DESC LIMIT 1"
+    ).bind(projectId).first();
+    if (!row) return json({ error: 'not_found' }, 404);
+    return json({ context: row });
+  } catch {
+    return json({ error: 'pollicino_context_unavailable' }, 503);
+  }
+}
+
 async function pollicinoResumeReady(request, env) {
   if (!(await continuityAuth(request, env, ''))) return json({ error: 'unauthorized' }, 401);
   if (!env.DB) return json({ error: 'd1_not_configured' }, 503);
@@ -148,6 +165,7 @@ export default {
     }
     if (request.method === 'POST' && url.pathname === '/continuity/v1/pulse') return pollicinoPulse(request, env);
     if (request.method === 'POST' && url.pathname === '/continuity/v1/seal') return pollicinoSeal(request, env);
+    if (request.method === 'GET' && url.pathname === '/continuity/v1/context') return pollicinoContext(request, env);
     if (request.method === 'GET' && url.pathname === '/continuity/v1/resume-ready') return pollicinoResumeReady(request, env);
     return core.fetch(request, env);
   }
