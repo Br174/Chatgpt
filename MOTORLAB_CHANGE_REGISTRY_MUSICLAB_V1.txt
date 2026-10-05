@@ -782,3 +782,26 @@ NEXT_LIFECYCLE_GATE=Bruno device test; no CANDIDATA/MADRE promotion before expli
 RESTORE_SCOPE_HINTS=Restore LAB44 original-first scoring, relevance sorting, COVER.INFO field-title/relation parsing, original-reference recovery and progressive video-ready UI onto a compatible later baseline. Preserve Player buono and LAB43B Discogs/token/approval behavior.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_COVERINFO_LOCAL_ARTIFACT_RECHECK
 
+CHANGE RECORD
+CHANGE_ID=musiclab-20261005-lab44-original-first-scoring-coverinfo-video
+DATE=2026-10-05
+TITLE=LAB44 punteggio originale-first + COVER.INFO parser + video readiness progressiva
+SEMANTIC_TAGS=LAB44,punteggio,10su10,originale,COVER.INFO,Balla balla ballerino,Lucio Dalla,video,verde,progressivo,Player buono
+USER_INTENT=Fare in modo che il 10/10 appartenga alla registrazione originale e non al risultato più vecchio, correggere titoli numerici COVER.INFO e ricerche avviate da una cover, rendere verde Tocca per riprodurre quando il video è davvero pronto e ridurre l'attesa Video in verifica.
+CHANGE_SCOPE=ORIGINAL_FIRST_SCORING_COVERINFO_RELATION_PARSER_ORIGINAL_RECOVERY_PROGRESSIVE_VIDEO_READY
+LIFECYCLE_ROLE=LAB44_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-coverinfo-video-discogs-43b
+SOURCE_BASE_SHA=3849c3f833b10ad053b3f46b5ce5b3f0f61d5fe2
+OFFICIAL_MOTHER_REF=mother/musiclab-lab42-final
+OFFICIAL_MOTHER_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+RESULT_REF=uab-build/musiclab-scoring-coverinfo-video-44
+RESULT_SHA=8a458f8f4d1e560736d81f78de551664998619f9
+BEHAVIOR_SUMMARY=10/10 è riservato alla registrazione originale identificata; l'anno non ordina più la modalità Punteggio 10→1. Verifica Discogs può riordinare la lista quando cambia realmente il punteggio. COVER.INFO legge soltanto i veri titoli .field-title, usa artista e video della stessa riga e interpreta initial/follow-up relation targets; non può più trasformare i contatori 1/2/3 in titoli. Un hint nel titolo come (Lucio Dalla), oppure una relazione Initial Song COVER.INFO, può recuperare l'opera originale anche partendo da una cover. Ogni video risolto aggiorna subito la propria scheda; Tocca per riprodurre è verde solo con video id pronto. Player buono è invariato.
+ROOT_CAUSE=Il vecchio scoring premiava interprete diverso in Cover e usava l'anno come spareggio; la lista manteneva l'ordine iniziale anche dopo enrichment. Il parser COVER.INFO era troppo generico sui link /song/ e le relazioni potevano usare URL/artista della radice. Il resolver video aspettava l'intero gruppo prima di mostrare i risultati.
+ROOT_CAUSE_CLOSURE=Scoring centrato sull'identità dell'opera, relevance senza anno e riordino su cambi reali; parser row-scoped con relation ids; original-work recovery da hint/Initial Song; aggiornamento per-card progressivo.
+VERIFICATION=Live COVER.INFO confirmed Balla balla ballerino Lucio Dalla original plus Fausto Papetti follow-up. Final GitHub Actions run 37292734148 success on exact SHA 8a458f8f4d1e560736d81f78de551664998619f9: LAB44 contract success, Android unit tests including dedicated Balla balla ballerino scoring tests success, UAB diagnostics success, APK+ZIP build/integrity/upload success. Initial run 37292620108 failed only an over-specific static assertion and was corrected without app-behavior change. Artifact 11336974698 digest sha256:aaf4370ad10d4056472ded2d9c926fd772e72faf6b98050f39f10920ad66bad4; APK sha256 f22324f4928b5363f78415692d6af3be1df367de235dc0b385aca15c79d92e08; ZIP sha256 dbc26e39ac9306d701173d86c2087d7bd5d26568f7029d78eb0dd2bf9a7628e4.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test; no CANDIDATA/MADRE promotion before explicit approval.
+RESTORE_SCOPE_HINTS=Restore original-first confidence, COVER.INFO row/relation parser, original-work recovery and progressive green video-ready behavior only onto compatible later baselines; preserve Player buono, Discogs fallback, credential controls and approval memory.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_COVERINFO_LOCAL_ARTIFACT_RECHECK
+
