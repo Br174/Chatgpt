@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "pollicino-musiclab-oidc-seed-20261005-01",
+  "sent_at": "2026-10-05T18:57:23.377Z",
+  "projects": [
+    {
+      "project_id": "MusicLab",
+      "repository": "Br174/MusicLab",
+      "lifecycle_stage": "LAB",
+      "source_ref": "main",
+      "source_head": "43a1fca35e54cb05db80f1a18d02f8626f656696",
+      "local_satellite_release_state": "2026.10.05-r20|VERIFIED|POLLICINO_SOURCE_PROOF_ENABLED",
+      "updated_at": "2026-10-05T18:57:23.377Z"
+    }
+  ],
+  "operations": [
+    {
+      "operation_id": "musiclab-lab44-original-first-scoring-coverinfo-video-readiness",
+      "project_id": "MusicLab",
+      "title": "MusicLab LAB44 device acceptance",
+      "type": "verification",
+      "requested_scope": "Verify delivered LAB44 behavior while preserving exact artifact and current Mother.",
+      "approved_scope": "Control-plane continuity and device acceptance tracking; no new application mutation.",
+      "approval_status": "approved",
+      "lifecycle_stage": "LAB",
+      "risk_class": "MEDIUM",
+      "status": "LAB44_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING",
+      "phase": "LAB44 artifact ready; Bruno device acceptance pending",
+      "artifact_progress": 100,
+      "overall_progress": 100,
+      "source_ref": "uab-build/musiclab-scoring-coverinfo-video-44",
+      "source_head": "8a458f8f4d1e560736d81f78de551664998619f9",
+      "created_at": "2026-10-05T18:57:23.377Z",
+      "updated_at": "2026-10-05T18:57:23.377Z"
+    }
+  ],
+  "checkpoints": [
+    {
+      "checkpoint_id": "pollicino-musiclab-oidc-seed-checkpoint-20261005-01",
+      "operation_id": "musiclab-lab44-original-first-scoring-coverinfo-video-readiness",
+      "phase": "LAB44 device acceptance pending",
+      "verified_progress": 100,
+      "completed_steps": "LAB44 code/build/artifact gates complete; MotorLab r20 Pollicino control-plane adopted.",
+      "next_safe_step": "Resume exact pending device-acceptance step; do not rebuild or promote without Bruno approval.",
+      "lock_state": "none",
+      "external_wait_state": "Bruno device acceptance",
+      "created_at": "2026-10-05T18:57:23.377Z"
+    }
+  ]
+}
