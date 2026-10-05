@@ -3,62 +3,68 @@ PROJECT=MusicLab
 REPOSITORY=Br174/MusicLab
 REGISTRY_STATUS=ACTIVE_VERIFIED
 AUTHORITY=MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
-MOTORLAB_RELEASE=2026.10.05-r18
+MOTORLAB_RELEASE=2026.10.05-r19
 
 ACTIVE LAB FAMILY
 FAMILY_ID=01
 FAMILY_ROLE=LAB
-FAMILY_STATUS=READY_FOR_DEVICE_USE
+FAMILY_STATUS=LAB46_READY_FOR_DEVICE_USE
 ORIGIN_LABEL=LAB44
 ORIGIN_REF=uab-build/musiclab-scoring-coverinfo-video-44
 ORIGIN_SHA=8a458f8f4d1e560736d81f78de551664998619f9
-CURRENT_VISIBLE_LABEL=LAB 44 aggiornamento
-CURRENT_REF=uab-build/musiclab-lab44-aggiornamento-family-01
-CURRENT_SHA=cb4a59afa5ec57c492c05a1ab8d845f5264cc7ad
+CURRENT_VISIBLE_LABEL=LAB 46 aggiornamento
+CURRENT_REF=uab-build/musiclab-lab46-aggiornamento-family-01
+CURRENT_SHA=955411b7e2b3ebc2c3d3217977ea9a6c53a1e944
 ANDROID_APPLICATION_ID=it.verlezza.musiclab.labupdate01
 SIGNING_PROFILE=musiclab-lab-family-01-test
 SIGNING_CERT_SHA256=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
 SIGNING_CLASS=TEST_ONLY
-CURRENT_VERSION_CODE=4401
-CURRENT_VERSION_NAME=0.9.2-lab44-aggiornamento
-CURRENT_BUILD_RUN=37299811755
-CURRENT_ARTIFACT_ID=11341696725
-CURRENT_ARTIFACT_DIGEST=sha256:29b2b63c531b46844b6377952bf53a1800206ea6363cb9a9dade6bb0e191e3f3
-CURRENT_APK_SHA256=59240ea488a0ed25c955368ce7a57a31afeeb09047704de698f05378bdfe7a13
-CURRENT_ZIP_SHA256=ee74b588f6a5f46814c9ad07feef25e1f6722479a7b4ab3a0a98582dc8f4ede3
+CURRENT_VERSION_CODE=4601
+CURRENT_VERSION_NAME=0.9.2-lab46-aggiornamento
+CURRENT_BUILD_RUN=37325324992
+CURRENT_ARTIFACT_ID=11352063411
+CURRENT_ARTIFACT_DIGEST=sha256:4617510dd4d695b226b9adbe26c4acaf544f1b92e5bf1fc1f2abea6ff956fc87
+CURRENT_APK_SHA256=be9782d7dccf18125a29f809ac262e54754e0d76b641d7ca167620d57d79b299
+CURRENT_ZIP_SHA256=a13a84920907e393e7fda6fe7504331bd08e400980c8173e720ef0820a6d6ab8
+PLAYER_BUONO_SOURCE_SHA=329e663061d46928dc4d58a946c0d3d2f88881b3
+PLAYER_BUONO_VERIFIED_BYTE_IDENTICAL=yes
 
-PAIRED SAFETY CHECKPOINT
-SAFETY_LABEL=LAB di sicurezza 44
-SAFETY_REF=safety/musiclab-lab-44
-SAFETY_SHA=cb4a59afa5ec57c492c05a1ab8d845f5264cc7ad
-SAFETY_APPLICATION_ID=it.verlezza.musiclab.safety44
-SAFETY_SIGNING_CERT_SHA256=BA18C6DFE97CE2DD145CAF85F3B65BED210375EFB428D60A7A8B6D576E5F94C8
+PAIRED SAFETY CHECKPOINT - CURRENT
+SAFETY_LABEL=LAB di sicurezza 46
+SAFETY_REF=safety/musiclab-lab-46
+SAFETY_SHA=955411b7e2b3ebc2c3d3217977ea9a6c53a1e944
+SAFETY_APPLICATION_ID=it.verlezza.musiclab.safety46
+SAFETY_SIGNING_CERT_SHA256=FB2527F24D55A35D7603FB0D69D1F6809FFD1A85F17FB54BE84A00D2901B0DCD
 SAFETY_SIGNING_CLASS=UNIQUE_EPHEMERAL_TEST_KEY
 SAFETY_IMMUTABLE=yes
-SAFETY_BUILD_RUN=37299811755
-SAFETY_ARTIFACT_ID=11341312063
-SAFETY_ARTIFACT_DIGEST=sha256:496b9266510080adbf70b66626d354183edeccaba829749385b26dcf989e715a
-SAFETY_APK_SHA256=84d8d8c81900cceffeaf8486ff5b984044f7edc25df86165e41034c921697d5a
-SAFETY_ZIP_SHA256=efd1bfc5022f83161cda71bbb659f8709646dc56002ba21bf4384ba32d43ee58
-SAFETY_FUNCTIONAL_SOURCE_EQUIVALENCE=exact same app/runtime source as paired update
+SAFETY_BUILD_RUN=37325324992
+SAFETY_ARTIFACT_ID=11353270393
+SAFETY_ARTIFACT_DIGEST=sha256:a60014dde3d2572b4d1dcc1392bc9048761150a4fb2fdca241fab95f45d227f4
+SAFETY_APK_SHA256=e00c3ee56092fc45127c7b8ba65247a6cb2f5f4b243d232d08bea7ea70700275
+SAFETY_ZIP_SHA256=a6965c6351402b039d95a9610004ab07f5f128cf85698a85426c14db24360144
+SAFETY_FUNCTIONAL_SOURCE_EQUIVALENCE=exact same source SHA as LAB 46 aggiornamento
 SAFETY_RECOVERY_ROLE=preferred recovery checkpoint before MADRE if active family later corrupts
 
+HISTORIC SAFETY CHECKPOINTS
+- LAB di sicurezza 44 -> safety/musiclab-lab-44 @ cb4a59afa5ec57c492c05a1ab8d845f5264cc7ad
+- LAB di sicurezza 45 -> artifact/run history retained in GitHub Actions for LAB45 family gate
+- LAB di sicurezza 46 -> safety/musiclab-lab-46 @ 955411b7e2b3ebc2c3d3217977ea9a6c53a1e944
+
 BRUNO-FACING NAMING
-- Current first install: LAB 44 aggiornamento.
-- Paired checkpoint: LAB di sicurezza 44.
-- Next modification: LAB 45 aggiornamento + LAB di sicurezza 45.
-- Then 46+46, 47+47, etc.
+- Current installed/update line: LAB 46 aggiornamento.
+- Current paired checkpoint: LAB di sicurezza 46.
+- Next modification: LAB 47 aggiornamento + LAB di sicurezza 47.
 - All LAB NN aggiornamento revisions in FAMILY_ID=01 keep the same applicationId and signing certificate.
 - Each LAB di sicurezza NN is a separate immutable Android family with its own package and unique test-only certificate.
 
 CONTINUATION RULE
 - Next LAB modification starts from CURRENT_REF/CURRENT_SHA of FAMILY_ID=01.
-- Next visible main label: LAB 45 aggiornamento.
-- Next paired label: LAB di sicurezza 45.
+- Next visible main label: LAB 47 aggiornamento.
+- Next paired label: LAB di sicurezza 47.
 - Keep FAMILY_ID=01, ANDROID_APPLICATION_ID and active-family SIGNING_CERT_SHA256 unchanged.
-- Use next versionCode 4501 (or a strictly higher conflict-free value if repository evidence requires it).
-- Build and verify both update + paired safety from the same functional source state.
-- Update CURRENT_* and append a new SAFETY checkpoint only after successful verification.
+- Use next versionCode 4701 (or a strictly higher conflict-free value if repository evidence requires it).
+- Publish the LAB aggiornamento artifact first after its own verification; safety build runs afterward from the exact same SHA.
+- Update CURRENT_* and safety checkpoint only after successful verification.
 
 RECOVERY RULE
 - If a later active LAB aggiornamento becomes unusable, do not automatically fall back to MADRE.
@@ -77,6 +83,7 @@ MADRE RULE
 - LAB/safety test signing profiles must never silently become the MADRE production signing profile.
 
 VERSION
-MOTORLAB-MUSICLAB-UPDATE-FAMILY-REGISTRY-V1.1
+MOTORLAB-MUSICLAB-UPDATE-FAMILY-REGISTRY-V1.2
 Established: 2026-10-05
-Revision 1.1: verified LAB 44 aggiornamento + immutable LAB di sicurezza 44 pair; next pair fixed to LAB 45 aggiornamento + LAB di sicurezza 45.
+Revision 1.1: verified LAB 44 aggiornamento + immutable LAB di sicurezza 44 pair.
+Revision 1.2: advanced verified active family to LAB 46 aggiornamento, paired immutable safety 46, update-first/safety-after delivery order, Player buono byte-identity guard, next pair LAB47.
