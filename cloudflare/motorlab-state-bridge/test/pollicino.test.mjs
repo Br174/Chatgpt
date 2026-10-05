@@ -166,3 +166,14 @@ test('source proof accepts an explicit stable satellite proof head before mutabl
   assert.match(entry,/SATELLITE_PROOF_HEAD/);
   assert.match(entry,/stableProofHead\(project\.local_satellite_release_state\)/);
 });
+
+test('Codex adapter uses a stable local proof anchor separately from mutable runtime HEAD', async () => {
+  const adapter = await readFile(resolve(bridge,'../../templates/codex/motorlab/motorlab_pollicino.py'),'utf8');
+  assert.match(adapter,/def _local_proof_head/);
+  assert.match(adapter,/MOTORLAB_PROJECT_HOOK\.txt/);
+  assert.match(adapter,/POLLICINO_PROOF_HEAD/);
+  assert.match(adapter,/runtime_head/);
+  assert.match(adapter,/proof_head/);
+  assert.match(adapter,/_enroll\(project_id, session_id, proof_head\)/);
+  assert.match(adapter,/"source_head": runtime_head/);
+});
