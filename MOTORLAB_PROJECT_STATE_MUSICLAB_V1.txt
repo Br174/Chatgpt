@@ -1,16 +1,16 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=69
-STATE_STATUS=CANDIDATE_LAB41_PLAYER_BUONO
+STATE_REVISION=70
+STATE_STATUS=MOTHER_LAB41_PLAYER_BUONO
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 
 ACTIVE_OPERATION_ID=musiclab-lab41-lab07-fast-player-restore
-OPERATION_STATUS=CANDIDATE_LAB41_PLAYER_BUONO
+OPERATION_STATUS=MOTHER_LAB41_PLAYER_BUONO
 CURRENT_PHASE=LAB41 exact SHA 329e663061d46928dc4d58a946c0d3d2f88881b3 is technically complete. Starting exactly from verified LAB40 SHA 7d5e4b5bb240903d4c2a77224c3bdc0288d6aaf0, only the stream resolver/player delivery path was selectively changed to restore the fast-first behavior observed by Bruno in historical branch uab-build/musiclab-originali-speed-tabs-07. A bounded 1800ms no-WebView/no-PoToken extractor lane now runs first; the full current InnerTubeX WebView/PoToken-capable resolver remains automatic fallback. Active LAB41 contract, inherited LAB40 behavior checks, Android unit tests, UAB diagnostics, APK+ZIP build/integrity and upload all passed in GitHub Actions run 37242528581. Artifact 11318365788 was downloaded and independently rechecked: outer artifact SHA256 9514cef8ed927328855091ab095aed072897287513e421976ecac8266529a683, APK SHA256 28163be3e678705d0a27b2b12487abe49ee2f18b6ebc5eda77e4245a9a7225ca, inner ZIP SHA256 0c57f528ed02bc49914b62bc400953758045477fd6388dcee12b93fa4a8283c5, embedded APK checksum matched and ZIP integrity passed. LAB40/MADRE/CANDIDATA remain untouched.
-CURRENT_REF=candidate/musiclab-lab41-player-buono
+CURRENT_REF=mother/musiclab-lab41-final
 CURRENT_HEAD_SHA=329e663061d46928dc4d58a946c0d3d2f88881b3
 CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder
 CURRENT_JOB_ID=37242528581
@@ -21,7 +21,7 @@ LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
 RECOVERY_FLOOR_PERCENT=100
 WRITE_LOCK_SCOPE=none; LAB41 gate complete
 PENDING_VERIFICATION=Il player LAB41 è stato esplicitamente approvato da Bruno e registrato come Player buono. Restano separati eventuali test futuri su funzioni non-player della LAB40/LAB41; nessuna promozione automatica a MADRE è implicita.
-NEXT_SAFE_STEP=CANDIDATA LAB41 Player buono creata e verificata identica alla LAB41 exact SHA. Non mutare MADRE senza istruzione esplicita di Bruno.
+NEXT_SAFE_STEP=MADRE LAB41 Player buono creata e verificata identica alla CANDIDATA/LAB41 exact SHA. Usare questa MADRE come baseline ufficiale finché Bruno non approva una MADRE successiva.
 LAST_USER_INTENT_SUMMARY=Keep the current LAB40 application and features but make only the player return to the very fast behavior Bruno observed in MusicLab LAB Originali 07 ispeed.
 ROOT_CAUSE_LAB41_1=The historical LAB07 branch predates the later stream-resolver migration visible in repository history: LAB07 used the older YTPlayerUtils playback resolver, while the current LAB40 path uses InnerTubeX with a WebView/PoToken-capable extraction stack. The later path adds compatibility work before stream delivery that is a plausible contributor to the device-visible first-sound latency.
 ROOT_CAUSE_LAB41_1_CORRECTION=LAB41 preserves the current InnerTubeX architecture but adds a bounded LAB07-style fast extractor before the full resolver. The fast extractor advertises no token providers, never opens WebView and requests no PoToken; if it cannot resolve within 1800ms, the unchanged modern resolver runs automatically.
@@ -54,6 +54,10 @@ LAB41_CANDIDATE_REF=candidate/musiclab-lab41-player-buono
 LAB41_CANDIDATE_SHA=329e663061d46928dc4d58a946c0d3d2f88881b3
 LAB41_CANDIDATE_COMPARE_STATUS=identical
 LAB41_CANDIDATE_PROMOTED_DATE=2026-10-05
+LAB41_MOTHER_REF=mother/musiclab-lab41-final
+LAB41_MOTHER_SHA=329e663061d46928dc4d58a946c0d3d2f88881b3
+LAB41_MOTHER_COMPARE_STATUS=identical
+LAB41_MOTHER_PROMOTED_DATE=2026-10-05
 
 
 ACTIVE_OPERATION_ID=musiclab-lab40-exact-video-playback-coverinfo
