@@ -10,6 +10,7 @@ Make a new chat continue from the latest materially verified project state witho
 
 ROLE / PRECEDENCE
 - Project Continuity owns durable cross-chat project-state ledgers.
+- Pollicino Continuity may precompute RESUME_READY from external session evidence before a new chat arrives; Project Continuity remains the cross-chat ledger and authority relationship is unchanged.
 - Auto Bootstrap owns activation and boot ordering.
 - Resume Recovery owns continuation/recovery from pending state once loaded.
 - Watchdog owns health/stall/recovery-level decisions.
@@ -98,13 +99,14 @@ If central persistence is unavailable, preserve the best available local/checkpo
 After MotorLab activation and before unrelated project work, a recognized project chat must:
 A. read its project hook;
 B. load the referenced canonical project continuity ledger;
+B1. load a coherent precomputed Pollicino RESUME_READY packet first when available, using it as the fast operational resume view rather than a replacement for the ledger;
 C. inspect live repository/ref/head and provider/job/artifact state that can materially supersede the ledger;
 D. classify newer live events before treating them as application lifecycle changes;
 E. compare ledger evidence with live state;
 F. if live state is newer/coherent, update the ledger before proceeding when safe;
 G. if an expected prior write-through is missing, invoke Root Cause Closure rather than silently treating refresh as complete;
 H. reconstruct current operation, phase, verified progress floor, pending verification and next safe step;
-I. if unfinished work exists, route continuation through Resume Recovery/Watchdog rather than restarting from a historical prompt;
+I. if unfinished work exists, route continuation through Resume Recovery/Watchdog rather than restarting from a historical prompt; when Pollicino RESUME_READY is coherent, pass that prepared state into Resume Recovery and limit live checks to the smallest freshness/lock verification needed before writes;
 J. only after reconciliation begin unrelated write-capable work.
 
 5. AUTHORITY / STALENESS ORDER
@@ -164,6 +166,7 @@ Once the chat exposes recognized project identity, a persistent project instruct
 Project Continuity is active when:
 - new recognized project chats load the canonical project ledger automatically;
 - continuation does not depend on a copied prompt;
+- supported-session interruption may be pre-reconciled externally into RESUME_READY before Bruno sends `continua`;
 - live repo/provider state supersedes stale ledger/history safely;
 - live events are classified before app lifecycle identity changes;
 - the same operation id/progress floor survives chat changes;
@@ -175,6 +178,8 @@ Project Continuity is active when:
 - app source/lifecycle identity is not mutated merely to persist chat continuity.
 
 VERSION
-MOTORLAB-PROJECT-CONTINUITY-V1.1
+MOTORLAB-PROJECT-CONTINUITY-V1.2
 Established: 2026-09-30
 Revision 1.1: r11 adds mandatory root-cause handling for missed write-through and live-event classification so control-plane activity cannot masquerade as application lifecycle progress.
+
+Revision 1.2: r20 integrates precomputed Pollicino RESUME_READY as the fast cross-chat operational view while preserving Project Continuity/live authority precedence.
