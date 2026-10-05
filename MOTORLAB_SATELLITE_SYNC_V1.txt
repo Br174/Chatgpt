@@ -152,7 +152,7 @@ For a private adopted satellite using source-proof enrollment, publish/update `P
 Persist that same adoption proof locally. Do not rotate it for metadata-only commits when the installed sidecar adoption is unchanged.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.20
+MOTORLAB-SATELLITE-SYNC-V1.21
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -169,3 +169,5 @@ Revision 1.18: r20 satellites inherit source-proof self-enrollment + ephemeral s
 Revision 1.19: r20 requires stable proof-head publication at verified satellite adoption boundaries.
 
 Revision 1.20: r20 requires the stable adoption proof to be written both to D1 and local satellite metadata and consumed before Git HEAD by the executor adapter.
+
+Revision 1.21: r20 sync requires the Codex sidecar immediate-first-pulse behavior before daemon heartbeat continuation.
