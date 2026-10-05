@@ -1,52 +1,82 @@
 MOTORLAB UPDATE FAMILY REGISTRY - MusicLab
 PROJECT=MusicLab
 REPOSITORY=Br174/MusicLab
-REGISTRY_STATUS=ACTIVE
+REGISTRY_STATUS=ACTIVE_VERIFIED
 AUTHORITY=MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
+MOTORLAB_RELEASE=2026.10.05-r18
 
 ACTIVE LAB FAMILY
 FAMILY_ID=01
 FAMILY_ROLE=LAB
-FAMILY_STATUS=INITIAL_BUILD_IN_PROGRESS
+FAMILY_STATUS=READY_FOR_DEVICE_USE
 ORIGIN_LABEL=LAB44
 ORIGIN_REF=uab-build/musiclab-scoring-coverinfo-video-44
 ORIGIN_SHA=8a458f8f4d1e560736d81f78de551664998619f9
 CURRENT_VISIBLE_LABEL=LAB 44 aggiornamento
 CURRENT_REF=uab-build/musiclab-lab44-aggiornamento-family-01
-CURRENT_SHA=7df4e1fe2ab4b1d8034980b561d328ee5e30fa18
+CURRENT_SHA=cb4a59afa5ec57c492c05a1ab8d845f5264cc7ad
 ANDROID_APPLICATION_ID=it.verlezza.musiclab.labupdate01
 SIGNING_PROFILE=musiclab-lab-family-01-test
-SIGNING_CERT_SHA256=9A:2F:67:CF:B3:C1:99:83:68:13:AD:DB:F7:BD:FB:0F:A6:5E:DC:76:5F:FA:CE:4B:6D:F9:49:0B:B0:96:27:49
+SIGNING_CERT_SHA256=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
 SIGNING_CLASS=TEST_ONLY
 CURRENT_VERSION_CODE=4401
 CURRENT_VERSION_NAME=0.9.2-lab44-aggiornamento
-CURRENT_BUILD_RUN=37297725710
-NEXT_VISIBLE_LABEL=LAB 45 aggiornamento
-NEXT_MIN_VERSION_CODE=4402
+CURRENT_BUILD_RUN=37299811755
+CURRENT_ARTIFACT_ID=11341696725
+CURRENT_ARTIFACT_DIGEST=sha256:29b2b63c531b46844b6377952bf53a1800206ea6363cb9a9dade6bb0e191e3f3
+CURRENT_APK_SHA256=59240ea488a0ed25c955368ce7a57a31afeeb09047704de698f05378bdfe7a13
+CURRENT_ZIP_SHA256=ee74b588f6a5f46814c9ad07feef25e1f6722479a7b4ab3a0a98582dc8f4ede3
+
+PAIRED SAFETY CHECKPOINT
+SAFETY_LABEL=LAB di sicurezza 44
+SAFETY_REF=safety/musiclab-lab-44
+SAFETY_SHA=cb4a59afa5ec57c492c05a1ab8d845f5264cc7ad
+SAFETY_APPLICATION_ID=it.verlezza.musiclab.safety44
+SAFETY_SIGNING_CERT_SHA256=BA18C6DFE97CE2DD145CAF85F3B65BED210375EFB428D60A7A8B6D576E5F94C8
+SAFETY_SIGNING_CLASS=UNIQUE_EPHEMERAL_TEST_KEY
+SAFETY_IMMUTABLE=yes
+SAFETY_BUILD_RUN=37299811755
+SAFETY_ARTIFACT_ID=11341312063
+SAFETY_ARTIFACT_DIGEST=sha256:496b9266510080adbf70b66626d354183edeccaba829749385b26dcf989e715a
+SAFETY_APK_SHA256=84d8d8c81900cceffeaf8486ff5b984044f7edc25df86165e41034c921697d5a
+SAFETY_ZIP_SHA256=efd1bfc5022f83161cda71bbb659f8709646dc56002ba21bf4384ba32d43ee58
+SAFETY_FUNCTIONAL_SOURCE_EQUIVALENCE=exact same app/runtime source as paired update
+SAFETY_RECOVERY_ROLE=preferred recovery checkpoint before MADRE if active family later corrupts
 
 BRUNO-FACING NAMING
 - Current first install: LAB 44 aggiornamento.
-- Next modification: LAB 45 aggiornamento.
-- Then LAB 46 aggiornamento, LAB 47 aggiornamento, etc.
-- All LAB aggiornamento revisions in FAMILY_ID=01 keep the same applicationId and signing certificate.
-- Bruno configures accounts/tokens/settings on the first install only; later family revisions are intended as in-place Android updates.
+- Paired checkpoint: LAB di sicurezza 44.
+- Next modification: LAB 45 aggiornamento + LAB di sicurezza 45.
+- Then 46+46, 47+47, etc.
+- All LAB NN aggiornamento revisions in FAMILY_ID=01 keep the same applicationId and signing certificate.
+- Each LAB di sicurezza NN is a separate immutable Android family with its own package and unique test-only certificate.
 
 CONTINUATION RULE
-- Next LAB modification starts from CURRENT_REF/CURRENT_SHA of this family, not from MADRE and not from the old LAB44 origin.
-- Increment visible LAB number.
-- Keep FAMILY_ID=01, ANDROID_APPLICATION_ID and SIGNING_CERT_SHA256 unchanged.
-- Increase Android versionCode monotonically before every artifact.
-- Update CURRENT_REF/CURRENT_SHA/version fields after successful verification.
+- Next LAB modification starts from CURRENT_REF/CURRENT_SHA of FAMILY_ID=01.
+- Next visible main label: LAB 45 aggiornamento.
+- Next paired label: LAB di sicurezza 45.
+- Keep FAMILY_ID=01, ANDROID_APPLICATION_ID and active-family SIGNING_CERT_SHA256 unchanged.
+- Use next versionCode 4501 (or a strictly higher conflict-free value if repository evidence requires it).
+- Build and verify both update + paired safety from the same functional source state.
+- Update CURRENT_* and append a new SAFETY checkpoint only after successful verification.
+
+RECOVERY RULE
+- If a later active LAB aggiornamento becomes unusable, do not automatically fall back to MADRE.
+- Select the latest known-good LAB di sicurezza checkpoint approved/verified for recovery.
+- Create a NEW active update family from that safety source state with a new stable update package/signing profile.
+- Never patch or update a safety checkpoint itself.
+- MADRE remains ultimate fallback.
 
 CANDIDATA RULE
-- LAB -> CANDIDATA does NOT rename/convert this family.
+- LAB -> CANDIDATA does NOT rename/convert FAMILY_ID=01.
 - Create CANDIDATA NN as a NEW immutable Android family using the exact approved LAB state/method.
-- Existing candidate is never patched. If changes are needed, return to FAMILY_ID=01, create next LAB aggiornamento, then create a new candidate number.
+- Existing candidate is never patched. If changes are needed, return to active LAB family, create next LAB aggiornamento + safety pair, then create a new candidate number.
 
 MADRE RULE
 - After explicit Bruno approval, approved CANDIDATA -> MADRE promotes that same candidate source/family identity.
-- LAB test signing profile must never become the MADRE production signing profile.
+- LAB/safety test signing profiles must never silently become the MADRE production signing profile.
 
 VERSION
-MOTORLAB-MUSICLAB-UPDATE-FAMILY-REGISTRY-V1.0
+MOTORLAB-MUSICLAB-UPDATE-FAMILY-REGISTRY-V1.1
 Established: 2026-10-05
+Revision 1.1: verified LAB 44 aggiornamento + immutable LAB di sicurezza 44 pair; next pair fixed to LAB 45 aggiornamento + LAB di sicurezza 45.
