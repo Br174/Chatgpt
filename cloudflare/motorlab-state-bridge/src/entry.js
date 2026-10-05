@@ -100,54 +100,141 @@ async function issueRelay(request, env) {
 
 
 function validId(value) { return typeof value === 'string' && /^[A-Za-z0-9._:/-]{1,128}$/.test(value); }
+function validSourceHead(value) { return typeof value === 'string' && /^[0-9a-f]{7,64}$/i.test(value); }
+function bearerToken(request) {
+  const value = request.headers.get('authorization');
+  return typeof value === 'string' && value.startsWith('Bearer ') ? value.slice(7).trim() : null;
+}
+async function sourceProofProject(env, projectId, sourceHead) {
+  if (!env.DB || !validId(projectId) || !validSourceHead(sourceHead)) return null;
+  const project = await env.DB.prepare(
+    'SELECT project_id, repository, lifecycle_stage, source_ref, source_head, local_satellite_release_state, updated_at FROM projects WHERE project_id=?'
+  ).bind(projectId).first();
+  if (!project || !String(project.local_satellite_release_state || '').includes('POLLICINO_SOURCE_PROOF_ENABLED')) return null;
+  const operation = await env.DB.prepare(
+    "SELECT operation_id, project_id, status, phase, overall_progress, source_ref, source_head, updated_at FROM operations WHERE project_id=? AND status NOT IN ('COMPLETED','FAILED_SAFE','CANCELLED_BY_USER') ORDER BY updated_at DESC LIMIT 1"
+  ).bind(projectId).first();
+  if (!operation) return null;
+  const proof = String(project.source_head || '').toLowerCase() === sourceHead.toLowerCase()
+    ? 'PROJECT_HEAD'
+    : String(operation.source_head || '').toLowerCase() === sourceHead.toLowerCase()
+      ? 'OPERATION_HEAD'
+      : null;
+  return proof ? { project, operation, proof } : null;
+}
 async function continuityAuth(request, env, rawBody = '') {
   const secret = env.POLLICINO_SECRET || env.RELAY_SECRET;
   if (!secret) return false;
   return verifyMotorLabRequest(secret, request, rawBody);
 }
+async function pollicinoEnroll(request, env) {
+  const rawBody = await request.text();
+  if (textEncoder.encode(rawBody).byteLength > 32 * 1024) return json({ error: 'payload_too_large' }, 413);
+  let payload; try { payload = JSON.parse(rawBody); } catch { return json({ error: 'invalid_payload' }, 400); }
+  if (!validId(payload?.project_id) || !validId(payload?.session_id) || !validSourceHead(payload?.source_head)) return json({ error: 'invalid_identity' }, 400);
+  if (typeof payload?.executor_type !== 'string' || payload.executor_type.length < 1 || payload.executor_type.length > 128) return json({ error: 'invalid_executor_type' }, 400);
+  if (!env.POLLICINO_SENTINEL || !env.DB) return json({ error: 'pollicino_sentinel_not_configured' }, 503);
+  try {
+    const proof = await sourceProofProject(env, payload.project_id, payload.source_head);
+    if (!proof) return json({ error: 'source_proof_rejected' }, 403);
+    const stub = env.POLLICINO_SENTINEL.getByName(`${payload.project_id}:${proof.operation.operation_id}`);
+    const result = await stub.enroll({
+      session_id: payload.session_id,
+      project_id: payload.project_id,
+      operation_id: proof.operation.operation_id,
+      executor_type: payload.executor_type,
+      source_head: payload.source_head,
+      source_ref: proof.operation.source_ref ?? proof.project.source_ref ?? null,
+      phase: proof.operation.phase ?? null,
+      verified_progress: Number.isInteger(proof.operation.overall_progress) ? proof.operation.overall_progress : null,
+      proof: proof.proof
+    });
+    return json({ ...result, context: proof.operation, proof: proof.proof }, 201);
+  } catch (error) {
+    const message = error?.message || 'pollicino_enroll_failed';
+    return json({ error: message }, message === 'active_session_exists' ? 409 : 503);
+  }
+}
 async function pollicinoPulse(request, env) {
   const rawBody = await request.text();
-  if (!(await continuityAuth(request, env, rawBody))) return json({ error: 'unauthorized' }, 401);
   let payload; try { payload = JSON.parse(rawBody); } catch { return json({ error: 'invalid_payload' }, 400); }
   if (!validId(payload?.project_id) || !validId(payload?.operation_id) || !validId(payload?.session_id)) return json({ error: 'invalid_identity' }, 400);
   if (!env.POLLICINO_SENTINEL) return json({ error: 'pollicino_sentinel_not_configured' }, 503);
-  try { return json(await env.POLLICINO_SENTINEL.getByName(`${payload.project_id}:${payload.operation_id}`).pulse(payload)); }
-  catch (error) { return json({ error: error?.message || 'pollicino_pulse_failed' }, 503); }
+  const trusted = await continuityAuth(request, env, rawBody);
+  const token = trusted ? null : bearerToken(request);
+  if (!trusted && !token) return json({ error: 'unauthorized' }, 401);
+  try { return json(await env.POLLICINO_SENTINEL.getByName(`${payload.project_id}:${payload.operation_id}`).pulse(payload, token, trusted)); }
+  catch (error) {
+    const message = error?.message || 'pollicino_pulse_failed';
+    return json({ error: message }, message.startsWith('unauthorized') || message === 'session_sealed' ? 401 : 503);
+  }
 }
 async function pollicinoSeal(request, env) {
   const rawBody = await request.text();
-  if (!(await continuityAuth(request, env, rawBody))) return json({ error: 'unauthorized' }, 401);
   let payload; try { payload = JSON.parse(rawBody); } catch { return json({ error: 'invalid_payload' }, 400); }
-  if (!validId(payload?.project_id) || !validId(payload?.operation_id)) return json({ error: 'invalid_identity' }, 400);
+  if (!validId(payload?.project_id) || !validId(payload?.operation_id) || !validId(payload?.session_id)) return json({ error: 'invalid_identity' }, 400);
   if (!env.POLLICINO_SENTINEL) return json({ error: 'pollicino_sentinel_not_configured' }, 503);
-  try { return json(await env.POLLICINO_SENTINEL.getByName(`${payload.project_id}:${payload.operation_id}`).seal(payload)); }
-  catch (error) { return json({ error: error?.message || 'pollicino_seal_failed' }, 503); }
+  const trusted = await continuityAuth(request, env, rawBody);
+  const token = trusted ? null : bearerToken(request);
+  if (!trusted && !token) return json({ error: 'unauthorized' }, 401);
+  try { return json(await env.POLLICINO_SENTINEL.getByName(`${payload.project_id}:${payload.operation_id}`).seal(payload, token, trusted)); }
+  catch (error) {
+    const message = error?.message || 'pollicino_seal_failed';
+    return json({ error: message }, message.startsWith('unauthorized') ? 401 : 503);
+  }
+}
+async function pollicinoStatus(request, env) {
+  if (!env.POLLICINO_SENTINEL) return json({ error: 'pollicino_sentinel_not_configured' }, 503);
+  const url = new URL(request.url);
+  const projectId = url.searchParams.get('project_id');
+  const operationId = url.searchParams.get('operation_id');
+  if (!validId(projectId) || !validId(operationId)) return json({ error: 'invalid_identity' }, 400);
+  const trusted = await continuityAuth(request, env, '');
+  const token = trusted ? null : bearerToken(request);
+  if (!trusted && !token) return json({ error: 'unauthorized' }, 401);
+  try { return json(await env.POLLICINO_SENTINEL.getByName(`${projectId}:${operationId}`).status(token, trusted)); }
+  catch (error) {
+    const message = error?.message || 'pollicino_status_failed';
+    return json({ error: message }, message.startsWith('unauthorized') ? 401 : 503);
+  }
 }
 async function pollicinoContext(request, env) {
-  if (!(await continuityAuth(request, env, ''))) return json({ error: 'unauthorized' }, 401);
   if (!env.DB) return json({ error: 'd1_not_configured' }, 503);
   const url = new URL(request.url);
   const projectId = url.searchParams.get('project_id');
+  const sourceHead = url.searchParams.get('source_head');
   if (!validId(projectId)) return json({ error: 'invalid_identity' }, 400);
   try {
-    const row = await env.DB.prepare(
+    const trusted = await continuityAuth(request, env, '');
+    let proof = null;
+    if (!trusted) {
+      proof = await sourceProofProject(env, projectId, sourceHead);
+      if (!proof) return json({ error: 'source_proof_rejected' }, 403);
+    }
+    const row = proof?.operation ?? await env.DB.prepare(
       "SELECT operation_id, project_id, status, phase, overall_progress, source_ref, source_head, updated_at FROM operations WHERE project_id=? AND status NOT IN ('COMPLETED','FAILED_SAFE','CANCELLED_BY_USER') ORDER BY updated_at DESC LIMIT 1"
     ).bind(projectId).first();
     if (!row) return json({ error: 'not_found' }, 404);
-    return json({ context: row });
+    return json({ context: row, proof: proof?.proof ?? 'HMAC' });
   } catch {
     return json({ error: 'pollicino_context_unavailable' }, 503);
   }
 }
 
 async function pollicinoResumeReady(request, env) {
-  if (!(await continuityAuth(request, env, ''))) return json({ error: 'unauthorized' }, 401);
   if (!env.DB) return json({ error: 'd1_not_configured' }, 503);
   const url = new URL(request.url);
   const projectId = url.searchParams.get('project_id');
   const operationId = url.searchParams.get('operation_id');
+  const sourceHead = url.searchParams.get('source_head');
   if (!validId(projectId) || (operationId && !validId(operationId))) return json({ error: 'invalid_identity' }, 400);
   try {
+    const trusted = await continuityAuth(request, env, '');
+    if (!trusted) {
+      const proof = await sourceProofProject(env, projectId, sourceHead);
+      if (!proof) return json({ error: 'source_proof_rejected' }, 403);
+      if (operationId && operationId !== proof.operation.operation_id) return json({ error: 'operation_mismatch' }, 403);
+    }
     const query = operationId
       ? env.DB.prepare("SELECT * FROM pollicino_resume_packets WHERE project_id=? AND operation_id=? AND status LIKE 'READY%' ORDER BY prepared_at DESC LIMIT 1").bind(projectId,operationId)
       : env.DB.prepare("SELECT * FROM pollicino_resume_packets WHERE project_id=? AND status LIKE 'READY%' ORDER BY prepared_at DESC LIMIT 1").bind(projectId);
@@ -163,8 +250,10 @@ export default {
     if (request.method === 'POST' && url.pathname === '/github-webhook' && request.headers.get('x-github-event') === 'issues') {
       return issueRelay(request, env);
     }
+    if (request.method === 'POST' && url.pathname === '/continuity/v1/enroll') return pollicinoEnroll(request, env);
     if (request.method === 'POST' && url.pathname === '/continuity/v1/pulse') return pollicinoPulse(request, env);
     if (request.method === 'POST' && url.pathname === '/continuity/v1/seal') return pollicinoSeal(request, env);
+    if (request.method === 'GET' && url.pathname === '/continuity/v1/status') return pollicinoStatus(request, env);
     if (request.method === 'GET' && url.pathname === '/continuity/v1/context') return pollicinoContext(request, env);
     if (request.method === 'GET' && url.pathname === '/continuity/v1/resume-ready') return pollicinoResumeReady(request, env);
     return core.fetch(request, env);
