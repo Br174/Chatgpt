@@ -241,7 +241,7 @@ If the repository becomes public or the project cannot maintain a private author
 17C. STABLE SATELLITE PROOF HEAD
 The mutable projects.source_head field is operational state and may legitimately be rewritten by later project reconciliation.
 Therefore it MUST NOT be the only bootstrap proof for a private adopted satellite.
-When source-proof enrollment is enabled, local_satellite_release_state may carry exactly one explicit `POLLICINO_PROOF_HEAD=<git-sha>` marker for the currently adopted control-plane revision.
+When source-proof enrollment is enabled, local_satellite_release_state may carry exactly one explicit `POLLICINO_PROOF_HEAD=<git-sha>` marker for a previously verified adopted control-plane revision. The executor uses that anchor only for enrollment/context proof; it MUST keep the actual current Git HEAD separate as runtime/source evidence so RESUME_READY and reconciliation do not confuse the proof capability with the code revision being worked on.
 Proof precedence is:
 1. POLLICINO_PROOF_HEAD from the verified satellite state;
 2. current projects.source_head;
@@ -308,7 +308,7 @@ Pollicino is correctly integrated when:
 - opaque host limits are represented honestly.
 
 VERSION
-MOTORLAB-POLLICINO-CONTINUITY-V1.5
+MOTORLAB-POLLICINO-CONTINUITY-V1.6
 Established: 2026-10-05.
 Release: r20.
 
@@ -323,3 +323,5 @@ Revision 1.4: adds stable satellite POLLICINO_PROOF_HEAD precedence so mutable p
 Revision 1.5: records live OIDC direct-persist success and production E2E Pollicino canary 37360730928 as the r20 acceptance gate; stall/crash/preemptive-resume behavior is VERIFIED.
 
 Revision 1.5: defines the stable proof as the sidecar adoption identity and makes the Codex adapter consume the locally persisted proof before mutable Git HEAD, preventing metadata-only commits from invalidating enrollment.
+
+Revision 1.6: separates the stable enrollment proof anchor from mutable runtime Git HEAD in executor session evidence; proof is used for authentication bootstrap only, while current source revision remains independently observable for exact recovery.

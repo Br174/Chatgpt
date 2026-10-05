@@ -416,21 +416,18 @@ def _hook_main() -> int:
     path = _state_path(session_id)
     state = _load_state(path)
     head, _ = _git_snapshot(cwd)
-    source_head = (
-        os.environ.get("MOTORLAB_SOURCE_HEAD", "").strip()
-        or _local_proof_head(cwd)
-        or head
-    )
+    runtime_head = os.environ.get("MOTORLAB_SOURCE_HEAD", "").strip() or head
+    proof_head = _local_proof_head(cwd) or runtime_head
     operation_id = _safe_id(os.environ.get("MOTORLAB_OPERATION_ID", "").strip() or str(state.get("operation_id") or ""))
     context = None
 
     if _secret() and not operation_id:
-        discovered = _discover_operation(project_id, source_head)
+        discovered = _discover_operation(project_id, proof_head)
         context = discovered.get("context") if isinstance(discovered, dict) else None
         operation_id = _safe_id(str((context or {}).get("operation_id") or ""))
 
     if not operation_id and not state.get("session_token"):
-        enrolled = _enroll(project_id, session_id, source_head)
+        enrolled = _enroll(project_id, session_id, proof_head)
         if isinstance(enrolled, dict):
             operation_id = _safe_id(str(enrolled.get("operation_id") or ""))
             token = str(enrolled.get("session_token") or "")
@@ -451,7 +448,8 @@ def _hook_main() -> int:
         "transcript_path": payload.get("transcript_path"),
         "canonical_chat_ref": os.environ.get("MOTORLAB_CANONICAL_CHAT_REF") or None,
         "source_ref": os.environ.get("MOTORLAB_SOURCE_REF") or (context or {}).get("source_ref") or None,
-        "source_head": source_head or (context or {}).get("source_head") or None,
+        "source_head": runtime_head or (context or {}).get("source_head") or None,
+        "proof_head": proof_head or None,
         "phase": os.environ.get("MOTORLAB_PHASE") or (context or {}).get("phase") or None,
         "next_action": os.environ.get("MOTORLAB_NEXT_ACTION") or None,
         "updated_at": time.time(),
