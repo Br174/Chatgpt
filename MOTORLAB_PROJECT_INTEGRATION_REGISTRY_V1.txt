@@ -5,7 +5,7 @@ Canonical registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.05-r19
+Release: 2026.10.05-r20
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
@@ -16,6 +16,7 @@ Canonical pre-change approval: MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
 Canonical visible restore register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
 Canonical authority/data ownership: MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
 Canonical persistent operational state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
+Canonical Pollicino continuity: MOTORLAB_POLLICINO_CONTINUITY_V1.txt
 Canonical observability: MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
 Canonical knowledge/tool routing: MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 Canonical service connection status: MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
@@ -45,16 +46,16 @@ R15 RULES PRESERVED
 
 REGISTERED PROJECTS
 1. MusicLab — Br174/MusicLab
-   Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt revision 19
+   Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt revision 77
    Technical registry: MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_MUSICLAB_V1.txt
    Visible state: N.1 Player / mini-player fuori dal lettore from device-accepted LAB19 CANDIDATA
    Stable CANDIDATA: candidate/musiclab-lab19-player-stable @ 6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-   Local satellite: 2026.09.30-r15 VERIFIED on uab-build/musiclab-player-direct-collapse-19
-   r15 control-plane head: dcf20dcb00f9b20ed8a1cdfc59864f0052fd636a
-   LAST_GOOD: r14
-   Central r16 authoritative; local r16 adoption pending next verified safe boundary.
-   Candidate ref unchanged; application runtime impact from central r16: NONE.
+   Local satellite: 2026.10.05-r20 VERIFIED on main @ 43a1fca35e54cb05db80f1a18d02f8626f656696
+   r20 control-plane head: 43a1fca35e54cb05db80f1a18d02f8626f656696
+   LAST_GOOD: 2026.09.30-r16
+   Central r20 authoritative; local r20 adopted on verified safe boundary. Pollicino sidecar/lifecycle hooks installed; real executor enrollment remains authenticated-pulse pending.
+   Candidate/ref/application lifecycle unchanged; application runtime impact from r20/Pollicino control-plane adoption: NONE.
 
 2. GeoVision — Br174/GeoVision-Test
    Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
@@ -97,16 +98,16 @@ CENTRAL SERVICE INTEGRATION STATUS
 Existing Cloudflare use inside MusicLab/Cover Lab AI remains project-specific and distinct from the verified central MotorLab state store.
 
 SAFE ADOPTION RULE
-Never force a release change into active/unknown project work. Projects must be live-reconciled before local r16 adoption. Central r16 remains authoritative whenever central access exists; local satellite versions remain truthfully reported until upgraded.
+Never force a release change into active/unknown project work. Projects must be live-reconciled before local CORE adoption. Central r20 remains authoritative whenever central access exists; local satellite versions remain truthfully reported until upgraded.
 
 SYNC CLOSURE
-MOTORLAB_SATELLITE_SYNC_V1.txt v1.12 requires r16 authority/data ownership, MOTORLAB_OPERATION_ID, persistent-state fallback, observability boundaries and knowledge/tool routing markers in addition to prior release gates.
+MOTORLAB_SATELLITE_SYNC_V1.txt v1.17 requires r20 Pollicino external continuity/executor-adapter markers in addition to authority/data ownership, MOTORLAB_OPERATION_ID, persistent-state fallback, observability and prior release gates.
 
 FUTURE PROJECTS
-Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r16 authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
+Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r20 Pollicino external continuity plus authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.13
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.14
 Revision 2.11: GitBook live status reconciled to read/write CONNECTED_VERIFIED after OAuth Full access authorization and successful harmless draft change-request write check. Root cause recorded as prior Read only OAuth scope; prevention requires separate read and write capability checks. Central r16 release unchanged.
 Revision 2.12: Context7 Free custom MCP app reconciled to CONNECTED_VERIFIED after two end-to-end documentation checks. Catalog-plugin state is explicitly separated from custom-app state; the anonymous free endpoint is pinned and the failed OAuth prototype is recorded as removed. Central r16 release unchanged.
 
@@ -120,4 +121,6 @@ R19 CHANGE COMPATIBILITY PILLAR
 - Existing projects adopt r19 at the next verified safe boundary; future projects inherit it during onboarding.
 
 VERSION NOTE
-Registry alignment for MotorLab 2026.10.05-r19.
+Registry alignment for MotorLab 2026.10.05-r20.
+
+Revision 2.14: central release aligned to r20; MusicLab safely adopted the r20 satellite and external Pollicino Codex sidecar on main with r16 preserved as LAST_GOOD and zero application-runtime changes. Authenticated executor enrollment remains pending.
