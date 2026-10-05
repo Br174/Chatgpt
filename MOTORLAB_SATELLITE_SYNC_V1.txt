@@ -148,9 +148,10 @@ Do not place heartbeat/breadcrumb logic in application runtime code merely for M
 Watchdog/Resume ownership and single-writer precedence remain unchanged.
 When the local executor supports Codex hooks, sync the external Pollicino sidecar/hook template at a safe boundary; never place it in application runtime source.
 For a private adopted satellite using source-proof enrollment, publish/update `POLLICINO_PROOF_HEAD=<current adopted Git SHA>` in D1 at the same verified adoption boundary; do not rely exclusively on mutable project operational heads.
+Also persist the chosen verified anchor in project control-plane metadata readable by the sidecar. The anchor may point to a prior verified adoption commit; do not attempt self-referential embedding of the commit that contains the marker itself.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.19
+MOTORLAB-SATELLITE-SYNC-V1.20
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -165,3 +166,5 @@ Revision 1.17: r20 satellite sync now carries the external Codex Pollicino adapt
 Revision 1.18: r20 satellites inherit source-proof self-enrollment + ephemeral session token support for explicitly opted-in private projects.
 
 Revision 1.19: r20 requires stable proof-head publication at verified satellite adoption boundaries.
+
+Revision 1.20: r20 closes proof-anchor drift by requiring the D1 proof marker and the executor-readable project control-plane marker to stay paired at safe adoption boundaries.
