@@ -5,11 +5,16 @@ on:
     branches: [main]
     paths:
       - 'relay/MOTORLAB_D1_OUTBOX.json'
+      - '.github/workflows/motorlab-d1-oidc-relay.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
   id-token: write
+
+concurrency:
+  group: motorlab-d1-oidc-relay
+  cancel-in-progress: true
 
 jobs:
   relay:
