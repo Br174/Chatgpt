@@ -1,4 +1,4 @@
-import core, { sha256Hex, validateSnapshot } from './index.js';
+import core, { sha256Hex, validateSnapshot, persistSnapshot } from './index.js';
 import { verifyGitHubActionsOidc } from './github-oidc.js';
 export { PollicinoSentinel } from './pollicino-sentinel.js';
 
@@ -101,10 +101,10 @@ async function issueRelay(request, env) {
 
 
 async function oidcRelay(request, env) {
-  if (!env.GITHUB_WEBHOOK_SECRET) return json({ error: 'internal_relay_not_configured' }, 503);
   const rawSnapshot = await request.text();
   if (textEncoder.encode(rawSnapshot).byteLength > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
-  try { validateSnapshot(JSON.parse(rawSnapshot)); }
+  let snapshot;
+  try { snapshot = validateSnapshot(JSON.parse(rawSnapshot)); }
   catch (error) { return json({ error: error.message || 'invalid_snapshot' }, 400); }
 
   const auth = request.headers.get('authorization');
@@ -131,18 +131,7 @@ async function oidcRelay(request, env) {
     } catch {}
   }
 
-  const timestamp = String(Math.floor(Date.now() / 1000));
-  const signature = await signInternalRelay(env.GITHUB_WEBHOOK_SECRET, timestamp, rawSnapshot);
-  const relayRequest = new Request(new URL('/relay', request.url), {
-    method: 'POST',
-    body: rawSnapshot,
-    headers: {
-      'content-type': 'application/json',
-      'x-motorlab-timestamp': timestamp,
-      'x-motorlab-signature': signature
-    }
-  });
-  const response = await core.fetch(relayRequest, { ...env, RELAY_SECRET: env.GITHUB_WEBHOOK_SECRET });
+  const response = await persistSnapshot(snapshot, rawSnapshot, env);
   if (response.ok && env.CACHE) {
     try { await env.CACHE.put(`github-oidc-jti:${claims.jti}`, '1', { expirationTtl: 900 }); } catch {}
   }
