@@ -214,6 +214,22 @@ Do not turn high-frequency liveness into GitHub commit/issue spam.
 All current/future MotorLab-managed software projects inherit this capability through the central release and satellite sync at safe boundaries.
 Project-native engines remain intact.
 
+17A. CODEX EXECUTOR SIDECAR ADAPTER
+The canonical Codex template may install .codex/hooks/motorlab_pollicino.py outside application source.
+When MOTORLAB_OPERATION_ID plus a provider-native MOTORLAB_POLLICINO_SECRET (or compatible relay secret) are actually available:
+- SessionStart/UserPromptSubmit/PostToolUse refresh local session evidence and send signed pulses;
+- a detached sidecar emits periodic PUSH_HEARTBEAT pulses while the observed host process remains alive;
+- the sidecar hashes tool input/repository/transcript metadata locally and sends only a fingerprint, not raw prompt/tool content;
+- Stop/Interrupt/SessionEnd emit terminal seals;
+- abrupt host-process disappearance intentionally emits no seal so the external Alarm can detect liveness loss;
+- missing secret/operation identity fails closed/degraded and must not claim enrollment.
+This adapter is MotorLab executor infrastructure and MUST remain outside application/domain code.
+
+17B. STALL PRECOMPUTE
+When an enrolled executor remains alive but crosses the configured unchanged-fingerprint threshold, Pollicino may prepare RESUME_READY with status READY_STALL_SUSPECTED immediately.
+This is read-only preparation, not cancellation or recovery.
+If later progress resumes, supersede that packet and preserve the newer verified state.
+
 18. SUCCESS CRITERIA
 Pollicino is correctly integrated when:
 - application code remains free of continuity breadcrumbs;
@@ -228,6 +244,8 @@ Pollicino is correctly integrated when:
 - opaque host limits are represented honestly.
 
 VERSION
-MOTORLAB-POLLICINO-CONTINUITY-V1.0
+MOTORLAB-POLLICINO-CONTINUITY-V1.1
 Established: 2026-10-05.
 Release: r20.
+
+Revision 1.1: adds canonical Codex external sidecar adapter contract and precomputed RESUME_READY on alive-but-stalled evidence, with automatic supersession when progress resumes.
