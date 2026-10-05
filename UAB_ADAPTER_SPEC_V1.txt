@@ -90,6 +90,16 @@ MOTORLAB_REGRESSION_MAP=<path/description|none-with-reason>
 MOTORLAB_PREAPPROVAL_READONLY=<allowed|restricted|none-with-reason>
 MOTORLAB_PARALLEL_READONLY=<allowed|restricted|none-with-reason>
 
+MOTORLAB UPDATE FAMILY FIELDS - REQUIRED WHEN ANDROID UPDATE-FAMILY MODE IS ENABLED
+MOTORLAB_UPDATE_FAMILY_MODE=<off|lab|candidate-mother>
+MOTORLAB_UPDATE_FAMILY_ID=<stable internal family id>
+MOTORLAB_UPDATE_APPLICATION_ID=<stable Android package id for the family>
+MOTORLAB_UPDATE_SIGNING_PROFILE=<stable signing profile/certificate identity>
+MOTORLAB_UPDATE_VERSION_CODE=<strictly increasing integer>
+MOTORLAB_UPDATE_VISIBLE_NAME=<Bruno-facing LAB NN aggiornamento / CANDIDATA NN name>
+MOTORLAB_UPDATE_ORIGIN_REF=<family origin ref/SHA>
+MOTORLAB_UPDATE_CURRENT_REF=<current family head ref/SHA>
+
 Legacy adapters that do not yet declare watchdog/background/service-guard/velocity fields remain usable. MotorLab applies conservative defaults, MUST NOT claim true persistent background continuity unless a durable executor is actually defined and observable, MUST NOT invent provider quota values that have not been established, and MUST NOT use a Velocity optimization that cannot be proven compatible with existing MotorLab safety rules.
 
 MANDATORY ADAPTER BEHAVIOR
@@ -141,12 +151,18 @@ MANDATORY ADAPTER BEHAVIOR
 46. Existing approval remains valid across phases/executors for the same clearly described scope; do not ask Bruno to repeat the same approval unless scope/consequences materially change or another canonical rule requires renewed approval.
 47. Provider-dependent acceleration must remain inside MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt budgets/circuit/backoff/failover rules; speed may not come from increasing API pressure.
 48. Adoption of Velocity Layer must execute the applicable verification checks in MOTORLAB_VELOCITY_LAYER_V1.txt, including stale-snapshot invalidation, no pre-approval writes, no conflicting writer, risk gating, FAST LAB lifecycle safety, cache invalidation, Service Guard preservation and continued Watchdog/checkpoint/progress operation.
+49. Android update-family mode is governed by MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt. Later LAB aggiornamento builds in one family MUST keep applicationId + signing certificate and increase versionCode.
+50. LAB -> CANDIDATA in update-family mode creates a NEW immutable candidate family from the exact approved LAB state/change-set and MUST NOT mutate or repurpose the LAB family package/signing identity.
+51. If a candidate needs source changes, return to the LAB family, create the next LAB aggiornamento, approve it, then create a new CANDIDATA number; do not patch an existing candidate.
+52. Approved CANDIDATA -> MADRE promotes the same candidate source identity. Android packaging may preserve that candidate family identity as the future MADRE identity according to project policy; no LAB test key may silently become a production key.
+53. Update-family artifact gates MUST verify package/applicationId, monotonically increasing versionCode and signing certificate identity before calling the artifact update-compatible.
 
 VERSION
-UAB-ADAPTER-SPEC-V1.5 / MOTORLAB COMPATIBILITY
+UAB-ADAPTER-SPEC-V1.6 / MOTORLAB COMPATIBILITY
 Established: 2026-09-24
 Revision 1.1: atomic LAB and exact same-Mother/same-change Candidate promotion chain.
 Revision 1.2: MotorLab naming compatibility plus mandatory anti-stall watchdog observability, checkpoint, lock and recovery contract.
 Revision 1.3: persistent background execution, durable checkpoints and single-chat continuity contract.
 Revision 1.4: reusable External Service Guard provider/API protection fields and mandatory adapter behavior.
 Revision 1.5: additive-only Velocity Layer fields, project snapshots, Change Capsules, FAST LAB, risk-scaled LAB verification and safe incremental build readiness.
+Revision 1.6: Android update-family fields and stable package/signing/versionCode gates.
