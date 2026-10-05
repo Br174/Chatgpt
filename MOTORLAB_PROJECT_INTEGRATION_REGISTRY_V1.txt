@@ -5,7 +5,7 @@ Canonical registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.09.30-r16
+Release: 2026.10.05-r19
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
@@ -106,6 +106,18 @@ FUTURE PROJECTS
 Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r16 authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.12
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.13
 Revision 2.11: GitBook live status reconciled to read/write CONNECTED_VERIFIED after OAuth Full access authorization and successful harmless draft change-request write check. Root cause recorded as prior Read only OAuth scope; prevention requires separate read and write capability checks. Central r16 release unchanged.
 Revision 2.12: Context7 Free custom MCP app reconciled to CONNECTED_VERIFIED after two end-to-end documentation checks. Catalog-plugin state is explicitly separated from custom-app state; the anonymous free endpoint is pinned and the failed OAuth prototype is recorded as removed. Central r16 release unchanged.
+
+
+R19 CHANGE COMPATIBILITY PILLAR
+- MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is mandatory for every currently registered MotorLab software project and every future project.
+- Before write-capable changes, inspect the authoritative current implementation for overlap, redundancy, conflict and already-existing rules.
+- ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR.
+- Extend or merge the existing responsible mechanism when appropriate; if an older path conflicts, explicitly supersede it instead of leaving duplicate active behavior.
+- Fast iteration, optimization, automation, migration, restore and background execution do not bypass this pillar.
+- Existing projects adopt r19 at the next verified safe boundary; future projects inherit it during onboarding.
+
+VERSION NOTE
+Registry alignment for MotorLab 2026.10.05-r19.
