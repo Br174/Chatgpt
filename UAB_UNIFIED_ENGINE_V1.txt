@@ -11,6 +11,9 @@ UNIVERSAL LIFECYCLE
 MADRE -> LAB -> CANDIDATA -> NEW MADRE
 
 
+PAIRED SAFETY CHECKPOINTS
+For every verified LAB NN aggiornamento in Android update-family mode, MotorLab produces LAB di sicurezza NN from the exact same functional source state. The safety artifact uses a different package/family and a different test-only certificate, is immutable, and becomes a recovery checkpoint. If the active family breaks after many revisions, a new active update family may start from the last known-good safety checkpoint rather than returning to MADRE. Safety is not CANDIDATA and cannot promote directly to MADRE.
+
 ANDROID UPDATE-FAMILY MODE
 For Android projects explicitly using Bruno's persistent test-family workflow:
 - one new LAB family is installed/configured once;
