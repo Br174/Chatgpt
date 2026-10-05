@@ -107,3 +107,44 @@ test('Codex adapter supports secretless self-enrollment and ephemeral bearer pul
   assert.match(adapter,/Bearer/);
   assert.doesNotMatch(adapter,/session_token.*git add|session_token.*commit/);
 });
+
+test('GitHub OIDC relay validates narrow repository/workflow claims', async () => {
+  const oidcUrl = pathToFileURL(resolve(bridge,'src/github-oidc.js')).href;
+  const { validateGitHubOidcClaims } = await import(oidcUrl);
+  const now = 2_000_000_000;
+  const claims = {
+    iss:'https://token.actions.githubusercontent.com',
+    aud:'motorlab-state-bridge',
+    repository:'Br174/Chatgpt',
+    repository_id:'1363281702',
+    repository_visibility:'private',
+    ref:'refs/heads/main',
+    workflow_ref:'Br174/Chatgpt/.github/workflows/motorlab-d1-oidc-relay.yml@refs/heads/main',
+    event_name:'push',
+    runner_environment:'github-hosted',
+    exp:now+300, nbf:now-10, iat:now-10, jti:'test-jti-123456'
+  };
+  assert.equal(validateGitHubOidcClaims(claims,{
+    audience:'motorlab-state-bridge',
+    repository:'Br174/Chatgpt',
+    repositoryId:'1363281702',
+    ref:'refs/heads/main',
+    workflowRef:'Br174/Chatgpt/.github/workflows/motorlab-d1-oidc-relay.yml@refs/heads/main'
+  },now).repository,'Br174/Chatgpt');
+  assert.throws(() => validateGitHubOidcClaims({...claims,ref:'refs/heads/evil'},{
+    audience:'motorlab-state-bridge',repository:'Br174/Chatgpt',repositoryId:'1363281702',
+    ref:'refs/heads/main',workflowRef:'Br174/Chatgpt/.github/workflows/motorlab-d1-oidc-relay.yml@refs/heads/main'
+  },now),/invalid_oidc_ref/);
+});
+
+test('permanent D1 relay uses GitHub OIDC instead of repository secrets', async () => {
+  const workflow = await readFile(resolve(bridge,'../../.github/workflows/motorlab-d1-oidc-relay.yml'),'utf8');
+  const entry = await readFile(resolve(bridge,'src/entry.js'),'utf8');
+  assert.match(workflow,/id-token:\s*write/);
+  assert.match(workflow,/ACTIONS_ID_TOKEN_REQUEST_URL/);
+  assert.match(workflow,/motorlab-state-bridge/);
+  assert.doesNotMatch(workflow,/secrets\./);
+  assert.match(entry,/\/control\/v1\/oidc-relay/);
+  assert.match(entry,/verifyGitHubActionsOidc/);
+  assert.match(entry,/github-oidc-jti/);
+});

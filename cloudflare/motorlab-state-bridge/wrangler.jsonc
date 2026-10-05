@@ -31,9 +31,14 @@
     }
   ],
   "vars": {
-    "ENGINE_VERSION": "1.3.2",
+    "ENGINE_VERSION": "1.3.3",
     "ALLOWED_REPOSITORY": "Br174/Chatgpt",
     "ALLOWED_REFS": "refs/heads/main,refs/heads/motorlab/cloudflare-state-r16",
-    "RELAY_ISSUE_NUMBER": "1"
+    "RELAY_ISSUE_NUMBER": "1",
+    "GITHUB_OIDC_AUDIENCE": "motorlab-state-bridge",
+    "OIDC_ALLOWED_REPOSITORY": "Br174/Chatgpt",
+    "OIDC_ALLOWED_REPOSITORY_ID": "1363281702",
+    "OIDC_ALLOWED_REF": "refs/heads/main",
+    "OIDC_ALLOWED_WORKFLOW_REF": "Br174/Chatgpt/.github/workflows/motorlab-d1-oidc-relay.yml@refs/heads/main"
   }
 }

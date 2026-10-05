@@ -242,7 +242,18 @@ If the repository becomes public or the project cannot maintain a private author
 For an opted-in project, read-only context/RESUME_READY lookup may accept the same verified source-head proof so a fresh canonical chat can consume precomputed state without holding a long-lived HMAC secret.
 The read proof never authorizes mutation; all write-capable continuation still requires normal MotorLab authority, lock and approval rules.
 
-17D. STALL PRECOMPUTE
+17D. AUTHENTICATED D1 TRANSPORT
+Central durable operational snapshots must not depend on GitHub webhook delivery alone.
+The canonical fallback/primary free transport is GitHub Actions OIDC:
+- only the private central repository Br174/Chatgpt on main may request the trusted relay role;
+- the dedicated motorlab-d1-oidc-relay workflow requests a short-lived GitHub OIDC JWT with audience motorlab-state-bridge;
+- the Worker verifies RS256 signature against GitHub OIDC JWKS plus issuer, audience, repository id/name, private visibility, ref, workflow_ref, runner type and token lifetime;
+- token jti is replay-protected;
+- after OIDC verification, the Worker reuses the existing validated internal /relay path and D1 writer rather than creating a competing writer;
+- the central JSON outbox changes only at material state boundaries, never as a heartbeat bus.
+Legacy GitHub issue/webhook relay may remain as a compatibility path but is not required for Pollicino correctness.
+
+17E. STALL PRECOMPUTE
 When an enrolled executor remains alive but crosses the configured unchanged-fingerprint threshold, Pollicino may prepare RESUME_READY with status READY_STALL_SUSPECTED immediately.
 This is read-only preparation, not cancellation or recovery.
 If later progress resumes, supersede that packet and preserve the newer verified state.
@@ -261,10 +272,12 @@ Pollicino is correctly integrated when:
 - opaque host limits are represented honestly.
 
 VERSION
-MOTORLAB-POLLICINO-CONTINUITY-V1.2
+MOTORLAB-POLLICINO-CONTINUITY-V1.3
 Established: 2026-10-05.
 Release: r20.
 
 Revision 1.1: adds canonical Codex external sidecar adapter contract and precomputed RESUME_READY on alive-but-stalled evidence, with automatic supersession when progress resumes.
 
 Revision 1.2: removes the long-lived-secret blocker for adopted private projects through D1-gated source-proof enrollment, ephemeral per-session tokens, bearer status/seal/pulse, and source-proof read-only RESUME_READY lookup.
+
+Revision 1.3: adds GitHub Actions OIDC authenticated D1 transport with narrow claim validation and replay protection, removing dependence on webhook delivery while reusing the single existing D1 relay writer.
