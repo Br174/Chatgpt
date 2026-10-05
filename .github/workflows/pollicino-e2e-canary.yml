@@ -229,9 +229,12 @@ jobs:
 
           if operation_id != expected_operation:
               raise SystemExit(f"Unexpected sidecar operation {operation_id}")
-          if state.get("source_head") != expected_proof:
-              raise SystemExit(f"Local stable proof not consumed: {state.get('source_head')}")
+          if state.get("proof_head") != expected_proof:
+              raise SystemExit(f"Local stable proof not consumed: {state.get('proof_head')}")
+          if state.get("source_head") == expected_proof:
+              raise SystemExit("Runtime source head was incorrectly overwritten by proof anchor")
           print("CODEX_SIDECAR_LOCAL_PROOF=PASSED")
+          print("CODEX_SIDECAR_RUNTIME_HEAD_SEPARATION=PASSED")
           print("CODEX_SIDECAR_SELF_ENROLL=PASSED")
           print("CODEX_SIDECAR_LIVENESS=PASSED")
 
