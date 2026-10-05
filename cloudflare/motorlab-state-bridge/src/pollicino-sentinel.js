@@ -106,6 +106,7 @@ export class PollicinoSentinel extends DurableObject {
   async pulse(input, sessionToken = null, trusted = false) {
     if (!trusted && !(await this.verifySessionToken(sessionToken, input))) throw new Error('unauthorized_session_token');
     const previous = await this.ctx.storage.get('session');
+    if (previous?.terminal_seal && previous.session_id === input.session_id) throw new Error('session_sealed');
     const next = advanceSession(previous, input, Date.now());
     await this.ctx.storage.put('session', next);
     await this.persistSession(next);
