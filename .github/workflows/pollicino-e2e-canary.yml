@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/pollicino-e2e-canary.yml'
+      - 'cloudflare/motorlab-state-bridge/**'
+      - 'templates/codex/motorlab/motorlab_pollicino.py'
+      - 'MOTORLAB_POLLICINO_CONTINUITY_V1.txt'
   workflow_dispatch:
 
 permissions:
