@@ -85,3 +85,25 @@ test('signed context endpoint is wired for operation auto-discovery', async () =
   assert.match(entry,/pollicinoContext/);
   assert.match(entry,/status NOT IN \('COMPLETED','FAILED_SAFE','CANCELLED_BY_USER'\)/);
 });
+
+test('source-proof enrollment mints ephemeral session auth without repository secrets', async () => {
+  const entry = await readFile(resolve(bridge,'src/entry.js'),'utf8');
+  const sentinel = await readFile(resolve(bridge,'src/pollicino-sentinel.js'),'utf8');
+  assert.match(entry,/\/continuity\/v1\/enroll/);
+  assert.match(entry,/POLLICINO_SOURCE_PROOF_ENABLED/);
+  assert.match(entry,/sourceProofProject/);
+  assert.match(entry,/\/continuity\/v1\/status/);
+  assert.match(sentinel,/session_auth/);
+  assert.match(sentinel,/crypto\.getRandomValues/);
+  assert.match(sentinel,/token_hash/);
+  assert.match(sentinel,/unauthorized_session_token/);
+});
+
+test('Codex adapter supports secretless self-enrollment and ephemeral bearer pulses', async () => {
+  const adapter = await readFile(resolve(bridge,'../../templates/codex/motorlab/motorlab_pollicino.py'),'utf8');
+  assert.match(adapter,/_enroll/);
+  assert.match(adapter,/session_token/);
+  assert.match(adapter,/Authorization|authorization/);
+  assert.match(adapter,/Bearer/);
+  assert.doesNotMatch(adapter,/session_token.*git add|session_token.*commit/);
+});
