@@ -230,6 +230,11 @@ def _signed_request(method: str, url: str, body: bytes = b"") -> dict | None:
         return None
 
 
+def _discover_operation(project_id: str) -> dict | None:
+    query = urllib.parse.urlencode({"project_id": project_id})
+    return _signed_request("GET", _endpoint("context") + "?" + query, b"")
+
+
 def _runtime_fingerprint(state: dict) -> str:
     cwd = str(state.get("cwd") or os.getcwd())
     head, status_hash = _git_snapshot(cwd)
@@ -351,14 +356,22 @@ def _hook_main() -> int:
         return 0
 
     session_id = _safe_id(str(payload.get("session_id") or ""))
-    operation_id = _safe_id(os.environ.get("MOTORLAB_OPERATION_ID", "").strip())
     secret = _secret()
-    if not session_id or not operation_id or not secret:
+    if not session_id or not secret:
         return 0
 
     cwd = str(payload.get("cwd") or os.getcwd())
     project_id = _safe_id(_project_id(cwd))
     if not project_id:
+        return 0
+
+    operation_id = _safe_id(os.environ.get("MOTORLAB_OPERATION_ID", "").strip())
+    context = None
+    if not operation_id:
+        discovered = _discover_operation(project_id)
+        context = discovered.get("context") if isinstance(discovered, dict) else None
+        operation_id = _safe_id(str((context or {}).get("operation_id") or ""))
+    if not operation_id:
         return 0
 
     path = _state_path(session_id)
@@ -372,9 +385,9 @@ def _hook_main() -> int:
         "host_pid": _host_pid(),
         "transcript_path": payload.get("transcript_path"),
         "canonical_chat_ref": os.environ.get("MOTORLAB_CANONICAL_CHAT_REF") or None,
-        "source_ref": os.environ.get("MOTORLAB_SOURCE_REF") or None,
-        "source_head": head or os.environ.get("MOTORLAB_SOURCE_HEAD") or None,
-        "phase": os.environ.get("MOTORLAB_PHASE") or None,
+        "source_ref": os.environ.get("MOTORLAB_SOURCE_REF") or (context or {}).get("source_ref") or None,
+        "source_head": head or os.environ.get("MOTORLAB_SOURCE_HEAD") or (context or {}).get("source_head") or None,
+        "phase": os.environ.get("MOTORLAB_PHASE") or (context or {}).get("phase") or None,
         "next_action": os.environ.get("MOTORLAB_NEXT_ACTION") or None,
         "updated_at": time.time(),
     })
@@ -386,7 +399,6 @@ def _hook_main() -> int:
         if event == "PostToolUse":
             state["last_completed_action"] = str(payload.get("tool_name") or "tool")
         _save_state(path, state)
-        _send_pulse(state)
         _ensure_daemon(path, state)
         return 0
 
