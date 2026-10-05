@@ -21,6 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Static Pollicino regression suite
+        run: |
+          node --test cloudflare/motorlab-state-bridge/test/pollicino.test.mjs
+          python3 -m py_compile templates/codex/motorlab/motorlab_pollicino.py
+
       - name: Run Pollicino detector and recovery canary
         env:
           RUN_ID: ${{ github.run_id }}
