@@ -83,6 +83,7 @@ POLLICINO_EXECUTOR_ADAPTER=required
 POLLICINO_TERMINAL_HOOKS=required
 POLLICINO_SOURCE_PROOF_ENROLLMENT=required
 POLLICINO_EPHEMERAL_SESSION_TOKEN=required
+POLLICINO_STABLE_PROOF_HEAD=required
 
 R19+ FOUNDATIONAL CHANGE COMPATIBILITY PILLAR
 Local fallback must preserve mandatory pre-write overlap/redundancy/conflict preflight for every MotorLab/project modification. ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR. Existing equivalent logic must be reused/extended/merged or explicitly superseded; do not stack competing paths.
@@ -146,9 +147,10 @@ Local fallback must preserve the external-only Pollicino contract: supported liv
 Do not place heartbeat/breadcrumb logic in application runtime code merely for MotorLab continuity.
 Watchdog/Resume ownership and single-writer precedence remain unchanged.
 When the local executor supports Codex hooks, sync the external Pollicino sidecar/hook template at a safe boundary; never place it in application runtime source.
+For a private adopted satellite using source-proof enrollment, publish/update `POLLICINO_PROOF_HEAD=<current adopted Git SHA>` in D1 at the same verified adoption boundary; do not rely exclusively on mutable project operational heads.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.18
+MOTORLAB-SATELLITE-SYNC-V1.19
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -161,3 +163,5 @@ Revision 1.16: r20 requires Pollicino external continuity markers and app-code i
 Revision 1.17: r20 satellite sync now carries the external Codex Pollicino adapter/terminal-hook requirement.
 
 Revision 1.18: r20 satellites inherit source-proof self-enrollment + ephemeral session token support for explicitly opted-in private projects.
+
+Revision 1.19: r20 requires stable proof-head publication at verified satellite adoption boundaries.
