@@ -51,11 +51,11 @@ REGISTERED PROJECTS
    Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_MUSICLAB_V1.txt
    Visible state: N.1 Player / mini-player fuori dal lettore from device-accepted LAB19 CANDIDATA
    Stable CANDIDATA: candidate/musiclab-lab19-player-stable @ 6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-   Local satellite: 2026.10.05-r20 / MOTORLAB-SATELLITE-BUNDLE-V2.14 VERIFIED on main @ abf77afc4ae74f629cdf2d5c665211a20ed7b368
-   r20 control-plane head: abf77afc4ae74f629cdf2d5c665211a20ed7b368
+   Local satellite: 2026.10.05-r20 / MOTORLAB-SATELLITE-BUNDLE-V2.15 VERIFIED on main @ 667c65beaa1040cdcdd10f5e8f8b8c37cab1a6ee
+   r20 control-plane head: 667c65beaa1040cdcdd10f5e8f8b8c37cab1a6ee
    POLLICINO_PROOF_HEAD: 966c40dbfb3746d56de199c8beb35558bf150a92 (stable verified enrollment anchor; intentionally distinct from mutable current HEAD)
-   LAST_GOOD: 2026.10.05-r20 / MOTORLAB-SATELLITE-BUNDLE-V2.13
-   Central r20 authoritative; local r20 adopted on verified safe boundary. Pollicino self-enrolling sidecar/lifecycle hooks installed; source-proof executor enrollment and full stall/crash/preemptive-resume flow verified by successful E2E runs including 37360730928 and 37361999443. Final sidecar equals the central template byte-for-byte; stable proof anchor is persisted in real .motorlab metadata and runtime Git HEAD is kept separate from proof identity.
+   LAST_GOOD: 2026.10.05-r20 / MOTORLAB-SATELLITE-BUNDLE-V2.14
+   Central r20 authoritative; local r20 adopted on verified safe boundary. Pollicino self-enrolling sidecar/lifecycle hooks installed; source-proof executor enrollment and full stall/crash/preemptive-resume flow verified by successful E2E runs including final run 37382896686. Final D1 OIDC relay run 37365348315 is SUCCESS and snapshot pollicino-musiclab-final-667c65b-20261005 is verified readable. Final sidecar equals the central template byte-for-byte; stable proof anchor is persisted in real .motorlab metadata and runtime Git HEAD is kept separate from proof identity. FINAL_GATE=COMPLETE_PASSED; no external gate pending.
    Candidate/ref/application lifecycle unchanged; application runtime impact from r20/Pollicino control-plane adoption: NONE.
 
 2. GeoVision — Br174/GeoVision-Test
@@ -108,7 +108,7 @@ FUTURE PROJECTS
 Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r20 Pollicino external continuity plus authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.16
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.17
 Revision 2.11: GitBook live status reconciled to read/write CONNECTED_VERIFIED after OAuth Full access authorization and successful harmless draft change-request write check. Root cause recorded as prior Read only OAuth scope; prevention requires separate read and write capability checks. Central r16 release unchanged.
 Revision 2.12: Context7 Free custom MCP app reconciled to CONNECTED_VERIFIED after two end-to-end documentation checks. Catalog-plugin state is explicitly separated from custom-app state; the anonymous free endpoint is pinned and the failed OAuth prototype is recorded as removed. Central r16 release unchanged.
 
@@ -129,3 +129,5 @@ Revision 2.14: central release aligned to r20; MusicLab safely adopted the r20 s
 Revision 2.15: MusicLab Pollicino adoption finalized on main 966c40dbfb3746d56de199c8beb35558bf150a92; source-proof enrollment, OIDC D1 relay and complete stall/crash/RESUME_READY behavior verified end-to-end with no app runtime changes.
 
 Revision 2.16: MusicLab control-plane finalized at abf77afc4ae74f629cdf2d5c665211a20ed7b368 with V2.14, V2.13 rollback floor and real POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92; current Git HEAD and proof anchor are intentionally separate. No application/runtime source changed.
+
+Revision 2.17: MusicLab Pollicino r20 final gate COMPLETE_PASSED at main 667c65beaa1040cdcdd10f5e8f8b8c37cab1a6ee with V2.15 active, V2.14 LAST_GOOD, stable proof anchor 966c40dbfb3746d56de199c8beb35558bf150a92, final canary 37382896686 SUCCESS and final OIDC relay 37365348315 SUCCESS; application/runtime impact remains NONE.
