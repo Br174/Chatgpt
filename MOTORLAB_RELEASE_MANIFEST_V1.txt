@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.05-r18
+CURRENT_RELEASE=2026.10.05-r19
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -112,6 +112,10 @@ All current/future MotorLab software projects inherit r16 authority/data-ownersh
 NO RUNTIME REGRESSION
 MotorLab control-plane metadata alone must not alter application runtime/UI/package/signing/lifecycle/native engines.
 
+R19+ FOUNDATIONAL CHANGE COMPATIBILITY PILLAR
+MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is a permanent mandatory pillar for MotorLab and every current/future managed software project.
+Before any write-capable change, read authoritative current state and classify existing overlap/redundancy/conflict. Apply ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR: reuse/extend/merge existing behavior or explicitly supersede obsolete/conflicting paths. Do not accumulate parallel implementations for the same responsibility. Fast paths, Velocity, automation, restore, migration and optimization may not bypass this pillar.
+
 R18+ PAIRED SAFETY LABS
 Every verified LAB NN aggiornamento in update-family mode must also produce LAB di sicurezza NN from the same exact functional source state, with a distinct package/family and unique test-only signing certificate. Safety checkpoints are immutable and provide a recovery floor from which a new active update family may be created.
 
@@ -119,9 +123,11 @@ R17+ ANDROID UPDATE FAMILIES
 MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt is mandatory for Android projects using Bruno's persistent LAB-update method. Same-family LAB revisions keep applicationId + signing certificate and increase versionCode; LAB -> CANDIDATA creates a new family without mutating LAB; approved CANDIDATA -> MADRE promotes the same candidate family/source identity.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.18
+MOTORLAB-RELEASE-MANIFEST-V1.19
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
 
 Revision 1.18: r18 adds mandatory paired immutable LAB di sicurezza checkpoints for Android update-family revisions.
+
+Revision 1.19: r19 elevates Change Compatibility Guard to a foundational mandatory cross-project pillar for redundancy/overlap/conflict prevention.
