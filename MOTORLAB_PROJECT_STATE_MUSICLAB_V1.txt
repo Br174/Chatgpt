@@ -1,10 +1,45 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=70
-STATE_STATUS=MOTHER_LAB41_PLAYER_BUONO
+STATE_REVISION=71
+STATE_STATUS=LAB42_COVERINFO_DIAGNOSTICS_VERIFIED_DEVICE_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
+
+
+ACTIVE_OPERATION_ID=musiclab-lab42-coverinfo-diagnostics
+OPERATION_STATUS=LAB42_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB42 exact SHA 43e3168c256f650d63a9b2c86ba18ef1f6cadd71 is technically complete from official MADRE LAB41 SHA 329e663061d46928dc4d58a946c0d3d2f88881b3. Live COVER.INFO verification showed the service is reachable and its current search syntax/markup are compatible with MusicLab; the screenshot case "Stupida sfortuna / Fulminacci" legitimately returns no songs. The defect was diagnostic: MusicLab marked any reachable zero-result page as unavailable because searchDocument was assigned only when a song anchor existed. LAB42 tracks publicSearchReachable separately and reports "raggiungibile · nessuna corrispondenza" for valid zero-result responses, reserving "ricerca pubblica non disponibile" for actual fetch/parse failure. Player buono code is unchanged and contract-verified. GitHub Actions run 37249909681 passed LAB42 contract, Android unit tests, UAB diagnostics, APK+ZIP build/integrity and artifact upload. Artifact 11320118159 independently rechecked: outer artifact SHA256 307cfb1e2153796cfbe541527849190e19c4da49caa0b767e830958cd3fab61c, APK SHA256 844015185b88c90878003d1ec46e7bb21a019d0993d03399a83f25e8d2603627, inner ZIP SHA256 ea137f1f3c64f8779f7a70d91b7e445e76a116f12affe42d2d180f8524517f8b, embedded APK checksum matched and ZIP integrity passed.
+CURRENT_REF=uab-build/musiclab-coverinfo-diagnostics-42
+CURRENT_HEAD_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+CURRENT_PROVIDER=GitHub + GitHub Actions + Universal APK Builder + live COVER.INFO verification
+CURRENT_JOB_ID=37249909681
+CURRENT_JOB_STATUS=success
+ARTIFACT_PROGRESS_PERCENT=100
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_USER_VISIBLE_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+WRITE_LOCK_SCOPE=none; LAB42 gate complete
+PENDING_VERIFICATION=Bruno device acceptance of exact LAB42 APK: verify COVER.INFO shows green/reachable with "nessuna corrispondenza" for a real zero-result case such as Stupida sfortuna / Fulminacci; verify a known COVER.INFO hit is still parsed; verify Player buono remains fast.
+NEXT_SAFE_STEP=Install/test exact MusicLab-LAB42.apk. Keep official MADRE mother/musiclab-lab41-final untouched until Bruno explicitly approves LAB42 lifecycle promotion.
+LAST_USER_INTENT_SUMMARY=Correct the device-visible COVER.INFO status: screenshot showed "ricerca pubblica non disponibile" even though COVER.INFO is expected to be a primary cover source.
+ROOT_CAUSE_LAB42_1=discoverCoverInfo set searchDocument only when COVER_INFO_SONG_SELECTOR had at least one result. Therefore a valid HTTP/HTML search page containing zero songs fell through the same branch as network/unavailable failure.
+ROOT_CAUSE_LAB42_1_CORRECTION=Track successful public search reachability independently of result count. A parsed zero-result response now returns available=true, found=0 and "raggiungibile · nessuna corrispondenza"; only actual fetch/parse failure returns unavailable.
+ROOT_CAUSE_LAB42_1_PREVENTION=LAB42 contract permanently asserts publicSearchReachable state, distinct zero-match/unavailable diagnostics, current COVER.INFO precise query/parser, Player buono fast-first lane and LAB42 isolated APK identity.
+LAB42_FINAL_GATE_RUN=37249909681
+LAB42_FINAL_GATE_STATUS=success
+LAB42_ARTIFACT_ID=11320118159
+LAB42_ARTIFACT_NAME=MusicLab-LAB42
+LAB42_ARTIFACT_DIGEST=sha256:307cfb1e2153796cfbe541527849190e19c4da49caa0b767e830958cd3fab61c
+LAB42_APK_NAME=MusicLab-LAB42.apk
+LAB42_APK_SHA256=844015185b88c90878003d1ec46e7bb21a019d0993d03399a83f25e8d2603627
+LAB42_ZIP_NAME=MusicLab-LAB42-APK.zip
+LAB42_ZIP_SHA256=ea137f1f3c64f8779f7a70d91b7e445e76a116f12affe42d2d180f8524517f8b
+LAB42_BUILD_SHA_FILE=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+LAB42_BASE_MOTHER_REF=mother/musiclab-lab41-final
+LAB42_BASE_MOTHER_SHA=329e663061d46928dc4d58a946c0d3d2f88881b3
+LAB42_PLAYER_BUONO_MUTATED=no
+LAB42_MOTHER_MUTATED=no
 
 
 ACTIVE_OPERATION_ID=musiclab-lab41-lab07-fast-player-restore
