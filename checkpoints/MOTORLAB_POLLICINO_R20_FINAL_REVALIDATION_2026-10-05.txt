@@ -1,34 +1,44 @@
 MOTORLAB CHECKPOINT — POLLICINO R20 FINAL REVALIDATION
 DATE=2026-10-05
-STATUS=IMPLEMENTATION_COMPLETE_EXTERNAL_RUNNER_REVALIDATION_QUEUED
+FINALIZED_AT=2026-10-05T22:30:52Z
+STATUS=COMPLETE_PASSED
 
 CORE_RELEASE=2026.10.05-r20
 POLLICINO_CONTRACT=MOTORLAB-POLLICINO-CONTINUITY-V1.6
 WORKER=1.3.5_DEPLOYED_VERIFIED
-MUSICLAB_MAIN=abf77afc4ae74f629cdf2d5c665211a20ed7b368
-MUSICLAB_LOCAL_BUNDLE=MOTORLAB-SATELLITE-BUNDLE-V2.14
-MUSICLAB_LAST_GOOD_BUNDLE=MOTORLAB-SATELLITE-BUNDLE-V2.13
+MUSICLAB_MAIN=667c65beaa1040cdcdd10f5e8f8b8c37cab1a6ee
+MUSICLAB_LOCAL_BUNDLE=MOTORLAB-SATELLITE-BUNDLE-V2.15
+MUSICLAB_LAST_GOOD_BUNDLE=MOTORLAB-SATELLITE-BUNDLE-V2.14
 POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92
-MUSICLAB_ADAPTER_SHA=b1db2e7ec006a65578f2224ce3429702b27caa06
-CENTRAL_ADAPTER_SHA=b1db2e7ec006a65578f2224ce3429702b27caa06
+MUSICLAB_ADAPTER_SHA=e8f0c7ea8048936813dce72c2ae6be68037d4a42
+CENTRAL_ADAPTER_SHA=e8f0c7ea8048936813dce72c2ae6be68037d4a42
 ADAPTER_EXACT_MATCH=yes
 APPLICATION_RUNTIME_DIFF=none
 
 LIVE_WORKER_HEALTH=passed
+LIVE_WORKER_ENGINE_VERSION=1.3.5
 LIVE_STABLE_PROOF_CONTEXT=passed
 LIVE_STABLE_PROOF_CLASSIFICATION=SATELLITE_PROOF_HEAD
-BACKEND_E2E_CANARY_37360730928=passed
-BACKEND_E2E_CANARY_37361999443=passed
+FINAL_D1_OUTBOX_SNAPSHOT=pollicino-musiclab-final-667c65b-20261005
+FINAL_D1_SNAPSHOT_READ=passed
+FINAL_D1_OIDC_RUN=37365348315
+FINAL_D1_OIDC_RUN_STATE=success
+FINAL_SIDECAR_CANARY_RUN=37382896686
+FINAL_SIDECAR_CANARY_RUN_STATE=success
 
-FINAL_D1_OUTBOX_SNAPSHOT=pollicino-musiclab-final-abf77af-20261005
-FINAL_D1_OIDC_RUN=37364070403
-FINAL_D1_OIDC_RUN_STATE=queued_due_external_github_actions_runner_delay
-FINAL_SIDECAR_CANARY_RUN=37363842231
-FINAL_SIDECAR_CANARY_RUN_STATE=queued_due_external_github_actions_runner_delay
+FINAL_CANARY_MARKERS=SOURCE_PROOF_CONTEXT,STALL_DETECTION,STALL_RESUME_READY,PROGRESS_RESUME,NORMAL_TERMINAL_SEAL,CRASH_DETECTION,PREEMPTIVE_RESUME_READY,FRESH_CHAT_RESUME_READ,POST_CANARY_SAFE_STOP,POLLICINO_E2E_CANARY,CODEX_SIDECAR_LOCAL_PROOF,CODEX_SIDECAR_RUNTIME_HEAD_SEPARATION,CODEX_SIDECAR_SELF_ENROLL,CODEX_SIDECAR_LIVENESS,CODEX_SIDECAR_TERMINAL_SEAL,CODEX_SIDECAR_LIFECYCLE
+FINAL_CANARY_MARKERS_STATE=all_passed
 
 ROOT_CAUSE_4=test probe had stable proof marker before real MusicLab satellite metadata
-ROOT_CAUSE_4_CORRECTION=real MusicLab .motorlab now contains POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92 and exact central sidecar
+ROOT_CAUSE_4_CORRECTION=real MusicLab .motorlab contains POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92 and exact central sidecar
 ROOT_CAUSE_5=proof anchor and current runtime source revision were overloaded into one source_head field
 ROOT_CAUSE_5_CORRECTION=central/MusicLab sidecar separates proof_head for enrollment from runtime source_head for recovery evidence
+ROOT_CAUSE_6=final static canary assertion still matched the pre-separation proof-head source form
+ROOT_CAUSE_6_CORRECTION=assertion aligned to explicit runtime_head/proof_head separation and literal local proof metadata paths
+ROOT_CAUSE_7=exact sidecar status verifier omitted an explicit User-Agent and Cloudflare edge returned HTTP 403 even though enrollment and initial pulse succeeded
+ROOT_CAUSE_7_CORRECTION=canary status verifier now sends MotorLab-Pollicino-E2E/2.0 User-Agent; no sidecar/Worker behavior change was required
 
-NEXT_SAFE_STEP=When GitHub Actions assigns hosted runners again, require runs 37364070403 and 37363842231 (or superseding equivalent runs) to complete successfully; then verify snapshot endpoint and update this checkpoint to COMPLETE_PASSED. No further application or MotorLab code change is expected unless a gate fails.
+GITHUB_ACTIONS_PROVIDER_INCIDENT=cleared_for_Actions_at_2026-10-05T21:54:00Z
+FINAL_GATE=passed
+PENDING_EXTERNAL_GATE=none
+NEXT_SAFE_STEP=Pollicino r20 is positively complete. Preserve V2.15 active, V2.14 LAST_GOOD and stable proof anchor until a future verified satellite adoption intentionally supersedes them.
