@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "snapshot_id": "pollicino-musiclab-oidc-seed-20261005-03",
-  "sent_at": "2026-10-05T19:07:00.371Z",
+  "snapshot_id": "pollicino-musiclab-proofhead-342caf3b-fix1",
+  "sent_at": "2026-10-05T19:10:17.178Z",
   "projects": [
     {
       "project_id": "MusicLab",
@@ -10,7 +10,7 @@
       "source_ref": "main",
       "source_head": "43a1fca35e54cb05db80f1a18d02f8626f656696",
       "local_satellite_release_state": "2026.10.05-r20|VERIFIED|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=43a1fca35e54cb05db80f1a18d02f8626f656696",
-      "updated_at": "2026-10-05T19:07:00.371Z"
+      "updated_at": "2026-10-05T19:10:17.178Z"
     }
   ],
   "operations": [
@@ -31,7 +31,7 @@
       "source_ref": "uab-build/musiclab-scoring-coverinfo-video-44",
       "source_head": "8a458f8f4d1e560736d81f78de551664998619f9",
       "created_at": "2026-10-05T18:57:23.377Z",
-      "updated_at": "2026-10-05T19:07:00.371Z"
+      "updated_at": "2026-10-05T19:10:17.178Z"
     }
   ],
   "checkpoints": [
@@ -44,7 +44,7 @@
       "next_safe_step": "Resume exact pending device-acceptance step; do not rebuild or promote without Bruno approval.",
       "lock_state": "none",
       "external_wait_state": "Bruno device acceptance",
-      "created_at": "2026-10-05T19:07:00.371Z"
+      "created_at": "2026-10-05T19:10:17.178Z"
     }
   ]
 }
