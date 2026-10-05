@@ -1,0 +1,34 @@
+MOTORLAB CHECKPOINT — POLLICINO R20 FINAL REVALIDATION
+DATE=2026-10-05
+STATUS=IMPLEMENTATION_COMPLETE_EXTERNAL_RUNNER_REVALIDATION_QUEUED
+
+CORE_RELEASE=2026.10.05-r20
+POLLICINO_CONTRACT=MOTORLAB-POLLICINO-CONTINUITY-V1.6
+WORKER=1.3.5_DEPLOYED_VERIFIED
+MUSICLAB_MAIN=abf77afc4ae74f629cdf2d5c665211a20ed7b368
+MUSICLAB_LOCAL_BUNDLE=MOTORLAB-SATELLITE-BUNDLE-V2.14
+MUSICLAB_LAST_GOOD_BUNDLE=MOTORLAB-SATELLITE-BUNDLE-V2.13
+POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92
+MUSICLAB_ADAPTER_SHA=b1db2e7ec006a65578f2224ce3429702b27caa06
+CENTRAL_ADAPTER_SHA=b1db2e7ec006a65578f2224ce3429702b27caa06
+ADAPTER_EXACT_MATCH=yes
+APPLICATION_RUNTIME_DIFF=none
+
+LIVE_WORKER_HEALTH=passed
+LIVE_STABLE_PROOF_CONTEXT=passed
+LIVE_STABLE_PROOF_CLASSIFICATION=SATELLITE_PROOF_HEAD
+BACKEND_E2E_CANARY_37360730928=passed
+BACKEND_E2E_CANARY_37361999443=passed
+
+FINAL_D1_OUTBOX_SNAPSHOT=pollicino-musiclab-final-abf77af-20261005
+FINAL_D1_OIDC_RUN=37364070403
+FINAL_D1_OIDC_RUN_STATE=queued_due_external_github_actions_runner_delay
+FINAL_SIDECAR_CANARY_RUN=37363842231
+FINAL_SIDECAR_CANARY_RUN_STATE=queued_due_external_github_actions_runner_delay
+
+ROOT_CAUSE_4=test probe had stable proof marker before real MusicLab satellite metadata
+ROOT_CAUSE_4_CORRECTION=real MusicLab .motorlab now contains POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92 and exact central sidecar
+ROOT_CAUSE_5=proof anchor and current runtime source revision were overloaded into one source_head field
+ROOT_CAUSE_5_CORRECTION=central/MusicLab sidecar separates proof_head for enrollment from runtime source_head for recovery evidence
+
+NEXT_SAFE_STEP=When GitHub Actions assigns hosted runners again, require runs 37364070403 and 37363842231 (or superseding equivalent runs) to complete successfully; then verify snapshot endpoint and update this checkpoint to COMPLETE_PASSED. No further application or MotorLab code change is expected unless a gate fails.

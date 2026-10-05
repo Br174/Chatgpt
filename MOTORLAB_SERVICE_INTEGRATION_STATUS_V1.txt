@@ -37,7 +37,7 @@ ROLE: persistent live operational state + reconstructible cache
 WORKER: motorlab-state-bridge
 D1: motorlab-operational-state-db
 KV: motorlab-operational-cache
-GITHUB RELAY: Br174/Chatgpt Issue #1 webhook transport
+GITHUB RELAY: GitHub Actions OIDC -> canonical persistSnapshot is primary verified transport; legacy Issue #1 webhook is compatibility-only
 END-TO-END CHECK: PASSED on 2026-09-30; GitHub event -> signed webhook -> Worker -> D1 write -> verification read returned snapshot_id and payload_hash.
 AUTHORITY RULE: GitHub remains durable technical authority; D1 is live operational state; KV is cache only and may be rebuilt.
 FAIL-SAFE: MotorLab must continue from GitHub authoritative state if Cloudflare is unavailable or quota-limited, then resynchronize operational state when available.
@@ -159,15 +159,15 @@ DURABLE OBJECT / ALARM: DEPLOYED_VERIFIED; live stall and liveness-loss paths pa
 CONTINUITY ROUTES: DEPLOYED_VERIFIED — source-proof context/enrollment/status/resume-ready plus bearer pulse/seal exercised by E2E canary
 AUTHORIZED PULSE/SEAL END-TO-END: PASSED — run 37360730928 verified MOVING, STALL_SUSPECTED, READY_STALL_SUSPECTED, resumed progress, HANDOFF_COMPLETE, abrupt liveness loss, READY_PRECOMPUTED, fresh-chat resume read and SAFE_STOP
 STANDARD CHAT HIDDEN-PING CAPABILITY: NOT EXPOSED; do not claim ordinary opaque ChatGPT thinking can be silently pinged
-PROJECT/EXECUTOR ADOPTION: MusicLab PROJECT_ADOPTED + SESSION_ENROLLMENT_E2E_VERIFIED; final satellite main 966c40dbfb3746d56de199c8beb35558bf150a92; zero application-runtime changes
+PROJECT/EXECUTOR ADOPTION: MusicLab PROJECT_ADOPTED + SESSION_ENROLLMENT_E2E_VERIFIED; final control-plane satellite main abf77afc4ae74f629cdf2d5c665211a20ed7b368, V2.14 active, V2.13 LAST_GOOD, stable enrollment anchor 966c40dbfb3746d56de199c8beb35558bf150a92; zero application-runtime changes
 OIDC D1 TRANSPORT: PASSED — runs 37360391426 and 37360456855; canonical persistSnapshot writer; no shared secret required
-ROOT CAUSE CLOSED: legacy issue/webhook delivery was unreliable and first OIDC revision redundantly required absent GITHUB_WEBHOOK_SECRET; corrected by verified OIDC -> canonical persistSnapshot direct path
+ROOT CAUSE CLOSED: legacy issue/webhook delivery was unreliable; first OIDC revision redundantly required absent GITHUB_WEBHOOK_SECRET; mutable project HEAD was initially overloaded as enrollment proof; and the test probe briefly had a stable marker before the real MusicLab satellite did. Corrections: verified OIDC -> canonical persistSnapshot direct path, Worker 1.3.5 stable proof precedence, real .motorlab proof marker, sidecar template sync, and explicit runtime-head/proof-head separation.
 AUTHORITY: D1 operational state + GitHub technical authority; Watchdog owns stall classification and Resume Recovery owns continuation
 RUNTIME IMPACT ON APPS: NONE
 COST SAFETY: free-first; no paid fallback or high-frequency GitHub heartbeat transport
 
 VERSION
-MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.18
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.19
 Established: 2026-09-30
 Revision 1.6: GitBook OAuth write authorization restored and verified. Root cause closed as prior Read only OAuth scope; prevention now requires independent read plus harmless draft-write verification before declaring read/write CONNECTED_VERIFIED. Central r16 release unchanged.
 Revision 1.7: Context7 Free custom MCP app moved to CONNECTED_VERIFIED after two functional checks. Public catalog `installed:false` is explicitly separated from custom-app status; failed OAuth prototype removed; anonymous free endpoint and recurrence-prevention rule recorded. Central r16 release unchanged.
@@ -192,3 +192,5 @@ Revision 1.16: records OIDC run 37359874905 HTTP 503 root cause as residual lega
 Revision 1.17: OIDC relay verified end-to-end in run 37360391426. Observed project-head proof instability after later D1 reconciliation; target 1.3.5 adds stable satellite POLLICINO_PROOF_HEAD while preserving operation-head fallback.
 
 Revision 1.18: Pollicino r20 marked E2E PASSED on Worker 1.3.5. OIDC D1 relay, source-proof enrollment, stall recovery, crash detection, terminal seals and preemptive RESUME_READY are live-verified; MusicLab session enrollment no longer pending.
+
+Revision 1.19: final MusicLab satellite moved to abf77afc4ae74f629cdf2d5c665211a20ed7b368 with V2.14, V2.13 LAST_GOOD and real stable proof marker 966c40dbfb3746d56de199c8beb35558bf150a92. Worker live proof acceptance is verified; the newest OIDC snapshot/canary revalidation is queued only because GitHub Actions runner assignment is degraded externally on 2026-10-05.
