@@ -1,0 +1,27 @@
+name: MotorLab Pollicino r20 Verify
+
+on:
+  push:
+    branches:
+      - motorlab/pollicino-r20-source-proof
+    paths:
+      - 'cloudflare/motorlab-state-bridge/**'
+      - 'templates/codex/motorlab/**'
+      - '.github/workflows/pollicino-r20-verify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node version
+        run: node --version
+      - name: Python version
+        run: python3 --version
+      - name: Pollicino tests
+        run: node --test cloudflare/motorlab-state-bridge/test/pollicino.test.mjs
