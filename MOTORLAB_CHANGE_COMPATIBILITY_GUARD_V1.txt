@@ -12,6 +12,22 @@ CORE PRINCIPLE
 ANALYZE FIRST, MODIFY SECOND.
 Do not stack a new rule or implementation on top of existing behavior until its relationship with the current system is understood.
 
+FOUNDATIONAL PILLAR STATUS
+This guard is a foundational MotorLab pillar, not an optional checklist.
+It is mandatory for every present and future MotorLab-managed software project and for MotorLab self-changes.
+It cannot be bypassed by Fast Iteration, Velocity Layer, background execution, automation, restore, refactor, migration, optimization, provider integration or project-specific convenience logic.
+
+PILLAR INVARIANT
+ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR.
+Before adding a new rule/function/path that overlaps an existing responsibility:
+- identify the existing responsible mechanism;
+- determine whether the requested behavior should extend it, replace it, merge into it or explicitly supersede it;
+- do not leave equivalent competing paths active;
+- if two pre-existing rules conflict, compare both against current user intent, canonical precedence, verified behavior and regression risk, then keep/merge the stronger compatible rule and explicitly retire/supersede the weaker conflicting path;
+- if no safe winner/merge can be established from evidence, stop before writes.
+
+A change is not considered safely designed merely because its own code works. It must also fit the surrounding system without avoidable duplication, contradiction or hidden precedence ambiguity.
+
 1. SCOPE - MANDATORY
 This guard applies before:
 - MotorLab CORE/module/governance/routing/release changes;
@@ -24,7 +40,8 @@ This guard applies before:
 - changes in current and future MotorLab-managed projects.
 
 2. REQUIRED PRE-CHANGE CHECK
-Before the first write, inspect the relevant current state and determine:
+This check begins during read-only planning/preflight and must be resolved before the first write. Re-run it if scope materially changes or new overlap is discovered.
+Inspect the relevant current state and determine:
 - requested goal and exact scope;
 - existing modules/functions/rules touching the same responsibility;
 - project-native engine responsibilities that must remain authoritative;
@@ -37,7 +54,10 @@ Before the first write, inspect the relevant current state and determine:
 - regression risk;
 - backward-compatibility risk;
 - migration/rollback implications;
-- whether an existing mechanism should be extended instead of creating a new one.
+- whether an existing mechanism should be extended instead of creating a new one;
+- whether the requested behavior already exists fully or partially under another name/path;
+- whether the proposed change would create two sources of truth, two writers, two retries, two caches, two resolvers, two state machines or two UI/domain decisions for one responsibility;
+- whether an older rule should be explicitly superseded rather than silently left active.
 
 3. CLASSIFICATION
 Classify findings as:
@@ -128,8 +148,12 @@ The guard is active when:
 - overlapping mechanisms are merged or given explicit precedence instead of silently accumulating;
 - protected/native behavior is preserved unless explicitly approved for change;
 - conflict findings affect implementation and regression scope;
-- unresolved unsafe conflicts stop safely rather than being worked around blindly.
+- unresolved unsafe conflicts stop safely rather than being worked around blindly;
+- no avoidable duplicate active path remains for the changed responsibility;
+- the implementation records which existing mechanism was reused/extended/merged/superseded when overlap existed;
+- current and future projects inherit the same invariant through central CORE/satellite bootstrap rather than relying on conversational memory.
 
 VERSION
-MOTORLAB-CHANGE-COMPATIBILITY-GUARD-V1.0
+MOTORLAB-CHANGE-COMPATIBILITY-GUARD-V1.1
 Established: 2026-09-29
+Revision 1.1: elevated to foundational MotorLab pillar for all current/future projects; adds ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR invariant, mandatory read-only preflight, duplicate-path/source-of-truth detection and explicit supersession/merge requirements.
