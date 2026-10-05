@@ -93,12 +93,17 @@ MotorLab metadata/policies do not authorize application runtime/UI/package/signi
 PLATFORM BOUNDARY
 MotorLab cannot wake a host with no execution cycle or claim invisible continuation without a real durable executor.
 
+PAIRED SAFETY LAB - R18+
+For every verified LAB NN aggiornamento, produce LAB di sicurezza NN from the exact same functional source state. Safety uses a distinct Android package/family and unique ephemeral test signing certificate, is immutable, and becomes the preferred recovery checkpoint if the active update family later corrupts. A recovery from safety creates a new active LAB update family; safety itself is never patched.
+
 ANDROID UPDATE FAMILY - R17+
 When Bruno activates update-family mode, load MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt. Do not create random package ids for later revisions of the same LAB family. Preserve stable applicationId + signing certificate, increase versionCode, use Bruno-facing "LAB NN aggiornamento" naming, create CANDIDATA as a new immutable family, and promote an approved CANDIDATA to MADRE without reconstructing app source.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.11
+MOTORLAB-CORE-ENTRYPOINT-V1.12
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
 Revision 1.10: adds post-approval execution continuity to verified completion and retires the former approval-countdown proposal.
+
+Revision 1.12: r18 adds paired immutable LAB di sicurezza checkpoints and recovery-from-safety family restart.
