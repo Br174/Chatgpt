@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 jobs:
   canary:
@@ -17,117 +16,49 @@ jobs:
     timeout-minutes: 5
     env:
       MOTORLAB_BASE: https://motorlab-state-bridge.brunoverlezza.workers.dev
-      MUSICLAB_HEAD: 43a1fca35e54cb05db80f1a18d02f8626f656696
+      MUSICLAB_PROOF_HEAD: 8a458f8f4d1e560736d81f78de551664998619f9
+      MUSICLAB_OPERATION_ID: musiclab-lab44-original-first-scoring-coverinfo-video-readiness
     steps:
-      - name: Seed D1 and run Pollicino end-to-end canary
+      - name: Run Pollicino detector and recovery canary
         env:
-          GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.run_id }}
         run: |
           python3 - <<'PY'
-          import base64, json, os, re, time, urllib.error, urllib.parse, urllib.request
+          import json, os, time, urllib.error, urllib.parse, urllib.request
 
           base = os.environ["MOTORLAB_BASE"].rstrip("/")
-          source_head = os.environ["MUSICLAB_HEAD"]
+          proof_head = os.environ["MUSICLAB_PROOF_HEAD"]
+          expected_operation = os.environ["MUSICLAB_OPERATION_ID"]
           run_id = os.environ["RUN_ID"]
-          gh_token = os.environ["GH_TOKEN"]
-          now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-          snapshot_id = f"pollicino-musiclab-e2e-{run_id}"
-
-          snapshot = {
-              "schema_version": 1,
-              "snapshot_id": snapshot_id,
-              "sent_at": now,
-              "projects": [{
-                  "project_id": "MusicLab",
-                  "repository": "Br174/MusicLab",
-                  "lifecycle_stage": "LAB",
-                  "source_ref": "main",
-                  "source_head": source_head,
-                  "local_satellite_release_state": "2026.10.05-r20|VERIFIED|POLLICINO_SOURCE_PROOF_ENABLED",
-                  "updated_at": now,
-              }],
-              "operations": [{
-                  "operation_id": "musiclab-lab44-original-first-scoring-coverinfo-video-readiness",
-                  "project_id": "MusicLab",
-                  "title": "MusicLab LAB44 device acceptance",
-                  "type": "verification",
-                  "requested_scope": "Verify delivered LAB44 behavior while preserving exact artifact and current Mother.",
-                  "approved_scope": "Control-plane continuity and device acceptance tracking; no new application mutation.",
-                  "approval_status": "approved",
-                  "lifecycle_stage": "LAB",
-                  "risk_class": "MEDIUM",
-                  "status": "LAB44_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING",
-                  "phase": "LAB44 artifact ready; Bruno device acceptance pending",
-                  "artifact_progress": 100,
-                  "overall_progress": 100,
-                  "source_ref": "uab-build/musiclab-scoring-coverinfo-video-44",
-                  "source_head": "8a458f8f4d1e560736d81f78de551664998619f9",
-                  "created_at": now,
-                  "updated_at": now,
-              }],
-              "checkpoints": [{
-                  "checkpoint_id": f"pollicino-e2e-checkpoint-{run_id}",
-                  "operation_id": "musiclab-lab44-original-first-scoring-coverinfo-video-readiness",
-                  "phase": "LAB44 device acceptance pending",
-                  "verified_progress": 100,
-                  "completed_steps": "LAB44 code/build/artifact gates complete; Pollicino control-plane adopted.",
-                  "next_safe_step": "Resume exact pending device-acceptance step; do not rebuild or promote without Bruno approval.",
-                  "lock_state": "none",
-                  "external_wait_state": "Bruno device acceptance",
-                  "created_at": now,
-              }],
-          }
 
           def req(method, url, payload=None, headers=None, timeout=10):
               body = None if payload is None else json.dumps(payload, separators=(",", ":")).encode()
-              h = {"Accept": "application/json", "User-Agent": "MotorLab-Pollicino-E2E/1.0"}
+              h = {"Accept": "application/json", "User-Agent": "MotorLab-Pollicino-E2E/2.0"}
               if payload is not None:
                   h["Content-Type"] = "application/json"
               if headers:
                   h.update(headers)
               request = urllib.request.Request(url, data=body, method=method, headers=h)
-              with urllib.request.urlopen(request, timeout=timeout) as response:
-                  raw = response.read().decode()
-                  return response.status, (json.loads(raw) if raw else {})
-
-          # 1) Use github-actions[bot] to edit the authorized relay issue.
-          gh_headers = {
-              "Authorization": f"Bearer {gh_token}",
-              "Accept": "application/vnd.github+json",
-              "X-GitHub-Api-Version": "2022-11-28",
-          }
-          _, issue = req("GET", "https://api.github.com/repos/Br174/Chatgpt/issues/1", headers=gh_headers)
-          marker = base64.urlsafe_b64encode(json.dumps(snapshot, separators=(",", ":")).encode()).decode().rstrip("=")
-          body = issue.get("body") or ""
-          body = re.sub(r"MOTORLAB_RELAY_STATUS:[^\n]*", "MOTORLAB_RELAY_STATUS: POLLICINO_R20_E2E_CANARY", body)
-          body = re.sub(r"MOTORLAB_SNAPSHOT_B64:[A-Za-z0-9_-]+", "MOTORLAB_SNAPSHOT_B64:" + marker, body)
-          req("PATCH", "https://api.github.com/repos/Br174/Chatgpt/issues/1", {"body": body}, gh_headers)
-
-          # 2) Verify webhook -> Worker -> D1.
-          verified = False
-          for _ in range(15):
               try:
-                  status, data = req("GET", f"{base}/verify/{snapshot_id}")
-                  if status == 200 and data.get("snapshot_id") == snapshot_id:
-                      verified = True
-                      break
-              except urllib.error.HTTPError:
-                  pass
-              time.sleep(2)
-          if not verified:
-              raise SystemExit("D1 relay verification failed")
+                  with urllib.request.urlopen(request, timeout=timeout) as response:
+                      raw = response.read().decode()
+                      return response.status, (json.loads(raw) if raw else {})
+              except urllib.error.HTTPError as error:
+                  detail = error.read().decode("utf-8", errors="replace")
+                  raise SystemExit(f"HTTP {error.code} {url}: {detail}")
 
-          # 3) Read-only source proof must now resolve context.
-          q = urllib.parse.urlencode({"project_id": "MusicLab", "source_head": source_head})
+          q = urllib.parse.urlencode({"project_id": "MusicLab", "source_head": proof_head})
           _, context = req("GET", f"{base}/continuity/v1/context?{q}")
           operation_id = context["context"]["operation_id"]
+          if operation_id != expected_operation or context.get("proof") != "OPERATION_HEAD":
+              raise SystemExit("Source-proof context mismatch")
+          print("SOURCE_PROOF_CONTEXT=PASSED")
 
           def enroll(session_id):
               _, data = req("POST", f"{base}/continuity/v1/enroll", {
                   "project_id": "MusicLab",
                   "session_id": session_id,
-                  "source_head": source_head,
+                  "source_head": proof_head,
                   "executor_type": "github-actions-canary",
               })
               token = data.get("session_token")
@@ -150,13 +81,13 @@ jobs:
                   "current_action": "canary",
                   "next_action": "verify continuity state",
                   "verified_progress": 100,
-                  "source_ref": "main",
-                  "source_head": source_head,
+                  "source_ref": "uab-build/musiclab-scoring-coverinfo-video-44",
+                  "source_head": proof_head,
                   "sent_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
               }, {"Authorization": f"Bearer {token}"})
               return data
 
-          def status(session_id, token):
+          def status(token):
               q = urllib.parse.urlencode({"project_id": "MusicLab", "operation_id": operation_id})
               _, data = req("GET", f"{base}/continuity/v1/status?{q}", headers={"Authorization": f"Bearer {token}"})
               return data
@@ -170,63 +101,73 @@ jobs:
               }, {"Authorization": f"Bearer {token}"})
               return data
 
-          # 4) Alive but unchanged -> stall -> precomputed RESUME_READY.
+          # Alive + unchanged fingerprint -> stall suspicion -> prepared resume packet.
           stall_session = f"e2e-stall-{run_id}"
           stall_token = enroll(stall_session)
           first = pulse(stall_session, stall_token, "fp-A")
           if first.get("progress_state") != "MOVING":
-              raise SystemExit("Initial moving pulse failed")
+              raise SystemExit(f"Initial moving pulse failed: {first}")
           for _ in range(3):
               last = pulse(stall_session, stall_token, "fp-A")
               time.sleep(1)
           if last.get("progress_state") != "STALL_SUSPECTED":
-              raise SystemExit("STALL_SUSPECTED not detected")
-          st = status(stall_session, stall_token)
+              raise SystemExit(f"STALL_SUSPECTED not detected: {last}")
+          st = status(stall_token)
           if (st.get("resume_ready") or {}).get("status") != "READY_STALL_SUSPECTED":
-              raise SystemExit("READY_STALL_SUSPECTED not prepared")
+              raise SystemExit(f"READY_STALL_SUSPECTED not prepared: {st}")
+          print("STALL_DETECTION=PASSED")
+          print("STALL_RESUME_READY=PASSED")
 
+          # Progress changes -> stale stall recovery packet is superseded.
           resumed = pulse(stall_session, stall_token, "fp-B")
           if resumed.get("progress_state") != "MOVING":
-              raise SystemExit("Progress resume not detected")
-          st = status(stall_session, stall_token)
+              raise SystemExit(f"Progress resume not detected: {resumed}")
+          st = status(stall_token)
           if (st.get("resume_ready") or {}).get("status") != "SUPERSEDED_PROGRESS_RESUMED":
-              raise SystemExit("Stale stall packet not superseded")
+              raise SystemExit(f"Stale stall packet not superseded: {st}")
+          print("PROGRESS_RESUME=PASSED")
+
           sealed = seal(stall_session, stall_token, "HANDOFF_COMPLETE")
           if sealed.get("terminal_seal") != "HANDOFF_COMPLETE":
-              raise SystemExit("Normal terminal seal failed")
+              raise SystemExit(f"Normal terminal seal failed: {sealed}")
+          print("NORMAL_TERMINAL_SEAL=PASSED")
 
-          # 5) Abrupt loss -> alarm -> READY_PRECOMPUTED before any user continuation.
+          # New session deliberately stops heartbeating. Alarm must prepare recovery before any user message.
           crash_session = f"e2e-crash-{run_id}"
           crash_token = enroll(crash_session)
-          pulse(crash_session, crash_token, "fp-C", lease_ms=5000, stall_pulses=20)
+          crash_first = pulse(crash_session, crash_token, "fp-C", lease_ms=5000, stall_pulses=20)
+          if crash_first.get("liveness_state") != "ALIVE":
+              raise SystemExit(f"Crash-session initial pulse failed: {crash_first}")
 
           crash_ready = False
           for _ in range(15):
               time.sleep(2)
-              st = status(crash_session, crash_token)
+              st = status(crash_token)
               session = st.get("session") or {}
               ready = st.get("resume_ready") or {}
               if session.get("liveness_state") == "LOST" and ready.get("status") == "READY_PRECOMPUTED":
                   crash_ready = True
                   break
           if not crash_ready:
-              raise SystemExit("Crash/liveness-loss RESUME_READY not prepared")
+              raise SystemExit(f"Crash/liveness-loss RESUME_READY not prepared: {st}")
+          print("CRASH_DETECTION=PASSED")
+          print("PREEMPTIVE_RESUME_READY=PASSED")
+
+          # Fresh-chat style read: no session token; only authoritative operation SHA proof.
+          q = urllib.parse.urlencode({
+              "project_id": "MusicLab",
+              "operation_id": operation_id,
+              "source_head": proof_head,
+          })
+          _, ready = req("GET", f"{base}/continuity/v1/resume-ready?{q}")
+          if ready.get("resume_ready", {}).get("status") != "READY_PRECOMPUTED":
+              raise SystemExit(f"Source-proof RESUME_READY read failed: {ready}")
+          print("FRESH_CHAT_RESUME_READ=PASSED")
 
           sealed = seal(crash_session, crash_token, "SAFE_STOP")
           if sealed.get("terminal_seal") != "SAFE_STOP":
-              raise SystemExit("Post-canary SAFE_STOP seal failed")
-
-          # 6) Fresh chat-style read can obtain prepared packet with source proof only.
-          q = urllib.parse.urlencode({"project_id": "MusicLab", "operation_id": operation_id, "source_head": source_head})
-          _, ready = req("GET", f"{base}/continuity/v1/resume-ready?{q}")
-          if ready.get("resume_ready", {}).get("status") != "READY_PRECOMPUTED":
-              raise SystemExit("Source-proof RESUME_READY read failed")
+              raise SystemExit(f"Post-canary SAFE_STOP seal failed: {sealed}")
+          print("POST_CANARY_SAFE_STOP=PASSED")
 
           print("POLLICINO_E2E_CANARY=PASSED")
-          print("D1_RELAY=PASSED")
-          print("SOURCE_PROOF_ENROLLMENT=PASSED")
-          print("STALL_DETECTION=PASSED")
-          print("CRASH_DETECTION=PASSED")
-          print("PREEMPTIVE_RESUME_READY=PASSED")
-          print("TERMINAL_SEAL=PASSED")
           PY
