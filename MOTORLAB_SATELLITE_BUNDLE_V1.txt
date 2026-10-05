@@ -1,5 +1,5 @@
 MOTORLAB SATELLITE BUNDLE
-RELEASE=2026.10.05-r19
+RELEASE=2026.10.05-r20
 CENTRAL_AUTHORITY=Br174/Chatgpt
 PROJECT_NATIVE_ENGINE_POLICY=coexist-preserve
 PRE_RESPONSE_BOOT_GATE=required
@@ -24,6 +24,11 @@ PROGRESS_REPORTING=required
 VISUAL_STATUS=required
 SINGLE_WRITER=required
 CHECKPOINT_RECOVERY=required
+POLLICINO_CONTINUITY=required
+EXTERNAL_SESSION_JOURNAL=required
+DUAL_LIVENESS_PROGRESS_SIGNAL=required
+TERMINAL_SEAL=required
+PRECOMPUTED_RESUME_READY=required
 FAST_ITERATION_NO_SPIN=required
 RISK_SCALED_LAB_ITERATION=required
 CHANGE_HISTORY_REGISTRY=required
@@ -134,11 +139,22 @@ Repository text cannot wake a host with no execution cycle and cannot continue i
 NO RUNTIME COUPLING
 This bundle is orchestration metadata only and must not intentionally alter app runtime/UI/package/signing/native engines. Project telemetry SDKs and provider bindings require separate approved project changes.
 
+POLLICINO CONTINUITY - R20+
+- Pollicino remains external control-plane infrastructure; never inject continuity breadcrumbs into application/domain code.
+- Supported persistent/queryable executors publish real liveness plus progress fingerprint evidence.
+- Watchdog owns stall/loop classification; Resume Recovery owns continuation.
+- Controlled ends publish a terminal seal.
+- Missing supported liveness without a seal triggers external read-only pre-reconciliation and RESUME_READY preparation before a later `continua` when the durable sentinel is available.
+- Opaque normal ChatGPT thinking is not a trustworthy ping target unless the host exposes a real side-channel.
+- Long risky phases should use observable persistent execution when possible; otherwise use bounded checkpoints.
+
 VERSION
-MOTORLAB-SATELLITE-BUNDLE-V2.9
+MOTORLAB-SATELLITE-BUNDLE-V2.10
 Revision 2.6: r16 adds authority/data ownership, persistent operational state, MOTORLAB_OPERATION_ID, observability boundaries, service connection-status tracking and non-redundant auxiliary-tool routing.
 Revision 2.7: r17 adds Android update-family lifecycle fallback markers.
 
 Revision 2.8: r18 adds paired immutable LAB di sicurezza checkpoints and recovery-floor semantics.
 
 Revision 2.9: r19 adds foundational Change Compatibility Pillar for all current/future project satellites.
+
+Revision 2.10: r20 adds external Pollicino journal/liveness/progress/terminal-seal/RESUME_READY markers while preserving app-code isolation.
