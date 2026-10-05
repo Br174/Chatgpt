@@ -8,6 +8,15 @@ function str(value, max = 4096) {
   const s = typeof value === 'string' ? value : JSON.stringify(value);
   return s.length > max ? s.slice(0, max) : s;
 }
+async function sha256Token(value) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+function randomToken() {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
 
 export class PollicinoSentinel extends DurableObject {
   constructor(ctx, env) { super(ctx, env); this.ctx = ctx; this.env = env; }
@@ -50,7 +59,52 @@ export class PollicinoSentinel extends DurableObject {
       .bind(eventId,session.session_id,session.operation_id,type,str(summary,4096) ?? type,fingerprint,iso()).run();
   }
 
-  async pulse(input) {
+  async enroll(input) {
+    const now = Date.now();
+    const current = await this.ctx.storage.get('session');
+    if (current && !current.terminal_seal && current.liveness_state === 'ALIVE' && current.session_id !== input.session_id) {
+      const due = (current.last_signal_ms ?? 0) + (current.lease_ms ?? 45000);
+      if (now < due) throw new Error('active_session_exists');
+    }
+    const token = randomToken();
+    const auth = {
+      token_hash: await sha256Token(token),
+      session_id: input.session_id,
+      operation_id: input.operation_id,
+      project_id: input.project_id,
+      source_head: input.source_head,
+      executor_type: input.executor_type,
+      proof: input.proof,
+      issued_ms: now,
+      expires_ms: now + 8 * 60 * 60 * 1000
+    };
+    await this.ctx.storage.put('session_auth', auth);
+    return {
+      session_token: token,
+      token_expires_at: iso(auth.expires_ms),
+      session_id: auth.session_id,
+      operation_id: auth.operation_id,
+      project_id: auth.project_id
+    };
+  }
+
+  async verifySessionToken(token, identity = null) {
+    if (typeof token !== 'string' || token.length < 32 || token.length > 256) return false;
+    const auth = await this.ctx.storage.get('session_auth');
+    if (!auth || Date.now() >= auth.expires_ms) return false;
+    if (identity) {
+      if (identity.session_id && identity.session_id !== auth.session_id) return false;
+      if (identity.operation_id && identity.operation_id !== auth.operation_id) return false;
+      if (identity.project_id && identity.project_id !== auth.project_id) return false;
+    }
+    if (await sha256Token(token) !== auth.token_hash) return false;
+    auth.expires_ms = Date.now() + 8 * 60 * 60 * 1000;
+    await this.ctx.storage.put('session_auth', auth);
+    return true;
+  }
+
+  async pulse(input, sessionToken = null, trusted = false) {
+    if (!trusted && !(await this.verifySessionToken(sessionToken, input))) throw new Error('unauthorized_session_token');
     const previous = await this.ctx.storage.get('session');
     const next = advanceSession(previous, input, Date.now());
     await this.ctx.storage.put('session', next);
@@ -65,15 +119,26 @@ export class PollicinoSentinel extends DurableObject {
     if (previous?.liveness_state === 'LOST') {
       await this.event(next,'SESSION_REVIVED','A valid liveness pulse arrived after interruption suspicion',next.progress_fingerprint);
       await this.env.DB.prepare("UPDATE pollicino_resume_packets SET status='SUPERSEDED_REVIVED' WHERE session_id=? AND status LIKE 'READY%'").bind(next.session_id).run();
+      const ready = await this.ctx.storage.get('resume_ready');
+      if (ready?.session_id === next.session_id && String(ready.status || '').startsWith('READY')) {
+        ready.status = 'SUPERSEDED_REVIVED';
+        await this.ctx.storage.put('resume_ready', ready);
+      }
     } else if (previous?.progress_state === 'STALL_SUSPECTED' && next.progress_state !== 'STALL_SUSPECTED') {
       await this.event(next,'PROGRESS_RESUMED','Progress resumed after a prior stall suspicion',next.progress_fingerprint);
       await this.env.DB.prepare("UPDATE pollicino_resume_packets SET status='SUPERSEDED_PROGRESS_RESUMED' WHERE session_id=? AND status='READY_STALL_SUSPECTED'").bind(next.session_id).run();
+      const ready = await this.ctx.storage.get('resume_ready');
+      if (ready?.session_id === next.session_id && ready.status === 'READY_STALL_SUSPECTED') {
+        ready.status = 'SUPERSEDED_PROGRESS_RESUMED';
+        await this.ctx.storage.put('resume_ready', ready);
+      }
     }
     await this.ctx.storage.setAlarm(next.last_signal_ms + next.lease_ms);
     return {session_id:next.session_id,liveness_state:next.liveness_state,progress_state:next.progress_state,recommended_action:recommendedAction(next),next_alarm_at:iso(next.last_signal_ms + next.lease_ms)};
   }
 
-  async seal(input) {
+  async seal(input, sessionToken = null, trusted = false) {
+    if (!trusted && !(await this.verifySessionToken(sessionToken, input))) throw new Error('unauthorized_session_token');
     const previous = await this.ctx.storage.get('session');
     const next = applyTerminalSeal(previous, input?.terminal_state, Date.now());
     await this.ctx.storage.put('session', next);
@@ -136,5 +201,8 @@ export class PollicinoSentinel extends DurableObject {
     await this.ctx.storage.put('resume_ready', packet);
   }
 
-  async status() { return {session:(await this.ctx.storage.get('session')) ?? null,resume_ready:(await this.ctx.storage.get('resume_ready')) ?? null}; }
+  async status(sessionToken = null, trusted = false) {
+    if (!trusted && !(await this.verifySessionToken(sessionToken))) throw new Error('unauthorized_session_token');
+    return {session:(await this.ctx.storage.get('session')) ?? null,resume_ready:(await this.ctx.storage.get('resume_ready')) ?? null};
+  }
 }
