@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.09.30-r16
+CURRENT_RELEASE=2026.10.05-r17
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -22,6 +22,7 @@ OBSERVABILITY_DIAGNOSTICS_MODULE=MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
 KNOWLEDGE_TOOL_ROUTING_MODULE=MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 SERVICE_INTEGRATION_STATUS_MODULE=MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
 EXECUTION_CONTINUITY_MODULE=MOTORLAB_EXECUTION_CONTINUITY_V1.txt
+UPDATE_FAMILY_LIFECYCLE_MODULE=MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
 
 CURRENT REQUIRED CORE MODULES
 - MOTORLAB_CORE_ENTRYPOINT_V1.txt
@@ -52,6 +53,7 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 - MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
 - MOTORLAB_EXECUTION_CONTINUITY_V1.txt
+- MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
 - MOTORLAB_SATELLITE_SYNC_V1.txt
 - MOTORLAB_SATELLITE_BUNDLE_V1.txt
 
@@ -110,7 +112,11 @@ All current/future MotorLab software projects inherit r16 authority/data-ownersh
 NO RUNTIME REGRESSION
 MotorLab control-plane metadata alone must not alter application runtime/UI/package/signing/lifecycle/native engines.
 
+R17+ ANDROID UPDATE FAMILIES
+MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt is mandatory for Android projects using Bruno's persistent LAB-update method. Same-family LAB revisions keep applicationId + signing certificate and increase versionCode; LAB -> CANDIDATA creates a new family without mutating LAB; approved CANDIDATA -> MADRE promotes the same candidate family/source identity.
+
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.16
+MOTORLAB-RELEASE-MANIFEST-V1.17
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
+Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
