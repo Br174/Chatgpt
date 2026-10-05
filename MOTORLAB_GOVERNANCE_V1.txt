@@ -5,6 +5,12 @@ Mandatory MotorLab CORE governance capability.
 Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
+FOUNDATIONAL PILLAR - CHANGE COMPATIBILITY
+MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is a permanent foundational pillar for MotorLab and every current/future managed project.
+Every write-capable software/control-plane change must perform read-only conflict/overlap/redundancy preflight before mutation.
+Equivalent responsibilities must be merged/extended or explicitly superseded; MotorLab must not accumulate competing implementations for the same responsibility.
+No speed/automation/project-local rule may bypass this pillar.
+
 PURPOSE
 This contract defines permanent governance rules for MotorLab:
 1. MotorLab must always coexist with and support project-native engines; it must never replace them merely because MotorLab is active.
@@ -229,9 +235,11 @@ This governance contract is active when:
 - later explicit Bruno decisions can supersede earlier rules through normal versioned repository updates.
 
 VERSION
-MOTORLAB-GOVERNANCE-V1.4
+MOTORLAB-GOVERNANCE-V1.5
 Established: 2026-09-29
 Revision 1.1: structural implicit auto-bootstrap for registered projects; recurring per-chat activation prompts demoted to fallback-only compatibility behavior.
 Revision 1.2: project-first activation precedence plus semantic software-build intent onboarding for unregistered chats.
 Revision 1.3: External Service Guard becomes a permanent cross-project MotorLab control-plane capability for provider/API protection and future service integrations.
 Revision 1.4: Velocity Layer becomes a permanent additive-only acceleration capability; all earlier MotorLab protections retain precedence.
+
+Revision 1.5: r19 elevates Change Compatibility Guard to a permanent foundational cross-project pillar with one-responsibility/one-active-coordinator semantics.
