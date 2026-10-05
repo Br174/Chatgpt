@@ -150,14 +150,14 @@ No AVAILABLE_NOT_CONNECTED or DEGRADED optional integration blocks MotorLab core
 
 9. MotorLab Pollicino External Continuity
 CORE: CORE_READY via MOTORLAB_POLLICINO_CONTINUITY_V1.txt
-CENTRAL BRIDGE SOURCE: READY for Worker target 1.3.3 on the r20 integration
+CENTRAL BRIDGE SOURCE: READY for Worker target 1.3.4 on the r20 integration
 D1 SCHEMA SOURCE: READY for pollicino_sessions, pollicino_session_events and pollicino_resume_packets
 DURABLE SENTINEL SOURCE: READY via PollicinoSentinel Durable Object + Alarm
-WORKER DEPLOYMENT: 1.3.2 DEPLOYED_VERIFIED; 1.3.3 OIDC relay source prepared, live deployment pending merge/canary
+WORKER DEPLOYMENT: 1.3.3 DEPLOYED_VERIFIED; 1.3.4 direct-persist OIDC correction prepared, live deployment pending merge/canary
 D1 SCHEMA LIVE: VERIFIED indirectly by successful post-deploy /control/v1/directives response, which executes the shared schema initializer containing Pollicino tables
 DURABLE OBJECT MIGRATION: DEPLOYED with Worker 1.3.1 configuration; first authenticated real-project Pollicino session invocation remains pending end-to-end pulse/seal verification
 CONTINUITY ROUTES: DEPLOYED_PROTECTED — unauthenticated /continuity/v1/context and /continuity/v1/resume-ready return HTTP 401 as designed
-AUTHORIZED PULSE/SEAL END-TO-END: CANARY_PENDING behind D1 seed transport. Root cause of failed run 37358917563: GitHub Actions updated relay Issue #1 successfully but the expected webhook event did not persist the snapshot to D1. Replacement transport: dedicated GitHub Actions OIDC relay in Worker 1.3.3, reusing the same internal /relay writer.
+AUTHORIZED PULSE/SEAL END-TO-END: CANARY_PENDING behind D1 seed transport. Failed OIDC relay run 37359874905 returned HTTP 503 because the first OIDC implementation still required legacy GITHUB_WEBHOOK_SECRET after successful OIDC authentication. Root cause correction target 1.3.4 calls the canonical persistSnapshot writer directly after OIDC verification; no legacy secret remains in that path.
 STANDARD CHAT HIDDEN-PING CAPABILITY: NOT EXPOSED; do not claim ordinary opaque ChatGPT thinking can be silently pinged
 PROJECT/EXECUTOR ADOPTION: MusicLab satellite PROJECT_ADOPTED at control-plane level on main @ 43a1fca35e54cb05db80f1a18d02f8626f656696; sidecar + lifecycle hooks installed with zero application-runtime changes. Actual executor SESSION_ENROLLMENT remains provider-secret gated until the first signed pulse/seal succeeds
 AUTHORITY: D1 operational state + GitHub technical authority; Watchdog owns stall classification and Resume Recovery owns continuation
@@ -165,7 +165,7 @@ RUNTIME IMPACT ON APPS: NONE
 COST SAFETY: free-first; no paid fallback or high-frequency GitHub heartbeat transport
 
 VERSION
-MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.15
+MOTORLAB-SERVICE-INTEGRATION-STATUS-V1.16
 Established: 2026-09-30
 Revision 1.6: GitBook OAuth write authorization restored and verified. Root cause closed as prior Read only OAuth scope; prevention now requires independent read plus harmless draft-write verification before declaring read/write CONNECTED_VERIFIED. Central r16 release unchanged.
 Revision 1.7: Context7 Free custom MCP app moved to CONNECTED_VERIFIED after two functional checks. Public catalog `installed:false` is explicitly separated from custom-app status; failed OAuth prototype removed; anonymous free endpoint and recurrence-prevention rule recorded. Central r16 release unchanged.
@@ -184,3 +184,5 @@ Revision 1.13: MusicLab safely adopted the r20 Pollicino control-plane satellite
 Revision 1.14: source-proof enrollment implementation prepared for Worker 1.3.2; the previous mandatory provider-secret blocker is removed in source, pending live canary verification before marking end-to-end passed.
 
 Revision 1.15: records failed E2E run 37358917563 root cause at legacy webhook delivery and introduces the secretless GitHub Actions OIDC D1 relay target 1.3.3; end-to-end remains pending until live OIDC relay + Pollicino canary pass.
+
+Revision 1.16: records OIDC run 37359874905 HTTP 503 root cause as residual legacy-secret coupling and corrects it by exporting/reusing canonical persistSnapshot directly; Worker target 1.3.4 pending live canary.

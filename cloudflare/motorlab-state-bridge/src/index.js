@@ -244,7 +244,10 @@ function buildStatements(db, snapshot, payloadHash, receivedAt) {
   return statements;
 }
 
-async function persistSnapshot(snapshot, rawSnapshot, env) {
+export async function persistSnapshot(snapshot, rawSnapshot, env) {
+  if (!env.DB) return json({ error: 'd1_not_configured', snapshot_id: snapshot?.snapshot_id ?? null }, 503);
+  try { await ensureSchema(env.DB); }
+  catch { return json({ error: 'd1_unavailable', snapshot_id: snapshot?.snapshot_id ?? null }, 503); }
   const payloadHash = await sha256Hex(rawSnapshot);
   let existing;
   try {
