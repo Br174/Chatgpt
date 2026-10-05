@@ -758,3 +758,27 @@ NEXT_LIFECYCLE_GATE=Bruno device test; no CANDIDATA/MADRE promotion before expli
 RESTORE_SCOPE_HINTS=Restore Discogs optional-auth public fallback, credential reveal/clear UI and persistent approval-state logic onto a compatible later baseline. Preserve Player buono, LAB43 COVER.INFO breadth/video acceleration and unrelated Originali/Archivio behavior.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_DISCOGS_LOCAL_ARTIFACT_RECHECK
 
+CHANGE RECORD
+CHANGE_ID=musiclab-20261005-lab44-scoring-coverinfo-video
+DATE=2026-10-05
+TITLE=LAB44 punteggio originale-first + parser COVER.INFO + video progressivi
+SEMANTIC_TAGS=LAB44,punteggio,10/10,originale,COVER.INFO,titolo,1 2 3,Initial Song,cover,video,verde,Player buono
+USER_INTENT=Correggere il punteggio 1-10 affinché l'originale sia il riferimento più forte, evitare che l'anno più vecchio domini l'ordinamento, eliminare i falsi titoli numerici COVER.INFO, ritrovare l'opera originale anche partendo da una cover, e rendere più immediato/visibile lo stato video pronto.
+CHANGE_SCOPE=ORIGINAL_FIRST_SCORING_COVERINFO_RELATION_PARSER_PROGRESSIVE_VIDEO_UI
+LIFECYCLE_ROLE=LAB44_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-coverinfo-video-discogs-43b
+SOURCE_BASE_SHA=3849c3f833b10ad053b3f46b5ce5b3f0f61d5fe2
+OFFICIAL_MOTHER_REF=mother/musiclab-lab42-final
+OFFICIAL_MOTHER_SHA=43e3168c256f650d63a9b2c86ba18ef1f6cadd71
+RESULT_REF=uab-build/musiclab-scoring-coverinfo-video-44
+RESULT_SHA=8a458f8f4d1e560736d81f78de551664998619f9
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/CoverDiscoverySources.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsVersionSource.kt,app/src/main/kotlin/com/metrolist/music/ui/component/TitleMeaningResolver.kt,app/src/test/kotlin/com/metrolist/music/ui/component/Lab44ScoringAndTitleResolverTest.kt,cloudflare/music-intelligence/test/lab44-scoring-coverinfo-video-contract.test.mjs,uab-project.env,.github/workflows/lab44-scoring-coverinfo-video-gate.yml
+BEHAVIOR_SUMMARY=10/10 is reserved for the identified exact original recording; original-performer variants follow, then exact-title covers/adaptations and weaker evidence. RELEVANCE no longer uses publication year and reorders after real confidence changes. COVER.INFO only parses real field-title rows, rejects numeric pseudo-titles, uses row-scoped performers and understands initial/follow-up relation targets. Trailing performer hints such as (Lucio Dalla) can establish the original reference and COVER.INFO Initial Song evidence can recover it when starting from a cover. Video checks update each card as soon as its result completes and Tocca per riprodurre is green only when a video id is resolved. LAB43B Discogs/token/approval features and Player buono are preserved.
+ROOT_CAUSE=The old score rewarded performer difference in Cover mode, used age as a relevance tie-break, preserved stale stable ordering, parsed overly broad COVER.INFO song links and treated the incoming artist as the immutable original. Video chunk UI also waited for sibling resolutions before updating rows.
+ROOT_CAUSE_CLOSURE=Original-first score model + evidence-based relevance ties + score-triggered reorder + field-title/relation-aware COVER.INFO parser + original-artist hint/Initial Song resolver + per-row progressive video updates.
+VERIFICATION=Final GitHub Actions run 37292734148 success on exact SHA 8a458f8f4d1e560736d81f78de551664998619f9: LAB44 contract, Android unit tests including Balla balla ballerino original/cover cases, UAB diagnostics, APK+ZIP build/integrity/upload all passed. Initial run 37292620108 exposed only a syntax-specific contract regex and was corrected. Artifact 11336974698 digest sha256:aaf4370ad10d4056472ded2d9c926fd772e72faf6b98050f39f10920ad66bad4; APK sha256 f22324f4928b5363f78415692d6af3be1df367de235dc0b385aca15c79d92e08; ZIP sha256 dbc26e39ac9306d701173d86c2087d7bd5d26568f7029d78eb0dd2bf9a7628e4.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test; no CANDIDATA/MADRE promotion before explicit approval.
+RESTORE_SCOPE_HINTS=Restore LAB44 original-first scoring, relevance sorting, COVER.INFO field-title/relation parsing, original-reference recovery and progressive video-ready UI onto a compatible later baseline. Preserve Player buono and LAB43B Discogs/token/approval behavior.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LIVE_COVERINFO_LOCAL_ARTIFACT_RECHECK
+
