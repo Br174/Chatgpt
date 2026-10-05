@@ -143,7 +143,7 @@ Do not place heartbeat/breadcrumb logic in application runtime code merely for M
 Watchdog/Resume ownership and single-writer precedence remain unchanged.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.15
+MOTORLAB-SATELLITE-SYNC-V1.16
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -151,4 +151,4 @@ Revision 1.14: r18 adds paired LAB di sicurezza fallback marker and recovery che
 
 Revision 1.15: r19 adds foundational Change Compatibility Pillar marker and one-responsibility/one-coordinator fallback invariant.
 
-Revision r20: satellites now require Pollicino external continuity markers and app-code isolation.
+Revision 1.16: r20 requires Pollicino external continuity markers and app-code isolation.
