@@ -9,20 +9,20 @@ VISIBLE_SLOTS=1
 RESTORE SLOT
 RESTORE_NO=1
 FEATURE_KEY=player
-TITLE=Player / mini-player fuori dal lettore
-ALIASES=player,lettore,mini-player,miniplayer,player persistente,riproduzione,play now,preload
-BEHAVIOR_SUMMARY=Il player mantiene il comportamento stabile del mini-player fuori dal lettore e la protezione di navigazione di LAB19; la MADRE LAB25 aggiunge il percorso Play Now approvato su dispositivo, annulla il lavoro di preload vecchio prima del cambio traccia e preriscalda soltanto una traccia successiva in modo leggero dopo che quella corrente è stabile. Nel mini-player il titolo non intercetta più il tap destinato ad aprire il lettore.
-BRUNO_CONFIRMED_STATUS=WORKING_AND_PROMOTED_TO_MOTHER
-BRUNO_CONFIRMED_DATE=2026-10-03
-PROJECT_LIFECYCLE_ID=MADRE mother/musiclab-lab25-final
-CURRENT_CHANGE_ID=musiclab-20261002-lab25-instant-playback-cover
-SOURCE_REF=mother/musiclab-lab25-final
-SOURCE_SHA=01a4793f99628473854884753d783ba8ca6bd51b
-CANDIDATE_SOURCE_REF=candidate/musiclab-lab25-playback-cover
-CANDIDATE_SOURCE_SHA=01a4793f99628473854884753d783ba8ca6bd51b
-IMPLEMENTATION_COMMIT=c92314ed1c846f209e12d0806898d7f47a8a0eff
-RESTORE_SCOPE_HINTS=Restore only the registered player/navigation/playback behavior from MADRE LAB25 provenance; preserve unrelated later Cover/Brain/search changes. New work starts from mother/musiclab-lab25-final unless Bruno explicitly selects another lifecycle base.
-STATUS=ACTIVE_CONFIRMED_MOTHER
+TITLE=Player buono
+ALIASES=player buono,player,lettore,mini-player,miniplayer,player veloce,ispeed,riproduzione,first sound
+BEHAVIOR_SUMMARY=Riferimento approvato da Bruno per il player: implementazione LAB41 derivata dalla LAB40 con corsia fast-first stile Originali 07 ispeed. Il resolver prova prima per massimo 1800 ms una via senza WebView e senza PoToken; se non basta passa automaticamente al resolver InnerTubeX moderno completo. Il ripristino deve riguardare solo il sottosistema player/stream resolver e deve preservare Cover, Originali, Archivio, fonti e altre funzioni successive.
+BRUNO_CONFIRMED_STATUS=WORKING_APPROVED_FOR_RESTORE
+BRUNO_CONFIRMED_DATE=2026-10-05
+PROJECT_LIFECYCLE_ID=LAB41 uab-build/musiclab-lab07-player-fast-41
+CURRENT_CHANGE_ID=musiclab-20261005-lab41-lab07-fast-player-restore
+SOURCE_REF=uab-build/musiclab-lab07-player-fast-41
+SOURCE_SHA=329e663061d46928dc4d58a946c0d3d2f88881b3
+IMPLEMENTATION_COMMIT=a688fe65213ad4bddf533345a472efafcc2b1b1a
+HISTORICAL_REFERENCE_REF=uab-build/musiclab-originali-speed-tabs-07
+HISTORICAL_REFERENCE_SHA=6900614a785b7b21f7fa9725837ade447a0407c8
+RESTORE_SCOPE_HINTS=Quando Bruno chiede "Player buono", ripristinare selettivamente la fast-first lane LAB41 sul baseline corrente compatibile. Non sostituire l'intera app con LAB07/LAB41 e non sovrascrivere Cover, Originali, Archivio, MADRE o CANDIDATA.
+STATUS=ACTIVE_CONFIRMED_LAB41
 
 RULES
 - Only Bruno-confirmed working modifications explicitly approved for conservation enter this visible register.
@@ -31,8 +31,9 @@ RULES
 - One feature family keeps one plain integer number; later confirmed working Player implementations update RESTORE_NO=1 rather than creating another visible Player entry.
 - Failed/unconfirmed restore attempts do not change this slot.
 
-VERSION=MOTORLAB-MUSICLAB-MODIFICATION-RESTORE-REGISTER-V1.3
+VERSION=MOTORLAB-MUSICLAB-MODIFICATION-RESTORE-REGISTER-V1.4
 REVISION=1.1 first visible confirmed slot: Player from device-accepted LAB19 CANDIDATA.
 REVISION=1.2 Bruno explicitly promoted the tested LAB19 CANDIDATA to MADRE mother/musiclab-lab19-final at identical source SHA.
 
 REVISION=1.3 Bruno ha testato CANDIDATA LAB25 e l'ha promossa a MADRE; RESTORE_NO=1 Player ora punta alla nuova MADRE exact-SHA.
+REVISION=1.4 Bruno ha registrato esplicitamente il player LAB41 come "Player buono"; RESTORE_NO=1 ora punta alla fast-first lane LAB41 senza promozione automatica a MADRE.
