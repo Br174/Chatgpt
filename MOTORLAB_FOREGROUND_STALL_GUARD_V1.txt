@@ -45,6 +45,7 @@ Do not begin a fragile long phase without a recoverable next step.
 If the next autonomous phase is BACKGROUNDABLE and an approved persistent executor is available, hand it off before depending on a long ordinary chat turn.
 Examples: adapter-approved GitHub Actions/runner, remote worker, Work/cloud execution or another durable executor.
 Do not claim background continuity until the handoff is real and durable state/job identity exists.
+When that executor exposes a supported liveness/control surface, enroll the operation/session in Pollicino before entering the opaque phase.
 
 4. FOREGROUND CHUNKING RULE
 If no persistent executor is available:
@@ -71,6 +72,7 @@ This guard itself does not invent a stall.
 
 7. NO FALSE HEARTBEAT
 A ChatGPT UI message saying systems are still processing, spinner, typing indicator or elapsed time is NOT a MotorLab heartbeat or material progress.
+An ordinary opaque ChatGPT reasoning turn also cannot be treated as queryable merely because Pollicino exists. Real heartbeat/probe claims require an enrolled executor/host surface that actually exposes them.
 Only observable model/tool/provider/job/repository state counts.
 
 8. HOST-SUSPENSION DETECTION AT NEXT CONTROL CYCLE
@@ -128,6 +130,8 @@ The guard is active when:
 - no duplicate recovery mechanism competes with Watchdog/Resume Recovery.
 
 VERSION
-MOTORLAB-FOREGROUND-STALL-GUARD-V1.1
+MOTORLAB-FOREGROUND-STALL-GUARD-V1.2
 Established: 2026-09-29
 Revision 1.1: emerging-loop prevention, Watchdog preventive handoff, two-strike integration and explicit module precedence.
+
+Revision 1.2: r20 enrolls supported persistent executors in Pollicino and explicitly forbids fake hidden-heartbeat claims for opaque normal chat turns.
