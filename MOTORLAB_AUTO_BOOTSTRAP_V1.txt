@@ -16,6 +16,7 @@ MANDATORY DEPENDENCIES
 - MOTORLAB_FOREGROUND_STALL_GUARD_V1.txt
 - MOTORLAB_PROGRESS_REPORTING_V1.txt
 - MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
+- MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt
 - current required CORE modules from MOTORLAB_RELEASE_MANIFEST_V1.txt
 
 MotorLab supports two activation paths:
@@ -131,7 +132,7 @@ J. restore project-native engine coexistence;
 K. emit the first numeric progress status when a substantial operation is active/pending;
 L. if unfinished work exists, Resume Recovery continues it before unrelated writes;
 M. if stale-state/write-through failure is detected, Root Cause Closure owns causal closure;
-N. apply Change Compatibility Guard before writes;
+N. apply the foundational Change Compatibility Guard during read-only preflight and resolve redundancy/overlap/conflict before writes;
 O. classify substantial execution under Foreground Stall Guard;
 P. proceed with the requested work.
 
@@ -186,7 +187,8 @@ Future concrete software projects inherit:
 - numeric progress visibility gate;
 - Root Cause Closure;
 - current Watchdog/Resume/Foreground/Progress/safety rules;
-- native-engine coexistence.
+- native-engine coexistence;
+- foundational Change Compatibility Guard with ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR for every write-capable change.
 
 16. FAILURE MODE
 If bootstrap/continuity cannot complete because project identity, permissions or canonical state is unavailable:
@@ -213,7 +215,9 @@ Auto Bootstrap is active when:
 - platform limits are represented honestly.
 
 VERSION
-MOTORLAB-AUTO-BOOTSTRAP-V1.9
+MOTORLAB-AUTO-BOOTSTRAP-V1.10
 Established: 2026-09-29
 Revision 1.8: pre-response MotorLab gate plus durable cross-chat Project Continuity bootstrap.
 Revision 1.9: r11 adds mandatory first-visible numeric progress and Root Cause Closure routing for stale/missed continuity and discovered problems.
+
+Revision 1.10: r19 makes the Change Compatibility Guard a mandatory bootstrap dependency and foundational pre-write pillar for all registered/future projects.
