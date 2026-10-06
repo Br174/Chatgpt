@@ -124,3 +124,26 @@ APK_SHA256=96b879cdef7208cbc69765a0fc8c45e0141301cd3233d8d988f13829817097ae
 ZIP_SHA256=19dbef67e6c008d9741affcf8821dfc99ecfe123082eb79c9e7d96a2b5f20e03
 VERIFICATION=UAB run 37496464226 success; Android run 37496464177 success; Force stable APK signing identity success; Verify APK update identity success; final artifact uploaded.
 MIGRATION_NOTE=If the currently installed old APK was signed with a transient unrecoverable certificate, Android requires one final uninstall/reinstall to establish this corrected stable signing baseline. Subsequent LAB updates must preserve this certificate and strictly increasing versionCode so user data can remain in place.
+
+
+CHANGE_ID=STUDYBOOK-20261006-LAB03-ANDROID-UPDATE-CONTINUITY
+DATE=2026-10-06
+TYPE=ANDROID_UPDATE_IDENTITY
+TITLE=LAB 03 fixes in-place Android update continuity
+REQUESTED_BY=Bruno
+STATUS=VERIFIED_ARTIFACT_READY
+MOTORLAB_OPERATION_ID=studybook-lab03-android-update-continuity-20261006
+SOURCE_REF=lab/studybook-core-android-01-update-03
+SOURCE_HEAD=a5b0e0035ff8b437785ac4884d1e2da1665d97c2
+CAUSE=Update-family builds used small GitHub workflow run numbers as versionCode and relied on generated debug signing behavior. Either a higher installed versionCode or a divergent historical signing lineage could force uninstall/reinstall.
+REPAIR=Use permanently high monotonic Android versionCode derived from date base plus run number; explicitly force the recovered original LAB signing key onto the final APK; verify applicationId, exact versionCode and final APK signing certificate before artifact upload.
+PREVENTION=Every future LAB update build fails closed unless final APK identity matches it.studybook.ai.lab, versionCode is the requested monotonic value and final certificate is D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC.
+OFFICIAL_UPDATE_ARTIFACT=StudyBook-AI-LAB-03-AGGIORNAMENTO.apk
+UPDATE_APK_SHA256=6685b60797a6be47b5c70f678a32c84a42222701c4127ba80081d9c358ef0df5
+UPDATE_ZIP_SHA256=474a822ab0aff94a493a556b17633c0a2b593985518af047825f1b35b457b820
+UPDATE_APPLICATION_ID=it.studybook.ai.lab
+UPDATE_VERSION_CODE=2026100015
+UPDATE_VERSION_NAME=0.3.15
+UPDATE_SIGNING_SHA256=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
+VERIFICATION=UAB 37496668653 success; Android 37496668654 success; Force stable APK signing identity success; Verify APK update identity success; artifact checksum verified after download.
+NOTE=If this exact verified package is rejected on a device, the installed copy is outside the recovered LAB signing/package lineage. Android cannot bridge incompatible signing certificates; one final uninstall/reinstall alignment is then unavoidable, after which this stable family supports normal in-place updates.

@@ -8,23 +8,23 @@ ACTIVE_OPERATION_ID=studybook-lab03-motorlab-runtime-r21-20261006
 OPERATION_STATUS=LAB03_ARTIFACTS_VERIFIED_DEVICE_ACCEPTANCE_PENDING
 CURRENT_PHASE=LAB 03 aggiornamento + LAB 03 ripristino built and verified with StudyBook MotorLab Runtime r21; awaiting Bruno physical-device acceptance before any CANDIDATA
 CURRENT_REF=lab/studybook-core-android-01-update-03
-CURRENT_HEAD_SHA=4a01af628a9b97ca07eca4aed15589da63dc60fc
+CURRENT_HEAD_SHA=a5b0e0035ff8b437785ac4884d1e2da1665d97c2
 CURRENT_PROVIDER=GitHub Actions / Cloudflare MotorLab state bridge
-JOB_ID=UPDATE_ANDROID_37496464177; UPDATE_CORE_37496464226; RECOVERY_ANDROID_37491089109; RECOVERY_CORE_37491089121
+JOB_ID=UPDATE_ANDROID_37496668654; UPDATE_CORE_37496668653; RECOVERY_ANDROID_37491089109; RECOVERY_CORE_37491089121
 JOB_STATUS=all completed success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB03 Android update pipeline repaired at root cause: final APK is now explicitly signed with the stable LAB certificate, monotonic high versionCode is enforced, and package/version/certificate are verified on the final APK before publication
+LAST_COMPLETED_MATERIAL_STEP=LAB03 Android update continuity fixed at the source: stable LAB signing key is explicitly applied to the final APK, final APK certificate is verified directly, and versionCode is permanently monotonic/high (2026100015). Final update artifact built and verified successfully.
 NEXT_SAFE_STEP=Bruno installs LAB 03 aggiornamento over the existing LAB and tests book creation speed/quality, cache reuse on regeneration, recovery after interruption and all prior LAB02 behaviors. If accepted, create a NEW immutable CANDIDATA family from this LAB03 state. Do not mutate LAB into CANDIDATA.
 PENDING_VERIFICATION=Physical-device acceptance only: LAB03 update install; MotorLab Runtime adaptive runners; incremental block reuse on regeneration; checkpoint resume/correction relay behavior; creation-time improvement; plus reader/original opening, distinct Testo di studio/In parole semplici, book workspace, PDF elaborato/export, grounded quiz/flashcards and scanner/OCR.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-03-AGGIORNAMENTO.apk sha256=96b879cdef7208cbc69765a0fc8c45e0141301cd3233d8d988f13829817097ae
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-03-AGGIORNAMENTO.apk sha256=6685b60797a6be47b5c70f678a32c84a42222701c4127ba80081d9c358ef0df5
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=19dbef67e6c008d9741affcf8821dfc99ecfe123082eb79c9e7d96a2b5f20e03
+UPDATE_ZIP_SHA256=474a822ab0aff94a493a556b17633c0a2b593985518af047825f1b35b457b820
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
-ROOT_CAUSE_NOTE=Android update failures were caused by Gradle signing the generated APK with a different debug certificate than the stable LAB keystore that the workflow had merely verified. Previous metadata therefore reported the intended key rather than the certificate actually embedded in the APK. Fixed by explicitly signing the final APK with the stable LAB keystore, verifying the final APK certificate, and moving to monotonic high versionCode values. One final uninstall may be unavoidable only for devices currently holding an old APK signed with an unrecoverable transient certificate; all future LAB updates from the corrected baseline are designed for in-place update.
+ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
 LAST_USER_INTENT_SUMMARY=Integrate only the useful MotorLab r21 runtime method directly inside StudyBook so the APK carries adaptive orchestration on any phone, then return to physical StudyBook testing.
-STATE_SOURCE=Corrected LAB03 update head 4a01af628a9b97ca07eca4aed15589da63dc60fc; UAB 37496464226 success; Android 37496464177 success; final APK applicationId=it.studybook.ai.lab versionCode=2026100014 versionName=0.3.14 certificate=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC; APK sha256=96b879cdef7208cbc69765a0fc8c45e0141301cd3233d8d988f13829817097ae; ZIP sha256=19dbef67e6c008d9741affcf8821dfc99ecfe123082eb79c9e7d96a2b5f20e03
+STATE_SOURCE=LAB03 final update source a5b0e0035ff8b437785ac4884d1e2da1665d97c2; UAB run 37496668653 success; Android run 37496668654 success; applicationId it.studybook.ai.lab; versionCode 2026100015; signing D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC; APK sha256 6685b60797a6be47b5c70f678a32c84a42222701c4127ba80081d9c358ef0df5; ZIP sha256 474a822ab0aff94a493a556b17633c0a2b593985518af047825f1b35b457b820
 CONTINUITY_NOTE=On future chat/continua load r21 satellite state/RESUME_READY and LAB03 runtime state first. Do not recreate LAB03. The next lifecycle boundary is physical-device acceptance of LAB03, then CANDIDATA only after Bruno acceptance.
 UPDATED_DATE=2026-10-06
 SATELLITE_LOCAL_RELEASE=2026.10.06-r21
@@ -44,8 +44,8 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100014
-ANDROID_UPDATE_VERSION_NAME=0.3.14
+ANDROID_UPDATE_VERSION_CODE=2026100015
+ANDROID_UPDATE_VERSION_NAME=0.3.15
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
