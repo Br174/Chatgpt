@@ -205,12 +205,23 @@ Verified background successes use MOTORLAB_VISUAL_STATUS_V1.txt:
 - 🎆🎆🎆 significant milestone;
 - 🎆🎆🎆🎆 major/final verified completion.
 
-18. SINGLE-WRITER SAFETY
+18. R22 PARALLEL DURABLE RUNNERS
+Background Execution is the durable executor layer used by Execution Fabric for PARALLEL_DURABLE nodes.
+Independent background jobs may overlap when:
+- their dependencies are satisfied;
+- write/lock scopes do not conflict or writes are truly isolated;
+- provider quotas/cost policy allow it;
+- overlapping them improves expected TTTA.
+Do not use one global durable-job barrier when downstream work depends on only one completed job.
+Each durable runner should expose start/finish/status identity so Execution Fabric can record observed overlap and Watchdog/Pollicino can monitor supported sessions.
+A healthy slow durable runner does not block dispatch of unrelated ready nodes.
+
+19. SINGLE-WRITER SAFETY
 Background execution must not create multiple writers to the same lock_scope merely because the foreground chat is reopened.
 When Bruno returns, the chat first inspects the current durable job/lock state.
 If the background job is still RUNNING, the chat must not start a conflicting duplicate operation.
 
-19. PROJECT-ADAPTER REQUIREMENTS
+20. PROJECT-ADAPTER REQUIREMENTS
 New/updated adapters should declare:
 MOTORLAB_BACKGROUND_MODE=<none|github-actions|worker|runner|work|hybrid|custom>
 MOTORLAB_BACKGROUND_STATUS_PROBE=<how job state is read>
@@ -223,11 +234,11 @@ MOTORLAB_BACKGROUND_NOTIFY=<supported notification path or none>
 
 Legacy adapters remain usable but may not claim true background continuity until a persistent executor is defined.
 
-20. NO PROJECT LOGIC REGRESSION
+21. NO PROJECT LOGIC REGRESSION
 Background execution is control-plane infrastructure.
 It must not alter application UI, domain logic, package identity, signing, source lineage or MADRE/LAB/CANDIDATA semantics merely to add background capability.
 
-21. SUCCESS CRITERIA
+22. SUCCESS CRITERIA
 MotorLab Background Execution is correctly active when:
 - Bruno can stay conceptually in one canonical project chat;
 - long backgroundable work is proactively handed to a persistent executor;
@@ -240,7 +251,9 @@ MotorLab Background Execution is correctly active when:
 - supported persistent executors can be externally monitored by Pollicino without changing project application code.
 
 VERSION
-MOTORLAB-BACKGROUND-EXECUTION-V1.1
+MOTORLAB-BACKGROUND-EXECUTION-V1.2
 Established: 2026-09-28
 
 Revision 1.1: r20 enrolls supported persistent executors in Pollicino external liveness/progress monitoring while preserving Background Execution ownership.
+
+Revision 1.2: r22 supports Execution Fabric PARALLEL_DURABLE nodes, dependency-local completion, observed-overlap evidence and critical-path-friendly durable concurrency while retaining lock safety.
