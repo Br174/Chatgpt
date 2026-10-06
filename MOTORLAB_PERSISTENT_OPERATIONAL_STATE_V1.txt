@@ -36,8 +36,10 @@ MINIMUM D1 ENTITIES
 - artifact_progress
 - overall_progress
 - source_ref/source_head
-- execution_mode / runner_count when applicable
+- execution_mode / planned_runner_count / observed_peak_concurrency when applicable
 - critical_path summary when applicable
+- execution_fabric_status / host_concurrency_limit when known
+- single_integration_lane_verified when applicable
 - request_execution_started_at when measurable
 - first_testable_artifact_at when applicable
 - time_to_testable_artifact_ms when measurable
@@ -58,7 +60,9 @@ MINIMUM D1 ENTITIES
 - completed material steps
 - next safe step
 - active/completed runner graph summary when applicable
+- ready/running/waiting node summary when applicable
 - critical-path next node when applicable
+- parallelism proof summary / overlap evidence refs when applicable
 - lock state/reference
 - external wait state when any
 - created_at
@@ -161,7 +165,12 @@ Lessons are advisory and cannot authorize writes, override GitHub technical trut
 Optional/coalesced performance record for comparable operations:
 - operation_id / project_id
 - execution_mode
-- runner_count_peak
+- planned_runner_count
+- runner_count_peak / observed_peak_concurrency
+- host_concurrency_limit when known
+- overlap evidence summary
+- single_integration_lane_verified
+- correction_relay_count
 - critical_path summary
 - planning_ms
 - wait_external_ms
@@ -251,10 +260,12 @@ SUCCESS CRITERIA
 - comparable operations can use TTTA/phase evidence to reduce future avoidable latency.
 
 VERSION
-MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.3
+MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.4
 Established: 2026-09-30
 Revision 1.1: adds secret-free live_directives persistence, transition-only writes, deduplication and fail-open read/fallback semantics.
 
 Revision 1.2: r20 adds external Pollicino sessions, compact session journal and precomputed RESUME_READY state in D1/KV while keeping GitHub technical authority.
 
 Revision 1.3: r21 adds bounded velocity lessons, adaptive-runner/critical-path checkpoint summaries and TTTA/phase metrics for evidence-based acceleration without storing chain-of-thought or creating new write authority.
+
+Revision 1.4: r22 persists Execution Fabric ready/running graph summaries and observed parallelism proof, including host limits, overlap evidence, correction relays and single integration lane verification.
