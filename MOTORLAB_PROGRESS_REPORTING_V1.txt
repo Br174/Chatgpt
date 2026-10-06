@@ -22,14 +22,26 @@ After `⚙️ MotorLab attivo`, if MotorLab-controlled work is active/pending/ne
 3. LONG / EXTERNAL OPERATION VISIBILITY
 Before a long build/test/provider phase show current percentage and what is starting. Report material provider/job transitions at the next available control point. Healthy durable jobs follow No-Spin rather than endless foreground polling.
 
-4. MICRO-PROGRESS / MICRO-MILESTONES
+4. R22 GROUPED PARALLEL STATUS
+When Execution Fabric is active, do not convert parallel work into serial prose.
+At useful visible control points prefer a compact grouped status:
+- COMPLETATI INSIEME: verified nodes that finished since the prior status;
+- IN CORSO INSIEME: currently overlapping runners/jobs/tools when observable;
+- SBLOCCATI: downstream nodes made READY by completed dependencies;
+- CRITICAL PATH: current artifact-blocking chain;
+- MODALITA: DIRECT_FAST / PARALLEL_OBSERVED / SERIALE NECESSARIA / SERIALE LIMITATA DALL'HOST;
+- observed peak runner count when evidence exists.
+Do not claim PARALLEL_OBSERVED merely because r22 is installed.
+A serial status is acceptable when dependencies or host limits require it; state the reason rather than inventing concurrency.
+
+5. MICRO-PROGRESS / MICRO-MILESTONES
 Small one-step change minimum: opening percentage + verified closing percentage.
 Small change with any tool/test/write boundary minimum: opening percentage + at least one intermediate material boundary + verified closing percentage.
 Longer work continues the existing high-presence verified model.
 Use deterministic milestones: baseline protected, patch applied, diff/static checks, targeted tests, packaging, artifact produced, checksum/identity verified, delivery, causal items confirmed/corrected/prevention verified.
 When Live Control supplies FORCE_PROGRESS_DISPLAY=ON, every user-visible active-work status at a supported control point includes numeric progress. When PROGRESS_PRESENCE=HIGH, use the micro-progress minimums above. Live directives never justify false precision.
 
-5. DEFAULT FULL-OPERATION SCALE
+6. DEFAULT FULL-OPERATION SCALE
 5% request accepted / scope locked
 15% current source/baseline identified and protected
 30% requested LAB/config changes applied
@@ -41,7 +53,7 @@ When Live Control supplies FORCE_PROGRESS_DISPLAY=ON, every user-visible active-
 100% entire requested operation verified, delivered and causally closed or explicitly terminal with stated blocker
 Remap only using evidence-backed milestones.
 
-6. DUAL PROGRESS - R15+
+7. DUAL PROGRESS - R15+
 When Artifact-First applies, MotorLab may and should show two distinct values:
 - `Artefatto: <N>%` = requested APK/ZIP/testable artifact readiness;
 - `Progresso MotorLab complessivo: <N>%` = full operation including mandatory Root Cause Closure/prevention.
@@ -50,10 +62,10 @@ Overall progress MUST remain below 100% while mandatory causal/prevention items 
 Example:
 `🎆 Azione completata — APK/ZIP pronto e verificato per il test. Artefatto: 100%. Progresso MotorLab complessivo: 94%. Restano 2 chiusure causali.`
 
-7. ARTIFACT DELIVERY STATUS
+8. ARTIFACT DELIVERY STATUS
 Artifact 100% is an intermediate milestone, not `💯 Conclusione definitiva`, whenever post-artifact causal work remains. It also does not by itself permit `✅ Problema risolto` for the underlying defect.
 
-8. USER-FACING LABELS
+9. USER-FACING LABELS
 Canonical labels remain:
 ⚙️ MotorLab attivo
 🎆 Azione completata
@@ -74,33 +86,33 @@ Canonical labels remain:
 🧪 Test / verifica in corso
 🔄 Sincronizzazione in corso
 
-9. ROOT CAUSE / FAILURE
+10. ROOT CAUSE / FAILURE
 On failure preserve last verified progress unless evidence invalidates it. Successful containment/retry/artifact delivery does not equal definitive problem closure. When causal work is safely deferred, persist/report the POST_ARTIFACT_ROOT_CAUSE_QUEUE and continue overall progress from the existing recovery floor.
 
-10. ARTIFACT IMMUTABILITY
+11. ARTIFACT IMMUTABILITY
 Once Bruno receives an artifact for testing, later causal/prevention work cannot silently redefine its identity. Report follow-up builds as separate LAB/ref/artifact states.
 
-11. MONOTONIC VERIFIED PROGRESS
+12. MONOTONIC VERIFIED PROGRESS
 Within one logical scale, later values repeat or increase unless explicit material invalidation is explained. Dual artifact/overall scales are independent but each remains monotonic within its own operation.
 
-12. MANUAL `⚡`
+13. MANUAL `⚡`
 Manual recovery reports the current checkpoint/pending step and preserves both artifact and overall progress when dual scales are active.
 
-13. FINAL STATUS RULES
+14. FINAL STATUS RULES
 🎆 = a completed action/milestone; may coexist with remaining work.
 ✅ = underlying problem has Root Cause Closure permission.
 💯 = whole requested operation fully completed, verified and causally closed; normally overall 100%.
 
-14. NO FALSE PRECISION
+15. NO FALSE PRECISION
 Use only observable milestones. If exact percentage cannot yet be established, keep the last verified value and explain state.
 
-15. CROSS-PROJECT / PERSISTENCE
+16. CROSS-PROJECT / PERSISTENCE
 Global across current/future MotorLab projects. Persist enough operation identity, latest verified overall progress, artifact progress when active, and pending causal queue for deterministic recovery.
 
-16. LIVE CONTROL / LIMITATION
+17. LIVE CONTROL / LIMITATION
 Progress can be reported only when the execution surface provides a control point. No invisible progress claims during a frozen host. A directive queued for an executor that did not load Live Control may apply only on a later supported safe point/run/resume; never claim it was applied without evidence.
 
-17. NO RUNTIME REGRESSION
+18. NO RUNTIME REGRESSION
 Reporting behavior does not authorize app/runtime/package/signing/lifecycle changes.
 
 SUCCESS CRITERIA
@@ -113,7 +125,8 @@ SUCCESS CRITERIA
 - percentages remain evidence-based and monotonic.
 
 VERSION
-MOTORLAB-PROGRESS-REPORTING-V1.7
+MOTORLAB-PROGRESS-REPORTING-V1.8
 Established: 2026-09-28
 Revision 1.6: r15 adds dual Artifact/Overall progress and post-artifact Root Cause queue semantics.
 Revision 1.7: makes evidence-based numeric progress mandatory for all MotorLab-controlled modifications and adds Live Control micro-progress semantics.
+Revision 1.8: r22 adds grouped parallel runner status and observed execution-mode/peak-concurrency reporting so progress communication reflects real concurrency instead of serial narration.
