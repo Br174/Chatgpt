@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "snapshot_id": "studybook-r21-adopted-20261006-01",
-  "sent_at": "2026-10-06T15:10:18Z",
+  "snapshot_id": "studybook-lab03-motorlab-runtime-20261006-01",
+  "sent_at": "2026-10-06T15:56:00.000Z",
   "projects": [
     {
       "project_id": "MusicLab",
@@ -16,10 +16,10 @@
       "project_id": "StudyBook-AI",
       "repository": "Br174/StudyBook-AI",
       "lifecycle_stage": "LAB",
-      "source_ref": "lab/studybook-core-android-01-update-02",
-      "source_head": "e3f3bb5a819e45b95dc4da77e431f6c9a016d4a9",
+      "source_ref": "lab/studybook-core-android-01-update-03",
+      "source_head": "9690bdcff2b0050e68ca3b8ec101f9ce51483032",
       "local_satellite_release_state": "r21|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055",
-      "updated_at": "2026-10-06T15:10:18Z"
+      "updated_at": "2026-10-06T15:56:00.000Z"
     }
   ],
   "operations": [
@@ -79,6 +79,25 @@
       "source_head": "e3f3bb5a819e45b95dc4da77e431f6c9a016d4a9",
       "created_at": "2026-10-06T15:10:18Z",
       "updated_at": "2026-10-06T15:10:18Z"
+    },
+    {
+      "operation_id": "studybook-lab03-motorlab-runtime-r21-20261006",
+      "project_id": "StudyBook-AI",
+      "title": "StudyBook LAB 03 MotorLab Runtime r21",
+      "type": "implementation",
+      "requested_scope": "Integrate only the useful MotorLab r21 method directly inside StudyBook so every APK carries the runtime orchestration.",
+      "approved_scope": "Selective runtime-only integration: adaptive runners, incremental cache, checkpoint resume, targeted correction relay and timing metrics; preserve StudyBook engine, Cloudflare AI, LAB family identity and existing UX.",
+      "approval_status": "approved",
+      "lifecycle_stage": "LAB",
+      "risk_class": "MEDIUM",
+      "status": "LAB03_ARTIFACTS_VERIFIED_DEVICE_ACCEPTANCE_PENDING",
+      "phase": "LAB03 update and paired recovery verified; physical-device validation of runtime speed/quality pending",
+      "artifact_progress": 100,
+      "overall_progress": 100,
+      "source_ref": "lab/studybook-core-android-01-update-03",
+      "source_head": "9690bdcff2b0050e68ca3b8ec101f9ce51483032",
+      "created_at": "2026-10-06T15:56:00.000Z",
+      "updated_at": "2026-10-06T15:56:00.000Z"
     }
   ],
   "checkpoints": [
@@ -114,6 +133,17 @@
       "lock_state": "none",
       "external_wait_state": "physical-device acceptance for LAB02 only; r21 adoption complete",
       "created_at": "2026-10-06T15:10:18Z"
+    },
+    {
+      "checkpoint_id": "studybook-lab03-motorlab-runtime-verified-20261006",
+      "operation_id": "studybook-lab03-motorlab-runtime-r21-20261006",
+      "phase": "MotorLab Runtime r21 integrated; LAB03 update and paired recovery artifacts verified",
+      "verified_progress": 100,
+      "completed_steps": "Existing V09 checkpoint/concurrency path retained as sole coordinator; r21 runtime module adds device/network-aware fan-out, per-unit AI cache, targeted correction relay and timing metrics; update/recovery UAB and Android builds all green; identities/checksums verified.",
+      "next_safe_step": "Install LAB 03 aggiornamento on Android and compare creation/regeneration behavior with prior LAB. Candidate remains gated by Bruno physical-device acceptance.",
+      "lock_state": "none",
+      "external_wait_state": "physical-device acceptance",
+      "created_at": "2026-10-06T15:56:00.000Z"
     }
   ],
   "events": [
@@ -144,6 +174,13 @@
       "event_type": "SATELLITE_R21_ADOPTED",
       "event_summary": "StudyBook MotorLab satellite moved from r20 to r21 at a safe boundary, preserving r20 as LAST_GOOD and enabling Four-Pillar TTTA-first Adaptive Velocity, critical-path DAG scheduling, adaptive isolated runners, continuous convergence, correction relay, evidence learning and incremental execution. Application runtime and LAB02 artifacts unchanged.",
       "created_at": "2026-10-06T15:10:18Z"
+    },
+    {
+      "event_id": "studybook-lab03-motorlab-runtime-20261006",
+      "operation_id": "studybook-lab03-motorlab-runtime-r21-20261006",
+      "event_type": "LAB_RUNTIME_ORCHESTRATION_VERIFIED",
+      "event_summary": "StudyBook now embeds selective MotorLab r21 runtime orchestration while retaining the native StudyBook engine and Cloudflare AI path. LAB03 update/recovery artifacts verified; no candidate promotion.",
+      "created_at": "2026-10-06T15:56:00.000Z"
     }
   ],
   "artifacts": [
@@ -170,6 +207,30 @@
       "delivery_state": "READY_FOR_CHAT_DELIVERY",
       "immutable_under_test": true,
       "created_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "artifact_id": "studybook-lab03-update-apk-20261006",
+      "operation_id": "studybook-lab03-motorlab-runtime-r21-20261006",
+      "name": "StudyBook-AI-LAB-03-AGGIORNAMENTO.apk",
+      "source_ref": "lab/studybook-core-android-01-update-03",
+      "source_head": "9690bdcff2b0050e68ca3b8ec101f9ce51483032",
+      "checksums": "sha256=cbaa685f8615fc8edd3c5ed938cc17b5bb4085bcc088dd50a1a894ca25f319f7; zip_sha256=2587f58b9c6b0add9d109d9fac456283bbdd33deb654217547f17a8d1cf1fe34; applicationId=it.studybook.ai.lab; versionCode=9; signing=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC",
+      "verification_state": "VERIFIED",
+      "delivery_state": "READY_FOR_CHAT_DELIVERY",
+      "immutable_under_test": true,
+      "created_at": "2026-10-06T15:56:00.000Z"
+    },
+    {
+      "artifact_id": "studybook-lab03-recovery-apk-20261006",
+      "operation_id": "studybook-lab03-motorlab-runtime-r21-20261006",
+      "name": "StudyBook-AI-LAB-03-RIPRISTINO.apk",
+      "source_ref": "lab/recovery-studybook-core-android-03",
+      "source_head": "6a58462d03895bd89432dc5b781812586cd3ea04",
+      "checksums": "sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a; zip_sha256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4; functionalSource=9690bdcff2b0050e68ca3b8ec101f9ce51483032; applicationId=it.studybook.ai.lab.recovery03; versionCode=10; signing=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03",
+      "verification_state": "VERIFIED",
+      "delivery_state": "READY_FOR_CHAT_DELIVERY",
+      "immutable_under_test": true,
+      "created_at": "2026-10-06T15:56:00.000Z"
     }
   ],
   "root_causes": [
