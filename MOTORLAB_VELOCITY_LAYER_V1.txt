@@ -1,11 +1,20 @@
-MOTORLAB VELOCITY LAYER V1 - ADDITIVE IDEA-TO-LAB ACCELERATION
+MOTORLAB VELOCITY LAYER V1 - ADAPTIVE IDEA-TO-ARTIFACT ACCELERATION
 
 STATUS
 Mandatory MotorLab CORE capability for accelerating project work without weakening existing safety, lifecycle, verification or governance controls.
 Established: 2026-09-29.
 
 PURPOSE
-Reduce the elapsed work between Bruno expressing an idea/change and obtaining the first useful LAB/testable result, while preserving every existing MotorLab capability and protection.
+Minimize the real elapsed time between Bruno expressing an idea/change and obtaining the first useful verified testable artifact (APK/ZIP/build/result), while preserving every existing MotorLab capability and protection. MotorLab complexity is justified only when it improves net execution: faster delivery, less manual work, less wasted work, fewer defects or materially better artifact quality.
+
+FOUR DESIGN PILLARS - R21+
+Every MotorLab optimization, past or future, is evaluated against four permanent design pillars:
+1. ENGINE EFFICIENCY — minimize redundant reads, duplicate computation, unnecessary provider/tool calls, idle waits and repeated setup.
+2. AUTOMATION / PROGRAMMING FACILITATION — remove avoidable manual coordination, repetition and re-entry of already-known technical decisions.
+3. FINAL ARTIFACT QUALITY — produce stable, correct, compatible and appropriately verified artifacts with fewer avoidable regressions.
+4. EXECUTION SPEED — PRIMARY OPTIMIZATION PRIORITY: minimize end-to-end elapsed time from request/approval to a useful testable artifact.
+
+Speed is the primary optimization target, but not permission to violate safety, correctness, security, data integrity, signing/package identity, explicit approval, project-native authority or required final promotion gates. Between two equally trustworthy approaches, prefer the one with lower time-to-artifact, lower coordination overhead and greater automation.
 
 NON-NEGOTIABLE PRINCIPLE - ADDITIVE ONLY
 Velocity Layer is strictly additive.
@@ -31,9 +40,11 @@ It MUST NOT remove, replace, weaken, bypass, redefine downward or silently skip 
 If a Velocity optimization conflicts with an existing MotorLab rule, the existing safety/governance rule wins and the optimization is disabled or degraded for that operation.
 
 CORE GOAL
-Make MotorLab less serial, not less safe.
+Make MotorLab less serial, more adaptive and measurably faster without becoming less safe.
 The preferred acceleration pattern is:
-UNDERSTAND ONCE -> PREPARE IN PARALLEL READ-ONLY -> WRITE ONCE -> VERIFY BY RISK -> KEEP FULL PROMOTION SAFETY.
+UNDERSTAND ONCE -> BUILD DEPENDENCY GRAPH -> PRIORITIZE CRITICAL PATH -> FAN OUT INDEPENDENT RUNNERS -> CONTINUOUS COMPATIBILITY CONVERGENCE -> SINGLE INTEGRATION LANE -> VERIFY BY RISK -> ARTIFACT -> LEARN FROM EVIDENCE -> KEEP FULL PROMOTION SAFETY.
+
+Global barriers are avoided when dependencies do not require them. A downstream task may start as soon as its own prerequisites are satisfied; it does not wait for unrelated runners merely because they belong to the same operation.
 
 1. PROJECT SNAPSHOT
 For onboarded projects, MotorLab should maintain/reconstruct a compact current project snapshot when technically possible.
@@ -274,6 +285,11 @@ MOTORLAB_INCREMENTAL_BUILD=<supported|conditional|none>
 MOTORLAB_REGRESSION_MAP=<path/description>
 MOTORLAB_PREAPPROVAL_READONLY=<allowed|restricted|none-with-reason>
 MOTORLAB_PARALLEL_READONLY=<allowed|restricted|none-with-reason>
+MOTORLAB_PARALLEL_EXECUTION=<adaptive|read-only|isolated-write|off-with-reason>
+MOTORLAB_MAX_RUNNERS=<auto|N>
+MOTORLAB_CONTINUOUS_CONVERGENCE=<supported|conditional|none-with-reason>
+MOTORLAB_LEARNING_LOOP=<supported|d1|git-fallback|none-with-reason>
+MOTORLAB_TIME_TO_ARTIFACT_METRICS=<supported|partial|none-with-reason>
 
 Legacy adapters remain valid; MotorLab may use conservative default Velocity behavior until adapter-specific fields are added.
 
@@ -303,6 +319,131 @@ Velocity Layer is active when:
 - build readiness/cache reduce avoidable setup time;
 - every previous MotorLab capability remains intact and authoritative.
 
+
+23. PRIMARY KPI - TIME_TO_TESTABLE_ARTIFACT
+The primary Velocity KPI is TIME_TO_TESTABLE_ARTIFACT (TTTA): elapsed wall-clock time from the earliest valid execution start for an approved/requested operation to the first verified testable artifact/result that satisfies the requested LAB-level acceptance gate.
+Where measurable, also record phase timings such as planning/preflight, waiting, source modification, targeted verification, build/package, integration and artifact verification.
+Do not game TTTA by emitting an unverified artifact, skipping required safety or moving necessary work outside the measured operation.
+For defects using Artifact-First, causal closure may continue after TTTA while MOTORLAB_OVERALL_PROGRESS remains below 100%.
+
+24. COMPLEXITY BUDGET - COMPLEXITY MUST PAY RENT
+Every new MotorLab mechanism, check, service, runner or orchestration layer must justify its runtime/coordination cost against at least one of the four design pillars.
+Prefer extending an existing responsible mechanism over adding a new always-on layer.
+Do not run a capability merely because it exists. Activate it on demand when the current dependency/risk graph makes it useful.
+If a new mechanism repeatedly increases TTTA or coordination overhead without necessary quality/safety benefit, simplify, merge, disable-by-default or supersede it under Change Compatibility Guard.
+A more sophisticated MotorLab should feel simpler and faster to Bruno, not slower.
+
+25. ADAPTIVE DAG / CRITICAL-PATH SCHEDULER
+For non-trivial eligible work, normalize the Change Capsule into a dependency graph (DAG) of bounded tasks.
+Each task should identify, when relevant:
+- objective/output;
+- prerequisites;
+- affected resource/file/component scope;
+- read-only or write-capable status;
+- risk class;
+- estimated/learned cost;
+- required verification;
+- integration contract;
+- whether it blocks TTTA.
+Prioritize the CRITICAL PATH: tasks whose completion directly determines artifact readiness receive first access to scarce executor/build resources.
+Independent tasks should run as soon as their own prerequisites are satisfied instead of waiting at unnecessary whole-operation barriers.
+
+26. ADAPTIVE RUNNER FAN-OUT
+Runner count is chosen by expected net latency reduction, not by a fixed maximum or the belief that more agents are always faster.
+Use one runner when decomposition/coordination overhead would exceed expected savings.
+Use multiple runners when tasks are genuinely independent or can be isolated with explicit interfaces.
+Scale runner count using available executor capacity, cost/quota, historical evidence, shared-resource contention, build-system characteristics and operation risk.
+Do not create runner fan-out that overloads external providers, shared caches, build machines or repository write surfaces.
+
+27. RUNNER ISOLATION + SINGLE INTEGRATION LANE
+Parallel read-only work may share the same authoritative baseline.
+Parallel write-capable work is allowed only when the execution surface can isolate mutations by non-overlapping resource scope or separate controlled ref/branch/worktree/ephemeral workspace and when the project adapter permits it.
+No two runners may mutate the same ref/resource scope concurrently.
+Each runner must receive an explicit scope and protected/non-target boundary.
+The state that will produce the final artifact has ONE integration coordinator / SINGLE INTEGRATION LANE. Runner outputs are proposals/isolated changes until accepted by that coordinator.
+This extends single-writer safety rather than bypassing it.
+
+28. CONTINUOUS CONVERGENCE - NO UNNECESSARY GLOBAL BARRIERS
+Do not wait for every runner before checking compatibility when partial results can already be validated.
+As runner outputs become ready:
+- validate interface/contracts against the current integration baseline;
+- detect overlapping files/resources/behavior early;
+- run the smallest useful compatibility/static/targeted checks;
+- integrate independent compatible results when safe;
+- update downstream DAG readiness;
+- preserve evidence and runner provenance.
+A slow unrelated runner must not block a ready critical-path task unless there is a real dependency.
+
+29. CORRECTION RELAY
+When convergence finds incompatibility, fan correction work back only to the affected runner(s)/component(s).
+Do not restart the full operation or repeat unaffected analysis.
+After correction, re-run the smallest compatibility gate that proves the conflict is resolved, then continue the DAG.
+If integration evidence changes dependency boundaries, update the DAG rather than forcing the original plan.
+
+30. BOUNDED SPECULATIVE EXECUTION
+When two or more plausible approaches have materially uncertain latency/success and trying them in parallel is cheaper than serial failure, MotorLab may run bounded speculative alternatives only when:
+- each alternative is read-only or safely isolated;
+- no shared write conflict exists;
+- external cost/quota remains acceptable and no hidden paid usage is introduced;
+- risk is LOW/MEDIUM or the speculative portion itself is non-destructive;
+- success criteria are explicit.
+The first trustworthy valid result may win; losing alternatives are safely stopped/discarded.
+Do not use speculative execution for irreversible production changes, signing/package identity, destructive migration, security-sensitive writes or provider-abusive traffic.
+
+31. EVIDENCE LEARNING LOOP - ERRORS / RESEARCH / EXPERIENCE
+MotorLab learns operationally from evidence without autonomously weakening governance.
+Eligible lesson sources include:
+- confirmed Root Cause incidents and prevention outcomes;
+- successful/failed runner decompositions;
+- searches/documentation that resolved a recurring uncertainty;
+- build/test/cache timing;
+- provider/tool latency and failure modes;
+- repeated compatibility conflicts;
+- TTTA and phase timing comparisons;
+- successful recovery paths and ineffective retries.
+A reusable lesson should record scope/context, evidence, strategy, observed effect, confidence, invalidation conditions and last verification.
+Lessons are advisory acceleration knowledge, never a new technical source of truth and never automatic permission to write.
+Before reuse, validate applicability against current source/tool/provider/risk state.
+Prefer lessons that reduce TTTA, remove repeated work, improve automation or prevent known regressions.
+Retire/down-rank lessons when newer evidence contradicts them.
+
+32. LEARNING PERSISTENCE / BOUNDED MEMORY
+When D1 is connected, bounded operational lessons may be stored through Persistent Operational State.
+GitHub technical Change History may preserve durable high-value lesson provenance/fallback without logging high-frequency noise.
+Do not store hidden chain-of-thought, secrets or raw private prompts.
+Do not create unbounded knowledge accumulation: merge duplicates, keep evidence links, age/stale-mark context-sensitive lessons and preserve only information likely to affect future decisions.
+
+33. INCREMENTAL EVERYTHING
+Prefer incremental source inspection, targeted tests, dependency-aware build tasks, cache reuse and partial recomputation over full repetition.
+A task already proven valid for the same authoritative inputs should not be rerun merely because another independent runner finished.
+Invalidate only the affected cache/test/analysis surface when dependencies change.
+Full rebuild/full regression remains available when required by risk, promotion or invalidation evidence.
+
+34. R21 MINIMUM ADAPTIVE VERIFICATION
+In addition to earlier checks, verify when applicable:
+13. DAG contains no unresolved cyclic dependency before execution;
+14. critical-path tasks are not delayed by unrelated global barriers;
+15. concurrent writes have disjoint isolated scopes;
+16. exactly one integration lane owns final artifact state;
+17. convergence detects overlapping resource changes before final packaging;
+18. correction relay does not restart unaffected work;
+19. speculative alternatives remain bounded/isolated/cost-safe;
+20. TTTA is measured from honest execution boundaries when metrics are available;
+21. reused lessons include current applicability/invalidation checks;
+22. complexity additions demonstrate a net pillar benefit or remain disabled/on-demand.
+
+35. R21 SUCCESS EXTENSIONS
+Velocity Layer is additionally successful when:
+- MotorLab chooses one vs many runners adaptively;
+- independent work overlaps without violating single-writer;
+- critical-path work advances without waiting for unrelated runners;
+- compatibility is checked continuously rather than only at the end;
+- failed strategies and confirmed root causes improve later routing;
+- build/test work is increasingly incremental;
+- median TTTA for comparable recurring work trends downward without artifact-quality regression;
+- increasing MotorLab internal complexity does not create increasing user-visible process latency by default.
+
 VERSION
-MOTORLAB-VELOCITY-LAYER-V1.0
+MOTORLAB-VELOCITY-LAYER-V1.1
 Established: 2026-09-29
+Revision 1.1: r21 establishes the four design pillars, TTTA primary KPI, complexity budget, adaptive DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, correction relay, bounded speculative execution, evidence learning and incremental-everything semantics without weakening single-writer or promotion safety.
