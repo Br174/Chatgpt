@@ -1,20 +1,20 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=12
+STATE_REVISION=13
 STATE_STATUS=SEED004_REAL_DEVICE_ACCEPTED_FIRST_GOOD_BASELINE
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.06-r23
 ACTIVE_OPERATION_ID=MOTORAI-SEED003-FIRST-APK-20261006
 OPERATION_STATUS=artifact_delivered_pending_device_acceptance
-CURRENT_PHASE=SEED007_LEVEL2_DEVICE_ACCEPTANCE
+CURRENT_PHASE=SEED007_DEVICE_LEVEL2_UNDER_THRESHOLD_ROOT_CAUSE
 CURRENT_REF=main
 CURRENT_HEAD_SHA=2fc178f6e119b7a06325b63a6568fa18bebf1a13
 LAST_VERIFIED_PROGRESS_PERCENT=99
-LAST_COMPLETED_MATERIAL_STEP=Seed007 adaptive Level2 host gate passed: L2 91.67%, L1 retention 100%, L0 retention 100%; Android APK build verified
-NEXT_SAFE_STEP=Install Seed007 over Seed006, verify step620 checkpoint auto-transitions to Level2, train 600 L2 steps to step1220, test ef>> -> ef>>ee, then verify restart/resume before promotion
-PENDING_VERIFICATION=Seed007 real-device Level2 training, L1/L0 retention, generation, temperature/RAM and restart/resume
+LAST_COMPLETED_MATERIAL_STEP=Seed007 resumed accepted Seed006 checkpoint at step620, then completed 600 L2 training steps on device to step1220; L2 reached 75.0%, L1 retention 100%, L0 retention 95.6%
+NEXT_SAFE_STEP=Reject Seed007 device promotion; fix completion gate so step budget alone cannot mark success; add adaptive Level2 convergence/rollback and stronger cross-check before next APK
+PENDING_VERIFICATION=Corrected adaptive Level2 candidate must reach >=90% L2 with >=90% L1/L0 retention on real device
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
 FIRST_APK_ARTIFACT_ID=11446590832
@@ -131,4 +131,17 @@ SEED007_ARTIFACT_ID=11448741123
 SEED007_ARTIFACT_SHA256=afae089bf71840ed59e0fe31bef2e067c7562f09f4bbe048bb8829a3239a8c9e
 SEED007_APK_SHA256=24af190b674348c916a22c2ed82fa2ba89f4801908a316c13a67118064274514
 SEED007_DEVICE_ACCEPTANCE=pending
+CURRENT_ACCEPTED_RESTORE_BASELINE=SEED006
+
+SEED007_REAL_DEVICE_REJECTED=yes
+SEED007_REAL_DEVICE_INITIAL_RESUME_STEP=620
+SEED007_REAL_DEVICE_FINAL_STEP=1220
+SEED007_REAL_DEVICE_LEVEL2_STEPS=600
+SEED007_REAL_DEVICE_LEVEL2_LOSS=4.8903
+SEED007_REAL_DEVICE_LEVEL2_GENERALIZATION_PERCENT=75.0
+SEED007_REAL_DEVICE_LEVEL1_RETENTION_PERCENT=100.0
+SEED007_REAL_DEVICE_LEVEL0_RETENTION_PERCENT=95.6
+SEED007_REAL_DEVICE_TEMP_C=36.9
+SEED007_REAL_DEVICE_FREE_RAM_MB=1923
+SEED007_DEFECT=fixed_step_budget_marked_level_complete_without_acceptance_threshold
 CURRENT_ACCEPTED_RESTORE_BASELINE=SEED006
