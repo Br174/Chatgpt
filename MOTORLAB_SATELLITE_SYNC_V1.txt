@@ -12,7 +12,7 @@ BOOT
 2. Use VERIFIED local core immediately as fallback.
 3. When central is reachable, read release manifest and compare releases.
 4. Reconcile Project Continuity/live state before selecting a safe update boundary.
-5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, and r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status.
+5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status, r20 Pollicino continuity and r21 Four-Pillar adaptive Velocity/TTTA/learning semantics.
 
 SAFE UPDATE
 - pin one MotorLab release during active write/build/test/promotion;
@@ -50,6 +50,20 @@ SINGLE_WRITER=required
 CHECKPOINT_RECOVERY=required
 FAST_ITERATION_NO_SPIN=required
 RISK_SCALED_LAB_ITERATION=required
+FOUR_DESIGN_PILLARS=required
+SPEED_PRIMARY_OPTIMIZATION=required
+TIME_TO_TESTABLE_ARTIFACT_KPI=required
+COMPLEXITY_BUDGET=required
+ADAPTIVE_DAG_EXECUTION=required
+CRITICAL_PATH_FIRST=required
+ADAPTIVE_RUNNER_FANOUT=required
+RUNNER_ISOLATION=required
+SINGLE_INTEGRATION_LANE=required
+CONTINUOUS_CONVERGENCE=required
+CORRECTION_RELAY=required
+BOUNDED_SPECULATIVE_EXECUTION=required
+EVIDENCE_LEARNING_LOOP=required
+INCREMENTAL_EVERYTHING=required
 CHANGE_HISTORY_REGISTRY=required
 SEMANTIC_CHANGE_LOOKUP=required
 SELECTIVE_EXACT_RESTORE=required
@@ -85,6 +99,20 @@ POLLICINO_SOURCE_PROOF_ENROLLMENT=required
 POLLICINO_EPHEMERAL_SESSION_TOKEN=required
 POLLICINO_STABLE_PROOF_HEAD=required
 POLLICINO_LOCAL_PROOF_CONSUMPTION=required
+
+
+R21+ FOUR PILLARS / ADAPTIVE VELOCITY
+Local fallback must preserve the r21 Velocity contract:
+- optimize the four design pillars, with execution speed/TTTA as primary performance target under hard safety/quality constraints;
+- keep unnecessary complexity off the critical path;
+- build dependency-aware execution graphs for eligible work;
+- prioritize critical path and start independent tasks as soon as prerequisites are ready;
+- adapt runner count to expected net speedup rather than maximizing concurrency;
+- isolate parallel writes and keep one final integration lane;
+- converge continuously and correct only affected scopes;
+- reuse valid incremental/cached/test/research evidence;
+- preserve bounded context-aware lessons from verified errors/research/timings/experience;
+- never let lessons or speed bypass approval, compatibility, current technical truth, single-writer or promotion gates.
 
 R19+ FOUNDATIONAL CHANGE COMPATIBILITY PILLAR
 Local fallback must preserve mandatory pre-write overlap/redundancy/conflict preflight for every MotorLab/project modification. ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR. Existing equivalent logic must be reused/extended/merged or explicitly superseded; do not stack competing paths.
@@ -135,7 +163,7 @@ Use previously VERIFIED local release plus live evidence conservatively; do not 
 Optional service state must not override verified local/GitHub technical evidence.
 
 FUTURE PROJECTS
-Future projects receive hook + local satellite + Project Continuity + technical history + visible restore register and inherit current release gates.
+Future projects receive hook + local satellite + Project Continuity + technical history + visible restore register and inherit current release gates, including r21 Four-Pillar adaptive Velocity, TTTA metrics and bounded evidence learning.
 
 AUTOMATIC MEANING
 Synchronization requires an execution cycle with repository access; repository text cannot self-update or wake a frozen host.
@@ -152,7 +180,7 @@ For a private adopted satellite using source-proof enrollment, publish/update `P
 Persist that same adoption proof locally. Do not rotate it for metadata-only commits when the installed sidecar adoption is unchanged.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.21
+MOTORLAB-SATELLITE-SYNC-V1.22
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -171,3 +199,5 @@ Revision 1.19: r20 requires stable proof-head publication at verified satellite 
 Revision 1.20: r20 requires the stable adoption proof to be written both to D1 and local satellite metadata and consumed before Git HEAD by the executor adapter.
 
 Revision 1.21: r20 sync requires the Codex sidecar immediate-first-pulse behavior before daemon heartbeat continuation.
+
+Revision 1.22: r21 requires satellite inheritance of Four-Pillar TTTA-first adaptive Velocity, critical-path DAG scheduling, isolated runners, continuous convergence, incremental execution, complexity budget and bounded evidence learning.
