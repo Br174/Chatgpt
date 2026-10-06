@@ -1,20 +1,20 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=15
+STATE_REVISION=16
 STATE_STATUS=SEED004_REAL_DEVICE_ACCEPTED_FIRST_GOOD_BASELINE
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.06-r23
 ACTIVE_OPERATION_ID=MOTORAI-SEED003-FIRST-APK-20261006
 OPERATION_STATUS=artifact_delivered_pending_device_acceptance
-CURRENT_PHASE=SEED008_LEVEL2_GENERATION_AND_RESUME_VALIDATION
+CURRENT_PHASE=SEED008_FINAL_RESTART_RESUME_VALIDATION
 CURRENT_REF=main
 CURRENT_HEAD_SHA=2fc178f6e119b7a06325b63a6568fa18bebf1a13
 LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=Seed008 resumed prior Level2 checkpoint and adaptively continued to step1700; validation acceptance triggered stop; final device test L2 95.8%, L1 retention 100%, L0 retention 100%
-NEXT_SAFE_STEP=Test Level2 generation ef>> -> ef>>ee, then close/reopen app and verify step1700/curriculum Level2 persistence before promoting Seed008 to accepted restore baseline
-PENDING_VERIFICATION=Seed008 Level2 generation and step1700 restart/resume persistence
+LAST_COMPLETED_MATERIAL_STEP=Seed008 real-device Level2 generation verified: ef>> -> ef>>ee at step1700 with L2 test 95.8%, L1 retention 100%, L0 retention 100%
+NEXT_SAFE_STEP=Close and reopen Seed008 once; verify checkpoint auto-resumes at step1700 with curriculum Level2 and retained metrics, then promote Seed008 to current accepted restore baseline
+PENDING_VERIFICATION=Seed008 step1700/curriculum Level2 checkpoint-resume persistence after restart
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
 FIRST_APK_ARTIFACT_ID=11446590832
@@ -170,3 +170,7 @@ SEED008_REAL_DEVICE_LEVEL2_TEST_LOSS=5.2480
 SEED008_REAL_DEVICE_TEMP_C=35.6
 SEED008_REAL_DEVICE_FREE_RAM_MB=1810
 SEED008_VALIDATION_ACCEPTANCE_TRIGGERED=yes
+
+SEED008_LEVEL2_GENERATION_VERIFIED=yes
+SEED008_LEVEL2_GENERATION_INPUT=ef>>
+SEED008_LEVEL2_GENERATION_OUTPUT=ef>>ee
