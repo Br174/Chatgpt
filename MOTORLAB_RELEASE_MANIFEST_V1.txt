@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.06-r22
+CURRENT_RELEASE=2026.10.06-r23
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -170,8 +170,27 @@ r22 converts r21 planning into observable dispatch:
 - user-visible updates group completed/running/unlocked runner sets rather than serial microstep narration.
 Reference dispatcher: templates/execution/motorlab_execution_fabric.mjs.
 
+
+R23+ INCREMENTAL DYNAMIC CRITICAL-PATH ENGINE
+r23 evolves r22 without replacing it.
+Canonical optimization order:
+- eliminate safely reusable work through content-addressed/result reuse;
+- recompute only invalidated deltas;
+- prioritize the remaining TTTA critical path;
+- stream newly-unblocked nodes immediately;
+- parallelize only the remaining useful independent work;
+- grow the DAG dynamically from verified discoveries;
+- prune pending obsolete/dominated work;
+- use bounded racing only for critical uncertainty where duplicate cost is justified;
+- defer materialization of large intermediates until required.
+
+Execution Fabric reference behavior now includes stable content keys, cache-hit worker skipping, dynamic task spawning, pending-task pruning and bounded material event history.
+Persistent Operational State reuses operation_events as central material event memory and adds bounded incremental_result_index metadata.
+Cache/result indexes are non-authoritative: invalid/stale/ambiguous reuse becomes a MISS, and cache loss causes recomputation rather than correctness loss.
+Small operations start FAST LINE and escalate to MINI TREE / FULL DYNAMIC GRAPH only when expected TTTA savings exceed orchestration cost.
+
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.22
+MOTORLAB-RELEASE-MANIFEST-V1.23
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -183,3 +202,4 @@ Revision 1.19: r19 elevates Change Compatibility Guard to a foundational mandato
 Revision 1.20: r20 adds mandatory Pollicino external session continuity, dual liveness/progress evidence, terminal seals, durable interruption sentinel and precomputed RESUME_READY without application-code breadcrumbs.
 Revision 1.21: r21 establishes the four design pillars and adaptive Velocity architecture with TTTA KPI, complexity budget, DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, incremental execution and bounded evidence learning.
 Revision 1.22: r22 adds mandatory operational Execution Fabric, real ready-queue dispatch, Fast Decision Gate, batched tool concurrency, observed Proof of Parallelism and honest host-limited serial mode.
+Revision 1.23: r23 adds work-elimination-first incremental execution, content-addressed reuse, dynamic DAG growth/pruning, progressive branching, event memory and deferred materialization on top of r22 Execution Fabric.
