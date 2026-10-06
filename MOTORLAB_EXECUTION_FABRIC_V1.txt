@@ -1,4 +1,4 @@
-MOTORLAB EXECUTION FABRIC V1 - R22 OPERATIONAL PARALLEL DISPATCH
+MOTORLAB EXECUTION FABRIC V1 - R23 INCREMENTAL DYNAMIC EXECUTION
 
 STATUS
 Mandatory MotorLab CORE execution capability.
@@ -174,6 +174,119 @@ Execution Fabric r22 is active when:
 - user-facing updates group completed/running/next work;
 - TTTA improves without weakening artifact quality or existing safety.
 
+
+18. R23 WORK-ELIMINATION FIRST
+Before dispatching a ready task, ask whether the task can be safely avoided.
+Preferred order:
+A. VALID CONTENT/RESULT CACHE -> do not run the worker;
+B. VALID INCREMENTAL RESULT -> recompute only the affected delta;
+C. REQUIRED NEW WORK -> schedule by critical-path value;
+D. PARALLELIZE only the remaining useful work.
+A runner that never needs to start is faster than a faster runner.
+
+19. CONTENT-ADDRESSED RESULT IDENTITY
+Reusable deterministic work should carry a cache identity derived from all inputs that can change correctness, for example:
+- action/command/test identity;
+- authoritative source/ref/input digests;
+- relevant config/dependency manifests;
+- toolchain/runtime versions;
+- policy/verification version;
+- environment dimensions that materially affect output.
+The reference executor exposes makeContentKey() using a stable SHA-256 digest.
+Cache keys are correctness identities, not merely filenames or timestamps.
+Security-sensitive, non-deterministic, provider-live or environment-dependent results are cacheable only when their invalidation contract explicitly makes reuse safe.
+
+20. CACHE AUTHORITY / INVALIDATION
+Cache is an acceleration layer, never a new source of truth.
+A cache hit may replace execution only when:
+- key inputs are complete and current;
+- result provenance is compatible with the requested acceptance gate;
+- no invalidation condition is active;
+- required freshness/live-provider checks are not being bypassed.
+Stale/ambiguous cache -> MISS, not guess.
+Cache loss must only cause more work, never correctness loss.
+
+21. DYNAMIC GRAPH GROWTH
+The graph may grow during execution.
+A completed runner may emit DISCOVERY_BRANCH / TASK_SPAWNED nodes when it discovers independent or newly-required work.
+Dynamic children inherit the parent dependency by default unless explicitly detached by an allowed adapter contract.
+New nodes enter the same READY queue and scheduler; do not restart the operation or rebuild already-valid branches from zero.
+
+22. PROGRESSIVE BRANCHING
+Branching is adaptive:
+FAST LINE -> MINI TREE -> FULL DYNAMIC GRAPH.
+Start with the lightest execution shape that fits the known work.
+Create branches only when expected TTTA reduction or required independent verification exceeds branching/coordination cost.
+Small work should not pay full-tree overhead merely because dynamic branching exists.
+
+23. PRUNING
+When new evidence makes pending work unnecessary, obsolete or dominated by a verified result, prune it immediately.
+Pruning rules:
+- only pending/not-yet-authoritative work may be removed automatically;
+- a running task is not silently killed unless the executor exposes safe cancellation semantics;
+- never prune a required safety/lifecycle/verification gate;
+- record the pruning event and reason.
+Pruned dependency nodes count as intentionally resolved only for descendants whose contract accepts that pruning decision.
+
+24. EVENT MEMORY
+Execution Fabric emits bounded material events such as:
+EXECUTION_STARTED
+CACHE_HIT / CACHE_MISS / CACHE_STORED
+RUNNER_STARTED / RUNNER_COMPLETED / RUNNER_FAILED
+TASK_SPAWNED
+TASK_PRUNED
+CORRECTION_RELAY
+EXECUTION_COMPLETED
+Persistent Operational State may persist/coalesce these at meaningful boundaries.
+This event memory is operational evidence, not chain-of-thought.
+
+25. DEFERRED MATERIALIZATION
+Do not download/copy/render/materialize large intermediates merely because they exist.
+Keep provider-native references/digests until the result is actually required for:
+- downstream computation that cannot consume the remote/reference form;
+- verification;
+- user delivery;
+- lifecycle/promotion evidence.
+Deferred materialization must never hide a verification requirement.
+
+26. CRITICAL-PATH-FIRST RESOURCE ALLOCATION
+After cache/pruning removes avoidable work, scarce runner/build/provider capacity goes first to nodes that block TTTA.
+Non-critical branches may continue concurrently when resources are spare but must not starve critical-path nodes.
+
+27. SELECTIVE RACING
+Bounded speculative racing from Velocity may be used for a critical uncertain node only when:
+- alternatives are safe/isolated;
+- first VERIFIED valid result can satisfy the same contract;
+- cancellation/discard of losing work is safe;
+- expected time saved exceeds duplicate cost/quota pressure.
+Do not race ordinary deterministic work that cache/incrementality can eliminate.
+
+28. R23 PROOF
+For substantial work Proof of Execution should additionally record when observable:
+CACHE_HITS
+CACHE_AVOIDED_ESTIMATED_WORK
+DYNAMIC_TASKS_CREATED
+TASKS_PRUNED
+EVENTS_RECORDED
+DEFERRED_MATERIALIZATION_COUNT when meaningful
+The performance story must distinguish:
+work avoided,
+work reduced,
+work parallelized,
+work remaining on the serial critical path.
+
+29. R23 REFERENCE EXECUTOR BEHAVIOR
+templates/execution/motorlab_execution_fabric.mjs now supports:
+- stable content keys;
+- concurrent cache lookup for ready cacheable tasks;
+- worker skip on valid cache hit;
+- runtime task spawning;
+- pending-task pruning;
+- bounded material event history;
+- existing correction relay and single integration lane.
+The injected callbacks cacheLookup/cacheStore remain host/adaptor responsibilities and grant no independent write authority.
+
 VERSION
-MOTORLAB-EXECUTION-FABRIC-V1.0
+MOTORLAB-EXECUTION-FABRIC-V1.1
 Established: 2026-10-06
+Revision 1.1: r23 adds work-elimination-first execution, content-addressed reuse, dynamic graph growth, progressive branching, pruning, event memory, deferred materialization and expanded proof metrics while preserving Velocity as sole scheduler.
