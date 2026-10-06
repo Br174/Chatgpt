@@ -236,6 +236,16 @@ Substantial operations must distinguish configured capability from observed conc
 Fast Decision Gate prevents the Fabric itself from becoming overhead for trivial deterministic work.
 Execution Fabric may never bypass approval, Change Compatibility, single-writer, lifecycle, External Service Guard, Watchdog or final verification.
 
+R23 INCREMENTAL DYNAMIC EXECUTION
+Velocity + Execution Fabric must optimize useful work in this order: eliminate safely reusable work, reduce invalidated scope, prioritize the critical path, stream newly-unblocked nodes, then parallelize remaining work.
+Content-addressed/result cache is non-authoritative acceleration only. A cache hit may suppress execution only when correctness-relevant inputs, toolchain/policy context and freshness requirements are covered by the reuse contract.
+The execution graph may grow from verified discoveries and shrink through safe pruning without restarting valid completed work.
+Progressive branching must start with the lightest topology that fits the known work; FULL dynamic branching is not the default for small operations.
+Operational event memory stores material states/results/decisions, never private chain-of-thought.
+Deferred materialization is preferred for large intermediates that are not yet needed, but cannot defer required verification/delivery.
+Bounded racing remains subordinate to Velocity and is reserved for critical uncertain alternatives where duplicate cost is justified.
+None of these mechanisms create a new source of truth or a new scheduler.
+
 This governance rule does not automatically rewrite project repositories. Project-specific acceleration mechanics are introduced through adapters and normal authorized project workflows.
 
 11. NO FALSE GUARANTEE
@@ -270,7 +280,7 @@ This governance contract is active when:
 - later explicit Bruno decisions can supersede earlier rules through normal versioned repository updates.
 
 VERSION
-MOTORLAB-GOVERNANCE-V1.7
+MOTORLAB-GOVERNANCE-V1.8
 Established: 2026-09-29
 Revision 1.1: structural implicit auto-bootstrap for registered projects; recurring per-chat activation prompts demoted to fallback-only compatibility behavior.
 Revision 1.2: project-first activation precedence plus semantic software-build intent onboarding for unregistered chats.
@@ -282,3 +292,5 @@ Revision 1.5: r19 elevates Change Compatibility Guard to a permanent foundationa
 Revision 1.6: r21 establishes the four design pillars, speed-first TTTA optimization, complexity-must-pay-rent rule, adaptive DAG/runner governance and evidence-based learning while preserving all hard safety/project-authority constraints.
 
 Revision 1.7: r22 makes the Execution Fabric mandatory subordinate runtime machinery, requires real concurrent dispatch where supported, Proof of Parallelism and truthful host-limited serial reporting without creating a second scheduler.
+
+Revision 1.8: r23 adds work-elimination-first governance, safe content-addressed reuse, dynamic graph growth/pruning, progressive topology, event memory and deferred materialization while preserving one scheduler and all hard gates.
