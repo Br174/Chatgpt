@@ -482,8 +482,69 @@ User-facing updates for active r22 work should group concurrency:
 - execution mode + observed peak runners when known.
 Do not narrate independent ready work as a long sequence of "adesso faccio..." messages.
 
+
+40. R23 GLOBAL ORDER OF OPTIMIZATION
+For speed work, optimize in this order unless evidence shows a safer faster exception:
+1. ELIMINATE work through valid reuse/cache.
+2. REDUCE work through incremental/delta invalidation.
+3. PRIORITIZE the remaining TTTA critical path.
+4. STREAM newly-unblocked work immediately.
+5. PARALLELIZE independent remaining work adaptively.
+6. BRANCH dynamically when discoveries justify it.
+7. PRUNE obsolete/dominated pending work.
+8. RACE alternatives only for bounded critical uncertainty.
+This ordering supersedes the simplistic idea that more concurrency is the primary accelerator.
+
+41. CONTENT-ADDRESSED / INCREMENTAL REUSE
+Velocity owns the decision to reuse or invalidate prior work.
+Prefer content-addressed identities that include every correctness-relevant input.
+Examples of reusable classes when deterministic and fully keyed:
+- unchanged source/config inspection;
+- build/test outputs;
+- dependency resolution metadata;
+- generated intermediates;
+- previously verified research tied to version/source;
+- immutable artifact metadata.
+Do not cache away live facts, time-sensitive provider state, security checks or mutable external conditions unless their freshness/invalidation is explicitly part of the key/contract.
+
+42. DYNAMIC DAG
+The DAG is not frozen at planning time.
+Runner discoveries may add nodes/edges; validated evidence may prune pending nodes.
+Velocity remains the sole scheduler and re-evaluates critical-path priority after material graph mutations.
+Preserve unaffected completed nodes; graph mutation is not a reason to restart from zero.
+
+43. PROGRESSIVE EXECUTION SHAPE
+Choose the smallest useful topology:
+FAST LINE: one direct path;
+MINI TREE: small local branching without supervisory hierarchy;
+FULL DYNAMIC GRAPH: larger work with multiple active branches and optional local supervisors/adapters.
+Escalate only when expected TTTA benefit exceeds orchestration cost.
+De-escalate/prune when complexity no longer pays rent.
+
+44. EVENT-DRIVEN MEMORY / ORCHESTRATION
+Use material execution events as compact operational memory.
+The central orchestration view consumes events and current state; it does not require every runner to narrate every microstep.
+Local supervisors/adapters may aggregate low-value noise before central persistence.
+Persistent history must store decisions/results/evidence, never private chain-of-thought.
+
+45. DEFERRED MATERIALIZATION
+Prefer remote/reference/digest form for intermediate artifacts until bytes/rendered output are actually required.
+Avoid download/copy/repackaging work that is not on the critical path.
+Final artifact verification/delivery requirements still win.
+
+46. PERFORMANCE ACCOUNTING
+For comparable operations separate:
+WORK_AVOIDED_BY_CACHE
+WORK_REDUCED_BY_INCREMENTALITY
+WORK_PARALLELIZED
+SERIAL_CRITICAL_PATH
+EXTERNAL_WAIT
+COORDINATION_OVERHEAD
+A speed improvement is real only when TTTA falls without required quality/safety regression.
+
 VERSION
-MOTORLAB-VELOCITY-LAYER-V1.2
+MOTORLAB-VELOCITY-LAYER-V1.3
 Established: 2026-09-29
 Revision 1.1: r21 establishes the four design pillars, TTTA primary KPI, complexity budget, adaptive DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, correction relay, bounded speculative execution, evidence learning and incremental-everything semantics without weakening single-writer or promotion safety.
 Revision 1.2: r22 binds adaptive Velocity to the executable Execution Fabric, requires Fast Decision Gate, event-driven ready-queue dispatch, observed parallelism proof, host-limited truthfulness and grouped concurrency status.
+Revision 1.3: r23 establishes work-elimination-first optimization, content-addressed incremental reuse, dynamic DAG growth/pruning, progressive execution shapes, event-driven memory and deferred materialization before adaptive parallelism.
