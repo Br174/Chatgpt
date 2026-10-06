@@ -1,20 +1,20 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=14
+STATE_REVISION=15
 STATE_STATUS=SEED004_REAL_DEVICE_ACCEPTED_FIRST_GOOD_BASELINE
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.06-r23
 ACTIVE_OPERATION_ID=MOTORAI-SEED003-FIRST-APK-20261006
 OPERATION_STATUS=artifact_delivered_pending_device_acceptance
-CURRENT_PHASE=SEED008_ADAPTIVE_LEVEL2_DEVICE_ACCEPTANCE
+CURRENT_PHASE=SEED008_LEVEL2_GENERATION_AND_RESUME_VALIDATION
 CURRENT_REF=main
 CURRENT_HEAD_SHA=2fc178f6e119b7a06325b63a6568fa18bebf1a13
-LAST_VERIFIED_PROGRESS_PERCENT=99
-LAST_COMPLETED_MATERIAL_STEP=Seed008 root-cause closure passed 3-seed checkpoint-resume gate and Android build; no fixed-step completion, exact curriculum transitions, balanced replay and test-isolated training
-NEXT_SAFE_STEP=Install Seed008 over Seed007 without uninstalling; continue Level2 adaptively from existing step1220 checkpoint until validation acceptance or safety cap; then inspect final test and retention
-PENDING_VERIFICATION=Seed008 real-device adaptive convergence, final L2 test >=90%, L1/L0 retention >=90%, generation ef>> -> ef>>ee and restart/resume
+LAST_VERIFIED_PROGRESS_PERCENT=100
+LAST_COMPLETED_MATERIAL_STEP=Seed008 resumed prior Level2 checkpoint and adaptively continued to step1700; validation acceptance triggered stop; final device test L2 95.8%, L1 retention 100%, L0 retention 100%
+NEXT_SAFE_STEP=Test Level2 generation ef>> -> ef>>ee, then close/reopen app and verify step1700/curriculum Level2 persistence before promoting Seed008 to accepted restore baseline
+PENDING_VERIFICATION=Seed008 Level2 generation and step1700 restart/resume persistence
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
 FIRST_APK_ARTIFACT_ID=11446590832
@@ -157,3 +157,16 @@ SEED008_ARTIFACT_SHA256=081edbcdfe2af12dc0cf94e4a2e367d458820240772c009a3bc6b5ef
 SEED008_APK_SHA256=25c9bf8fc0c6c059ddfa9d4b5a4a3cf7c6189da95a52a034a4bb8b9fad04ba56
 SEED008_DEVICE_ACCEPTANCE=pending
 CURRENT_ACCEPTED_RESTORE_BASELINE=SEED006
+
+SEED008_REAL_DEVICE_TRAINING_ACCEPTED=yes
+SEED008_REAL_DEVICE_START_STEP=1220
+SEED008_REAL_DEVICE_FINAL_STEP=1700
+SEED008_REAL_DEVICE_ADDITIONAL_STEPS=480
+SEED008_REAL_DEVICE_LEVEL2_TOTAL_STEPS=1080
+SEED008_REAL_DEVICE_LEVEL2_TEST_PERCENT=95.8
+SEED008_REAL_DEVICE_LEVEL1_RETENTION_PERCENT=100.0
+SEED008_REAL_DEVICE_LEVEL0_RETENTION_PERCENT=100.0
+SEED008_REAL_DEVICE_LEVEL2_TEST_LOSS=5.2480
+SEED008_REAL_DEVICE_TEMP_C=35.6
+SEED008_REAL_DEVICE_FREE_RAM_MB=1810
+SEED008_VALIDATION_ACCEPTANCE_TRIGGERED=yes
