@@ -13,7 +13,7 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
 3. Use VERIFIED local core immediately as fallback.
 4. When central is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
-5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_POLLICINO_CONTINUITY_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
+5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_POLLICINO_CONTINUITY_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
 6. Read Project Continuity ledger.
 7. Read technical Change History registry when present.
 8. Read visible Registro Modifiche e Ripristini when present.
@@ -30,6 +30,9 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 18. For defect/regression operations that request APK/ZIP/testable artifacts, apply Artifact-First ordering: repair/contain + risk-appropriate verification + artifact delivery first when safe; defer eligible causal/prevention work into POST_ARTIFACT_ROOT_CAUSE_QUEUE.
 19. Non-deferrable high-risk causes remain on the artifact critical path.
 20. Apply Foreground Stall Guard and Fast Iteration/No-Spin where eligible.
+20A. Apply Velocity r21 Four-Pillar planning: minimize TTTA, keep complexity off the critical path unless it pays for itself, build a dependency DAG for non-trivial eligible work, prioritize the critical path, choose runner count adaptively, and use continuous convergence rather than unnecessary global barriers.
+20B. Preserve single-writer by allowing parallel write-capable runners only in disjoint isolated scopes and accepting outputs through one integration lane for the artifact-producing state.
+20C. Reuse current applicable evidence-backed lessons/timing/cache/history before repeating research or failed strategies; learned heuristics never replace current source-of-truth checks or approval.
 21. Route optional auxiliary services through Knowledge & Tool Routing: Superpowers for methodology only, Context7 only when current/versioned documentation materially reduces uncertainty, Notion for status projection, GitBook for stable documentation.
 22. Use PostHog/observability only as diagnostic evidence; absence of telemetry must not block otherwise safe work.
 23. Execute continuously toward the approved outcome. Reopen the decision only for a material change to the agreed objective, an explicit protected boundary, an unrelated destructive action, or new paid usage; ordinary technical substeps do not pause execution.
@@ -44,6 +47,16 @@ MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is mandatory for MotorLab self-change
 Before writes, inspect authoritative current state for equivalent/overlapping rules, functions, writers, resolvers, caches, state machines, UI/domain decisions and source-of-truth paths.
 Reuse/extend/merge the existing responsible mechanism when possible. If an older path is weaker/conflicting, explicitly supersede/deactivate it. Never leave avoidable competing implementations active for one responsibility.
 Fast/Velocity/background/restore/migration/optimization flows cannot bypass this pillar.
+
+
+FOUR PILLARS + ADAPTIVE VELOCITY - R21+
+MotorLab exists to improve four outcomes: engine efficiency, automation/programming facilitation, final artifact quality and — as the primary optimization priority — execution speed.
+The primary performance KPI is TIME_TO_TESTABLE_ARTIFACT (TTTA), measured honestly to the first appropriately verified testable artifact/result.
+Complexity must pay rent: a rule/module/runner/check that adds recurring latency without required safety/quality value must be simplified, merged, made on-demand or superseded through Change Compatibility Guard.
+For eligible non-trivial work, Velocity builds a dependency DAG, prioritizes the critical path, starts independent tasks as soon as their own prerequisites are satisfied, converges compatible results continuously and sends corrections only to affected scopes.
+More runners are not automatically better. Fan-out is adaptive to expected latency savings, executor capacity, shared-resource contention, cost/quota, risk and historical evidence.
+One integration coordinator owns final artifact state. No two writers mutate the same ref/resource concurrently.
+Errors, Root Cause findings, useful research, timings, successful paths and ineffective retries may become bounded evidence-backed lessons. Lessons accelerate later comparable work but never create write authority or override current technical truth.
 
 HARD PRE-CHANGE APPROVAL - R14+
 A phrase such as modifica/correggi/aggiungi/togli/sistema/ripristina does not authorize the first write. Read-only preparation is allowed. Only approval after the pre-change report authorizes writing. Approval continuity applies only inside the described scope.
@@ -92,7 +105,7 @@ SAFE VERSION PINNING
 The MotorLab release used by active work is pinned until a safe boundary; adopt newer releases only at verified safe boundaries.
 
 FUTURE PROJECTS
-New projects receive hook + local satellite + sync state + central Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherit Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin, hard pre-change approval, r16 authority/data ownership, persistent-state fallback, Pollicino external continuity, observability boundaries and knowledge/tool routing.
+New projects receive hook + local satellite + sync state + central Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherit Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin, hard pre-change approval, r16 authority/data ownership, persistent-state fallback, Pollicino external continuity, observability boundaries, knowledge/tool routing and r21 Four-Pillar adaptive Velocity/learning/TTTA rules.
 
 NO RUNTIME REGRESSION
 MotorLab metadata/policies do not authorize application runtime/UI/package/signing/native-engine changes outside approved scope. Instrumentation SDKs or provider bindings inside apps require normal project approval.
@@ -107,7 +120,7 @@ ANDROID UPDATE FAMILY - R17+
 When Bruno activates update-family mode, load MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt. Do not create random package ids for later revisions of the same LAB family. Preserve stable applicationId + signing certificate, increase versionCode, use Bruno-facing "LAB NN aggiornamento" naming, create CANDIDATA as a new immutable family, and promote an approved CANDIDATA to MADRE without reconstructing app source.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.14
+MOTORLAB-CORE-ENTRYPOINT-V1.15
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -118,3 +131,5 @@ Revision 1.12: r18 adds paired immutable LAB di sicurezza checkpoints and recove
 Revision 1.13: r19 elevates Change Compatibility Guard to foundational mandatory pre-write compatibility/redundancy/conflict pillar for all current/future projects.
 
 Revision 1.14: r20 loads Pollicino external session continuity and prioritizes precomputed RESUME_READY before broad cross-chat reconstruction while preserving Watchdog/Resume ownership and host boundaries.
+
+Revision 1.15: r21 makes Velocity explicit at boot and adds Four-Pillar TTTA optimization, complexity budgeting, adaptive DAG/critical-path runner execution, continuous convergence and bounded evidence learning while preserving one integration writer.
