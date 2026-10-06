@@ -857,3 +857,28 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device test della LAB48 aggiornamento; non modificare RESTORE_NO=1 Player buono finché non conferma sul dispositivo.
 RESTORE_SCOPE_HINTS=Per ripristino selettivo futuro preservare InnerTubeXPlayer.kt della LAB41; applicare soltanto isolamento MusicService da prewarm moderno e priority-before-resolve del tap Cover con timeout 2500 ms, compatibilmente con il baseline corrente.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261006-lab49-cancellable-background
+DATE=2026-10-06
+TITLE=LAB49 cancellazione reale rete/background e stop accumulo progressivo tra brani
+SEMANTIC_TAGS=LAB49,Cover,Originali,Archivio Cloud,Discogs,COVER.INFO,OkHttp,cancellation,coroutine,Thread.sleep,background,resolver,progressive slowdown,freeze,Player buono,LAB aggiornamento,LAB di sicurezza
+USER_INTENT=Dopo LAB48 il primo brano partiva subito ma ogni brano successivo diventava progressivamente più lento fino al blocco; inoltre uscendo dalla sezione Cloud tutti i processi della sezione devono fermarsi. Correggere la causa senza limitarsi a disattivare il Cloud e senza modificare il Player buono.
+CHANGE_SCOPE=CANCELLABLE_PROVIDER_LIFECYCLE_AND_PLAYBACK_BACKGROUND_ISOLATION
+LIFECYCLE_ROLE=LAB49_UPDATE_FAMILY_01_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-lab48-aggiornamento-family-01
+SOURCE_BASE_SHA=ab25ab272c632dac3bd9e5a994af6d8f76d94284
+RESULT_REF=uab-build/musiclab-lab49-aggiornamento-family-01
+RESULT_BUILD_SHA=3dcabf1b6b8e233a3f2c8f8f5c4e79efefe43697
+RESULT_STATUS_SHA=03ffa74f2143a55eb7beeafa97804d20d5b996e3
+IMPLEMENTATION_COMMITS=284eb8b03ce665fc114951ad16bbb7483e7742a1,6c2498c1d7b0feb3e368c0033d88b6ab1cf2654e,739fd1547153449b0b865222e96a38c1424e3658,5cdc9647e91893ba09f29467b95b30fb30b2b9bd,fc3071ad3f6f403d238304c1a6b5f882b9be18dd,41cc45e7936eed75c2b67bbbf42d2d136def79d9,c877a740bb28badd8456fea69843fcd553aeace1,889e131aa96efcc64f017c428a03b0c501fa12fb,bacccace757ed6159a48e59f25a3de33dff2c3d3,3dcabf1b6b8e233a3f2c8f8f5c4e79efefe43697
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/discogs/DiscogsClient.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CloudMusicDiscovery.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverDiscoverySources.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt,app/src/main/kotlin/com/metrolist/music/ui/component/MusicLabArchiveScreen.kt,cloudflare/music-intelligence/test/lab49-cancellable-background-contract.test.mjs,uab-project.env,.github/workflows/lab49-aggiornamento-family-01-gate.yml
+BEHAVIOR_SUMMARY=Il Player buono LAB41 resta byte-identico. Discogs elimina Thread.sleep dai retry/rate-limit e lega le OkHttp Call alla cancellazione coroutine. CloudMusicDiscovery e le lane web/COVER.INFO usano chiamate OkHttp cancellabili; l'Archivio Cloud mantiene e cancella esplicitamente le proprie Call all'uscita. Cover/Originali introduce una lifecycle barrier che cancella tutti i job della schermata, mantiene una sola coroutine di playback del tap e non riavvia più verifica Discogs/video preload appena termina il first-sound burst: il lavoro provider riparte solo quando la riproduzione non è più attiva.
+ROOT_CAUSE=La regressione progressiva non era nel core player né nel Cloud isolatamente. LAB46 con Cloud presente non mostrava lo stesso schema. LAB47 aveva introdotto il ciclo stop-background al tap + riavvio automatico dopo first sound. Alcune lane sottostanti usavano OkHttp execute() bloccante e Discogs/COVER.INFO usavano Thread.sleep; cancellare la coroutine non fermava necessariamente la richiesta/sleep reale. Ad ogni nuovo brano potevano quindi sopravvivere operazioni precedenti mentre ne venivano lanciate altre, producendo accumulo progressivo di rete/thread/lavoro provider fino al blocco.
+ROOT_CAUSE_CLOSURE=Cancellazione cooperativa end-to-end delle Call HTTP; sostituzione Thread.sleep Discogs/COVER.INFO con delay cancellabile; lifecycle stop all'uscita da Cover/Originali/Archivio; singolo playback-launch job per il tap; eliminazione del restart automatico dei provider durante musica attiva; contratto LAB49 che impedisce il ritorno dei pattern bloccanti e verifica la barriera di playback.
+VERIFICATION=GitHub Actions run 37525537705 success su exact source SHA 3dcabf1b6b8e233a3f2c8f8f5c4e79efefe43697. Contratti LAB46/LAB48/LAB49, prova byte-identica Player buono LAB41, unit test LAB45/LAB46/LAB47, UAB preflight, build, identità aggiornamento e safety isolation tutti success. Update artifact 11442825610 digest sha256:5f63638f6c53eaffa27dc9a0325324dc25b4d5a1f21f185dcaae25cb95dbf9f4; APK sha256 33549fdf41376c0f6bf57ba9e7c85d08e4e6eb75fe32ce8cf542484d52443203; ZIP sha256 0d0454609b23fce98e808638075136093571e54a16f6ac7f7409d20c89007dfd. Safety artifact 11443640487 digest sha256:c518283a616e751aacadab06dfdfb61f90f8cf131bd413ee7dadb907fce9299d; safety APK sha256 01f73a1c85a8d6f2d2c12b79ea4a16b9518d1ec41e5250f7fb94f9cd0d177a0e; safety ZIP sha256 004fe6d2b7108892e957a7955852f25e40b47d1b2f048a02c3a401cef9f50ba7.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test della LAB49 aggiornamento con sequenza di almeno 6-10 brani consecutivi e verifica uscita Archivio/Cover; non promuovere CANDIDATA/MADRE e non modificare RESTORE_NO=1 finché non conferma sul dispositivo.
+RESTORE_SCOPE_HINTS=Preservare InnerTubeXPlayer.kt della LAB41. In caso di ripristino selettivo applicare cancellazione reale provider, lifecycle barrier e no-restart-during-playback sopra il baseline corrente.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
+
