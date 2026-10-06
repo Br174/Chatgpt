@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "snapshot_id": "studybook-lab02-artifacts-verified-20261006-01",
-  "sent_at": "2026-10-06T14:16:00.000Z",
+  "snapshot_id": "studybook-r21-adopted-20261006-01",
+  "sent_at": "2026-10-06T15:10:18Z",
   "projects": [
     {
       "project_id": "MusicLab",
@@ -17,9 +17,9 @@
       "repository": "Br174/StudyBook-AI",
       "lifecycle_stage": "LAB",
       "source_ref": "lab/studybook-core-android-01-update-02",
-      "source_head": "dd1d06e437b580f0a621164b36f1537f577de198",
-      "local_satellite_release_state": "r20|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055",
-      "updated_at": "2026-10-06T14:16:00.000Z"
+      "source_head": "e3f3bb5a819e45b95dc4da77e431f6c9a016d4a9",
+      "local_satellite_release_state": "r21|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055",
+      "updated_at": "2026-10-06T15:10:18Z"
     }
   ],
   "operations": [
@@ -60,6 +60,25 @@
       "source_head": "dd1d06e437b580f0a621164b36f1537f577de198",
       "created_at": "2026-10-06T13:58:00.000Z",
       "updated_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "operation_id": "studybook-motorlab-r21-sync-20261006",
+      "project_id": "StudyBook-AI",
+      "title": "StudyBook MotorLab r21 satellite adoption",
+      "type": "control_plane_sync",
+      "requested_scope": "Adopt MotorLab r21 and its Four-Pillar Adaptive Velocity integration on StudyBook.",
+      "approved_scope": "Control-plane-only r20 to r21 satellite synchronization at safe boundary; preserve LAB02 app artifacts, Pollicino sidecars/proof and Android lifecycle.",
+      "approval_status": "approved",
+      "lifecycle_stage": "LAB",
+      "risk_class": "LOW",
+      "status": "COMPLETED",
+      "phase": "r21 satellite adopted, reread and centrally reconciled",
+      "artifact_progress": 100,
+      "overall_progress": 100,
+      "source_ref": "lab/studybook-core-android-01-update-02",
+      "source_head": "e3f3bb5a819e45b95dc4da77e431f6c9a016d4a9",
+      "created_at": "2026-10-06T15:10:18Z",
+      "updated_at": "2026-10-06T15:10:18Z"
     }
   ],
   "checkpoints": [
@@ -84,6 +103,17 @@
       "lock_state": "none",
       "external_wait_state": "physical-device acceptance",
       "created_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "checkpoint_id": "studybook-r21-adoption-20261006",
+      "operation_id": "studybook-motorlab-r21-sync-20261006",
+      "phase": "MotorLab r21 satellite adoption verified; LAB02 device acceptance remains the next application lifecycle boundary",
+      "verified_progress": 100,
+      "completed_steps": "r20 preserved as LAST_GOOD; r21 bundle installed; Four-Pillar TTTA/Adaptive Velocity markers verified; hook/sync state reconciled; Git compare confirmed control-plane-only delta; app workflows not triggered; LAB02 artifacts unchanged.",
+      "next_safe_step": "Bruno tests the already-built LAB 02 aggiornamento on physical Android. Candidate creation remains gated by device acceptance.",
+      "lock_state": "none",
+      "external_wait_state": "physical-device acceptance for LAB02 only; r21 adoption complete",
+      "created_at": "2026-10-06T15:10:18Z"
     }
   ],
   "events": [
@@ -107,6 +137,13 @@
       "event_type": "LAB_ARTIFACTS_VERIFIED",
       "event_summary": "LAB 02 aggiornamento and paired LAB 02 ripristino APK/ZIP artifacts verified; update family identity/signing preserved, recovery family isolated, full tests green; next boundary is Bruno physical-device acceptance.",
       "created_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "event_id": "studybook-r21-adopted-20261006",
+      "operation_id": "studybook-motorlab-r21-sync-20261006",
+      "event_type": "SATELLITE_R21_ADOPTED",
+      "event_summary": "StudyBook MotorLab satellite moved from r20 to r21 at a safe boundary, preserving r20 as LAST_GOOD and enabling Four-Pillar TTTA-first Adaptive Velocity, critical-path DAG scheduling, adaptive isolated runners, continuous convergence, correction relay, evidence learning and incremental execution. Application runtime and LAB02 artifacts unchanged.",
+      "created_at": "2026-10-06T15:10:18Z"
     }
   ],
   "artifacts": [
