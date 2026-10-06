@@ -3,8 +3,8 @@ PROJECT=MotorAI
 REPOSITORY=Br174/MotorAI
 REGISTER_STATUS=ACTIVE_CONFIRMED_ONLY
 DISPLAY_NAME=Registro Modifiche e Ripristini
-NEXT_RESTORE_NO=2
-VISIBLE_SLOTS=1
+NEXT_RESTORE_NO=3
+VISIBLE_SLOTS=2
 RULE=Only Bruno-confirmed working modifications explicitly approved for conservation enter this register. Technical history remains in Git/MOTORLAB_CHANGE_REGISTRY_MOTORAI_V1.txt. The Seed 003 APK is pending real-device acceptance and is therefore not yet a visible restore slot.
 VERSION=MOTORLAB-MOTORAI-MODIFICATION-RESTORE-REGISTER-V1.0
 
@@ -18,3 +18,14 @@ ARTIFACT_ID=11447405080
 APK_SHA256=0e941a8cc1b92b926727a05ce8de393fa5755d68509e588ea2eca94c1a802031
 DEVICE_RESULT=220 steps; test loss 0.8275; generalization 100.0%; 36.8C; ~1788MB free RAM
 STATUS=CONFIRMED_WORKING
+
+
+RESTORE_SLOT=2
+NAME=MotorAI Seed 005 - Baseline Android con Genera e aggiornamento in-place
+CONFIRMED_DATE=2026-10-07
+SOURCE_HEAD=e0f9cd54a7ce178a7bb17b18819562309549d89a
+BUILD_RUN_ID=37538216106
+ARTIFACT_ID=11447586302
+APK_SHA256=03e920fa03d2283b2c905f8e1ffa9c592a6b14a9d3d34db6d153e5f4f439e9bb
+DEVICE_RESULT=update over Seed004 preserved step 220; test loss 0.8275; generalization 100%; abc> -> abc>abc
+STATUS=CONFIRMED_WORKING_CURRENT
