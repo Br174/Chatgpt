@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "snapshot_id": "pollicino-studybook-r20-adoption-20261006-02",
-  "sent_at": "2026-10-06T14:02:00.000Z",
+  "snapshot_id": "studybook-lab02-artifacts-verified-20261006-01",
+  "sent_at": "2026-10-06T14:16:00.000Z",
   "projects": [
     {
       "project_id": "MusicLab",
@@ -17,9 +17,9 @@
       "repository": "Br174/StudyBook-AI",
       "lifecycle_stage": "LAB",
       "source_ref": "lab/studybook-core-android-01-update-02",
-      "source_head": "e4d52a3885684e67371dd80de188994a42260a3a",
+      "source_head": "dd1d06e437b580f0a621164b36f1537f577de198",
       "local_satellite_release_state": "r20|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055",
-      "updated_at": "2026-10-06T14:02:00.000Z"
+      "updated_at": "2026-10-06T14:16:00.000Z"
     }
   ],
   "operations": [
@@ -52,14 +52,14 @@
       "approval_status": "approved",
       "lifecycle_stage": "LAB",
       "risk_class": "MEDIUM",
-      "status": "MOTORLAB_R20_ADOPTED_APP_REPAIR_PENDING",
-      "phase": "r20 adopted at safe boundary; app repair next",
-      "artifact_progress": 0,
-      "overall_progress": 55,
+      "status": "LAB02_ARTIFACTS_VERIFIED_DEVICE_ACCEPTANCE_PENDING",
+      "phase": "LAB02 update and paired recovery artifacts verified; physical-device acceptance pending",
+      "artifact_progress": 100,
+      "overall_progress": 100,
       "source_ref": "lab/studybook-core-android-01-update-02",
-      "source_head": "e4d52a3885684e67371dd80de188994a42260a3a",
+      "source_head": "dd1d06e437b580f0a621164b36f1537f577de198",
       "created_at": "2026-10-06T13:58:00.000Z",
-      "updated_at": "2026-10-06T14:02:00.000Z"
+      "updated_at": "2026-10-06T14:16:00.000Z"
     }
   ],
   "checkpoints": [
@@ -75,15 +75,15 @@
       "created_at": "2026-10-05T19:24:03.930Z"
     },
     {
-      "checkpoint_id": "studybook-r20-lab02-pre-app-write-20261006",
+      "checkpoint_id": "studybook-lab02-artifacts-verified-20261006",
       "operation_id": "studybook-lab02-r20-ux-repair-20261006",
-      "phase": "MotorLab r20 control-plane adoption complete before StudyBook application writes",
-      "verified_progress": 55,
-      "completed_steps": "r16 saved as LAST_GOOD; r20 bundle adopted; external Live Control and Pollicino sidecars installed; stable proof persisted; project hook updated; metadata-only branch produced zero app workflow runs.",
-      "next_safe_step": "Apply approved StudyBook UI/behavior fixes, then build LAB 02 aggiornamento and paired LAB 02 ripristino from the same functional source.",
-      "lock_state": "single-writer current operation",
-      "external_wait_state": "none",
-      "created_at": "2026-10-06T13:58:00.000Z"
+      "phase": "LAB02 update and paired recovery artifacts verified; device acceptance is next lifecycle boundary",
+      "verified_progress": 100,
+      "completed_steps": "MotorLab r20 adopted; D1 relay verified; LAB02 UX/behavior corrections applied; full UAB tests green; update APK package/signature/versionCode verified; paired recovery APK package/distinct signing verified; checksums captured.",
+      "next_safe_step": "Bruno installs LAB 02 aggiornamento over existing LAB and tests requested behaviors. If accepted, create a new immutable CANDIDATA family; do not promote recovery directly and do not mutate LAB into candidate.",
+      "lock_state": "none",
+      "external_wait_state": "physical-device acceptance",
+      "created_at": "2026-10-06T14:16:00.000Z"
     }
   ],
   "events": [
@@ -100,6 +100,119 @@
       "event_type": "SATELLITE_R20_ADOPTED",
       "event_summary": "StudyBook local MotorLab satellite moved from r16 to r20 with external Pollicino/Live Control sidecars, stable proof and Android update-family + paired recovery lifecycle; application runtime unchanged.",
       "created_at": "2026-10-06T13:58:00.000Z"
+    },
+    {
+      "event_id": "studybook-lab02-final-artifacts-20261006",
+      "operation_id": "studybook-lab02-r20-ux-repair-20261006",
+      "event_type": "LAB_ARTIFACTS_VERIFIED",
+      "event_summary": "LAB 02 aggiornamento and paired LAB 02 ripristino APK/ZIP artifacts verified; update family identity/signing preserved, recovery family isolated, full tests green; next boundary is Bruno physical-device acceptance.",
+      "created_at": "2026-10-06T14:16:00.000Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "studybook-lab02-update-apk-20261006",
+      "operation_id": "studybook-lab02-r20-ux-repair-20261006",
+      "name": "StudyBook-AI-LAB-02-AGGIORNAMENTO.apk",
+      "source_ref": "lab/studybook-core-android-01-update-02",
+      "source_head": "dd1d06e437b580f0a621164b36f1537f577de198",
+      "checksums": "sha256=8616eb9df6a88db1f5f408bc464defcf430bb4d2440e4cc110c77f2613235851; zip_sha256=eb2a85b3f9a7fa6757f5e4a6cb7140b57da30203e0a7a544785122b0c57d9086; applicationId=it.studybook.ai.lab; versionCode=7; signing=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC",
+      "verification_state": "VERIFIED",
+      "delivery_state": "READY_FOR_CHAT_DELIVERY",
+      "immutable_under_test": true,
+      "created_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "artifact_id": "studybook-lab02-recovery-apk-20261006",
+      "operation_id": "studybook-lab02-r20-ux-repair-20261006",
+      "name": "StudyBook-AI-LAB-02-RIPRISTINO.apk",
+      "source_ref": "lab/recovery-studybook-core-android-02",
+      "source_head": "cc7b63669845467a3757bfeeb99906afef015d3f",
+      "checksums": "sha256=f525bc1e45f67fe4f4de1c1577926888d31ae9c25642eb948110254c944e8271; zip_sha256=a1dec304ee31fa0e1b7e0fcb8f54a929758525ffabf8b0d844776088d7e470b8; functionalSource=dd1d06e437b580f0a621164b36f1537f577de198; applicationId=it.studybook.ai.lab.recovery02; versionCode=8; signing=67:1D:06:1B:6D:CF:26:E6:9A:81:08:59:1C:CC:81:B0:EF:B7:6D:12:2C:34:AD:7F:77:5D:E9:0D:DE:60:BD:EA",
+      "verification_state": "VERIFIED",
+      "delivery_state": "READY_FOR_CHAT_DELIVERY",
+      "immutable_under_test": true,
+      "created_at": "2026-10-06T14:16:00.000Z"
+    }
+  ],
+  "root_causes": [
+    {
+      "root_cause_id": "studybook-lab02-rc-simple",
+      "operation_id": "studybook-lab02-r20-ux-repair-20261006",
+      "defect": "Study/simple toggle could show equivalent content in local fallback.",
+      "immediate_repair": "Generate and persist source-derived simpleSummary distinct from study summary.",
+      "status": "CLOSED",
+      "evidence_refs": "src/lib/studyEngine.js; scripts/test-update-02-ux.mjs",
+      "recurrence_surfaces": "StudyBook LAB family and MotorLab continuity payload validation",
+      "prevention_step": "Regression tests/gates are now part of the active LAB02 pipeline; lifecycle identity and D1 schema are verified at material boundaries.",
+      "approval_scope_status": "IN_SCOPE_APPROVED",
+      "associated_artifact": "StudyBook LAB 02",
+      "updated_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "root_cause_id": "studybook-lab02-rc-original",
+      "operation_id": "studybook-lab02-r20-ux-repair-20261006",
+      "defect": "Originali did not truly open the preserved original document.",
+      "immediate_repair": "Use record.originalFile and deliverBlob preferOpen through the native/system format reader.",
+      "status": "CLOSED",
+      "evidence_refs": "src/AppV15.jsx; src/lib/library.js; scripts/test-update-02-ux.mjs",
+      "recurrence_surfaces": "StudyBook LAB family and MotorLab continuity payload validation",
+      "prevention_step": "Regression tests/gates are now part of the active LAB02 pipeline; lifecycle identity and D1 schema are verified at material boundaries.",
+      "approval_scope_status": "IN_SCOPE_APPROVED",
+      "associated_artifact": "StudyBook LAB 02",
+      "updated_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "root_cause_id": "studybook-lab02-rc-tools",
+      "operation_id": "studybook-lab02-r20-ux-repair-20261006",
+      "defect": "Quiz/flashcards could be generated from generic prose fallback.",
+      "immediate_repair": "Remove generic split-sentence fallback; use glossary/keyPoints/remember only.",
+      "status": "CLOSED",
+      "evidence_refs": "src/lib/studyTools.js; scripts/test-study-tools.mjs",
+      "recurrence_surfaces": "StudyBook LAB family and MotorLab continuity payload validation",
+      "prevention_step": "Regression tests/gates are now part of the active LAB02 pipeline; lifecycle identity and D1 schema are verified at material boundaries.",
+      "approval_scope_status": "IN_SCOPE_APPROVED",
+      "associated_artifact": "StudyBook LAB 02",
+      "updated_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "root_cause_id": "studybook-lab02-rc-workspace",
+      "operation_id": "studybook-lab02-r20-ux-repair-20261006",
+      "defect": "Opened-book screen did not make clear that actions belonged to the current book.",
+      "immediate_repair": "Add visible book cover/context and compact symmetric action controls.",
+      "status": "CLOSED",
+      "evidence_refs": "src/components/AppScreens.jsx; src/appShellV16.css; scripts/test-update-02-ux.mjs",
+      "recurrence_surfaces": "StudyBook LAB family and MotorLab continuity payload validation",
+      "prevention_step": "Regression tests/gates are now part of the active LAB02 pipeline; lifecycle identity and D1 schema are verified at material boundaries.",
+      "approval_scope_status": "IN_SCOPE_APPROVED",
+      "associated_artifact": "StudyBook LAB 02",
+      "updated_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "root_cause_id": "studybook-lab02-rc-test",
+      "operation_id": "studybook-lab02-r20-ux-repair-20261006",
+      "defect": "Initial LAB02 CI failed after repair.",
+      "immediate_repair": "Correct the regression assertion to compare non-DSA study variant with summary.",
+      "status": "CLOSED",
+      "evidence_refs": "scripts/test-update-02-ux.mjs; successful UAB run 37476059090",
+      "recurrence_surfaces": "StudyBook LAB family and MotorLab continuity payload validation",
+      "prevention_step": "Regression tests/gates are now part of the active LAB02 pipeline; lifecycle identity and D1 schema are verified at material boundaries.",
+      "approval_scope_status": "IN_SCOPE_APPROVED",
+      "associated_artifact": "StudyBook LAB 02",
+      "updated_at": "2026-10-06T14:16:00.000Z"
+    },
+    {
+      "root_cause_id": "studybook-lab02-rc-d1",
+      "operation_id": "studybook-lab02-r20-ux-repair-20261006",
+      "defect": "Initial StudyBook r20 D1 relay snapshot failed validation.",
+      "immediate_repair": "Shorten local_satellite_release_state to only canonical r20 Pollicino markers.",
+      "status": "CLOSED",
+      "evidence_refs": "OIDC relay failure 37474611599; success 37474752357",
+      "recurrence_surfaces": "StudyBook LAB family and MotorLab continuity payload validation",
+      "prevention_step": "Regression tests/gates are now part of the active LAB02 pipeline; lifecycle identity and D1 schema are verified at material boundaries.",
+      "approval_scope_status": "IN_SCOPE_APPROVED",
+      "associated_artifact": "StudyBook LAB 02",
+      "updated_at": "2026-10-06T14:16:00.000Z"
     }
   ]
 }
