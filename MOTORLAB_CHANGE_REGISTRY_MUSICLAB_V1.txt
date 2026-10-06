@@ -832,3 +832,28 @@ VERIFICATION=GitHub Actions run 37299811755 success. Main update package/version
 STATUS=VERIFIED_READY_FOR_DEVICE
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
 
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261006-lab48-player-isolation
+DATE=2026-10-06
+TITLE=LAB48 isolamento Player buono da prewarm concorrente e priorità immediata al tap Cover
+SEMANTIC_TAGS=LAB48,Player buono,LAB41,MusicService,prewarm,PoToken,WebView,Cover,first sound,priorità,rallentamento,blocco,LAB aggiornamento,LAB di sicurezza
+USER_INTENT=Il player risultava ancora lento, con blocchi e avvio ritardato; verificare se il Player buono fosse corrotto da modifiche circostanti e correggere la causa senza riscrivere il player approvato.
+CHANGE_SCOPE=PLAYER_ENVIRONMENT_ISOLATION_AND_TAPPED_COVER_PRIORITY
+LIFECYCLE_ROLE=LAB48_UPDATE_FAMILY_01_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-lab47-aggiornamento-family-01
+SOURCE_BASE_SHA=2ffb723c7cdba5e2652ec377cdb1757d50ccbffc
+RESULT_REF=uab-build/musiclab-lab48-aggiornamento-family-01
+RESULT_BUILD_SHA=3090963d7ac6b55b7d940b57029270c3751ffac4
+RESULT_STATUS_SHA=ab25ab272c632dac3bd9e5a994af6d8f76d94284
+IMPLEMENTATION_COMMITS=a65523b5bfc056335df702a980619c5f3f610b98,c555ac2ce7c6e07413d7e0cd4341ca412669a71f,b4c9a8c0a9df50df227c24a322eba43535c104eb,7a574464ecae6c3cfb899bdd7efae21cc183fc6e,3090963d7ac6b55b7d940b57029270c3751ffac4
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/playback/MusicService.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt,cloudflare/music-intelligence/test/lab48-player-isolation-contract.test.mjs,uab-project.env,.github/workflows/lab48-aggiornamento-family-01-gate.yml
+BEHAVIOR_SUMMARY=InnerTubeXPlayer.kt resta byte-identico alla MADRE LAB41 Player buono. LAB48 rimuove dal MusicService il prewarm speculativo del resolver moderno/WebView/PoToken introdotto in LAB47 e conserva solo InnerTubeXPlayer.prepare() leggero. Nel tap Cover la playback-priority burst parte prima di ogni resolve della riga selezionata; la risoluzione della sola riga toccata è limitata a 2500 ms e il lavoro Cover di background resta sospeso durante la priorità.
+ROOT_CAUSE=Il Player buono non era stato corrotto: InnerTubeXPlayer.kt LAB47/LAB48 ha lo stesso blob Git della LAB41 approvata. La regressione era esterna al core player: LAB47 avviava un prewarm moderno concorrente nel MusicService e nel percorso Cover attivava la priorità playback solo dopo la risoluzione video della riga, sommando attese prima dell'avvio del player.
+ROOT_CAUSE_CLOSURE=Rimozione del prewarm moderno concorrente; mantenimento della sola preparazione locale LAB41; priorità playback anticipata prima del resolver Cover; timeout duro 2500 ms sulla risoluzione della riga toccata; contratto LAB48 che vieta il ritorno del prewarm speculativo e verifica l'ordine priority-before-resolve.
+VERIFICATION=GitHub Actions run 37520381316 success su exact source SHA 3090963d7ac6b55b7d940b57029270c3751ffac4. Contratti LAB46/LAB48, prova byte-identica Player buono LAB41, unit test LAB45/LAB46/LAB47, UAB preflight, build, identità aggiornamento e safety isolation tutti success. Update artifact 11440361463 digest sha256:1db5de505a2311e7c36eb62b5e4f9d26d589d3dcd5b21e3ff5d6117da0e52f8b; APK sha256 563a9ad6266749c2667c0d1a788c197043871b6cd9de946ea58286ec0dcd2d1e; ZIP sha256 a914979349bde0abeb345cdd0f2ab28adba2c40109e9c4358988a61aa12f4836. Safety artifact 11439319625 digest sha256:000a35102c1ce308779180accd98ba14a5979aaf46bdb682cddadc8da67c34cf; safety APK sha256 c7a927213afca1856e30ee121d2dcacb611a0fa2bd6f988a9bb4afb477174fd6; safety ZIP sha256 c37cf1cb344169e3fb79b200826b912699bde71b77c0c928f2cdce6738bc319b.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test della LAB48 aggiornamento; non modificare RESTORE_NO=1 Player buono finché non conferma sul dispositivo.
+RESTORE_SCOPE_HINTS=Per ripristino selettivo futuro preservare InnerTubeXPlayer.kt della LAB41; applicare soltanto isolamento MusicService da prewarm moderno e priority-before-resolve del tap Cover con timeout 2500 ms, compatibilmente con il baseline corrente.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
