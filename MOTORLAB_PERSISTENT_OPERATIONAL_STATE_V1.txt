@@ -36,6 +36,11 @@ MINIMUM D1 ENTITIES
 - artifact_progress
 - overall_progress
 - source_ref/source_head
+- execution_mode / runner_count when applicable
+- critical_path summary when applicable
+- request_execution_started_at when measurable
+- first_testable_artifact_at when applicable
+- time_to_testable_artifact_ms when measurable
 - created_at/updated_at
 
 3. approvals
@@ -52,6 +57,8 @@ MINIMUM D1 ENTITIES
 - verified progress
 - completed material steps
 - next safe step
+- active/completed runner graph summary when applicable
+- critical-path next node when applicable
 - lock state/reference
 - external wait state when any
 - created_at
@@ -132,12 +139,50 @@ Prepared externally after supported-session liveness loss so a later `continua` 
 - status
 Live directives contain orchestration/presentation metadata only and MUST NOT contain secrets, API keys, access tokens, webhook secrets, approval tokens, raw credentials or hidden provider payloads.
 
+13. velocity_lessons
+Bounded evidence-backed reusable acceleration/prevention knowledge:
+- lesson_id
+- project_id or global scope
+- category (error/root-cause/research/timing/cache/build/test/provider/runner/integration/recovery)
+- context_signature / applicability scope
+- observed_problem_or_opportunity
+- strategy_used
+- evidence refs
+- outcome
+- TTTA/phase timing effect when measurable
+- artifact-quality/regression effect when known
+- confidence
+- invalidation conditions
+- first_verified_at / last_verified_at
+- status (ACTIVE / STALE / SUPERSEDED / REJECTED)
+Lessons are advisory and cannot authorize writes, override GitHub technical truth or weaken governance.
+
+14. velocity_operation_metrics
+Optional/coalesced performance record for comparable operations:
+- operation_id / project_id
+- execution_mode
+- runner_count_peak
+- critical_path summary
+- planning_ms
+- wait_external_ms
+- source_change_ms
+- verification_ms
+- build_package_ms
+- integration_ms
+- first_testable_artifact_ms / TTTA
+- cache/incremental reuse summary
+- rework/conflict count
+- artifact verification result
+Use transition/phase timestamps where available; do not add high-frequency telemetry spam.
+
 WRITE DISCIPLINE
 - D1 writes must be bounded and meaningful; avoid polling/event spam.
 - Pollicino high-frequency liveness updates overwrite/coalesce the current session row; append journal events only for material transitions.
 - Live-directive writes occur only on meaningful directive transitions/publication; safe-point reads do not create D1 event spam.
 - Use directive_id plus project/operation/session identity for deduplication; agents may keep reconstructible local seen-ID state.
 - Persist at material transitions and checkpoints.
+- Velocity lessons/metrics are bounded, deduplicated and written at meaningful completion/failure/comparison boundaries rather than per tool call.
+- A learned lesson must carry evidence plus applicability/invalidation context; stale lessons are not silently reused.
 - Use idempotent keys where possible so Resume Recovery does not duplicate state.
 - One logical operation uses one MOTORLAB_OPERATION_ID.
 - Approval records must preserve scope identity so old approval cannot authorize broadened scope.
@@ -201,11 +246,15 @@ SUCCESS CRITERIA
 - active locks/checkpoints/artifacts/root-cause queues survive chat changes;
 - optional cache loss is harmless;
 - D1 outage does not make MotorLab unusable;
-- GitHub remains the durable technical backstop.
+- GitHub remains the durable technical backstop;
+- evidence-backed acceleration lessons survive chat changes without becoming an uncontrolled second source of truth;
+- comparable operations can use TTTA/phase evidence to reduce future avoidable latency.
 
 VERSION
-MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.2
+MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.3
 Established: 2026-09-30
 Revision 1.1: adds secret-free live_directives persistence, transition-only writes, deduplication and fail-open read/fallback semantics.
 
 Revision 1.2: r20 adds external Pollicino sessions, compact session journal and precomputed RESUME_READY state in D1/KV while keeping GitHub technical authority.
+
+Revision 1.3: r21 adds bounded velocity lessons, adaptive-runner/critical-path checkpoint summaries and TTTA/phase metrics for evidence-based acceleration without storing chain-of-thought or creating new write authority.
