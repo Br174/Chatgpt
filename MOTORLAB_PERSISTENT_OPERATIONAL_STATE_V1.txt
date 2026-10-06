@@ -40,6 +40,9 @@ MINIMUM D1 ENTITIES
 - critical_path summary when applicable
 - execution_fabric_status / host_concurrency_limit when known
 - single_integration_lane_verified when applicable
+- cache_hit_count / cache_avoided_estimated_work when applicable
+- dynamic_task_count / pruned_task_count when applicable
+- deferred_materialization_count when applicable
 - request_execution_started_at when measurable
 - first_testable_artifact_at when applicable
 - time_to_testable_artifact_ms when measurable
@@ -100,8 +103,9 @@ MINIMUM D1 ENTITIES
 
 8. operation_events
 Append-oriented operational history for material transitions only.
-Examples: request parsed, pre-change report emitted, approval captured, write started, checkpoint reached, artifact verified, artifact delivered, causal queue opened/closed, operation closed.
-Do not log every low-value internal thought/tool call.
+Examples: request parsed, pre-change report emitted, approval captured, write started, checkpoint reached, CACHE_HIT/MISS at a material boundary, TASK_SPAWNED, TASK_PRUNED, runner/integration milestone, artifact verified, artifact delivered, causal queue opened/closed, operation closed.
+Do not log every low-value internal thought/tool call and never store private chain-of-thought.
+r23 uses this existing entity as the central event-memory journal rather than creating a competing history system.
 
 9. pollicino_sessions
 - session_id
@@ -184,13 +188,29 @@ Optional/coalesced performance record for comparable operations:
 - artifact verification result
 Use transition/phase timestamps where available; do not add high-frequency telemetry spam.
 
+
+15. incremental_result_index
+Optional bounded metadata index for safely reusable deterministic results:
+- cache_key / content digest
+- project/global scope
+- task/action identity
+- authoritative input/source/config/toolchain/policy fingerprints
+- result/artifact/evidence reference
+- verification/acceptance class
+- created_at / last_verified_at
+- invalidation/freshness conditions
+- status (VALID / STALE / INVALID / SUPERSEDED)
+This is an acceleration index only. Loss causes recomputation. It cannot authorize writes or override GitHub/current live technical truth. Large cached bytes should remain in the provider/tool cache or artifact store rather than D1.
+
+
 WRITE DISCIPLINE
 - D1 writes must be bounded and meaningful; avoid polling/event spam.
 - Pollicino high-frequency liveness updates overwrite/coalesce the current session row; append journal events only for material transitions.
 - Live-directive writes occur only on meaningful directive transitions/publication; safe-point reads do not create D1 event spam.
 - Use directive_id plus project/operation/session identity for deduplication; agents may keep reconstructible local seen-ID state.
 - Persist at material transitions and checkpoints.
-- Velocity lessons/metrics are bounded, deduplicated and written at meaningful completion/failure/comparison boundaries rather than per tool call.
+- Velocity lessons/metrics and incremental-result metadata are bounded, deduplicated and written at meaningful completion/failure/comparison boundaries rather than per tool call.
+- Material Execution Fabric events may be appended/coalesced at state transitions; do not persist high-frequency runner chatter.
 - A learned lesson must carry evidence plus applicability/invalidation context; stale lessons are not silently reused.
 - Use idempotent keys where possible so Resume Recovery does not duplicate state.
 - One logical operation uses one MOTORLAB_OPERATION_ID.
@@ -260,7 +280,7 @@ SUCCESS CRITERIA
 - comparable operations can use TTTA/phase evidence to reduce future avoidable latency.
 
 VERSION
-MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.4
+MOTORLAB-PERSISTENT-OPERATIONAL-STATE-V1.5
 Established: 2026-09-30
 Revision 1.1: adds secret-free live_directives persistence, transition-only writes, deduplication and fail-open read/fallback semantics.
 
@@ -269,3 +289,5 @@ Revision 1.2: r20 adds external Pollicino sessions, compact session journal and 
 Revision 1.3: r21 adds bounded velocity lessons, adaptive-runner/critical-path checkpoint summaries and TTTA/phase metrics for evidence-based acceleration without storing chain-of-thought or creating new write authority.
 
 Revision 1.4: r22 persists Execution Fabric ready/running graph summaries and observed parallelism proof, including host limits, overlap evidence, correction relays and single integration lane verification.
+
+Revision 1.5: r23 adds bounded incremental result metadata plus cache/dynamic/pruning/deferred-materialization metrics and reuses operation_events as the material event-memory journal without storing chain-of-thought.
