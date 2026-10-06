@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.05-r20
+CURRENT_RELEASE=2026.10.06-r21
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -132,8 +132,27 @@ Watchdog remains sole stall/recovery-level coordinator; Resume Recovery remains 
 When a supported enrolled session loses liveness without a terminal seal, a durable external sentinel should prepare RESUME_READY before a later Bruno `continua`.
 Opaque ordinary ChatGPT thinking cannot be truthfully pinged unless the host exposes a real side-channel; risky work should therefore use observable persistent executors or bounded recoverable segments.
 
+
+R21+ FOUR DESIGN PILLARS + ADAPTIVE VELOCITY
+MOTORLAB_VELOCITY_LAYER_V1.txt r21 semantics are mandatory.
+Every current/future MotorLab project inherits:
+- ENGINE EFFICIENCY, AUTOMATION/PROGRAMMING FACILITATION, FINAL ARTIFACT QUALITY and EXECUTION SPEED as the four design pillars;
+- execution speed / honest TIME_TO_TESTABLE_ARTIFACT (TTTA) as the primary optimization KPI, subject to hard safety/correctness/approval/lifecycle constraints;
+- COMPLEXITY MUST PAY RENT: avoid always-on orchestration that adds recurring latency without a required net pillar benefit;
+- dependency-DAG planning for eligible non-trivial work;
+- CRITICAL-PATH-FIRST scheduling;
+- adaptive one-or-many runner fan-out;
+- parallel writes only in disjoint isolated scopes with one final integration lane;
+- continuous convergence and correction relay instead of unnecessary global barriers/full restarts;
+- bounded speculative execution only when isolated, safe, quota/cost appropriate and likely faster than serial trial;
+- incremental inspection/test/build/cache reuse with dependency-aware invalidation;
+- bounded evidence learning from Root Cause, research, timings, provider/tool behavior, runner conflicts, recoveries and successful/failed strategies;
+- current evidence/invalidation checks before any lesson is reused.
+Velocity learning never grants write authority and never replaces GitHub/current project technical truth.
+Repeated TTTA regression without required quality/safety justification is treated as an optimization defect.
+
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.20
+MOTORLAB-RELEASE-MANIFEST-V1.21
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -143,3 +162,4 @@ Revision 1.18: r18 adds mandatory paired immutable LAB di sicurezza checkpoints 
 Revision 1.19: r19 elevates Change Compatibility Guard to a foundational mandatory cross-project pillar for redundancy/overlap/conflict prevention.
 
 Revision 1.20: r20 adds mandatory Pollicino external session continuity, dual liveness/progress evidence, terminal seals, durable interruption sentinel and precomputed RESUME_READY without application-code breadcrumbs.
+Revision 1.21: r21 establishes the four design pillars and adaptive Velocity architecture with TTTA KPI, complexity budget, DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, incremental execution and bounded evidence learning.
