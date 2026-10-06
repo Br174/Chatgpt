@@ -11,6 +11,16 @@ Every write-capable software/control-plane change must perform read-only conflic
 Equivalent responsibilities must be merged/extended or explicitly superseded; MotorLab must not accumulate competing implementations for the same responsibility.
 No speed/automation/project-local rule may bypass this pillar.
 
+FOUR DESIGN PILLARS - R21+
+All MotorLab design, maintenance and optimization is governed by four permanent objectives:
+1. ENGINE EFFICIENCY.
+2. AUTOMATION / PROGRAMMING FACILITATION.
+3. FINAL ARTIFACT QUALITY.
+4. EXECUTION SPEED — primary optimization priority, measured primarily as end-to-end request/approval to verified testable artifact latency.
+Complexity is not a goal. New complexity must produce a net benefit in one or more pillars and should remain on-demand when always-on execution would add avoidable latency.
+Speed has priority among optimization choices, while safety, correctness, security, data integrity, signing/package identity, approval and project-native authority remain hard constraints.
+Between equally trustworthy approaches, prefer lower TIME_TO_TESTABLE_ARTIFACT (TTTA), lower coordination overhead and greater automation.
+
 PURPOSE
 This contract defines permanent governance rules for MotorLab:
 1. MotorLab must always coexist with and support project-native engines; it must never replace them merely because MotorLab is active.
@@ -18,7 +28,8 @@ This contract defines permanent governance rules for MotorLab:
 3. MotorLab activation for registered projects must be structural and implicit: recurring per-chat activation strings are fallback compatibility aids, not the normal architecture.
 4. Registered project context has mandatory precedence over software-build intent detection; intent discovery is used only when no registered project context is already identifiable.
 5. Protection of external APIs/providers/services is a shared MotorLab control-plane responsibility governed by MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt whenever relevant.
-6. Faster idea-to-LAB execution is a shared MotorLab capability governed by MOTORLAB_VELOCITY_LAYER_V1.txt and is strictly additive: no existing capability or safety rule may be removed, weakened or bypassed for speed.
+6. Faster idea-to-artifact execution is a shared MotorLab capability governed by MOTORLAB_VELOCITY_LAYER_V1.txt and is strictly additive: no existing capability or safety rule may be removed, weakened or bypassed for speed.
+7. MotorLab must learn operationally from verified errors, searches/research, timings and successful/failed execution patterns so future comparable work can use a faster, simpler or safer route. Learned heuristics are advisory only: they cannot authorize writes or weaken governance.
 
 1. PROJECT ENGINE COEXISTENCE - MANDATORY
 MotorLab is the shared orchestration, lifecycle, build/test, checkpoint, watchdog, routing, progress, release, continuity, external-service-protection and safe-acceleration control-plane.
@@ -34,7 +45,11 @@ MotorLab MUST:
 - treat project-native engines as authoritative for their own domain responsibilities unless Bruno explicitly approves a migration/change;
 - add cross-project control capabilities without unnecessarily rewriting project internals;
 - protect external-service integrations through reusable cache/rate-limit/queue/backoff/circuit/failover rules instead of encouraging incompatible ad-hoc retry logic in each project;
-- reduce redundant analysis, questions, serial read-only work and avoidable build setup through the additive Velocity Layer where safe.
+- reduce redundant analysis, questions, serial work and avoidable build setup through the additive Velocity Layer where safe;
+- decompose eligible work into dependency-aware tasks, prioritize the critical path and use adaptive isolated runners only when they reduce net time-to-artifact;
+- keep one integration lane for final artifact state while allowing compatible parallel preparation/isolated work;
+- reuse verified lessons, caches, timing evidence and prior successful paths when still applicable;
+- simplify orchestration when complexity overhead no longer pays for itself.
 
 MotorLab MUST NOT, merely because it is activated:
 - replace a project-native engine;
@@ -204,6 +219,14 @@ Velocity Layer may NEVER remove, weaken or bypass an existing MotorLab capabilit
 
 FAST LAB is not a new lifecycle state and cannot promote directly to CANDIDATA or MADRE. Candidate reconstruction, full adapter-defined regression gates and explicit promotion approval remain unchanged.
 
+R21 ADAPTIVE EXECUTION / LEARNING
+Velocity Layer is the single coordinator for adaptive parallel execution. Do not create a competing scheduler merely to add more agents.
+It may build a dependency DAG, prioritize critical-path tasks, choose one or many runners adaptively, run independent work in parallel, perform continuous compatibility convergence, use a single integration lane for artifact-producing state, use bounded isolated speculative alternatives, reuse evidence-backed lessons and prefer incremental build/test/inspection.
+Parallel write-capable work is allowed only in disjoint isolated scopes supported by the executor/project adapter. No two runners may mutate the same ref/resource concurrently.
+TIME_TO_TESTABLE_ARTIFACT is the primary performance KPI for comparable project operations. Repeated TTTA regression without required safety/quality justification is a MotorLab optimization defect and should trigger simplification/root-cause analysis.
+Learning from prior work is evidence-based, bounded and context-sensitive. Learned heuristics never become a second technical source of truth and never bypass current compatibility, approval or safety checks.
+The scheduler must prefer one runner when fan-out/coordination cost exceeds expected savings; more runners are not inherently better.
+
 This governance rule does not automatically rewrite project repositories. Project-specific acceleration mechanics are introduced through adapters and normal authorized project workflows.
 
 11. NO FALSE GUARANTEE
@@ -229,13 +252,16 @@ This governance contract is active when:
 - unregistered future chats with genuine software-build intent can enter MotorLab onboarding when the host exposes the required intent-trigger mechanism;
 - project context always takes precedence over intent gating;
 - external-service integrations inherit the reusable Service Guard when relevant instead of relying on uncontrolled retries or repeated duplicate provider calls;
-- Velocity Layer reduces avoidable idea-to-LAB latency while every pre-existing MotorLab capability remains active;
+- Velocity Layer reduces avoidable idea-to-artifact latency while every pre-existing MotorLab capability remains active;
+- adaptive runner fan-out reduces real elapsed time only when beneficial and never creates competing writers;
+- TTTA/phase evidence and verified lessons are reused to reduce future avoidable latency;
+- MotorLab complexity is simplified or moved off the critical path when it does not pay for itself;
 - manual activation prompts are fallback only;
 - project repositories are not modified merely because a MotorLab governance rule changed;
 - later explicit Bruno decisions can supersede earlier rules through normal versioned repository updates.
 
 VERSION
-MOTORLAB-GOVERNANCE-V1.5
+MOTORLAB-GOVERNANCE-V1.6
 Established: 2026-09-29
 Revision 1.1: structural implicit auto-bootstrap for registered projects; recurring per-chat activation prompts demoted to fallback-only compatibility behavior.
 Revision 1.2: project-first activation precedence plus semantic software-build intent onboarding for unregistered chats.
@@ -243,3 +269,5 @@ Revision 1.3: External Service Guard becomes a permanent cross-project MotorLab 
 Revision 1.4: Velocity Layer becomes a permanent additive-only acceleration capability; all earlier MotorLab protections retain precedence.
 
 Revision 1.5: r19 elevates Change Compatibility Guard to a permanent foundational cross-project pillar with one-responsibility/one-active-coordinator semantics.
+
+Revision 1.6: r21 establishes the four design pillars, speed-first TTTA optimization, complexity-must-pay-rent rule, adaptive DAG/runner governance and evidence-based learning while preserving all hard safety/project-authority constraints.
