@@ -1,0 +1,9 @@
+MOTORLAB MODIFICATION + RESTORE REGISTER - MotorAI
+PROJECT=MotorAI
+REPOSITORY=Br174/MotorAI
+REGISTER_STATUS=ACTIVE_CONFIRMED_ONLY
+DISPLAY_NAME=Registro Modifiche e Ripristini
+NEXT_RESTORE_NO=1
+VISIBLE_SLOTS=0
+RULE=Only Bruno-confirmed working modifications explicitly approved for conservation enter this register. Technical history remains in Git/MOTORLAB_CHANGE_REGISTRY_MOTORAI_V1.txt. The Seed 003 APK is pending real-device acceptance and is therefore not yet a visible restore slot.
+VERSION=MOTORLAB-MOTORAI-MODIFICATION-RESTORE-REGISTER-V1.0
