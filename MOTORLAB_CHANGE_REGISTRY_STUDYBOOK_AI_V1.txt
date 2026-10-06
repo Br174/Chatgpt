@@ -11,3 +11,17 @@ No pre-r13 records are asserted without Git/ledger verification. On first semant
 
 VERSION
 MOTORLAB-STUDYBOOK-AI-CHANGE-REGISTRY-V1.0
+
+CHANGE_ID=STUDYBOOK-20261006-MOTORLAB-R20-ADOPTION
+DATE=2026-10-06
+TYPE=CONTROL_PLANE_LIFECYCLE
+TITLE=StudyBook adopts MotorLab r20 external Pollicino and Android update-family lifecycle
+REQUESTED_BY=Bruno
+STATUS=VERIFIED_BOUNDARY
+SOURCE_REF=lab/studybook-core-android-01-update-02
+SOURCE_HEAD=e4d52a3885684e67371dd80de188994a42260a3a
+MOTORLAB_OPERATION_ID=studybook-lab02-r20-ux-repair-20261006
+BEHAVIOR=Preserves r16 as LAST_GOOD; installs r20 local bundle, external Live Control/Pollicino sidecars, stable proof marker, no application runtime coupling; activates same-family LAB updates, paired immutable recovery/safety APK, new-family CANDIDATA and same-candidate MADRE promotion.
+VERIFICATION=StudyBook branch reread passed; r20 sync state present; app Actions runs on metadata-only branch = 0.
+RESTORE=Control-plane rollback may restore r16 LAST_GOOD without changing app source.
+
