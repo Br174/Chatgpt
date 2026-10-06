@@ -22,7 +22,7 @@ PROJECT TECHNICAL REGISTRY
 Each MotorLab-managed project has one canonical central technical change registry, normally MOTORLAB_CHANGE_REGISTRY_<PROJECT>_V1.txt.
 
 TECHNICAL RECORD FIELDS
-When available: CHANGE_ID, PROJECT/REPOSITORY, DATE, TITLE, SEMANTIC_TAGS/ALIASES, USER_INTENT, CHANGE_SCOPE, lifecycle identity, source base/ref/SHA, result ref/SHA, implementation commits, changed files/hunks, behavior summary, verification evidence, technical STATUS, supersedes links, restore hints and source confidence. Never store secrets.
+When available: CHANGE_ID, PROJECT/REPOSITORY, DATE, TITLE, SEMANTIC_TAGS/ALIASES, USER_INTENT, CHANGE_SCOPE, lifecycle identity, source base/ref/SHA, result ref/SHA, implementation commits, changed files/hunks, behavior summary, verification evidence, technical STATUS, supersedes links, restore hints and source confidence. For r21 acceleration analysis it may also preserve EXECUTION_MODE, RUNNER_COUNT, TTTA/phase timing summary, high-value LESSON_IDS and whether a lesson reduced later rework. Never store secrets.
 
 TECHNICAL WRITE-THROUGH
 At verified material boundaries MotorLab may append/update technical history records automatically when useful and write access exists. This does NOT mean Bruno approved the change as a visible restore point.
@@ -48,6 +48,12 @@ When a later change regresses an earlier behavior, preserve technical provenance
 HISTORY PRESERVATION
 Do not delete technical records merely because they are superseded, rejected or no longer visible. Git/technical history is the audit trail; the r14 visible register stays short by pointing only to the latest Bruno-confirmed working point per feature.
 
+VELOCITY LEARNING FALLBACK - R21+
+Technical Change History may preserve high-value durable provenance for MotorLab learning when D1 velocity lessons/metrics are unavailable or when a lesson materially affects future engineering decisions.
+Do not turn the registry into a high-frequency telemetry store.
+Persist only evidence-backed lessons likely to change later routing, decomposition, build/test selection, provider strategy, compatibility prevention or recovery.
+A lesson reference remains subordinate to current Git/source/provider evidence and must include enough context to know when it no longer applies.
+
 CURRENT/FUTURE PROJECTS
 All current/future MotorLab projects inherit both layers: technical Change History and the separate user-confirmed numbered Registro Modifiche e Ripristini.
 
@@ -55,5 +61,6 @@ NO RUNTIME COUPLING
 Registry metadata alone must not alter app runtime/UI/package/signing/lifecycle/native engines.
 
 VERSION
-MOTORLAB-CHANGE-HISTORY-REGISTRY-V1.1
+MOTORLAB-CHANGE-HISTORY-REGISTRY-V1.2
 Revision 1.1: r14 explicitly separates technical automatic/history provenance from the Bruno-confirmed visible Registro Modifiche e Ripristini.
+Revision 1.2: r21 adds bounded TTTA/execution-strategy and high-value lesson provenance as a durable learning fallback without converting technical history into telemetry noise.
