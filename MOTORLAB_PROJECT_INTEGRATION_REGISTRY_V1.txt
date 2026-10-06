@@ -1,133 +1,89 @@
 MOTORLAB PROJECT INTEGRATION REGISTRY V1
 
 STATUS
-Canonical registry of MotorLab-managed projects.
+Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.05-r20
+Release: 2026.10.06-r23
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
-Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt
-Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt
-Canonical Root Cause: MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
-Canonical Artifact-First policy: MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
-Canonical technical history: MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
-Canonical pre-change approval: MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
-Canonical visible restore register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
-Canonical authority/data ownership: MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt
-Canonical persistent operational state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt
+Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.24
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.18
+Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.1
+Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.3
+Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
 Canonical Pollicino continuity: MOTORLAB_POLLICINO_CONTINUITY_V1.txt
-Canonical observability: MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
-Canonical knowledge/tool routing: MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
-Canonical service connection status: MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
 
-GLOBAL R16 RULES
-- All r15 approval, Artifact-First, Root Cause, lifecycle, restore, progress and safety gates remain mandatory.
-- GitHub remains durable technical authority and recovery source.
-- Cloudflare D1 is the verified live operational state store for central MotorLab; KV is reconstructible cache only.
-- One MOTORLAB_OPERATION_ID correlates each logical operation across operational state, artifacts, Root Cause, diagnostics and projections.
-- PostHog is runtime diagnostic evidence only and cannot authorize changes.
-- Notion is Bruno-facing status projection only.
-- GitBook is architecture/manual projection only.
-- Superpowers is a subordinate engineering-method layer and cannot override MotorLab.
-- Context7 is quota-aware on-demand documentation only.
-- Optional services must fail safely and never silently trigger paid usage.
-- CORE readiness must not be confused with live plugin/provider connection; MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt tracks that distinction.
+R23 GLOBAL EXECUTION POLICY
+All registered projects inherit:
+- WORK_ELIMINATION_FIRST;
+- CONTENT_ADDRESSED_REUSE with explicit invalidation;
+- INCREMENTAL_DELTA_EXECUTION;
+- CRITICAL_PATH_FIRST;
+- READY_QUEUE / batched concurrent dispatch where supported;
+- DYNAMIC_DAG_GROWTH;
+- FAST LINE -> MINI TREE -> FULL DYNAMIC GRAPH progressive branching;
+- DYNAMIC_PRUNING;
+- EVENT_MEMORY through existing operational state;
+- DEFERRED_MATERIALIZATION;
+- adaptive runner fan-out with one final integration lane;
+- observed parallelism proof and honest host-limited serial reporting.
+Velocity remains the sole scheduling authority. Execution Fabric is the dispatcher. Pollicino remains the external continuity line and is not replaced.
 
-R15 RULES PRESERVED
-- Initial change request is intent only; pre-change report + later Bruno approval precedes first write.
-- For approved defect/regression work where Bruno expects APK/ZIP/testable artifact, default critical path is repair -> risk-appropriate verify -> artifact -> deliver.
-- Safely deferrable causal/prevention work is persisted in POST_ARTIFACT_ROOT_CAUSE_QUEUE and continues afterward.
-- Root Cause Closure remains mandatory; non-deferrable high-risk causes stay before artifact when needed for trust/safety/integrity.
-- Delivered artifact/ref/checksum remains stable while Bruno tests it; later prevention builds are separate controlled states.
-- Artifact progress may reach 100% while overall MotorLab progress remains below 100% until causal closure.
-- Technical Change History remains provenance/search.
-- Visible Registro Modifiche e Ripristini contains only specific Bruno-confirmed working modifications with one stable plain integer per feature family.
-
-REGISTERED PROJECTS
+REGISTERED PROJECTS — R23 MIGRATION VERIFIED 2026-10-06
 1. MusicLab — Br174/MusicLab
-   Project state: MOTORLAB_PROJECT_STATE_MUSICLAB_V1.txt revision 78
-   Technical registry: MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt
-   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_MUSICLAB_V1.txt
-   Visible state: N.1 Player / mini-player fuori dal lettore from device-accepted LAB19 CANDIDATA
-   Stable CANDIDATA: candidate/musiclab-lab19-player-stable @ 6f3efabd77d6e0a918b91091bb1862986d1dc5fc
-   Local satellite: 2026.10.05-r20 / MOTORLAB-SATELLITE-BUNDLE-V2.15 VERIFIED on main @ 667c65beaa1040cdcdd10f5e8f8b8c37cab1a6ee
-   r20 control-plane head: 667c65beaa1040cdcdd10f5e8f8b8c37cab1a6ee
-   POLLICINO_PROOF_HEAD: 966c40dbfb3746d56de199c8beb35558bf150a92 (stable verified enrollment anchor; intentionally distinct from mutable current HEAD)
-   LAST_GOOD: 2026.10.05-r20 / MOTORLAB-SATELLITE-BUNDLE-V2.14
-   Central r20 authoritative; local r20 adopted on verified safe boundary. Pollicino self-enrolling sidecar/lifecycle hooks installed; source-proof executor enrollment and full stall/crash/preemptive-resume flow verified by successful E2E runs including final run 37382896686. Final D1 OIDC relay run 37365348315 is SUCCESS and snapshot pollicino-musiclab-final-667c65b-20261005 is verified readable. Final sidecar equals the central template byte-for-byte; stable proof anchor is persisted in real .motorlab metadata and runtime Git HEAD is kept separate from proof identity. FINAL_GATE=COMPLETE_PASSED; no external gate pending.
-   Candidate/ref/application lifecycle unchanged; application runtime impact from r20/Pollicino control-plane adoption: NONE.
+   main r23 commit: 212f9d7370f5fb90ac42be324c09ec6d92d86152
+   active LAB47 branch r23 commit: 2ffb723c7cdba5e2652ec377cdb1757d50ccbffc
+   Pollicino sidecar/proof flow preserved.
+   Native MusicLab engines/lifecycle remain authoritative.
 
 2. GeoVision — Br174/GeoVision-Test
-   Project state: MOTORLAB_PROJECT_STATE_GEOVISION_V1.txt
-   Technical registry: MOTORLAB_CHANGE_REGISTRY_GEOVISION_V1.txt
-   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_GEOVISION_V1.txt
-   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
+   main r23 commit: 8a397f6b058abeb01f09eda8a537a21186082d3a
+   Native GeoVision engine/lifecycle preserved.
 
 3. StudyBook-AI — Br174/StudyBook-AI
-   Project state: MOTORLAB_PROJECT_STATE_STUDYBOOK_AI_V1.txt
-   Technical registry: MOTORLAB_CHANGE_REGISTRY_STUDYBOOK_AI_V1.txt
-   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_STUDYBOOK_AI_V1.txt
-   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
+   main r23 commit: efad83b799d65234b8f467bd22a5c9d981ce4cba
+   active LAB03 branch r23 commit: 759d5ce999253c2da8480f3b46a726d8f153e50a
+   StudyBook application/runtime behavior remains separate from MotorLab control-plane adoption.
 
 4. Visionflix / Verlezza Vision — Br174/Visionflix
-   Project state: MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt
-   Technical registry: MOTORLAB_CHANGE_REGISTRY_VISIONFLIX_V1.txt
-   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_VISIONFLIX_V1.txt
-   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
+   main r23 commit: f09b8e191556d7a7af57577e4fe8892597ae680a
+   Visionflix remains source lifecycle authority.
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
-   Project state: MOTORLAB_PROJECT_STATE_COVER_LAB_AI_V1.txt
-   Technical registry: MOTORLAB_CHANGE_REGISTRY_COVER_LAB_AI_V1.txt
-   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_COVER_LAB_AI_V1.txt
-   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
+   main r23 commit: 16454c990bda09861e904232bc35d0bd6a35cc5b
+   Native Cover Lab engine remains authoritative.
 
 6. streamflix-BV — Br174/streamflix-BV
-   Project state: MOTORLAB_PROJECT_STATE_STREAMFLIX_BV_V1.txt
-   Technical registry: MOTORLAB_CHANGE_REGISTRY_STREAMFLIX_BV_V1.txt
-   Visible register: MOTORLAB_MODIFICATION_RESTORE_REGISTER_STREAMFLIX_BV_V1.txt
-   Local satellite: r11 VERIFIED; r16 adoption pending live reconcile/safe boundary.
+   main r23 commit: f46d74900f3cfe92f8941314a759b6a97fe2373c
+   Remains delivery adapter; Visionflix source authority preserved.
 
-CENTRAL SERVICE INTEGRATION STATUS
-- GitHub: CONNECTED_VERIFIED.
-- Cloudflare central MotorLab D1/KV: CONNECTED_VERIFIED / RESOURCE_READY; end-to-end GitHub webhook -> Worker -> D1 write -> verification read passed on 2026-09-30; GitHub remains authoritative fallback.
-- PostHog: CONNECTED_VERIFIED at ChatGPT/plugin account level; project instrumentation not yet adopted.
-- Notion: CONNECTED_VERIFIED; MotorLab Control Center is derived status projection only.
-- GitBook: CONNECTED_VERIFIED for read/write. User-authenticated OAuth Full access was explicitly authorized on 2026-09-30; site read passed and harmless draft change-request creation passed in Documentation space as change request #1 `MotorLab write-auth verification` (id Om35NPWJOlL2sYvHGNgm). The verification change request remains draft and unmerged. Previous HTTP 403 root cause was Read only OAuth scope; future verification requires separate read and harmless draft-write checks.
-- Superpowers: CONNECTED_VERIFIED; subordinate engineering-method layer.
-- Context7: CONNECTED_VERIFIED through the custom MCP app `Context7 Free` at `https://mcp.context7.com/mcp` with anonymous/no-auth free access. Two functional checks passed on 2026-10-01 (Cloudflare documentation; Next.js resolved as `/vercel/next.js` with current official docs/code). The public catalog plugin remains not installed (`installed:false`) and is a separate surface, not an error. The failed OAuth prototype was removed. Context7 remains optional, advisory, quota-aware and never blocking.
-Existing Cloudflare use inside MusicLab/Cover Lab AI remains project-specific and distinct from the verified central MotorLab state store.
+CLEANUP / NON-REDUNDANCY
+- Old r11/r16/r19/r20/r21 active satellite contents were superseded by one current r23 local core at the verified safe boundary.
+- The immediately previous verified local core is preserved only as .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt for rollback.
+- LAST_GOOD is intentional safety state and is not redundant legacy.
+- One local current dispatcher copy exists at .motorlab/execution/motorlab_execution_fabric.mjs.
+- No duplicate active scheduler was introduced: ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR remains mandatory.
+- Git history preserves older releases; current registry does not duplicate obsolete release prose.
 
-SAFE ADOPTION RULE
-Never force a release change into active/unknown project work. Projects must be live-reconciled before local CORE adoption. Central r20 remains authoritative whenever central access exists; local satellite versions remain truthfully reported until upgraded.
+POLLICINO
+Pollicino remains external control-plane continuity: liveness/progress evidence, terminal seals, RESUME_READY and stable proof semantics remain intact. r23 does not replace or move Pollicino into application runtime code.
 
-SYNC CLOSURE
-MOTORLAB_SATELLITE_SYNC_V1.txt v1.17 requires r20 Pollicino external continuity/executor-adapter markers in addition to authority/data ownership, MOTORLAB_OPERATION_ID, persistent-state fallback, observability and prior release gates.
+SAFE ADOPTION
+The global migration was performed only after confirming no active GitHub workflow runs in the six registered repositories. MotorLab-only commits used [skip ci]. Application source/runtime/package/signing/lifecycle was not changed by this migration.
+
+CENTRAL SERVICE STATUS
+GitHub: CONNECTED_VERIFIED.
+Cloudflare central D1/KV: CONNECTED_VERIFIED / RESOURCE_READY; GitHub remains durable technical authority.
+PostHog: CONNECTED_VERIFIED at account/plugin level; runtime evidence only.
+Notion: CONNECTED_VERIFIED; status projection only.
+GitBook: CONNECTED_VERIFIED read/write; documentation projection only.
+Superpowers: CONNECTED_VERIFIED; subordinate methodology.
+Context7 Free: CONNECTED_VERIFIED; optional/version-aware documentation only.
 
 FUTURE PROJECTS
-Every future project receives hook + local satellite + Project Continuity + technical Change History + visible restore register and inherits r20 Pollicino external continuity plus authority, persistent-state, observability, plugin-routing, approval, Artifact-First and Root Cause policies.
+Every newly onboarded project receives the current r23 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, and the r23 incremental dynamic execution policy.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.17
-Revision 2.11: GitBook live status reconciled to read/write CONNECTED_VERIFIED after OAuth Full access authorization and successful harmless draft change-request write check. Root cause recorded as prior Read only OAuth scope; prevention requires separate read and write capability checks. Central r16 release unchanged.
-Revision 2.12: Context7 Free custom MCP app reconciled to CONNECTED_VERIFIED after two end-to-end documentation checks. Catalog-plugin state is explicitly separated from custom-app state; the anonymous free endpoint is pinned and the failed OAuth prototype is recorded as removed. Central r16 release unchanged.
-
-
-R19 CHANGE COMPATIBILITY PILLAR
-- MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is mandatory for every currently registered MotorLab software project and every future project.
-- Before write-capable changes, inspect the authoritative current implementation for overlap, redundancy, conflict and already-existing rules.
-- ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR.
-- Extend or merge the existing responsible mechanism when appropriate; if an older path conflicts, explicitly supersede it instead of leaving duplicate active behavior.
-- Fast iteration, optimization, automation, migration, restore and background execution do not bypass this pillar.
-- Existing projects adopt r19 at the next verified safe boundary; future projects inherit it during onboarding.
-
-VERSION NOTE
-Registry alignment for MotorLab 2026.10.05-r20.
-
-Revision 2.14: central release aligned to r20; MusicLab safely adopted the r20 satellite and external Pollicino Codex sidecar on main with r16 preserved as LAST_GOOD and zero application-runtime changes. Authenticated executor enrollment remains pending.
-
-Revision 2.15: MusicLab Pollicino adoption finalized on main 966c40dbfb3746d56de199c8beb35558bf150a92; source-proof enrollment, OIDC D1 relay and complete stall/crash/RESUME_READY behavior verified end-to-end with no app runtime changes.
-
-Revision 2.16: MusicLab control-plane finalized at abf77afc4ae74f629cdf2d5c665211a20ed7b368 with V2.14, V2.13 rollback floor and real POLLICINO_PROOF_HEAD=966c40dbfb3746d56de199c8beb35558bf150a92; current Git HEAD and proof anchor are intentionally separate. No application/runtime source changed.
-
-Revision 2.17: MusicLab Pollicino r20 final gate COMPLETE_PASSED at main 667c65beaa1040cdcdd10f5e8f8b8c37cab1a6ee with V2.15 active, V2.14 LAST_GOOD, stable proof anchor 966c40dbfb3746d56de199c8beb35558bf150a92, final canary 37382896686 SUCCESS and final OIDC relay 37365348315 SUCCESS; application/runtime impact remains NONE.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.18
+Revision 2.18: registry cleaned to current-state r23; all six registered projects migrated at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
