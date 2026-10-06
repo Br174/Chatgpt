@@ -25,3 +25,33 @@ BEHAVIOR=Preserves r16 as LAST_GOOD; installs r20 local bundle, external Live Co
 VERIFICATION=StudyBook branch reread passed; r20 sync state present; app Actions runs on metadata-only branch = 0.
 RESTORE=Control-plane rollback may restore r16 LAST_GOOD without changing app source.
 
+CHANGE_ID=STUDYBOOK-20261006-LAB02-UX-AND-RECOVERY
+DATE=2026-10-06
+TYPE=LAB_FUNCTIONAL_AND_ANDROID_LIFECYCLE
+TITLE=LAB 02 book workspace, real simple text, original reader, grounded study tools and paired recovery APK
+REQUESTED_BY=Bruno
+STATUS=VERIFIED_ARTIFACTS_READY_DEVICE_ACCEPTANCE_PENDING
+MOTORLAB_OPERATION_ID=studybook-lab02-r20-ux-repair-20261006
+UPDATE_SOURCE_REF=lab/studybook-core-android-01-update-02
+UPDATE_SOURCE_HEAD=dd1d06e437b580f0a621164b36f1537f577de198
+RECOVERY_SOURCE_REF=lab/recovery-studybook-core-android-02
+RECOVERY_SOURCE_HEAD=cc7b63669845467a3757bfeeb99906afef015d3f
+FUNCTIONAL_SOURCE_HEAD=dd1d06e437b580f0a621164b36f1537f577de198
+UPDATE_ARTIFACT=StudyBook-AI-LAB-02-AGGIORNAMENTO.apk
+UPDATE_APK_SHA256=8616eb9df6a88db1f5f408bc464defcf430bb4d2440e4cc110c77f2613235851
+UPDATE_ZIP_SHA256=eb2a85b3f9a7fa6757f5e4a6cb7140b57da30203e0a7a544785122b0c57d9086
+UPDATE_APPLICATION_ID=it.studybook.ai.lab
+UPDATE_VERSION_CODE=7
+UPDATE_SIGNING_SHA256=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
+RECOVERY_ARTIFACT=StudyBook-AI-LAB-02-RIPRISTINO.apk
+RECOVERY_APK_SHA256=f525bc1e45f67fe4f4de1c1577926888d31ae9c25642eb948110254c944e8271
+RECOVERY_ZIP_SHA256=a1dec304ee31fa0e1b7e0fcb8f54a929758525ffabf8b0d844776088d7e470b8
+RECOVERY_APPLICATION_ID=it.studybook.ai.lab.recovery02
+RECOVERY_VERSION_CODE=8
+RECOVERY_SIGNING_SHA256=67:1D:06:1B:6D:CF:26:E6:9A:81:08:59:1C:CC:81:B0:EF:B7:6D:12:2C:34:AD:7F:77:5D:E9:0D:DE:60:BD:EA
+BEHAVIOR=Book-open screen shows cover/context and compact Leggi/PDF elaborato/Studia/porta-con-te actions; Originali opens preserved source file via format reader; local simpleSummary is distinct; quiz/flashcards no longer use generic-prose fallback.
+ROOT_CAUSES=1 local fallback had no distinct simpleSummary; 2 Originali path treated parsed source as sufficient and did not use preserved file reader; 3 paragraphPoints included generic summary-sentence fallback; 4 StudioScreen action layout did not visually anchor actions to the opened book.
+PREVENTION=LAB02 UX regression test + grounded study-tools test + Android native identity/signing/package gates + paired recovery artifact.
+VERIFICATION=UAB run 37476059090 success; update Android run 37476059378 success; recovery UAB run 37476816977 success; recovery Android run 37476817099 success; update/recovery source compare shows only two workflow packaging lines on recovery branch.
+VISIBLE_RESTORE_REGISTER=not yet; requires Bruno device confirmation and conservation request.
+
