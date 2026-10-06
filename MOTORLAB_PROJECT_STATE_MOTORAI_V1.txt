@@ -1,20 +1,20 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=9
+STATE_REVISION=10
 STATE_STATUS=SEED004_REAL_DEVICE_ACCEPTED_FIRST_GOOD_BASELINE
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.06-r23
 ACTIVE_OPERATION_ID=MOTORAI-SEED003-FIRST-APK-20261006
 OPERATION_STATUS=artifact_delivered_pending_device_acceptance
-CURRENT_PHASE=SEED006_LEVEL1_GENERATION_AND_RESUME_VALIDATION
+CURRENT_PHASE=SEED006_FINAL_RESUME_VALIDATION
 CURRENT_REF=main
 CURRENT_HEAD_SHA=2fc178f6e119b7a06325b63a6568fa18bebf1a13
 LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=Seed006 real-device Level1 training completed at step620 with 100.0% Level1 generalization and 100.0% Level0 retention; checkpoint saved
-NEXT_SAFE_STEP=Test reverse-pair generation (for example ef> -> ef>fe), then close/reopen app and verify step620/curriculum Level1 persist before promoting Seed006 to accepted restore baseline
-PENDING_VERIFICATION=Seed006 reverse-pair generation and step620 checkpoint-resume persistence on real device
+LAST_COMPLETED_MATERIAL_STEP=Seed006 real-device generation verified for Level1: ef> -> ef>fe at step620 with Level1 generalization 100% and Level0 retention 100%
+NEXT_SAFE_STEP=Close and reopen Seed006 once; verify step620 and curriculum Level1 checkpoint resume, then promote Seed006 to current accepted restore baseline
+PENDING_VERIFICATION=Seed006 step620/curriculum Level1 checkpoint-resume persistence after app restart
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
 FIRST_APK_ARTIFACT_ID=11446590832
@@ -105,3 +105,7 @@ SEED006_REAL_DEVICE_BATTERY_PERCENT=84
 SEED006_REAL_DEVICE_CHARGING=yes
 SEED006_REAL_DEVICE_FREE_RAM_MB=1745
 SEED006_CHECKPOINT_SAVED=yes
+
+SEED006_LEVEL1_GENERATION_VERIFIED=yes
+SEED006_LEVEL1_GENERATION_INPUT=ef>
+SEED006_LEVEL1_GENERATION_OUTPUT=ef>fe
