@@ -55,3 +55,18 @@ PREVENTION=LAB02 UX regression test + grounded study-tools test + Android native
 VERIFICATION=UAB run 37476059090 success; update Android run 37476059378 success; recovery UAB run 37476816977 success; recovery Android run 37476817099 success; update/recovery source compare shows only two workflow packaging lines on recovery branch.
 VISIBLE_RESTORE_REGISTER=not yet; requires Bruno device confirmation and conservation request.
 
+
+CHANGE_ID=STUDYBOOK-20261006-MOTORLAB-R21-ADOPTION
+DATE=2026-10-06
+TYPE=CONTROL_PLANE_VELOCITY
+TITLE=StudyBook adopts MotorLab r21 Four-Pillar Adaptive Velocity
+REQUESTED_BY=Bruno
+STATUS=VERIFIED_BOUNDARY
+SOURCE_REF=lab/studybook-core-android-01-update-02
+SOURCE_HEAD=e3f3bb5a819e45b95dc4da77e431f6c9a016d4a9
+FUNCTIONAL_ARTIFACT_SOURCE_HEAD=dd1d06e437b580f0a621164b36f1537f577de198
+MOTORLAB_OPERATION_ID=studybook-motorlab-r21-sync-20261006
+BEHAVIOR=Preserves r20 as LAST_GOOD and adopts r21 Four Design Pillars, TTTA-first optimization, complexity budget, dependency DAG/critical-path scheduling, adaptive one-or-many runner fan-out, isolated parallel writes, one integration lane, continuous convergence, correction relay, bounded speculative execution, evidence learning and incremental execution. Pollicino proof/sidecars and Android LAB/CANDIDATA/MADRE lifecycle remain unchanged.
+VERIFICATION=Satellite bundle reread passed all r21 required markers; sync state reports r21 with r20 LAST_GOOD; hook reports r21; Git compare dd1d06e..e3f3bb5 changed only four MotorLab control-plane files; no StudyBook application workflow run was created for the metadata-only adoption.
+RUNTIME_IMPACT=none; existing LAB02 update/recovery APK identities and checksums unchanged.
+RESTORE=Restore .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt to return the satellite control plane to verified r20 without changing application source or APK artifacts.
