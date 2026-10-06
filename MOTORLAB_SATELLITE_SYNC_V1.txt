@@ -12,7 +12,7 @@ BOOT
 2. Use VERIFIED local core immediately as fallback.
 3. When central is reachable, read release manifest and compare releases.
 4. Reconcile Project Continuity/live state before selecting a safe update boundary.
-5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status, r20 Pollicino continuity, r21 Four-Pillar adaptive Velocity/TTTA/learning semantics and r22 operational Execution Fabric dispatch/proof semantics.
+5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status, r20 Pollicino continuity, r21 Four-Pillar adaptive Velocity/TTTA/learning semantics, r22 operational Execution Fabric dispatch/proof semantics and r23 incremental dynamic work-elimination/event-memory semantics.
 
 SAFE UPDATE
 - pin one MotorLab release during active write/build/test/promotion;
@@ -71,6 +71,14 @@ BATCHED_TOOL_CONCURRENCY=required
 OBSERVED_PARALLELISM_PROOF=required
 HOST_LIMIT_SERIAL_TRUTH=required
 GROUPED_RUNNER_STATUS=required
+WORK_ELIMINATION_FIRST=required
+CONTENT_ADDRESSED_REUSE=required
+INCREMENTAL_DELTA_EXECUTION=required
+DYNAMIC_DAG_GROWTH=required
+PROGRESSIVE_BRANCHING=required
+DYNAMIC_PRUNING=required
+EVENT_MEMORY=required
+DEFERRED_MATERIALIZATION=required
 CHANGE_HISTORY_REGISTRY=required
 SEMANTIC_CHANGE_LOOKUP=required
 SELECTIVE_EXACT_RESTORE=required
@@ -108,6 +116,21 @@ POLLICINO_STABLE_PROOF_HEAD=required
 POLLICINO_LOCAL_PROOF_CONSUMPTION=required
 
 
+
+
+R23+ INCREMENTAL DYNAMIC EXECUTION
+Local fallback must preserve:
+- safe reuse/cache before new execution;
+- content-addressed correctness identities with explicit invalidation;
+- delta-scoped recomputation;
+- critical-path-first allocation after work elimination;
+- runtime DAG growth from discoveries without operation restart;
+- FAST LINE -> MINI TREE -> FULL DYNAMIC GRAPH progressive escalation;
+- safe pending-task pruning;
+- material event-memory persistence through existing operational state;
+- deferred materialization of unnecessary intermediates;
+- proof of cache hits/avoided work/dynamic branches/pruning when observable.
+Cache is never technical authority and cannot bypass current-source/freshness/safety gates.
 
 R22+ EXECUTION FABRIC
 Local fallback must preserve:
@@ -186,7 +209,7 @@ Use previously VERIFIED local release plus live evidence conservatively; do not 
 Optional service state must not override verified local/GitHub technical evidence.
 
 FUTURE PROJECTS
-Future projects receive hook + local satellite + Project Continuity + technical history + visible restore register and inherit current release gates, including r21 Four-Pillar adaptive Velocity/TTTA/learning and r22 operational Execution Fabric real-dispatch/proof behavior.
+Future projects receive hook + local satellite + Project Continuity + technical history + visible restore register and inherit current release gates, including r21 Four-Pillar adaptive Velocity/TTTA/learning, r22 operational Execution Fabric real-dispatch/proof behavior and r23 incremental dynamic execution.
 
 AUTOMATIC MEANING
 Synchronization requires an execution cycle with repository access; repository text cannot self-update or wake a frozen host.
@@ -203,7 +226,7 @@ For a private adopted satellite using source-proof enrollment, publish/update `P
 Persist that same adoption proof locally. Do not rotate it for metadata-only commits when the installed sidecar adoption is unchanged.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.23
+MOTORLAB-SATELLITE-SYNC-V1.24
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -226,3 +249,5 @@ Revision 1.21: r20 sync requires the Codex sidecar immediate-first-pulse behavio
 Revision 1.22: r21 requires satellite inheritance of Four-Pillar TTTA-first adaptive Velocity, critical-path DAG scheduling, isolated runners, continuous convergence, incremental execution, complexity budget and bounded evidence learning.
 
 Revision 1.23: r22 requires satellite inheritance of the operational Execution Fabric, Fast Decision Gate, ready-queue/batched execution, observed parallelism proof, host-limit reporting and grouped runner status.
+
+Revision 1.24: r23 requires work-elimination-first reuse, incremental delta execution, dynamic DAG growth/pruning, progressive branching, event memory and deferred materialization at safe satellite boundaries.
