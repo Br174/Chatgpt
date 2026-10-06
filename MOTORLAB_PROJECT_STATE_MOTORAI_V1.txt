@@ -1,20 +1,20 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=18
+STATE_REVISION=19
 STATE_STATUS=SEED009_HOST_VERIFIED_DEVICE_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.06-r23
 ACTIVE_OPERATION_ID=MOTORAI-SEED003-FIRST-APK-20261006
 OPERATION_STATUS=artifact_delivered_pending_device_acceptance
-CURRENT_PHASE=SEED009_LEVEL3_GENERATION_AND_RESUME_VALIDATION
+CURRENT_PHASE=SEED009_FINAL_RESTART_RESUME_VALIDATION
 CURRENT_REF=main
 CURRENT_HEAD_SHA=e316e55f59986f24d6abae04c6a108c35373c734
 LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=Seed009 real-device Level3 adaptive training passed at step1760 after 60 L3 steps; L3 test 100%, L2 retention 95.8%, L1 retention 100%, L0 retention 95.6%
-NEXT_SAFE_STEP=Verify Level3 generation with ef>>> -> ef>>>ff, then close/reopen app and confirm step1760/curriculum Level3 persistence before promoting Seed009
-PENDING_VERIFICATION=Seed009 Level3 generation and restart/resume persistence
+LAST_COMPLETED_MATERIAL_STEP=Seed009 real-device Level3 generation verified: ef>>> -> ef>>>ff at step1760 with L3 test 100%, L2 retention 95.8%, L1 retention 100%, L0 retention 95.6%
+NEXT_SAFE_STEP=Close and reopen Seed009 once; verify checkpoint auto-resumes at step1760 with curriculum Level3 and retained metrics, then promote Seed009 to current accepted restore baseline
+PENDING_VERIFICATION=Seed009 step1760/curriculum Level3 checkpoint-resume persistence after restart
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
 FIRST_APK_ARTIFACT_ID=11446590832
@@ -210,3 +210,7 @@ SEED009_REAL_DEVICE_LEVEL3_TEST_LOSS=6.5873
 SEED009_REAL_DEVICE_TEMP_C=36.8
 SEED009_REAL_DEVICE_BATTERY_PERCENT=93
 SEED009_REAL_DEVICE_FREE_RAM_MB=1850
+
+SEED009_LEVEL3_GENERATION_VERIFIED=yes
+SEED009_LEVEL3_GENERATION_INPUT=ef>>>
+SEED009_LEVEL3_GENERATION_OUTPUT=ef>>>ff
