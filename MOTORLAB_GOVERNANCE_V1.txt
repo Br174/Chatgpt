@@ -227,6 +227,15 @@ TIME_TO_TESTABLE_ARTIFACT is the primary performance KPI for comparable project 
 Learning from prior work is evidence-based, bounded and context-sensitive. Learned heuristics never become a second technical source of truth and never bypass current compatibility, approval or safety checks.
 The scheduler must prefer one runner when fan-out/coordination cost exceeds expected savings; more runners are not inherently better.
 
+R22 EXECUTION FABRIC
+MOTORLAB_EXECUTION_FABRIC_V1.txt is mandatory runtime machinery under Velocity Layer.
+It does not create another scheduler: Velocity owns planning/critical-path/runner-count decisions; Execution Fabric owns dispatch of the resulting ready tasks.
+When a host exposes useful concurrency, MotorLab must prefer actual concurrent dispatch of independent work over conversational one-step-at-a-time execution.
+When the host cannot expose concurrency, MotorLab must report SERIAL_HOST_LIMITED rather than pretending that configured parallelism ran.
+Substantial operations must distinguish configured capability from observed concurrency using Proof of Parallelism.
+Fast Decision Gate prevents the Fabric itself from becoming overhead for trivial deterministic work.
+Execution Fabric may never bypass approval, Change Compatibility, single-writer, lifecycle, External Service Guard, Watchdog or final verification.
+
 This governance rule does not automatically rewrite project repositories. Project-specific acceleration mechanics are introduced through adapters and normal authorized project workflows.
 
 11. NO FALSE GUARANTEE
@@ -261,7 +270,7 @@ This governance contract is active when:
 - later explicit Bruno decisions can supersede earlier rules through normal versioned repository updates.
 
 VERSION
-MOTORLAB-GOVERNANCE-V1.6
+MOTORLAB-GOVERNANCE-V1.7
 Established: 2026-09-29
 Revision 1.1: structural implicit auto-bootstrap for registered projects; recurring per-chat activation prompts demoted to fallback-only compatibility behavior.
 Revision 1.2: project-first activation precedence plus semantic software-build intent onboarding for unregistered chats.
@@ -271,3 +280,5 @@ Revision 1.4: Velocity Layer becomes a permanent additive-only acceleration capa
 Revision 1.5: r19 elevates Change Compatibility Guard to a permanent foundational cross-project pillar with one-responsibility/one-active-coordinator semantics.
 
 Revision 1.6: r21 establishes the four design pillars, speed-first TTTA optimization, complexity-must-pay-rent rule, adaptive DAG/runner governance and evidence-based learning while preserving all hard safety/project-authority constraints.
+
+Revision 1.7: r22 makes the Execution Fabric mandatory subordinate runtime machinery, requires real concurrent dispatch where supported, Proof of Parallelism and truthful host-limited serial reporting without creating a second scheduler.
