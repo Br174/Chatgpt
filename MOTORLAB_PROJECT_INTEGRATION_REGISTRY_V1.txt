@@ -58,6 +58,13 @@ REGISTERED PROJECTS — R23 MIGRATION VERIFIED 2026-10-06
    main r23 commit: f46d74900f3cfe92f8941314a759b6a97fe2373c
    Remains delivery adapter; Visionflix source authority preserved.
 
+7. MotorAI — Br174/MotorAI
+   initial r23/onboarding application head: 2fc178f6e119b7a06325b63a6568fa18bebf1a13
+   first verified Android build: GitHub Actions run 37534929516 / artifact 11446590832
+   Native MotorAI neural brain remains authoritative; MotorLab-Training is a subordinate specialized tutor/orchestrator.
+   MotorAI-specific training innovations do not propagate automatically into central MotorLab.
+   Public repository is the code/build authority; future private weights, datasets, credentials and personal checkpoints remain outside public Git.
+
 CLEANUP / NON-REDUNDANCY
 - Old r11/r16/r19/r20/r21 active satellite contents were superseded by one current r23 local core at the verified safe boundary.
 - The immediately previous verified local core is preserved only as .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt for rollback.
@@ -70,7 +77,7 @@ POLLICINO
 Pollicino remains external control-plane continuity: liveness/progress evidence, terminal seals, RESUME_READY and stable proof semantics remain intact. r23 does not replace or move Pollicino into application runtime code.
 
 SAFE ADOPTION
-The global migration was performed only after confirming no active GitHub workflow runs in the six registered repositories. MotorLab-only commits used [skip ci]. Application source/runtime/package/signing/lifecycle was not changed by this migration.
+The global migration was performed only after confirming no active GitHub workflow runs in the prior registered repositories. MotorLab-only commits used [skip ci]. Application source/runtime/package/signing/lifecycle was not changed by this migration.
 
 CENTRAL SERVICE STATUS
 GitHub: CONNECTED_VERIFIED.
@@ -85,5 +92,5 @@ FUTURE PROJECTS
 Every newly onboarded project receives the current r23 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, and the r23 incremental dynamic execution policy.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.18
-Revision 2.18: registry cleaned to current-state r23; all six registered projects migrated at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.19
+Revision 2.18: registry cleaned to current-state r23; six prior projects migrated and MotorAI onboarded at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
