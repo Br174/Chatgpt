@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.06-r21
+CURRENT_RELEASE=2026.10.06-r22
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -23,6 +23,7 @@ OBSERVABILITY_DIAGNOSTICS_MODULE=MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt
 KNOWLEDGE_TOOL_ROUTING_MODULE=MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt
 SERVICE_INTEGRATION_STATUS_MODULE=MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt
 EXECUTION_CONTINUITY_MODULE=MOTORLAB_EXECUTION_CONTINUITY_V1.txt
+EXECUTION_FABRIC_MODULE=MOTORLAB_EXECUTION_FABRIC_V1.txt
 UPDATE_FAMILY_LIFECYCLE_MODULE=MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
 
 CURRENT REQUIRED CORE MODULES
@@ -43,6 +44,7 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_BACKGROUND_EXECUTION_V1.txt
 - MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt
 - MOTORLAB_VELOCITY_LAYER_V1.txt
+- MOTORLAB_EXECUTION_FABRIC_V1.txt
 - MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
 - MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
 - MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
@@ -151,8 +153,25 @@ Every current/future MotorLab project inherits:
 Velocity learning never grants write authority and never replaces GitHub/current project technical truth.
 Repeated TTTA regression without required quality/safety justification is treated as an optimization defect.
 
+
+R22+ OPERATIONAL EXECUTION FABRIC
+MOTORLAB_EXECUTION_FABRIC_V1.txt is mandatory and subordinate to Velocity Layer.
+r22 converts r21 planning into observable dispatch:
+- Fast Decision Gate avoids orchestration overhead for trivial deterministic work;
+- eligible independent ready nodes are dispatched concurrently when the host/executor supports it;
+- concurrent tool/read calls are batched in the same execution cycle where supported;
+- durable runners may overlap through Background Execution;
+- dependency completion unlocks downstream work immediately without unrelated global barriers;
+- same-scope writes never overlap; isolated writes still converge through one integration lane;
+- correction relay reworks only affected scopes;
+- substantial operations record Proof of Parallelism: execution mode, observed peak concurrency, critical path, overlap evidence, single-integration-lane verification and host limitation;
+- capability configuration is never presented as proof that parallelism actually occurred;
+- SERIAL_HOST_LIMITED is reported honestly when useful concurrency exists but the host exposes one lane;
+- user-visible updates group completed/running/unlocked runner sets rather than serial microstep narration.
+Reference dispatcher: templates/execution/motorlab_execution_fabric.mjs.
+
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.21
+MOTORLAB-RELEASE-MANIFEST-V1.22
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -163,3 +182,4 @@ Revision 1.19: r19 elevates Change Compatibility Guard to a foundational mandato
 
 Revision 1.20: r20 adds mandatory Pollicino external session continuity, dual liveness/progress evidence, terminal seals, durable interruption sentinel and precomputed RESUME_READY without application-code breadcrumbs.
 Revision 1.21: r21 establishes the four design pillars and adaptive Velocity architecture with TTTA KPI, complexity budget, DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, incremental execution and bounded evidence learning.
+Revision 1.22: r22 adds mandatory operational Execution Fabric, real ready-queue dispatch, Fast Decision Gate, batched tool concurrency, observed Proof of Parallelism and honest host-limited serial mode.
