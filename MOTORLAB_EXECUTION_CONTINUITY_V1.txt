@@ -22,6 +22,13 @@ After the initial approved plan is active, MotorLab continues through all techni
 
 Intermediate technical discoveries that are necessary to achieve the same agreed outcome do not create a new pause for confirmation.
 
+R22 EXECUTION FABRIC HANDOFF
+After approval, continuation must not imply serial execution by default.
+For eligible work, Velocity produces/reuses the compact dependency graph and MOTORLAB_EXECUTION_FABRIC_V1.txt dispatches independent ready nodes concurrently where the host supports it.
+Execution Continuity owns the obligation to continue; Execution Fabric owns how ready nodes are dispatched.
+A runner/tool/job completion should unlock its dependents immediately without waiting for unrelated work.
+If the host is serial-only, continue without pausing but record SERIAL_HOST_LIMITED so the limitation is visible and learnable.
+
 2. COMPLETION TARGET
 Continue until:
 A. the entire agreed modification/project outcome reaches verified 100% completion; or
@@ -55,4 +62,5 @@ For post-approval execution continuity, this module overrides older MotorLab wor
 The initial plan-before-write gate still applies before the first write of a genuinely new modification.
 
 VERSION
-MOTORLAB-EXECUTION-CONTINUITY-V1.0
+MOTORLAB-EXECUTION-CONTINUITY-V1.1
+Revision 1.1: r22 integrates approved-operation continuity with Execution Fabric ready-queue dispatch; continuation no longer implies one-step-at-a-time work when safe concurrency exists.
