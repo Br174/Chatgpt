@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "snapshot_id": "studybook-lab03-android-update-fix-20261006-01",
-  "sent_at": "2026-10-06T16:36:00.000Z",
+  "snapshot_id": "studybook-lab03-update-continuity-20261006-01",
+  "sent_at": "2026-10-06T16:38:00.000Z",
   "projects": [
     {
       "project_id": "MusicLab",
@@ -17,9 +17,9 @@
       "repository": "Br174/StudyBook-AI",
       "lifecycle_stage": "LAB",
       "source_ref": "lab/studybook-core-android-01-update-03",
-      "source_head": "4a01af628a9b97ca07eca4aed15589da63dc60fc",
+      "source_head": "a5b0e0035ff8b437785ac4884d1e2da1665d97c2",
       "local_satellite_release_state": "r21|POLLICINO_SOURCE_PROOF_ENABLED|POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055",
-      "updated_at": "2026-10-06T16:36:00.000Z"
+      "updated_at": "2026-10-06T16:38:00.000Z"
     }
   ],
   "operations": [
@@ -98,6 +98,25 @@
       "source_head": "4a01af628a9b97ca07eca4aed15589da63dc60fc",
       "created_at": "2026-10-06T15:56:00.000Z",
       "updated_at": "2026-10-06T16:36:00.000Z"
+    },
+    {
+      "operation_id": "studybook-lab03-android-update-continuity-20261006",
+      "project_id": "StudyBook-AI",
+      "title": "StudyBook LAB03 Android update continuity",
+      "type": "repair",
+      "requested_scope": "Make new StudyBook APKs install over the existing LAB without requiring uninstall.",
+      "approved_scope": "Fix Android update identity at source without changing StudyBook runtime behavior.",
+      "approval_status": "approved",
+      "lifecycle_stage": "LAB",
+      "risk_class": "HIGH",
+      "status": "COMPLETED_VERIFIED_ARTIFACT_READY",
+      "phase": "stable signing + monotonic versionCode verified",
+      "artifact_progress": 100,
+      "overall_progress": 100,
+      "source_ref": "lab/studybook-core-android-01-update-03",
+      "source_head": "a5b0e0035ff8b437785ac4884d1e2da1665d97c2",
+      "created_at": "2026-10-06T16:38:00.000Z",
+      "updated_at": "2026-10-06T16:38:00.000Z"
     }
   ],
   "checkpoints": [
@@ -188,6 +207,13 @@
       "event_type": "ANDROID_INPLACE_UPDATE_FIX_VERIFIED",
       "event_summary": "Final LAB03 APK is explicitly signed with the stable LAB certificate and uses monotonic high versionCode 2026100014; final APK package/version/certificate verification passed.",
       "created_at": "2026-10-06T16:36:00.000Z"
+    },
+    {
+      "event_id": "studybook-lab03-update-continuity-20261006",
+      "operation_id": "studybook-lab03-android-update-continuity-20261006",
+      "event_type": "ANDROID_UPDATE_CONTINUITY_FIXED",
+      "event_summary": "LAB03 final update APK now uses stable original LAB signing identity and high monotonic versionCode 2026100015; final APK identity/certificate verification passed.",
+      "created_at": "2026-10-06T16:38:00.000Z"
     }
   ],
   "artifacts": [
@@ -220,12 +246,12 @@
       "operation_id": "studybook-lab03-motorlab-runtime-r21-20261006",
       "name": "StudyBook-AI-LAB-03-AGGIORNAMENTO.apk",
       "source_ref": "lab/studybook-core-android-01-update-03",
-      "source_head": "4a01af628a9b97ca07eca4aed15589da63dc60fc",
-      "checksums": "sha256=96b879cdef7208cbc69765a0fc8c45e0141301cd3233d8d988f13829817097ae; zip_sha256=19dbef67e6c008d9741affcf8821dfc99ecfe123082eb79c9e7d96a2b5f20e03; applicationId=it.studybook.ai.lab; versionCode=2026100014; versionName=0.3.14; signing=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC",
-      "verification_state": "VERIFIED",
+      "source_head": "a5b0e0035ff8b437785ac4884d1e2da1665d97c2",
+      "checksums": "sha256=6685b60797a6be47b5c70f678a32c84a42222701c4127ba80081d9c358ef0df5; zip_sha256=474a822ab0aff94a493a556b17633c0a2b593985518af047825f1b35b457b820; applicationId=it.studybook.ai.lab; versionCode=2026100015; versionName=0.3.15; signing=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC",
+      "verification_state": "VERIFIED_FINAL_UPDATE_CONTINUITY",
       "delivery_state": "READY_FOR_CHAT_DELIVERY",
       "immutable_under_test": true,
-      "created_at": "2026-10-06T15:56:00.000Z"
+      "created_at": "2026-10-06T16:38:00.000Z"
     },
     {
       "artifact_id": "studybook-lab03-recovery-apk-20261006",
