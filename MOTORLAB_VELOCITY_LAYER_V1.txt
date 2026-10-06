@@ -443,7 +443,47 @@ Velocity Layer is additionally successful when:
 - median TTTA for comparable recurring work trends downward without artifact-quality regression;
 - increasing MotorLab internal complexity does not create increasing user-visible process latency by default.
 
+
+36. R22 EXECUTION FABRIC - PLAN MUST BECOME ACTION
+MOTORLAB_EXECUTION_FABRIC_V1.txt is the mandatory runtime dispatcher subordinate to this Velocity Layer.
+Velocity remains the sole scheduling authority; Execution Fabric turns the selected graph/critical path into actual host/tool/job dispatch.
+For every eligible non-trivial operation:
+- run the Fast Decision Gate first so tiny deterministic work stays DIRECT_FAST;
+- when the host supports concurrent calls, batch independent ready tool/read operations in the same execution cycle;
+- when durable executors support concurrency, launch independent ready jobs without unnecessary barriers;
+- recompute the READY set after any runner completes rather than waiting for the whole wave;
+- preserve one integration lane and all write locks;
+- record observed execution mode and proof instead of treating PARALLEL_EXECUTION=enabled as evidence.
+
+37. OBSERVED PARALLELISM, NOT CONFIGURED PARALLELISM
+The presence of DAG/fan-out settings does not prove that an operation ran in parallel.
+Substantial operations should expose one of:
+DIRECT_FAST
+PARALLEL_OBSERVED
+SERIAL_REQUIRED
+SERIAL_HOST_LIMITED
+PARALLEL_OBSERVED requires overlap/same-cycle evidence from real tool calls, jobs or executor intervals.
+If useful concurrency was planned but the host only exposed one lane, report SERIAL_HOST_LIMITED and preserve the graph for an executor that can run it.
+
+38. FAST DECISION / REASONING BUDGET
+Do not spend deep orchestration effort on a known deterministic path.
+Prefer:
+KNOWN + LOW/CONTAINED RISK + VERIFIED LESSON/SNAPSHOT -> FAST decision + execute.
+NOVEL/AMBIGUOUS/CONFLICTING/HIGH RISK -> deeper analysis as needed.
+This is an orchestration rule, not a claim that MotorLab controls the host model's intrinsic reasoning speed.
+Reduce repeated interpretation, repeated CORE reading and serial state gathering before reducing necessary verification.
+
+39. GROUPED EXECUTION STATUS
+User-facing updates for active r22 work should group concurrency:
+- COMPLETATI INSIEME;
+- IN CORSO INSIEME;
+- SBLOCCATI / PROSSIMI NODI;
+- CRITICAL PATH;
+- execution mode + observed peak runners when known.
+Do not narrate independent ready work as a long sequence of "adesso faccio..." messages.
+
 VERSION
-MOTORLAB-VELOCITY-LAYER-V1.1
+MOTORLAB-VELOCITY-LAYER-V1.2
 Established: 2026-09-29
 Revision 1.1: r21 establishes the four design pillars, TTTA primary KPI, complexity budget, adaptive DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, correction relay, bounded speculative execution, evidence learning and incremental-everything semantics without weakening single-writer or promotion safety.
+Revision 1.2: r22 binds adaptive Velocity to the executable Execution Fabric, requires Fast Decision Gate, event-driven ready-queue dispatch, observed parallelism proof, host-limited truthfulness and grouped concurrency status.
