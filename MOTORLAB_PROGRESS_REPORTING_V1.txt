@@ -31,7 +31,13 @@ At useful visible control points prefer a compact grouped status:
 - CRITICAL PATH: current artifact-blocking chain;
 - MODALITA: DIRECT_FAST / PARALLEL_OBSERVED / SERIALE NECESSARIA / SERIALE LIMITATA DALL'HOST;
 - observed peak runner count when evidence exists.
-Do not claim PARALLEL_OBSERVED merely because r22 is installed.
+Do not claim PARALLEL_OBSERVED merely because r22/r23 is installed.
+When r23 materially avoids work, status may also report compact evidence such as:
+- RIUSO/CACHE: N task evitati;
+- RAMI CREATI: N;
+- RAMI POTATI: N;
+- MATERIALIZZAZIONE RINVIATA when it materially reduces work.
+These are execution facts, not percentage inflation.
 A serial status is acceptable when dependencies or host limits require it; state the reason rather than inventing concurrency.
 
 5. MICRO-PROGRESS / MICRO-MILESTONES
@@ -125,8 +131,9 @@ SUCCESS CRITERIA
 - percentages remain evidence-based and monotonic.
 
 VERSION
-MOTORLAB-PROGRESS-REPORTING-V1.8
+MOTORLAB-PROGRESS-REPORTING-V1.9
 Established: 2026-09-28
 Revision 1.6: r15 adds dual Artifact/Overall progress and post-artifact Root Cause queue semantics.
 Revision 1.7: makes evidence-based numeric progress mandatory for all MotorLab-controlled modifications and adds Live Control micro-progress semantics.
 Revision 1.8: r22 adds grouped parallel runner status and observed execution-mode/peak-concurrency reporting so progress communication reflects real concurrency instead of serial narration.
+Revision 1.9: r23 allows concise visible evidence of work avoided by cache/incrementality, dynamic branches, pruning and deferred materialization without inflating verified progress.
