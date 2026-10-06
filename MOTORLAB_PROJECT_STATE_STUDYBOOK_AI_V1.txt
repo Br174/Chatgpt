@@ -1,30 +1,30 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=11
+STATE_REVISION=12
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
 ACTIVE_OPERATION_ID=studybook-lab03-motorlab-runtime-r21-20261006
 OPERATION_STATUS=LAB03_ARTIFACTS_VERIFIED_DEVICE_ACCEPTANCE_PENDING
 CURRENT_PHASE=LAB 03 aggiornamento + LAB 03 ripristino built and verified with StudyBook MotorLab Runtime r21; awaiting Bruno physical-device acceptance before any CANDIDATA
 CURRENT_REF=lab/studybook-core-android-01-update-03
-CURRENT_HEAD_SHA=9690bdcff2b0050e68ca3b8ec101f9ce51483032
+CURRENT_HEAD_SHA=4a01af628a9b97ca07eca4aed15589da63dc60fc
 CURRENT_PROVIDER=GitHub Actions / Cloudflare MotorLab state bridge
-JOB_ID=UPDATE_ANDROID_37490665514; UPDATE_CORE_37490665652; RECOVERY_ANDROID_37491089109; RECOVERY_CORE_37491089121
+JOB_ID=UPDATE_ANDROID_37496464177; UPDATE_CORE_37496464226; RECOVERY_ANDROID_37491089109; RECOVERY_CORE_37491089121
 JOB_STATUS=all completed success
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=StudyBook MotorLab Runtime r21 integrated into the app as the single runtime coordinator for adaptive AI batch runners, incremental unit cache, checkpoint resume, targeted correction relay and runtime timing metrics; LAB03 update/recovery APKs built and verified
+LAST_COMPLETED_MATERIAL_STEP=LAB03 Android update pipeline repaired at root cause: final APK is now explicitly signed with the stable LAB certificate, monotonic high versionCode is enforced, and package/version/certificate are verified on the final APK before publication
 NEXT_SAFE_STEP=Bruno installs LAB 03 aggiornamento over the existing LAB and tests book creation speed/quality, cache reuse on regeneration, recovery after interruption and all prior LAB02 behaviors. If accepted, create a NEW immutable CANDIDATA family from this LAB03 state. Do not mutate LAB into CANDIDATA.
 PENDING_VERIFICATION=Physical-device acceptance only: LAB03 update install; MotorLab Runtime adaptive runners; incremental block reuse on regeneration; checkpoint resume/correction relay behavior; creation-time improvement; plus reader/original opening, distinct Testo di studio/In parole semplici, book workspace, PDF elaborato/export, grounded quiz/flashcards and scanner/OCR.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-03-AGGIORNAMENTO.apk sha256=cbaa685f8615fc8edd3c5ed938cc17b5bb4085bcc088dd50a1a894ca25f319f7
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-03-AGGIORNAMENTO.apk sha256=96b879cdef7208cbc69765a0fc8c45e0141301cd3233d8d988f13829817097ae
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=2587f58b9c6b0add9d109d9fac456283bbdd33deb654217547f17a8d1cf1fe34
+UPDATE_ZIP_SHA256=19dbef67e6c008d9741affcf8821dfc99ecfe123082eb79c9e7d96a2b5f20e03
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
-ROOT_CAUSE_NOTE=LAB03 structural optimization: the active V09 chain already had checkpointing and adaptive parallel waves, so r21 was integrated by extending that coordinator rather than stacking a second one. Missing pieces added: dedicated runtime orchestration module, cross-regeneration per-unit cache, device/network-aware initial fan-out, targeted correction-relay metrics and runtime timing evidence.
+ROOT_CAUSE_NOTE=Android update failures were caused by Gradle signing the generated APK with a different debug certificate than the stable LAB keystore that the workflow had merely verified. Previous metadata therefore reported the intended key rather than the certificate actually embedded in the APK. Fixed by explicitly signing the final APK with the stable LAB keystore, verifying the final APK certificate, and moving to monotonic high versionCode values. One final uninstall may be unavoidable only for devices currently holding an old APK signed with an unrecoverable transient certificate; all future LAB updates from the corrected baseline are designed for in-place update.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
 LAST_USER_INTENT_SUMMARY=Integrate only the useful MotorLab r21 runtime method directly inside StudyBook so the APK carries adaptive orchestration on any phone, then return to physical StudyBook testing.
-STATE_SOURCE=LAB03 functional source 9690bdcff2b0050e68ca3b8ec101f9ce51483032; recovery head 6a58462d03895bd89432dc5b781812586cd3ea04 differs only by recovery workflow trigger comment; UAB runs 37490665652/37491089121 success; Android runs 37490665514/37491089109 success; APK identities, signatures and SHA256 values verified
+STATE_SOURCE=Corrected LAB03 update head 4a01af628a9b97ca07eca4aed15589da63dc60fc; UAB 37496464226 success; Android 37496464177 success; final APK applicationId=it.studybook.ai.lab versionCode=2026100014 versionName=0.3.14 certificate=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC; APK sha256=96b879cdef7208cbc69765a0fc8c45e0141301cd3233d8d988f13829817097ae; ZIP sha256=19dbef67e6c008d9741affcf8821dfc99ecfe123082eb79c9e7d96a2b5f20e03
 CONTINUITY_NOTE=On future chat/continua load r21 satellite state/RESUME_READY and LAB03 runtime state first. Do not recreate LAB03. The next lifecycle boundary is physical-device acceptance of LAB03, then CANDIDATA only after Bruno acceptance.
 UPDATED_DATE=2026-10-06
 SATELLITE_LOCAL_RELEASE=2026.10.06-r21
@@ -44,8 +44,8 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=9
-ANDROID_UPDATE_VERSION_NAME=0.2.9
+ANDROID_UPDATE_VERSION_CODE=2026100014
+ANDROID_UPDATE_VERSION_NAME=0.3.14
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10

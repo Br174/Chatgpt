@@ -103,3 +103,24 @@ RECOVERY_VERSION_NAME=0.2.10
 RECOVERY_SIGNING_SHA256=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
 VERIFICATION=Update UAB 37490665652 success; update Android 37490665514 success; recovery UAB 37491089121 success; recovery Android 37491089109 success; LAB03 runtime regression test passed; Cloudflare/runtime/stress suite passed; update/recovery compare differs only by workflow trigger comment.
 VISIBLE_RESTORE_REGISTER=not yet; requires Bruno physical-device confirmation and conservation request.
+
+
+CHANGE_ID=STUDYBOOK-20261006-LAB03-ANDROID-INPLACE-UPDATE-FIX
+DATE=2026-10-06
+TYPE=ANDROID_UPDATE_IDENTITY_FIX
+TITLE=LAB 03 Android in-place update signing and monotonic version repair
+REQUESTED_BY=Bruno
+STATUS=VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
+MOTORLAB_OPERATION_ID=studybook-lab03-motorlab-runtime-r21-20261006
+SOURCE_REF=lab/studybook-core-android-01-update-03
+SOURCE_HEAD=4a01af628a9b97ca07eca4aed15589da63dc60fc
+ROOT_CAUSE=The workflow restored and verified the stable LAB keystore but Gradle still emitted the APK with a different debug certificate. This caused Android signature mismatch across builds and forced uninstall/reinstall. Small GitHub run-number versionCodes were also unnecessarily fragile.
+FIX=Use a monotonic high Android versionCode, explicitly sign the final APK with the selected stable family keystore, then verify applicationId, versionCode and certificate directly on the final APK before artifact publication.
+APPLICATION_ID=it.studybook.ai.lab
+VERSION_CODE=2026100014
+VERSION_NAME=0.3.14
+FINAL_APK_SIGNING_SHA256=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
+APK_SHA256=96b879cdef7208cbc69765a0fc8c45e0141301cd3233d8d988f13829817097ae
+ZIP_SHA256=19dbef67e6c008d9741affcf8821dfc99ecfe123082eb79c9e7d96a2b5f20e03
+VERIFICATION=UAB run 37496464226 success; Android run 37496464177 success; Force stable APK signing identity success; Verify APK update identity success; final artifact uploaded.
+MIGRATION_NOTE=If the currently installed old APK was signed with a transient unrecoverable certificate, Android requires one final uninstall/reinstall to establish this corrected stable signing baseline. Subsequent LAB updates must preserve this certificate and strictly increasing versionCode so user data can remain in place.
