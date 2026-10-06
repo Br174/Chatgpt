@@ -3,7 +3,18 @@ PROJECT=MotorAI
 REPOSITORY=Br174/MotorAI
 REGISTER_STATUS=ACTIVE_CONFIRMED_ONLY
 DISPLAY_NAME=Registro Modifiche e Ripristini
-NEXT_RESTORE_NO=1
-VISIBLE_SLOTS=0
+NEXT_RESTORE_NO=2
+VISIBLE_SLOTS=1
 RULE=Only Bruno-confirmed working modifications explicitly approved for conservation enter this register. Technical history remains in Git/MOTORLAB_CHANGE_REGISTRY_MOTORAI_V1.txt. The Seed 003 APK is pending real-device acceptance and is therefore not yet a visible restore slot.
 VERSION=MOTORLAB-MOTORAI-MODIFICATION-RESTORE-REGISTER-V1.0
+
+
+RESTORE_SLOT=1
+NAME=MotorAI Seed 004 - Prima baseline Android buona
+CONFIRMED_DATE=2026-10-07
+SOURCE_HEAD=5f5b125d1312855986598e11fe53bd7c1cdbc19f
+BUILD_RUN_ID=37537239081
+ARTIFACT_ID=11447405080
+APK_SHA256=0e941a8cc1b92b926727a05ce8de393fa5755d68509e588ea2eca94c1a802031
+DEVICE_RESULT=220 steps; test loss 0.8275; generalization 100.0%; 36.8C; ~1788MB free RAM
+STATUS=CONFIRMED_WORKING
