@@ -1,0 +1,179 @@
+MOTORLAB EXECUTION FABRIC V1 - R22 OPERATIONAL PARALLEL DISPATCH
+
+STATUS
+Mandatory MotorLab CORE execution capability.
+Central authority: Br174/Chatgpt.
+Established: 2026-10-06.
+
+PURPOSE
+Turn Velocity Layer r21 scheduling decisions into real, observable execution behavior. MotorLab must not merely declare that parallel execution is supported; when an execution surface supports useful concurrency, it must dispatch independent work concurrently, advance newly-unblocked work immediately, preserve single-writer safety, and produce evidence of what actually ran in parallel.
+
+OWNERSHIP / NO DUPLICATE COORDINATOR
+- MOTORLAB_VELOCITY_LAYER_V1.txt remains the ONLY scheduler/planning authority for DAG, critical path, runner count, complexity budget and TTTA optimization.
+- Execution Fabric is subordinate runtime machinery: it executes the Velocity plan.
+- MOTORLAB_EXECUTION_CONTINUITY_V1.txt owns continuation after approval.
+- MOTORLAB_BACKGROUND_EXECUTION_V1.txt owns durable executor/job handoff.
+- Change Compatibility Guard + single-writer own write compatibility.
+- Watchdog owns stall/recovery classification.
+- Progress Reporting owns visible percentage.
+Execution Fabric MUST NOT become a competing planner, lifecycle engine, recovery engine or project-native domain engine.
+
+1. FAST DECISION GATE
+Before creating orchestration overhead classify the operation:
+DIRECT_FAST:
+- one atomic/deterministic task or coordination overhead >= expected speed benefit;
+- act directly after required gates; do not build a ceremonial DAG.
+PARALLEL_LOCAL:
+- two or more independent short/medium tasks can run concurrently on the current host/tool surface.
+PARALLEL_DURABLE:
+- long-running independent tasks benefit from persistent/queryable executors.
+SERIAL_REQUIRED:
+- true dependency/conflicting write/risk constraint makes serial order necessary.
+SERIAL_HOST_LIMITED:
+- useful parallelism exists but the current host exposes only one usable execution lane.
+Do not confuse SERIAL_HOST_LIMITED with a MotorLab design choice.
+
+2. EXECUTION GRAPH
+For non-trivial work, Velocity emits a compact graph. A task should contain only what the dispatcher needs:
+TASK_ID
+DEPENDENCIES
+KIND=<read|write|integration|external>
+LOCK_SCOPES
+CRITICAL_PATH_WEIGHT/estimated cost when known
+OUTPUT/acceptance condition
+EXECUTOR eligibility
+RISK/verification requirement
+Do not inflate the graph with low-value microsteps.
+
+3. READY-QUEUE DISPATCH
+Execution Fabric maintains READY, RUNNING, COMPLETED, FAILED/WAITING state.
+At each safe execution cycle:
+A. identify every task whose dependencies are satisfied;
+B. order critical-path/blocking tasks first;
+C. launch as many compatible ready tasks as the adaptive runner limit permits;
+D. do not wait for unrelated runners before unlocking downstream tasks;
+E. when any runner finishes, immediately recompute READY;
+F. integrate results continuously instead of using unnecessary whole-operation barriers.
+
+4. REAL CONCURRENCY
+When the host supports batching/concurrent calls, independent read/tool/provider operations SHOULD be launched in the same execution cycle rather than as conversational one-by-one calls.
+When durable executors support concurrent jobs, independent jobs SHOULD overlap when net TTTA improves.
+More runners are not automatically better. Fan-out must consider startup overhead, quotas, cache contention, provider pressure and expected duration.
+
+5. WRITE ISOLATION / SINGLE INTEGRATION LANE
+- same ref/resource/lock scope: never two concurrent writers;
+- disjoint writes may overlap only if executor/project adapter provides real isolation;
+- isolated runner results are not authoritative final state until accepted by the single integration lane;
+- integration tasks that can mutate final artifact state are serialized through one integration coordinator;
+- a read may continue alongside a write only when it cannot observe/use an unsafe intermediate state.
+
+6. EVENT-DRIVEN CONVERGENCE
+Do not use a global "wait for everybody" barrier unless the next task actually depends on everybody.
+Runner completion is an event:
+RUNNER_DONE -> validate smallest relevant interface -> unlock downstream tasks -> integrate if safe.
+A slow unrelated runner must not hold the critical path.
+
+7. CORRECTION RELAY
+If convergence detects a conflict/regression:
+- identify affected scopes/runners;
+- create correction task(s) only for those scopes;
+- preserve all unaffected completed work;
+- re-run the smallest proof necessary;
+- do not restart the whole graph unless evidence invalidates the common baseline.
+
+8. FAST REASONING / NO RE-THINK LOOP
+MotorLab orchestration must minimize reasoning that does not change a decision.
+Use:
+- verified snapshot/Change Capsule;
+- RESUME_READY;
+- applicable velocity lessons;
+- one-pass parallel state gathering;
+- deterministic rules for known operations.
+Escalate to deeper analysis only for novelty, ambiguity, conflict, high risk or contradictory evidence.
+MotorLab cannot change the host model's intrinsic internal reasoning speed and must not claim it can. It can reduce time spent on the critical path by avoiding repeated interpretation and moving deterministic work to tools/executors.
+
+9. PROOF OF PARALLELISM - MANDATORY
+Parallelism is a measured operation property, not a capability flag.
+For substantial work record when observable:
+EXECUTION_MODE=<DIRECT_FAST|PARALLEL_OBSERVED|SERIAL_REQUIRED|SERIAL_HOST_LIMITED>
+PLANNED_RUNNERS
+OBSERVED_PEAK_CONCURRENCY
+TASKS_STARTED / TASKS_COMPLETED
+CRITICAL_PATH
+OVERLAP_EVIDENCE (runner/job/tool intervals or same-cycle concurrent dispatch evidence)
+SINGLE_INTEGRATION_LANE_VERIFIED
+CORRECTION_RELAYS
+HOST_LIMITATION when applicable
+Do not report PARALLEL_OBSERVED without evidence of overlapping work.
+
+10. USER-VISIBLE EXECUTION STATUS
+For substantial work, status should describe groups rather than narrating every microstep.
+Preferred style:
+COMPLETATI INSIEME: A, B, C.
+IN CORSO INSIEME: D, E, F.
+SBLOCCATI DOPO D: G, H.
+CRITICAL PATH: D -> G -> artifact.
+MODALITA: PARALLELA — picco N corridori reali.
+If serial:
+MODALITA: SERIALE NECESSARIA — reason.
+or
+MODALITA: SERIALE LIMITATA DALL'HOST — useful parallelism exists but is not exposed here.
+Avoid repetitive "ora faccio X, poi faro Y" when independent tasks can be grouped.
+
+11. TOOL-BATCHING RULE
+When one model/execution cycle can invoke several independent read-only tools/calls, batch them concurrently where supported.
+Do not serialize repository reads, status checks, independent searches or artifact metadata lookups without a dependency reason.
+Write calls remain sequential for overlapping scopes. Independent isolated writes may use separate executor lanes only when explicitly supported.
+
+12. DURABLE RUNNERS
+Execution Fabric may delegate nodes to Background Execution adapters.
+A durable node must expose enough identity/status for Watchdog/Pollicino when supported.
+The foreground chat must not spin-poll a healthy durable job; while it runs, dispatch other independent ready work.
+
+13. FAIL-FAST / FAIL-SMALL
+A runner failure blocks only its dependency descendants unless shared-baseline evidence requires broader invalidation.
+Continue independent safe branches.
+Apply Two-Strike/Root Cause rules to repeated failures; do not duplicate the same ineffective runner strategy.
+
+14. TTTA ACCOUNTING
+Record enough timestamps to distinguish:
+- orchestration/planning;
+- host/tool queue;
+- parallel runner work;
+- serial critical-path work;
+- integration;
+- build/package;
+- verification.
+Optimization targets CRITICAL PATH and TTTA, not total summed CPU/tool time.
+
+15. REFERENCE EXECUTOR
+The repository reference implementation is:
+templates/execution/motorlab_execution_fabric.mjs
+It validates DAGs, prioritizes critical-path work, dispatches compatible ready tasks without global barriers, enforces write-scope collision rules, supports correction relays, and emits observed parallelism proof.
+It uses an injected worker callback: it does not execute arbitrary shell commands itself and therefore does not create independent write authority.
+Host/project adapters may wrap this reference behavior in their native tool/job system.
+
+16. ADAPTER FIELDS
+MOTORLAB_EXECUTION_FABRIC=<supported|policy-only|none-with-reason>
+MOTORLAB_EXECUTOR_MAX_CONCURRENCY=<auto|N>
+MOTORLAB_EXECUTOR_BATCHED_TOOLS=<supported|none>
+MOTORLAB_EXECUTOR_ISOLATED_WRITES=<supported|conditional|none>
+MOTORLAB_EXECUTOR_DURABLE_RUNNERS=<supported|conditional|none>
+MOTORLAB_PARALLELISM_PROOF=<full|partial|mode-only>
+
+17. SUCCESS CRITERIA
+Execution Fabric r22 is active when:
+- eligible independent operations are actually overlapped on capable surfaces;
+- newly-unblocked tasks start without waiting for unrelated runners;
+- conflicting writes never overlap;
+- one integration lane owns artifact-producing state;
+- correction relay preserves unaffected work;
+- DIRECT_FAST avoids orchestration overhead for trivial work;
+- host-limited serial execution is reported truthfully;
+- substantial operations expose observed, not merely configured, parallelism;
+- user-facing updates group completed/running/next work;
+- TTTA improves without weakening artifact quality or existing safety.
+
+VERSION
+MOTORLAB-EXECUTION-FABRIC-V1.0
+Established: 2026-10-06
