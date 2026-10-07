@@ -1,0 +1,22 @@
+name: MotorLab r26 Reconcile Gate
+on:
+  push:
+    branches:
+      - lab/motorlab-r26-reconcile
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Execution Fabric tests
+        run: node --test tests/motorlab-execution-fabric.test.mjs
+      - name: Semantic workgroups benchmark
+        run: node tests/motorlab-semantic-workgroups-benchmark.mjs
+      - name: Intrinsic dispatcher benchmark
+        run: node tests/motorlab-intrinsic-speed-benchmark.mjs
+      - name: Adaptive runtime benchmark
+        run: node tests/motorlab-r26-adaptive-runtime-benchmark.mjs
