@@ -270,3 +270,11 @@ test('adaptive governor state persists and restores across executions',async()=>
   assert.equal(second.proof.adaptiveStateLoaded,true);
   assert.equal(second.proof.adaptiveGovernor.lanes.github.limit,1);
 });
+
+
+test('non-hedge adaptive external failure closes instead of hanging',async()=>{
+  await assert.rejects(
+    executeGraph([{id:'ext-fail',kind:'external',laneKey:'provider',adaptiveLane:true}],async()=>{throw new Error('provider down');},{maxConcurrency:3}),
+    /provider down/
+  );
+});
