@@ -272,6 +272,28 @@ R25_ORDINARY_FAST_PATH=preserved
 SINGLE_WRITER=preserved
 SINGLE_INTEGRATION_LANE=preserved
 
+R26 ADAPTIVE RUNTIME INHERITANCE
+ADAPTIVE_RUNTIME_GOVERNOR=required
+ADAPTIVE_RUNTIME_SINGLE_COORDINATOR=required
+ADAPTIVE_LANE_POOL=required
+ADAPTIVE_LANE_AIMD=required
+ADAPTIVE_LANE_PROVIDER_BUDGET=preserved
+FRESH_HEDGE=required
+FRESH_HEDGE_DEFAULT_TRIGGER_MS=10000
+FRESH_HEDGE_EARLY_STALL_SIGNAL=required
+FRESH_HEDGE_MAX_ATTEMPTS_PER_WAVE=3
+FRESH_HEDGE_MAX_WAVES=2
+FRESH_HEDGE_MAX_TOTAL_ATTEMPTS=6
+FRESH_HEDGE_FIRST_VALID_WINS=required
+FRESH_HEDGE_WRITES=forbidden
+FRESH_HEDGE_EXTERNAL_PROVIDER_AUTH=required
+FRESH_HEDGE_UNBOUNDED_MULTIPLICATION=forbidden
+R24_LATENCY_BRANCH_FALLBACK=preserved
+ADAPTIVE_STATE_PERSIST_RESTORE=supported
+ADAPTIVE_STATE_NON_AUTHORITATIVE=required
+ORDINARY_TASK_FAST_PATH=required
+OPAQUE_HOST_REASONING_RESTART_CLAIM=forbidden
+
 VERSION
 MOTORLAB-SATELLITE-BUNDLE-V2.21
 Revision 2.6: r16 adds authority/data ownership, persistent operational state, MOTORLAB_OPERATION_ID, observability boundaries, service connection-status tracking and non-redundant auxiliary-tool routing.
@@ -302,3 +324,5 @@ Revision 2.18: r23 adds work-elimination-first, content-addressed reuse, increme
 Revision 2.20: r25 inherits Work-Elimination-first semantic workgroups and intrinsic dispatcher acceleration while preserving r24 latency branching and all project-native/safety boundaries.
 
 Revision 2.21: r26 inherits coordinated Triple Fresh Hedge, Adaptive Lane Pool and runtime feedback while preserving r24/r25 behavior and project-native authority.
+
+Revision 2.21: r26 inherits the single Adaptive Runtime Governor, bounded triple hedge, adaptive lanes, persistent governor evidence and r25-compatible ordinary-task fast path.
