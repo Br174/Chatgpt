@@ -26,11 +26,11 @@ test('r27 starts different useful work before same-task recovery', async () => {
   }], async (task, ctx) => {
     seen.push({ id: task.id, attempt: ctx.attempt, at: Date.now() - started });
     if (task.id === 'primary' && ctx.attempt === 1) {
-      await sleep(80);
+      await sleep(45);
       return { valid: true, from: 1 };
     }
     if (task.id === 'primary') {
-      await sleep(60);
+      await sleep(20);
       return { valid: true, from: ctx.attempt };
     }
     await sleep(12);
