@@ -1,0 +1,33 @@
+name: MotorLab r27 gate
+on:
+  push:
+    branches:
+      - 'motorlab-r27-*'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'templates/execution/motorlab_execution_fabric.mjs'
+      - 'tests/motorlab-execution-fabric.test.mjs'
+      - 'tests/motorlab-r27-dual-lane.test.mjs'
+      - 'MOTORLAB_EXECUTION_FABRIC_V1.txt'
+      - 'MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt'
+      - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
+      - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
+      - 'MOTORLAB_SATELLITE_BUNDLE_V1.txt'
+      - 'MOTORLAB_SATELLITE_SYNC_V1.txt'
+      - 'MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt'
+      - '.github/workflows/motorlab-r27-gate.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Execution Fabric regression suite
+        run: |
+          node --test tests/motorlab-execution-fabric.test.mjs
+          node --test tests/motorlab-r27-dual-lane.test.mjs
