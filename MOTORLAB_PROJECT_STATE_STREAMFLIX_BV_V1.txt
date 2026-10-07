@@ -5,7 +5,7 @@ STATE_REVISION=1
 STATE_STATUS=BOOT_RECONCILE_REQUIRED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/streamflix-BV evidence
-MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.06-r23
+MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r24
 ACTIVE_OPERATION_ID=unknown_until_live_reconcile
 OPERATION_STATUS=unknown_until_live_reconcile
 CURRENT_PHASE=unknown_until_live_reconcile
@@ -18,8 +18,12 @@ PENDING_VERIFICATION=Current authoritative delivery state
 LAST_USER_INTENT_SUMMARY=Preserve latest streamflix-BV delivery work across new chats without transfer prompts
 CONTINUITY_RULES=streamflix-BV remains delivery adapter only; Visionflix remains source lifecycle authority; live newer evidence wins; update this ledger at material transitions and turn handoff.
 UPDATED_BY=MotorLab r8 continuity bootstrap
-UPDATED_DATE=2026-10-06
-SATELLITE_LOCAL_RELEASE=2026.10.06-r23
+UPDATED_DATE=2026-10-07
+SATELLITE_LOCAL_RELEASE=2026.10.07-r24
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R23_EXECUTION_FABRIC=work-elimination-first;content-addressed-reuse;incremental-delta;critical-path;dynamic-dag;progressive-branching;pruning;event-memory;deferred-materialization
 
+
+MOTORLAB_R24_STATUS=VERIFIED_ADOPTED
+MOTORLAB_R24_LATENCY_BRANCHING=evidence-gated;expected-gain-gt-overhead;inflight-trigger;immediate-wake;early-finish-cancel;single-writer-preserved;fictional-countdown-forbidden
+MOTORLAB_R24_MAIN_ADOPTION_COMMIT=9fbc15c87d9a3a3fc45dff4755b44ad721ebf3fe
