@@ -239,9 +239,10 @@ r26 adds one coordinated feedback layer on top of r25:
 
 Final LAB gate evidence, GitHub Actions run 37639565434:
 - 29 tests passed / 0 failed;
-- semantic workgroups: 232.76 ms serial vs 95.65 ms parallel, 58.90% lower TTTA / 2.43x;
-- intrinsic dispatcher: 62.099 ms average on the 1200-task benchmark;
-- controlled stall recovery: 80.93 ms baseline vs 29.25 ms hedged, 63.86% lower time / 2.77x;
+- reconciliation final gate (GitHub Actions run 37641735277): 31 tests passed / 0 failed;
+- semantic workgroups: 232.97 ms serial vs 95.70 ms parallel, 58.92% lower TTTA / 2.43x;
+- intrinsic dispatcher: 1,200 tasks / 9 rounds, median 54.351 ms, average 57.336 ms, p90 91.134 ms;
+- controlled stall recovery: 81.01 ms baseline vs 28.92 ms hedged, 64.30% lower time / 2.80x;
 - adaptive lane trace under synthetic 429 + recovery: 3 -> 1 -> 1 -> 2.
 These are controlled observations, not universal speed guarantees.
 
