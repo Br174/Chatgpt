@@ -286,7 +286,23 @@ templates/execution/motorlab_execution_fabric.mjs now supports:
 - existing correction relay and single integration lane.
 The injected callbacks cacheLookup/cacheStore remain host/adaptor responsibilities and grant no independent write authority.
 
+R24 LATENCY BRANCH TRIGGER
+When a live runner crosses a declared latency threshold, Execution Fabric may unlock preplanned independent useful work instead of passively waiting.
+Rules:
+- Velocity remains the sole authority deciding whether a latency branch is worthwhile.
+- A latency branch is eligible only when LATENCY_BRANCH_EXPECTED_GAIN_MS > LATENCY_BRANCH_OVERHEAD_MS.
+- The branch must be independent of the still-running parent until an explicit later join; it may prepare downstream reads/computation or other safely isolated work.
+- Never duplicate irreversible/external side effects merely to race a slow provider.
+- Existing lock scopes, single-writer rules, runner limit and single integration lane remain mandatory.
+- If the parent finishes before the threshold, the trigger is cancelled and no branch is created.
+- When triggered, the dispatcher wakes immediately; it must not wait for the slow parent to finish before scheduling newly READY work.
+- Material events include LATENCY_BRANCH_TRIGGERED and LATENCY_BRANCH_FAILED.
+- Proof records branch count, spawned task count, expected gain and failures.
+- Do not display fictional countdowns. A time value is either observed elapsed time, a configured trigger threshold, or explicitly an estimate.
+
 VERSION
-MOTORLAB-EXECUTION-FABRIC-V1.1
+MOTORLAB-EXECUTION-FABRIC-V1.2
 Established: 2026-10-06
 Revision 1.1: r23 adds work-elimination-first execution, content-addressed reuse, dynamic graph growth, progressive branching, pruning, event memory, deferred materialization and expanded proof metrics while preserving Velocity as sole scheduler.
+
+Revision 1.2: r24 adds evidence-gated latency branching so useful independent work can start while a slow runner is still live, with immediate dispatcher wake-up, no-side-effect-race guardrails and proof metrics.
