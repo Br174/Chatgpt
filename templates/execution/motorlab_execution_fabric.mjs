@@ -141,8 +141,10 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   const initial=validateGraph(input), max=Math.max(1,Number(maxConcurrency)||1);
   const tasks=new Map(initial.map(t=>[t.id,t])), pending=new Set(tasks.keys()), done=new Set(), pruned=new Set(), running=new Map(), results=new Map(), records=[], eventHistory=[], cacheChecked=new Set();
   let peak=0,intNow=0,intPeak=0,correctionRelays=0,dynamicTasks=0,cacheHits=0,cacheAvoidedEstimatedMs=0,latencyBranches=0,latencyBranchTasks=0,latencyExpectedGainMs=0,latencyBranchFailures=0;
-  const emit=async event=>{const entry={sequence:eventHistory.length+1,at:now(),...event};eventHistory.push(entry);if(onEvent)await onEvent(entry);};
-  const graphSnapshot=()=>validateGraph([...tasks.values()]);
+  let graphVersion=0,cachedGraphVersion=-1,cachedGraph=null,cachedScores=null,schedulerGraphRecomputes=0,eventFastPathCount=0;
+  const emit=event=>{const entry={sequence:eventHistory.length+1,at:now(),...event};eventHistory.push(entry);if(!onEvent){eventFastPathCount++;return null;}return Promise.resolve(onEvent(entry));};
+  const emitWait=async event=>{const ack=emit(event);if(ack)await ack;};
+  const schedulerView=()=>{if(cachedGraphVersion!==graphVersion){cachedGraph=validateGraph([...tasks.values()]);cachedScores=tailScores(cachedGraph);cachedGraphVersion=graphVersion;schedulerGraphRecomputes++;}return{graph:cachedGraph,scores:cachedScores};};
   const canStart=t=>running.size<max && ![...running.values()].some(x=>conflicts(t,x.task));
   const latencyUseful=t=>t.latencyBranchAfterMs>0&&t.latencySpawn.length>0&&t.latencyBranchExpectedGainMs>t.latencyBranchOverheadMs;
 
@@ -151,16 +153,16 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
       const child=task({...raw,workgroup:raw.workgroup??parent.workgroup,workgroupLabel:raw.workgroupLabel??parent.workgroupLabel,deps:[...new Set([...(raw.deps||[]),...(raw.detached?[]:[parent.id])])]});
       if(tasks.has(child.id))throw new Error('duplicate dynamic task '+child.id);
       for(const dep of child.deps)if(!tasks.has(dep))throw new Error(child.id+' missing dep '+dep);
-      tasks.set(child.id,child);pending.add(child.id);dynamicTasks++;
-      await emit({type:'TASK_SPAWNED',taskId:child.id,parentTaskId:parent.id,reason});
+      tasks.set(child.id,child);pending.add(child.id);dynamicTasks++;graphVersion++;
+      await emitWait({type:'TASK_SPAWNED',taskId:child.id,parentTaskId:parent.id,reason});
     }
   };
   const pruneTasks=async(parent,ids=[])=>{
     for(const rawId of ids){
       const id=String(rawId);
       if(!tasks.has(id)||done.has(id)||pruned.has(id))continue;
-      if(running.has(id)){await emit({type:'PRUNE_DEFERRED_RUNNING',taskId:id,parentTaskId:parent.id});continue;}
-      pending.delete(id);pruned.add(id);await emit({type:'TASK_PRUNED',taskId:id,parentTaskId:parent.id});
+      if(running.has(id)){await emitWait({type:'PRUNE_DEFERRED_RUNNING',taskId:id,parentTaskId:parent.id});continue;}
+      pending.delete(id);pruned.add(id);await emitWait({type:'TASK_PRUNED',taskId:id,parentTaskId:parent.id});
     }
   };
   const addCorrections=async(parent,list=[])=>{if(!list.length)return;correctionRelays+=list.length;await addTasks(parent,list,'CORRECTION_RELAY');};
@@ -172,10 +174,10 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
     const lookups=await Promise.all(candidates.map(async t=>{cacheChecked.add(t.id);try{return{t,value:await cacheLookup(t.cacheKey,t)};}catch{return{t,value:null};}}));
     let hit=false;
     for(const {t,value} of lookups){
-      if(value==null||value===false){await emit({type:'CACHE_MISS',taskId:t.id,cacheKey:t.cacheKey});continue;}
+      if(value==null||value===false){await emitWait({type:'CACHE_MISS',taskId:t.id,cacheKey:t.cacheKey});continue;}
       hit=true;pending.delete(t.id);done.add(t.id);results.set(t.id,value?.value??value);cacheHits++;cacheAvoidedEstimatedMs+=t.estimatedMs;
       records.push({id:t.id,kind:t.kind,workgroup:t.workgroup,workgroupLabel:t.workgroupLabel,startedAt:now(),finishedAt:now(),status:'CACHE_HIT',cacheKey:t.cacheKey});
-      await emit({type:'CACHE_HIT',taskId:t.id,cacheKey:t.cacheKey,avoidedEstimatedMs:t.estimatedMs});
+      await emitWait({type:'CACHE_HIT',taskId:t.id,cacheKey:t.cacheKey,avoidedEstimatedMs:t.estimatedMs});
       if(value?.spawn)await addTasks(t,value.spawn,'CACHE_RESTORED_BRANCH');
       if(value?.prune)await pruneTasks(t,value.prune);
     }
@@ -184,7 +186,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
 
   const launch=async t=>{
     pending.delete(t.id);const rec={id:t.id,kind:t.kind,workgroup:t.workgroup,workgroupLabel:t.workgroupLabel,startedAt:now(),finishedAt:null,status:'RUNNING'};records.push(rec);
-    if(t.kind==='integration'){intNow++;intPeak=Math.max(intPeak,intNow);}peak=Math.max(peak,running.size+1);await emit({type:'RUNNER_STARTED',taskId:t.id,workgroupId:t.workgroup||null,workgroupLabel:t.workgroupLabel||null,running:running.size+1});
+    if(t.kind==='integration'){intNow++;intPeak=Math.max(intPeak,intNow);}peak=Math.max(peak,running.size+1);const startAck=emit({type:'RUNNER_STARTED',taskId:t.id,workgroupId:t.workgroup||null,workgroupLabel:t.workgroupLabel||null,running:running.size+1});if(startAck)await startAck;
     let latencyTimer=null,latencyWakeResolve=null;
     const promise=Promise.resolve().then(()=>worker(t,{completed:new Set(done),pruned:new Set(pruned),runningCount:running.size+1,maxConcurrency:max,makeContentKey})).then(async value=>{
       if(latencyTimer)clearTimeout(latencyTimer);
@@ -192,11 +194,11 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
       if(value?.spawn)await addTasks(t,value.spawn,'DISCOVERY_BRANCH');
       if(value?.prune)await pruneTasks(t,value.prune);
       if(value?.corrections)await addCorrections(t,value.corrections);
-      if(t.cacheable&&t.cacheKey&&typeof cacheStore==='function'&&value?.cacheable!==false){await cacheStore(t.cacheKey,value,t);await emit({type:'CACHE_STORED',taskId:t.id,cacheKey:t.cacheKey});}
-      await emit({type:'RUNNER_COMPLETED',taskId:t.id,workgroupId:t.workgroup||null,workgroupLabel:t.workgroupLabel||null,running:running.size});return value;
+      if(t.cacheable&&t.cacheKey&&typeof cacheStore==='function'&&value?.cacheable!==false){await cacheStore(t.cacheKey,value,t);await emitWait({type:'CACHE_STORED',taskId:t.id,cacheKey:t.cacheKey});}
+      await emitWait({type:'RUNNER_COMPLETED',taskId:t.id,workgroupId:t.workgroup||null,workgroupLabel:t.workgroupLabel||null,running:running.size});return value;
     }).catch(async e=>{
       if(latencyTimer)clearTimeout(latencyTimer);
-      rec.finishedAt=now();rec.status='FAILED';rec.error=String(e?.message||e);if(t.kind==='integration')intNow--;running.delete(t.id);await emit({type:'RUNNER_FAILED',taskId:t.id,workgroupId:t.workgroup||null,workgroupLabel:t.workgroupLabel||null,error:rec.error});throw e;
+      rec.finishedAt=now();rec.status='FAILED';rec.error=String(e?.message||e);if(t.kind==='integration')intNow--;running.delete(t.id);await emitWait({type:'RUNNER_FAILED',taskId:t.id,workgroupId:t.workgroup||null,workgroupLabel:t.workgroupLabel||null,error:rec.error});throw e;
     });
     const entry={task:t,promise,latencyWake:null};running.set(t.id,entry);
     if(latencyUseful(t)){
@@ -209,21 +211,21 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
           const spawned=t.latencySpawn.map(raw=>({...raw,detached:true}));
           await addTasks(t,spawned,'LATENCY_BRANCH');
           latencyBranches++;latencyBranchTasks+=spawned.length;latencyExpectedGainMs+=t.latencyBranchExpectedGainMs;
-          await emit({type:'LATENCY_BRANCH_TRIGGERED',taskId:t.id,afterMs:t.latencyBranchAfterMs,spawnedTasks:spawned.map(x=>String(x.id)),expectedGainMs:t.latencyBranchExpectedGainMs,overheadMs:t.latencyBranchOverheadMs});
+          await emitWait({type:'LATENCY_BRANCH_TRIGGERED',taskId:t.id,afterMs:t.latencyBranchAfterMs,spawnedTasks:spawned.map(x=>String(x.id)),expectedGainMs:t.latencyBranchExpectedGainMs,overheadMs:t.latencyBranchOverheadMs});
         }catch(e){
           latencyBranchFailures++;
-          await emit({type:'LATENCY_BRANCH_FAILED',taskId:t.id,error:String(e?.message||e)});
+          await emitWait({type:'LATENCY_BRANCH_FAILED',taskId:t.id,error:String(e?.message||e)});
         }finally{latencyWakeResolve?.();}
       },t.latencyBranchAfterMs);
     }
   };
-  await emit({type:'EXECUTION_STARTED',initialTasks:initial.length,maxConcurrency:max});
+  const executionStartAck=emit({type:'EXECUTION_STARTED',initialTasks:initial.length,maxConcurrency:max});if(executionStartAck)await executionStartAck;
   while(pending.size||running.size){
     let launched=false;
-    let graph=graphSnapshot(),scores=tailScores(graph);
+    let {graph,scores}=schedulerView();
     let ready=[...pending].map(id=>tasks.get(id)).filter(t=>t&&!pruned.has(t.id)&&t.deps.every(d=>done.has(d)||pruned.has(d))).sort((a,b)=>(scores.get(b.id)||b.estimatedMs)-(scores.get(a.id)||a.estimatedMs));
     if(await resolveCacheFor(ready)){
-      graph=graphSnapshot();scores=tailScores(graph);
+      ({graph,scores}=schedulerView());
       ready=[...pending].map(id=>tasks.get(id)).filter(t=>t&&!pruned.has(t.id)&&t.deps.every(d=>done.has(d)||pruned.has(d))).sort((a,b)=>(scores.get(b.id)||b.estimatedMs)-(scores.get(a.id)||a.estimatedMs));
     }
     for(const t of ready){if(!canStart(t))continue;await launch(t);launched=true;if(running.size>=max)break;}
@@ -233,10 +235,10 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
 
   const overlaps=[],workRecords=records.filter(r=>r.status!=='CACHE_HIT');
   for(let i=0;i<workRecords.length;i++)for(let j=i+1;j<workRecords.length;j++)if(workRecords[i].startedAt<workRecords[j].finishedAt&&workRecords[j].startedAt<workRecords[i].finishedAt)overlaps.push([workRecords[i].id,workRecords[j].id]);
-  const finalGraph=graphSnapshot(),effectiveRunnerCount=workRecords.length;
+  const finalGraph=schedulerView().graph,effectiveRunnerCount=workRecords.length;
   const executionMode=effectiveRunnerCount<=1&&cacheHits===0?'DIRECT_FAST':max===1&&effectiveRunnerCount>1?'SERIAL_HOST_LIMITED':peak>1?'PARALLEL_OBSERVED':'SERIAL_REQUIRED';
-  await emit({type:'EXECUTION_COMPLETED',cacheHits,dynamicTasks,prunedTasks:pruned.size,latencyBranches});
-  return {results:Object.fromEntries(results),eventHistory,proof:{executionMode,runnerCount:effectiveRunnerCount,observedPeakConcurrency:peak,observedPeakIntegrationConcurrency:intPeak,singleIntegrationLaneVerified:intPeak<=1,overlapPairs:overlaps,criticalPath:criticalPath(finalGraph),correctionRelays,dynamicTasks,prunedTasks:[...pruned],cacheHits,cacheAvoidedEstimatedMs,latencyBranches,latencyBranchTasks,latencyExpectedGainMs,latencyBranchFailures,eventsRecorded:eventHistory.length,records}};
+  const executionDoneAck=emit({type:'EXECUTION_COMPLETED',cacheHits,dynamicTasks,prunedTasks:pruned.size,latencyBranches});if(executionDoneAck)await executionDoneAck;
+  return {results:Object.fromEntries(results),eventHistory,proof:{executionMode,runnerCount:effectiveRunnerCount,observedPeakConcurrency:peak,observedPeakIntegrationConcurrency:intPeak,singleIntegrationLaneVerified:intPeak<=1,overlapPairs:overlaps,criticalPath:criticalPath(finalGraph),correctionRelays,dynamicTasks,prunedTasks:[...pruned],cacheHits,cacheAvoidedEstimatedMs,latencyBranches,latencyBranchTasks,latencyExpectedGainMs,latencyBranchFailures,schedulerGraphRecomputes,eventFastPathCount,eventsRecorded:eventHistory.length,records}};
 }
 
 export function formatProof(p={}){
