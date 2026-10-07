@@ -54,7 +54,8 @@ test('same session stays pinned while a new session adopts the newer local relea
   const pinDir = join(temp, 'pins');
   await mkdir(join(temp, '.motorlab'), { recursive: true });
   await mkdir(join(temp, '.codex', 'hooks'), { recursive: true });
-  await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=Test\n');\n  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), 'MOTORLAB CRITICAL BOOT CAPSULE V1\nNUMERIC_PROGRESS=required\nVISUAL_STATUS=required\nSESSION_RELEASE_PIN=required\n');
+  await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=Test\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), 'MOTORLAB CRITICAL BOOT CAPSULE V1\nNUMERIC_PROGRESS=required\nVISUAL_STATUS=required\nSESSION_RELEASE_PIN=required\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.07-r28\nSTATE=VERIFIED\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'MOTORLAB SATELLITE BUNDLE\nRELEASE=2026.10.07-r28\nVISUAL_STATUS=required\n');
   await copyFile(join(repo, 'templates', 'codex', 'motorlab', 'motorlab_boot.py'), join(temp, '.codex', 'hooks', 'motorlab_boot.py'));
