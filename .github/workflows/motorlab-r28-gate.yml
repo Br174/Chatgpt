@@ -1,0 +1,40 @@
+name: MotorLab r28 Gate
+
+on:
+  push:
+    branches:
+      - 'motorlab-r28-*'
+    paths:
+      - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
+      - 'MOTORLAB_RELEASE_FANOUT_V1.txt'
+      - 'MOTORLAB_SATELLITE_SYNC_V1.txt'
+      - 'MOTORLAB_SATELLITE_BUNDLE_V1.txt'
+      - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
+      - 'MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt'
+      - 'templates/codex/motorlab/motorlab_boot.py'
+      - 'tests/motorlab-r28-sync-pin.test.mjs'
+      - '.github/workflows/motorlab-r28-gate.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
+      - 'MOTORLAB_RELEASE_FANOUT_V1.txt'
+      - 'MOTORLAB_SATELLITE_SYNC_V1.txt'
+      - 'MOTORLAB_SATELLITE_BUNDLE_V1.txt'
+      - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
+      - 'MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt'
+      - 'templates/codex/motorlab/motorlab_boot.py'
+      - 'tests/motorlab-r28-sync-pin.test.mjs'
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Existing execution fabric regression
+        run: node --test tests/motorlab-execution-fabric.test.mjs tests/motorlab-r27-dual-lane.test.mjs
+      - name: r28 fanout and session pin regression
+        run: node --test tests/motorlab-r28-sync-pin.test.mjs
