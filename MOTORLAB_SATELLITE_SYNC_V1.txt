@@ -12,7 +12,7 @@ BOOT
 2. Use VERIFIED local core immediately as fallback.
 3. When central is reachable, read release manifest and compare releases.
 4. Reconcile Project Continuity/live state before selecting a safe update boundary.
-5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status, r20 Pollicino continuity, r21 Four-Pillar adaptive Velocity/TTTA/learning semantics, r22 operational Execution Fabric dispatch/proof semantics and r23 incremental dynamic work-elimination/event-memory semantics.
+5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status, r20 Pollicino continuity, r21 Four-Pillar adaptive Velocity/TTTA/learning semantics, r22 operational Execution Fabric dispatch/proof semantics, r23 incremental dynamic work-elimination/event-memory semantics, r25 semantic/intrinsic speed semantics and r26 Adaptive Runtime Governor semantics.
 
 SAFE UPDATE
 - pin one MotorLab release during active write/build/test/promotion;
@@ -79,6 +79,15 @@ PROGRESSIVE_BRANCHING=required
 DYNAMIC_PRUNING=required
 EVENT_MEMORY=required
 DEFERRED_MATERIALIZATION=required
+ADAPTIVE_RUNTIME_GOVERNOR=required
+ADAPTIVE_LANE_POOL=required
+FRESH_HEDGE=required
+FRESH_HEDGE_DEFAULT_TRIGGER_MS=10000
+FRESH_HEDGE_MAX_ATTEMPTS_PER_WAVE=3
+FRESH_HEDGE_MAX_WAVES=2
+FRESH_HEDGE_EXTERNAL_PROVIDER_AUTH=required
+ADAPTIVE_STATE_PERSIST_RESTORE=supported
+ORDINARY_TASK_FAST_PATH=required
 CHANGE_HISTORY_REGISTRY=required
 SEMANTIC_CHANGE_LOOKUP=required
 SELECTIVE_EXACT_RESTORE=required
@@ -239,6 +248,15 @@ At a safe satellite adoption boundary, sync the r26 dispatcher and adaptive-runt
 - Preserve r24 useful-work latency branching, r25 workgroups/intrinsic fast path and single-writer/integration semantics.
 - External hedging remains disabled unless the project adapter explicitly authorizes it under External Service Guard constraints.
 
+R26 ADAPTIVE RUNTIME SYNC
+At a safe satellite boundary, sync the r26 governor contract and dispatcher only.
+- preserve r25 as LAST_GOOD;
+- preserve app/runtime/UI/package/signing/native project engine;
+- do not switch control-plane during active write/build/test/promotion;
+- persist adaptive state only through existing approved operational-state mechanisms;
+- stale/missing adaptive state must degrade to conservative defaults rather than block work;
+- provider-specific hedge authorization remains adapter-owned under External Service Guard.
+
 VERSION
 MOTORLAB-SATELLITE-SYNC-V1.27
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
@@ -271,3 +289,5 @@ Revision 1.25: r24 requires evidence-gated latency branch trigger inheritance an
 Revision 1.26: r25 requires semantic-workgroup and intrinsic-speed inheritance at safe satellite boundaries, with r24 retained as LAST_GOOD.
 
 Revision 1.27: r26 requires safe-boundary inheritance of Triple Fresh Hedge, Adaptive Lane Pool and the coordinated runtime governor, with r25 retained as LAST_GOOD.
+
+Revision 1.27: r26 requires Adaptive Runtime Governor, bounded hedge and adaptive lane inheritance at safe satellite boundaries, with r25 retained as LAST_GOOD.
