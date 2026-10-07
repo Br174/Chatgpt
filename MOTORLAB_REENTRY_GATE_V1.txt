@@ -1,0 +1,75 @@
+MOTORLAB RE-ENTRY GATE V1
+
+STATUS
+Mandatory MotorLab CORE capability for every current/future software project.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Keep MotorLab governing the project for the entire conversation lifecycle, not only at new-chat SessionStart. Every supported project turn/resume must re-enter through MotorLab before substantive project reasoning, tool use, writes, build/test/lifecycle actions or continuation.
+
+ROLE / PRECEDENCE
+- Auto Bootstrap owns first activation/onboarding.
+- Re-entry Gate owns subsequent project-turn/resume reactivation.
+- Session pinning protects an in-flight control snapshot.
+- Resume Recovery owns continuation from unfinished checkpoints.
+- Velocity remains the only scheduler.
+- Re-entry Gate never becomes a second scheduler and never replaces project-native engines.
+
+1. EVERY-TURN RE-ENTRY — MANDATORY
+On every supported UserPromptSubmit in a recognizable MotorLab project:
+A. load/reinject the pinned Critical Boot Capsule before substantive project work;
+B. restore compact project identity + sync state;
+C. mark MotorLab as governing THIS turn;
+D. preserve current ACTIVE_OPERATION_ID, approval, progress floor, lock and native-engine coexistence;
+E. route unfinished work through Resume Recovery/Watchdog before unrelated writes;
+F. apply current progress/visual/Velocity/Pollicino/artifact/lifecycle/safety semantics for the turn.
+
+A user prompt such as "continua", "procedi", "ok", "⚡", a correction, or a new in-scope request must not bypass this gate merely because the same chat is already open.
+
+2. RESUME / COMPACT / CLEAR RE-ENTRY
+SessionStart sources resume, compact and clear are also mandatory re-entry points.
+The same pinned capsule is re-established before project work. A host compaction or interruption must not silently strip MotorLab critical behavior.
+
+3. SAFE LATEST-RELEASE REFRESH
+At a re-entry boundary, compare the session pin with the repository's VERIFIED local satellite.
+- If the local release is newer, complete, and no explicit in-flight write/build/test/promotion lock is recorded, refresh the session pin to that newer local snapshot before the turn.
+- If an explicit unsafe/in-flight lock is recorded, keep the existing pin and mark the newer release pending for the next safe re-entry.
+- Never downgrade a pin.
+- Never invent a release.
+- Central fanout remains responsible for placing a verified newer satellite in the project repository; Re-entry Gate consumes it, it does not bypass fanout safety.
+
+4. CODEX / HOOK-CAPABLE EXECUTORS
+Supported project hook configuration must invoke motorlab_boot.py on:
+- SessionStart;
+- UserPromptSubmit.
+UserPromptSubmit must run MotorLab re-entry before Pollicino-only prompt logging. Live Control may also reconcile at that safe prompt boundary.
+The boot adapter must return additionalContext for UserPromptSubmit containing the Critical Boot Capsule and re-entry contract.
+
+5. VISIBLE BEHAVIOR
+The exact versioned banner remains mandatory as the first visible line of a new project chat/session.
+It does not need to be repeated on every user prompt unless a real activation/recovery/version-change status is useful.
+Numeric progress/visual status remain mandatory at supported visible control points for active MotorLab work.
+
+6. PROJECT-NATIVE ENGINE COEXISTENCE
+MotorLab orchestrates every project turn while preserving MusicLab/CoverLab/StudyBook/MotorAI or any other project-native engine. Re-entry must never replace or disable the native engine.
+
+7. FUTURE PROJECTS
+Every newly onboarded project inherits this gate automatically through the current satellite, hook template and release fanout. No per-project manual trigger is allowed.
+
+8. PLATFORM BOUNDARY
+If a host exposes no UserPromptSubmit-equivalent callback, repository hook execution cannot be forced invisibly. In that case the shared CORE instruction still requires MotorLab re-entry at every available assistant execution cycle. Do not claim a hook fired when the host did not expose one.
+
+9. SUCCESS CRITERIA
+Re-entry Gate is working when:
+- MotorLab governs both the first turn and every later supported project turn;
+- same-chat continuation cannot degrade into Pollicino-only or memory-only behavior;
+- critical capsule semantics are restored after resume/compact/clear;
+- a newer verified local MotorLab release is adopted at a safe re-entry boundary without waiting for a brand-new chat;
+- unsafe in-flight operations retain their current pin until safe;
+- project-native engines remain intact;
+- no second scheduler or duplicate coordinator is created.
+
+VERSION
+MOTORLAB-REENTRY-GATE-V1.0
+Established: 2026-10-08
+Revision 1.0: r31 adds mandatory every-turn/resume MotorLab re-entry and safe latest-verified-release refresh.
