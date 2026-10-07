@@ -5,10 +5,11 @@ Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.07-r29
+Release: 2026.10.07-r30
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
-Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.29
-Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.24
+Canonical boot capsule: MOTORLAB_BOOT_CAPSULE_V1.txt
+Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.30
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.25
 Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.5
 Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.6
 Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
@@ -174,3 +175,11 @@ Revision 2.28: r28 fanout verified COMPLETE across all registered default/curren
 Revision 2.29: r29 makes all-project MotorLab activation and versioned first-line startup proof mandatory for current and future projects while preserving r28 session pin/fanout semantics.
 
 Revision 2.30: r29 fanout verified COMPLETE across all registered/default/current active refs; every current/future project must auto-activate MotorLab and open with the pinned versioned banner `⚙️ MotorLab rNN attivo`.
+
+R30 CRITICAL BOOT CAPSULE POLICY
+- Every current/future project must receive the current capsule as `.motorlab/MOTORLAB_BOOT_CAPSULE.txt`.
+- Capsule is loaded before hook/sync/core detail and must remain entirely inside the startup context budget.
+- It compactly preserves all critical user-visible, speed, continuity, artifact/APK, lifecycle, safety, session and fanout semantics.
+- Long-form modules remain authoritative detail; capsule is not a competing scheduler/policy implementation.
+
+Revision 2.31: r30 adds mandatory capsule-first bootstrap to all current/future projects.

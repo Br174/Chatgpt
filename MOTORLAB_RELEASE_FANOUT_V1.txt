@@ -26,6 +26,7 @@ Before mutating a project target:
 
 FANOUT PAYLOAD
 At minimum synchronize:
+- .motorlab/MOTORLAB_BOOT_CAPSULE.txt (from central MOTORLAB_BOOT_CAPSULE_V1.txt)
 - .motorlab/MOTORLAB_LOCAL_CORE.txt
 - .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt
 - .motorlab/MOTORLAB_SYNC_STATE.txt
@@ -56,5 +57,10 @@ HOST LIMIT
 This mechanism executes when an authorized MotorLab/GitHub release executor has an execution cycle. Repository text alone cannot wake a completely inactive host. Within a MotorLab release operation, fanout is mandatory and cannot be skipped silently.
 
 VERSION
-MOTORLAB-RELEASE-FANOUT-V1.0
+MOTORLAB-RELEASE-FANOUT-V1.1
 Established: 2026-10-07
+
+R30 CAPSULE FANOUT
+A target is not UPDATED_VERIFIED unless the local capsule exists, matches the central release, the bootstrap emits it before long-form detail, and the compact startup context remains below the declared host cap.
+
+Revision 1.1: r30 adds the critical capsule to mandatory fanout verification.

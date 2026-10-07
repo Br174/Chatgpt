@@ -9,6 +9,7 @@ PURPOSE
 MotorLab activation must be structural, persistent and FIRST in software-project sessions. It must not depend on Bruno remembering or pasting an activation prompt in every new chat.
 
 MANDATORY DEPENDENCIES
+- MOTORLAB_BOOT_CAPSULE_V1.txt
 - MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt
 - MOTORLAB_SESSION_BOOT_BANNER_V1.txt
 - MOTORLAB_PROJECT_CONTINUITY_V1.txt
@@ -237,3 +238,9 @@ R29 MANDATORY ALL-PROJECT + VERSIONED FIRST-LINE GATE
 - The first visible line is always `⚙️ MotorLab rNN attivo`, where rNN is derived from the pinned session release.
 - Unversioned `⚙️ MotorLab attivo` is no longer valid startup proof.
 - Missing/unknown release identity is a bootstrap defect; do not fabricate a version.
+
+R30 CAPSULE-FIRST BOOT ORDER
+0. Load the local pinned `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` before long-form hook/sync/core context.
+1. Emit a compact startup context that keeps the whole critical capsule inside the host additional-context budget.
+2. The capsule owns non-truncatable startup semantics; detailed modules remain authoritative and are loaded on demand.
+3. Missing/invalid/oversized capsule is a bootstrap defect. Never silently fall back to a truncated long-form dump.
