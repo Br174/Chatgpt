@@ -5,16 +5,16 @@ Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.06-r23
+Release: 2026.10.07-r24
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
-Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.24
-Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.18
-Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.1
-Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.3
+Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.25
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.19
+Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.2
+Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.4
 Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
 Canonical Pollicino continuity: MOTORLAB_POLLICINO_CONTINUITY_V1.txt
 
-R23 GLOBAL EXECUTION POLICY
+R24 GLOBAL EXECUTION POLICY
 All registered projects inherit:
 - WORK_ELIMINATION_FIRST;
 - CONTENT_ADDRESSED_REUSE with explicit invalidation;
@@ -30,36 +30,46 @@ All registered projects inherit:
 - observed parallelism proof and honest host-limited serial reporting.
 Velocity remains the sole scheduling authority. Execution Fabric is the dispatcher. Pollicino remains the external continuity line and is not replaced.
 
-REGISTERED PROJECTS — R23 MIGRATION VERIFIED 2026-10-06
+R24 LATENCY BRANCH POLICY
+- When a live task crosses a declared latency threshold, preplanned independent useful work may start before the parent finishes.
+- Trigger only when EXPECTED_GAIN_MS > OVERHEAD_MS.
+- If the parent finishes first, cancel the trigger.
+- Wake the dispatcher immediately when latency work is spawned.
+- Never duplicate irreversible/costly provider side effects as a blind race.
+- Preserve lock scopes, single-writer, runner caps and the single integration lane.
+- Completion countdowns are never presented as guaranteed unless truly deterministic.
+
+REGISTERED PROJECTS — R24 LATENCY ADOPTION 2026-10-07
 1. MusicLab — Br174/MusicLab
-   main r23 commit: 212f9d7370f5fb90ac42be324c09ec6d92d86152
-   active LAB47 branch r23 commit: 2ffb723c7cdba5e2652ec377cdb1757d50ccbffc
+   main r24 commit: aa1614093c05cb6158d5f1d4a04b038b66b7e4e3
+   active LAB47 branch r24 commit: 073a9d2e2eb9237c88e7eb870c1f26dfa10456a0
    Pollicino sidecar/proof flow preserved.
    Native MusicLab engines/lifecycle remain authoritative.
 
 2. GeoVision — Br174/GeoVision-Test
-   main r23 commit: 8a397f6b058abeb01f09eda8a537a21186082d3a
+   main r24 commit: c1fb62be2ba3efdaa2154c589e7df2f2145aaa0b
    Native GeoVision engine/lifecycle preserved.
 
 3. StudyBook-AI — Br174/StudyBook-AI
-   main r23 commit: efad83b799d65234b8f467bd22a5c9d981ce4cba
-   active LAB03 branch r23 commit: 759d5ce999253c2da8480f3b46a726d8f153e50a
+   main r24 commit: 8057362daee21a7a270c1858d62dce976aacd4f7
+   active LAB03 branch r24 commit: ec8439139bc49c93912aa5116e0438a5ad48444c
    StudyBook application/runtime behavior remains separate from MotorLab control-plane adoption.
 
 4. Visionflix / Verlezza Vision — Br174/Visionflix
-   main r23 commit: f09b8e191556d7a7af57577e4fe8892597ae680a
+   main r24 commit: 262e22edc4bebb748d802734fe914d6d87b855fc
    Visionflix remains source lifecycle authority.
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
-   main r23 commit: 16454c990bda09861e904232bc35d0bd6a35cc5b
+   main r24 commit: e841a730418ba853afb4854756ac2aa72d527a84
    Native Cover Lab engine remains authoritative.
 
 6. streamflix-BV — Br174/streamflix-BV
-   main r23 commit: f46d74900f3cfe92f8941314a759b6a97fe2373c
+   main r24 commit: 9fbc15c87d9a3a3fc45dff4755b44ad721ebf3fe
    Remains delivery adapter; Visionflix source authority preserved.
 
 7. MotorAI — Br174/MotorAI
    initial r23/onboarding application head: 2fc178f6e119b7a06325b63a6568fa18bebf1a13
+   r24 adoption: PENDING_SAFE_BOUNDARY — Android build run 37591803299 currently in progress; do not switch control-plane mid-build.
    first verified Android build: GitHub Actions run 37534929516 / artifact 11446590832
    Native MotorAI neural brain remains authoritative; MotorLab-Training is a subordinate specialized tutor/orchestrator.
    MotorAI-specific training innovations do not propagate automatically into central MotorLab.
@@ -89,8 +99,10 @@ Superpowers: CONNECTED_VERIFIED; subordinate methodology.
 Context7 Free: CONNECTED_VERIFIED; optional/version-aware documentation only.
 
 FUTURE PROJECTS
-Every newly onboarded project receives the current r23 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, and the r23 incremental dynamic execution policy.
+Every newly onboarded project receives the current r24 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, and the r24 incremental dynamic + latency-branch execution policy.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.19
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.20
 Revision 2.18: registry cleaned to current-state r23; six prior projects migrated and MotorAI onboarded at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
+
+Revision 2.20: r24 adds evidence-gated latency branching to the central contract; six established project mains plus active MusicLab LAB47 and StudyBook LAB03 were aligned at safe boundaries, while MotorAI remains explicitly pinned until its in-flight Android build closes.
