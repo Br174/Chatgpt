@@ -333,8 +333,11 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
     const finishFailureIfExhausted=()=>{
       if(settled)return;
       if(activeForWave(currentWave).length)return;
-      if(currentWave<maxWaves){startNextWave('WAVE_FAILED');return;}
-      settled=true;hedgeExhausted++;abortAttempts('HEDGE_EXHAUSTED');rejectTask(failures.at(-1)||new Error('fresh hedge waves exhausted'));
+      if(eligible&&currentWave<maxWaves&&startNextWave('WAVE_FAILED'))return;
+      settled=true;
+      if(eligible)hedgeExhausted++;
+      abortAttempts(eligible?'HEDGE_EXHAUSTED':'TASK_FAILED');
+      rejectTask(failures.at(-1)||new Error(eligible?'fresh hedge waves exhausted':'task failed'));
     };
     const startAttempt=wave=>{
       const id=++attemptSeq,controller=new AbortController(),startedAt=now(),a={id,wave,active:true,startedAt,budgetHeld:false};
