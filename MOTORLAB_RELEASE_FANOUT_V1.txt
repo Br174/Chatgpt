@@ -1,0 +1,60 @@
+MOTORLAB RELEASE FANOUT V1
+
+STATUS
+Mandatory release-coordination capability.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Make MotorLab release propagation part of the release transaction itself so registered projects cannot silently remain on an obsolete satellite while central MotorLab advances.
+
+CORE RULE
+A MotorLab release is not operationally COMPLETE until every registered project target is either:
+- UPDATED_VERIFIED to the new release at a safe boundary; or
+- PENDING_SAFE_BOUNDARY with exact repository/ref/reason recorded for automatic adoption at the next safe boundary.
+
+TARGETS
+- Every registered project default branch.
+- Every explicitly registered/current active LAB/CANDIDATA/work ref.
+- Future active refs discovered by Project Continuity before release closure.
+
+SAFE-BOUNDARY GATE
+Before mutating a project target:
+- no active write/build/test/promotion must be running on that target;
+- preserve project-native engine/lifecycle;
+- preserve current verified local core as LAST_GOOD;
+- never rewrite application/domain/runtime code as part of MotorLab-only synchronization.
+
+FANOUT PAYLOAD
+At minimum synchronize:
+- .motorlab/MOTORLAB_LOCAL_CORE.txt
+- .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt
+- .motorlab/MOTORLAB_SYNC_STATE.txt
+- .motorlab/execution/motorlab_execution_fabric.mjs
+- stable bootstrap/session-pin adapter where supported
+- Pollicino/Live-Control control-plane files required by the current release where supported
+
+SESSION IMMUTABILITY
+SESSION_RELEASE_PIN=required.
+A session pins the full local MotorLab control snapshot at its first SessionStart.
+Resume/compact/clear of the same session reuse that snapshot.
+A newer release may be written to the repository while a session is open, but the open session must not switch to it.
+The newer release becomes eligible only on a new session or an explicit verified safe-boundary handoff.
+
+RELEASE TRANSACTION
+1. PREPARE central release and tests.
+2. Set FANOUT_STATE=IN_PROGRESS.
+3. Discover registered default + active refs.
+4. For each safe target, synchronize MotorLab control-plane payload and verify release markers.
+5. For each busy target, write PENDING_SAFE_BOUNDARY into central/project continuity state; do not force a mid-operation switch.
+6. Verify all safe targets and exact release ids.
+7. Only then set FANOUT_STATE=COMPLETE and declare the MotorLab release globally adopted.
+
+NO SECOND SCHEDULER
+Release Fanout is release coordination, not a runtime scheduler. Velocity remains the sole runtime scheduler.
+
+HOST LIMIT
+This mechanism executes when an authorized MotorLab/GitHub release executor has an execution cycle. Repository text alone cannot wake a completely inactive host. Within a MotorLab release operation, fanout is mandatory and cannot be skipped silently.
+
+VERSION
+MOTORLAB-RELEASE-FANOUT-V1.0
+Established: 2026-10-07
