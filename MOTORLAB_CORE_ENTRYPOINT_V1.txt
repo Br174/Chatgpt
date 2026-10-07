@@ -158,6 +158,7 @@ At boot, preserve r23-r26 ordering and apply r27 through Velocity + Adaptive Run
 - safe productive sidework declared for a potentially waiting task starts immediately when expected gain exceeds overhead;
 - no artificial 3-second or 10-second wait is introduced before different useful work begins;
 - same-task Fresh Hedge recovery remains separate with the default 10000 ms hard trigger unless reliable stall evidence triggers earlier;
+- controlled analysis/wait tasks may opt into replacePrimaryOnHardHedge so the stale primary attempt is cancelled or invalidated at the hard trigger and cannot later win;
 - productive sidework and same-task recovery may overlap without creating a second scheduler;
 - user-visible updates at available control points report only real started/completed activity;
 - opaque host reasoning remains outside direct MotorLab restart/cancel control unless the host exposes that capability.
