@@ -138,7 +138,7 @@ Superpowers: CONNECTED_VERIFIED; subordinate methodology.
 Context7 Free: CONNECTED_VERIFIED; optional/version-aware documentation only.
 
 FUTURE PROJECTS
-Every newly onboarded project receives the current r28 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, plus r26 adaptive runtime and r27 zero-idle dual-lane execution. Existing registered project refs remain on their verified r26 adoption until a safe synchronization boundary.
+Every newly onboarded project receives the current r28 satellite contract and the release-fanout/session-pin mechanism. Central release work must synchronize registered targets in the same release operation; busy targets become PENDING_SAFE_BOUNDARY and are retried automatically at the first verified safe boundary.
 
 VERSION
 MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.27
@@ -158,3 +158,19 @@ Revision 2.25: verified r26 adoption recorded for six project mains, active Musi
 Revision 2.26: r27 becomes the central contract with immediate productive sidework, separate default-10s same-task recovery and optional stale-primary replacement; existing project refs remain verified r26 until safe-boundary sync.
 
 Revision 2.27: r28 makes release fanout part of central release completion and requires immutable session pins so projects auto-adopt new MotorLab releases only at safe boundaries.
+
+
+R28 FANOUT STATUS — 2026-10-07
+FANOUT_STATE=COMPLETE_WITH_PENDING_SAFE_BOUNDARY
+- Br174/MusicLab main = UPDATED_VERIFIED r28
+- Br174/GeoVision-Test main = UPDATED_VERIFIED r28 @ dfe7d475586257158711dafd276d3ffa8abd0a05
+- Br174/StudyBook-AI main = UPDATED_VERIFIED r28 @ a9ab160d76410a68400ccb372b74255a75cdb604
+- Br174/Visionflix main = UPDATED_VERIFIED r28 @ c62018c5b134c3ddb94fc3df240f103d71bb620d
+- Br174/Cover-Lab-AI main = UPDATED_VERIFIED r28 @ 784020cff0c19eb1fcbe316889a7a6e6452a2b33
+- Br174/streamflix-BV main = UPDATED_VERIFIED r28 @ a14ab7526fd2f1c03d111fcdbc6434bdad440e80
+- Br174/MotorAI main = UPDATED_VERIFIED r28 @ 82620dc1d8791bd17b8516548667c39904f92ff2
+- Br174/MusicLab uab-build/musiclab-lab50-aggiornamento-family-01 = UPDATED_VERIFIED r28
+- Br174/StudyBook-AI lab/studybook-core-android-01-update-03 = UPDATED_VERIFIED r28
+- Br174/MusicLab uab-build/musiclab-lab52-aggiornamento-family-01 = PENDING_SAFE_BOUNDARY
+  reason: concurrent write/content-SHA conflict observed during r28 fanout; do not force a MotorLab switch while the branch is active.
+  required next action: at first verified safe boundary, preserve current r23 local core as LAST_GOOD, install r28 bundle/execution fabric/bootstrap/Pollicino/Live Control, verify release markers, then clear this pending entry.
