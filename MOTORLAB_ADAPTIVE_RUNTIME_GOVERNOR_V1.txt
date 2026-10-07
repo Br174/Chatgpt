@@ -1,7 +1,7 @@
 MOTORLAB ADAPTIVE RUNTIME GOVERNOR V1
 
 STATUS
-Canonical r26 runtime coordination policy.
+Canonical r27 runtime coordination policy.
 Central authority: Br174/Chatgpt.
 
 PURPOSE
@@ -53,6 +53,7 @@ PLANE B — SAME-TASK RECOVERY
 - The original slow task continues normally while productive sidework advances.
 - If that same task is hedge-safe and remains unresolved until the hard Fresh Hedge trigger, bounded Fresh Hedge recovery starts. Default trigger remains 10000 ms.
 - A reliable explicit stall signal may trigger same-task recovery earlier.
+- Controlled analysis/wait tasks may declare replacePrimaryOnHardHedge. At the hard trigger, the stale primary attempt is cancelled when supported or invalidated so a late primary result cannot win; bounded fresh attempts continue the same task.
 - If hedging is unsafe/unavailable, the original task remains governed by Watchdog and legacy r24 latency branching where appropriate.
 
 The two planes may be active at the same time. Productive sidework MUST NOT be delayed merely because Fresh Hedge has not reached its trigger. Fresh Hedge MUST NOT suppress productive sidework.
