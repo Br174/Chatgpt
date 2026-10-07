@@ -245,3 +245,28 @@ test('adaptive lane pool caps provider concurrency without throttling local work
   assert.ok(providerPeak<=2,`provider peak exceeded lane budget: ${providerPeak}`);
   assert.ok(localPeak>=2,`local work was unnecessarily lane-throttled: ${localPeak}`);
 });
+
+
+test('adaptive governor state persists and restores across executions',async()=>{
+  let stored=null;
+  const first=await executeGraph([
+    {id:'p1',kind:'external',laneKey:'github',adaptiveLane:true}
+  ],async()=>({runtime:{throttled:true}}),{
+    maxConcurrency:4,
+    adaptiveGovernorConfig:{minLanes:1,maxLanes:4,initialLanes:3,successesToIncrease:2},
+    adaptiveStateStore:async state=>{stored=state;}
+  });
+  assert.equal(first.proof.adaptiveStateStored,true);
+  assert.ok(stored);
+  assert.equal(stored.lanes.github.limit,1);
+
+  const second=await executeGraph([
+    {id:'p2',kind:'external',laneKey:'github',adaptiveLane:true}
+  ],async()=>({ok:true}),{
+    maxConcurrency:4,
+    adaptiveGovernorConfig:{minLanes:1,maxLanes:4,initialLanes:3,successesToIncrease:2},
+    adaptiveStateLoad:async()=>stored
+  });
+  assert.equal(second.proof.adaptiveStateLoaded,true);
+  assert.equal(second.proof.adaptiveGovernor.lanes.github.limit,1);
+});
