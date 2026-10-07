@@ -76,7 +76,7 @@ REGISTERED PROJECTS — R24 LATENCY ADOPTION 2026-10-07
    Public repository is the code/build authority; future private weights, datasets, credentials and personal checkpoints remain outside public Git.
 
 CLEANUP / NON-REDUNDANCY
-- Old r11/r16/r19/r20/r21 active satellite contents were superseded by one current r23 local core at the verified safe boundary.
+- Old active satellite contents were superseded by the current r24 local core at verified safe boundaries for migrated projects; the immediately previous verified r23 core is preserved as LAST_GOOD. MotorAI remains pinned until its current build reaches a safe boundary.
 - The immediately previous verified local core is preserved only as .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt for rollback.
 - LAST_GOOD is intentional safety state and is not redundant legacy.
 - One local current dispatcher copy exists at .motorlab/execution/motorlab_execution_fabric.mjs.
@@ -84,7 +84,7 @@ CLEANUP / NON-REDUNDANCY
 - Git history preserves older releases; current registry does not duplicate obsolete release prose.
 
 POLLICINO
-Pollicino remains external control-plane continuity: liveness/progress evidence, terminal seals, RESUME_READY and stable proof semantics remain intact. r23 does not replace or move Pollicino into application runtime code.
+Pollicino remains external control-plane continuity: liveness/progress evidence, terminal seals, RESUME_READY and stable proof semantics remain intact. r24 does not replace or move Pollicino into application runtime code.
 
 SAFE ADOPTION
 The global migration was performed only after confirming no active GitHub workflow runs in the prior registered repositories. MotorLab-only commits used [skip ci]. Application source/runtime/package/signing/lifecycle was not changed by this migration.
