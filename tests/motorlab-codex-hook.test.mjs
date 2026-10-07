@@ -10,11 +10,15 @@ const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const script = resolve(repo,'templates/codex/motorlab/motorlab_live_control.py');
 const config = resolve(repo,'templates/codex/motorlab/hooks.json');
 
-test('central Codex template uses only SessionStart and PostToolUse safe points', async () => {
+test('central Codex template re-enters MotorLab on SessionStart, UserPromptSubmit and PostToolUse safe points', async () => {
   const cfg = JSON.parse(await readFile(config,'utf8'));
   assert.ok(cfg.hooks.SessionStart);
+  assert.ok(cfg.hooks.UserPromptSubmit);
   assert.ok(cfg.hooks.PostToolUse);
-  assert.equal(cfg.hooks.Interrupt, undefined);
+  const promptCommands = cfg.hooks.UserPromptSubmit[0].hooks.map((h) => h.command || '');
+  assert.match(promptCommands[0], /motorlab_boot\.py/);
+  assert.ok(promptCommands.some((x) => /motorlab_live_control\.py/.test(x)));
+  assert.ok(promptCommands.some((x) => /motorlab_pollicino\.py/.test(x)));
   assert.doesNotMatch(JSON.stringify(cfg), /continue\s*[:=]\s*false/i);
 });
 

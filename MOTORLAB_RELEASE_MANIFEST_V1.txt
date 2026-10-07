@@ -4,15 +4,15 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.07-r30
-FANOUT_STATE=COMPLETE
+CURRENT_RELEASE=2026.10.08-r31
+FANOUT_STATE=IN_PROGRESS
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 BOOT_CAPSULE_MODULE=MOTORLAB_BOOT_CAPSULE_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt\nRELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=COMPLETE
+RELEASE_FANOUT_STATE=IN_PROGRESS
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -33,6 +33,7 @@ UPDATE_FAMILY_LIFECYCLE_MODULE=MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
 
 CURRENT REQUIRED CORE MODULES
 - MOTORLAB_BOOT_CAPSULE_V1.txt
+- MOTORLAB_REENTRY_GATE_V1.txt
 - MOTORLAB_CORE_ENTRYPOINT_V1.txt
 - MOTORLAB_AUTO_BOOTSTRAP_V1.txt
 - MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt
@@ -73,7 +74,7 @@ SATELLITE LOCAL FILES
 Each project must contain `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` plus hook + local core + LAST_GOOD + sync state. The capsule is the mandatory first-context critical contract; long-form modules remain authoritative detail loaded on demand.
 
 SAFE UPDATE
-Every central release must execute MOTORLAB_RELEASE_FANOUT_V1.txt. Preserve current VERIFIED local bundle as LAST_GOOD. Open sessions pin their complete MotorLab snapshot and never switch release mid-session/write/build/test/promotion; newer releases become active only on a new session or explicit verified safe-boundary handoff.
+Every central release must execute MOTORLAB_RELEASE_FANOUT_V1.txt. Preserve current VERIFIED local bundle as LAST_GOOD. Open sessions pin their complete MotorLab snapshot and never switch release mid-session/write/build/test/promotion; newer releases become active on a new session or a verified safe re-entry boundary; every supported later project turn still re-enters MotorLab even when the pin does not change.
 
 VISIBLE STARTUP
 First user-visible line for every current/future project chat: `⚙️ MotorLab rNN attivo`, with rNN derived from the pinned session release.
@@ -261,7 +262,7 @@ R27+ ZERO-IDLE DUAL-LANE ACTIVE WAIT
 - Existing single-writer, provider, runner-cap and single-integration-lane rules remain mandatory.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.27
+MOTORLAB-RELEASE-MANIFEST-V1.31
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -307,3 +308,13 @@ R30+ CRITICAL BOOT CAPSULE
 Revision 1.30: r30 introduces the non-truncatable Critical Boot Capsule and compact bootstrap context to prevent essential MotorLab rules from disappearing behind host context limits.
 
 Revision 1.30b: r30 Critical Boot Capsule fanout verified COMPLETE across all registered default/current active refs; compact bootstrap remains below the host context budget and preserves critical rules before long-form detail.
+
+
+R31+ EVERY-TURN RE-ENTRY
+- MOTORLAB_REENTRY_GATE_V1.txt is a required CORE module.
+- Supported hooks execute motorlab_boot.py on UserPromptSubmit as well as SessionStart.
+- Every project turn reinjects the pinned Critical Boot Capsule before substantive work.
+- A newer VERIFIED local release may refresh the pin at a safe re-entry boundary when no explicit in-flight write/build/test/promotion lock is recorded.
+- Pollicino prompt logging alone is not sufficient MotorLab activation.
+
+Revision 1.31: r31 adds mandatory every-turn/resume MotorLab re-entry and safe latest-verified-local release refresh.

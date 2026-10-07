@@ -33,6 +33,10 @@ For an unregistered chat that legitimately activates MotorLab through software-b
 After the banner in a recognized project, MotorLab must load/reconcile the project's Project Continuity state before choosing a starting point for unfinished work.
 The banner itself does not prove continuity reconciliation; it proves activation.
 
+4A. TURN RE-ENTRY
+The exact banner is a new-chat/session visible proof and need not be repeated on every user prompt.
+However, absence of a repeated banner NEVER means MotorLab may be skipped: MOTORLAB_REENTRY_GATE_V1.txt must still execute before every supported later project turn/resume and keep the pinned/current verified MotorLab contract active.
+
 5. AUDIT RULE
 If the banner has not appeared, Bruno must not be expected to assume MotorLab is active.
 If a software-project response was already given without the banner despite a recognizable activation path, treat that as a bootstrap defect and activate immediately on the next available response.
@@ -59,8 +63,11 @@ SUCCESS CRITERIA
 - no false activation is claimed.
 
 VERSION
-MOTORLAB-SESSION-BOOT-BANNER-V1.3
+MOTORLAB-SESSION-BOOT-BANNER-V1.4
 Established: 2026-09-29
 Revision 1.2: banner becomes mandatory PRE-RESPONSE first-line gate for every supported project/software-build activation path.
 
 Revision 1.3: r29 makes the release version mandatory in the first visible project-chat line and removes the unversioned banner as a valid normal startup state.
+
+
+Revision 1.4: r31 separates visible first-line banner proof from mandatory silent/compact every-turn MotorLab re-entry.

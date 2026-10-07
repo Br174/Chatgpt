@@ -49,7 +49,7 @@ test('r28 central contracts require release fanout and session pinning', async (
   assert.match(registry, /R28 CENTRAL RELEASE FANOUT POLICY/);
 });
 
-test('same session stays pinned while a new session adopts the newer local release', async () => {
+test('same session pin is stable until a later release safely refreshes it at re-entry', async () => {
   const temp = await mkdtemp(join(tmpdir(), 'motorlab-r28-pin-'));
   const pinDir = join(temp, 'pins');
   await mkdir(join(temp, '.motorlab'), { recursive: true });
@@ -69,9 +69,8 @@ test('same session stays pinned while a new session adopts the newer local relea
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'MOTORLAB SATELLITE BUNDLE\nRELEASE=2026.10.08-r29\nVISUAL_STATUS=required\n');
 
   const resumed = runBoot(temp, pinDir, 'resume', 'session-A');
-  assert.match(resumed, /SESSION_RELEASE_PIN=2026\.10\.07-r28/);
-  assert.match(resumed, /SESSION_RELEASE_PIN_MODE=PIN_REUSED/);
-  assert.doesNotMatch(resumed, /2026\.10\.08-r29/);
+  assert.match(resumed, /SESSION_RELEASE_PIN=2026\.10\.08-r29/);
+  assert.match(resumed, /SESSION_RELEASE_PIN_MODE=PIN_REFRESHED_SAFE_REENTRY/);
 
   const fresh = runBoot(temp, pinDir, 'startup', 'session-B');
   assert.match(fresh, /SESSION_RELEASE_PIN=2026\.10\.08-r29/);

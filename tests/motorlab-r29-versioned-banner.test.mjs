@@ -18,7 +18,7 @@ function boot(cwd, pinDir, source, sessionId) {
   return JSON.parse(run.stdout).hookSpecificOutput.additionalContext;
 }
 
-test('r29 bootstrap emits exact versioned first-line instruction and preserves session pin', async () => {
+test('r29 bootstrap keeps exact versioned banner and later releases may refresh at safe re-entry', async () => {
   const temp = await mkdtemp(join(tmpdir(), 'motorlab-r29-banner-'));
   const pinDir = join(temp, 'pins');
   await mkdir(join(temp, '.motorlab'), { recursive: true });
@@ -38,8 +38,8 @@ test('r29 bootstrap emits exact versioned first-line instruction and preserves s
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'MOTORLAB SATELLITE BUNDLE\nRELEASE=2026.10.08-r30\nVERSIONED_BOOT_BANNER=required\n');
 
   const resumed = boot(temp, pinDir, 'resume', 'session-A');
-  assert.match(resumed, /First user-visible line exactly: "⚙️ MotorLab r29 attivo"\./);
-  assert.doesNotMatch(resumed, /MotorLab r30 attivo/);
+  assert.match(resumed, /First user-visible line exactly: "⚙️ MotorLab r30 attivo"\./);
+  assert.match(resumed, /SESSION_RELEASE_PIN_MODE=PIN_REFRESHED_SAFE_REENTRY/);
 
   const fresh = boot(temp, pinDir, 'startup', 'session-B');
   assert.match(fresh, /First user-visible line exactly: "⚙️ MotorLab r30 attivo"\./);

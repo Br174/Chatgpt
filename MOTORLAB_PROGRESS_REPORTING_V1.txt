@@ -19,6 +19,10 @@ For ALL MotorLab-controlled modifications establish or reconstruct a meaningful 
 2. FIRST-STATUS GATE
 After the versioned first-line banner `⚙️ MotorLab rNN attivo`, if MotorLab-controlled work is active/pending/newly accepted, establish/reconstruct and display a verified percentage at the first available visible control point. Use live provider/repository/checkpoint evidence; do not reset because a chat/turn changed.
 
+2A. RE-ENTRY PROGRESS FLOOR
+Every supported project-turn re-entry preserves the same operation's verified progress floor. Re-entry, resume, compact, clear or MotorLab release refresh must not reset progress.
+When active work exists, the first available visible status after re-entry uses the current verified percentage and current r31 visual/status rules.
+
 3. LONG / EXTERNAL OPERATION VISIBILITY
 Before a long build/test/provider phase show current percentage and what is starting. Report material provider/job transitions at the next available control point. Healthy durable jobs follow No-Spin rather than endless foreground polling.
 
@@ -131,7 +135,7 @@ SUCCESS CRITERIA
 - percentages remain evidence-based and monotonic.
 
 VERSION
-MOTORLAB-PROGRESS-REPORTING-V1.9
+MOTORLAB-PROGRESS-REPORTING-V1.11
 Established: 2026-09-28
 Revision 1.6: r15 adds dual Artifact/Overall progress and post-artifact Root Cause queue semantics.
 Revision 1.7: makes evidence-based numeric progress mandatory for all MotorLab-controlled modifications and adds Live Control micro-progress semantics.
@@ -139,3 +143,6 @@ Revision 1.8: r22 adds grouped parallel runner status and observed execution-mod
 Revision 1.9: r23 allows concise visible evidence of work avoided by cache/incrementality, dynamic branches, pruning and deferred materialization without inflating verified progress.
 
 Revision 1.10: r29 updates activation/progress handoff to require the pinned MotorLab version in the first visible banner.
+
+
+Revision 1.11: r31 preserves numeric progress and visual-status obligations across every-turn MotorLab re-entry and safe release refresh.

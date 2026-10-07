@@ -31,6 +31,12 @@ A recognized project context alone is sufficient.
 Bruno must not repeat intent, paste "ATTIVA MOTORLAB", or paste a transfer prompt.
 The bootstrap must load current hook/satellite/CORE and Project Continuity automatically.
 
+3A. SAME-CHAT / EVERY-TURN PERSISTENCE - MANDATORY
+Persistent activation means more than new-chat startup. Every supported project UserPromptSubmit/resume/compact/clear must re-enter MotorLab before substantive project work, using MOTORLAB_REENTRY_GATE_V1.txt.
+The re-entry gate restores the Critical Boot Capsule, current session release, project identity, continuity/progress semantics and native-engine coexistence for THIS turn.
+Pollicino-only prompt logging is not sufficient MotorLab activation.
+A newer VERIFIED local release is adopted at a safe re-entry boundary when no explicit in-flight write/build/test/promotion lock is recorded; otherwise the current pin is preserved until safe.
+
 4. CROSS-CHAT PROJECT CONTINUITY - MANDATORY
 Each registered project has a canonical Project Continuity ledger in Br174/Chatgpt.
 A new chat must automatically load that ledger, reconcile it with newer live repository/provider/job/artifact evidence, reconstruct the same logical operation/progress/next step, and route unfinished work through Resume Recovery.
@@ -81,7 +87,7 @@ This rule is permanent until Bruno explicitly supersedes it. It applies to curre
 
 13. SUCCESS CRITERIA
 Correct implementation means:
-- MotorLab starts before substantive software-project work;
+- MotorLab starts before substantive software-project work and re-enters before every supported later project turn;
 - registered projects auto-activate by context alone;
 - new build/development chats auto-activate by intent;
 - no recurring activation prompt is required;
@@ -92,8 +98,11 @@ Correct implementation means:
 - platform limitations are represented honestly.
 
 VERSION
-MOTORLAB-GLOBAL-PERSISTENT-ACTIVATION-V1.3
+MOTORLAB-GLOBAL-PERSISTENT-ACTIVATION-V1.4
 Established: 2026-09-29
 Revision 1.2: pre-response activation gate and mandatory durable Project Continuity across new chats; manual activation/transfer prompts become fallback-only.
 
 Revision 1.3: r29 makes MotorLab mandatory for every current/future project from first recognizable project context and requires versioned first-line activation proof derived from the pinned session release.
+
+
+Revision 1.4: r31 extends persistent activation from new-chat startup to mandatory every-turn/resume MotorLab re-entry.

@@ -6,10 +6,11 @@ Established: 2026-09-29.
 Repository authority: Br174/Chatgpt.
 
 PURPOSE
-MotorLab activation must be structural, persistent and FIRST in software-project sessions. It must not depend on Bruno remembering or pasting an activation prompt in every new chat.
+MotorLab activation must be structural, persistent and FIRST at software-project session start AND every supported project-turn re-entry. It must not depend on Bruno remembering or pasting an activation prompt in every new chat or later turn.
 
 MANDATORY DEPENDENCIES
 - MOTORLAB_BOOT_CAPSULE_V1.txt
+- MOTORLAB_REENTRY_GATE_V1.txt
 - MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt
 - MOTORLAB_SESSION_BOOT_BANNER_V1.txt
 - MOTORLAB_PROJECT_CONTINUITY_V1.txt
@@ -38,6 +39,12 @@ E. only then continue bootstrap/reconciliation and the requested work.
 
 This gate is not optional because the user message is short, administrative, says only "continua", arrives in a new chat, or does not contain the word MotorLab.
 Do not wait for a later write step to activate if software-project context is already available at the start.
+
+0A. EVERY-TURN / RESUME RE-ENTRY GATE - MANDATORY
+After initial activation, every supported UserPromptSubmit and every SessionStart resume/compact/clear MUST invoke MOTORLAB_REENTRY_GATE_V1.txt before substantive project reasoning, tools or writes.
+The gate reinjects the pinned Critical Boot Capsule and compact project identity/sync state, so a same-chat continuation cannot degrade into memory-only or Pollicino-only behavior.
+When the repository contains a newer VERIFIED local MotorLab release, the gate may refresh the session pin at a safe re-entry boundary when no explicit in-flight write/build/test/promotion lock is recorded. It never downgrades or invents a release.
+This is mandatory for short prompts such as "continua", "procedi", "ok" and "⚡" as well as longer project requests.
 
 1. ACTIVATION PRECEDENCE - MANDATORY
 A. REGISTERED PROJECT CONTEXT identifiable:
@@ -141,6 +148,14 @@ N. apply the foundational Change Compatibility Guard during read-only preflight 
 O. classify substantial execution under Foreground Stall Guard;
 P. proceed with the requested work.
 
+8A. REGISTERED-PROJECT TURN RE-ENTRY ORDER
+A. UserPromptSubmit/resume/compact/clear opens the re-entry gate;
+B. reinject pinned capsule + compact identity/sync state;
+C. safely refresh to a newer VERIFIED local release when eligible;
+D. preserve operation id, approval, progress floor, lock and native-engine coexistence;
+E. apply Resume Recovery/Watchdog before unrelated writes when unfinished work exists;
+F. continue under full current MotorLab progress/Velocity/Pollicino/artifact/lifecycle/safety semantics.
+
 9. NEW-PROJECT BOOT ORDER
 A. confirm no registered context is available;
 B. detect genuine software-build intent;
@@ -221,7 +236,7 @@ Auto Bootstrap is active when:
 - platform limits are represented honestly.
 
 VERSION
-MOTORLAB-AUTO-BOOTSTRAP-V1.12
+MOTORLAB-AUTO-BOOTSTRAP-V1.13
 Established: 2026-09-29
 Revision 1.8: pre-response MotorLab gate plus durable cross-chat Project Continuity bootstrap.
 Revision 1.9: r11 adds mandatory first-visible numeric progress and Root Cause Closure routing for stale/missed continuity and discovered problems.
@@ -244,3 +259,6 @@ R30 CAPSULE-FIRST BOOT ORDER
 1. Emit a compact startup context that keeps the whole critical capsule inside the host additional-context budget.
 2. The capsule owns non-truncatable startup semantics; detailed modules remain authoritative and are loaded on demand.
 3. Missing/invalid/oversized capsule is a bootstrap defect. Never silently fall back to a truncated long-form dump.
+
+
+Revision 1.13: r31 adds mandatory MotorLab Re-entry Gate on every supported project UserPromptSubmit and resume/compact/clear, with safe newer-local-release pin refresh and no second scheduler.

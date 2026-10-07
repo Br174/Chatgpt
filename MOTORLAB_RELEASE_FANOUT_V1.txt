@@ -31,15 +31,17 @@ At minimum synchronize:
 - .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt
 - .motorlab/MOTORLAB_SYNC_STATE.txt
 - .motorlab/execution/motorlab_execution_fabric.mjs
-- stable bootstrap/session-pin adapter where supported
+- stable bootstrap/session-pin/re-entry adapter where supported
+- .codex/hooks/motorlab_boot.py + .codex/hooks.json with UserPromptSubmit re-entry where supported
 - Pollicino/Live-Control control-plane files required by the current release where supported
 
 SESSION IMMUTABILITY
 SESSION_RELEASE_PIN=required.
 A session pins the full local MotorLab control snapshot at its first SessionStart.
-Resume/compact/clear of the same session reuse that snapshot.
-A newer release may be written to the repository while a session is open, but the open session must not switch to it.
-The newer release becomes eligible only on a new session or an explicit verified safe-boundary handoff.
+Every supported UserPromptSubmit/resume/compact/clear re-enters MotorLab through the Re-entry Gate.
+A newer release may be written to the repository while a session is open. The existing pin remains valid until a re-entry boundary.
+At a re-entry boundary, a newer VERIFIED local satellite may refresh the pin when no explicit in-flight write/build/test/promotion lock is recorded; otherwise keep the current pin until safe.
+Never downgrade or invent a release.
 
 RELEASE TRANSACTION
 1. PREPARE central release and tests.
@@ -57,10 +59,21 @@ HOST LIMIT
 This mechanism executes when an authorized MotorLab/GitHub release executor has an execution cycle. Repository text alone cannot wake a completely inactive host. Within a MotorLab release operation, fanout is mandatory and cannot be skipped silently.
 
 VERSION
-MOTORLAB-RELEASE-FANOUT-V1.1
+MOTORLAB-RELEASE-FANOUT-V1.2
 Established: 2026-10-07
 
 R30 CAPSULE FANOUT
 A target is not UPDATED_VERIFIED unless the local capsule exists, matches the central release, the bootstrap emits it before long-form detail, and the compact startup context remains below the declared host cap.
 
 Revision 1.1: r30 adds the critical capsule to mandatory fanout verification.
+
+
+R31 RE-ENTRY FANOUT
+A target is not UPDATED_VERIFIED for r31 unless:
+- local capsule/core declare r31 re-entry markers;
+- motorlab_boot.py accepts UserPromptSubmit;
+- hooks.json invokes motorlab_boot.py before Pollicino on UserPromptSubmit;
+- a focused re-entry verification proves same-turn capsule reinjection and safe newer-local pin refresh;
+- application/domain/runtime code remains unchanged.
+
+Revision 1.2: r31 makes every-turn re-entry adapter/hook propagation part of release fanout verification.

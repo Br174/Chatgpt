@@ -1,42 +1,41 @@
 MOTORLAB RELEASE FANOUT STATE V1
 
-RELEASE=2026.10.07-r30
-GLOBAL_STATE=COMPLETE
+RELEASE=2026.10.08-r31
+GLOBAL_STATE=IN_PROGRESS
 CENTRAL_AUTHORITY=Br174/Chatgpt
-VERIFIED_DATE=2026-10-08
+VERIFIED_DATE=pending
 
-UPDATED_VERIFIED_TARGETS
-- Br174/MusicLab ref=main release=r30 capsule=verified boot=verified
-- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 release=r30 capsule=verified
-- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 release=r30 capsule=verified
-- Br174/MusicLab ref=uab-build/musiclab-lab53-aggiornamento-family-01 release=r30 capsule=verified boot=verified
-- Br174/GeoVision-Test ref=main release=r30 capsule=verified boot=verified
-- Br174/StudyBook-AI ref=main release=r30 capsule=verified boot=verified
-- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 release=r30 capsule=verified boot=verified
-- Br174/Visionflix ref=main release=r30 capsule=verified boot=verified
-- Br174/Cover-Lab-AI ref=main release=r30 capsule=verified boot=verified
-- Br174/streamflix-BV ref=main release=r30 capsule=verified boot=verified
-- Br174/MotorAI ref=main release=r30 capsule=verified boot=verified
+TARGETS
+- Br174/MusicLab ref=main state=PENDING_R31
+- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 state=PENDING_R31
+- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 state=PENDING_R31
+- Br174/MusicLab ref=uab-build/musiclab-lab53-aggiornamento-family-01 state=PENDING_R31
+- Br174/GeoVision-Test ref=main state=PENDING_R31
+- Br174/StudyBook-AI ref=main state=PENDING_R31
+- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 state=PENDING_R31
+- Br174/Visionflix ref=main state=PENDING_R31
+- Br174/Cover-Lab-AI ref=main state=PENDING_R31
+- Br174/streamflix-BV ref=main state=PENDING_R31
+- Br174/MotorAI ref=main state=PENDING_R31
 
-R30_CRITICAL_BOOT_PROOF
-CENTRAL_CAPSULE_SHA=d95689a5c41749af93683c8589fe169fe1e133b9
-CENTRAL_BOOTSTRAP_SHA=8030d4a0175c869bedaeee60b8456035aa6f037b
-CAPSULE_CHARS=3471
-BOOT_CONTEXT_SOFT_CAP=5500
-MUSICLAB_HOST_ADDITIONAL_CONTEXT_LIMIT=6000
-NUMERIC_PROGRESS_INDEX=482
-HARD_PROGRESS_VISIBILITY_INDEX=508
-VELOCITY_INDEX=1415
-POLLICINO_INDEX=2006
-APK_INDEX=2475
-MADRE_LAB_CANDIDATA_INDEX=2840
+R31_REQUIRED_PROOF
+- local release r31 verified
+- Critical Boot Capsule r31 present and compact
+- motorlab_boot.py accepts SessionStart + UserPromptSubmit
+- hooks.json invokes motorlab_boot.py before Pollicino on UserPromptSubmit
+- every-turn re-entry context reinjects MotorLab critical capsule
+- safe newer-local release refresh supported
+- explicit in-flight lock preserves existing pin
+- project-native/application runtime unchanged
 
 SESSION_RULE
-Open sessions keep their pinned MotorLab snapshot. r30 becomes active on a new session or explicit verified safe-boundary handoff.
+Every supported project turn/resume re-enters MotorLab.
+A newer VERIFIED local release may refresh the session pin at a safe re-entry boundary.
+An explicit in-flight write/build/test/promotion lock keeps the existing pin until safe.
 
 FUTURE_PROJECT_RULE
-Every future project inherits the current r30 capsule during onboarding. The capsule is mandatory first-context data and is included in every future MotorLab release fanout.
+Every future software project inherits r31 every-turn re-entry through onboarding, local satellite and hook template.
 
 VERSION
-MOTORLAB-RELEASE-FANOUT-STATE-V1.2
-Revision 1.2: r30 Critical Boot Capsule fanout verified COMPLETE.
+MOTORLAB-RELEASE-FANOUT-STATE-V1.3
+Revision 1.3: r31 fanout tracks every-turn re-entry adoption across all registered default/current active refs.
