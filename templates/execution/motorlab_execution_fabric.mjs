@@ -37,6 +37,7 @@ function task(t) {
     workgroupLabel:t.workgroupLabel ? String(t.workgroupLabel) : '',
     laneKey:t.laneKey ? String(t.laneKey) : kind,
     hedgeSafe:Boolean(t.hedgeSafe),
+    hedgeExternalAllowed:Boolean(t.hedgeExternalAllowed),
     hedgeAfterMs:Math.max(0,Number(t.hedgeAfterMs)||0),
     hedgeWidth:Math.max(1,Math.min(3,Number(t.hedgeWidth)||3)),
     hedgeMaxWaves:Math.max(1,Math.min(2,Number(t.hedgeMaxWaves)||2)),
@@ -222,7 +223,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   const laneRunning=key=>[...running.values()].filter(x=>x.task.laneKey===key).length;
   const canStart=t=>running.size<max&&laneRunning(t.laneKey)<Math.min(max,governor.laneLimit(t.laneKey))&&![...running.values()].some(x=>conflicts(t,x.task));
   const latencyUseful=t=>t.latencyBranchAfterMs>0&&t.latencySpawn.length>0&&t.latencyBranchExpectedGainMs>t.latencyBranchOverheadMs;
-  const hedgeEligible=t=>t.hedgeSafe&&(t.kind==='read'||t.kind==='external');
+  const hedgeEligible=t=>t.hedgeSafe&&(t.kind==='read'||(t.kind==='external'&&t.hedgeExternalAllowed));
 
   const addTasks=async(parent,list=[],reason='BRANCH')=>{
     for(const raw of list){
