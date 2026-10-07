@@ -113,3 +113,20 @@ test('semantic workgroup labels are visible in runner events and proof',async()=
   assert.equal(out.proof.singleIntegrationLaneVerified,true);
   assert.match(formatProof(out.proof),/workgroup semantici/);
 });
+
+
+test('intrinsic scheduler reuses static graph analysis',async()=>{
+  const tasks=Array.from({length:120},(_,i)=>({id:'s'+i,deps:i>=12?['s'+(i-12)]:[]}));
+  const out=await executeGraph(tasks,async()=>({ok:true}),{maxConcurrency:12});
+  assert.equal(out.proof.schedulerGraphRecomputes,1);
+  assert.ok(out.proof.eventFastPathCount>0);
+});
+
+test('event listener remains awaited on intrinsic fast path',async()=>{
+  const order=[];
+  const out=await executeGraph([{id:'a'}],async()=>{order.push('worker');return{ok:true};},{
+    onEvent:async e=>{if(e.type==='RUNNER_STARTED'){await sleep(5);order.push('listener-started');}}
+  });
+  assert.ok(order.indexOf('listener-started')<order.indexOf('worker'));
+  assert.equal(out.proof.eventFastPathCount,0);
+});
