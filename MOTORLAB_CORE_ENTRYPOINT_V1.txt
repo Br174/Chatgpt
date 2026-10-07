@@ -163,8 +163,15 @@ At boot, preserve r23-r26 ordering and apply r27 through Velocity + Adaptive Run
 - user-visible updates at available control points report only real started/completed activity;
 - opaque host reasoning remains outside direct MotorLab restart/cancel control unless the host exposes that capability.
 
+R28 BOOT / RELEASE ADOPTION
+- Before project work, load the verified local satellite and establish SESSION_RELEASE_PIN from the full control snapshot.
+- The same session_id must reuse that snapshot across resume/compact/clear.
+- Do not switch MotorLab release during active session/write/build/test/promotion.
+- Central MotorLab releases execute mandatory cross-project fanout; safe targets adopt immediately for future sessions, busy targets become PENDING_SAFE_BOUNDARY.
+- Release fanout is release coordination only and does not replace Velocity, native project engines or project lifecycle authority.
+
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.21
+MOTORLAB-CORE-ENTRYPOINT-V1.22
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -191,3 +198,5 @@ Revision 1.20: r26 boots one coordinated Adaptive Runtime Governor for bounded F
 Revision 1.20: r26 boots the Adaptive Runtime Governor as the single coordinator for adaptive lanes and bounded hedge/latency recovery while preserving Velocity, Service Guard, Pollicino and project-native authorities.
 
 Revision 1.21: r27 adds zero-idle dual-lane active wait: immediate independent productive work plus separate default-10s same-task recovery and truthful visible-forward-motion reporting.
+
+Revision 1.22: r28 adds mandatory release fanout and immutable per-session snapshot pinning with safe-boundary adoption.

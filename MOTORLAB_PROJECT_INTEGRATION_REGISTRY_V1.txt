@@ -5,10 +5,10 @@ Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.07-r27
+Release: 2026.10.07-r28
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
-Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.28
-Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.22
+Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.29
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.23
 Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.5
 Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.6
 Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
@@ -48,6 +48,16 @@ R27 CENTRAL ZERO-IDLE POLICY
 - Controlled analysis/wait tasks may opt into replacePrimaryOnHardHedge: at the hard trigger the stale primary attempt is cancelled or invalidated and late results cannot win.
 - Productive sidework and same-task recovery may overlap without adding a second scheduler.
 - Visible activity reports only real started/completed work; host-limited execution remains explicitly reported.
+
+R28 CENTRAL RELEASE FANOUT POLICY
+- A central MotorLab release is incomplete until every registered project default/current active ref is UPDATED_VERIFIED or PENDING_SAFE_BOUNDARY.
+- Safe targets receive the new satellite during the release operation itself.
+- Open sessions keep the full MotorLab snapshot pinned by session_id and never switch underneath active work.
+- resume/compact/clear reuse the same pinned snapshot.
+- New sessions automatically use the newest verified local satellite.
+- Busy write/build/test/promotion targets are not force-switched; adoption is deferred to the first verified safe boundary.
+- LAST_GOOD remains the immediately previous verified release.
+- Fanout changes control-plane metadata only; project-native engines/runtime/lifecycle remain authoritative.
 
 R25 COMBINED SPEED POLICY
 - First eliminate safely unnecessary work.
@@ -128,10 +138,10 @@ Superpowers: CONNECTED_VERIFIED; subordinate methodology.
 Context7 Free: CONNECTED_VERIFIED; optional/version-aware documentation only.
 
 FUTURE PROJECTS
-Every newly onboarded project receives the current r27 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, plus r26 adaptive runtime and r27 zero-idle dual-lane execution. Existing registered project refs remain on their verified r26 adoption until a safe synchronization boundary.
+Every newly onboarded project receives the current r28 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, plus r26 adaptive runtime and r27 zero-idle dual-lane execution. Existing registered project refs remain on their verified r26 adoption until a safe synchronization boundary.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.26
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.27
 Revision 2.18: registry cleaned to current-state r23; six prior projects migrated and MotorAI onboarded at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
 
 Revision 2.20: r24 adds evidence-gated latency branching to the central contract; six established project mains plus active MusicLab LAB47 and StudyBook LAB03 were aligned at safe boundaries.
@@ -146,3 +156,5 @@ Revision 2.24: r26 makes the coordinated Adaptive Runtime Governor, bounded Trip
 Revision 2.25: verified r26 adoption recorded for six project mains, active MusicLab LAB47, active StudyBook LAB03 and MotorAI-Training; r25 preserved as immediate LAST_GOOD rollback and dispatcher SHA 136f1b00e597b0a6f5dcbe3ad3986c088b5441cd verified across all nine refs.
 
 Revision 2.26: r27 becomes the central contract with immediate productive sidework, separate default-10s same-task recovery and optional stale-primary replacement; existing project refs remain verified r26 until safe-boundary sync.
+
+Revision 2.27: r28 makes release fanout part of central release completion and requires immutable session pins so projects auto-adopt new MotorLab releases only at safe boundaries.

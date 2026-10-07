@@ -248,8 +248,17 @@ At a safe satellite adoption boundary, sync the r27 dispatcher and zero-idle mar
 - preserve application runtime/UI/package/signing and project-native engines;
 - do not switch execution control mid active write/build/test/promotion.
 
+R28+ RELEASE FANOUT / SESSION IMMUTABILITY
+- Central release completion requires MOTORLAB_RELEASE_FANOUT_V1.txt.
+- Every registered default/current active ref is synchronized at a verified safe boundary or recorded PENDING_SAFE_BOUNDARY.
+- Supported bootstraps pin the full MotorLab control snapshot by session_id on first SessionStart.
+- resume/compact/clear of the same session reuse that pinned snapshot even if repository MotorLab files advance.
+- Newer local MotorLab becomes eligible only for a new session or explicit verified safe-boundary handoff.
+- Fanout must never mutate project application/domain/runtime code.
+- The previous VERIFIED local core remains LAST_GOOD.
+
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.28
+MOTORLAB-SATELLITE-SYNC-V1.29
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -282,3 +291,5 @@ Revision 1.26: r25 requires semantic-workgroup and intrinsic-speed inheritance a
 Revision 1.27: r26 requires safe-boundary inheritance of Triple Fresh Hedge, Adaptive Lane Pool and the coordinated runtime governor, with r25 retained as LAST_GOOD.
 
 Revision 1.28: r27 requires safe-boundary inheritance of zero-idle immediate sidework plus separate same-task recovery; r26 remains LAST_GOOD until verified adoption.
+
+Revision 1.29: r28 makes release fanout mandatory and introduces immutable full-snapshot session pinning with safe-boundary-only adoption.
