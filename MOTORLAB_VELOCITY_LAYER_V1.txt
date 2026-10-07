@@ -587,6 +587,29 @@ External services remain subordinate to MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt. 
 
 Adaptive lane evidence uses actual latency, success, throttle and saturation signals. Increase concurrency gradually after healthy evidence; decrease quickly on throttling. Complexity still must pay rent.
 
+R26 COORDINATED AUTO-ADAPTATION
+Velocity remains the sole scheduler. The Adaptive Runtime Governor is subordinate and may tune only execution pressure/timing inside Velocity-approved work.
+
+Permanent order:
+1. ELIMINATE;
+2. REUSE;
+3. REDUCE;
+4. ACCELERATE INTRINSICALLY;
+5. GROUP SEMANTICALLY;
+6. ALLOCATE adaptive lane capacity;
+7. DISPATCH READY work;
+8. RECOVER eligible slow work through the unified Latency Controller;
+9. INTEGRATE once;
+10. VERIFY + persist material adaptive evidence.
+
+The governor may learn from observed latency, healthy completions, throttling, saturation, hedge outcomes and stall evidence. Learned state is bounded, context-aware and non-authoritative. Current provider limits, current source truth, External Service Guard, single-writer and approval always outrank learned state.
+
+Latency responsibility is singular:
+- hedge-safe slow work -> bounded Fresh Hedge;
+- otherwise safe useful independent work -> r24 latency branch;
+- otherwise continue normal/watchdog recovery.
+Do not run competing latency managers for the same task.
+
 VERSION
 MOTORLAB-VELOCITY-LAYER-V1.6
 Established: 2026-09-29
@@ -599,3 +622,5 @@ Revision 1.4: r24 adds latency-hiding branch decisions: branch only when measure
 Revision 1.5: r25 establishes the eliminate/reuse/reduce/intrinsic-accelerate/semantic-group/parallelize/latency-hide/integrate order and makes semantic workgroups a Velocity-owned execution shape.
 
 Revision 1.6: r26 coordinates work elimination, r25 workgroups/intrinsic speed, adaptive lane feedback and bounded Triple Hedge under one Velocity-owned policy with a 10s hard hedge trigger and early material-stall recovery.
+
+Revision 1.6: r26 coordinates work elimination, intrinsic speed, semantic workgroups, adaptive lanes and unified latency/hedge recovery through one evidence-driven governor subordinate to Velocity.
