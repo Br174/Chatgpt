@@ -1,0 +1,21 @@
+name: MotorLab r27 gate
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'templates/execution/motorlab_execution_fabric.mjs'
+      - 'tests/motorlab-execution-fabric.test.mjs'
+      - 'MOTORLAB_EXECUTION_FABRIC_V1.txt'
+      - 'MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt'
+      - 'MOTORLAB_VISUAL_STATUS_V1.txt'
+      - '.github/workflows/motorlab-r27-gate.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/motorlab-execution-fabric.test.mjs
