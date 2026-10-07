@@ -23,7 +23,8 @@ test('r29 bootstrap emits exact versioned first-line instruction and preserves s
   const pinDir = join(temp, 'pins');
   await mkdir(join(temp, '.motorlab'), { recursive: true });
   await mkdir(join(temp, '.codex', 'hooks'), { recursive: true });
-  await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=FutureProject\n');\n  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), 'MOTORLAB CRITICAL BOOT CAPSULE V1\nNUMERIC_PROGRESS=required\nVISUAL_STATUS=required\nSESSION_RELEASE_PIN=required\n');
+  await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=FutureProject\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), 'MOTORLAB CRITICAL BOOT CAPSULE V1\nNUMERIC_PROGRESS=required\nVISUAL_STATUS=required\nSESSION_RELEASE_PIN=required\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.07-r29\nSTATE=VERIFIED\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'MOTORLAB SATELLITE BUNDLE\nRELEASE=2026.10.07-r29\nVERSIONED_BOOT_BANNER=required\n');
   await copyFile(join(repo, 'templates', 'codex', 'motorlab', 'motorlab_boot.py'), join(temp, '.codex', 'hooks', 'motorlab_boot.py'));
@@ -50,7 +51,8 @@ test('unknown release never fabricates a versioned banner', async () => {
   const pinDir = join(temp, 'pins');
   await mkdir(join(temp, '.motorlab'), { recursive: true });
   await mkdir(join(temp, '.codex', 'hooks'), { recursive: true });
-  await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=BrokenProject\n');\n  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), 'MOTORLAB CRITICAL BOOT CAPSULE V1\nNUMERIC_PROGRESS=required\nVISUAL_STATUS=required\nSESSION_RELEASE_PIN=required\n');
+  await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=BrokenProject\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), 'MOTORLAB CRITICAL BOOT CAPSULE V1\nNUMERIC_PROGRESS=required\nVISUAL_STATUS=required\nSESSION_RELEASE_PIN=required\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'STATE=VERIFIED\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'MOTORLAB SATELLITE BUNDLE\nVERSIONED_BOOT_BANNER=required\n');
   await copyFile(join(repo, 'templates', 'codex', 'motorlab', 'motorlab_boot.py'), join(temp, '.codex', 'hooks', 'motorlab_boot.py'));
