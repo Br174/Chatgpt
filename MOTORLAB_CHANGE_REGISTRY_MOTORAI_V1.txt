@@ -306,3 +306,21 @@ ROOT_CAUSE_RESPONSE=protect Seed010 by dedicated zero-effect grow3 attention mod
 EVOLUTION_PANEL=persistent chart for learning, minimum retention and internal evolution index
 CAPABILITY_DIARY=verified "what it knows / what it is learning / latest progress"
 STATUS=final CI gate running
+
+
+SEED011 FINAL CI ACCEPTANCE
+DATE=2026-10-07
+SOURCE_HEAD=9ab068fb701908e9c166c67339d285e6b2a56cd5
+BUILD_RUN_ID=37597257465
+ARTIFACT_ID=11471670708
+ARTIFACT_ZIP_SHA256=5e4cdc0dba99f9e72461c184a211e94855e504fbb480c91ffce00beccdb3c7ec
+APK_SHA256=64883438f84f8e6f39c40c6e4a43c2505a89d2f16aa7cfdabfdc752e04947a77
+ROOT_CAUSE_CLOSED=L5 relational classifier raw output copy broke autograd edge; replaced with differentiable binaryAnswerOverride
+HOST_174=L5 100%; L4ret 91.54%; L3ret 95.83%; L2ret 95.83%; L1ret 100%; L0ret 100%
+HOST_175=L5 100%; L4ret 95.38%; L3ret 100%; L2ret 100%; L1ret 100%; L0ret 100%
+HOST_176=L5 100%; L4ret 96.92%; L3ret 100%; L2ret 91.67%; L1ret 100%; L0ret 95.56%
+ANDROID_BUILD=PASSED
+COMBINED_CI_GATE=PASSED
+FEATURES=Auto-Training V1; persistent background JobScheduler cycles; Evolution graph; capability diary; 20-minute diagnostics; immediate failure aggregation; remote diagnostic telemetry via PostHog; combined multi-failure CI
+DEVICE_ACCEPTANCE=pending
+CURRENT_BASELINE=Seed010
