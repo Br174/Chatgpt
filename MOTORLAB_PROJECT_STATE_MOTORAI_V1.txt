@@ -1,20 +1,20 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=28
-STATE_STATUS=SEED011_CI_ACCEPTED_DEVICE_VALIDATION_PENDING
+STATE_REVISION=29
+STATE_STATUS=SEED011R1_CI_ACCEPTED_DEVICE_VALIDATION_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
-MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.06-r23
+MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r24
 ACTIVE_OPERATION_ID=MOTORAI-SEED003-FIRST-APK-20261006
-OPERATION_STATUS=artifact_delivered_pending_device_acceptance
-CURRENT_PHASE=SEED011_DEVICE_UPDATE_AND_AUTOTRAIN_VALIDATION
+OPERATION_STATUS=seed011r1_artifact_ready_pending_device_acceptance
+CURRENT_PHASE=SEED011R1_DEVICE_AUTOTRAIN_VALIDATION
 CURRENT_REF=main
-CURRENT_HEAD_SHA=9ab068fb701908e9c166c67339d285e6b2a56cd5
-LAST_VERIFIED_PROGRESS_PERCENT=94
-LAST_COMPLETED_MATERIAL_STEP=Seed011 final CI passed after fixing L5 autograd; L5=100% on seeds174/175/176 with retention gates; Android build and combined gate passed; APK artifact verified
-NEXT_SAFE_STEP=Install Seed011 over accepted Seed010; verify checkpoint migration, Evolution/Diagnostics panels, remote telemetry, and autonomous background L5 cycle without manual letter tests
-PENDING_VERIFICATION=Seed011 real-device update-in-place, checkpoint migration, remote diagnostic event arrival, background Auto-Training cycle, restart-resume
+CURRENT_HEAD_SHA=1bd80e89618fc1bc7d2a85326dff80ae2fafc5d7
+LAST_VERIFIED_PROGRESS_PERCENT=99
+LAST_COMPLETED_MATERIAL_STEP=Seed011 real-device update and checkpoint migration verified by remote diagnostics; Seed011R1 background Auto-Training handoff implemented, rollback-burst safety added, merged to main, native curriculum/background gate/Android build/APK upload/final gate all passed
+NEXT_SAFE_STEP=Install Seed011R1 over the currently installed Seed011; keep device charging, move MotorAI to background, then validate remote automatic L5 start/training/consolidation and restart-resume without manual letter tests
+PENDING_VERIFICATION=Seed011R1 real-device update-in-place, immediate background kick, bounded autonomous L5 cycle, final L5 acceptance, restart-resume
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
 FIRST_APK_ARTIFACT_ID=11446590832
@@ -277,4 +277,32 @@ SEED011_EVOLUTION_PANEL_IMPLEMENTED=yes
 SEED011_REMOTE_DIAGNOSTICS_TRANSPORT=PostHog_EU
 SEED011_POSTHOG_PROJECT_ID=289332
 SEED011_POSTHOG_EVENT=motorai_diagnostic_snapshot
+CURRENT_ACCEPTED_RESTORE_BASELINE=SEED010
+
+
+SEED011_REAL_DEVICE_LAUNCHED=yes
+SEED011_REAL_DEVICE_UPDATE_IN_PLACE=yes
+SEED011_REAL_DEVICE_RESUME_STEP=2960
+SEED011_REAL_DEVICE_L4_TEST_PERCENT=98.4615
+SEED011_REAL_DEVICE_LEVEL3_RETENTION_PERCENT=100.0
+SEED011_REAL_DEVICE_LEVEL2_RETENTION_PERCENT=95.8333
+SEED011_REAL_DEVICE_LEVEL1_RETENTION_PERCENT=100.0
+SEED011_REAL_DEVICE_LEVEL0_RETENTION_PERCENT=95.5556
+SEED011_DIAGNOSTIC_BRIDGE_VERIFIED=yes
+SEED011_REMOTE_EVENT_TIMESTAMP_UTC=2026-10-07T09:05:14.851Z
+
+SEED011R1_BACKGROUND_ROOT_CAUSE=periodic_only_JobScheduler_wake_was_platform_deferrable_and_one_20_step_chunk_per_wake_was_too_conservative
+SEED011R1_FIX=existing_JobService_only;charging_one_shot_kick_on_UI_background;bounded_multi_chunk_wake;periodic_safety_net_preserved
+SEED011R1_SINGLE_WRITER_PRESERVED=yes
+SEED011R1_ROLLBACK_TERMINATES_BURST=yes
+SEED011R1_NATIVE_BRAIN_CHANGED=no
+SEED011R1_VERSION=0.11.1-seed011r1
+SEED011R1_VERSION_CODE=12
+SEED011R1_MAIN_APP_HEAD=1bd80e89618fc1bc7d2a85326dff80ae2fafc5d7
+SEED011R1_MAIN_BUILD_RUN_ID=37600264302
+SEED011R1_MAIN_ARTIFACT_ID=11472776541
+SEED011R1_MAIN_ARTIFACT_ZIP_SHA256=6f29c5962f7f4caa99461760b97b77b8678c6c76043cc14d77909d29bd59a328
+SEED011R1_MAIN_APK_SHA256=13ec5367811a0bf1d3d51b383f3324eae0b2013e4357911ec3e9a1a94643a3b7
+SEED011R1_MAIN_CI_GATE_PASSED=yes
+SEED011R1_DEVICE_ACCEPTANCE=pending
 CURRENT_ACCEPTED_RESTORE_BASELINE=SEED010
