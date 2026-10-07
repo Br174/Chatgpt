@@ -1,9 +1,35 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=78
-STATE_STATUS=LAB44_UPDATE_FAMILY_01_WITH_SAFETY44_READY
+STATE_REVISION=79
+STATE_STATUS=LAB49_UPDATE_FAMILY_01_WITH_SAFETY49_READY_DEVICE_PENDING
 RECONCILE_ON_BOOT=required
+CURRENT_LIVE_OVERRIDE_DATE=2026-10-07
+CURRENT_LIVE_OVERRIDE_SOURCE=live Br174/MusicLab branch + GitHub Actions run 37525537705 + artifact evidence
+ACTIVE_OPERATION_ID=musiclab-lab49-cancellable-background
+OPERATION_STATUS=LAB49_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB49 exact source SHA 3dcabf1b6b8e233a3f2c8f8f5c4e79efefe43697 is technically complete from LAB48. It preserves Player buono LAB41 byte-identical, makes Discogs/COVER.INFO/Cloud HTTP work coroutine-cancellable, replaces blocking retry sleeps with cancellable delays, stops Cover/Originali/Archivio work on lifecycle exit, keeps one playback tap job, and prevents provider background restart while playback is active. Live run 37525537705 passed retained contracts/tests, UAB build, update identity and paired safety isolation.
+CURRENT_REF=uab-build/musiclab-lab49-aggiornamento-family-01
+CURRENT_HEAD_SHA=03ffa74f2143a55eb7beeafa97804d20d5b996e3
+CURRENT_BUILD_SOURCE_SHA=3dcabf1b6b8e233a3f2c8f8f5c4e79efefe43697
+CURRENT_JOB_ID=37525537705
+CURRENT_JOB_STATUS=success
+ARTIFACT_PROGRESS_PERCENT=100
+LAST_VERIFIED_PROGRESS_PERCENT=100
+RECOVERY_FLOOR_PERCENT=100
+UPDATE_ARTIFACT_ID=11442825610
+UPDATE_ARTIFACT_DIGEST=sha256:5f63638f6c53eaffa27dc9a0325324dc25b4d5a1f21f185dcaae25cb95dbf9f4
+UPDATE_APK_SHA256=33549fdf41376c0f6bf57ba9e7c85d08e4e6eb75fe32ce8cf542484d52443203
+UPDATE_ZIP_SHA256=0d0454609b23fce98e808638075136093571e54a16f6ac7f7409d20c89007dfd
+PAIRED_SAFETY_LABEL=LAB di sicurezza 49
+PAIRED_SAFETY_ARTIFACT_ID=11443640487
+PAIRED_SAFETY_ARTIFACT_DIGEST=sha256:c518283a616e751aacadab06dfdfb61f90f8cf131bd413ee7dadb907fce9299d
+PAIRED_SAFETY_APK_SHA256=01f73a1c85a8d6f2d2c12b79ea4a16b9518d1ec41e5250f7fb94f9cd0d177a0e
+PAIRED_SAFETY_ZIP_SHA256=004fe6d2b7108892e957a7955852f25e40b47d1b2f048a02c3a401cef9f50ba7
+PENDING_VERIFICATION=Bruno device acceptance: play at least 6-10 consecutive songs and verify no progressive slowdown/freeze; leave Archivio Cloud/Cover/Originali and verify section work stops; verify first-song and later-song start remain fast.
+NEXT_SAFE_STEP=Install/test MusicLab LAB 49 aggiornamento. Do not promote CANDIDATA/MADRE and do not mutate Player buono RESTORE_NO=1 before Bruno device acceptance.
+WRITE_LOCK_SCOPE=none; LAB49 technical gate complete
+
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r24
