@@ -212,7 +212,10 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   const tasks=new Map(initial.map(t=>[t.id,t])),pending=new Set(tasks.keys()),done=new Set(),pruned=new Set(),running=new Map(),results=new Map(),records=[],eventHistory=[],cacheChecked=new Set();
   let peak=0,intNow=0,intPeak=0,correctionRelays=0,dynamicTasks=0,cacheHits=0,cacheAvoidedEstimatedMs=0,latencyBranches=0,latencyBranchTasks=0,latencyExpectedGainMs=0,latencyBranchFailures=0;
   let freshHedges=0,hedgeWaves=0,hedgeWins=0,hedgePrimaryWins=0,hedgeAbortRequests=0,hedgeSuppressedUnsafe=0,hedgeExhausted=0,materialProgressSignals=0,earlyStallSignals=0,laneAdjustments=0,laneThrottleSignals=0,laneSaturationSignals=0;
-  let graphVersion=0,cachedGraphVersion=-1,cachedGraph=null,cachedScores=null,schedulerGraphRecomputes=0,eventFastPathCount=0;
+  let graphVersion=0,cachedGraphVersion=-1,cachedGraph=null,cachedScores=null,schedulerGraphRecomputes=0,eventFastPathCount=0,wakeGeneration=0;
+  const wakeWaiters=new Set();
+  const wakeScheduler=()=>{wakeGeneration++;for(const token of [...wakeWaiters]){wakeWaiters.delete(token);token.resolve();}};
+  const makeWakeWaiter=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});const token={resolve};wakeWaiters.add(token);return{promise,cancel:()=>wakeWaiters.delete(token)};};
   const emit=event=>{const entry={sequence:eventHistory.length+1,at:now(),...event};eventHistory.push(entry);if(!onEvent){eventFastPathCount++;return null;}return Promise.resolve(onEvent(entry));};
   const emitWait=async event=>{const ack=emit(event);if(ack)await ack;};
   const schedulerView=()=>{if(cachedGraphVersion!==graphVersion){cachedGraph=validateGraph([...tasks.values()]);cachedScores=tailScores(cachedGraph);cachedGraphVersion=graphVersion;schedulerGraphRecomputes++;}return{graph:cachedGraph,scores:cachedScores};};
@@ -226,7 +229,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
       const child=task({...raw,workgroup:raw.workgroup??parent.workgroup,workgroupLabel:raw.workgroupLabel??parent.workgroupLabel,laneKey:raw.laneKey??parent.laneKey,deps:[...new Set([...(raw.deps||[]),...(raw.detached?[]:[parent.id])])]});
       if(tasks.has(child.id))throw new Error('duplicate dynamic task '+child.id);
       for(const dep of child.deps)if(!tasks.has(dep))throw new Error(child.id+' missing dep '+dep);
-      tasks.set(child.id,child);pending.add(child.id);dynamicTasks++;graphVersion++;
+      tasks.set(child.id,child);pending.add(child.id);dynamicTasks++;graphVersion++;wakeScheduler();
       await emitWait({type:'TASK_SPAWNED',taskId:child.id,parentTaskId:parent.id,reason,laneKey:child.laneKey});
     }
   };
@@ -268,7 +271,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
 
     const eligible=hedgeEligible(t);
     if(t.hedgeSafe&&!eligible)hedgeSuppressedUnsafe++;
-    const hardMs=governor.hedgeTriggerMs(t),maxWaves=t.hedgeMaxWaves,width=()=>governor.hedgeWidth(t);
+    const hardMs=governor.hedgeTriggerMs(t),maxWaves=t.hedgeMaxWaves,width=()=>Math.max(1,Math.min(governor.hedgeWidth(t),governor.laneLimit(t.laneKey)-Math.max(0,laneRunning(t.laneKey)-1)));
     let recoveryTimer=null,latencyWakeResolve=null,latencyBranchTriggered=false,settled=false,currentWave=1,waveExpanded=false,attemptSeq=0,winnerAttempt=0;
     const controllers=new Map(),attempts=new Map(),stalled=new Set(),failures=[];
     let resolveTask,rejectTask;
@@ -388,6 +391,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
 
   const executionStartAck=emit({type:'EXECUTION_STARTED',initialTasks:initial.length,maxConcurrency:max,adaptive:true});if(executionStartAck)await executionStartAck;
   while(pending.size||running.size){
+    const cycleWakeGeneration=wakeGeneration;
     let launched=false;
     let {graph,scores}=schedulerView();
     let ready=[...pending].map(id=>tasks.get(id)).filter(t=>t&&!pruned.has(t.id)&&t.deps.every(d=>done.has(d)||pruned.has(d))).sort((a,b)=>(scores.get(b.id)||b.estimatedMs)-(scores.get(a.id)||a.estimatedMs));
@@ -396,7 +400,14 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
       ready=[...pending].map(id=>tasks.get(id)).filter(t=>t&&!pruned.has(t.id)&&t.deps.every(d=>done.has(d)||pruned.has(d))).sort((a,b)=>(scores.get(b.id)||b.estimatedMs)-(scores.get(a.id)||a.estimatedMs));
     }
     for(const t of ready){if(!canStart(t))continue;await launch(t);launched=true;if(running.size>=max)break;}
-    if(running.size){if(!launched||running.size>=max||!ready.length)await Promise.race([...running.values()].map(x=>x.promise));continue;}
+    if(running.size){
+      if(wakeGeneration!==cycleWakeGeneration)continue;
+      if(!launched||running.size>=max||!ready.length){
+        const waiter=makeWakeWaiter();
+        try{await Promise.race([...running.values()].map(x=>x.promise).concat(waiter.promise));}finally{waiter.cancel();}
+      }
+      continue;
+    }
     if(pending.size)throw new Error('execution deadlock');
   }
 
