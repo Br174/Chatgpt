@@ -1,40 +1,45 @@
 MOTORLAB RELEASE FANOUT STATE V1
 
-RELEASE=2026.10.07-r28
+RELEASE=2026.10.07-r29
 GLOBAL_STATE=COMPLETE
 CENTRAL_AUTHORITY=Br174/Chatgpt
+CENTRAL_RELEASE_COMMIT=0c8464100f832251316b0b609edf3b002743f44f
 VERIFIED_DATE=2026-10-07
 
 UPDATED_VERIFIED_TARGETS
-- Br174/MusicLab ref=main sha=2b67a3910613376b8953d80c971393357a53190b
-- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 sha=0dd28b0d6323e53cc142ba625e7200930e13ea89
-- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 sha=1ef03886448f087b3c4dd42bba12b08c1ba9dd28
-- Br174/GeoVision-Test ref=main sha=dfe7d475586257158711dafd276d3ffa8abd0a05
-- Br174/StudyBook-AI ref=main sha=a9ab160d76410a68400ccb372b74255a75cdb604
-- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 sha=a74d6dff9a6dd31dcb876393619e76c80a2ee64a
-- Br174/Visionflix ref=main sha=c62018c5b134c3ddb94fc3df240f103d71bb620d
-- Br174/Cover-Lab-AI ref=main sha=784020cff0c19eb1fcbe316889a7a6e6452a2b33
-- Br174/streamflix-BV ref=main sha=a14ab7526fd2f1c03d111fcdbc6434bdad440e80
-- Br174/MotorAI ref=main sha=82620dc1d8791bd17b8516548667c39904f92ff2
+- Br174/MusicLab ref=main sha=4cf0e275ee4b0a830d4a6bf4fe39c68c62d9776c
+- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 sha=b5148d389b73ebfdd62af4cc7c7d3d68e93ca5a9
+- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 sha=86bbd1882c8f2057d0cfb009f6adf3a1acc77279
+- Br174/GeoVision-Test ref=main sha=1a648dcbd23b50a1cbd1b0e11b5d7528f30a3bf8
+- Br174/StudyBook-AI ref=main sha=794b35a5bbd8e5b9d34f04ee99cfe197506985f9
+- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 sha=54112aada6804f8beb104d607eaf7b5aa94e7fc8
+- Br174/Visionflix ref=main sha=55a299fecf47aa7c74061b596f8c3d1a26336fa0
+- Br174/Cover-Lab-AI ref=main sha=dbbe1007e1bfcef9289a03c58c8ac122b4cde569
+- Br174/streamflix-BV ref=main sha=62c5c1f32c48b233ba264c8dd9e6afdd14fe318f
+- Br174/MotorAI ref=main sha=0104b257b42a6006b5a262d604ac7e6c80eddcc8
 
 VERIFICATION
-- Every target above reports MotorLab release 2026.10.07-r28.
-- Every target above has SESSION_RELEASE_PIN=required.
-- Every target above has the r27+ execution fabric markers productiveSpawn and replacePrimaryOnHardHedge.
-- Every target above has the r28 bootstrap session-pin policy.
+- Every target above reports MotorLab release 2026.10.07-r29.
+- Every target carries ALL_PROJECTS_MOTORLAB=required and VERSIONED_BOOT_BANNER=required.
+- Every target bootstrap derives the short rNN banner version from the pinned session release.
+- Every active project hook and AGENTS.override uses the versioned startup form and contains no active unversioned startup instruction.
+- Existing sessions retain their pinned prior MotorLab snapshot until a new session or explicit verified safe-boundary handoff.
 - No project application/runtime/domain code was intentionally changed by this fanout.
 
-SESSION_RULE
-- A running session uses the complete MotorLab snapshot pinned at its first SessionStart.
-- resume/compact/clear of the same session reuse that snapshot.
-- Repository adoption of a newer MotorLab release never switches the engine under an already-running session.
-- A new session adopts the newest VERIFIED local satellite.
+MANDATORY STARTUP
+Every recognizable current/future project chat must activate MotorLab before substantive project work.
+The first user-visible line must be exactly:
+⚙️ MotorLab rNN attivo
+where rNN matches the pinned session release.
+Unversioned startup is invalid.
+Future projects auto-onboard into the current MotorLab release at first recognizable project context.
 
-FUTURE_RELEASE_RULE
-- Each future central MotorLab release must execute fanout in the same release operation.
-- Safe targets are updated immediately for future sessions.
-- Busy targets are recorded PENDING_SAFE_BOUNDARY and retried automatically at the first supported safe-boundary execution cycle.
-- Global release fanout is COMPLETE only after all registered default/current active refs are UPDATED_VERIFIED or explicitly retired/superseded.
+FUTURE RELEASE RULE
+- Every future MotorLab release must fan out to all registered/default/current active refs in the same release operation.
+- Busy refs become PENDING_SAFE_BOUNDARY; open sessions never switch release mid-session.
+- New sessions use the newest VERIFIED local satellite automatically.
+- GLOBAL_STATE is COMPLETE only after every registered/default/current active ref is UPDATED_VERIFIED or explicitly retired/superseded.
 
 VERSION
-MOTORLAB-RELEASE-FANOUT-STATE-V1.0
+MOTORLAB-RELEASE-FANOUT-STATE-V1.1
+Revision 1.1: r29 verified complete across all current registered/default/current active refs, with mandatory all-project activation and versioned first-line startup proof.
