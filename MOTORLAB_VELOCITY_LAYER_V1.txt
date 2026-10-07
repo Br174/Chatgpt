@@ -565,8 +565,30 @@ Permanent optimization order:
 8. INTEGRATE once through the authoritative lane.
 Semantic workgroups are an execution shape chosen by Velocity, not independent agents or schedulers.
 
+R26 ADAPTIVE RUNTIME GOVERNANCE
+Velocity remains the sole scheduling/planning authority. The Adaptive Runtime Governor is subordinate feedback control, not a second scheduler.
+
+Permanent coordinated order:
+1. ELIMINATE safely unnecessary work.
+2. REUSE valid cache/checkpoint/result.
+3. REDUCE to invalidated delta.
+4. ACCELERATE intrinsic dispatcher hot path.
+5. GROUP remaining independent semantic work.
+6. ASSIGN adaptive lanes only where shared-resource/provider concurrency benefits from feedback control.
+7. PARALLELIZE within global, lane, provider and write-conflict bounds.
+8. RECOVER LATENCY through one controller:
+   - explicit material stall on eligible hedge-safe work -> early bounded Triple Hedge;
+   - otherwise eligible hedge-safe work -> hard Fresh Hedge trigger at 10000 ms;
+   - non-hedge work with useful independent latency work -> r24 latency branch;
+   - first valid hedge result wins; maximum two waves, maximum three attempts per wave.
+9. CONVERGE through one integration lane.
+
+External services remain subordinate to MOTORLAB_EXTERNAL_SERVICE_GUARD_V1.txt. Equivalent external requests should normally coalesce, not hedge. External hedging requires explicit adapter/provider authorization and must remain inside documented/observed budgets.
+
+Adaptive lane evidence uses actual latency, success, throttle and saturation signals. Increase concurrency gradually after healthy evidence; decrease quickly on throttling. Complexity still must pay rent.
+
 VERSION
-MOTORLAB-VELOCITY-LAYER-V1.5
+MOTORLAB-VELOCITY-LAYER-V1.6
 Established: 2026-09-29
 Revision 1.1: r21 establishes the four design pillars, TTTA primary KPI, complexity budget, adaptive DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, correction relay, bounded speculative execution, evidence learning and incremental-everything semantics without weakening single-writer or promotion safety.
 Revision 1.2: r22 binds adaptive Velocity to the executable Execution Fabric, requires Fast Decision Gate, event-driven ready-queue dispatch, observed parallelism proof, host-limited truthfulness and grouped concurrency status.
@@ -575,3 +597,5 @@ Revision 1.3: r23 establishes work-elimination-first optimization, content-addre
 Revision 1.4: r24 adds latency-hiding branch decisions: branch only when measured/estimated TTTA gain exceeds overhead, while preserving no-duplicate-side-effect and single-writer constraints.
 
 Revision 1.5: r25 establishes the eliminate/reuse/reduce/intrinsic-accelerate/semantic-group/parallelize/latency-hide/integrate order and makes semantic workgroups a Velocity-owned execution shape.
+
+Revision 1.6: r26 coordinates work elimination, r25 workgroups/intrinsic speed, adaptive lane feedback and bounded Triple Hedge under one Velocity-owned policy with a 10s hard hedge trigger and early material-stall recovery.
