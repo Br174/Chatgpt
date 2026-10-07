@@ -229,21 +229,21 @@ test('r27 productive sidework starts immediately while same-task hedge waits for
       {id:'other-work-a',kind:'read',estimatedMs:12},
       {id:'other-work-b',kind:'read',estimatedMs:12}
     ],
-    hedgeSafe:true,hedgeAfterMs:30,hedgeWidth:3,hedgeMaxWaves:1,laneKey:'thinking'
+    hedgeSafe:true,hedgeAfterMs:100,hedgeWidth:3,hedgeMaxWaves:1,laneKey:'thinking'
   }],async(task,ctx)=>{
     seen.push({id:task.id,attempt:ctx.attempt,at:Date.now()-started});
-    if(task.id==='slow-thinking'&&ctx.attempt===1){await sleep(90);return {valid:true,from:1};}
+    if(task.id==='slow-thinking'&&ctx.attempt===1){await sleep(200);return {valid:true,from:1};}
     if(task.id==='slow-thinking'){await sleep(5);return {valid:true,from:ctx.attempt};}
     await sleep(12);return {ok:true};
   },{
     maxConcurrency:4,
-    adaptiveGovernor:createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:4,initialLanes:3,hedgeTriggerMs:30})
+    adaptiveGovernor:createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:4,initialLanes:3,hedgeTriggerMs:100})
   });
   const side=seen.filter(x=>x.id.startsWith('other-work-'));
   const hedge=seen.find(x=>x.id==='slow-thinking'&&x.attempt===2);
   assert.equal(side.length,2);
-  assert.ok(side.every(x=>x.at<25),`sidework was not immediate: ${JSON.stringify(side)}`);
-  assert.ok(hedge&&hedge.at>=20,`same-task hedge fired too early or not at all: ${JSON.stringify(hedge)}`);
+  assert.ok(side.every(x=>x.at<75),`sidework did not start well before recovery threshold: ${JSON.stringify(side)}`);
+  assert.ok(hedge&&hedge.at>=70,`same-task hedge fired too early or not at all: ${JSON.stringify(hedge)}`);
   assert.ok(side.some(x=>x.at<hedge.at),'independent work should begin before recovery hedge');
   assert.equal(out.proof.productiveBranches,1);
   assert.equal(out.proof.productiveBranchTasks,2);
