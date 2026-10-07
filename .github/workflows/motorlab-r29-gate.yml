@@ -15,6 +15,7 @@ on:
       - 'MOTORLAB_PROGRESS_REPORTING_V1.txt'
       - 'MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt'
       - 'templates/codex/motorlab/motorlab_boot.py'
+      - 'tests/motorlab-r28-sync-pin.test.mjs'
       - 'tests/motorlab-r29-versioned-banner.test.mjs'
       - '.github/workflows/motorlab-r29-gate.yml'
   pull_request:
@@ -30,6 +31,7 @@ on:
       - 'MOTORLAB_PROGRESS_REPORTING_V1.txt'
       - 'MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt'
       - 'templates/codex/motorlab/motorlab_boot.py'
+      - 'tests/motorlab-r28-sync-pin.test.mjs'
       - 'tests/motorlab-r29-versioned-banner.test.mjs'
 
 jobs:
