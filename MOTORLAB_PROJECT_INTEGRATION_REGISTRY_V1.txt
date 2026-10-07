@@ -69,7 +69,8 @@ REGISTERED PROJECTS — R24 LATENCY ADOPTION 2026-10-07
 
 7. MotorAI — Br174/MotorAI
    initial r23/onboarding application head: 2fc178f6e119b7a06325b63a6568fa18bebf1a13
-   r24 adoption: PENDING_SAFE_BOUNDARY — Android build run 37591803299 currently in progress; do not switch control-plane mid-build.
+   main r24 control-plane commit: 375ea0c83a8ed222815e481def98b6b187448f65
+   r24 adoption followed Android build run 37591803299 reaching a terminal failure safe boundary; the r24 metadata adoption did not modify the neural brain or application runtime.
    first verified Android build: GitHub Actions run 37534929516 / artifact 11446590832
    Native MotorAI neural brain remains authoritative; MotorLab-Training is a subordinate specialized tutor/orchestrator.
    MotorAI-specific training innovations do not propagate automatically into central MotorLab.
@@ -102,7 +103,8 @@ FUTURE PROJECTS
 Every newly onboarded project receives the current r24 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, and the r24 incremental dynamic + latency-branch execution policy.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.20
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.21
 Revision 2.18: registry cleaned to current-state r23; six prior projects migrated and MotorAI onboarded at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
 
-Revision 2.20: r24 adds evidence-gated latency branching to the central contract; six established project mains plus active MusicLab LAB47 and StudyBook LAB03 were aligned at safe boundaries, while MotorAI remains explicitly pinned until its in-flight Android build closes.
+Revision 2.20: r24 adds evidence-gated latency branching to the central contract; six established project mains plus active MusicLab LAB47 and StudyBook LAB03 were aligned at safe boundaries.
+Revision 2.21: MotorAI adopted r24 after its pre-existing Android workflow reached a terminal safe boundary; MotorLab-Training specialization and native neural brain separation were preserved.
