@@ -5,10 +5,10 @@ Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.07-r28
+Release: 2026.10.07-r29
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.29
-Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.23
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.24
 Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.5
 Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.6
 Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
@@ -48,6 +48,14 @@ R27 CENTRAL ZERO-IDLE POLICY
 - Controlled analysis/wait tasks may opt into replacePrimaryOnHardHedge: at the hard trigger the stale primary attempt is cancelled or invalidated and late results cannot win.
 - Productive sidework and same-task recovery may overlap without adding a second scheduler.
 - Visible activity reports only real started/completed work; host-limited execution remains explicitly reported.
+
+R29 MANDATORY ALL-PROJECT VERSIONED BOOT POLICY
+- Every current/future project activates MotorLab from the first recognizable project chat, registered or not.
+- Future projects auto-onboard before substantive project work.
+- First visible line is exactly `⚙️ MotorLab rNN attivo`, with rNN derived from the pinned session release.
+- Unversioned startup proof is invalid.
+- Missing/unknown release identity is a bootstrap defect; never invent a version.
+- r28 session pin/fanout semantics remain mandatory.
 
 R28 CENTRAL RELEASE FANOUT POLICY
 - A central MotorLab release is incomplete until every registered project default/current active ref is UPDATED_VERIFIED or PENDING_SAFE_BOUNDARY.
@@ -176,3 +184,5 @@ FANOUT_STATE=COMPLETE_WITH_PENDING_SAFE_BOUNDARY
   required next action: at first verified safe boundary, preserve current r23 local core as LAST_GOOD, install r28 bundle/execution fabric/bootstrap/Pollicino/Live Control, verify release markers, then clear this pending entry.
 
 Revision 2.28: r28 fanout verified COMPLETE across all registered default/current active refs; MusicLab LAB52 and StudyBook LAB03 aligned; immutable session-pin semantics verified on every target.
+
+Revision 2.29: r29 makes all-project MotorLab activation and versioned first-line startup proof mandatory for current and future projects while preserving r28 session pin/fanout semantics.

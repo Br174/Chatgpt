@@ -9,8 +9,9 @@ PURPOSE
 Bruno must be able to tell immediately whether the current chat/session is actually operating under MotorLab. Hidden or assumed activation is not sufficient.
 
 CORE RULE
-Whenever MotorLab activates in a registered project chat or through valid software-build intent, the FIRST user-visible line of the first substantive project response must be exactly:
-"⚙️ MotorLab attivo"
+Whenever MotorLab activates in any current/future project chat or through valid project/software intent, the FIRST user-visible line of the first substantive project response must be exactly:
+"⚙️ MotorLab rNN attivo"
+where rNN is the short version extracted from the actually pinned MotorLab release for that session (for example release 2026.10.07-r29 -> banner "⚙️ MotorLab r29 attivo").
 
 This is a PRE-RESPONSE GATE requirement, not a decoration that may be added later.
 
@@ -22,7 +23,7 @@ If MotorLab activation is supported by current project context or software-build
 - after the banner, bootstrap/continuity checks may continue normally.
 
 2. REGISTERED PROJECTS
-For registered projects, the banner is mandatory at the first available user-visible response of every new chat/session once project context is recognizable.
+For every current or future project, the banner is mandatory at the first available user-visible response of every new chat/session once project context is recognizable.
 No manual activation phrase, transfer prompt or repeated build intent is required.
 
 3. NEW PROJECT / INTENT ACTIVATION
@@ -38,8 +39,8 @@ If a software-project response was already given without the banner despite a re
 
 6. NORMAL STARTUP TEXT
 The normal banner must remain exactly:
-"⚙️ MotorLab attivo"
-Do not append satellite/CORE/native-engine detail unless a real warning, recovery event or blocker materially needs explanation.
+"⚙️ MotorLab rNN attivo"
+The version is mandatory and MUST match the pinned session release. Do not use an unversioned banner. Do not append satellite/CORE/native-engine detail unless a real warning, recovery event or blocker materially needs explanation.
 
 7. NO FALSE ACTIVATION
 Do not show the banner when the execution surface exposes no supported activation path at all. Report a blocker only if that limitation materially prevents requested software work.
@@ -51,13 +52,15 @@ This contract cannot make a completely context-free host expose project identity
 This feature changes session reporting/bootstrap ordering only. It must not alter application code, UI, package identity, signing, runtime logic, native engines or release behavior.
 
 SUCCESS CRITERIA
-- every recognized MotorLab project chat starts visible project work with "⚙️ MotorLab attivo";
+- every current/future project chat starts visible project work with the exact versioned banner "⚙️ MotorLab rNN attivo";
 - new software-build chats do the same under intent activation;
 - no manual activation prompt is required;
 - continuity reconciliation follows activation automatically;
 - no false activation is claimed.
 
 VERSION
-MOTORLAB-SESSION-BOOT-BANNER-V1.2
+MOTORLAB-SESSION-BOOT-BANNER-V1.3
 Established: 2026-09-29
 Revision 1.2: banner becomes mandatory PRE-RESPONSE first-line gate for every supported project/software-build activation path.
+
+Revision 1.3: r29 makes the release version mandatory in the first visible project-chat line and removes the unversioned banner as a valid normal startup state.

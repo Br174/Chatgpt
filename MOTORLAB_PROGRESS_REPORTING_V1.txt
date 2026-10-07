@@ -17,7 +17,7 @@ Progress Reporting owns user-visible percentages. Visual Status owns emoji label
 For ALL MotorLab-controlled modifications establish or reconstruct a meaningful verified scale and keep `Progresso MotorLab: <N>%` visible at the available user-visible control points. This includes small and one-step changes. Repeating the same value with new state is better than inventing advancement.
 
 2. FIRST-STATUS GATE
-After `⚙️ MotorLab attivo`, if MotorLab-controlled work is active/pending/newly accepted, establish/reconstruct and display a verified percentage at the first available visible control point. Use live provider/repository/checkpoint evidence; do not reset because a chat/turn changed.
+After the versioned first-line banner `⚙️ MotorLab rNN attivo`, if MotorLab-controlled work is active/pending/newly accepted, establish/reconstruct and display a verified percentage at the first available visible control point. Use live provider/repository/checkpoint evidence; do not reset because a chat/turn changed.
 
 3. LONG / EXTERNAL OPERATION VISIBILITY
 Before a long build/test/provider phase show current percentage and what is starting. Report material provider/job transitions at the next available control point. Healthy durable jobs follow No-Spin rather than endless foreground polling.
@@ -73,7 +73,7 @@ Artifact 100% is an intermediate milestone, not `💯 Conclusione definitiva`, w
 
 9. USER-FACING LABELS
 Canonical labels remain:
-⚙️ MotorLab attivo
+⚙️ MotorLab rNN attivo
 🎆 Azione completata
 ⚡ Risveglio / recupero
 ✅ Problema risolto
@@ -137,3 +137,5 @@ Revision 1.6: r15 adds dual Artifact/Overall progress and post-artifact Root Cau
 Revision 1.7: makes evidence-based numeric progress mandatory for all MotorLab-controlled modifications and adds Live Control micro-progress semantics.
 Revision 1.8: r22 adds grouped parallel runner status and observed execution-mode/peak-concurrency reporting so progress communication reflects real concurrency instead of serial narration.
 Revision 1.9: r23 allows concise visible evidence of work avoided by cache/incrementality, dynamic branches, pruning and deferred materialization without inflating verified progress.
+
+Revision 1.10: r29 updates activation/progress handoff to require the pinned MotorLab version in the first visible banner.
