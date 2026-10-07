@@ -542,9 +542,22 @@ EXTERNAL_WAIT
 COORDINATION_OVERHEAD
 A speed improvement is real only when TTTA falls without required quality/safety regression.
 
+R24 LATENCY-HIDING DECISION RULE
+When a live task becomes slower than its declared useful threshold, Velocity should prefer productive independent work over passive waiting only when the expected TTTA saving is positive after orchestration/provider/lock overhead.
+Decision order:
+1. do not branch if there is no useful independent work;
+2. do not duplicate irreversible or costly side effects as a blind race;
+3. estimate branch benefit versus overhead/contention;
+4. if positive, declare LATENCY_BRANCH_AFTER_MS, EXPECTED_GAIN_MS, OVERHEAD_MS and safe independent spawn candidates;
+5. Execution Fabric triggers the branch only while the parent is still running;
+6. reconverge through normal dependency and single-integration rules.
+A timer is not an optimization by itself. The optimization is useful work overlapped with otherwise unavoidable latency.
+
 VERSION
-MOTORLAB-VELOCITY-LAYER-V1.3
+MOTORLAB-VELOCITY-LAYER-V1.4
 Established: 2026-09-29
 Revision 1.1: r21 establishes the four design pillars, TTTA primary KPI, complexity budget, adaptive DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, correction relay, bounded speculative execution, evidence learning and incremental-everything semantics without weakening single-writer or promotion safety.
 Revision 1.2: r22 binds adaptive Velocity to the executable Execution Fabric, requires Fast Decision Gate, event-driven ready-queue dispatch, observed parallelism proof, host-limited truthfulness and grouped concurrency status.
 Revision 1.3: r23 establishes work-elimination-first optimization, content-addressed incremental reuse, dynamic DAG growth/pruning, progressive execution shapes, event-driven memory and deferred materialization before adaptive parallelism.
+
+Revision 1.4: r24 adds latency-hiding branch decisions: branch only when measured/estimated TTTA gain exceeds overhead, while preserving no-duplicate-side-effect and single-writer constraints.
