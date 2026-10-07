@@ -32,7 +32,7 @@ WRITE_LOCK_SCOPE=none; LAB49 technical gate complete
 
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
 
-MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r24
+MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r25
 MOTORLAB_CONTROL_PLANE_REF=main
 MOTORLAB_CONTROL_PLANE_SHA=4f122feac98d4ba551bb837f3057f1a198ba728b
 MOTORLAB_CONTROL_PLANE_LAST_GOOD=2026.09.30-r16
@@ -1562,7 +1562,7 @@ FINAL_GATE_DELIVERABLE_VERIFY=success
 FINAL_GATE_UPLOAD=success
 CANDIDATE_DEVICE_ACCEPTANCE=pending Bruno test
 MADRE_PROMOTION=no
-SATELLITE_LOCAL_RELEASE=2026.10.07-r24
+SATELLITE_LOCAL_RELEASE=2026.10.07-r25
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R23_EXECUTION_FABRIC=work-elimination-first;content-addressed-reuse;incremental-delta;critical-path;dynamic-dag;progressive-branching;pruning;event-memory;deferred-materialization
 
@@ -1571,3 +1571,8 @@ MOTORLAB_R24_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R24_LATENCY_BRANCHING=evidence-gated;expected-gain-gt-overhead;inflight-trigger;immediate-wake;early-finish-cancel;single-writer-preserved;fictional-countdown-forbidden
 MOTORLAB_R24_MAIN_ADOPTION_COMMIT=aa1614093c05cb6158d5f1d4a04b038b66b7e4e3
 MOTORLAB_R24_ACTIVE_BRANCH_ADOPTION_COMMIT=073a9d2e2eb9237c88e7eb870c1f26dfa10456a0
+
+MOTORLAB_R25_STATUS=VERIFIED_ADOPTED
+MOTORLAB_R25_EXECUTION=work-elimination-first;intrinsic-acceleration;semantic-workgroups;gain-gated-parallelism;r24-latency-branching;single-integration-lane
+MOTORLAB_R25_MAIN_ADOPTION_COMMIT=b0a02b0413c809587b7ab8cdb3f9c3e5f56bf489
+MOTORLAB_R25_ACTIVE_BRANCH_ADOPTION_COMMIT=9c9582ae6eb55d739214fdc97f117802d6c82fa5
