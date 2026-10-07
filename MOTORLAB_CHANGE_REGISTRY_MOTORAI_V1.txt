@@ -294,3 +294,15 @@ LEVEL2_RETENTION_PERCENT=95.8
 LEVEL1_RETENTION_PERCENT=100.0
 LEVEL0_RETENTION_PERCENT=95.6
 RESULT=PASSED
+
+
+SEED011 AUTOTRAIN V1 + EVOLUTION PANEL
+DATE=2026-10-07
+BASELINE=Seed010 accepted
+AUTOTRAIN=one-touch local train/validation/retention/checkpoint/final-test/rollback
+L5=first-vs-last equality over four-symbol sequences
+FIRST_GATE=failed at val 78.75% with L4 retention 74.615%; L3-L0 100%
+ROOT_CAUSE_RESPONSE=protect Seed010 by dedicated zero-effect grow3 attention module and stronger L4 replay
+EVOLUTION_PANEL=persistent chart for learning, minimum retention and internal evolution index
+CAPABILITY_DIARY=verified "what it knows / what it is learning / latest progress"
+STATUS=final CI gate running
