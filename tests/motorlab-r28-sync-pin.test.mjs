@@ -34,12 +34,16 @@ test('r28 central contracts require release fanout and session pinning', async (
     read('MOTORLAB_CORE_ENTRYPOINT_V1.txt'),
     read('MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt'),
   ]);
-  assert.match(manifest, /CURRENT_RELEASE=2026\.10\.07-r28/);
+  const manifestRelease = manifest.match(/CURRENT_RELEASE=\\d{4}\\.\\d{2}\\.\\d{2}-r(\\d+)/);
+  assert.ok(manifestRelease, 'current release must be declared');
+  assert.ok(Number(manifestRelease[1]) >= 28, 'r28 fanout semantics must survive later releases');
   assert.match(manifest, /RELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1\.txt/);
   assert.match(fanout, /PENDING_SAFE_BOUNDARY/);
   assert.match(fanout, /SESSION_RELEASE_PIN=required/);
   assert.match(sync, /R28\+ RELEASE FANOUT \/ SESSION IMMUTABILITY/);
-  assert.match(bundle, /RELEASE=2026\.10\.07-r28/);
+  const bundleRelease = bundle.match(/^RELEASE=\\d{4}\\.\\d{2}\\.\\d{2}-r(\\d+)$/m);
+  assert.ok(bundleRelease, 'satellite release must be declared');
+  assert.ok(Number(bundleRelease[1]) >= 28, 'r28 session-pin semantics must survive later releases');
   assert.match(bundle, /SESSION_RELEASE_PIN_FULL_SNAPSHOT=required/);
   assert.match(entry, /R28 BOOT \/ RELEASE ADOPTION/);
   assert.match(registry, /R28 CENTRAL RELEASE FANOUT POLICY/);
