@@ -257,13 +257,13 @@ R28+ RELEASE FANOUT / SESSION IMMUTABILITY
 - Central release completion requires MOTORLAB_RELEASE_FANOUT_V1.txt.
 - Every registered default/current active ref is synchronized at a verified safe boundary or recorded PENDING_SAFE_BOUNDARY.
 - Supported bootstraps pin the full MotorLab control snapshot by session_id on first SessionStart.
-- resume/compact/clear of the same session reuse that pinned snapshot even if repository MotorLab files advance.
-- Newer local MotorLab becomes eligible only for a new session or explicit verified safe-boundary handoff.
+- resume/compact/clear and every supported UserPromptSubmit re-enter MotorLab. The current pin is reused unless a newer VERIFIED local satellite is safely eligible for prompt-boundary refresh.
+- Newer local MotorLab becomes eligible on a new session or a verified safe re-entry boundary when no explicit in-flight write/build/test/promotion lock is recorded.
 - Fanout must never mutate project application/domain/runtime code.
 - The previous VERIFIED local core remains LAST_GOOD.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.30
+MOTORLAB-SATELLITE-SYNC-V1.31
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -303,3 +303,15 @@ R30 CRITICAL BOOT CAPSULE
 Local fallback MUST load `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` before longer control-plane text. The emitted startup context must remain under the host cap and retain all critical markers. Missing/oversized capsule blocks write-capable bootstrap until repaired.
 
 Revision 1.30: r30 adds capsule-first non-truncatable bootstrap synchronization.
+
+
+R31 EVERY-TURN RE-ENTRY SYNC
+At every r31 satellite adoption boundary:
+- sync MOTORLAB_REENTRY_GATE_V1 semantics into local capsule/core markers;
+- sync .codex/hooks/motorlab_boot.py and .codex/hooks.json where supported;
+- UserPromptSubmit must invoke motorlab_boot.py before Pollicino-only logging;
+- preserve the existing pin when an explicit in-flight write/build/test/promotion lock is recorded;
+- otherwise allow a newer VERIFIED local release to refresh the pin at re-entry;
+- never alter application/domain/runtime code.
+
+Revision 1.31: r31 adds every-turn/resume re-entry synchronization and prompt-hook bootstrap inheritance.
