@@ -5,11 +5,11 @@ Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.07-r30
+Release: 2026.10.08-r31
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical boot capsule: MOTORLAB_BOOT_CAPSULE_V1.txt
-Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.30
-Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.25
+Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.31
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.26
 Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.5
 Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.6
 Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
@@ -199,3 +199,19 @@ This section supersedes older r28/r29 adoption-status sections for current state
 - Long-form MotorLab modules remain authoritative detail loaded on demand; capsule is the mandatory non-truncatable critical layer.
 
 Revision 2.32: r30 Critical Boot Capsule fanout verified COMPLETE across current default/active refs; future projects inherit capsule-first non-truncatable critical semantics.
+
+
+R31 EVERY-TURN RE-ENTRY POLICY — AUTHORITATIVE
+- MotorLab must govern the entire lifecycle of every current/future project conversation, not only its first chat response.
+- Every supported UserPromptSubmit/resume/compact/clear must pass through MOTORLAB_REENTRY_GATE_V1.txt before substantive project work.
+- Supported project hooks run motorlab_boot.py before Pollicino on UserPromptSubmit.
+- Pollicino-only prompt logging is not sufficient MotorLab activation.
+- Re-entry reinjects the Critical Boot Capsule and compact identity/sync state.
+- Newer VERIFIED local releases are adopted at safe re-entry boundaries when no explicit in-flight write/build/test/promotion lock is recorded.
+- Project-native engines remain preserved and MotorLab remains the orchestration/control plane.
+- Future projects inherit r31 automatically through onboarding + fanout.
+
+CURRENT R31 FANOUT
+State: IN_PROGRESS on release branch; becomes authoritative COMPLETE only after all registered default/current active refs pass r31 re-entry verification.
+
+Revision 2.33: r31 adds permanent all-turn MotorLab re-entry and safe latest-verified-local adoption across all current/future projects.
