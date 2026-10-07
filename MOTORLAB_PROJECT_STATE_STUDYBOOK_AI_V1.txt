@@ -27,7 +27,7 @@ LAST_USER_INTENT_SUMMARY=Integrate only the useful MotorLab r21 runtime method d
 STATE_SOURCE=LAB03 final update source a5b0e0035ff8b437785ac4884d1e2da1665d97c2; UAB run 37496668653 success; Android run 37496668654 success; applicationId it.studybook.ai.lab; versionCode 2026100015; signing D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC; APK sha256 6685b60797a6be47b5c70f678a32c84a42222701c4127ba80081d9c358ef0df5; ZIP sha256 474a822ab0aff94a493a556b17633c0a2b593985518af047825f1b35b457b820
 CONTINUITY_NOTE=On future chat/continua load r21 satellite state/RESUME_READY and LAB03 runtime state first. Do not recreate LAB03. The next lifecycle boundary is physical-device acceptance of LAB03, then CANDIDATA only after Bruno acceptance.
 UPDATED_DATE=2026-10-07
-SATELLITE_LOCAL_RELEASE=2026.10.07-r24
+SATELLITE_LOCAL_RELEASE=2026.10.07-r25
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
 MOTORLAB_R21_VELOCITY_STATUS=VERIFIED_ADOPTED
 MOTORLAB_TTTA_PRIMARY_KPI=enabled
@@ -59,8 +59,13 @@ MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R23_EXECUTION_FABRIC=work-elimination-first;content-addressed-reuse;incremental-delta;critical-path;dynamic-dag;progressive-branching;pruning;event-memory;deferred-materialization
 
 
-MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r24
+MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r25
 MOTORLAB_R24_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R24_LATENCY_BRANCHING=evidence-gated;expected-gain-gt-overhead;inflight-trigger;immediate-wake;early-finish-cancel;single-writer-preserved;fictional-countdown-forbidden
 MOTORLAB_R24_MAIN_ADOPTION_COMMIT=8057362daee21a7a270c1858d62dce976aacd4f7
 MOTORLAB_R24_ACTIVE_BRANCH_ADOPTION_COMMIT=ec8439139bc49c93912aa5116e0438a5ad48444c
+
+MOTORLAB_R25_STATUS=VERIFIED_ADOPTED
+MOTORLAB_R25_EXECUTION=work-elimination-first;intrinsic-acceleration;semantic-workgroups;gain-gated-parallelism;r24-latency-branching;single-integration-lane
+MOTORLAB_R25_MAIN_ADOPTION_COMMIT=a8f765c45a32db49dcc622296c9e2376ca117225
+MOTORLAB_R25_ACTIVE_BRANCH_ADOPTION_COMMIT=c64da673ddcc114c6c423ffbb63d270891bef263
