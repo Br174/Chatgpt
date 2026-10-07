@@ -85,42 +85,28 @@ R24 LATENCY BRANCH POLICY
 - Preserve lock scopes, single-writer, runner caps and the single integration lane.
 - Completion countdowns are never presented as guaranteed unless truly deterministic.
 
-REGISTERED PROJECTS — R28 RELEASE FANOUT VERIFIED 2026-10-07
+REGISTERED PROJECTS — R29 VERSIONED BOOT FANOUT VERIFIED 2026-10-07
 1. MusicLab — Br174/MusicLab
-   main r28 commit: 2b67a3910613376b8953d80c971393357a53190b
-   retained diagnostic LAB50 r28 commit: 0dd28b0d6323e53cc142ba625e7200930e13ea89
-   current LAB52 r28 commit: 1ef03886448f087b3c4dd42bba12b08c1ba9dd28
-   Pollicino + Live Control + session-pinned bootstrap preserved.
-   Native MusicLab engines/lifecycle remain authoritative.
-
+   main r29 commit: 4cf0e275ee4b0a830d4a6bf4fe39c68c62d9776c
+   LAB50 r29 commit: b5148d389b73ebfdd62af4cc7c7d3d68e93ca5a9
+   LAB52 r29 commit: 86bbd1882c8f2057d0cfb009f6adf3a1acc77279
 2. GeoVision — Br174/GeoVision-Test
-   main r28 commit: dfe7d475586257158711dafd276d3ffa8abd0a05
-   Native GeoVision engine/lifecycle preserved.
-
+   main r29 commit: 1a648dcbd23b50a1cbd1b0e11b5d7528f30a3bf8
 3. StudyBook-AI — Br174/StudyBook-AI
-   main r28 commit: a9ab160d76410a68400ccb372b74255a75cdb604
-   active LAB03 r28 commit: a74d6dff9a6dd31dcb876393619e76c80a2ee64a
-   StudyBook application/runtime behavior remains separate from MotorLab control-plane adoption.
-
+   main r29 commit: 794b35a5bbd8e5b9d34f04ee99cfe197506985f9
+   active LAB03 r29 commit: 54112aada6804f8beb104d607eaf7b5aa94e7fc8
 4. Visionflix / Verlezza Vision — Br174/Visionflix
-   main r28 commit: c62018c5b134c3ddb94fc3df240f103d71bb620d
-   Visionflix remains source lifecycle authority.
-
+   main r29 commit: 55a299fecf47aa7c74061b596f8c3d1a26336fa0
 5. Cover Lab AI — Br174/Cover-Lab-AI
-   main r28 commit: 784020cff0c19eb1fcbe316889a7a6e6452a2b33
-   Native Cover Lab engine remains authoritative.
-
+   main r29 commit: dbbe1007e1bfcef9289a03c58c8ac122b4cde569
 6. streamflix-BV — Br174/streamflix-BV
-   main r28 commit: a14ab7526fd2f1c03d111fcdbc6434bdad440e80
-   Remains delivery adapter; Visionflix source authority preserved.
-
+   main r29 commit: 62c5c1f32c48b233ba264c8dd9e6afdd14fe318f
 7. MotorAI — Br174/MotorAI
-   main r28 commit: 82620dc1d8791bd17b8516548667c39904f92ff2
-   Native MotorAI neural brain remains authoritative; MotorLab-Training remains subordinate.
+   main r29 commit: 0104b257b42a6006b5a262d604ac7e6c80eddcc8
 
 FANOUT STATE
-MOTORLAB_RELEASE_FANOUT_STATE_V1.txt = COMPLETE for 2026.10.07-r28.
-Every verified target carries r28, session pinning, current Execution Fabric markers and pinned bootstrap semantics.
+MOTORLAB_RELEASE_FANOUT_STATE_V1.txt = COMPLETE for 2026.10.07-r29.
+Every verified target carries r29, all-project activation, versioned first-line startup proof, session pinning and current Execution Fabric semantics.
 
 CLEANUP / NON-REDUNDANCY
 - Old active satellite contents are superseded by the current r28 local core at verified safe boundaries; each target preserves its immediately previous VERIFIED core as LAST_GOOD.
@@ -186,3 +172,5 @@ FANOUT_STATE=COMPLETE_WITH_PENDING_SAFE_BOUNDARY
 Revision 2.28: r28 fanout verified COMPLETE across all registered default/current active refs; MusicLab LAB52 and StudyBook LAB03 aligned; immutable session-pin semantics verified on every target.
 
 Revision 2.29: r29 makes all-project MotorLab activation and versioned first-line startup proof mandatory for current and future projects while preserving r28 session pin/fanout semantics.
+
+Revision 2.30: r29 fanout verified COMPLETE across all registered/default/current active refs; every current/future project must auto-activate MotorLab and open with the pinned versioned banner `⚙️ MotorLab rNN attivo`.
