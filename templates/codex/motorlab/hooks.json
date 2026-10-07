@@ -1,10 +1,17 @@
 {
-  "description": "MotorLab Live Control + Pollicino external continuity safe-point template",
+  "description": "Mandatory MotorLab bootstrap/re-entry + Live Control + Pollicino external continuity",
   "hooks": {
     "SessionStart": [
       {
         "matcher": "startup|resume|clear|compact",
         "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_boot.py\"",
+            "timeout": 3,
+            "statusMessage": "Loading MotorLab bootstrap",
+            "additionalContextLimit": 6000
+          },
           {
             "type": "command",
             "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_live_control.py\"",
@@ -23,6 +30,20 @@
     "UserPromptSubmit": [
       {
         "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_boot.py\"",
+            "timeout": 3,
+            "statusMessage": "Re-entering MotorLab",
+            "additionalContextLimit": 6000
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_live_control.py\"",
+            "timeout": 5,
+            "statusMessage": "Checking MotorLab Live Control",
+            "additionalContextLimit": 1500
+          },
           {
             "type": "command",
             "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/motorlab_pollicino.py\"",
