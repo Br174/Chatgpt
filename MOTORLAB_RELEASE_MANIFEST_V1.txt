@@ -4,11 +4,11 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.07-r27
+CURRENT_RELEASE=2026.10.07-r28
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
-SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
+SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt\nRELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -61,13 +61,13 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_EXECUTION_CONTINUITY_V1.txt
 - MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
 - MOTORLAB_SATELLITE_SYNC_V1.txt
-- MOTORLAB_SATELLITE_BUNDLE_V1.txt
+- MOTORLAB_SATELLITE_BUNDLE_V1.txt\n- MOTORLAB_RELEASE_FANOUT_V1.txt
 
 SATELLITE LOCAL FILES
 Each project should contain hook + local core + LAST_GOOD + sync state and reference central Project Continuity, technical Change History and visible Registro Modifiche e Ripristini.
 
 SAFE UPDATE
-Adopt newer MotorLab releases only at a verified safe boundary, preserve current VERIFIED local bundle as LAST_GOOD, and never switch release mid active write/build/test/promotion.
+Every central release must execute MOTORLAB_RELEASE_FANOUT_V1.txt. Preserve current VERIFIED local bundle as LAST_GOOD. Open sessions pin their complete MotorLab snapshot and never switch release mid-session/write/build/test/promotion; newer releases become active only on a new session or explicit verified safe-boundary handoff.
 
 VISIBLE STARTUP
 First user-visible line for project work: `⚙️ MotorLab attivo`.
@@ -277,3 +277,4 @@ Revision 1.26: r26 adds coordinated bounded Triple Hedge, Adaptive Lane Pool and
 
 Revision 1.27: r27 introduces zero-idle dual-lane active wait: immediate independent productive work plus separate bounded same-task recovery at the default 10-second trigger.
 r27 final gate evidence: GitHub Actions run 37657147621; execution fabric regression 32/32 passed and focused r27 regression 2/2 passed.
+\nRevision 1.28: r28 makes cross-project release fanout mandatory and adds immutable per-session MotorLab snapshot pinning so new releases propagate automatically without changing MotorLab underneath active work.\n
