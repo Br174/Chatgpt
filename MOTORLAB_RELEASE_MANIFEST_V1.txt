@@ -262,10 +262,10 @@ Capabilities:
 - ordinary tasks retain a lightweight r25-compatible fast path.
 
 Controlled GitHub Actions evidence:
-- final verification run 37640102912: 30 tests passed / 0 failed;
-- semantic workgroups: 232.92 ms serial vs 95.04 ms parallel, 59.20% lower TTTA / 2.45x speedup;
-- ordinary intrinsic dispatcher: 1,200 tasks, 9 rounds, median 57.245 ms (average 55.959 ms; noisy p90 129.682 ms);
-- adaptive hedge benchmark: 81.05 ms baseline vs 28.37 ms hedged, 65.00% lower TTTA / 2.86x speedup;
+- final verification run 37640836861: 31 tests passed / 0 failed;
+- semantic workgroups: 232.03 ms serial vs 95.78 ms parallel, 58.72% lower TTTA / 2.42x speedup;
+- ordinary intrinsic dispatcher: 1,200 tasks, 9 rounds, median 50.945 ms (average 50.985 ms; noisy p90 129.682 ms);
+- adaptive hedge benchmark: 81.07 ms baseline vs 28.61 ms hedged, 64.70% lower TTTA / 2.83x speedup;
 - lane AIMD trace under synthetic 429 then healthy recovery: 3 -> 1 -> 1 -> 2.
 These figures are controlled benchmark observations, not universal performance guarantees.
 
