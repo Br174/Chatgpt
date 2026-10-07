@@ -1,0 +1,48 @@
+name: MotorLab r29 Gate
+
+on:
+  push:
+    branches:
+      - 'motorlab-r29-*'
+    paths:
+      - 'MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt'
+      - 'MOTORLAB_SESSION_BOOT_BANNER_V1.txt'
+      - 'MOTORLAB_AUTO_BOOTSTRAP_V1.txt'
+      - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
+      - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
+      - 'MOTORLAB_SATELLITE_BUNDLE_V1.txt'
+      - 'MOTORLAB_VISUAL_STATUS_V1.txt'
+      - 'MOTORLAB_PROGRESS_REPORTING_V1.txt'
+      - 'MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt'
+      - 'templates/codex/motorlab/motorlab_boot.py'
+      - 'tests/motorlab-r28-sync-pin.test.mjs'
+      - 'tests/motorlab-r29-versioned-banner.test.mjs'
+      - '.github/workflows/motorlab-r29-gate.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt'
+      - 'MOTORLAB_SESSION_BOOT_BANNER_V1.txt'
+      - 'MOTORLAB_AUTO_BOOTSTRAP_V1.txt'
+      - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
+      - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
+      - 'MOTORLAB_SATELLITE_BUNDLE_V1.txt'
+      - 'MOTORLAB_VISUAL_STATUS_V1.txt'
+      - 'MOTORLAB_PROGRESS_REPORTING_V1.txt'
+      - 'MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt'
+      - 'templates/codex/motorlab/motorlab_boot.py'
+      - 'tests/motorlab-r28-sync-pin.test.mjs'
+      - 'tests/motorlab-r29-versioned-banner.test.mjs'
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Previous MotorLab regressions
+        run: node --test tests/motorlab-execution-fabric.test.mjs tests/motorlab-r27-dual-lane.test.mjs tests/motorlab-r28-sync-pin.test.mjs
+      - name: r29 versioned startup regression
+        run: node --test tests/motorlab-r29-versioned-banner.test.mjs

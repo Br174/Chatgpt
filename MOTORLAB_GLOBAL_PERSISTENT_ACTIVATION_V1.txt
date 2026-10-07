@@ -10,8 +10,8 @@ MotorLab is a persistent shared orchestration layer for Bruno's software project
 
 1. GLOBAL SCOPE - MANDATORY
 MotorLab applies to:
-- every registered MotorLab software project;
-- every future project registered with MotorLab;
+- every current project in Bruno's project ecosystem where project work is performed;
+- every future project from its first recognizable project session, whether or not it has already been registered with MotorLab;
 - every chat whose practical purpose is active software creation/development/modification/testing/build/release/maintenance;
 - every new chat inside a recognized project, even when the first message is short or contains no build keyword.
 
@@ -21,9 +21,10 @@ The first user-visible line of activated project work must be the Session Boot B
 Do not defer MotorLab activation until after project work has already started.
 
 Activation precedence:
-A. recognized registered project context -> immediate implicit activation;
-B. otherwise clear software-build intent -> immediate implicit activation + onboarding;
-C. otherwise inactive until a supported signal exists or explicit invocation occurs.
+A. any recognizable current/future Bruno project context -> immediate implicit activation;
+B. if not yet registered, immediate MotorLab activation + automatic onboarding before substantive project work;
+C. clear software-build intent outside an already recognized project -> immediate implicit activation + onboarding;
+D. otherwise inactive until a supported project/software signal exists or explicit invocation occurs.
 
 3. PERSISTENT PROJECT ACTIVATION
 A recognized project context alone is sufficient.
@@ -40,7 +41,7 @@ Continuation-relevant project changes must update the central project ledger at 
 This replaces recurring manual handoff prompts as the normal continuity mechanism.
 
 6. FUTURE PROJECT ONBOARDING
-Every future concrete software project must, when technically applicable:
+Every future project must be treated as MotorLab-managed from its first recognizable project session. When technically applicable it must:
 - receive MOTORLAB_PROJECT_HOOK.txt/local satellite;
 - be added to canonical routing/integration state;
 - receive a central Project Continuity ledger;
@@ -49,7 +50,7 @@ Every future concrete software project must, when technically applicable:
 - inherit Watchdog, Resume Recovery, Foreground Stall Guard, Progress Reporting, checkpoint, single-writer, regression, background execution, External Service Guard and Velocity rules.
 
 7. VISIBLE ACTIVATION PROOF
-A successful activation must visibly identify MotorLab according to MOTORLAB_SESSION_BOOT_BANNER_V1.txt.
+A successful activation must visibly identify MotorLab AND the pinned release version according to MOTORLAB_SESSION_BOOT_BANNER_V1.txt.
 If the banner does not appear, Bruno must not be expected to assume MotorLab is active.
 
 8. PROJECT-NATIVE ENGINE COEXISTENCE
@@ -91,6 +92,8 @@ Correct implementation means:
 - platform limitations are represented honestly.
 
 VERSION
-MOTORLAB-GLOBAL-PERSISTENT-ACTIVATION-V1.2
+MOTORLAB-GLOBAL-PERSISTENT-ACTIVATION-V1.3
 Established: 2026-09-29
 Revision 1.2: pre-response activation gate and mandatory durable Project Continuity across new chats; manual activation/transfer prompts become fallback-only.
+
+Revision 1.3: r29 makes MotorLab mandatory for every current/future project from first recognizable project context and requires versioned first-line activation proof derived from the pinned session release.
