@@ -882,3 +882,28 @@ NEXT_LIFECYCLE_GATE=Bruno device test della LAB49 aggiornamento con sequenza di 
 RESTORE_SCOPE_HINTS=Preservare InnerTubeXPlayer.kt della LAB41. In caso di ripristino selettivo applicare cancellazione reale provider, lifecycle barrier e no-restart-during-playback sopra il baseline corrente.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
 
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261007-lab50-direct-play-background-barrier
+DATE=2026-10-07
+TITLE=LAB50 Play diretto cover verificata e barriera persistente contro riavvii background
+SEMANTIC_TAGS=LAB50,Cover,Originali,Player buono,YouTube.queue,metadata hydration,playQueue,preload,Discogs,background,pagination,progressive slowdown,Family 01,LAB aggiornamento,LAB di sicurezza
+USER_INTENT=Continuare il lavoro iniziato in Work dopo esaurimento crediti, ricostruendo il punto esatto e completando la modifica senza toccare il Player buono LAB41.
+CHANGE_SCOPE=DIRECT_VERIFIED_VIDEO_PLAY_AND_PERSISTENT_BACKGROUND_BARRIER
+LIFECYCLE_ROLE=LAB50_UPDATE_FAMILY_01_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-lab49-aggiornamento-family-01
+SOURCE_BASE_SHA=03ffa74f2143a55eb7beeafa97804d20d5b996e3
+RESULT_REF=uab-build/musiclab-lab50-aggiornamento-family-01
+RESULT_BUILD_SHA=4034ac2f66498a9012b553c6c5e99a3035b7ea34
+RESULT_STATUS_SHA=6634cd1824cbfa2da743c8dce66c8e7672c6372a
+IMPLEMENTATION_COMMITS=cadf3af7ffc4b3287c941c257a57b6a10d97be53,c4ef6f925529ec4410ae99d65b1fa998efdf9b13,9da23d9f8d0aa25ceabfc6bdfac66ab3f705ddc1,e9c191c507325661b93340d1794cffa7132fba33,5b7eacc400b58b82e8b63b5e0c7daafe6d66626b,c25368f221ca3407263d12a0ffba721257b51d60,e9be0caae7f892ca8b77160f00623afaca5b7493,4034ac2f66498a9012b553c6c5e99a3035b7ea34
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt,cloudflare/music-intelligence/test/lab50-direct-play-background-barrier-contract.test.mjs,uab-project.env,.github/workflows/lab50-aggiornamento-family-01-gate.yml,LAB50_BUILD_STATUS.txt
+BEHAVIOR_SUMMARY=Quando una cover ha già un resolvedVideoId verificato, il tap non esegue più una nuova YouTube.queue per idratare metadati prima di playQueue: riusa SongItem preparato oppure costruisce MediaMetadata minimo locale e consegna subito il video ID al Player. È rimosso anche il successivo hydration/preload del brano seguente dal percorso critico. Una barriera persistente backgroundPausedForPlayback impedisce che preload video, verifica Discogs e paginazione automatica ripartano mentre il playback è attivo. InnerTubeXPlayer.kt resta byte-identico alla sorgente Player buono LAB41.
+ROOT_CAUSE=LAB49 aveva eliminato l'accumulo più grave di chiamate non cancellabili, ma il percorso Cover poteva ancora introdurre attese evitabili dopo il tap: fino a 2500 ms di YouTube.queue anche quando il video era già stato verificato e una seconda idratazione fino a 2500 ms per preparare il brano successivo. Inoltre la sola cancellazione dei job non costituiva una barriera persistente contro nuovi scheduler Compose che potevano riavviare lavoro progressivo durante la riproduzione.
+ROOT_CAUSE_CLOSURE=Play diretto dal video ID già verificato senza metadata hydration pre-play; eliminazione dell'idratazione ritardata del brano successivo; backgroundPausedForPlayback come ownership barrier persistente; scheduleVideoPreload, scheduleDiscogsVerification e loadNextPage bloccati durante playback; contratti LAB49 conservati.
+VERIFICATION=GitHub Actions run 37654178496: build-update-first success e build-safety-after-update success sul source SHA 4034ac2f66498a9012b553c6c5e99a3035b7ea34. Contratti LAB46-LAB50 success, Player buono LAB41 byte-identico, Android unit test LAB45-LAB47 success, UAB preflight success, update identity success, safety isolation success. Update artifact 11497519250 digest sha256:c40ab90754fa867ff731a826d63ed7582a50b58f032cd9cb174454272044f430; APK sha256 21a8335b3c5848a80c8336d9907a8c765c78f27aebf7ab26091e7b7e1d5fb540; ZIP sha256 c91a2246171429701b4e953457e3b5f1b0d0811277c56e4e07288834512ceba0. Safety artifact 11497834563 digest sha256:8875e1e215d84bc0109353bafdfec15ec002d6c2e1c543caada8ae9436551c9e; safety APK sha256 1252d067204c0e56876d0c372eaba6f20a64dddee8cdd8a63153797b5ea9f6ad; safety ZIP sha256 b8178fadc74353e0cc6b9c6bc2573d5b0ce1b0ada1e9357ac296cbb72d28fe57. Workflow envelope remained failure only because durable record-status closure did not materialize; both executable build jobs and both artifacts are verified successful.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test della LAB50 aggiornamento, con confronto del tempo tap->audio sul primo brano e sequenza 6-10 brani consecutivi; verificare anche uscita da Cover/Originali/Archivio. Non promuovere CANDIDATA/MADRE prima della conferma.
+RESTORE_SCOPE_HINTS=Preservare InnerTubeXPlayer.kt della LAB41 e le correzioni cancellabili LAB49. Per ripristino selettivo LAB50 applicare soltanto fast lane resolvedVideoId + background ownership barrier sul baseline corrente.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
