@@ -171,7 +171,7 @@ R28 BOOT / RELEASE ADOPTION
 - Release fanout is release coordination only and does not replace Velocity, native project engines or project lifecycle authority.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.23
+MOTORLAB-CORE-ENTRYPOINT-V1.24
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -208,3 +208,8 @@ R29 ALL-PROJECT VERSIONED BOOT
 - Unknown release identity is a bootstrap defect, never a reason to invent a version.
 
 Revision 1.23: r29 makes MotorLab mandatory across every current/future project and makes the pinned release version mandatory in the first visible chat line.
+
+R30 CRITICAL BOOT CAPSULE
+Load MOTORLAB_BOOT_CAPSULE_V1.txt / local `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` before longer MotorLab/project instructions. The capsule is mandatory first-context critical policy and must fit the host context budget.
+
+Revision 1.24: r30 adds capsule-first compact boot semantics so essential rules cannot be truncated.

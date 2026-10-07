@@ -8,7 +8,7 @@ PURPOSE
 Keep one verified local MotorLab satellite per registered project while Br174/Chatgpt remains authoritative, with safe release adoption and no silent loss of newer CORE gates.
 
 BOOT
-1. Read project hook + local sync/core.
+1. Read `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` first, then project hook + local sync/core.
 2. Use VERIFIED local core immediately as fallback.
 3. When central is reachable, read release manifest and compare releases.
 4. Reconcile Project Continuity/live state before selecting a safe update boundary.
@@ -18,7 +18,8 @@ SAFE UPDATE
 - pin one MotorLab release during active write/build/test/promotion;
 - adopt newer release only at a verified safe boundary;
 - preserve current VERIFIED bundle as LAST_GOOD;
-- fetch/validate MOTORLAB_SATELLITE_BUNDLE_V1.txt release id + required markers;
+- fetch/validate MOTORLAB_BOOT_CAPSULE_V1.txt and MOTORLAB_SATELLITE_BUNDLE_V1.txt release id + required markers;
+- write the central capsule to `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` before declaring adoption complete;
 - replace only MotorLab control-plane files;
 - use safe CI suppression for metadata-only synchronization where supported;
 - never suppress validation when real app/source/config changes share the commit;
@@ -32,6 +33,10 @@ RELEASE=<id>
 CENTRAL_AUTHORITY=Br174/Chatgpt
 PROJECT_NATIVE_ENGINE_POLICY=coexist-preserve
 PRE_RESPONSE_BOOT_GATE=required
+COMPACT_BOOT_CONTEXT=required
+CAPSULE_TRUNCATION=forbidden
+CAPSULE_FIRST_CONTEXT=required
+CRITICAL_BOOT_CAPSULE=required
 PROJECT_CONTINUITY=required
 ROOT_CAUSE_CLOSURE=required
 ARTIFACT_FIRST_ROOT_CAUSE=required
@@ -258,7 +263,7 @@ R28+ RELEASE FANOUT / SESSION IMMUTABILITY
 - The previous VERIFIED local core remains LAST_GOOD.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.29
+MOTORLAB-SATELLITE-SYNC-V1.30
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -293,3 +298,8 @@ Revision 1.27: r26 requires safe-boundary inheritance of Triple Fresh Hedge, Ada
 Revision 1.28: r27 requires safe-boundary inheritance of zero-idle immediate sidework plus separate same-task recovery; r26 remains LAST_GOOD until verified adoption.
 
 Revision 1.29: r28 makes release fanout mandatory and introduces immutable full-snapshot session pinning with safe-boundary-only adoption.
+
+R30 CRITICAL BOOT CAPSULE
+Local fallback MUST load `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` before longer control-plane text. The emitted startup context must remain under the host cap and retain all critical markers. Missing/oversized capsule blocks write-capable bootstrap until repaired.
+
+Revision 1.30: r30 adds capsule-first non-truncatable bootstrap synchronization.

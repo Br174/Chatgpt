@@ -4,16 +4,15 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.07-r29
-FANOUT_STATE=COMPLETE_WITH_PENDING_SAFE_BOUNDARY
-FANOUT_PENDING_TARGET=Br174/MusicLab@uab-build/musiclab-lab52-aggiornamento-family-01
-FANOUT_PENDING_REASON=concurrent-write-conflict; adopt-r28-at-first-verified-safe-boundary
+CURRENT_RELEASE=2026.10.07-r30
+FANOUT_STATE=IN_PROGRESS
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
+BOOT_CAPSULE_MODULE=MOTORLAB_BOOT_CAPSULE_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt\nRELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=COMPLETE
+RELEASE_FANOUT_STATE=IN_PROGRESS
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -33,6 +32,7 @@ ADAPTIVE_RUNTIME_GOVERNOR_MODULE=MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt
 UPDATE_FAMILY_LIFECYCLE_MODULE=MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
 
 CURRENT REQUIRED CORE MODULES
+- MOTORLAB_BOOT_CAPSULE_V1.txt
 - MOTORLAB_CORE_ENTRYPOINT_V1.txt
 - MOTORLAB_AUTO_BOOTSTRAP_V1.txt
 - MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt
@@ -70,7 +70,7 @@ CURRENT REQUIRED CORE MODULES
 - MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
 
 SATELLITE LOCAL FILES
-Each project should contain hook + local core + LAST_GOOD + sync state and reference central Project Continuity, technical Change History and visible Registro Modifiche e Ripristini.
+Each project must contain `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` plus hook + local core + LAST_GOOD + sync state. The capsule is the mandatory first-context critical contract; long-form modules remain authoritative detail loaded on demand.
 
 SAFE UPDATE
 Every central release must execute MOTORLAB_RELEASE_FANOUT_V1.txt. Preserve current VERIFIED local bundle as LAST_GOOD. Open sessions pin their complete MotorLab snapshot and never switch release mid-session/write/build/test/promotion; newer releases become active only on a new session or explicit verified safe-boundary handoff.
@@ -296,3 +296,12 @@ R29+ MANDATORY ALL-PROJECT VERSIONED ACTIVATION
 Revision 1.29: r29 makes all-project activation mandatory and makes the pinned MotorLab short release version mandatory in the first visible project-chat line.
 
 Revision 1.29b: r29 fanout closure verified COMPLETE across all registered/default/current active refs; every active project bootstrap now requires the pinned versioned first-line banner.
+
+R30+ CRITICAL BOOT CAPSULE
+- Every current/future project receives `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` generated from MOTORLAB_BOOT_CAPSULE_V1.txt.
+- Bootstrap injects the capsule before any long project/core text and keeps the emitted critical context below the host context cap.
+- Progress/visual status, speed/TTTA, Pollicino/recovery, APK/artifact-first, update-in-place, MADRE/LAB/CANDIDATA lifecycle, safety, single-writer/root-cause, session-pin/fanout and native-engine preservation are non-truncatable critical semantics.
+- Full long-form MotorLab modules remain authoritative and load on demand; absence from the compact context never disables them.
+- Missing/oversized capsule is a bootstrap defect; silent fallback to truncated long-form context is forbidden.
+
+Revision 1.30: r30 introduces the non-truncatable Critical Boot Capsule and compact bootstrap context to prevent essential MotorLab rules from disappearing behind host context limits.
