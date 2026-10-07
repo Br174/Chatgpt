@@ -5,6 +5,9 @@ Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
 CURRENT_RELEASE=2026.10.07-r28
+FANOUT_STATE=COMPLETE_WITH_PENDING_SAFE_BOUNDARY
+FANOUT_PENDING_TARGET=Br174/MusicLab@uab-build/musiclab-lab52-aggiornamento-family-01
+FANOUT_PENDING_REASON=concurrent-write-conflict; adopt-r28-at-first-verified-safe-boundary
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
