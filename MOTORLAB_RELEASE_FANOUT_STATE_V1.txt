@@ -1,45 +1,42 @@
 MOTORLAB RELEASE FANOUT STATE V1
 
-RELEASE=2026.10.07-r29
+RELEASE=2026.10.07-r30
 GLOBAL_STATE=COMPLETE
 CENTRAL_AUTHORITY=Br174/Chatgpt
-CENTRAL_RELEASE_COMMIT=0c8464100f832251316b0b609edf3b002743f44f
-VERIFIED_DATE=2026-10-07
+VERIFIED_DATE=2026-10-08
 
 UPDATED_VERIFIED_TARGETS
-- Br174/MusicLab ref=main sha=4cf0e275ee4b0a830d4a6bf4fe39c68c62d9776c
-- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 sha=b5148d389b73ebfdd62af4cc7c7d3d68e93ca5a9
-- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 sha=86bbd1882c8f2057d0cfb009f6adf3a1acc77279
-- Br174/GeoVision-Test ref=main sha=1a648dcbd23b50a1cbd1b0e11b5d7528f30a3bf8
-- Br174/StudyBook-AI ref=main sha=794b35a5bbd8e5b9d34f04ee99cfe197506985f9
-- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 sha=54112aada6804f8beb104d607eaf7b5aa94e7fc8
-- Br174/Visionflix ref=main sha=55a299fecf47aa7c74061b596f8c3d1a26336fa0
-- Br174/Cover-Lab-AI ref=main sha=dbbe1007e1bfcef9289a03c58c8ac122b4cde569
-- Br174/streamflix-BV ref=main sha=62c5c1f32c48b233ba264c8dd9e6afdd14fe318f
-- Br174/MotorAI ref=main sha=0104b257b42a6006b5a262d604ac7e6c80eddcc8
+- Br174/MusicLab ref=main release=r30 capsule=verified boot=verified
+- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 release=r30 capsule=verified
+- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 release=r30 capsule=verified
+- Br174/MusicLab ref=uab-build/musiclab-lab53-aggiornamento-family-01 release=r30 capsule=verified boot=verified
+- Br174/GeoVision-Test ref=main release=r30 capsule=verified boot=verified
+- Br174/StudyBook-AI ref=main release=r30 capsule=verified boot=verified
+- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 release=r30 capsule=verified boot=verified
+- Br174/Visionflix ref=main release=r30 capsule=verified boot=verified
+- Br174/Cover-Lab-AI ref=main release=r30 capsule=verified boot=verified
+- Br174/streamflix-BV ref=main release=r30 capsule=verified boot=verified
+- Br174/MotorAI ref=main release=r30 capsule=verified boot=verified
 
-VERIFICATION
-- Every target above reports MotorLab release 2026.10.07-r29.
-- Every target carries ALL_PROJECTS_MOTORLAB=required and VERSIONED_BOOT_BANNER=required.
-- Every target bootstrap derives the short rNN banner version from the pinned session release.
-- Every active project hook and AGENTS.override uses the versioned startup form and contains no active unversioned startup instruction.
-- Existing sessions retain their pinned prior MotorLab snapshot until a new session or explicit verified safe-boundary handoff.
-- No project application/runtime/domain code was intentionally changed by this fanout.
+R30_CRITICAL_BOOT_PROOF
+CENTRAL_CAPSULE_SHA=d95689a5c41749af93683c8589fe169fe1e133b9
+CENTRAL_BOOTSTRAP_SHA=8030d4a0175c869bedaeee60b8456035aa6f037b
+CAPSULE_CHARS=3471
+BOOT_CONTEXT_SOFT_CAP=5500
+MUSICLAB_HOST_ADDITIONAL_CONTEXT_LIMIT=6000
+NUMERIC_PROGRESS_INDEX=482
+HARD_PROGRESS_VISIBILITY_INDEX=508
+VELOCITY_INDEX=1415
+POLLICINO_INDEX=2006
+APK_INDEX=2475
+MADRE_LAB_CANDIDATA_INDEX=2840
 
-MANDATORY STARTUP
-Every recognizable current/future project chat must activate MotorLab before substantive project work.
-The first user-visible line must be exactly:
-⚙️ MotorLab rNN attivo
-where rNN matches the pinned session release.
-Unversioned startup is invalid.
-Future projects auto-onboard into the current MotorLab release at first recognizable project context.
+SESSION_RULE
+Open sessions keep their pinned MotorLab snapshot. r30 becomes active on a new session or explicit verified safe-boundary handoff.
 
-FUTURE RELEASE RULE
-- Every future MotorLab release must fan out to all registered/default/current active refs in the same release operation.
-- Busy refs become PENDING_SAFE_BOUNDARY; open sessions never switch release mid-session.
-- New sessions use the newest VERIFIED local satellite automatically.
-- GLOBAL_STATE is COMPLETE only after every registered/default/current active ref is UPDATED_VERIFIED or explicitly retired/superseded.
+FUTURE_PROJECT_RULE
+Every future project inherits the current r30 capsule during onboarding. The capsule is mandatory first-context data and is included in every future MotorLab release fanout.
 
 VERSION
-MOTORLAB-RELEASE-FANOUT-STATE-V1.1
-Revision 1.1: r29 verified complete across all current registered/default/current active refs, with mandatory all-project activation and versioned first-line startup proof.
+MOTORLAB-RELEASE-FANOUT-STATE-V1.2
+Revision 1.2: r30 Critical Boot Capsule fanout verified COMPLETE.
