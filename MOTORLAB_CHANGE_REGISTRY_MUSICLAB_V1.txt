@@ -932,3 +932,24 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device test: confirm Cover returns candidates instead of zero, score appears 1..20, strong results rank first and weak/unconfirmed remain at bottom. No CANDIDATA/MADRE promotion before explicit device acceptance.
 RESTORE_SCOPE_HINTS=Preserve LAB50 direct-play/background barrier and Player buono LAB41. Restore selectively only the LAB51 Cover admission/ranking changes if needed.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261007-lab52-cover-video-ready-pages
+DATE=2026-10-07
+TITLE=LAB52 Cover in pagine da 10 con video già pronto e miniatura del video
+SEMANTIC_TAGS=LAB52,Cover,video,10 per pagina,20-1,COVER.INFO,Discogs,YouTube Music,YouTube,thumbnail,Family 01,LAB sicurezza
+USER_INTENT=La lista Cover deve mostrare pagine di 10 canzoni con video già disponibile da subito; togliere la locandina aggiunta e usare direttamente la miniatura del video; preparare prima i video delle cover col punteggio maggiore; sfruttare prima video già noti a MusicLab e video diretti COVER.INFO, poi le altre fonti.
+CHANGE_SCOPE=COVER_VIDEO_READY_PAGE_PUBLICATION_AND_SOURCE_PRIORITY
+LIFECYCLE_ROLE=LAB52_UPDATE_FAMILY_01_DEVICE_PENDING
+SOURCE_BASE_SHA=022ed37d1eda58bb0e1b98ad921487c47dfc7c0e
+RESULT_REF=uab-build/musiclab-lab52-aggiornamento-family-01
+RESULT_BUILD_SHA=cc2d8b17e00a62ffce489dc3b8df5aedb1b4b28b
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt,app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsVersionSource.kt,cloudflare/music-intelligence/test/lab52-cover-video-page-contract.test.mjs,uab-project.env,.github/workflows/lab52-fast-artifact-gate.yml
+BEHAVIOR_SUMMARY=Cover usa pageSize 10 mentre Originali conserva 20. La lista Cover pubblica soltanto candidate con resolvedVideoId non vuoto; candidate senza video restano nel pool interno e non vengono eliminate. Il resolver video lavora sempre in ordine di confidenceScore 20/20->1/20 indipendentemente dall'ordinamento visuale. La ricerca sorgente raccoglie più candidate della pagina per poter sostituire quelle senza video. COVER.INFO conserva i propri playbackVideoId diretti. A parità di versione la sorgente video preferita è MusicLab interno/cloud, poi COVER.INFO, Discogs diretto, YouTube Music e YouTube. La card Cover non usa album artwork: mostra la miniatura del video risolto con pulsante play. Player buono LAB41 resta byte-identico.
+ROOT_CAUSE=Il modello precedente separava raccolta risultati e video readiness: una pagina poteva mostrare fino a 20 candidate mentre la risoluzione video procedeva dopo, perciò molte card apparivano con locandina e stato Video in verifica. Inoltre il lavoro video seguiva in parte la finestra visuale/ordine di arrivo e non una priorità esplicita 20->1.
+ROOT_CAUSE_CLOSURE=Barriera di pubblicazione su resolvedVideoId per Cover; pagina logica da 10; pool sorgente più ampio; coda video ordinata per confidenceScore discendente; uso immediato dei binding diretti; miniatura video come unica immagine nella card Cover; test LAB52 che blocca queste regole.
+VERIFICATION=GitHub Actions run 37675908803 success. Retained LAB46-LAB52 behavioral contracts success; Player buono LAB41 byte-identico; UAB preflight success; LAB52 update build, identity and upload success; paired safety build, isolation and upload success. Update artifact 11506849516 digest sha256:e164a0f3a566028a1f0e3a113feb8b1ade2db24708016075ba9a0435e96033a7, APK sha256 ea4cb98cb8242e53fe545283ff5cf2b373ff19d43c57c05435e64147a82d6416, ZIP sha256 520c20c97290f89a865d43a3b9d29738b0fc4b16c89e4954d6802f570c26a19c. Safety artifact 11508275441 digest sha256:c5f2895584b128e278e45c52d18a3733078facae14a7b349fbe9c997df756ba2, APK sha256 7b45dbdd8f488610ec153add1c76303c594de8d21913975cfe69d748a89bdffb, ZIP sha256 4985c55f33ef8b3f13fe5851c27eb847d6fc881e4a00f2b05ff41a683260d951. Both downloaded artifacts and inner ZIP integrity were rechecked locally.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test della LAB52 aggiornamento. Verificare 10 video pronti per pagina, miniature video senza locandina album, priorità punteggio 20->1, resa COVER.INFO e fallback YT Music/YT, e stabilità del playback. Nessuna promozione CANDIDATA/MADRE prima dell'accettazione esplicita.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
