@@ -133,7 +133,7 @@ Superpowers: CONNECTED_VERIFIED; subordinate methodology.
 Context7 Free: CONNECTED_VERIFIED; optional/version-aware documentation only.
 
 FUTURE PROJECTS
-Every newly onboarded project receives the current r28 satellite contract and the release-fanout/session-pin mechanism. Central release work must synchronize registered targets in the same release operation; busy targets become PENDING_SAFE_BOUNDARY and are retried automatically at the first verified safe boundary.
+Every newly onboarded project receives the current r30 satellite + Critical Boot Capsule contract and the release-fanout/session-pin mechanism. Central release work must synchronize registered targets in the same release operation; busy targets become PENDING_SAFE_BOUNDARY and are retried automatically at the first verified safe boundary.
 
 VERSION
 MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.27
@@ -183,3 +183,19 @@ R30 CRITICAL BOOT CAPSULE POLICY
 - Long-form modules remain authoritative detail; capsule is not a competing scheduler/policy implementation.
 
 Revision 2.31: r30 adds mandatory capsule-first bootstrap to all current/future projects.
+
+
+CURRENT R30 VERIFIED FANOUT — AUTHORITATIVE
+This section supersedes older r28/r29 adoption-status sections for current state.
+- MusicLab: main + LAB50 + LAB52 + current LAB53 = r30
+- GeoVision-Test: main = r30
+- StudyBook-AI: main + active LAB03 = r30
+- Visionflix: main = r30
+- Cover-Lab-AI: main = r30
+- streamflix-BV: main = r30
+- MotorAI: main = r30
+- All targets carry the same verified Critical Boot Capsule and compact bootstrap semantics.
+- Future projects inherit r30 capsule-first bootstrap automatically.
+- Long-form MotorLab modules remain authoritative detail loaded on demand; capsule is the mandatory non-truncatable critical layer.
+
+Revision 2.32: r30 Critical Boot Capsule fanout verified COMPLETE across current default/active refs; future projects inherit capsule-first non-truncatable critical semantics.
