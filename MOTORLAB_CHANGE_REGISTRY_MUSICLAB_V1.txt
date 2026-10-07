@@ -953,3 +953,26 @@ VERIFICATION=GitHub Actions run 37675908803 success. Retained LAB46-LAB52 behavi
 STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device test della LAB52 aggiornamento. Verificare 10 video pronti per pagina, miniature video senza locandina album, priorità punteggio 20->1, resa COVER.INFO e fallback YT Music/YT, e stabilità del playback. Nessuna promozione CANDIDATA/MADRE prima dell'accettazione esplicita.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261007-lab53-cover-card-decisions
+DATE=2026-10-07
+TITLE=LAB53 Cover quadrate tap diretto e decisioni manuali contestuali
+SEMANTIC_TAGS=LAB53,Cover,thumbnail,quadrata,play,approve,reject,archive,work-scoped,X,top,Family 01,LAB sicurezza
+USER_INTENT=Togliere l'icona play dalla miniatura video, renderla più grande e quadrata, riprodurre con tap diretto, rimuovere Tocca per riprodurre, rendere Approva e Disapprova effettivi, nascondere una disapprovata soltanto dalla Cover di quella specifica canzone, archiviare le approvate, sostituire Chiudi con X in alto a destra e partire dalla prima locandina in alto.
+CHANGE_SCOPE=COVER_CARD_UI_AND_MANUAL_DECISION_SEMANTICS
+LIFECYCLE_ROLE=LAB53_UPDATE_FAMILY_01_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-lab52-aggiornamento-family-01
+SOURCE_BASE_SHA=cc2d8b17e00a62ffce489dc3b8df5aedb1b4b28b
+RESULT_REF=uab-build/musiclab-lab53-aggiornamento-family-01
+RESULT_BUILD_SHA=9be723ebac11a2833d28915d25895e45fbad87ea
+CHANGED_APP_RUNTIME_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt
+BEHAVIOR_SUMMARY=Cover mantiene la barriera LAB52 dei 10 video-ready ma la miniatura video diventa 144dp quadrata e direttamente tappabile, senza overlay play e senza testo Tocca per riprodurre. Un REJECTED manuale viene salvato dal backend sotto work_id/version_key e nascosto dalla lista Cover di quell'opera; non diventa un blacklist globale. Un APPROVED manuale usa il percorso cloud esistente che imposta user_verified=1/APPROVED e l'Archivio mostra le righe approvate. Dialog e header usano X; una nuova ricerca azzera indice/offset e scrolla al primo risultato. Player buono LAB41 resta byte-identico.
+ROOT_CAUSE=LAB51 aveva correttamente abolito i filtri automatici che eliminavano candidate deboli, ma il client riutilizzava la stessa filosofia anche dopo un rifiuto umano esplicito: Disapprova salvava REJECTED nel cloud ma il browser trasformava il risultato in 1/20 e lo lasciava visibile. Questo confondeva evidenza automatica debole con una decisione manuale contestuale. La UI LAB52 inoltre manteneva overlay play, testo esplicativo e thumbnail rettangolare non più necessari dopo la barriera video-ready.
+ROOT_CAUSE_CLOSURE=Separazione semantica tra ranking automatico e decisione manuale: debolezza delle fonti continua a non eliminare candidate; REJECTED manuale è invece un hide contestuale per il work/search corrente. Il resolver evita lavoro video/Discogs sulle righe nascoste. L'approvazione riusa l'unica pipeline cloud/archivio esistente, senza coordinatori duplicati. UI semplificata con thumbnail square/tap diretto/X e reset esplicito della lista a indice zero.
+PREVENTION=Contratto LAB53 verifica 144dp square, assenza overlay e Tocca per riprodurre, tap play, hide contestuale, work-scoped cloud identity, archive approval predicate, X e list reset; contratti LAB46-LAB52 restano verdi.
+VERIFICATION=GitHub Actions run 37690665896 success su exact source SHA 9be723ebac11a2833d28915d25895e45fbad87ea. Contratti LAB46-LAB53 success, Player buono LAB41 byte-identico, UAB preflight success, update build/identity/upload success, safety build/isolation/upload success. Update artifact 11513621796 digest sha256:a38ea3edaa7978c2b33a2eba9460f9d4392c800bfa5a0ccbc842c83082bf605a; APK sha256 aff055bd02a1f763fceec5ed9212138d3a2cd4f575238d27ac4842894294e94d; ZIP sha256 8cd7d370711520353c8b436967be88367300c1340c4f5c26da9e5461aef70b04. Safety artifact 11513258933 digest sha256:e55c4a2742f70016666aa80ec2ff750bb9a70bf43ca4ac0a38402d317a43a448; APK sha256 0921bf54e9120c3730f7b167c1c823f6982c957f084e69f4f6ac68c934440fc7; ZIP sha256 58a18f9338b72fcd54d56c29bcfe50876cf27bb8aef498f5407c3b3bae954f2d. Both inner ZIPs passed local integrity checks.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test della LAB53 aggiornamento. Nessuna promozione CANDIDATA/MADRE prima dell'accettazione esplicita.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
