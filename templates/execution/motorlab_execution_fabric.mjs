@@ -207,10 +207,14 @@ export function createAdaptiveRuntimeGovernor(config={}) {
   };
 }
 
-export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,now=()=>Date.now(),onEvent,cacheLookup,cacheStore,adaptiveGovernor,resultValidator}={}) {
+export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,now=()=>Date.now(),onEvent,cacheLookup,cacheStore,adaptiveGovernor,adaptiveGovernorConfig={},adaptiveStateLoad,adaptiveStateStore,resultValidator}={}) {
   if(typeof worker!=='function')throw new Error('worker callback required');
   const initial=validateGraph(input),max=Math.max(1,Number(maxConcurrency)||1);
-  const governor=adaptiveGovernor||createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:max,initialLanes:Math.min(3,max)});
+  let adaptiveStateLoaded=false,adaptiveStateStored=false,restoredAdaptiveState=null;
+  if(!adaptiveGovernor&&typeof adaptiveStateLoad==='function'){
+    try{restoredAdaptiveState=await adaptiveStateLoad();adaptiveStateLoaded=Boolean(restoredAdaptiveState);}catch{}
+  }
+  const governor=adaptiveGovernor||createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:max,initialLanes:Math.min(3,max),...adaptiveGovernorConfig,state:restoredAdaptiveState||adaptiveGovernorConfig.state});
   const tasks=new Map(initial.map(t=>[t.id,t])),pending=new Set(tasks.keys()),done=new Set(),pruned=new Set(),running=new Map(),results=new Map(),records=[],eventHistory=[],cacheChecked=new Set();
   let peak=0,intNow=0,intPeak=0,correctionRelays=0,dynamicTasks=0,cacheHits=0,cacheAvoidedEstimatedMs=0,latencyBranches=0,latencyBranchTasks=0,latencyExpectedGainMs=0,latencyBranchFailures=0;
   let freshHedges=0,hedgeWaves=0,hedgeWins=0,hedgePrimaryWins=0,hedgeAbortRequests=0,hedgeSuppressedUnsafe=0,hedgeExhausted=0,materialProgressSignals=0,earlyStallSignals=0,laneAdjustments=0,laneThrottleSignals=0,laneSaturationSignals=0;
@@ -446,8 +450,9 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   const finalGraph=schedulerView().graph,effectiveRunnerCount=workRecords.length;
   const executionMode=effectiveRunnerCount<=1&&cacheHits===0?'DIRECT_FAST':max===1&&effectiveRunnerCount>1?'SERIAL_HOST_LIMITED':peak>1?'PARALLEL_OBSERVED':'SERIAL_REQUIRED';
   const governorSnapshot=governor.snapshot();
-  const executionDoneAck=emit({type:'EXECUTION_COMPLETED',cacheHits,dynamicTasks,prunedTasks:pruned.size,latencyBranches,freshHedges,laneAdjustments});if(executionDoneAck)await executionDoneAck;
-  return {results:Object.fromEntries(results),eventHistory,proof:{executionMode,runnerCount:effectiveRunnerCount,observedPeakConcurrency:peak,observedPeakIntegrationConcurrency:intPeak,singleIntegrationLaneVerified:intPeak<=1,overlapPairs:overlaps,criticalPath:criticalPath(finalGraph),correctionRelays,dynamicTasks,prunedTasks:[...pruned],cacheHits,cacheAvoidedEstimatedMs,latencyBranches,latencyBranchTasks,latencyExpectedGainMs,latencyBranchFailures,freshHedges,hedgeWaves,hedgeWins,hedgePrimaryWins,hedgeAbortRequests,hedgeSuppressedUnsafe,hedgeExhausted,materialProgressSignals,earlyStallSignals,laneAdjustments,laneThrottleSignals,laneSaturationSignals,adaptiveGovernor:governorSnapshot,schedulerGraphRecomputes,eventFastPathCount,eventsRecorded:eventHistory.length,records}};
+  if(typeof adaptiveStateStore==='function'){try{await adaptiveStateStore(governorSnapshot);adaptiveStateStored=true;}catch{}}
+  const executionDoneAck=emit({type:'EXECUTION_COMPLETED',cacheHits,dynamicTasks,prunedTasks:pruned.size,latencyBranches,freshHedges,laneAdjustments,adaptiveStateLoaded,adaptiveStateStored});if(executionDoneAck)await executionDoneAck;
+  return {results:Object.fromEntries(results),eventHistory,proof:{executionMode,runnerCount:effectiveRunnerCount,observedPeakConcurrency:peak,observedPeakIntegrationConcurrency:intPeak,singleIntegrationLaneVerified:intPeak<=1,overlapPairs:overlaps,criticalPath:criticalPath(finalGraph),correctionRelays,dynamicTasks,prunedTasks:[...pruned],cacheHits,cacheAvoidedEstimatedMs,latencyBranches,latencyBranchTasks,latencyExpectedGainMs,latencyBranchFailures,freshHedges,hedgeWaves,hedgeWins,hedgePrimaryWins,hedgeAbortRequests,hedgeSuppressedUnsafe,hedgeExhausted,materialProgressSignals,earlyStallSignals,laneAdjustments,laneThrottleSignals,laneSaturationSignals,adaptiveStateLoaded,adaptiveStateStored,adaptiveGovernor:governorSnapshot,schedulerGraphRecomputes,eventFastPathCount,eventsRecorded:eventHistory.length,records}};
 }
 
 export function formatProof(p={}){
