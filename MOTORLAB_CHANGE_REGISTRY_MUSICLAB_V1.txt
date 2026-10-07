@@ -907,3 +907,28 @@ STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device test della LAB50 aggiornamento, con confronto del tempo tap->audio sul primo brano e sequenza 6-10 brani consecutivi; verificare anche uscita da Cover/Originali/Archivio. Non promuovere CANDIDATA/MADRE prima della conferma.
 RESTORE_SCOPE_HINTS=Preservare InnerTubeXPlayer.kt della LAB41 e le correzioni cancellabili LAB49. Per ripristino selettivo LAB50 applicare soltanto fast lane resolvedVideoId + background ownership barrier sul baseline corrente.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261007-lab51-cover-score20-admission
+DATE=2026-10-07
+TITLE=LAB51 paletti Cover convertiti in graduatoria 1-20 senza eliminazione candidate
+SEMANTIC_TAGS=LAB51,Cover,score,punteggio,1-20,admission,ranking,COVER.INFO,Discogs,Last.fm,iTunes,LRCLIB,Spotify,AI Scout,Family 01,LAB aggiornamento,LAB di sicurezza
+USER_INTENT=Ripristinare la capacità di trovare cover dopo lo zero risultati e applicare tutti i criteri come punteggio invece che come cancello: nessuna cover plausibile eliminata; forti in alto, deboli fino a 1/20 in fondo.
+CHANGE_SCOPE=COVER_SCORE_ONLY_ADMISSION_AND_20_LEVEL_RANKING
+LIFECYCLE_ROLE=LAB51_UPDATE_FAMILY_01_DEVICE_PENDING
+SOURCE_BASE_REF=uab-build/musiclab-lab50-aggiornamento-family-01
+SOURCE_BASE_SHA=6634cd1824cbfa2da743c8dce66c8e7672c6372a
+RESULT_REF=uab-build/musiclab-lab51-aggiornamento-family-01
+FUNCTIONAL_RESULT_SHA=422a704c8e4d3299704e9d50cfbd4e572b4dd75a
+ARTIFACT_REF=uab-build/musiclab-lab51-artifact-fast
+ARTIFACT_BUILD_SHA=022ed37d1eda58bb0e1b98ad921487c47dfc7c0e
+ARTIFACT_ONLY_DIFF=.github/workflows/lab51-fast-artifact-gate.yml
+BEHAVIOR_SUMMARY=La ricerca Cover non usa più titolo, memoria reject, stesso interprete o altri segnali di affidabilità come cancelli di ammissione. Le candidate con dati minimi entrano e vengono ordinate su scala 1..20. Il titolo forte, relazioni dirette COVER.INFO, Discogs verificato, crediti, Master e conferme da più fonti alzano il punteggio. Mancanza di conferme o segnali negativi abbassano fino a 1/20 ma non nascondono la cover. Se l'interprete originale non è ancora risolto, Cover procede title-only; Originali resta rigorosa. Duplicati identici e righe senza dati minimi restano esclusioni tecniche, non filtri di affidabilità.
+ROOT_CAUSE=La regressione zero-cover non dipendeva dalla graduatoria visuale ma da più gate duri prima del ranking: memoria disapprovata rimossa dal merge, filtro title-match nelle lane Last.fm/iTunes/LRCLIB, blocco totale Cover quando mancava l'interprete originale, AI Scout same-performer drop e una lane Discogs che filtrava lo stesso interprete. Di conseguenza candidate potenzialmente utili non raggiungevano mai il punteggio.
+ROOT_CAUSE_CLOSURE=I gate di affidabilità sono stati trasformati in evidenza numerica 1..20. Nessun reject di confidenza rimuove una candidata già valida; il contratto LAB51 vieta il ritorno di filterNot(::isRejected), hard title-drop nelle discovery lane e same-performer drop residui. Player LAB41 e correzioni LAB50 restano invariati.
+VERIFICATION=Artifact-First run 37668702683 success su artifact SHA 022ed37d1eda58bb0e1b98ad921487c47dfc7c0e, che differisce dalla sorgente funzionale 422a704c8e4d3299704e9d50cfbd4e572b4dd75a solo per il workflow fast gate. LAB46-LAB51 behavioral contracts success, Player buono LAB41 byte-identico, UAB preflight success, update build+identity success, safety build+isolation success. Update artifact 11504560335 digest sha256:6966b82ac1b7b4dd9e42f21f8fd21f08f7c810f35f1c9449486f1b32ef01081f; APK sha256 1ceeb177c3b1130ed1d52ee3b1df2d200df6372769d3378b4bba9a31e58d9240; ZIP sha256 2104bbbfa89fe569eafa25492ac81a4485f1957bab6f170c0885870567c12df4. Safety artifact 11504426516 digest sha256:a9e017b9f23b8669c29fc42b7e255949643fc9f00dac532c4676bb658fc5d559; APK sha256 de6fb52606f22c35a797c2753342df4e5764dd8ad9c8cb32bd38668d84987c12; ZIP sha256 57f28bba9f05eb3ff80d104caa6221852d0e227e442a346e0f3c675220c72433. Local extraction and inner-ZIP checksum recheck passed.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+NEXT_LIFECYCLE_GATE=Bruno device test: confirm Cover returns candidates instead of zero, score appears 1..20, strong results rank first and weak/unconfirmed remain at bottom. No CANDIDATA/MADRE promotion before explicit device acceptance.
+RESTORE_SCOPE_HINTS=Preserve LAB50 direct-play/background barrier and Player buono LAB41. Restore selectively only the LAB51 Cover admission/ranking changes if needed.
+SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
