@@ -13,7 +13,7 @@ CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt\nRELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=IN_PROGRESS
+RELEASE_FANOUT_STATE=COMPLETE
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -294,3 +294,5 @@ R29+ MANDATORY ALL-PROJECT VERSIONED ACTIVATION
 - Release fanout must propagate this rule to all registered/current active project refs before r29 fanout is COMPLETE.
 
 Revision 1.29: r29 makes all-project activation mandatory and makes the pinned MotorLab short release version mandatory in the first visible project-chat line.
+
+Revision 1.29b: r29 fanout closure verified COMPLETE across all registered/default/current active refs; every active project bootstrap now requires the pinned versioned first-line banner.
