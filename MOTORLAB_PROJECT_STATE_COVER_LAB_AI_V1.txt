@@ -5,7 +5,7 @@ STATE_REVISION=1
 STATE_STATUS=BOOT_RECONCILE_REQUIRED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/Cover-Lab-AI evidence
-MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r25
+MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r26
 ACTIVE_OPERATION_ID=unknown_until_live_reconcile
 OPERATION_STATUS=unknown_until_live_reconcile
 CURRENT_PHASE=unknown_until_live_reconcile
@@ -19,7 +19,7 @@ LAST_USER_INTENT_SUMMARY=Preserve latest Cover Lab AI work across new chats with
 CONTINUITY_RULES=MotorLab must start first as orchestration and then load/preserve Cover Lab native engine; live newer evidence wins; older memory/registries are advisory only; update this ledger at material transitions and turn handoff.
 UPDATED_BY=MotorLab r8 continuity bootstrap
 UPDATED_DATE=2026-10-07
-SATELLITE_LOCAL_RELEASE=2026.10.07-r25
+SATELLITE_LOCAL_RELEASE=2026.10.07-r26
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R23_EXECUTION_FABRIC=work-elimination-first;content-addressed-reuse;incremental-delta;critical-path;dynamic-dag;progressive-branching;pruning;event-memory;deferred-materialization
 
@@ -31,3 +31,7 @@ MOTORLAB_R24_MAIN_ADOPTION_COMMIT=e841a730418ba853afb4854756ac2aa72d527a84
 MOTORLAB_R25_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R25_EXECUTION=work-elimination-first;intrinsic-acceleration;semantic-workgroups;gain-gated-parallelism;r24-latency-branching;single-integration-lane
 MOTORLAB_R25_MAIN_ADOPTION_COMMIT=4bde18d7702855941b04b6a02c061b7c786a1226
+
+MOTORLAB_R26_STATUS=VERIFIED_ADOPTED
+MOTORLAB_R26_EXECUTION=work-elimination-first;intrinsic-acceleration;semantic-workgroups;adaptive-lane-pool;triple-fresh-hedge;10s-hard-trigger;early-stall;r24-latency-branching;single-integration-lane
+MOTORLAB_R26_MAIN_ADOPTION_COMMIT=1e0aa0ef21dabad5fc6c2a9981eb14ee6c8c67f3
