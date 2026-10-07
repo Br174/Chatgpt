@@ -15,3 +15,50 @@ test('cache hit skips worker and records avoided work',async()=>{let calls=0;con
 test('dynamic discovery grows graph without restart',async()=>{const seen=[];const out=await executeGraph([{id:'root'}],async t=>{seen.push(t.id);if(t.id==='root')return{spawn:[{id:'left'},{id:'right'}]};return{ok:true};},{maxConcurrency:2});assert.deepEqual(new Set(seen),new Set(['root','left','right']));assert.equal(out.proof.dynamicTasks,2);assert.ok(out.proof.observedPeakConcurrency>=2);});
 test('pruning removes unnecessary pending branch',async()=>{const seen=[];const out=await executeGraph([{id:'root'},{id:'obsolete',deps:['root'],estimatedMs:100}],async t=>{seen.push(t.id);if(t.id==='root')return{prune:['obsolete']};return{ok:true};},{maxConcurrency:2});assert.deepEqual(seen,['root']);assert.deepEqual(out.proof.prunedTasks,['obsolete']);});
 test('event history records material lifecycle events',async()=>{const out=await executeGraph([{id:'a'}],async()=>({ok:true}),{maxConcurrency:1});const types=out.eventHistory.map(e=>e.type);assert.equal(types[0],'EXECUTION_STARTED');assert.ok(types.includes('RUNNER_STARTED'));assert.ok(types.includes('RUNNER_COMPLETED'));assert.equal(types.at(-1),'EXECUTION_COMPLETED');});
+
+
+test('latency branch overlaps useful work with a slow runner',async()=>{
+  const started=Date.now(),seen=[];
+  const out=await executeGraph([{
+    id:'slow',kind:'external',estimatedMs:80,
+    latencyBranchAfterMs:15,latencyBranchExpectedGainMs:30,latencyBranchOverheadMs:1,
+    latencySpawn:[
+      {id:'prep',kind:'read',estimatedMs:40},
+      {id:'join',kind:'integration',deps:['slow','prep'],estimatedMs:5}
+    ]
+  }],async task=>{
+    seen.push(task.id);
+    await sleep(task.id==='slow'?80:task.id==='prep'?40:5);
+    return {ok:true};
+  },{maxConcurrency:2});
+  const elapsed=Date.now()-started;
+  assert.deepEqual(new Set(seen),new Set(['slow','prep','join']));
+  assert.equal(out.proof.latencyBranches,1);
+  assert.equal(out.proof.latencyBranchTasks,2);
+  assert.equal(out.proof.latencyBranchFailures,0);
+  assert.ok(out.proof.overlapPairs.some(pair=>pair.includes('slow')&&pair.includes('prep')));
+  assert.ok(elapsed<115,`expected overlap to beat serial ~125ms, got ${elapsed}ms`);
+});
+
+test('latency branch is suppressed when expected gain does not beat overhead',async()=>{
+  const seen=[];
+  const out=await executeGraph([{
+    id:'slow',kind:'external',
+    latencyBranchAfterMs:5,latencyBranchExpectedGainMs:2,latencyBranchOverheadMs:5,
+    latencySpawn:[{id:'waste',kind:'read'}]
+  }],async task=>{seen.push(task.id);await sleep(15);return {ok:true};},{maxConcurrency:2});
+  assert.deepEqual(seen,['slow']);
+  assert.equal(out.proof.latencyBranches,0);
+});
+
+test('latency branch does not fire after the parent already completed',async()=>{
+  const seen=[];
+  const out=await executeGraph([{
+    id:'fast',kind:'external',
+    latencyBranchAfterMs:30,latencyBranchExpectedGainMs:20,latencyBranchOverheadMs:1,
+    latencySpawn:[{id:'late',kind:'read'}]
+  }],async task=>{seen.push(task.id);await sleep(5);return {ok:true};},{maxConcurrency:2});
+  await sleep(35);
+  assert.deepEqual(seen,['fast']);
+  assert.equal(out.proof.latencyBranches,0);
+});

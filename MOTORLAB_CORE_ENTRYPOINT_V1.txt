@@ -125,8 +125,11 @@ For every verified LAB NN aggiornamento, produce LAB di sicurezza NN from the ex
 ANDROID UPDATE FAMILY - R17+
 When Bruno activates update-family mode, load MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt. Do not create random package ids for later revisions of the same LAB family. Preserve stable applicationId + signing certificate, increase versionCode, use Bruno-facing "LAB NN aggiornamento" naming, create CANDIDATA as a new immutable family, and promote an approved CANDIDATA to MADRE without reconstructing app source.
 
+R24 LATENCY BRANCHING
+Load the r24 latency-hiding rule through Velocity + Execution Fabric. When a declared slow-operation threshold is crossed, prefer safe independent useful work over passive waiting only if expected TTTA gain exceeds overhead. Never turn countdown text into a promise of completion time, never duplicate irreversible side effects as a blind race, and preserve all lock/integration/approval boundaries.
+
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.17
+MOTORLAB-CORE-ENTRYPOINT-V1.18
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -143,3 +146,5 @@ Revision 1.15: r21 makes Velocity explicit at boot and adds Four-Pillar TTTA opt
 Revision 1.16: r22 loads Execution Fabric at boot and requires Fast Decision classification, event-driven ready-node dispatch, batched concurrent tool work where supported, observed parallelism proof and grouped runner status.
 
 Revision 1.17: r23 boots work-elimination-first execution: safe cache/incremental reuse before scheduling, dynamic DAG growth/pruning, progressive branching, deferred materialization and material event-memory persistence.
+
+Revision 1.18: r24 boots evidence-gated latency branching so MotorLab can overlap useful independent work with slow live operations instead of passively waiting.

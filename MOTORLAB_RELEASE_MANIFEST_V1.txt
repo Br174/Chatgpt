@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.06-r23
+CURRENT_RELEASE=2026.10.07-r24
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -189,8 +189,20 @@ Persistent Operational State reuses operation_events as central material event m
 Cache/result indexes are non-authoritative: invalid/stale/ambiguous reuse becomes a MISS, and cache loss causes recomputation rather than correctness loss.
 Small operations start FAST LINE and escalate to MINI TREE / FULL DYNAMIC GRAPH only when expected TTTA savings exceed orchestration cost.
 
+R24+ LATENCY BRANCH TRIGGER
+r24 adds evidence-gated latency hiding on top of r23:
+- slow live tasks may trigger preplanned independent useful work after a declared threshold;
+- trigger requires EXPECTED_GAIN_MS > OVERHEAD_MS;
+- dispatcher wakes immediately when latency work is spawned;
+- parent completion before the threshold cancels the branch;
+- single-writer, lock scopes, runner caps and one integration lane remain mandatory;
+- irreversible/costly provider side effects are not blindly duplicated;
+- proof records latency branch count/tasks/expected gain/failures;
+- fictional completion countdowns are prohibited.
+Reference implementation remains templates/execution/motorlab_execution_fabric.mjs.
+
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.23
+MOTORLAB-RELEASE-MANIFEST-V1.24
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -203,3 +215,5 @@ Revision 1.20: r20 adds mandatory Pollicino external session continuity, dual li
 Revision 1.21: r21 establishes the four design pillars and adaptive Velocity architecture with TTTA KPI, complexity budget, DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, incremental execution and bounded evidence learning.
 Revision 1.22: r22 adds mandatory operational Execution Fabric, real ready-queue dispatch, Fast Decision Gate, batched tool concurrency, observed Proof of Parallelism and honest host-limited serial mode.
 Revision 1.23: r23 adds work-elimination-first incremental execution, content-addressed reuse, dynamic DAG growth/pruning, progressive branching, event memory and deferred materialization on top of r22 Execution Fabric.
+
+Revision 1.24: r24 adds evidence-gated latency branching with immediate scheduler wake-up and safe useful-work overlap during slow live operations.
