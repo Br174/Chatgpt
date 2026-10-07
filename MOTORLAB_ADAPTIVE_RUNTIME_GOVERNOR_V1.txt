@@ -41,11 +41,21 @@ A lane is a bounded execution corridor for a shared resource/provider/tool scope
 - learning affects capacity only; it grants no new authority.
 
 UNIFIED LATENCY CONTROLLER
-The existing r24 useful-work latency branch and r26 Fresh Hedge share one recovery responsibility.
-Precedence:
-A. If a slow task is hedge-safe, use bounded Fresh Hedge recovery.
-B. Otherwise, if safe independent latency work exists and expected gain exceeds overhead, use r24 LATENCY_BRANCH.
-C. Otherwise continue the original task/watchdog path without inventing duplicate work.
+The existing r24 useful-work latency branch and r26 Fresh Hedge remain coordinated by one runtime governor, but r27 separates TWO DISTINCT responsibilities so useful time is not lost:
+
+PLANE A — IMMEDIATE PRODUCTIVE SIDEWORK
+- If safe independent useful work is already READY, Execution Fabric dispatches it immediately in the same scheduling cycle.
+- If the current task declares productiveSpawn and PRODUCTIVE_BRANCH_EXPECTED_GAIN_MS > PRODUCTIVE_BRANCH_OVERHEAD_MS, that independent work is spawned immediately when the potentially waiting/opaque task starts. There is NO 3 s or 10 s waiting threshold for productive sidework.
+- Productive sidework is different work that advances the operation; it is never a duplicate retry of the slow task.
+- Same-scope writers, provider budgets, runner caps and the single integration lane still apply.
+
+PLANE B — SAME-TASK RECOVERY
+- The original slow task continues normally while productive sidework advances.
+- If that same task is hedge-safe and remains unresolved until the hard Fresh Hedge trigger, bounded Fresh Hedge recovery starts. Default trigger remains 10000 ms.
+- A reliable explicit stall signal may trigger same-task recovery earlier.
+- If hedging is unsafe/unavailable, the original task remains governed by Watchdog and legacy r24 latency branching where appropriate.
+
+The two planes may be active at the same time. Productive sidework MUST NOT be delayed merely because Fresh Hedge has not reached its trigger. Fresh Hedge MUST NOT suppress productive sidework.
 
 FRESH HEDGE POLICY
 Default hard trigger: 10000 ms.
@@ -121,5 +131,6 @@ r26 is successful when:
 - adaptation can persist/reload without becoming a source of truth.
 
 VERSION
-MOTORLAB-ADAPTIVE-RUNTIME-GOVERNOR-V1.0
+MOTORLAB-ADAPTIVE-RUNTIME-GOVERNOR-V1.1
 Established: 2026-10-07
+Revision 1.1: r27 separates immediate productive sidework from delayed same-task recovery. Independent useful work starts without an artificial timer; default Fresh Hedge remains 10 s for the unresolved original task.

@@ -152,8 +152,18 @@ Load MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt between Velocity planning and Exe
 - Ordinary work that does not need r26 features must use the lightweight fast path.
 Opaque host ChatGPT reasoning remains outside direct restart/cancel control unless the host exposes that capability.
 
+R27 ZERO-IDLE DUAL-LANE ACTIVE WAIT
+At boot, preserve r23-r26 ordering and apply r27 through Velocity + Adaptive Runtime Governor + Execution Fabric:
+- compatible independent READY work starts in the same scheduling cycle;
+- safe productive sidework declared for a potentially waiting task starts immediately when expected gain exceeds overhead;
+- no artificial 3-second or 10-second wait is introduced before different useful work begins;
+- same-task Fresh Hedge recovery remains separate with the default 10000 ms hard trigger unless reliable stall evidence triggers earlier;
+- productive sidework and same-task recovery may overlap without creating a second scheduler;
+- user-visible updates at available control points report only real started/completed activity;
+- opaque host reasoning remains outside direct MotorLab restart/cancel control unless the host exposes that capability.
+
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.20
+MOTORLAB-CORE-ENTRYPOINT-V1.21
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -178,3 +188,5 @@ Revision 1.19: r25 boots semantic workgroups and intrinsic execution acceleratio
 Revision 1.20: r26 boots one coordinated Adaptive Runtime Governor for bounded Fresh Hedge and lane feedback while keeping Velocity the sole scheduler and preserving r24/r25 behavior.
 
 Revision 1.20: r26 boots the Adaptive Runtime Governor as the single coordinator for adaptive lanes and bounded hedge/latency recovery while preserving Velocity, Service Guard, Pollicino and project-native authorities.
+
+Revision 1.21: r27 adds zero-idle dual-lane active wait: immediate independent productive work plus separate default-10s same-task recovery and truthful visible-forward-motion reporting.

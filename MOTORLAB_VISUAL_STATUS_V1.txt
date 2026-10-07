@@ -72,6 +72,14 @@ If material progress disappears beyond Watchdog thresholds, use ⚡ Risveglio / 
 🧪 Test / verifica in corso means validation is underway; do not present the same check as successful until verified.
 🔄 Sincronizzazione in corso means state reconciliation/synchronization is underway; completion is not yet claimed.
 
+7A. R27 VISIBLE TIMELINE ADVANCE
+When MotorLab enters an observable wait/analysis state and safe independent useful work is available, that work should start immediately and later user-visible control points should surface concise truthful updates about what actually started/completed.
+- Do not intentionally keep 💭 Elaborazione in corso or ⏳ Attesa esterna as the sole latest visible activity while MotorLab-controlled independent work is genuinely executing.
+- Do not wait 3 seconds or 10 seconds merely to create visible progress.
+- Fresh Hedge recovery of the same slow task remains a separate default-10s mechanism.
+- Never fabricate updates just to move the timeline.
+- Native/opaque ChatGPT UI thinking indicators are host UI and cannot be directly hidden, cancelled or duplicated by MotorLab unless the host provides that capability; MotorLab can only keep its controlled work moving and report it at available control points.
+
 8. WATCHDOG / LIGHTNING INTEGRATION
 The user may still send bare `⚡` as the manual command.
 MotorLab's report must use:
@@ -117,8 +125,10 @@ SUCCESS CRITERIA
 MotorLab Visual Status is active when every canonical status emoji has its readable label; ✅ is gated by verified root-cause closure rather than symptom-only repair; the search/compatibility/latency/analysis/wait/test/sync states are used only under their defined evidence conditions; repeated fireworks/lightning counts are not user-facing level codes; 💯 remains final-only; and substantial operational status keeps the classic numeric MotorLab percentage visible whenever a verified value exists.
 
 VERSION
-MOTORLAB-VISUAL-STATUS-V1.3
+MOTORLAB-VISUAL-STATUS-V1.4
 Established: 2026-09-28
 Revision 1.1: permanent labeled visual legend; single-emoji semantic mapping; 💯 final-only.
 Revision 1.2: extended operational states and high-presence numeric progress.
 Revision 1.3: r11 binds ✅ Problema risolto to Root Cause Closure and makes numeric progress mandatory on meaningful substantial statuses when technically emit-able.
+
+Revision r27: visible timeline advance requires truthful immediate sidework updates when controlled independent work exists, while preserving host-boundary honesty for opaque UI thinking.

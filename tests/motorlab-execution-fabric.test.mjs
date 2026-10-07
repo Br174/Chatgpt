@@ -220,6 +220,52 @@ test('r24 latency branch still wakes scheduler under r26',async()=>{
 });
 
 
+test('r27 productive sidework starts immediately while same-task hedge waits for its recovery threshold',async()=>{
+  const started=Date.now(),seen=[];
+  const out=await executeGraph([{
+    id:'slow-thinking',kind:'read',estimatedMs:90,
+    productiveBranchExpectedGainMs:50,productiveBranchOverheadMs:1,
+    productiveSpawn:[
+      {id:'other-work-a',kind:'read',estimatedMs:12},
+      {id:'other-work-b',kind:'read',estimatedMs:12}
+    ],
+    hedgeSafe:true,hedgeAfterMs:30,hedgeWidth:3,hedgeMaxWaves:1,laneKey:'thinking'
+  }],async(task,ctx)=>{
+    seen.push({id:task.id,attempt:ctx.attempt,at:Date.now()-started});
+    if(task.id==='slow-thinking'&&ctx.attempt===1){await sleep(90);return {valid:true,from:1};}
+    if(task.id==='slow-thinking'){await sleep(5);return {valid:true,from:ctx.attempt};}
+    await sleep(12);return {ok:true};
+  },{
+    maxConcurrency:4,
+    adaptiveGovernor:createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:4,initialLanes:3,hedgeTriggerMs:30})
+  });
+  const side=seen.filter(x=>x.id.startsWith('other-work-'));
+  const hedge=seen.find(x=>x.id==='slow-thinking'&&x.attempt===2);
+  assert.equal(side.length,2);
+  assert.ok(side.every(x=>x.at<25),`sidework was not immediate: ${JSON.stringify(side)}`);
+  assert.ok(hedge&&hedge.at>=20,`same-task hedge fired too early or not at all: ${JSON.stringify(hedge)}`);
+  assert.ok(side.some(x=>x.at<hedge.at),'independent work should begin before recovery hedge');
+  assert.equal(out.proof.productiveBranches,1);
+  assert.equal(out.proof.productiveBranchTasks,2);
+  assert.equal(out.proof.productiveBranchFailures,0);
+  assert.equal(out.proof.freshHedges,1);
+  assert.ok(out.proof.observedPeakConcurrency>=2);
+  const types=out.eventHistory.map(e=>e.type);
+  assert.ok(types.indexOf('PRODUCTIVE_SIDEWORK_STARTED')<types.indexOf('FRESH_HEDGE_WAVE_STARTED'));
+  assert.match(formatProof(out.proof),/lavoro laterale immediato/);
+});
+
+test('r27 productive sidework is suppressed when it would cost more than it saves',async()=>{
+  const seen=[];
+  const out=await executeGraph([{
+    id:'main',kind:'read',
+    productiveBranchExpectedGainMs:2,productiveBranchOverheadMs:5,
+    productiveSpawn:[{id:'waste',kind:'read'}]
+  }],async task=>{seen.push(task.id);return {ok:true};},{maxConcurrency:3});
+  assert.deepEqual(seen,['main']);
+  assert.equal(out.proof.productiveBranches,0);
+});
+
 test('external hedging requires explicit provider authorization',async()=>{
   const seen=[];
   const out=await executeGraph([{id:'ext',kind:'external',hedgeSafe:true,hedgeAfterMs:5,laneKey:'provider'}],async(_t,ctx)=>{

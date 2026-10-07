@@ -33,6 +33,9 @@ function task(t) {
     latencyBranchExpectedGainMs:Math.max(0,Number(t.latencyBranchExpectedGainMs)||0),
     latencyBranchOverheadMs:Math.max(0,Number(t.latencyBranchOverheadMs)||0),
     latencySpawn:Array.isArray(t.latencySpawn)?t.latencySpawn:[],
+    productiveBranchExpectedGainMs:Math.max(0,Number(t.productiveBranchExpectedGainMs)||0),
+    productiveBranchOverheadMs:Math.max(0,Number(t.productiveBranchOverheadMs)||0),
+    productiveSpawn:Array.isArray(t.productiveSpawn)?t.productiveSpawn:[],
     workgroup:t.workgroup ? String(t.workgroup) : '',
     workgroupLabel:t.workgroupLabel ? String(t.workgroupLabel) : '',
     laneKey:t.laneKey ? String(t.laneKey) : kind,
@@ -217,6 +220,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   const governor=adaptiveGovernor||createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:max,initialLanes:Math.min(3,max),...adaptiveGovernorConfig,state:restoredAdaptiveState||adaptiveGovernorConfig.state});
   const tasks=new Map(initial.map(t=>[t.id,t])),pending=new Set(tasks.keys()),done=new Set(),pruned=new Set(),running=new Map(),results=new Map(),records=[],eventHistory=[],cacheChecked=new Set();
   let peak=0,intNow=0,intPeak=0,correctionRelays=0,dynamicTasks=0,cacheHits=0,cacheAvoidedEstimatedMs=0,latencyBranches=0,latencyBranchTasks=0,latencyExpectedGainMs=0,latencyBranchFailures=0;
+  let productiveBranches=0,productiveBranchTasks=0,productiveExpectedGainMs=0,productiveBranchFailures=0;
   let freshHedges=0,hedgeWaves=0,hedgeWins=0,hedgePrimaryWins=0,hedgeAbortRequests=0,hedgeSuppressedUnsafe=0,hedgeExhausted=0,materialProgressSignals=0,earlyStallSignals=0,laneAdjustments=0,laneThrottleSignals=0,laneSaturationSignals=0;
   let graphVersion=0,cachedGraphVersion=-1,cachedGraph=null,cachedScores=null,schedulerGraphRecomputes=0,eventFastPathCount=0,wakeGeneration=0;
   const laneInflight=new Map();
@@ -231,6 +235,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   const schedulerView=()=>{if(cachedGraphVersion!==graphVersion){cachedGraph=validateGraph([...tasks.values()]);cachedScores=tailScores(cachedGraph);cachedGraphVersion=graphVersion;schedulerGraphRecomputes++;}return{graph:cachedGraph,scores:cachedScores};};
   const canStart=t=>running.size<max&&(!t.adaptiveLane||laneCount(t.laneKey)<Math.min(max,governor.laneLimit(t.laneKey)))&&![...running.values()].some(x=>conflicts(t,x.task));
   const latencyUseful=t=>t.latencyBranchAfterMs>0&&t.latencySpawn.length>0&&t.latencyBranchExpectedGainMs>t.latencyBranchOverheadMs;
+  const productiveUseful=t=>t.productiveSpawn.length>0&&t.productiveBranchExpectedGainMs>t.productiveBranchOverheadMs;
   const hedgeEligible=t=>t.hedgeSafe&&(t.kind==='read'||(t.kind==='external'&&t.hedgeExternalAllowed));
 
   const addTasks=async(parent,list=[],reason='BRANCH')=>{
@@ -280,6 +285,21 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
 
     const eligible=hedgeEligible(t);
     if(t.hedgeSafe&&!eligible)hedgeSuppressedUnsafe++;
+
+    // r27 dual-lane rule: productive sidework starts immediately when declared.
+    // It is independent work, not a duplicate of the slow task. Same-task
+    // recovery remains the separate Fresh Hedge path at hardMs (default 10s).
+    if(productiveUseful(t)){
+      try{
+        const spawned=t.productiveSpawn.map(raw=>({...raw,detached:true}));
+        await addTasks(t,spawned,'PRODUCTIVE_SIDEWORK');
+        productiveBranches++;productiveBranchTasks+=spawned.length;productiveExpectedGainMs+=t.productiveBranchExpectedGainMs;
+        await emitWait({type:'PRODUCTIVE_SIDEWORK_STARTED',taskId:t.id,spawnedTasks:spawned.map(x=>String(x.id)),expectedGainMs:t.productiveBranchExpectedGainMs,overheadMs:t.productiveBranchOverheadMs});
+      }catch(e){
+        productiveBranchFailures++;
+        await emitWait({type:'PRODUCTIVE_SIDEWORK_FAILED',taskId:t.id,error:String(e?.message||e)});
+      }
+    }
 
     if(!eligible&&!latencyUseful(t)&&!t.adaptiveLane&&typeof resultValidator!=='function'){
       const promise=Promise.resolve().then(()=>worker(t,{
@@ -451,19 +471,20 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   const executionMode=effectiveRunnerCount<=1&&cacheHits===0?'DIRECT_FAST':max===1&&effectiveRunnerCount>1?'SERIAL_HOST_LIMITED':peak>1?'PARALLEL_OBSERVED':'SERIAL_REQUIRED';
   const governorSnapshot=governor.snapshot();
   if(typeof adaptiveStateStore==='function'){try{await adaptiveStateStore(governorSnapshot);adaptiveStateStored=true;}catch{}}
-  const executionDoneAck=emit({type:'EXECUTION_COMPLETED',cacheHits,dynamicTasks,prunedTasks:pruned.size,latencyBranches,freshHedges,laneAdjustments,adaptiveStateLoaded,adaptiveStateStored});if(executionDoneAck)await executionDoneAck;
-  return {results:Object.fromEntries(results),eventHistory,proof:{executionMode,runnerCount:effectiveRunnerCount,observedPeakConcurrency:peak,observedPeakIntegrationConcurrency:intPeak,singleIntegrationLaneVerified:intPeak<=1,overlapPairs:overlaps,criticalPath:criticalPath(finalGraph),correctionRelays,dynamicTasks,prunedTasks:[...pruned],cacheHits,cacheAvoidedEstimatedMs,latencyBranches,latencyBranchTasks,latencyExpectedGainMs,latencyBranchFailures,freshHedges,hedgeWaves,hedgeWins,hedgePrimaryWins,hedgeAbortRequests,hedgeSuppressedUnsafe,hedgeExhausted,materialProgressSignals,earlyStallSignals,laneAdjustments,laneThrottleSignals,laneSaturationSignals,adaptiveStateLoaded,adaptiveStateStored,adaptiveGovernor:governorSnapshot,schedulerGraphRecomputes,eventFastPathCount,eventsRecorded:eventHistory.length,records}};
+  const executionDoneAck=emit({type:'EXECUTION_COMPLETED',cacheHits,dynamicTasks,prunedTasks:pruned.size,productiveBranches,latencyBranches,freshHedges,laneAdjustments,adaptiveStateLoaded,adaptiveStateStored});if(executionDoneAck)await executionDoneAck;
+  return {results:Object.fromEntries(results),eventHistory,proof:{executionMode,runnerCount:effectiveRunnerCount,observedPeakConcurrency:peak,observedPeakIntegrationConcurrency:intPeak,singleIntegrationLaneVerified:intPeak<=1,overlapPairs:overlaps,criticalPath:criticalPath(finalGraph),correctionRelays,dynamicTasks,prunedTasks:[...pruned],cacheHits,cacheAvoidedEstimatedMs,productiveBranches,productiveBranchTasks,productiveExpectedGainMs,productiveBranchFailures,latencyBranches,latencyBranchTasks,latencyExpectedGainMs,latencyBranchFailures,freshHedges,hedgeWaves,hedgeWins,hedgePrimaryWins,hedgeAbortRequests,hedgeSuppressedUnsafe,hedgeExhausted,materialProgressSignals,earlyStallSignals,laneAdjustments,laneThrottleSignals,laneSaturationSignals,adaptiveStateLoaded,adaptiveStateStored,adaptiveGovernor:governorSnapshot,schedulerGraphRecomputes,eventFastPathCount,eventsRecorded:eventHistory.length,records}};
 }
 
 export function formatProof(p={}){
   const path=(p.criticalPath?.path||[]).join(' -> ')||'n/a';
   const reuse=p.cacheHits?` — cache hit ${p.cacheHits}, lavoro evitato ~${p.cacheAvoidedEstimatedMs||0}ms`:'';
   const dynamic=p.dynamicTasks?` — rami dinamici ${p.dynamicTasks}, potati ${(p.prunedTasks||[]).length}`:'';
+  const productive=p.productiveBranches?` — lavoro laterale immediato ${p.productiveBranches}, task ${p.productiveBranchTasks||0}`:'';
   const latency=p.latencyBranches?` — latency branch ${p.latencyBranches}, task ${p.latencyBranchTasks||0}, guadagno atteso ~${p.latencyExpectedGainMs||0}ms`:'';
   const wg=p.semanticWorkgroups?.mode==='SEMANTIC_PARALLEL'?` — workgroup semantici ${p.semanticWorkgroups.activeGroups?.length||0}, lavoro eliminato ${(p.semanticWorkgroups.eliminatedGroups||[]).length}, guadagno stimato ~${p.semanticWorkgroups.estimatedGainMs||0}ms`:p.semanticWorkgroups?.eliminatedGroups?.length?` — lavoro eliminato ${p.semanticWorkgroups.eliminatedGroups.length}`:'';
   const adaptive=p.freshHedges||p.laneAdjustments?` — hedge ${p.freshHedges||0} / wave ${p.hedgeWaves||0}, lane adjust ${p.laneAdjustments||0}`:'';
-  if(p.executionMode==='PARALLEL_OBSERVED')return `Modalita: PARALLELA — picco ${p.observedPeakConcurrency||0} corridori reali — critical path: ${path}${reuse}${dynamic}${latency}${wg}${adaptive}`;
-  if(p.executionMode==='SERIAL_HOST_LIMITED')return `Modalita: SERIALE LIMITATA DALL'HOST — 1 corridore — critical path: ${path}${reuse}${dynamic}${latency}${wg}${adaptive}`;
-  if(p.executionMode==='DIRECT_FAST')return `Modalita: DIRECT FAST — nessun fan-out necessario — critical path: ${path}${reuse}${dynamic}${latency}${wg}${adaptive}`;
-  return `Modalita: SERIALE NECESSARIA — dipendenze/conflitti impediscono fan-out utile — critical path: ${path}${reuse}${dynamic}${latency}${wg}${adaptive}`;
+  if(p.executionMode==='PARALLEL_OBSERVED')return `Modalita: PARALLELA — picco ${p.observedPeakConcurrency||0} corridori reali — critical path: ${path}${reuse}${dynamic}${productive}${latency}${wg}${adaptive}`;
+  if(p.executionMode==='SERIAL_HOST_LIMITED')return `Modalita: SERIALE LIMITATA DALL'HOST — 1 corridore — critical path: ${path}${reuse}${dynamic}${productive}${latency}${wg}${adaptive}`;
+  if(p.executionMode==='DIRECT_FAST')return `Modalita: DIRECT FAST — nessun fan-out necessario — critical path: ${path}${reuse}${dynamic}${productive}${latency}${wg}${adaptive}`;
+  return `Modalita: SERIALE NECESSARIA — dipendenze/conflitti impediscono fan-out utile — critical path: ${path}${reuse}${dynamic}${productive}${latency}${wg}${adaptive}`;
 }
