@@ -36,6 +36,7 @@ function task(t) {
     workgroup:t.workgroup ? String(t.workgroup) : '',
     workgroupLabel:t.workgroupLabel ? String(t.workgroupLabel) : '',
     laneKey:t.laneKey ? String(t.laneKey) : kind,
+    adaptiveLane:Boolean(t.adaptiveLane ?? kind==='external'),
     hedgeSafe:Boolean(t.hedgeSafe),
     hedgeExternalAllowed:Boolean(t.hedgeExternalAllowed),
     hedgeAfterMs:Math.max(0,Number(t.hedgeAfterMs)||0),
@@ -214,14 +215,17 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   let peak=0,intNow=0,intPeak=0,correctionRelays=0,dynamicTasks=0,cacheHits=0,cacheAvoidedEstimatedMs=0,latencyBranches=0,latencyBranchTasks=0,latencyExpectedGainMs=0,latencyBranchFailures=0;
   let freshHedges=0,hedgeWaves=0,hedgeWins=0,hedgePrimaryWins=0,hedgeAbortRequests=0,hedgeSuppressedUnsafe=0,hedgeExhausted=0,materialProgressSignals=0,earlyStallSignals=0,laneAdjustments=0,laneThrottleSignals=0,laneSaturationSignals=0;
   let graphVersion=0,cachedGraphVersion=-1,cachedGraph=null,cachedScores=null,schedulerGraphRecomputes=0,eventFastPathCount=0,wakeGeneration=0;
+  const laneInflight=new Map();
+  const laneCount=key=>laneInflight.get(key)||0;
+  const holdLane=(t,a)=>{if(!t.adaptiveLane||a.budgetHeld)return;a.budgetHeld=true;laneInflight.set(t.laneKey,laneCount(t.laneKey)+1);};
+  const releaseLane=(t,a)=>{if(!a?.budgetHeld)return;a.budgetHeld=false;laneInflight.set(t.laneKey,Math.max(0,laneCount(t.laneKey)-1));};
   const wakeWaiters=new Set();
   const wakeScheduler=()=>{wakeGeneration++;for(const token of [...wakeWaiters]){wakeWaiters.delete(token);token.resolve();}};
   const makeWakeWaiter=()=>{let resolve;const promise=new Promise(r=>{resolve=r;});const token={resolve};wakeWaiters.add(token);return{promise,cancel:()=>wakeWaiters.delete(token)};};
   const emit=event=>{const entry={sequence:eventHistory.length+1,at:now(),...event};eventHistory.push(entry);if(!onEvent){eventFastPathCount++;return null;}return Promise.resolve(onEvent(entry));};
   const emitWait=async event=>{const ack=emit(event);if(ack)await ack;};
   const schedulerView=()=>{if(cachedGraphVersion!==graphVersion){cachedGraph=validateGraph([...tasks.values()]);cachedScores=tailScores(cachedGraph);cachedGraphVersion=graphVersion;schedulerGraphRecomputes++;}return{graph:cachedGraph,scores:cachedScores};};
-  const laneRunning=key=>[...running.values()].filter(x=>x.task.laneKey===key).length;
-  const canStart=t=>running.size<max&&laneRunning(t.laneKey)<Math.min(max,governor.laneLimit(t.laneKey))&&![...running.values()].some(x=>conflicts(t,x.task));
+  const canStart=t=>running.size<max&&(!t.adaptiveLane||laneCount(t.laneKey)<Math.min(max,governor.laneLimit(t.laneKey)))&&![...running.values()].some(x=>conflicts(t,x.task));
   const latencyUseful=t=>t.latencyBranchAfterMs>0&&t.latencySpawn.length>0&&t.latencyBranchExpectedGainMs>t.latencyBranchOverheadMs;
   const hedgeEligible=t=>t.hedgeSafe&&(t.kind==='read'||(t.kind==='external'&&t.hedgeExternalAllowed));
 
@@ -272,7 +276,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
 
     const eligible=hedgeEligible(t);
     if(t.hedgeSafe&&!eligible)hedgeSuppressedUnsafe++;
-    const hardMs=governor.hedgeTriggerMs(t),maxWaves=t.hedgeMaxWaves,width=()=>Math.max(1,Math.min(governor.hedgeWidth(t),governor.laneLimit(t.laneKey)-Math.max(0,laneRunning(t.laneKey)-1)));
+    const hardMs=governor.hedgeTriggerMs(t),maxWaves=t.hedgeMaxWaves,width=()=>t.adaptiveLane?Math.max(1,Math.min(governor.hedgeWidth(t),1+Math.max(0,governor.laneLimit(t.laneKey)-laneCount(t.laneKey)))):Math.max(1,Math.min(3,t.hedgeWidth));
     let recoveryTimer=null,latencyWakeResolve=null,latencyBranchTriggered=false,settled=false,currentWave=1,waveExpanded=false,attemptSeq=0,winnerAttempt=0;
     const controllers=new Map(),attempts=new Map(),stalled=new Set(),failures=[];
     let resolveTask,rejectTask;
@@ -283,7 +287,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
       recoveryTimer=setTimeout(()=>{void onRecoveryDeadline();},Math.max(1,ms));
     };
     const abortAttempts=reason=>{
-      for(const [id,controller] of controllers)if(!controller.signal.aborted){controller.abort(reason);hedgeAbortRequests++;}
+      for(const [id,controller] of controllers)if(!controller.signal.aborted){controller.abort(reason);hedgeAbortRequests++;releaseLane(t,attempts.get(id));}
     };
     const taskAttemptsForWave=wave=>[...attempts.values()].filter(a=>a.wave===wave);
     const activeForWave=wave=>taskAttemptsForWave(wave).filter(a=>a.active);
@@ -292,6 +296,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
       return value?.valid!==false&&value?.stalled!==true;
     };
     const observeLane=async({ok,value,error,durationMs})=>{
+      if(!t.adaptiveLane)return;
       const obs=governor.observe({laneKey:t.laneKey,ok,value,error,durationMs});
       if(obs.before!==obs.after){laneAdjustments++;await emitWait({type:'LANE_LIMIT_ADJUSTED',taskId:t.id,laneKey:t.laneKey,before:obs.before,after:obs.after,throttled:obs.throttled,saturated:obs.saturated});}
       if(obs.throttled)laneThrottleSignals++;
@@ -304,11 +309,11 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
       settled=true;hedgeExhausted++;abortAttempts('HEDGE_EXHAUSTED');rejectTask(failures.at(-1)||new Error('fresh hedge waves exhausted'));
     };
     const startAttempt=wave=>{
-      const id=++attemptSeq,controller=new AbortController(),startedAt=now(),a={id,wave,active:true,startedAt};
-      attempts.set(id,a);controllers.set(id,controller);
+      const id=++attemptSeq,controller=new AbortController(),startedAt=now(),a={id,wave,active:true,startedAt,budgetHeld:false};
+      attempts.set(id,a);controllers.set(id,controller);holdLane(t,a);
       const ctx={completed:new Set(done),pruned:new Set(pruned),runningCount:running.size+1,maxConcurrency:max,makeContentKey,attempt:id,wave,signal:controller.signal,laneKey:t.laneKey,laneLimit:governor.laneLimit(t.laneKey),progress:detail=>{if(settled)return;materialProgressSignals++;const ack=emit({type:'RUNNER_PROGRESS',taskId:t.id,attempt:id,wave,laneKey:t.laneKey,detail:detail??null});if(ack)ack.catch(()=>{});},stall:reason=>{if(settled)return;earlyStallSignals++;stalled.add(id);const ack=emit({type:'RUNNER_STALL_SIGNAL',taskId:t.id,attempt:id,wave,laneKey:t.laneKey,reason:String(reason||'STALL')});if(ack)ack.catch(()=>{});if(wave===1&&!waveExpanded)expandWave('EARLY_STALL');else if(activeForWave(wave).length&&activeForWave(wave).every(x=>stalled.has(x.id)))startNextWave('ALL_ATTEMPTS_STALLED');}};
       Promise.resolve().then(()=>worker(t,ctx)).then(async value=>{
-        a.active=false;
+        a.active=false;releaseLane(t,a);
         await observeLane({ok:true,value,durationMs:Math.max(0,now()-startedAt)});
         if(settled)return;
         if(!(await validResult(value,a))){
@@ -321,7 +326,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
         abortAttempts('HEDGE_WINNER');
         resolveTask(value);
       }).catch(async error=>{
-        a.active=false;
+        a.active=false;releaseLane(t,a);
         await observeLane({ok:false,error,durationMs:Math.max(0,now()-startedAt)});
         if(settled)return;
         failures.push(error);
@@ -343,7 +348,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
     const startNextWave=reason=>{
       if(settled||!eligible||currentWave>=maxWaves)return false;
       currentWave++;waveExpanded=true;freshHedges++;hedgeWaves++;
-      for(const [id,controller] of controllers){const a=attempts.get(id);if(a?.wave<currentWave&&!controller.signal.aborted){controller.abort('NEXT_HEDGE_WAVE');hedgeAbortRequests++;}}
+      for(const [id,controller] of controllers){const a=attempts.get(id);if(a?.wave<currentWave&&!controller.signal.aborted){controller.abort('NEXT_HEDGE_WAVE');hedgeAbortRequests++;releaseLane(t,a);}}
       const target=width();
       for(let i=0;i<target;i++)startAttempt(currentWave);
       const ack=emit({type:'FRESH_HEDGE_WAVE_STARTED',taskId:t.id,wave:currentWave,width:target,reason,triggerMs:hardMs,laneKey:t.laneKey});
