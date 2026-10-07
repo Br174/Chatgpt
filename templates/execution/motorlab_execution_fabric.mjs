@@ -276,6 +276,30 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
 
     const eligible=hedgeEligible(t);
     if(t.hedgeSafe&&!eligible)hedgeSuppressedUnsafe++;
+
+    if(!eligible&&!latencyUseful(t)&&!t.adaptiveLane&&typeof resultValidator!=='function'){
+      const promise=Promise.resolve().then(()=>worker(t,{
+        completed:new Set(done),pruned:new Set(pruned),runningCount:running.size+1,maxConcurrency:max,makeContentKey,
+        attempt:1,wave:1,laneKey:t.laneKey,laneLimit:max,
+        progress:detail=>{materialProgressSignals++;const ack=emit({type:'RUNNER_PROGRESS',taskId:t.id,attempt:1,wave:1,laneKey:t.laneKey,detail:detail??null});if(ack)ack.catch(()=>{});},
+        stall:reason=>{earlyStallSignals++;const ack=emit({type:'RUNNER_STALL_SIGNAL',taskId:t.id,attempt:1,wave:1,laneKey:t.laneKey,reason:String(reason||'STALL')});if(ack)ack.catch(()=>{});}
+      })).then(async value=>{
+        rec.finishedAt=now();rec.status='COMPLETED';rec.winnerAttempt=1;rec.attempts=1;if(t.kind==='integration')intNow--;
+        results.set(t.id,value);done.add(t.id);running.delete(t.id);
+        if(value?.spawn)await addTasks(t,value.spawn,'DISCOVERY_BRANCH');
+        if(value?.prune)await pruneTasks(t,value.prune);
+        if(value?.corrections)await addCorrections(t,value.corrections);
+        if(t.cacheable&&t.cacheKey&&typeof cacheStore==='function'&&value?.cacheable!==false){await cacheStore(t.cacheKey,value,t);await emitWait({type:'CACHE_STORED',taskId:t.id,cacheKey:t.cacheKey});}
+        await emitWait({type:'RUNNER_COMPLETED',taskId:t.id,workgroupId:t.workgroup||null,workgroupLabel:t.workgroupLabel||null,laneKey:t.laneKey,winnerAttempt:1,attempts:1,running:running.size});
+        return value;
+      }).catch(async e=>{
+        rec.finishedAt=now();rec.status='FAILED';rec.error=String(e?.message||e);rec.attempts=1;if(t.kind==='integration')intNow--;
+        running.delete(t.id);await emitWait({type:'RUNNER_FAILED',taskId:t.id,workgroupId:t.workgroup||null,workgroupLabel:t.workgroupLabel||null,laneKey:t.laneKey,attempts:1,error:rec.error});throw e;
+      });
+      running.set(t.id,{task:t,promise,latencyWake:null});
+      return;
+    }
+
     const hardMs=governor.hedgeTriggerMs(t),maxWaves=t.hedgeMaxWaves,width=()=>t.adaptiveLane?Math.max(1,Math.min(governor.hedgeWidth(t),1+Math.max(0,governor.laneLimit(t.laneKey)-laneCount(t.laneKey)))):Math.max(1,Math.min(3,t.hedgeWidth));
     let recoveryTimer=null,latencyWakeResolve=null,latencyBranchTriggered=false,settled=false,currentWave=1,waveExpanded=false,attemptSeq=0,winnerAttempt=0;
     const controllers=new Map(),attempts=new Map(),stalled=new Set(),failures=[];
