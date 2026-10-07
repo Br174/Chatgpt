@@ -1,0 +1,40 @@
+MOTORLAB RELEASE FANOUT STATE V1
+
+RELEASE=2026.10.07-r28
+GLOBAL_STATE=COMPLETE
+CENTRAL_AUTHORITY=Br174/Chatgpt
+VERIFIED_DATE=2026-10-07
+
+UPDATED_VERIFIED_TARGETS
+- Br174/MusicLab ref=main sha=2b67a3910613376b8953d80c971393357a53190b
+- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 sha=0dd28b0d6323e53cc142ba625e7200930e13ea89
+- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 sha=1ef03886448f087b3c4dd42bba12b08c1ba9dd28
+- Br174/GeoVision-Test ref=main sha=dfe7d475586257158711dafd276d3ffa8abd0a05
+- Br174/StudyBook-AI ref=main sha=a9ab160d76410a68400ccb372b74255a75cdb604
+- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 sha=a74d6dff9a6dd31dcb876393619e76c80a2ee64a
+- Br174/Visionflix ref=main sha=c62018c5b134c3ddb94fc3df240f103d71bb620d
+- Br174/Cover-Lab-AI ref=main sha=784020cff0c19eb1fcbe316889a7a6e6452a2b33
+- Br174/streamflix-BV ref=main sha=a14ab7526fd2f1c03d111fcdbc6434bdad440e80
+- Br174/MotorAI ref=main sha=82620dc1d8791bd17b8516548667c39904f92ff2
+
+VERIFICATION
+- Every target above reports MotorLab release 2026.10.07-r28.
+- Every target above has SESSION_RELEASE_PIN=required.
+- Every target above has the r27+ execution fabric markers productiveSpawn and replacePrimaryOnHardHedge.
+- Every target above has the r28 bootstrap session-pin policy.
+- No project application/runtime/domain code was intentionally changed by this fanout.
+
+SESSION_RULE
+- A running session uses the complete MotorLab snapshot pinned at its first SessionStart.
+- resume/compact/clear of the same session reuse that snapshot.
+- Repository adoption of a newer MotorLab release never switches the engine under an already-running session.
+- A new session adopts the newest VERIFIED local satellite.
+
+FUTURE_RELEASE_RULE
+- Each future central MotorLab release must execute fanout in the same release operation.
+- Safe targets are updated immediately for future sessions.
+- Busy targets are recorded PENDING_SAFE_BOUNDARY and retried automatically at the first supported safe-boundary execution cycle.
+- Global release fanout is COMPLETE only after all registered default/current active refs are UPDATED_VERIFIED or explicitly retired/superseded.
+
+VERSION
+MOTORLAB-RELEASE-FANOUT-STATE-V1.0
