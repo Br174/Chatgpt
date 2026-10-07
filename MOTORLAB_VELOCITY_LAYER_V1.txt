@@ -604,14 +604,17 @@ Permanent order:
 
 The governor may learn from observed latency, healthy completions, throttling, saturation, hedge outcomes and stall evidence. Learned state is bounded, context-aware and non-authoritative. Current provider limits, current source truth, External Service Guard, single-writer and approval always outrank learned state.
 
-Latency responsibility is singular:
-- hedge-safe slow work -> bounded Fresh Hedge;
-- otherwise safe useful independent work -> r24 latency branch;
-- otherwise continue normal/watchdog recovery.
-Do not run competing latency managers for the same task.
+R27 DUAL-LANE RULE
+- Different useful independent work starts immediately when it is READY or declared as safe productive sidework with positive expected gain.
+- No 3-second or 10-second delay is required before different useful work starts.
+- Recovery of the same unresolved task remains separate: bounded Fresh Hedge keeps the default 10000 ms hard trigger unless reliable stall evidence justifies earlier recovery.
+- Immediate sidework and same-task recovery may coexist under the same Velocity scheduler.
+- Single-writer, provider limits, runner limits and one integration lane remain mandatory.
+
+Latency responsibility remains singular; r27 does not introduce another scheduler.
 
 VERSION
-MOTORLAB-VELOCITY-LAYER-V1.6
+MOTORLAB-VELOCITY-LAYER-V1.7
 Established: 2026-09-29
 Revision 1.1: r21 establishes the four design pillars, TTTA primary KPI, complexity budget, adaptive DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, correction relay, bounded speculative execution, evidence learning and incremental-everything semantics without weakening single-writer or promotion safety.
 Revision 1.2: r22 binds adaptive Velocity to the executable Execution Fabric, requires Fast Decision Gate, event-driven ready-queue dispatch, observed parallelism proof, host-limited truthfulness and grouped concurrency status.
@@ -624,3 +627,5 @@ Revision 1.5: r25 establishes the eliminate/reuse/reduce/intrinsic-accelerate/se
 Revision 1.6: r26 coordinates work elimination, r25 workgroups/intrinsic speed, adaptive lane feedback and bounded Triple Hedge under one Velocity-owned policy with a 10s hard hedge trigger and early material-stall recovery.
 
 Revision 1.6: r26 coordinates work elimination, intrinsic speed, semantic workgroups, adaptive lanes and unified latency/hedge recovery through one evidence-driven governor subordinate to Velocity.
+
+Revision 1.7: r27 separates immediate different-work progress from delayed recovery of the same slow task.
