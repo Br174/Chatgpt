@@ -382,8 +382,35 @@ Persistence and proof:
 - proof records hedge, lane, throttle/saturation, stall, adaptive state and existing critical-path/integration evidence.
 Ordinary tasks that do not use adaptive features stay on the r25-compatible lightweight fast path.
 
+R27 DUAL-LANE ACTIVE WAIT / ZERO-IDLE SIDEWORK
+r27 separates productive progress from same-task recovery.
+
+A. IMMEDIATE PRODUCTIVE SIDEWORK
+- If independent READY work exists, dispatch it in the same scheduler cycle; do not wait for a 3 s/10 s timer.
+- A task may declare productiveSpawn, productiveBranchExpectedGainMs and productiveBranchOverheadMs.
+- When PRODUCTIVE expected gain exceeds overhead, productiveSpawn tasks are inserted immediately as detached independent work and the scheduler is awakened immediately.
+- Productive sidework advances different useful work. It must not be a disguised duplicate of the slow task.
+- Material events: PRODUCTIVE_SIDEWORK_STARTED / PRODUCTIVE_SIDEWORK_FAILED.
+- Proof: productiveBranches, productiveBranchTasks, productiveExpectedGainMs, productiveBranchFailures.
+
+B. SAME-TASK RECOVERY REMAINS SEPARATE
+- The original task remains alive while productive sidework proceeds.
+- Fresh Hedge keeps the default 10000 ms hard trigger for eligible unresolved work, unless an explicit reliable stall signal triggers earlier.
+- Fresh Hedge duplicates/replaces the SAME task only inside existing bounded hedge rules.
+- Productive sidework and Fresh Hedge may overlap; one MUST NOT suppress the other.
+
+C. VISIBLE TIMELINE SEMANTICS
+- At available user-visible control points, an active wait/analysis status should be followed by concise truthful updates for materially started independent work, so a wait state does not remain the only visible latest activity.
+- Never emit fake activity merely to move the timeline.
+- Opaque host ChatGPT reasoning/spinner state cannot be inspected, cancelled or duplicated unless the host exposes a real control surface; r27 applies to MotorLab-controlled tasks/executors and to visible updates at supported control points.
+
+D. SAFETY
+- No second scheduler is introduced. Velocity remains scheduler authority; Adaptive Runtime Governor remains latency/capacity tuner; Execution Fabric remains dispatcher.
+- Single-writer, provider limits, lock scopes, runner caps and single integration lane remain mandatory.
+- If the host exposes only one usable lane, report SERIAL_HOST_LIMITED rather than pretending sidework overlapped.
+
 VERSION
-MOTORLAB-EXECUTION-FABRIC-V1.4
+MOTORLAB-EXECUTION-FABRIC-V1.5
 Established: 2026-10-06
 Revision 1.1: r23 adds work-elimination-first execution, content-addressed reuse, dynamic graph growth, progressive branching, pruning, event memory, deferred materialization and expanded proof metrics while preserving Velocity as sole scheduler.
 
@@ -394,3 +421,5 @@ Revision 1.3: r25 adds semantic workgroups after work elimination plus intrinsic
 Revision 1.4: r26 adds bounded Triple Fresh Hedge, provider-safe Adaptive Lane Pool and one measurable Adaptive Runtime Governor, preserving r24 wake behavior, r25 fast path, single-writer and one integration lane.
 
 Revision 1.4: r26 adds the unified Adaptive Runtime Governor execution hooks: bounded triple-hedge recovery, adaptive lane capacity, stall-triggered early recovery, persistent governor state and zero-cost ordinary-task fast path while preserving r24/r25 semantics.
+
+Revision 1.5: r27 adds zero-idle dual-lane active wait: immediate independent productive sidework plus separate default-10s same-task Fresh Hedge recovery, with truthful timeline/proof events and no second scheduler.
