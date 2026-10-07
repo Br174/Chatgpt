@@ -1,0 +1,21 @@
+name: MotorLab r27 gate
+on:
+  push:
+    branches:
+      - motorlab-r27-dual-lane-active-wait
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Execution Fabric regression suite
+        run: |
+          node --test tests/motorlab-execution-fabric.test.mjs
+          node --test tests/motorlab-r27-dual-lane.test.mjs
