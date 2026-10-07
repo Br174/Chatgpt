@@ -8,12 +8,13 @@ PURPOSE
 Start MotorLab first, reconcile verified current state, prevent unapproved writes, accelerate safe artifact delivery, preserve mandatory causal closure, keep progress visible, preserve project-native engines/lifecycle, and provide technical history, persistent operational continuity, runtime diagnostics and a Bruno-confirmed restore register without conflicting sources of truth.
 
 REGISTERED PROJECT BOOT ORDER - MANDATORY
-0. Emit `⚙️ MotorLab attivo` before substantive work when project context is identifiable.
+0. Emit `⚙️ MotorLab rNN attivo` before substantive first-session work when project context is identifiable, with rNN from the active pinned release.
+0A. Before EVERY supported project UserPromptSubmit and every resume/compact/clear, apply MOTORLAB_REENTRY_GATE_V1.txt: reinject the pinned Critical Boot Capsule and compact project identity/sync state before substantive project reasoning/tools/writes; safely refresh to a newer VERIFIED local release at a safe re-entry boundary when no explicit in-flight write/build/test/promotion lock is recorded.
 1. Read MOTORLAB_PROJECT_HOOK.txt.
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
 3. Use VERIFIED local core immediately as fallback.
 4. When central is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
-5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_EXECUTION_FABRIC_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_POLLICINO_CONTINUITY_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
+5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_REENTRY_GATE_V1.txt, MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_EXECUTION_FABRIC_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_POLLICINO_CONTINUITY_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
 6. Read Project Continuity ledger.
 7. Read technical Change History registry when present.
 8. Read visible Registro Modifiche e Ripristini when present.
@@ -108,7 +109,7 @@ LIVE CONTROL
 MOTORLAB_LIVE_CONTROL_V1.txt owns lightweight safe-point presentation directives. Live Control never grants write approval, never creates a second writer, never interrupts an in-flight tool/build solely for presentation, and never authorizes runtime/lifecycle changes. If the active executor did not load Live Control, report that honestly and apply the directive only at a later supported run/resume.
 
 SAFE VERSION PINNING
-The MotorLab release used by active work is pinned until a safe boundary; adopt newer releases only at verified safe boundaries.
+The MotorLab release used by active work is pinned until a safe boundary. Every supported project turn/resume re-enters MotorLab; if the repository contains a newer VERIFIED local release and no explicit in-flight write/build/test/promotion lock is recorded, that re-entry boundary may refresh the pin. Never downgrade or invent a release.
 
 FUTURE PROJECTS
 New projects receive hook + local satellite + sync state + central Project Continuity + technical Change History + visible Registro Modifiche e Ripristini and inherit Root Cause Closure, Artifact-First ordering, dual progress, Fast Iteration/No-Spin, hard pre-change approval, r16 authority/data ownership, persistent-state fallback, Pollicino external continuity, observability boundaries, knowledge/tool routing, r21 Four-Pillar adaptive Velocity/learning/TTTA rules r22 Execution Fabric real-dispatch/proof rules and r23 work-elimination-first incremental/dynamic execution rules.
@@ -171,7 +172,7 @@ R28 BOOT / RELEASE ADOPTION
 - Release fanout is release coordination only and does not replace Velocity, native project engines or project lifecycle authority.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.24
+MOTORLAB-CORE-ENTRYPOINT-V1.25
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -213,3 +214,13 @@ R30 CRITICAL BOOT CAPSULE
 Load MOTORLAB_BOOT_CAPSULE_V1.txt / local `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` before longer MotorLab/project instructions. The capsule is mandatory first-context critical policy and must fit the host context budget.
 
 Revision 1.24: r30 adds capsule-first compact boot semantics so essential rules cannot be truncated.
+
+
+R31 EVERY-TURN MOTORLAB RE-ENTRY
+- MotorLab is not a one-time chat bootstrap. Every supported project UserPromptSubmit/resume/compact/clear re-enters through MOTORLAB_REENTRY_GATE_V1.txt before project work.
+- Re-entry reinjects the Critical Boot Capsule plus compact identity/sync state, preserves operation/progress/approval/lock state and keeps project-native engines subordinate only to their own domain authority.
+- A newer VERIFIED local MotorLab release may replace the session pin at a safe re-entry boundary; an explicit in-flight write/build/test/promotion lock keeps the old pin until safe.
+- Supported hook configurations run motorlab_boot.py before Pollicino on UserPromptSubmit.
+- Velocity remains the sole scheduler; Re-entry Gate is a control-plane gate, not a second scheduler.
+
+Revision 1.25: r31 makes MotorLab mandatory for the whole project conversation lifecycle, not only new-chat SessionStart.
