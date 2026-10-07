@@ -1,20 +1,20 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=22
+STATE_REVISION=25
 STATE_STATUS=SEED010_CI_GATE_PASSED_DEVICE_VALIDATION_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.06-r23
 ACTIVE_OPERATION_ID=MOTORAI-SEED003-FIRST-APK-20261006
 OPERATION_STATUS=artifact_delivered_pending_device_acceptance
-CURRENT_PHASE=SEED010_LEVEL4_DEVICE_TRAINING
+CURRENT_PHASE=SEED010_FINAL_RESTART_RESUME_VALIDATION
 CURRENT_REF=main
 CURRENT_HEAD_SHA=e316e55f59986f24d6abae04c6a108c35373c734
 LAST_VERIFIED_PROGRESS_PERCENT=90
-LAST_COMPLETED_MATERIAL_STEP=Seed010 installed over Seed009 on real device; checkpoint migrated successfully at step1760, curriculum Level4 ready, parameter count expanded to 19360, historical retention preserved
-NEXT_SAFE_STEP=Start Level4 adaptive training on device from step1760, then verify hidden test, Level3/L2/L1/L0 retention, generation and restart-resume before promotion
-PENDING_VERIFICATION=Seed010 real-device Level4 adaptive training and acceptance
+LAST_COMPLETED_MATERIAL_STEP=Seed010 real-device positive and negative Level4 generation both verified at step2960
+NEXT_SAFE_STEP=Close and reopen Seed010; verify step2960, Level4 and retained metrics before baseline promotion
+PENDING_VERIFICATION=Seed010 restart resume persistence only
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
 FIRST_APK_ARTIFACT_ID=11446590832
@@ -238,3 +238,5 @@ SEED010_DEVICE_PRETRAIN_LEVEL3_RETENTION_PERCENT=100.0
 SEED010_DEVICE_PRETRAIN_LEVEL2_RETENTION_PERCENT=95.8
 SEED010_DEVICE_PRETRAIN_LEVEL1_RETENTION_PERCENT=100.0
 SEED010_DEVICE_PRETRAIN_LEVEL0_RETENTION_PERCENT=95.6
+
+SEED010_LEVEL4_NEGATIVE_GENERATION_VERIFIED=yes
