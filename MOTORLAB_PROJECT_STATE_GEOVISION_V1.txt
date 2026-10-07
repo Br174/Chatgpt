@@ -5,7 +5,7 @@ STATE_REVISION=1
 STATE_STATUS=BOOT_RECONCILE_REQUIRED
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/GeoVision-Test evidence
-MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r25
+MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.07-r26
 ACTIVE_OPERATION_ID=unknown_until_live_reconcile
 OPERATION_STATUS=unknown_until_live_reconcile
 CURRENT_PHASE=unknown_until_live_reconcile
@@ -19,7 +19,7 @@ LAST_USER_INTENT_SUMMARY=Preserve latest GeoVision project work across new chats
 CONTINUITY_RULES=Live newer evidence wins; older registries/memory are advisory only; preserve native GeoVision engine; update this ledger at material transitions and turn handoff.
 UPDATED_BY=MotorLab r8 continuity bootstrap
 UPDATED_DATE=2026-10-07
-SATELLITE_LOCAL_RELEASE=2026.10.07-r25
+SATELLITE_LOCAL_RELEASE=2026.10.07-r26
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R23_EXECUTION_FABRIC=work-elimination-first;content-addressed-reuse;incremental-delta;critical-path;dynamic-dag;progressive-branching;pruning;event-memory;deferred-materialization
 
@@ -31,3 +31,7 @@ MOTORLAB_R24_MAIN_ADOPTION_COMMIT=c1fb62be2ba3efdaa2154c589e7df2f2145aaa0b
 MOTORLAB_R25_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R25_EXECUTION=work-elimination-first;intrinsic-acceleration;semantic-workgroups;gain-gated-parallelism;r24-latency-branching;single-integration-lane
 MOTORLAB_R25_MAIN_ADOPTION_COMMIT=d5483108d683a865b978403cab98c5838691f964
+
+MOTORLAB_R26_STATUS=VERIFIED_ADOPTED
+MOTORLAB_R26_EXECUTION=work-elimination-first;intrinsic-acceleration;semantic-workgroups;adaptive-lane-pool;triple-fresh-hedge;10s-hard-trigger;early-stall;r24-latency-branching;single-integration-lane
+MOTORLAB_R26_MAIN_ADOPTION_COMMIT=71332106f45263478789d6268e0747dec5373a53
