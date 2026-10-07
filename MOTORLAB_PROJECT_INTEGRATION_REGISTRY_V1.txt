@@ -11,6 +11,7 @@ Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.27
 Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.21
 Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.4
 Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.6
+Canonical adaptive runtime governor: MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt V1.0
 Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
 Canonical Pollicino continuity: MOTORLAB_POLLICINO_CONTINUITY_V1.txt
 
@@ -40,6 +41,19 @@ R26 COORDINATED ADAPTIVE POLICY
 - Adaptive Lane Pool uses measured success/latency/throttle/saturation evidence and remains below global/provider/write-safety caps.
 - Ordinary non-adaptive work retains the r25 fast path.
 - r24 useful-work latency branching and immediate dispatcher wake remain preserved.
+
+R26 ADAPTIVE RUNTIME POLICY
+- Velocity remains the sole scheduler.
+- Adaptive Runtime Governor is the sole lane/latency tuner.
+- Adaptive Lane Pool learns safe capacity within Service Guard/provider ceilings.
+- Fresh Hedge default hard trigger is 10 s; explicit technical stall may trigger earlier.
+- Maximum 3 attempts per wave, maximum 2 waves / 6 attempts total.
+- First valid result wins; losers are cancelled/ignored where supported.
+- Writes/integration never hedge.
+- External hedge requires explicit provider-adapter authorization.
+- r24 useful-work latency branching remains the non-hedge fallback.
+- Governor state may persist/reload as non-authoritative operational evidence.
+- Ordinary work uses the r25-compatible fast path.
 
 R25 COMBINED SPEED POLICY
 - First eliminate safely unnecessary work.
@@ -134,3 +148,5 @@ Revision 2.22: r25 makes semantic workgroups plus intrinsic dispatcher accelerat
 Revision 2.23: verified r25 adoption recorded for six project mains, active MusicLab LAB47, active StudyBook LAB03 and MotorAI-Training; r24 preserved as immediate LAST_GOOD rollback.
 
 Revision 2.24: r26 makes the coordinated Adaptive Runtime Governor, bounded Triple Fresh Hedge and Adaptive Lane Pool the current central contract; project satellites remain on their verified r25 state until safe-boundary synchronization completes.
+
+Revision 2.24: central r26 contract prepared with one Adaptive Runtime Governor, bounded Triple Hedge and adaptive lanes; registered project satellites remain explicitly r25 until post-merge safe-boundary adoption.
