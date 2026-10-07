@@ -77,45 +77,45 @@ R24 LATENCY BRANCH POLICY
 - Preserve lock scopes, single-writer, runner caps and the single integration lane.
 - Completion countdowns are never presented as guaranteed unless truly deterministic.
 
-REGISTERED PROJECTS — R26 ADAPTIVE RUNTIME ADOPTION VERIFIED 2026-10-07
+REGISTERED PROJECTS — R28 RELEASE FANOUT VERIFIED 2026-10-07
 1. MusicLab — Br174/MusicLab
-   main r26 commit: 9e04615a581a0a904d7f21332e0520675fb3d0fc
-   active LAB47 branch r26 commit: 695ecb9a54ca831074fc3016627f88d7e6a605ed
-   Pollicino sidecar/proof flow preserved.
+   main r28 commit: 2b67a3910613376b8953d80c971393357a53190b
+   retained diagnostic LAB50 r28 commit: 0dd28b0d6323e53cc142ba625e7200930e13ea89
+   current LAB52 r28 commit: 1ef03886448f087b3c4dd42bba12b08c1ba9dd28
+   Pollicino + Live Control + session-pinned bootstrap preserved.
    Native MusicLab engines/lifecycle remain authoritative.
 
 2. GeoVision — Br174/GeoVision-Test
-   main r26 commit: 71332106f45263478789d6268e0747dec5373a53
+   main r28 commit: dfe7d475586257158711dafd276d3ffa8abd0a05
    Native GeoVision engine/lifecycle preserved.
 
 3. StudyBook-AI — Br174/StudyBook-AI
-   main r26 commit: ddbc17aff8fc7fa9f42e3f99b8d34af717902bcb
-   active LAB03 branch r26 commit: 43f2e0657207f4148085d357b81440221ebf352c
+   main r28 commit: a9ab160d76410a68400ccb372b74255a75cdb604
+   active LAB03 r28 commit: a74d6dff9a6dd31dcb876393619e76c80a2ee64a
    StudyBook application/runtime behavior remains separate from MotorLab control-plane adoption.
 
 4. Visionflix / Verlezza Vision — Br174/Visionflix
-   main r26 commit: 1b20d142d7b09c71ca5baeeb29163474c66a1331
+   main r28 commit: c62018c5b134c3ddb94fc3df240f103d71bb620d
    Visionflix remains source lifecycle authority.
 
 5. Cover Lab AI — Br174/Cover-Lab-AI
-   main r26 commit: 1e0aa0ef21dabad5fc6c2a9981eb14ee6c8c67f3
+   main r28 commit: 784020cff0c19eb1fcbe316889a7a6e6452a2b33
    Native Cover Lab engine remains authoritative.
 
 6. streamflix-BV — Br174/streamflix-BV
-   main r26 commit: 6799ee88a0240d7012efbb995de5275625e44ca7
+   main r28 commit: a14ab7526fd2f1c03d111fcdbc6434bdad440e80
    Remains delivery adapter; Visionflix source authority preserved.
 
 7. MotorAI — Br174/MotorAI
-   initial r23/onboarding application head: 2fc178f6e119b7a06325b63a6568fa18bebf1a13
-   main r26 control-plane commit: 63e56af5bbaf1dc4b35921a8853c5b0901673ed1
-   r26 adoption occurred at a verified safe boundary; the metadata/dispatcher adoption did not modify the neural brain or application runtime.
-   first verified Android build: GitHub Actions run 37534929516 / artifact 11446590832
-   Native MotorAI neural brain remains authoritative; MotorLab-Training is a subordinate specialized tutor/orchestrator.
-   MotorAI-specific training innovations do not propagate automatically into central MotorLab.
-   Public repository is the code/build authority; future private weights, datasets, credentials and personal checkpoints remain outside public Git.
+   main r28 commit: 82620dc1d8791bd17b8516548667c39904f92ff2
+   Native MotorAI neural brain remains authoritative; MotorLab-Training remains subordinate.
+
+FANOUT STATE
+MOTORLAB_RELEASE_FANOUT_STATE_V1.txt = COMPLETE for 2026.10.07-r28.
+Every verified target carries r28, session pinning, current Execution Fabric markers and pinned bootstrap semantics.
 
 CLEANUP / NON-REDUNDANCY
-- Old active satellite contents were superseded by the current r26 local core at verified safe boundaries; the immediately previous verified r25 core is preserved as LAST_GOOD.
+- Old active satellite contents are superseded by the current r28 local core at verified safe boundaries; each target preserves its immediately previous VERIFIED core as LAST_GOOD.
 - The immediately previous verified local core is preserved only as .motorlab/MOTORLAB_LOCAL_CORE_LAST_GOOD.txt for rollback.
 - LAST_GOOD is intentional safety state and is not redundant legacy.
 - One local current dispatcher copy exists at .motorlab/execution/motorlab_execution_fabric.mjs.
@@ -123,7 +123,7 @@ CLEANUP / NON-REDUNDANCY
 - Git history preserves older releases; current registry does not duplicate obsolete release prose.
 
 POLLICINO
-Pollicino remains external control-plane continuity: liveness/progress evidence, terminal seals, RESUME_READY and stable proof semantics remain intact. r26 does not replace or move Pollicino into application runtime code.
+Pollicino remains external control-plane continuity: liveness/progress evidence, terminal seals, RESUME_READY and stable proof semantics remain intact. r28 does not replace or move Pollicino into application runtime code.
 
 SAFE ADOPTION
 The global migration was performed only after confirming no active GitHub workflow runs in the prior registered repositories. MotorLab-only commits used [skip ci]. Application source/runtime/package/signing/lifecycle was not changed by this migration.
@@ -174,3 +174,5 @@ FANOUT_STATE=COMPLETE_WITH_PENDING_SAFE_BOUNDARY
 - Br174/MusicLab uab-build/musiclab-lab52-aggiornamento-family-01 = PENDING_SAFE_BOUNDARY
   reason: concurrent write/content-SHA conflict observed during r28 fanout; do not force a MotorLab switch while the branch is active.
   required next action: at first verified safe boundary, preserve current r23 local core as LAST_GOOD, install r28 bundle/execution fabric/bootstrap/Pollicino/Live Control, verify release markers, then clear this pending entry.
+
+Revision 2.28: r28 fanout verified COMPLETE across all registered default/current active refs; MusicLab LAB52 and StudyBook LAB03 aligned; immutable session-pin semantics verified on every target.
