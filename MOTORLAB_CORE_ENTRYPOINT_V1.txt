@@ -131,8 +131,16 @@ Load the r24 latency-hiding rule through Velocity + Execution Fabric. When a dec
 R25 SEMANTIC + INTRINSIC SPEED
 At boot, preserve Work Elimination First, then load intrinsic dispatcher acceleration and semantic workgroups through the existing Velocity/Execution Fabric pair. Never spawn workgroups merely to display parallel activity. A group exists only for necessary independent work with positive expected TTTA value. r24 latency branching remains a later fallback for slow live work.
 
+R26 ADAPTIVE RUNTIME
+At boot, preserve all r23-r25 ordering and load r26 as a coordinated extension of Velocity + Execution Fabric.
+- The runtime governor may tune adaptive lane capacity and invoke bounded Fresh Hedge only inside Velocity-declared safe boundaries.
+- Default Fresh Hedge hard trigger is 10000 ms; explicit material stall may trigger earlier.
+- Maximum hedge width is three attempts and maximum hedge waves are two.
+- External provider hedges require explicit adapter authorization and External Service Guard compliance.
+- Ordinary tasks without hedge/lane needs retain the r25-compatible lightweight fast path.
+
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.19
+MOTORLAB-CORE-ENTRYPOINT-V1.20
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -153,3 +161,5 @@ Revision 1.17: r23 boots work-elimination-first execution: safe cache/incrementa
 Revision 1.18: r24 boots evidence-gated latency branching so MotorLab can overlap useful independent work with slow live operations instead of passively waiting.
 
 Revision 1.19: r25 boots semantic workgroups and intrinsic execution acceleration after Work Elimination First, without adding a second scheduler or weakening r24/r23 safety contracts.
+
+Revision 1.20: r26 boots one coordinated Adaptive Runtime Governor for bounded Fresh Hedge and lane feedback while keeping Velocity the sole scheduler and preserving r24/r25 behavior.
