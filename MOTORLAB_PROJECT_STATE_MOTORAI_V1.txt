@@ -1,20 +1,20 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=20
-STATE_STATUS=SEED009_ACCEPTED_CURRENT_BASELINE
+STATE_REVISION=21
+STATE_STATUS=SEED010_CI_GATE_PASSED_DEVICE_VALIDATION_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.06-r23
 ACTIVE_OPERATION_ID=MOTORAI-SEED003-FIRST-APK-20261006
 OPERATION_STATUS=artifact_delivered_pending_device_acceptance
-CURRENT_PHASE=SEED009_ACCEPTED_CURRENT_BASELINE
+CURRENT_PHASE=SEED010_LEVEL4_DEVICE_VALIDATION
 CURRENT_REF=main
 CURRENT_HEAD_SHA=e316e55f59986f24d6abae04c6a108c35373c734
-LAST_VERIFIED_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=Seed009 restart/resume verified on real Android device at step1760, curriculum Level3, L3 test 100%, L2 retention 95.8%, L1 retention 100%, L0 retention 95.6%, persisted generation ef>>>ff
-NEXT_SAFE_STEP=Freeze Seed009 as current accepted baseline and design the next curriculum stage from this checkpoint while preserving Seed008 and Seed009 restore points
-PENDING_VERIFICATION=Next curriculum stage only; Seed009 acceptance complete
+LAST_VERIFIED_PROGRESS_PERCENT=90
+LAST_COMPLETED_MATERIAL_STEP=Seed010 CI multi-seed Level4 gate passed with expanded a-z tokenizer and structural equality dataset; Android APK built successfully
+NEXT_SAFE_STEP=Install Seed010 as update over accepted Seed009, verify automatic checkpoint migration to Level4, train on-device, run hidden test and restart/resume before promotion
+PENDING_VERIFICATION=Seed010 real-device checkpoint migration, Level4 training/test/generation and restart-resume
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
 FIRST_APK_ARTIFACT_ID=11446590832
