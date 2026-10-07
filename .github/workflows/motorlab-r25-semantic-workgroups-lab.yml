@@ -18,3 +18,5 @@ jobs:
         run: node tests/motorlab-semantic-workgroups-benchmark.mjs
       - name: Intrinsic dispatcher speed benchmark
         run: node tests/motorlab-intrinsic-speed-benchmark.mjs
+
+# intrinsic-rerun
