@@ -42,7 +42,7 @@ def release_from(loaded: dict[str, str]) -> str:
 
 def short_release(release: str) -> str:
     import re
-    m = re.search(r"(r\\d+)$", release.strip(), re.IGNORECASE)
+    m = re.search(r"(r\d+)$", release.strip(), re.IGNORECASE)
     return m.group(1).lower() if m else ""
 
 def pin_path(root: Path, session_id: str) -> Path:
