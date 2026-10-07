@@ -218,3 +218,30 @@ test('r24 latency branch still wakes scheduler under r26',async()=>{
   assert.ok(prep.at<60,`latency branch did not wake scheduler early: ${prep.at}ms`);
   assert.equal(out.proof.latencyBranches,1);
 });
+
+
+test('external hedging requires explicit provider authorization',async()=>{
+  const seen=[];
+  const out=await executeGraph([{id:'ext',kind:'external',hedgeSafe:true,hedgeAfterMs:5,laneKey:'provider'}],async(_t,ctx)=>{
+    seen.push(ctx.attempt);await sleep(12);return {ok:true};
+  },{maxConcurrency:3});
+  assert.deepEqual(seen,[1]);
+  assert.equal(out.proof.freshHedges,0);
+  assert.equal(out.proof.hedgeSuppressedUnsafe,1);
+});
+
+test('adaptive lane pool caps provider concurrency without throttling local work',async()=>{
+  let providerActive=0,providerPeak=0,localActive=0,localPeak=0;
+  const governor=createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:4,initialLanes:2,successesToIncrease:99});
+  const tasks=[
+    ...Array.from({length:4},(_,i)=>({id:'p'+i,kind:'external',laneKey:'github',adaptiveLane:true,estimatedMs:10})),
+    ...Array.from({length:4},(_,i)=>({id:'l'+i,kind:'read',estimatedMs:10}))
+  ];
+  await executeGraph(tasks,async task=>{
+    if(task.id.startsWith('p')){providerActive++;providerPeak=Math.max(providerPeak,providerActive);await sleep(10);providerActive--;}
+    else{localActive++;localPeak=Math.max(localPeak,localActive);await sleep(10);localActive--;}
+    return {ok:true};
+  },{maxConcurrency:6,adaptiveGovernor:governor});
+  assert.ok(providerPeak<=2,`provider peak exceeded lane budget: ${providerPeak}`);
+  assert.ok(localPeak>=2,`local work was unnecessarily lane-throttled: ${localPeak}`);
+});
