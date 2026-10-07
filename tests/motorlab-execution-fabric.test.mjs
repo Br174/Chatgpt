@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validateGraph,criticalPath,planGraph,executeGraph,formatProof,makeContentKey} from '../templates/execution/motorlab_execution_fabric.mjs';
+import {validateGraph,criticalPath,planGraph,planSemanticWorkgroups,executeGraph,executeSemanticWorkgroups,formatProof,makeContentKey} from '../templates/execution/motorlab_execution_fabric.mjs';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 test('cycle guard',()=>assert.throws(()=>validateGraph([{id:'a',deps:['b']},{id:'b',deps:['a']}]),/cycle/));
@@ -61,4 +61,72 @@ test('latency branch does not fire after the parent already completed',async()=>
   await sleep(35);
   assert.deepEqual(seen,['fast']);
   assert.equal(out.proof.latencyBranches,0);
+});
+
+
+test('semantic workgroups eliminate unneeded work before fan-out',async()=>{
+  const seen=[];
+  const out=await executeSemanticWorkgroups([
+    {id:'playback',label:'Playback',estimatedMs:20},
+    {id:'sources',label:'Sorgenti',estimatedMs:20},
+    {id:'obsolete',label:'Obsoleto',needed:false,eliminationReason:'CACHE_OR_NOT_REQUIRED',estimatedMs:100}
+  ],async task=>{seen.push(task.id);await sleep(5);return {ok:true};},{maxConcurrency:2,orchestrationOverheadMs:1});
+  assert.deepEqual(new Set(seen),new Set(['playback','sources']));
+  assert.deepEqual(out.proof.semanticWorkgroups.eliminatedGroups.map(x=>x.id),['obsolete']);
+  assert.equal(out.proof.semanticWorkgroups.mode,'SEMANTIC_PARALLEL');
+});
+
+test('semantic workgroups stay serial when overhead erases the gain',()=>{
+  const p=planSemanticWorkgroups([
+    {id:'a',estimatedMs:10},
+    {id:'b',estimatedMs:10}
+  ],{maxConcurrency:2,orchestrationOverheadMs:20});
+  assert.equal(p.mode,'SEMANTIC_SERIAL');
+  assert.equal(p.recommendedConcurrency,1);
+  assert.equal(p.estimatedGainMs,0);
+});
+
+test('semantic workgroups preserve same-scope writer serialization',()=>{
+  const p=planSemanticWorkgroups([
+    {id:'a',kind:'write',scopes:['same'],estimatedMs:30},
+    {id:'b',kind:'write',scopes:['same'],estimatedMs:30}
+  ],{maxConcurrency:4,orchestrationOverheadMs:1});
+  assert.equal(p.mode,'SEMANTIC_SERIAL');
+  assert.equal(p.plannedPeakConcurrency,1);
+});
+
+test('semantic workgroup labels are visible in runner events and proof',async()=>{
+  const out=await executeSemanticWorkgroups([
+    {id:'playback',label:'Playback',estimatedMs:25},
+    {id:'youtube',label:'YouTube',estimatedMs:25},
+    {id:'build',label:'Build env',estimatedMs:25}
+  ],async()=>{await sleep(15);return {ok:true};},{
+    maxConcurrency:3,
+    orchestrationOverheadMs:1,
+    integrationTask:{id:'join',label:'Integration',estimatedMs:2}
+  });
+  const starts=out.eventHistory.filter(e=>e.type==='RUNNER_STARTED'&&e.workgroupLabel).map(e=>e.workgroupLabel);
+  assert.ok(starts.includes('Playback'));
+  assert.ok(starts.includes('YouTube'));
+  assert.ok(starts.includes('Build env'));
+  assert.equal(out.proof.semanticWorkgroups.mode,'SEMANTIC_PARALLEL');
+  assert.equal(out.proof.singleIntegrationLaneVerified,true);
+  assert.match(formatProof(out.proof),/workgroup semantici/);
+});
+
+
+test('intrinsic scheduler reuses static graph analysis',async()=>{
+  const tasks=Array.from({length:120},(_,i)=>({id:'s'+i,deps:i>=12?['s'+(i-12)]:[]}));
+  const out=await executeGraph(tasks,async()=>({ok:true}),{maxConcurrency:12});
+  assert.equal(out.proof.schedulerGraphRecomputes,1);
+  assert.ok(out.proof.eventFastPathCount>0);
+});
+
+test('event listener remains awaited on intrinsic fast path',async()=>{
+  const order=[];
+  const out=await executeGraph([{id:'a'}],async()=>{order.push('worker');return{ok:true};},{
+    onEvent:async e=>{if(e.type==='RUNNER_STARTED'){await sleep(5);order.push('listener-started');}}
+  });
+  assert.ok(order.indexOf('listener-started')<order.indexOf('worker'));
+  assert.equal(out.proof.eventFastPathCount,0);
 });

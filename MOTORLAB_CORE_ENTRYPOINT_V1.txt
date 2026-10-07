@@ -128,8 +128,11 @@ When Bruno activates update-family mode, load MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V
 R24 LATENCY BRANCHING
 Load the r24 latency-hiding rule through Velocity + Execution Fabric. When a declared slow-operation threshold is crossed, prefer safe independent useful work over passive waiting only if expected TTTA gain exceeds overhead. Never turn countdown text into a promise of completion time, never duplicate irreversible side effects as a blind race, and preserve all lock/integration/approval boundaries.
 
+R25 SEMANTIC + INTRINSIC SPEED
+At boot, preserve Work Elimination First, then load intrinsic dispatcher acceleration and semantic workgroups through the existing Velocity/Execution Fabric pair. Never spawn workgroups merely to display parallel activity. A group exists only for necessary independent work with positive expected TTTA value. r24 latency branching remains a later fallback for slow live work.
+
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.18
+MOTORLAB-CORE-ENTRYPOINT-V1.19
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -148,3 +151,5 @@ Revision 1.16: r22 loads Execution Fabric at boot and requires Fast Decision cla
 Revision 1.17: r23 boots work-elimination-first execution: safe cache/incremental reuse before scheduling, dynamic DAG growth/pruning, progressive branching, deferred materialization and material event-memory persistence.
 
 Revision 1.18: r24 boots evidence-gated latency branching so MotorLab can overlap useful independent work with slow live operations instead of passively waiting.
+
+Revision 1.19: r25 boots semantic workgroups and intrinsic execution acceleration after Work Elimination First, without adding a second scheduler or weakening r24/r23 safety contracts.

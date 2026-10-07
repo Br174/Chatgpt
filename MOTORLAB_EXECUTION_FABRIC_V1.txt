@@ -300,9 +300,30 @@ Rules:
 - Proof records branch count, spawned task count, expected gain and failures.
 - Do not display fictional countdowns. A time value is either observed elapsed time, a configured trigger threshold, or explicitly an estimate.
 
+R25 SEMANTIC WORKGROUPS + INTRINSIC ENGINE ACCELERATION
+Work elimination remains first. Semantic workgroups are formed only from work that still must exist after cache/reuse/delta/pruning decisions.
+Rules:
+- semantic groups represent independent responsibility lanes such as Playback, Sources, Build/Test or analogous project-specific domains;
+- do not create a workgroup for work marked NOT_NEEDED or already safely reusable;
+- use the existing Velocity scheduler and Execution Fabric only; no second scheduler is introduced;
+- fan-out requires positive expected TTTA gain after orchestration overhead and existing conflict/lock checks;
+- same-scope writers still serialize and all compatible branches reconverge through one integration lane;
+- workgroup labels are material execution metadata and may be surfaced in status reporting;
+- r24 latency branching remains active inside/around workgroups when a live task becomes slow.
+
+Intrinsic acceleration:
+- reuse validated static graph analysis and tail scores until the graph topology actually changes;
+- invalidate cached graph analysis only when dynamic tasks change topology;
+- when no external event listener exists, record material events without an unnecessary asynchronous scheduling hop;
+- preserve listener ordering/await semantics when an external listener is present;
+- intrinsic optimization must not change task results, dependency semantics, locks, cache semantics, event history, approval gates or project-native authority.
+Proof may report semantic workgroups, eliminated groups, estimated semantic gain, scheduler graph recomputes and event fast-path count.
+
 VERSION
-MOTORLAB-EXECUTION-FABRIC-V1.2
+MOTORLAB-EXECUTION-FABRIC-V1.3
 Established: 2026-10-06
 Revision 1.1: r23 adds work-elimination-first execution, content-addressed reuse, dynamic graph growth, progressive branching, pruning, event memory, deferred materialization and expanded proof metrics while preserving Velocity as sole scheduler.
 
 Revision 1.2: r24 adds evidence-gated latency branching so useful independent work can start while a slow runner is still live, with immediate dispatcher wake-up, no-side-effect-race guardrails and proof metrics.
+
+Revision 1.3: r25 adds semantic workgroups after work elimination plus intrinsic dispatcher acceleration through topology-aware graph-analysis reuse and no-listener event fast path, while preserving r24 latency branching and single-writer integration safety.

@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.07-r24
+CURRENT_RELEASE=2026.10.07-r25
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -201,8 +201,28 @@ r24 adds evidence-gated latency hiding on top of r23:
 - fictional completion countdowns are prohibited.
 Reference implementation remains templates/execution/motorlab_execution_fabric.mjs.
 
+R25+ SEMANTIC WORKGROUPS + INTRINSIC ENGINE ACCELERATION
+r25 adds two complementary speed layers on top of r24:
+A) Semantic Workgroups
+- eliminate/reuse/reduce before grouping;
+- map remaining independent responsibility lanes into named workgroups;
+- parallelize only when expected gain beats overhead;
+- preserve same-scope serialization and one integration lane;
+- retain r24 latency branches for slow live work.
+
+B) Intrinsic Engine Acceleration
+- cache validated graph/tail-score analysis until topology changes;
+- avoid unnecessary async event scheduling hops when no listener exists;
+- retain exact listener await semantics when a listener exists;
+- expose schedulerGraphRecomputes and eventFastPathCount as proof.
+
+Observed LAB benchmark on GitHub Actions:
+- semantic workgroups scenario: about 232.24 ms serial vs 95.55 ms parallel, about 58.86% lower TTTA / 2.43x speedup;
+- intrinsic dispatcher scenario: about 183.956 ms baseline vs 71.087 ms optimized, about 61.36% lower dispatcher time / 2.59x speedup.
+These are controlled benchmark observations, not universal speed guarantees.
+
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.24
+MOTORLAB-RELEASE-MANIFEST-V1.25
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -217,3 +237,5 @@ Revision 1.22: r22 adds mandatory operational Execution Fabric, real ready-queue
 Revision 1.23: r23 adds work-elimination-first incremental execution, content-addressed reuse, dynamic DAG growth/pruning, progressive branching, event memory and deferred materialization on top of r22 Execution Fabric.
 
 Revision 1.24: r24 adds evidence-gated latency branching with immediate scheduler wake-up and safe useful-work overlap during slow live operations.
+
+Revision 1.25: r25 combines semantic parallel workgroups with measured intrinsic dispatcher acceleration, while preserving Work Elimination First, r24 latency hiding, r23 reuse/delta execution and all safety/lifecycle boundaries.

@@ -553,11 +553,25 @@ Decision order:
 6. reconverge through normal dependency and single-integration rules.
 A timer is not an optimization by itself. The optimization is useful work overlapped with otherwise unavoidable latency.
 
+R25 WORKGROUP / INTRINSIC SPEED DECISION ORDER
+Permanent optimization order:
+1. ELIMINATE: if safely unnecessary, do not execute it.
+2. REUSE: prefer valid cache/checkpoint/result reuse.
+3. REDUCE: run only invalidated delta.
+4. ACCELERATE INTRINSICALLY: remove dispatcher/orchestration overhead without weakening semantics.
+5. GROUP SEMANTICALLY: identify independent responsibility lanes among remaining necessary work.
+6. PARALLELIZE only when expected TTTA gain exceeds coordination/contention overhead.
+7. HIDE LATENCY with r24 only when useful independent work remains.
+8. INTEGRATE once through the authoritative lane.
+Semantic workgroups are an execution shape chosen by Velocity, not independent agents or schedulers.
+
 VERSION
-MOTORLAB-VELOCITY-LAYER-V1.4
+MOTORLAB-VELOCITY-LAYER-V1.5
 Established: 2026-09-29
 Revision 1.1: r21 establishes the four design pillars, TTTA primary KPI, complexity budget, adaptive DAG/critical-path scheduling, isolated runner fan-out, continuous convergence, correction relay, bounded speculative execution, evidence learning and incremental-everything semantics without weakening single-writer or promotion safety.
 Revision 1.2: r22 binds adaptive Velocity to the executable Execution Fabric, requires Fast Decision Gate, event-driven ready-queue dispatch, observed parallelism proof, host-limited truthfulness and grouped concurrency status.
 Revision 1.3: r23 establishes work-elimination-first optimization, content-addressed incremental reuse, dynamic DAG growth/pruning, progressive execution shapes, event-driven memory and deferred materialization before adaptive parallelism.
 
 Revision 1.4: r24 adds latency-hiding branch decisions: branch only when measured/estimated TTTA gain exceeds overhead, while preserving no-duplicate-side-effect and single-writer constraints.
+
+Revision 1.5: r25 establishes the eliminate/reuse/reduce/intrinsic-accelerate/semantic-group/parallelize/latency-hide/integrate order and makes semantic workgroups a Velocity-owned execution shape.
