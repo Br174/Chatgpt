@@ -13,7 +13,7 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
 3. Use VERIFIED local core immediately as fallback.
 4. When central is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
-5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_EXECUTION_FABRIC_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_POLLICINO_CONTINUITY_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
+5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_EXECUTION_FABRIC_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_POLLICINO_CONTINUITY_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
 6. Read Project Continuity ledger.
 7. Read technical Change History registry when present.
 8. Read visible Registro Modifiche e Ripristini when present.
@@ -139,6 +139,19 @@ At boot, preserve all r23-r25 ordering and load r26 as a coordinated extension o
 - External provider hedges require explicit adapter authorization and External Service Guard compliance.
 - Ordinary tasks without hedge/lane needs retain the r25-compatible lightweight fast path.
 
+R26 ADAPTIVE RUNTIME
+Load MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt between Velocity planning and Execution Fabric dispatch.
+- Velocity stays the only scheduler.
+- Governor stays the only adaptive lane/latency tuner.
+- Execution Fabric stays the dispatcher.
+- External Service Guard stays provider-pressure authority.
+- Fresh Hedge defaults to a 10 s hard trigger with early explicit-stall activation, maximum 3 attempts per wave and maximum 2 waves.
+- Never hedge write/integration work.
+- External hedging requires adapter/provider authorization and quota-safe cancellation semantics.
+- Persist/reload governor evidence when supported through existing operational state.
+- Ordinary work that does not need r26 features must use the lightweight fast path.
+Opaque host ChatGPT reasoning remains outside direct restart/cancel control unless the host exposes that capability.
+
 VERSION
 MOTORLAB-CORE-ENTRYPOINT-V1.20
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
@@ -163,3 +176,5 @@ Revision 1.18: r24 boots evidence-gated latency branching so MotorLab can overla
 Revision 1.19: r25 boots semantic workgroups and intrinsic execution acceleration after Work Elimination First, without adding a second scheduler or weakening r24/r23 safety contracts.
 
 Revision 1.20: r26 boots one coordinated Adaptive Runtime Governor for bounded Fresh Hedge and lane feedback while keeping Velocity the sole scheduler and preserving r24/r25 behavior.
+
+Revision 1.20: r26 boots the Adaptive Runtime Governor as the single coordinator for adaptive lanes and bounded hedge/latency recovery while preserving Velocity, Service Guard, Pollicino and project-native authorities.
