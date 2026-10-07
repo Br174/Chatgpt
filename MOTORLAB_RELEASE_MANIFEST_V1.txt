@@ -217,8 +217,9 @@ B) Intrinsic Engine Acceleration
 - expose schedulerGraphRecomputes and eventFastPathCount as proof.
 
 Observed LAB benchmark on GitHub Actions:
-- semantic workgroups scenario: about 232.24 ms serial vs 95.55 ms parallel, about 58.86% lower TTTA / 2.43x speedup;
-- intrinsic dispatcher scenario: about 183.956 ms baseline vs 71.087 ms optimized, about 61.36% lower dispatcher time / 2.59x speedup.
+- semantic workgroups final gate: 232.28 ms serial vs 95.09 ms parallel, 59.06% lower TTTA / 2.44x speedup;
+- intrinsic dispatcher final gate: 183.956 ms baseline vs 61.225 ms optimized, 66.72% lower dispatcher time / about 3.00x speedup.
+- final LAB gate: GitHub Actions run 37632156382, 20 tests passed / 0 failed.
 These are controlled benchmark observations, not universal speed guarantees.
 
 VERSION
