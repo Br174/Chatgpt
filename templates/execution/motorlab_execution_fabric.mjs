@@ -42,6 +42,7 @@ function task(t) {
     adaptiveLane:Boolean(t.adaptiveLane ?? kind==='external'),
     hedgeSafe:Boolean(t.hedgeSafe),
     hedgeExternalAllowed:Boolean(t.hedgeExternalAllowed),
+    replacePrimaryOnHardHedge:Boolean(t.replacePrimaryOnHardHedge),
     hedgeAfterMs:Math.max(0,Number(t.hedgeAfterMs)||0),
     hedgeWidth:Math.max(1,Math.min(3,Number(t.hedgeWidth)||3)),
     hedgeMaxWaves:Math.max(1,Math.min(2,Number(t.hedgeMaxWaves)||2)),
@@ -221,7 +222,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   const tasks=new Map(initial.map(t=>[t.id,t])),pending=new Set(tasks.keys()),done=new Set(),pruned=new Set(),running=new Map(),results=new Map(),records=[],eventHistory=[],cacheChecked=new Set();
   let peak=0,intNow=0,intPeak=0,correctionRelays=0,dynamicTasks=0,cacheHits=0,cacheAvoidedEstimatedMs=0,latencyBranches=0,latencyBranchTasks=0,latencyExpectedGainMs=0,latencyBranchFailures=0;
   let productiveBranches=0,productiveBranchTasks=0,productiveExpectedGainMs=0,productiveBranchFailures=0;
-  let freshHedges=0,hedgeWaves=0,hedgeWins=0,hedgePrimaryWins=0,hedgeAbortRequests=0,hedgeSuppressedUnsafe=0,hedgeExhausted=0,materialProgressSignals=0,earlyStallSignals=0,laneAdjustments=0,laneThrottleSignals=0,laneSaturationSignals=0;
+  let freshHedges=0,hedgeWaves=0,hedgeWins=0,hedgePrimaryWins=0,hedgePrimaryReplacements=0,hedgeAbortRequests=0,hedgeSuppressedUnsafe=0,hedgeExhausted=0,materialProgressSignals=0,earlyStallSignals=0,laneAdjustments=0,laneThrottleSignals=0,laneSaturationSignals=0;
   let graphVersion=0,cachedGraphVersion=-1,cachedGraph=null,cachedScores=null,schedulerGraphRecomputes=0,eventFastPathCount=0,wakeGeneration=0;
   const laneInflight=new Map();
   const laneCount=key=>laneInflight.get(key)||0;
@@ -364,6 +365,10 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
         a.active=false;releaseLane(t,a);
         await observeLane({ok:true,value,durationMs:Math.max(0,now()-startedAt)});
         if(settled)return;
+        if(controller.signal.aborted){
+          failures.push(new Error('aborted attempt'));
+          finishFailureIfExhausted();return;
+        }
         if(!(await validResult(value,a))){
           failures.push(new Error(value?.stalled?'stalled result':'invalid result'));
           stalled.add(id);
@@ -377,6 +382,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
         a.active=false;releaseLane(t,a);
         await observeLane({ok:false,error,durationMs:Math.max(0,now()-startedAt)});
         if(settled)return;
+        if(controller.signal.aborted){finishFailureIfExhausted();return;}
         failures.push(error);
         if(wave===1&&!waveExpanded)expandWave('PRIMARY_FAILED');
         finishFailureIfExhausted();
@@ -386,6 +392,15 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
     const expandWave=reason=>{
       if(settled||!eligible||waveExpanded)return false;
       waveExpanded=true;freshHedges++;hedgeWaves++;
+      if(reason==='HARD_10S_TRIGGER'&&t.replacePrimaryOnHardHedge){
+        const primary=attempts.get(1),controller=controllers.get(1);
+        if(primary&&controller&&!controller.signal.aborted){
+          controller.abort('HARD_HEDGE_REPLACED_PRIMARY');
+          hedgeAbortRequests++;hedgePrimaryReplacements++;releaseLane(t,primary);
+          const replacedAck=emit({type:'FRESH_HEDGE_PRIMARY_REPLACED',taskId:t.id,attempt:1,triggerMs:hardMs,laneKey:t.laneKey});
+          if(replacedAck)replacedAck.catch(()=>{});
+        }
+      }
       const target=width();
       while(taskAttemptsForWave(1).length<target)startAttempt(1);
       const ack=emit({type:'FRESH_HEDGE_WAVE_STARTED',taskId:t.id,wave:1,width:target,reason,triggerMs:hardMs,laneKey:t.laneKey});
@@ -472,7 +487,7 @@ export async function executeGraph(input=[],worker,{maxConcurrency=DEFAULT_MAX,n
   const governorSnapshot=governor.snapshot();
   if(typeof adaptiveStateStore==='function'){try{await adaptiveStateStore(governorSnapshot);adaptiveStateStored=true;}catch{}}
   const executionDoneAck=emit({type:'EXECUTION_COMPLETED',cacheHits,dynamicTasks,prunedTasks:pruned.size,productiveBranches,latencyBranches,freshHedges,laneAdjustments,adaptiveStateLoaded,adaptiveStateStored});if(executionDoneAck)await executionDoneAck;
-  return {results:Object.fromEntries(results),eventHistory,proof:{executionMode,runnerCount:effectiveRunnerCount,observedPeakConcurrency:peak,observedPeakIntegrationConcurrency:intPeak,singleIntegrationLaneVerified:intPeak<=1,overlapPairs:overlaps,criticalPath:criticalPath(finalGraph),correctionRelays,dynamicTasks,prunedTasks:[...pruned],cacheHits,cacheAvoidedEstimatedMs,productiveBranches,productiveBranchTasks,productiveExpectedGainMs,productiveBranchFailures,latencyBranches,latencyBranchTasks,latencyExpectedGainMs,latencyBranchFailures,freshHedges,hedgeWaves,hedgeWins,hedgePrimaryWins,hedgeAbortRequests,hedgeSuppressedUnsafe,hedgeExhausted,materialProgressSignals,earlyStallSignals,laneAdjustments,laneThrottleSignals,laneSaturationSignals,adaptiveStateLoaded,adaptiveStateStored,adaptiveGovernor:governorSnapshot,schedulerGraphRecomputes,eventFastPathCount,eventsRecorded:eventHistory.length,records}};
+  return {results:Object.fromEntries(results),eventHistory,proof:{executionMode,runnerCount:effectiveRunnerCount,observedPeakConcurrency:peak,observedPeakIntegrationConcurrency:intPeak,singleIntegrationLaneVerified:intPeak<=1,overlapPairs:overlaps,criticalPath:criticalPath(finalGraph),correctionRelays,dynamicTasks,prunedTasks:[...pruned],cacheHits,cacheAvoidedEstimatedMs,productiveBranches,productiveBranchTasks,productiveExpectedGainMs,productiveBranchFailures,latencyBranches,latencyBranchTasks,latencyExpectedGainMs,latencyBranchFailures,freshHedges,hedgeWaves,hedgeWins,hedgePrimaryWins,hedgePrimaryReplacements,hedgeAbortRequests,hedgeSuppressedUnsafe,hedgeExhausted,materialProgressSignals,earlyStallSignals,laneAdjustments,laneThrottleSignals,laneSaturationSignals,adaptiveStateLoaded,adaptiveStateStored,adaptiveGovernor:governorSnapshot,schedulerGraphRecomputes,eventFastPathCount,eventsRecorded:eventHistory.length,records}};
 }
 
 export function formatProof(p={}){

@@ -249,6 +249,7 @@ R27+ ZERO-IDLE DUAL-LANE ACTIVE WAIT
 - Independent useful work starts immediately when ready; there is no artificial 3-second or 10-second delay before productive sidework.
 - Predeclared safe productiveSpawn work may be inserted immediately by Execution Fabric when expected gain exceeds overhead.
 - Same-task Fresh Hedge recovery remains separate and keeps the default 10000 ms hard trigger, unless reliable stall evidence justifies earlier recovery.
+- Controlled analysis/wait tasks may use replacePrimaryOnHardHedge so the stale primary is cancelled or invalidated at the hard trigger and late stale results cannot win.
 - Productive sidework and same-task recovery may coexist; neither suppresses the other.
 - Visible status must report only real started/completed sidework at available control points.
 - Existing single-writer, provider, runner-cap and single-integration-lane rules remain mandatory.
@@ -275,3 +276,4 @@ Revision 1.25: r25 combines semantic parallel workgroups with measured intrinsic
 Revision 1.26: r26 adds coordinated bounded Triple Hedge, Adaptive Lane Pool and measurable runtime feedback while preserving work-elimination-first, r25 fast paths and all safety/provider boundaries.
 
 Revision 1.27: r27 introduces zero-idle dual-lane active wait: immediate independent productive work plus separate bounded same-task recovery at the default 10-second trigger.
+r27 final gate evidence: GitHub Actions run 37657147621; execution fabric regression 32/32 passed and focused r27 regression 2/2 passed.

@@ -239,8 +239,17 @@ At a safe satellite adoption boundary, sync the r26 dispatcher and adaptive-runt
 - Preserve r24 useful-work latency branching, r25 workgroups/intrinsic fast path and single-writer/integration semantics.
 - External hedging remains disabled unless the project adapter explicitly authorizes it under External Service Guard constraints.
 
+R27 ZERO-IDLE DUAL-LANE SYNC
+At a safe satellite adoption boundary, sync the r27 dispatcher and zero-idle markers only.
+- preserve the current verified r26 local core as LAST_GOOD before adoption;
+- immediately dispatch compatible READY work and immediate productive sidework;
+- keep same-task recovery separate at the default 10000 ms hard trigger;
+- carry replacePrimaryOnHardHedge support for controlled analysis/wait tasks where the adapter declares safe cancellation/invalidation;
+- preserve application runtime/UI/package/signing and project-native engines;
+- do not switch execution control mid active write/build/test/promotion.
+
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.27
+MOTORLAB-SATELLITE-SYNC-V1.28
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -271,3 +280,5 @@ Revision 1.25: r24 requires evidence-gated latency branch trigger inheritance an
 Revision 1.26: r25 requires semantic-workgroup and intrinsic-speed inheritance at safe satellite boundaries, with r24 retained as LAST_GOOD.
 
 Revision 1.27: r26 requires safe-boundary inheritance of Triple Fresh Hedge, Adaptive Lane Pool and the coordinated runtime governor, with r25 retained as LAST_GOOD.
+
+Revision 1.28: r27 requires safe-boundary inheritance of zero-idle immediate sidework plus separate same-task recovery; r26 remains LAST_GOOD until verified adoption.
