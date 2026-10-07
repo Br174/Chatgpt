@@ -319,11 +319,46 @@ Intrinsic acceleration:
 - intrinsic optimization must not change task results, dependency semantics, locks, cache semantics, event history, approval gates or project-native authority.
 Proof may report semantic workgroups, eliminated groups, estimated semantic gain, scheduler graph recomputes and event fast-path count.
 
+R26 ADAPTIVE RUNTIME COORDINATION
+r26 coordinates the existing r23-r25 speed layers through one subordinate runtime governor; it does not introduce a second scheduler.
+
+A. TRIPLE FRESH HEDGE
+- Hedge only work explicitly classified hedge-safe by Velocity/project adapters.
+- Write/integration tasks never duplicate through Fresh Hedge.
+- External/provider tasks require explicit HEDGE_EXTERNAL_ALLOWED=true and remain subordinate to External Service Guard budgets, queueing, coalescing, Retry-After, backoff and circuit state.
+- Default hard trigger is 10000 ms for an eligible task that has not completed.
+- An explicit material stall signal may trigger the first hedge wave earlier than 10000 ms.
+- First wave contains at most three total attempts including the original attempt.
+- First valid result wins. Abort-capable losers receive cancellation; non-cooperative losers are ignored after settlement.
+- If all attempts in wave 1 stall/fail/timeout, one additional wave of at most three attempts may start.
+- Maximum waves are bounded to two; never multiply 3 -> 9 -> 27.
+- Invalid/stalled results never win merely because they arrived first.
+
+B. ADAPTIVE LANE POOL
+- Lane limits are subordinate resource caps inside Execution Fabric, never a scheduler.
+- Adaptive lane control applies only to declared adaptive lanes; ordinary local work stays on the r25 fast path.
+- Use AIMD-style control: healthy evidence permits gradual increase; throttling cuts concurrency rapidly; saturation decreases conservatively.
+- Global maxConcurrency, provider limits, single-writer conflict rules and integration-lane rules remain hard upper bounds.
+- Governor state can be restored from prior evidence when the host persists it; cache/state loss causes conservative relearning, never correctness loss.
+
+C. UNIFIED LATENCY CONTROLLER
+- Velocity remains the only authority deciding which tasks are hedge-safe and what alternative useful work is eligible.
+- Explicit stall on hedge-safe work may invoke Fresh Hedge immediately.
+- Hard 10s on hedge-safe work invokes bounded Fresh Hedge.
+- Non-hedge work may still use the r24 useful-work latency branch.
+- Dynamic branch creation still wakes the dispatcher immediately.
+- Do not stack independent retry/hedge schedulers for the same responsibility.
+
+D. MEASUREMENT
+Proof records hedge waves/wins/exhaustion/cancellation requests, material progress/stall signals, lane adjustments/throttle/saturation signals and the governor snapshot, alongside existing r23-r25 proof.
+
 VERSION
-MOTORLAB-EXECUTION-FABRIC-V1.3
+MOTORLAB-EXECUTION-FABRIC-V1.4
 Established: 2026-10-06
 Revision 1.1: r23 adds work-elimination-first execution, content-addressed reuse, dynamic graph growth, progressive branching, pruning, event memory, deferred materialization and expanded proof metrics while preserving Velocity as sole scheduler.
 
 Revision 1.2: r24 adds evidence-gated latency branching so useful independent work can start while a slow runner is still live, with immediate dispatcher wake-up, no-side-effect-race guardrails and proof metrics.
 
 Revision 1.3: r25 adds semantic workgroups after work elimination plus intrinsic dispatcher acceleration through topology-aware graph-analysis reuse and no-listener event fast path, while preserving r24 latency branching and single-writer integration safety.
+
+Revision 1.4: r26 adds bounded Triple Fresh Hedge, provider-safe Adaptive Lane Pool and one measurable Adaptive Runtime Governor, preserving r24 wake behavior, r25 fast path, single-writer and one integration lane.
