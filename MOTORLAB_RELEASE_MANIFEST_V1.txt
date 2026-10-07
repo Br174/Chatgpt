@@ -4,7 +4,7 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.07-r25
+CURRENT_RELEASE=2026.10.07-r26
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
@@ -222,8 +222,29 @@ Observed LAB benchmark on GitHub Actions:
 - final LAB gate: GitHub Actions run 37632156382, 20 tests passed / 0 failed.
 These are controlled benchmark observations, not universal speed guarantees.
 
+R26+ COORDINATED ADAPTIVE RUNTIME
+r26 adds one coordinated feedback layer on top of r25:
+- Triple Fresh Hedge: eligible tasks may expand from the original attempt to at most three total attempts; first valid result wins.
+- Explicit material-stall signal can trigger recovery early.
+- Default hard Fresh Hedge trigger: 10000 ms.
+- At most two hedge waves; no exponential fan-out.
+- Write/integration hedge is forbidden.
+- External/provider hedge requires explicit adapter authorization and remains subordinate to External Service Guard.
+- Adaptive Lane Pool uses measured success/latency/throttle/saturation feedback with rapid decrease on throttling and gradual recovery.
+- Ordinary non-adaptive tasks retain the lightweight r25-compatible fast path.
+- r24 useful-work latency branching and immediate dispatcher wake remain preserved.
+- Velocity remains sole scheduler; one integration lane and all single-writer/project-native boundaries remain mandatory.
+
+Final LAB gate evidence, GitHub Actions run 37639565434:
+- 29 tests passed / 0 failed;
+- semantic workgroups: 232.76 ms serial vs 95.65 ms parallel, 58.90% lower TTTA / 2.43x;
+- intrinsic dispatcher: 62.099 ms average on the 1200-task benchmark;
+- controlled stall recovery: 80.93 ms baseline vs 29.25 ms hedged, 63.86% lower time / 2.77x;
+- adaptive lane trace under synthetic 429 + recovery: 3 -> 1 -> 1 -> 2.
+These are controlled observations, not universal speed guarantees.
+
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.25
+MOTORLAB-RELEASE-MANIFEST-V1.26
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -240,3 +261,5 @@ Revision 1.23: r23 adds work-elimination-first incremental execution, content-ad
 Revision 1.24: r24 adds evidence-gated latency branching with immediate scheduler wake-up and safe useful-work overlap during slow live operations.
 
 Revision 1.25: r25 combines semantic parallel workgroups with measured intrinsic dispatcher acceleration, while preserving Work Elimination First, r24 latency hiding, r23 reuse/delta execution and all safety/lifecycle boundaries.
+
+Revision 1.26: r26 adds coordinated bounded Triple Hedge, Adaptive Lane Pool and measurable runtime feedback while preserving work-elimination-first, r25 fast paths and all safety/provider boundaries.
