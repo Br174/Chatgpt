@@ -1,0 +1,125 @@
+MOTORLAB ADAPTIVE RUNTIME GOVERNOR V1
+
+STATUS
+Canonical r26 runtime coordination policy.
+Central authority: Br174/Chatgpt.
+
+PURPOSE
+Coordinate the existing MotorLab execution capabilities as one adaptive system instead of independent optimizers. Velocity remains the sole scheduling/planning authority. The Adaptive Runtime Governor is subordinate runtime control that tunes concurrency, hedge width/timing and learned execution pressure from measured evidence. Execution Fabric remains the dispatcher.
+
+GLOBAL ORDER
+1. ELIMINATE safely unnecessary work.
+2. REUSE valid cache/checkpoint/result state.
+3. REDUCE to invalidated delta.
+4. ACCELERATE the intrinsic dispatcher hot path.
+5. GROUP remaining independent work semantically.
+6. ASSIGN adaptive lane capacity within provider/tool budgets.
+7. DISPATCH compatible READY work.
+8. RECOVER slow hedge-safe work through the unified Latency Controller.
+9. INTEGRATE through exactly one authoritative integration lane.
+10. VERIFY and persist material governor evidence.
+
+ONE COORDINATOR
+- Velocity = only scheduler/planner.
+- Adaptive Runtime Governor = only runtime capacity/latency tuner.
+- Execution Fabric = only dispatcher.
+- Change Compatibility Guard + single-writer = write compatibility authority.
+- External Service Guard = provider quota/rate/backoff/circuit authority.
+- Pollicino/Resume Recovery = continuity authority.
+Do not introduce parallel schedulers, duplicate latency managers or competing provider limiters.
+
+ADAPTIVE LANE POOL
+A lane is a bounded execution corridor for a shared resource/provider/tool scope.
+- laneKey identifies the shared capacity domain, e.g. github, github-read, provider-X, build-host.
+- local/non-provider work is not lane-throttled unless explicitly marked adaptiveLane.
+- external work defaults to adaptive lane control.
+- configured provider ceilings always override learned expansion.
+- use additive increase after repeated healthy evidence.
+- use multiplicative decrease on throttling/rate-limit evidence.
+- reduce pressure on explicit saturation evidence.
+- never use extra credentials to evade a provider quota policy.
+- learning affects capacity only; it grants no new authority.
+
+UNIFIED LATENCY CONTROLLER
+The existing r24 useful-work latency branch and r26 Fresh Hedge share one recovery responsibility.
+Precedence:
+A. If a slow task is hedge-safe, use bounded Fresh Hedge recovery.
+B. Otherwise, if safe independent latency work exists and expected gain exceeds overhead, use r24 LATENCY_BRANCH.
+C. Otherwise continue the original task/watchdog path without inventing duplicate work.
+
+FRESH HEDGE POLICY
+Default hard trigger: 10000 ms.
+- An explicit technical stall signal may trigger recovery before 10 s.
+- 10 s is the maximum default wait for hedge-eligible work; it is not a claim that every >10 s operation is objectively broken.
+- Wave 1 contains the original attempt plus up to two fresh attempts: maximum 3 attempts.
+- First valid result wins.
+- Losers receive cancellation/abort where supported; late loser results are ignored after settlement.
+- If all Wave 1 attempts fail/stall or the wave times out, one additional Wave 2 may start.
+- Wave 2 contains at most 3 fresh attempts.
+- Maximum waves: 2. Maximum total attempts: 6.
+- No 3->9->27 unbounded multiplication.
+- If both waves exhaust without a valid result, fail visibly into normal recovery/fallback rather than loop forever.
+- A result validator may reject invalid/stalled results before they can win.
+- Worker adapters should honor AbortSignal when supplied.
+
+HEDGE SAFETY
+- write and integration tasks never hedge.
+- local/read/idempotent work may hedge only when explicitly hedgeSafe.
+- external/provider work additionally requires hedgeExternalAllowed from the adapter/provider profile.
+- external hedge attempts must remain inside External Service Guard budgets, concurrency limits, Retry-After/backoff and circuit state.
+- ordinary equivalent provider requests remain deduplicated/coalesced; hedging is a bounded explicit recovery exception, not a replacement for coalescing.
+- irreversible/costly side effects are never duplicated as a race.
+
+EARLY STALL SIGNAL
+A worker may emit an explicit technical stall signal through the Execution Fabric context.
+Examples: dead executor/session, deterministic no-progress sentinel, provider socket/stream failure already classified as recoverable.
+A vague elapsed-time impression is not an early-stall signal.
+When a reliable signal arrives, the first hedge wave may start before the 10 s hard trigger.
+
+MEASUREMENT
+Proof should expose, when applicable:
+- freshHedges;
+- hedgeWaves;
+- hedgeWins / hedgePrimaryWins;
+- hedgeAbortRequests;
+- hedgeSuppressedUnsafe;
+- hedgeExhausted;
+- earlyStallSignals;
+- materialProgressSignals;
+- laneAdjustments;
+- laneThrottleSignals;
+- laneSaturationSignals;
+- adaptive governor snapshot;
+- adaptive state load/store evidence;
+- existing workgroup/cache/latency/critical-path/single-integration proof.
+
+PERSISTENT ADAPTATION
+The governor snapshot is non-authoritative operational evidence.
+- it may be persisted through the existing Persistent Operational State backend;
+- it may be restored on a later execution;
+- stale/missing state falls back safely to conservative configured defaults;
+- provider documentation/current live evidence outranks learned historical state;
+- persisted state must not contain secrets or private chain-of-thought.
+Loss of adaptive state causes relearning, not correctness loss.
+
+FAST PATH
+Tasks that do not require hedging, adaptive lanes, result validation or r24 latency branching use the lightweight r25-compatible path and do not pay recurring governor orchestration cost merely because r26 is installed.
+
+HOST BOUNDARY
+MotorLab cannot directly inspect, restart or cancel an opaque internal ChatGPT "Penso..." reasoning turn unless the host exposes such control. The Fresh Hedge contract applies to MotorLab-controlled runners/tasks/model calls/executors. Never describe opaque host reasoning as directly restartable when it is not.
+
+SUCCESS CRITERIA
+r26 is successful when:
+- all prior r23/r24/r25 safety and execution tests remain green;
+- ordinary task overhead stays near the r25 fast-path envelope;
+- hedge-safe controlled stalls improve TTTA in evidence-backed benchmarks;
+- provider throttling reduces lane pressure instead of amplifying it;
+- healthy evidence allows gradual lane recovery;
+- no same-scope writer race is introduced;
+- exactly one final integration lane remains authoritative;
+- no infinite hedge or retry tree is possible;
+- adaptation can persist/reload without becoming a source of truth.
+
+VERSION
+MOTORLAB-ADAPTIVE-RUNTIME-GOVERNOR-V1.0
+Established: 2026-10-07

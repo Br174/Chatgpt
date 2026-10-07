@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validateGraph,criticalPath,planGraph,planSemanticWorkgroups,executeGraph,executeSemanticWorkgroups,formatProof,makeContentKey} from '../templates/execution/motorlab_execution_fabric.mjs';
+import {validateGraph,criticalPath,planGraph,planSemanticWorkgroups,createAdaptiveRuntimeGovernor,executeGraph,executeSemanticWorkgroups,formatProof,makeContentKey} from '../templates/execution/motorlab_execution_fabric.mjs';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 test('cycle guard',()=>assert.throws(()=>validateGraph([{id:'a',deps:['b']},{id:'b',deps:['a']}]),/cycle/));
@@ -129,4 +129,144 @@ test('event listener remains awaited on intrinsic fast path',async()=>{
   });
   assert.ok(order.indexOf('listener-started')<order.indexOf('worker'));
   assert.equal(out.proof.eventFastPathCount,0);
+});
+
+
+test('r26 default fresh hedge trigger is 10 seconds',()=>{
+  const g=createAdaptiveRuntimeGovernor();
+  assert.equal(g.snapshot().hedgeTriggerMs,10000);
+});
+
+test('fresh hedge starts up to three attempts and first valid wins',async()=>{
+  const seen=[];
+  const task={id:'slow-read',kind:'read',hedgeSafe:true,hedgeAfterMs:20,hedgeWidth:3,hedgeMaxWaves:2,laneKey:'github-read'};
+  const out=await executeGraph([task],async(_t,ctx)=>{
+    seen.push({attempt:ctx.attempt,wave:ctx.wave});
+    if(ctx.attempt===1){await sleep(80);return {valid:true,from:1};}
+    if(ctx.attempt===2){await sleep(5);return {valid:true,from:2};}
+    await sleep(30);return {valid:true,from:ctx.attempt};
+  },{maxConcurrency:4,adaptiveGovernor:createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:4,initialLanes:3,hedgeTriggerMs:20})});
+  assert.equal(out.results['slow-read'].from,2);
+  assert.ok(seen.some(x=>x.attempt===1));
+  assert.ok(seen.some(x=>x.attempt===2));
+  assert.ok(seen.some(x=>x.attempt===3));
+  assert.equal(out.proof.hedgeWins,1);
+  assert.equal(out.proof.hedgeWaves,1);
+});
+
+test('explicit early stall triggers hedge before hard timeout',async()=>{
+  const started=Date.now(),seen=[];
+  const out=await executeGraph([{id:'early',kind:'read',hedgeSafe:true,hedgeAfterMs:1000,hedgeWidth:3,laneKey:'read'}],async(_t,ctx)=>{
+    seen.push(ctx.attempt);
+    if(ctx.attempt===1){ctx.stall('blocked');await sleep(100);return {valid:false};}
+    await sleep(ctx.attempt===2?5:20);return {valid:true,from:ctx.attempt};
+  },{maxConcurrency:4,adaptiveGovernor:createAdaptiveRuntimeGovernor({initialLanes:3,maxLanes:4,hedgeTriggerMs:1000})});
+  assert.equal(out.results.early.from,2);
+  assert.ok(Date.now()-started<200);
+  assert.ok(out.proof.earlyStallSignals>=1);
+  assert.equal(out.proof.hedgeWaves,1);
+});
+
+test('second hedge wave is bounded to three attempts',async()=>{
+  const seen=[];
+  const out=await executeGraph([{id:'waves',kind:'read',hedgeSafe:true,hedgeAfterMs:25,hedgeWidth:3,hedgeMaxWaves:2,laneKey:'read'}],async(_t,ctx)=>{
+    seen.push({attempt:ctx.attempt,wave:ctx.wave});
+    if(ctx.wave===1){ctx.stall('wave1-stall');await sleep(80);return {valid:false};}
+    if(ctx.attempt===5){await sleep(5);return {valid:true,from:5};}
+    await sleep(30);return {valid:true,from:ctx.attempt};
+  },{maxConcurrency:4,adaptiveGovernor:createAdaptiveRuntimeGovernor({initialLanes:3,maxLanes:4,hedgeTriggerMs:25})});
+  assert.equal(out.results.waves.from,5);
+  assert.ok(seen.filter(x=>x.wave===1).length<=3);
+  assert.ok(seen.filter(x=>x.wave===2).length<=3);
+  assert.equal(out.proof.hedgeWaves,2);
+  assert.ok(Math.max(...seen.map(x=>x.attempt))<=6);
+});
+
+test('write tasks never hedge even when hedgeSafe was requested',async()=>{
+  const seen=[];
+  const out=await executeGraph([{id:'write',kind:'write',scopes:['x'],hedgeSafe:true,hedgeAfterMs:5}],async(_t,ctx)=>{seen.push(ctx.attempt);await sleep(12);return {ok:true};},{maxConcurrency:3});
+  assert.deepEqual(seen,[1]);
+  assert.equal(out.proof.freshHedges,0);
+  assert.equal(out.proof.hedgeSuppressedUnsafe,1);
+});
+
+test('adaptive lane pool uses AIMD and can restore learned state',()=>{
+  const g=createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:6,initialLanes:3,successesToIncrease:2});
+  const down=g.observe({laneKey:'github',ok:false,error:new Error('429 rate limit'),durationMs:10});
+  assert.equal(down.after,1);
+  g.observe({laneKey:'github',ok:true,durationMs:10});
+  const up=g.observe({laneKey:'github',ok:true,durationMs:10});
+  assert.equal(up.after,2);
+  const snapshot=g.snapshot();
+  const restored=createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:6,initialLanes:3,successesToIncrease:2,state:snapshot});
+  assert.equal(restored.laneLimit('github'),2);
+});
+
+test('r24 latency branch still wakes scheduler under r26',async()=>{
+  const seen=[],started=Date.now();
+  const out=await executeGraph([{
+    id:'slow-parent',kind:'external',estimatedMs:80,
+    latencyBranchAfterMs:10,latencyBranchExpectedGainMs:30,latencyBranchOverheadMs:1,
+    latencySpawn:[{id:'prep-r26',kind:'read',estimatedMs:20}]
+  }],async task=>{
+    seen.push({id:task.id,at:Date.now()-started});
+    await sleep(task.id==='slow-parent'?70:5);
+    return {ok:true};
+  },{maxConcurrency:2});
+  const prep=seen.find(x=>x.id==='prep-r26');
+  assert.ok(prep);
+  assert.ok(prep.at<60,`latency branch did not wake scheduler early: ${prep.at}ms`);
+  assert.equal(out.proof.latencyBranches,1);
+});
+
+
+test('external hedging requires explicit provider authorization',async()=>{
+  const seen=[];
+  const out=await executeGraph([{id:'ext',kind:'external',hedgeSafe:true,hedgeAfterMs:5,laneKey:'provider'}],async(_t,ctx)=>{
+    seen.push(ctx.attempt);await sleep(12);return {ok:true};
+  },{maxConcurrency:3});
+  assert.deepEqual(seen,[1]);
+  assert.equal(out.proof.freshHedges,0);
+  assert.equal(out.proof.hedgeSuppressedUnsafe,1);
+});
+
+test('adaptive lane pool caps provider concurrency without throttling local work',async()=>{
+  let providerActive=0,providerPeak=0,localActive=0,localPeak=0;
+  const governor=createAdaptiveRuntimeGovernor({minLanes:1,maxLanes:4,initialLanes:2,successesToIncrease:99});
+  const tasks=[
+    ...Array.from({length:4},(_,i)=>({id:'p'+i,kind:'external',laneKey:'github',adaptiveLane:true,estimatedMs:10})),
+    ...Array.from({length:4},(_,i)=>({id:'l'+i,kind:'read',estimatedMs:10}))
+  ];
+  await executeGraph(tasks,async task=>{
+    if(task.id.startsWith('p')){providerActive++;providerPeak=Math.max(providerPeak,providerActive);await sleep(10);providerActive--;}
+    else{localActive++;localPeak=Math.max(localPeak,localActive);await sleep(10);localActive--;}
+    return {ok:true};
+  },{maxConcurrency:6,adaptiveGovernor:governor});
+  assert.ok(providerPeak<=2,`provider peak exceeded lane budget: ${providerPeak}`);
+  assert.ok(localPeak>=2,`local work was unnecessarily lane-throttled: ${localPeak}`);
+});
+
+
+test('adaptive governor state persists and restores across executions',async()=>{
+  let stored=null;
+  const first=await executeGraph([
+    {id:'p1',kind:'external',laneKey:'github',adaptiveLane:true}
+  ],async()=>({runtime:{throttled:true}}),{
+    maxConcurrency:4,
+    adaptiveGovernorConfig:{minLanes:1,maxLanes:4,initialLanes:3,successesToIncrease:2},
+    adaptiveStateStore:async state=>{stored=state;}
+  });
+  assert.equal(first.proof.adaptiveStateStored,true);
+  assert.ok(stored);
+  assert.equal(stored.lanes.github.limit,1);
+
+  const second=await executeGraph([
+    {id:'p2',kind:'external',laneKey:'github',adaptiveLane:true}
+  ],async()=>({ok:true}),{
+    maxConcurrency:4,
+    adaptiveGovernorConfig:{minLanes:1,maxLanes:4,initialLanes:3,successesToIncrease:2},
+    adaptiveStateLoad:async()=>stored
+  });
+  assert.equal(second.proof.adaptiveStateLoaded,true);
+  assert.equal(second.proof.adaptiveGovernor.lanes.github.limit,1);
 });

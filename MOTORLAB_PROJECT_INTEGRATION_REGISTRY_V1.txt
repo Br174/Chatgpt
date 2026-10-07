@@ -5,16 +5,16 @@ Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.07-r25
+Release: 2026.10.07-r26
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
-Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.26
-Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.20
-Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.3
-Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.5
+Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.27
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.21
+Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.4
+Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.6
 Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
 Canonical Pollicino continuity: MOTORLAB_POLLICINO_CONTINUITY_V1.txt
 
-R25 GLOBAL EXECUTION POLICY
+R26 GLOBAL EXECUTION POLICY
 All registered projects inherit:
 - WORK_ELIMINATION_FIRST;
 - CONTENT_ADDRESSED_REUSE with explicit invalidation;
@@ -29,6 +29,17 @@ All registered projects inherit:
 - adaptive runner fan-out with one final integration lane;
 - observed parallelism proof and honest host-limited serial reporting.
 Velocity remains the sole scheduling authority. Execution Fabric is the dispatcher. Pollicino remains the external continuity line and is not replaced.
+
+R26 COORDINATED ADAPTIVE POLICY
+- Velocity remains the sole scheduler; Adaptive Runtime Governor is subordinate feedback control only.
+- Default Fresh Hedge hard trigger: 10000 ms.
+- Explicit material stall may trigger hedge recovery earlier.
+- Maximum three attempts per hedge wave, maximum two waves; first valid result wins.
+- Write/integration duplication is forbidden.
+- External/provider hedging requires explicit adapter authorization and External Service Guard compliance.
+- Adaptive Lane Pool uses measured success/latency/throttle/saturation evidence and remains below global/provider/write-safety caps.
+- Ordinary non-adaptive work retains the r25 fast path.
+- r24 useful-work latency branching and immediate dispatcher wake remain preserved.
 
 R25 COMBINED SPEED POLICY
 - First eliminate safely unnecessary work.
@@ -48,7 +59,7 @@ R24 LATENCY BRANCH POLICY
 - Preserve lock scopes, single-writer, runner caps and the single integration lane.
 - Completion countdowns are never presented as guaranteed unless truly deterministic.
 
-REGISTERED PROJECTS — R25 SEMANTIC + INTRINSIC ADOPTION 2026-10-07
+REGISTERED PROJECTS — R25 LAST VERIFIED ADOPTION / R26 SYNC PENDING SAFE BOUNDARY
 1. MusicLab — Br174/MusicLab
    main r25 commit: b0a02b0413c809587b7ab8cdb3f9c3e5f56bf489
    active LAB47 branch r25 commit: 9c9582ae6eb55d739214fdc97f117802d6c82fa5
@@ -109,10 +120,10 @@ Superpowers: CONNECTED_VERIFIED; subordinate methodology.
 Context7 Free: CONNECTED_VERIFIED; optional/version-aware documentation only.
 
 FUTURE PROJECTS
-Every newly onboarded project receives the current r25 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, and the r25 work-elimination-first semantic + intrinsic + latency-branch execution policy.
+Every newly onboarded project receives the current r26 satellite contract and inherits Pollicino continuity, approval, Root Cause, Artifact-First, update-family rules where relevant, and the r26 work-elimination-first semantic + intrinsic + adaptive-lane + bounded-hedge + latency-branch execution policy.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.23
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.24
 Revision 2.18: registry cleaned to current-state r23; six prior projects migrated and MotorAI onboarded at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
 
 Revision 2.20: r24 adds evidence-gated latency branching to the central contract; six established project mains plus active MusicLab LAB47 and StudyBook LAB03 were aligned at safe boundaries.
@@ -121,3 +132,5 @@ Revision 2.21: MotorAI adopted r24 after its pre-existing Android workflow reach
 Revision 2.22: r25 makes semantic workgroups plus intrinsic dispatcher acceleration the current global execution contract, subordinate to Work Elimination First and compatible with r24 latency branching.
 
 Revision 2.23: verified r25 adoption recorded for six project mains, active MusicLab LAB47, active StudyBook LAB03 and MotorAI-Training; r24 preserved as immediate LAST_GOOD rollback.
+
+Revision 2.24: r26 makes the coordinated Adaptive Runtime Governor, bounded Triple Fresh Hedge and Adaptive Lane Pool the current central contract; project satellites remain on their verified r25 state until safe-boundary synchronization completes.
