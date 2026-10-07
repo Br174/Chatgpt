@@ -225,8 +225,11 @@ When the local executor supports Codex hooks, sync the external Pollicino sideca
 For a private adopted satellite using source-proof enrollment, publish/update `POLLICINO_PROOF_HEAD=<current adopted Git SHA>` in D1 at the same verified adoption boundary; do not rely exclusively on mutable project operational heads.
 Persist that same adoption proof locally. Do not rotate it for metadata-only commits when the installed sidecar adoption is unchanged.
 
+R24 LATENCY BRANCH SYNC
+At a safe satellite adoption boundary, sync the r24 dispatcher plus LATENCY_BRANCH_TRIGGER markers. Existing application runtime/UI/package/signing remains untouched. Active work may remain pinned to r23 until its verified safe boundary; do not switch execution control mid-write/build/test/promotion.
+
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.24
+MOTORLAB-SATELLITE-SYNC-V1.25
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -251,3 +254,5 @@ Revision 1.22: r21 requires satellite inheritance of Four-Pillar TTTA-first adap
 Revision 1.23: r22 requires satellite inheritance of the operational Execution Fabric, Fast Decision Gate, ready-queue/batched execution, observed parallelism proof, host-limit reporting and grouped runner status.
 
 Revision 1.24: r23 requires work-elimination-first reuse, incremental delta execution, dynamic DAG growth/pruning, progressive branching, event memory and deferred materialization at safe satellite boundaries.
+
+Revision 1.25: r24 requires evidence-gated latency branch trigger inheritance and immediate dispatcher wake-up at safe satellite adoption boundaries.
