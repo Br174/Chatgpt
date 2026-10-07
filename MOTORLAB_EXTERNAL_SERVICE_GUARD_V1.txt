@@ -265,6 +265,18 @@ When technically applicable, verify at least:
 10. fallback/cache degraded mode preserves unrelated app functionality.
 Additional provider-specific regression checks may be mandatory.
 
+20A. BOUNDED HEDGE RECOVERY EXCEPTION - R26
+Equivalent in-flight external requests remain coalesced/deduplicated by default. r26 Fresh Hedge is a narrow recovery exception and is allowed only when ALL of the following hold:
+- the operation is explicitly hedge-safe and idempotent/read-only;
+- the provider/project adapter explicitly authorizes external hedging;
+- duplicate recovery attempts remain inside the same provider request budget and configured concurrency ceiling;
+- Retry-After, backoff, circuit state and documented provider limits are still honored;
+- cancellation/abort semantics are supported well enough to stop loser pressure where technically possible;
+- no credential rotation or alternate route is used to evade a shared quota;
+- maximum hedge width/waves stay bounded by the Adaptive Runtime Governor.
+A rate-limited, OPEN-circuit or policy-blocked provider must reduce/suppress hedge pressure rather than multiply it.
+Writes, purchases, mutations, irreversible side effects and unknown-safety calls are never hedge-raced.
+
 21. NO REGRESSION / COEXISTENCE
 This module is MotorLab control-plane infrastructure. It must not replace project-native search, playback, AI, geospatial or other domain engines. Existing working provider-specific logic should be wrapped/aligned incrementally rather than rewritten merely for terminology.
 
@@ -281,5 +293,7 @@ External Service Guard is active when:
 - future projects can reuse the same MotorLab mechanism through adapters.
 
 VERSION
-MOTORLAB-EXTERNAL-SERVICE-GUARD-V1.0
+MOTORLAB-EXTERNAL-SERVICE-GUARD-V1.1
 Established: 2026-09-29
+
+Revision 1.1: r26 defines a bounded provider-authorized Fresh Hedge exception without weakening coalescing, rate limiting, Retry-After, backoff, circuit-breaker or quota policy.
