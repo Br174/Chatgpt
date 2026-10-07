@@ -397,6 +397,7 @@ B. SAME-TASK RECOVERY REMAINS SEPARATE
 - The original task remains alive while productive sidework proceeds.
 - Fresh Hedge keeps the default 10000 ms hard trigger for eligible unresolved work, unless an explicit reliable stall signal triggers earlier.
 - Fresh Hedge duplicates/replaces the SAME task only inside existing bounded hedge rules.
+- With replacePrimaryOnHardHedge=true, the hard trigger invalidates/cancels the stale primary attempt before fresh replacements continue; a late stale result cannot win.
 - Productive sidework and Fresh Hedge may overlap; one MUST NOT suppress the other.
 
 C. VISIBLE TIMELINE SEMANTICS
