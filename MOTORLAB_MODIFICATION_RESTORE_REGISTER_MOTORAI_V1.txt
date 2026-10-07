@@ -3,8 +3,8 @@ PROJECT=MotorAI
 REPOSITORY=Br174/MotorAI
 REGISTER_STATUS=ACTIVE_CONFIRMED_ONLY
 DISPLAY_NAME=Registro Modifiche e Ripristini
-NEXT_RESTORE_NO=5
-VISIBLE_SLOTS=4
+NEXT_RESTORE_NO=6
+VISIBLE_SLOTS=5
 RULE=Only Bruno-confirmed working modifications explicitly approved for conservation enter this register. Technical history remains in Git/MOTORLAB_CHANGE_REGISTRY_MOTORAI_V1.txt. The Seed 003 APK is pending real-device acceptance and is therefore not yet a visible restore slot.
 VERSION=MOTORLAB-MOTORAI-MODIFICATION-RESTORE-REGISTER-V1.0
 
@@ -47,4 +47,14 @@ NAME=MotorAI Seed 009 - Baseline Livello 3 con retention completa
 CONFIRMED_DATE=2026-10-07
 SOURCE_HEAD=e316e55f59986f24d6abae04c6a108c35373c734
 DEVICE_RESULT=restart resume step1760; Level3 test 100%; Level2 retention 95.8%; Level1 retention 100%; Level0 retention 95.6%; ef>>> -> ef>>>ff
+STATUS=CONFIRMED_WORKING_CURRENT
+
+
+RESTORE_SLOT=5
+NAME=MotorAI Seed 010 - Baseline Livello 4 uguaglianza strutturale
+CONFIRMED_DATE=2026-10-07
+SOURCE_HEAD=28b2a68dc8b809ddd7b17b06a7c765ff3b816f34
+BUILD_RUN_ID=37581430312
+ARTIFACT_ID=11464189159
+DEVICE_RESULT=restart resume step2960; Level4 test 98.5%; Level3 100%; Level2 95.8%; Level1 100%; Level0 95.6%; ?efe> -> + and ?efg> -> -
 STATUS=CONFIRMED_WORKING_CURRENT
