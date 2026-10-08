@@ -97,7 +97,7 @@ Any new project added to MotorLab must declare:
 A project is not fully onboarded until these are defined.
 
 G. PRIORITY
-This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt and MOTORLAB_BACKGROUND_EXECUTION_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
+This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_BACKGROUND_EXECUTION_V1.txt and MOTORLAB_BUILD_FAST_LANE_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
 
 H. MOTORLAB WATCHDOG / ANTI-STALL - MANDATORY
 1. Every substantial controllable operation must expose heartbeat and material-progress state when technically available.
@@ -143,6 +143,14 @@ J. MOTORLAB BACKGROUND EXECUTION + SINGLE-CHAT CONTINUITY - MANDATORY
 16. MotorLab cannot force a suspended ordinary ChatGPT foreground turn to continue computing; therefore the background guarantee applies only after handoff to a real durable executor.
 17. MotorLab should proactively avoid leaving long backgroundable phases solely inside normal-chat execution.
 18. Detailed semantics are mandatory in MOTORLAB_BACKGROUND_EXECUTION_V1.txt.
+
+K. BUILD FAST LANE + SAFETY SOURCE CHECKPOINT - MANDATORY
+1. MOTORLAB_BUILD_FAST_LANE_V1.txt governs Android/UAB build acceleration.
+2. A verified LAB aggiornamento normally performs ONE update-family Gradle build.
+3. The paired LAB di sicurezza is preserved as an immutable GitHub SOURCE checkpoint plus materialization recipe; its APK is built only on demand by default.
+4. Requested update artifact delivery becomes eligible as soon as source/package/version/signing checks pass and the artifact is retrievable; unrelated/deferred work must not delay delivery.
+5. Historical eager safety APKs remain valid.
+6. Build acceleration may not weaken package identity, signing, update-in-place, source lineage or verification.
 
 Engine version: MOTORLAB-CORE-V1.6 (legacy UAB compatibility)
 Last updated: 2026-10-08.
