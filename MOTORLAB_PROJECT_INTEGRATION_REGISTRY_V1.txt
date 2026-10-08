@@ -61,10 +61,10 @@ R29 MANDATORY ALL-PROJECT VERSIONED BOOT POLICY
 R28 CENTRAL RELEASE FANOUT POLICY
 - A central MotorLab release is incomplete until every registered project default/current active ref is UPDATED_VERIFIED or PENDING_SAFE_BOUNDARY.
 - Safe targets receive the new satellite during the release operation itself.
-- Open sessions keep the full MotorLab snapshot pinned by session_id and never switch underneath active work.
-- resume/compact/clear reuse the same pinned snapshot.
-- New sessions automatically use the newest verified local satellite.
-- Busy write/build/test/promotion targets are not force-switched; adoption is deferred to the first verified safe boundary.
+- A session pin is immutable while explicit write/build/test/promotion work is in flight.
+- Every supported UserPromptSubmit/resume/compact/clear re-enters MotorLab and reinjects the pinned Critical Boot Capsule.
+- New sessions use the newest verified local satellite automatically.
+- At a safe re-entry boundary, a newer VERIFIED local satellite may refresh the session pin; busy targets keep the existing pin until safe.
 - LAST_GOOD remains the immediately previous verified release.
 - Fanout changes control-plane metadata only; project-native engines/runtime/lifecycle remain authoritative.
 
@@ -133,10 +133,10 @@ Superpowers: CONNECTED_VERIFIED; subordinate methodology.
 Context7 Free: CONNECTED_VERIFIED; optional/version-aware documentation only.
 
 FUTURE PROJECTS
-Every newly onboarded project receives the current r30 satellite + Critical Boot Capsule contract and the release-fanout/session-pin mechanism. Central release work must synchronize registered targets in the same release operation; busy targets become PENDING_SAFE_BOUNDARY and are retried automatically at the first verified safe boundary.
+Every newly onboarded project receives the current r31 satellite + Critical Boot Capsule + every-turn Re-entry Gate contract and the release-fanout/session-pin mechanism. Central release work must synchronize registered targets in the same release operation; busy targets become PENDING_SAFE_BOUNDARY and are retried automatically at the first verified safe boundary.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.27
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.33
 Revision 2.18: registry cleaned to current-state r23; six prior projects migrated and MotorAI onboarded at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
 
 Revision 2.20: r24 adds evidence-gated latency branching to the central contract; six established project mains plus active MusicLab LAB47 and StudyBook LAB03 were aligned at safe boundaries.
@@ -211,7 +211,10 @@ R31 EVERY-TURN RE-ENTRY POLICY — AUTHORITATIVE
 - Project-native engines remain preserved and MotorLab remains the orchestration/control plane.
 - Future projects inherit r31 automatically through onboarding + fanout.
 
-CURRENT R31 FANOUT
-State: IN_PROGRESS on release branch; becomes authoritative COMPLETE only after all registered default/current active refs pass r31 re-entry verification.
+CURRENT R31 FANOUT — AUTHORITATIVE
+State: COMPLETE.
+Verified targets: MusicLab main + LAB50 + LAB52 + LAB53 + LAB54; GeoVision-Test main; StudyBook-AI main + active LAB03; Visionflix main; Cover-Lab-AI main; streamflix-BV main; MotorAI main.
+Every verified target carries r31 Critical Boot Capsule, every-turn UserPromptSubmit re-entry, boot-before-Pollicino ordering, safe newer-local refresh and r30 LAST_GOOD preservation.
+This section supersedes older r28/r29/r30 adoption wording for current activation behavior.
 
 Revision 2.33: r31 adds permanent all-turn MotorLab re-entry and safe latest-verified-local adoption across all current/future projects.
