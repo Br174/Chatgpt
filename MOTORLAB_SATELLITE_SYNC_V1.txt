@@ -263,7 +263,7 @@ R28+ RELEASE FANOUT / SESSION IMMUTABILITY
 - The previous VERIFIED local core remains LAST_GOOD.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.32
+MOTORLAB-SATELLITE-SYNC-V1.33
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -326,3 +326,15 @@ At r32 adoption:
 - preserve historical safety APKs and all application/native-engine behavior.
 
 Revision 1.32: r32 adds source-first safety checkpointing and artifact-ready Android/UAB delivery semantics.
+
+
+R33 NON-COMPILER BUILD MICRO-ACCELERATION SYNC
+At r33 adoption:
+- inherit encrypted-secret-only cross-run configuration-cache policy;
+- permit cache-overwrite-existing on ephemeral runners;
+- keep precompressed APK/ZIP upload uncompressed where supported;
+- separate diagnostic logs from primary artifact readiness;
+- batch tiny contract-test process startup when semantics are unchanged;
+- do not tune Kotlin/KSP/compiler behavior without separate explicit approval.
+
+Revision 1.33: r33 adds safe non-compiler micro-acceleration to build satellites.
