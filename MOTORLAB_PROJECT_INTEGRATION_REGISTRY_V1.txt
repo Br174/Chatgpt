@@ -5,7 +5,7 @@ Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.08-r33
+Release: 2026.10.08-r34
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical boot capsule: MOTORLAB_BOOT_CAPSULE_V1.txt
 Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.33
@@ -275,3 +275,5 @@ MusicLab Family 01 fastlane additionally verifies one Gradle build, one Node tes
 This r33 section supersedes older current micro-build behavior while preserving all r32 Safety source-checkpoint semantics.
 
 Revision 2.35: r33 adds non-compiler build micro-acceleration while explicitly preserving Kotlin/KSP untouched.
+
+R34: Fantastici 20 names the entire present/future MotorLab suite, not a fixed twenty. Two-line startup, every-turn full capability application and external runtime proof required in all current/future projects. Adoption only at safe boundary. Rollout IN_PROGRESS.
