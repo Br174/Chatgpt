@@ -10,6 +10,7 @@ Start MotorLab first, reconcile verified current state, prevent unapproved write
 REGISTERED PROJECT BOOT ORDER - MANDATORY
 0. Emit `⚙️ MotorLab rNN attivo` before substantive first-session work when project context is identifiable, with rNN from the active pinned release.
 0A. Before EVERY supported project UserPromptSubmit and every resume/compact/clear, apply MOTORLAB_REENTRY_GATE_V1.txt: reinject the pinned Critical Boot Capsule and compact project identity/sync state before substantive project reasoning/tools/writes; safely refresh to a newer VERIFIED local release at a safe re-entry boundary when no explicit in-flight write/build/test/promotion lock is recorded.
+0B. R34: after exact first versioned startup line show the Fantastici 20 complete-suite second line, and apply the existing Re-entry Gate's ACTIVATE/RESTORE/EXECUTE/REPORT/VERIFY audit of ALL applicable MotorLab capabilities. The name is an umbrella for current/future subfeatures, never a 20-feature cap; no second engine. Verify external liveness rather than assuming it. Maintain visible numeric progress for active work.
 1. Read MOTORLAB_PROJECT_HOOK.txt.
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
 3. Use VERIFIED local core immediately as fallback.

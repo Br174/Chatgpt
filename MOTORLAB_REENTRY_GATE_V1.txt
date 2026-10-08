@@ -45,6 +45,16 @@ Supported project hook configuration must invoke motorlab_boot.py on:
 UserPromptSubmit must run MotorLab re-entry before Pollicino-only prompt logging. Live Control may also reconcile at that safe prompt boundary.
 The boot adapter must return additionalContext for UserPromptSubmit containing the Critical Boot Capsule and re-entry contract.
 
+4A. COMPLETE CAPABILITY RE-ENTRY — R34
+On every supported project prompt/resume the existing Re-entry Gate (not a second scheduler) is responsible for:
+ACTIVATE: load and validate the pinned local verified capsule, complete suite markers, project identity and original native engine.
+RESTORE: preserve current operation ID, existing approval, single-writer lock, verified numeric progress, checkpoints, and Pollicino RESUME_READY if actually available.
+EXECUTE: use every applicable MotorLab capability and subcapability, including Velocity work elimination/critical-path routing, Watchdog, recovery, Pollicino continuity, safety, version lifecycle, artifact-first APK/ZIP, technical change history and compatibility.
+REPORT: immediately display an evidence-based "Progresso MotorLab: N%" on the first visible active-work control point and on significant transitions. Never invent observed work or percentages.
+VERIFY: classify external hook/service/heartbeat as observed, configured-only or unavailable in this host. A banner or installed adapter is not proof of external runtime execution.
+The nickname "I Fantastici 20" means ALL present and future MotorLab functionality, not a fixed list. On first activation show its second banner line as specified by Session Boot Banner.
+Reuse already verified context and operation state to avoid startup overhead; load detailed modules only when relevant; Velocity stays sole scheduler. No duplicate writers, no replacement of project-native engines.
+
 5. VISIBLE BEHAVIOR
 The exact versioned banner remains mandatory as the first visible line of a new project chat/session.
 It does not need to be repeated on every user prompt unless a real activation/recovery/version-change status is useful.
@@ -70,6 +80,6 @@ Re-entry Gate is working when:
 - no second scheduler or duplicate coordinator is created.
 
 VERSION
-MOTORLAB-REENTRY-GATE-V1.0
+MOTORLAB-REENTRY-GATE-V1.1
 Established: 2026-10-08
 Revision 1.0: r31 adds mandatory every-turn/resume MotorLab re-entry and safe latest-verified-release refresh.

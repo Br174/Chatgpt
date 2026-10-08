@@ -15,6 +15,14 @@ where rNN is the short version extracted from the actually pinned MotorLab relea
 
 This is a PRE-RESPONSE GATE requirement, not a decoration that may be added later.
 
+0A. SECOND-LINE WHOLE-SUITE ACTIVATION PROOF — R34
+On each new supported MotorLab project session, immediately after the unchanged versioned first line, show:
+"✨ MotorLab — I Fantastici 20 attivati"
+"I Fantastici 20" is the stable user-facing name of the ENTIRE current and future MotorLab capability suite, including all subcapabilities; it is not capped at twenty.
+The second line confirms that the full suite policy and applicable capabilities have been loaded into the project orchestration. It does not claim unsupported external sidecars, services, parallel runners or hooks were observed running.
+If material host limitations exist, state them truthfully after the two lines.
+The project-native engine continues alongside MotorLab. No new scheduler is authorized.
+
 1. FIRST-LINE RULE - MANDATORY
 If MotorLab activation is supported by current project context or software-build intent:
 - do not send substantive project prose before the banner;
@@ -63,7 +71,7 @@ SUCCESS CRITERIA
 - no false activation is claimed.
 
 VERSION
-MOTORLAB-SESSION-BOOT-BANNER-V1.4
+MOTORLAB-SESSION-BOOT-BANNER-V1.5
 Established: 2026-09-29
 Revision 1.2: banner becomes mandatory PRE-RESPONSE first-line gate for every supported project/software-build activation path.
 
