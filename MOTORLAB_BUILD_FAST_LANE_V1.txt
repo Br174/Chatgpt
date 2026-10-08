@@ -52,11 +52,14 @@ When configuration-cache data is persisted outside the runner, encryption is man
 
 6. SAME-FAMILY CACHE REUSE
 Update-family adapters should maximize reuse across successive LAB revisions without weakening source isolation:
-- keep stable Gradle job/task identity where feasible;
+- prefer one stable ACTIVE BUILD REF for the same update family across successive LAB revisions when technically safe;
+- freeze every user-visible LAB revision as an immutable source checkpoint/ref before the stable family build ref advances again;
+- keep stable workflow/job identity and explicitly permit cache writes on that long-lived family build ref when provider policy otherwise defaults non-default branches to read-only;
 - prefer a stable family cache namespace;
 - persist/reuse safe Gradle User Home/build-cache state when the provider permits it;
 - never reuse outputs when relevant source/dependency/toolchain inputs invalidate them;
 - measure actual FROM-CACHE/UP-TO-DATE counts and wall time rather than assuming cache benefit.
+A migration from per-LAB build branches to a stable family build ref occurs only at a safe boundary and never invalidates historical LAB refs.
 
 7. CHECKOUT / SETUP MINIMIZATION
 Fetch only history required by the build/verification. If one historical verification SHA is needed, prefer shallow checkout plus a targeted fetch of that SHA instead of full repository history when safe.
