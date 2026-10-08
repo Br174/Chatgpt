@@ -38,7 +38,9 @@ test('r31 contracts require every-turn MotorLab re-entry', async () => {
     readFile(join(repo,'MOTORLAB_SATELLITE_SYNC_V1.txt'),'utf8'),
     readFile(join(repo,'templates','codex','motorlab','hooks.json'),'utf8'),
   ]);
-  assert.match(manifest, /CURRENT_RELEASE=2026\.10\.08-r31/);
+  const currentRelease = manifest.match(/CURRENT_RELEASE=\d{4}\.\d{2}\.\d{2}-r(\d+)/);
+  assert.ok(currentRelease, 'current release must be declared');
+  assert.ok(Number(currentRelease[1]) >= 31, 'r31 re-entry semantics must survive later releases');
   assert.match(manifest, /MOTORLAB_REENTRY_GATE_V1\.txt/);
   assert.match(entry, /EVERY supported project UserPromptSubmit/);
   assert.match(bootstrap, /EVERY-TURN \/ RESUME RE-ENTRY GATE/);
