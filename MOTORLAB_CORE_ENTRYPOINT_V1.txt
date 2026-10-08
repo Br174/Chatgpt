@@ -172,7 +172,7 @@ R28 BOOT / RELEASE ADOPTION
 - Release fanout is release coordination only and does not replace Velocity, native project engines or project lifecycle authority.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.26
+MOTORLAB-CORE-ENTRYPOINT-V1.27
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -234,3 +234,11 @@ R32 ANDROID/UAB BUILD FAST LANE
 - Build timing/cache evidence is measured and used for later optimization without weakening signing/update identity.
 
 Revision 1.26: r32 removes eager safety APK compilation from the normal LAB critical path and adds evidence-driven build acceleration.
+
+
+R33 BUILD MICRO-ACCELERATION
+- Continue r32 Build Fast Lane with non-compiler optimizations only when Kotlin/KSP tuning is excluded.
+- Prefer encrypted cross-run configuration-cache persistence, safe same-family cache writes, no-recompression upload for APK/ZIP, separate diagnostics and batched tiny test startup.
+- Kotlin/KSP/compiler tuning requires separate explicit approval and is not implied by general build optimization.
+
+Revision 1.27: r33 adds safe non-compiler micro-acceleration without altering Kotlin/KSP or application runtime.
