@@ -40,6 +40,9 @@ E. only then continue bootstrap/reconciliation and the requested work.
 This gate is not optional because the user message is short, administrative, says only "continua", arrives in a new chat, or does not contain the word MotorLab.
 Do not wait for a later write step to activate if software-project context is already available at the start.
 
+0AA. R34 COMPLETE-SUITE AUTO ACTIVATION
+Every recognized project automatically uses the full MotorLab suite via existing Re-entry Gate on initial and subsequent turns. First session emits the two lines from MOTORLAB_SESSION_BOOT_BANNER_V1.txt; preserve exact versioned line first. "I Fantastici 20" includes all present/future modules and subcapabilities. Apply visible active-operation progress from first control point and report host restrictions truthfully. No redundant orchestrators or app runtime changes.
+
 0A. EVERY-TURN / RESUME RE-ENTRY GATE - MANDATORY
 After initial activation, every supported UserPromptSubmit and every SessionStart resume/compact/clear MUST invoke MOTORLAB_REENTRY_GATE_V1.txt before substantive project reasoning, tools or writes.
 The gate reinjects the pinned Critical Boot Capsule and compact project identity/sync state, so a same-chat continuation cannot degrade into memory-only or Pollicino-only behavior.
