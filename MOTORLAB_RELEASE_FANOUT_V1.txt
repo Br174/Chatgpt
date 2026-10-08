@@ -59,7 +59,7 @@ HOST LIMIT
 This mechanism executes when an authorized MotorLab/GitHub release executor has an execution cycle. Repository text alone cannot wake a completely inactive host. Within a MotorLab release operation, fanout is mandatory and cannot be skipped silently.
 
 VERSION
-MOTORLAB-RELEASE-FANOUT-V1.2
+MOTORLAB-RELEASE-FANOUT-V1.3
 Established: 2026-10-07
 
 R30 CAPSULE FANOUT
@@ -77,3 +77,14 @@ A target is not UPDATED_VERIFIED for r31 unless:
 - application/domain/runtime code remains unchanged.
 
 Revision 1.2: r31 makes every-turn re-entry adapter/hook propagation part of release fanout verification.
+
+
+R32 BUILD FAST LANE FANOUT
+A target is not UPDATED_VERIFIED for r32 unless local capsule/core carry:
+- BUILD_FAST_LANE=required_for_android_uab;
+- SAFETY_SOURCE_CHECKPOINT=permanent_immutable_github_ref;
+- SAFETY_APK_MATERIALIZATION=on_demand_by_default;
+- ARTIFACT_READY_DELIVERY=required.
+Android project adapters are aligned at safe approved build-infrastructure boundaries; non-Android projects inherit the policy markers without application/runtime changes.
+
+Revision 1.3: r32 adds deferred safety/build-fast-lane markers to mandatory fanout verification.
