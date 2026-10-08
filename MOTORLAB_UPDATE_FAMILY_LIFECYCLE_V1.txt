@@ -46,6 +46,8 @@ LAB FAMILY
 5. Later LAB aggiornamento source starts from the immediately previous approved/current LAB aggiornamento head, not from an older revision.
 6. Artifact/display names may change to the new visible LAB number without changing technical family identity.
 7. LAB family signing keys are test-only unless an adapter explicitly defines otherwise.
+8. For build acceleration, the active update family SHOULD use one stable build ref across later LAB aggiornamento revisions when technically safe; each accepted/built LAB source is frozen as an immutable checkpoint/ref before the stable ref advances.
+9. Per-LAB historical refs remain valid. Transitioning to a stable build ref changes repository/build mechanics only, never package id, signing identity, versionCode monotonicity or application behavior.
 
 CANDIDATA - NEW FAMILY / METHOD COPY
 1. CANDIDATA is NEVER a package-id conversion of the LAB family.
