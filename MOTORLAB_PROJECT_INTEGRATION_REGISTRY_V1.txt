@@ -5,11 +5,11 @@ Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.08-r31
+Release: 2026.10.08-r32
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical boot capsule: MOTORLAB_BOOT_CAPSULE_V1.txt
-Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.31
-Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.26
+Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.32
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.27
 Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.5
 Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.6
 Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
@@ -136,7 +136,7 @@ FUTURE PROJECTS
 Every newly onboarded project receives the current r31 satellite + Critical Boot Capsule + every-turn Re-entry Gate contract and the release-fanout/session-pin mechanism. Central release work must synchronize registered targets in the same release operation; busy targets become PENDING_SAFE_BOUNDARY and are retried automatically at the first verified safe boundary.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.33
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.34
 Revision 2.18: registry cleaned to current-state r23; six prior projects migrated and MotorAI onboarded at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
 
 Revision 2.20: r24 adds evidence-gated latency branching to the central contract; six established project mains plus active MusicLab LAB47 and StudyBook LAB03 were aligned at safe boundaries.
@@ -218,3 +218,26 @@ Every verified target carries r31 Critical Boot Capsule, every-turn UserPromptSu
 This section supersedes older r28/r29/r30 adoption wording for current activation behavior.
 
 Revision 2.33: r31 adds permanent all-turn MotorLab re-entry and safe latest-verified-local adoption across all current/future projects.
+
+
+R32 BUILD FAST LANE POLICY — AUTHORITATIVE
+- Android/UAB normal LAB critical path performs one requested update Gradle build.
+- Paired safety defaults to permanent immutable GitHub source checkpoint + recovery recipe.
+- Safety APK materialization is on-demand; eager second safety Gradle is forbidden by default.
+- Requested verified artifact is deliverable immediately once uploaded/retrievable.
+- Update families should use a stable family build ref when safe and freeze each LAB source as immutable checkpoint/ref before the stable ref advances.
+- Safe Gradle cache writes/reuse are evidence-driven; configuration-cache persistence must not expose secrets.
+- Non-Android projects inherit the policy without runtime changes.
+
+MUSICLAB R32 ADAPTER
+- Existing LAB54 update artifact remains authoritative for device testing.
+- Historical Safety54 APK remains valid but is no longer the future default model.
+- Safety54 source checkpoint: safety-source-musiclab-lab54 @ cc2ab4b857568672d18f902a6c3e8d04d88dfd13.
+- Next same-family build lane: uab-build/musiclab-family-01-fastlane.
+- Stable workflow: .github/workflows/musiclab-family-01-fastlane.yml.
+- Current measured LAB54 baseline: update Gradle 406s; safety Gradle 428s.
+
+CURRENT R32 FANOUT
+State: IN_PROGRESS until every registered default/current active ref carries r32 markers and MusicLab fastlane adapter is verified.
+
+Revision 2.34: r32 adds deferred safety materialization, artifact-ready delivery and stable same-family Android build lanes.
