@@ -31,7 +31,10 @@ C. PERSISTENT CACHE - MANDATORY
 3. Android/Gradle projects:
    - Use the official Gradle setup/cache action on GitHub Actions.
    - Invoke Gradle with --build-cache unless a project adapter explicitly documents an incompatibility.
+   - Use configuration cache and parallel execution when project-compatible; configuration-cache persistence outside the runner must be encrypted when it may contain credentials/secrets.
    - Preserve dependency/tool caches across runs; do not delete provider caches merely to obtain a clean build.
+   - Prefer stable same-family build/job/cache identity where feasible so successive LAB revisions can reuse valid state.
+   - Measure FROM-CACHE / UP-TO-DATE / executed-task counts and wall time; do not assume cache benefit.
    - Do not cache secrets, signing passwords, plaintext keystores or user-sensitive data.
    - 'clean' may be used when required by a project, but it must not disable the persistent Gradle build cache.
 4. Node/web projects:
@@ -141,5 +144,5 @@ J. MOTORLAB BACKGROUND EXECUTION + SINGLE-CHAT CONTINUITY - MANDATORY
 17. MotorLab should proactively avoid leaving long backgroundable phases solely inside normal-chat execution.
 18. Detailed semantics are mandatory in MOTORLAB_BACKGROUND_EXECUTION_V1.txt.
 
-Engine version: MOTORLAB-CORE-V1.5 (legacy UAB compatibility)
-Last updated: 2026-09-28.
+Engine version: MOTORLAB-CORE-V1.6 (legacy UAB compatibility)
+Last updated: 2026-10-08.
