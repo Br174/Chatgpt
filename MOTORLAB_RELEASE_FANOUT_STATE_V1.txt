@@ -1,41 +1,49 @@
 MOTORLAB RELEASE FANOUT STATE V1
 
 RELEASE=2026.10.08-r31
-GLOBAL_STATE=IN_PROGRESS
+GLOBAL_STATE=COMPLETE
 CENTRAL_AUTHORITY=Br174/Chatgpt
-VERIFIED_DATE=pending
+VERIFIED_DATE=2026-10-08
 
-TARGETS
-- Br174/MusicLab ref=main state=PENDING_R31
-- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 state=PENDING_R31
-- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 state=PENDING_R31
-- Br174/MusicLab ref=uab-build/musiclab-lab53-aggiornamento-family-01 state=PENDING_R31
-- Br174/GeoVision-Test ref=main state=PENDING_R31
-- Br174/StudyBook-AI ref=main state=PENDING_R31
-- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 state=PENDING_R31
-- Br174/Visionflix ref=main state=PENDING_R31
-- Br174/Cover-Lab-AI ref=main state=PENDING_R31
-- Br174/streamflix-BV ref=main state=PENDING_R31
-- Br174/MotorAI ref=main state=PENDING_R31
+UPDATED_VERIFIED_TARGETS
+- Br174/MusicLab ref=main release=r31 reentry=verified
+- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 release=r31 reentry=verified
+- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 release=r31 reentry=verified
+- Br174/MusicLab ref=uab-build/musiclab-lab53-aggiornamento-family-01 release=r31 reentry=verified
+- Br174/MusicLab ref=uab-build/musiclab-lab54-aggiornamento-family-01 release=r31 reentry=verified
+- Br174/GeoVision-Test ref=main release=r31 reentry=verified
+- Br174/StudyBook-AI ref=main release=r31 reentry=verified
+- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 release=r31 reentry=verified
+- Br174/Visionflix ref=main release=r31 reentry=verified
+- Br174/Cover-Lab-AI ref=main release=r31 reentry=verified
+- Br174/streamflix-BV ref=main release=r31 reentry=verified
+- Br174/MotorAI ref=main release=r31 reentry=verified
 
-R31_REQUIRED_PROOF
-- local release r31 verified
-- Critical Boot Capsule r31 present and compact
-- motorlab_boot.py accepts SessionStart + UserPromptSubmit
-- hooks.json invokes motorlab_boot.py before Pollicino on UserPromptSubmit
-- every-turn re-entry context reinjects MotorLab critical capsule
-- safe newer-local release refresh supported
-- explicit in-flight lock preserves existing pin
-- project-native/application runtime unchanged
+R31_VERIFICATION
+CENTRAL_RELEASE=2026.10.08-r31
+CENTRAL_R31_PR=27
+CENTRAL_R31_MERGE_SHA=3a94dfc41bde47167fce33bed6b792f3e32c64ec
+CENTRAL_R31_PUSH_GATE_RUN=37703435786
+CENTRAL_R31_PR_GATE_RUN=37703452759
+HISTORICAL_GATES=r27_success;r28_success;r29_success;r30_success;r31_success
+CAPSULE_RELEASE=r31
+REENTRY_GATE=required_every_project_user_prompt_and_resume
+USER_PROMPT_ORDER=motorlab_boot.py->motorlab_live_control.py->motorlab_pollicino.py
+SAFE_NEWER_LOCAL_REFRESH=verified
+EXPLICIT_INFLIGHT_PIN_PRESERVATION=verified
+PROJECT_NATIVE_RUNTIME_IMPACT=none
+LAST_GOOD_RELEASE=r30
 
 SESSION_RULE
-Every supported project turn/resume re-enters MotorLab.
-A newer VERIFIED local release may refresh the session pin at a safe re-entry boundary.
-An explicit in-flight write/build/test/promotion lock keeps the existing pin until safe.
+- Every supported project UserPromptSubmit/resume/compact/clear re-enters MotorLab.
+- The Critical Boot Capsule is reinjected before substantive project work.
+- A newer VERIFIED local MotorLab release may refresh the pin at a safe re-entry boundary.
+- Explicit in-flight write/build/test/promotion state preserves the current pin until safe.
+- Re-entry never creates a second scheduler; Velocity remains the sole scheduler.
 
 FUTURE_PROJECT_RULE
-Every future software project inherits r31 every-turn re-entry through onboarding, local satellite and hook template.
+Every future software project inherits r31 through onboarding, satellite fanout and supported UserPromptSubmit bootstrap. New chat startup alone is not considered sufficient persistent activation.
 
 VERSION
-MOTORLAB-RELEASE-FANOUT-STATE-V1.3
-Revision 1.3: r31 fanout tracks every-turn re-entry adoption across all registered default/current active refs.
+MOTORLAB-RELEASE-FANOUT-STATE-V1.4
+Revision 1.4: r31 fanout verified COMPLETE across every registered default/current active ref, including MusicLab LAB54.
