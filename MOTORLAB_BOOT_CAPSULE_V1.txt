@@ -1,6 +1,6 @@
 MOTORLAB CRITICAL BOOT CAPSULE V1
 STATUS=MANDATORY_FIRST_CONTEXT
-RELEASE=2026.10.08-r32
+RELEASE=2026.10.08-r33
 PURPOSE=non-truncatable critical contract for every current/future project session
 
 ACTIVATION
@@ -97,6 +97,11 @@ SAFETY_SECOND_GRADLE_DEFAULT=forbidden
 SAFETY_LAB=immutable_distinct_package_and_test_signing
 BUILD_FAST_LANE=required
 ARTIFACT_READY_DELIVERY=immediate_when_verified
+BUILD_MICRO_ACCELERATION=non_compiler_only
+CONFIG_CACHE_CROSS_RUN=encrypted_secret_only
+PRECOMPRESSED_ARTIFACT_UPLOAD=no_recompression
+PRIMARY_ARTIFACT_LOGS=separate
+KOTLIN_KSP_TUNING=forbidden_without_explicit_approval
 
 LIFECYCLE
 FLOW=MADRE->LAB->CANDIDATA->NUOVA_MADRE
