@@ -37,7 +37,11 @@ High-risk causal work remains on the artifact critical path when needed to trust
 Risk-scaled FAST iteration accelerates LAB only. CANDIDATA/MADRE keep full adapter regression, identity/replay and explicit Bruno approval gates.
 
 8. AVOID REDUNDANT BUILD WORK
-Do not run expensive duplicate compile/test/build phases unless each has distinct verification value. Reuse safe caches/incremental outputs when compatible.
+Do not run expensive duplicate compile/test/build phases unless each has distinct non-deferrable verification value. Reuse safe caches/incremental outputs when compatible.
+For Android update families, the paired safety checkpoint is source-first by default: preserve the immutable GitHub source checkpoint and materialize the safety APK only on demand. A second Gradle build solely to prebuild safety is not part of the normal LAB critical path.
+
+8A. ARTIFACT-READY DELIVERY
+Once the requested update APK/ZIP has passed source/package/version/signing verification and is retrievable from the durable executor, deliver/reconcile it immediately. Do not wait for unrelated workflow-terminal state or deferred safety work.
 
 9. MUSICLAB DEFAULT PROFILE
 LOW: isolated copy/style/static UI.
@@ -75,6 +79,9 @@ SUCCESS CRITERIA
 - Root Cause Closure remains mandatory.
 
 VERSION
-MOTORLAB-FAST-ITERATION-NO-SPIN-V1.1
+MOTORLAB-FAST-ITERATION-NO-SPIN-V1.2
 Established: 2026-09-30
 Revision 1.1: r15 integrates Artifact-First ordering and deferred causal queue into the fast LAB loop.
+
+
+Revision 1.2: r32 adds source-first safety checkpoints and artifact-ready delivery without waiting for unrelated work.
