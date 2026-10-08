@@ -97,7 +97,6 @@ SAFETY_SECOND_GRADLE_DEFAULT=forbidden
 SAFETY_LAB=immutable_distinct_package_and_test_signing
 BUILD_FAST_LANE=required
 ARTIFACT_READY_DELIVERY=immediate_when_verified
-BUILD_MICRO=noncompiler;config_xrun=encrypted;kotlin_ksp=approval_only
 
 LIFECYCLE
 FLOW=MADRE->LAB->CANDIDATA->NUOVA_MADRE
