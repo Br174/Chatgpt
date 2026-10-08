@@ -5,11 +5,11 @@ Canonical current-state registry of MotorLab-managed projects.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
-Release: 2026.10.08-r32
+Release: 2026.10.08-r33
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
 Canonical boot capsule: MOTORLAB_BOOT_CAPSULE_V1.txt
-Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.32
-Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.27
+Canonical sync: MOTORLAB_SATELLITE_SYNC_V1.txt V1.33
+Canonical bundle: MOTORLAB_SATELLITE_BUNDLE_V1.txt V2.28
 Canonical execution fabric: MOTORLAB_EXECUTION_FABRIC_V1.txt V1.5
 Canonical Velocity: MOTORLAB_VELOCITY_LAYER_V1.txt V1.6
 Canonical persistent state: MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt V1.5
@@ -133,10 +133,10 @@ Superpowers: CONNECTED_VERIFIED; subordinate methodology.
 Context7 Free: CONNECTED_VERIFIED; optional/version-aware documentation only.
 
 FUTURE PROJECTS
-Every newly onboarded project receives the current r31 satellite + Critical Boot Capsule + every-turn Re-entry Gate contract and the release-fanout/session-pin mechanism. Central release work must synchronize registered targets in the same release operation; busy targets become PENDING_SAFE_BOUNDARY and are retried automatically at the first verified safe boundary.
+Every newly onboarded project receives the current r33 satellite + Critical Boot Capsule + every-turn Re-entry Gate + Build Fast Lane contract and the release-fanout/session-pin mechanism. Central release work must synchronize registered targets in the same release operation; busy targets become PENDING_SAFE_BOUNDARY and are retried automatically at the first verified safe boundary.
 
 VERSION
-MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.34
+MOTORLAB-PROJECT-INTEGRATION-REGISTRY-V2.35
 Revision 2.18: registry cleaned to current-state r23; six prior projects migrated and MotorAI onboarded at safe boundaries, active MusicLab LAB47 and StudyBook LAB03 branches aligned, obsolete active satellite releases superseded, LAST_GOOD rollback preserved, and Pollicino continuity retained.
 
 Revision 2.20: r24 adds evidence-gated latency branching to the central contract; six established project mains plus active MusicLab LAB47 and StudyBook LAB03 were aligned at safe boundaries.
@@ -244,3 +244,30 @@ All verified targets carry r32 capsule/core markers. MusicLab additionally has s
 This r32 section supersedes older current build/safety behavior while preserving historical safety APKs.
 
 Revision 2.34: r32 adds deferred safety materialization, artifact-ready delivery and stable same-family Android build lanes.
+
+
+R33 NON-COMPILER BUILD MICRO-ACCELERATION POLICY — AUTHORITATIVE
+- Preserve all r32 Build Fast Lane behavior.
+- Keep Kotlin/KSP/compiler tuning excluded unless Bruno explicitly approves it separately.
+- Long-lived family build refs may force Gradle cache writes and cache-overwrite-existing on ephemeral runners.
+- Cross-run configuration-cache persistence is allowed only through a repository encryption secret; absence of the secret must degrade safely without unsafe storage.
+- APK/ZIP are precompressed payloads and should use no-recompression upload where supported.
+- Primary user artifact excludes diagnostic logs; diagnostics are separate/best-effort after artifact readiness.
+- Tiny independent contract tests may be batched into one process where semantics are unchanged.
+- Stable family workflow/job identity remains preferred for cache reuse.
+
+MUSICLAB R33 ADAPTER
+- Family 01 stable lane remains: uab-build/musiclab-family-01-fastlane.
+- Workflow: .github/workflows/musiclab-family-01-fastlane.yml.
+- One Gradle build only.
+- Node contract tests batched into one process.
+- setup-gradle v6 cache-read-only=false + cache-overwrite-existing=true.
+- Optional encrypted configuration-cache hookup: secrets.GRADLE_ENCRYPTION_KEY.
+- Primary APK/ZIP artifact upload uses compression-level 0 and excludes diagnostic logs.
+- Diagnostics upload separately after primary artifact readiness.
+- Kotlin/KSP untouched.
+
+CURRENT R33 FANOUT
+State: IN_PROGRESS until all registered targets carry r33 control-plane markers and MusicLab Family 01 adapter verification remains green.
+
+Revision 2.35: r33 adds non-compiler build micro-acceleration while explicitly preserving Kotlin/KSP untouched.

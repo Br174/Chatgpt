@@ -15,15 +15,16 @@ test('r32 build fast lane is mandatory and capsule remains compact', async () =>
     read('MOTORLAB_SATELLITE_SYNC_V1.txt'),
     read('MOTORLAB_CORE_ENTRYPOINT_V1.txt'),
   ]);
-  assert.match(manifest,/CURRENT_RELEASE=2026\.10\.08-r32/);
+  const currentRelease = manifest.match(/CURRENT_RELEASE=\d{4}\.\d{2}\.\d{2}-r(\d+)/);
+  assert.ok(currentRelease, 'current release must be declared');
+  assert.ok(Number(currentRelease[1]) >= 32, 'r32 Build Fast Lane must survive later releases');
   assert.match(manifest,/BUILD_FAST_LANE_MODULE=MOTORLAB_BUILD_FAST_LANE_V1\.txt/);
   assert.ok(capsule.length < 4000, 'critical capsule must remain < 4000 chars');
   for (const marker of [
-    'RELEASE=2026.10.08-r32',
+    'BUILD_FAST_LANE=required',
     'SAFETY_SOURCE_CHECKPOINT=github_immutable_ref',
     'SAFETY_APK_MATERIALIZATION=on_demand',
     'SAFETY_SECOND_GRADLE_DEFAULT=forbidden',
-    'BUILD_FAST_LANE=required',
     'ARTIFACT_READY_DELIVERY=immediate_when_verified',
   ]) assert.ok(capsule.includes(marker), 'missing r32 capsule marker: '+marker);
   assert.match(module,/DEFERRED SAFETY MATERIALIZATION/);

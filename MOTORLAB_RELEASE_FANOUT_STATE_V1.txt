@@ -1,55 +1,44 @@
 MOTORLAB RELEASE FANOUT STATE V1
 
-RELEASE=2026.10.08-r32
-GLOBAL_STATE=COMPLETE
+RELEASE=2026.10.08-r33
+GLOBAL_STATE=IN_PROGRESS
 CENTRAL_AUTHORITY=Br174/Chatgpt
-VERIFIED_DATE=2026-10-08
+VERIFIED_DATE=pending
 
-UPDATED_VERIFIED_TARGETS
-- Br174/MusicLab ref=main release=r32 build_fast_lane=verified
-- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 release=r32 build_fast_lane=verified
-- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 release=r32 build_fast_lane=verified
-- Br174/MusicLab ref=uab-build/musiclab-lab53-aggiornamento-family-01 release=r32 build_fast_lane=verified
-- Br174/MusicLab ref=uab-build/musiclab-lab54-aggiornamento-family-01 release=r32 build_fast_lane=verified
-- Br174/MusicLab ref=uab-build/musiclab-family-01-fastlane release=r32 build_fast_lane=verified
-- Br174/GeoVision-Test ref=main release=r32 build_fast_lane=verified
-- Br174/StudyBook-AI ref=main release=r32 build_fast_lane=verified
-- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 release=r32 build_fast_lane=verified
-- Br174/Visionflix ref=main release=r32 build_fast_lane=verified
-- Br174/Cover-Lab-AI ref=main release=r32 build_fast_lane=verified
-- Br174/streamflix-BV ref=main release=r32 build_fast_lane=verified
-- Br174/MotorAI ref=main release=r32 build_fast_lane=verified
+TARGETS
+- Br174/MusicLab ref=main state=PENDING_R33
+- Br174/MusicLab ref=uab-build/musiclab-lab50-aggiornamento-family-01 state=PENDING_R33
+- Br174/MusicLab ref=uab-build/musiclab-lab52-aggiornamento-family-01 state=PENDING_R33
+- Br174/MusicLab ref=uab-build/musiclab-lab53-aggiornamento-family-01 state=PENDING_R33
+- Br174/MusicLab ref=uab-build/musiclab-lab54-aggiornamento-family-01 state=PENDING_R33
+- Br174/MusicLab ref=uab-build/musiclab-family-01-fastlane state=PENDING_R33
+- Br174/GeoVision-Test ref=main state=PENDING_R33
+- Br174/StudyBook-AI ref=main state=PENDING_R33
+- Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-03 state=PENDING_R33
+- Br174/Visionflix ref=main state=PENDING_R33
+- Br174/Cover-Lab-AI ref=main state=PENDING_R33
+- Br174/streamflix-BV ref=main state=PENDING_R33
+- Br174/MotorAI ref=main state=PENDING_R33
 
-R32_VERIFICATION
-CENTRAL_RELEASE=2026.10.08-r32
-CENTRAL_R32_PR=28
-CENTRAL_R32_MERGE_SHA=3e553472dc0bc49a783cef6096512c8bd169c620
-CENTRAL_R32_PUSH_GATE_RUN=37765660474
-CENTRAL_R32_PR_GATE_RUN=37765736155
-HISTORICAL_GATES=r27_success;r28_success;r29_success;r30_success;r31_success;r32_success
-CAPSULE_RELEASE=r32
-BUILD_FAST_LANE=required
-SAFETY_SOURCE_CHECKPOINT=github_immutable_ref
-SAFETY_APK_MATERIALIZATION=on_demand
-SAFETY_SECOND_GRADLE_DEFAULT=forbidden
-ARTIFACT_READY_DELIVERY=immediate_when_verified
-PROJECT_NATIVE_RUNTIME_IMPACT=none
-LAST_GOOD_RELEASE=r31
+R33_REQUIRED_PROOF
+- local release r33 verified
+- r32 Build Fast Lane markers preserved
+- local core carries non-compiler micro-acceleration markers
+- Kotlin/KSP compiler tuning remains explicit-approval-only
+- application/runtime untouched
 
-MUSICLAB_ADAPTER
-SAFETY54_SOURCE_REF=safety-source-musiclab-lab54
-SAFETY54_SOURCE_SHA=cc2ab4b857568672d18f902a6c3e8d04d88dfd13
-FAMILY01_FAST_BUILD_REF=uab-build/musiclab-family-01-fastlane
-FAMILY01_FAST_WORKFLOW=.github/workflows/musiclab-family-01-fastlane.yml
-FAST_WORKFLOW_GRADLE_INVOCATIONS=1
-FAST_WORKFLOW_CACHE_WRITE=enabled
-FAST_WORKFLOW_SETUP_GRADLE=v6
-LAB54_BASELINE_UPDATE_GRADLE_SECONDS=406
-LAB54_BASELINE_SAFETY_GRADLE_SECONDS=428
-
-FUTURE_PROJECT_RULE
-Every future Android/UAB project inherits r32 source-first safety and build-fast-lane semantics. Non-Android projects inherit the control-plane contract without application/runtime changes.
+MUSICLAB_R33_ADAPTER
+FAMILY01_BUILD_REF=uab-build/musiclab-family-01-fastlane
+ONE_GRADLE_BUILD=verified_static
+NODE_TEST_PROCESS_COUNT=1
+GRADLE_CACHE_WRITE=enabled
+GRADLE_CACHE_OVERWRITE_EXISTING=true
+CONFIG_CACHE_ENCRYPTION_SECRET=GRADLE_ENCRYPTION_KEY_optional
+PRIMARY_ARTIFACT_COMPRESSION_LEVEL=0
+PRIMARY_ARTIFACT_LOGS=excluded
+DIAGNOSTICS_UPLOAD=separate_best_effort
+KOTLIN_KSP_TUNING=none
 
 VERSION
-MOTORLAB-RELEASE-FANOUT-STATE-V1.6
-Revision 1.6: r32 fanout verified COMPLETE across all registered default/current active refs, including MusicLab Family 01 fastlane.
+MOTORLAB-RELEASE-FANOUT-STATE-V1.7
+Revision 1.7: r33 fanout tracks non-compiler build micro-acceleration across all registered targets.

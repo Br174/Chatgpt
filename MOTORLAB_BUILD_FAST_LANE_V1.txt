@@ -95,6 +95,23 @@ This is evidence, not a universal guarantee.
 - no application runtime/UI/player/domain behavior changes merely to speed the build;
 - package/signing/update-in-place guarantees remain intact.
 
+12. NON-COMPILER MICRO-ACCELERATION — R33
+When Bruno excludes Kotlin/KSP/compiler tuning, build acceleration must stay outside those areas.
+Safe/default candidates:
+- batch tiny independent JS/Node contract tests into one process when semantics are unchanged;
+- for long-lived non-default family build refs, explicitly allow Gradle cache writes;
+- set cache-overwrite-existing when the runner is ephemeral and a pre-existing Gradle User Home could otherwise disable restore;
+- wire setup-gradle configuration-cache encryption to a repository secret such as GRADLE_ENCRYPTION_KEY; if the secret is absent, builds continue normally and cross-run configuration-cache persistence remains disabled rather than storing sensitive state unsafely;
+- for already-compressed APK/ZIP payloads, use artifact-upload compression level 0 where supported;
+- keep diagnostics/log upload outside the primary user artifact so logs do not delay artifact readiness;
+- keep shallow checkout + targeted historical fetch;
+- preserve one stable same-family workflow/job identity.
+Do not disable signing/package verification, wrapper validation, safety checkpoints or required tests for these micro-gains.
+
+13. EXCLUDED COMPILER TUNING
+Kotlin compiler, KSP processors, Room/Hilt code generation behavior, compiler flags and related source/build semantics are OUT OF SCOPE unless Bruno explicitly approves them in a separate change.
+
 VERSION
-MOTORLAB-BUILD-FAST-LANE-V1.0
+MOTORLAB-BUILD-FAST-LANE-V1.1
 Revision 1.0: r32 introduces deferred safety APK materialization, artifact-ready delivery and evidence-driven Gradle fast path.
+Revision 1.1: r33 adds non-compiler micro-acceleration: encrypted configuration-cache hookup, safe cache overwrite, batched tiny tests, no-recompression primary artifact upload and diagnostic separation.

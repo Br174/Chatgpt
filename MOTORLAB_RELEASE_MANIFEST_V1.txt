@@ -4,15 +4,15 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.08-r32
-FANOUT_STATE=COMPLETE
+CURRENT_RELEASE=2026.10.08-r33
+FANOUT_STATE=IN_PROGRESS
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 BOOT_CAPSULE_MODULE=MOTORLAB_BOOT_CAPSULE_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt\nRELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=COMPLETE
+RELEASE_FANOUT_STATE=IN_PROGRESS
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -264,7 +264,7 @@ R27+ ZERO-IDLE DUAL-LANE ACTIVE WAIT
 - Existing single-writer, provider, runner-cap and single-integration-lane rules remain mandatory.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.32
+MOTORLAB-RELEASE-MANIFEST-V1.33
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -330,3 +330,15 @@ R32+ BUILD FAST LANE
 - Gradle optimization is evidence-driven: safe cache/configuration-cache/parallel reuse, no unsafe secret cache and no duplicate build work.
 
 Revision 1.32: r32 introduces deferred safety materialization and artifact-ready build acceleration.
+
+
+R33+ NON-COMPILER BUILD MICRO-ACCELERATION
+- Continue r32 Build Fast Lane without Kotlin/KSP/compiler tuning.
+- Long-lived family build refs keep Gradle cache writes enabled and may use cache-overwrite-existing on ephemeral runners.
+- Cross-run configuration-cache persistence is allowed only through an encryption secret; missing key degrades safely to non-persistent configuration cache.
+- Already-compressed APK/ZIP artifacts use no-recompression upload when supported.
+- Diagnostic logs stay outside the primary user artifact so they do not delay artifact-ready delivery.
+- Tiny contract tests may be batched into one process when semantics remain identical.
+- Kotlin/KSP/compiler tuning remains separately approval-gated.
+
+Revision 1.33: r33 adds non-compiler pipeline/cache/upload micro-acceleration while preserving r32 safety and artifact semantics.
