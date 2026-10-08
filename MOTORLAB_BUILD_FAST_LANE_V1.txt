@@ -1,0 +1,100 @@
+MOTORLAB BUILD FAST LANE V1
+
+STATUS
+Mandatory MotorLab CORE capability for Android/UAB build flows.
+Central authority: Br174/Chatgpt.
+Established: 2026-10-08.
+
+PURPOSE
+Reduce TIME_TO_TESTABLE_ARTIFACT without weakening update identity, signing, verification or recovery. The user-facing critical path is the requested LAB update artifact, not repeated safety compilation or passive workflow waiting.
+
+1. DEFERRED SAFETY MATERIALIZATION — MANDATORY
+For Android update-family LAB NN aggiornamento:
+- preserve a permanent immutable GitHub source checkpoint for the paired LAB di sicurezza NN from the exact functional source SHA;
+- persist the recovery recipe: paired LAB number, source SHA/ref, safety applicationId/package family, versionCode/versionName policy, signing policy, Java/Gradle/toolchain identity and build command/config needed to materialize it later;
+- DO NOT build the safety APK during the normal LAB critical path unless Bruno explicitly asks for that APK or a non-deferrable verification requires it;
+- safety APK materialization is ON_DEMAND from the frozen checkpoint;
+- when materialized, use a distinct package/family and distinct test-only signing identity exactly as required by Update Family Lifecycle;
+- source checkpoint creation must be lightweight and must not invoke Gradle.
+
+Historical safety APK artifacts remain valid; r32 changes future/default behavior only.
+
+2. FAST ARTIFACT CRITICAL PATH
+Normal LAB update path:
+SOURCE/REPAIR -> TARGETED VERIFY -> ONE UPDATE BUILD -> UPDATE IDENTITY VERIFY -> UPLOAD APK/ZIP -> DELIVER.
+The paired safety source checkpoint may be created before/after upload in a lightweight lane but must not delay delivery of the verified update artifact.
+
+3. ARTIFACT-READY EVENT
+A verified update artifact is user-deliverable as soon as:
+- requested source SHA is proven;
+- APK/ZIP exist;
+- package/applicationId, versionCode and signing identity pass required verification;
+- artifact upload is visible and retrievable.
+Do not wait for unrelated workflow jobs or workflow-terminal state after those conditions are true.
+
+4. NO DUPLICATE GRADLE
+For the same functional source and normal LAB request:
+- one update-family Gradle build is the default;
+- a second Gradle invocation solely to prebuild the safety APK is forbidden by default;
+- duplicate builds require distinct non-deferrable verification value.
+
+5. GRADLE FAST PROFILE
+Android adapters should:
+- use official Gradle setup/cache support;
+- invoke build cache explicitly or via verified project property;
+- use configuration cache where project-compatible;
+- use parallel execution where project-compatible;
+- preserve daemon use within a job;
+- avoid clean unless required;
+- cache tool downloads such as protoc;
+- avoid unsafe caching of signing material/secrets.
+When configuration-cache data is persisted outside the runner, encryption is mandatory if the cache may contain credentials/secrets.
+
+6. SAME-FAMILY CACHE REUSE
+Update-family adapters should maximize reuse across successive LAB revisions without weakening source isolation:
+- prefer one stable ACTIVE BUILD REF for the same update family across successive LAB revisions when technically safe;
+- freeze every user-visible LAB revision as an immutable source checkpoint/ref before the stable family build ref advances again;
+- keep stable workflow/job identity and explicitly permit cache writes on that long-lived family build ref when provider policy otherwise defaults non-default branches to read-only;
+- prefer a stable family cache namespace;
+- persist/reuse safe Gradle User Home/build-cache state when the provider permits it;
+- never reuse outputs when relevant source/dependency/toolchain inputs invalidate them;
+- measure actual FROM-CACHE/UP-TO-DATE counts and wall time rather than assuming cache benefit.
+A migration from per-LAB build branches to a stable family build ref occurs only at a safe boundary and never invalidates historical LAB refs.
+
+7. CHECKOUT / SETUP MINIMIZATION
+Fetch only history required by the build/verification. If one historical verification SHA is needed, prefer shallow checkout plus a targeted fetch of that SHA instead of full repository history when safe.
+
+8. OBSERVABILITY
+Record at minimum:
+- build start/end;
+- Gradle wall time;
+- configuration-cache reused/stored;
+- FROM-CACHE / UP-TO-DATE / executed task counts when available;
+- artifact-upload time;
+- safety checkpoint ref/SHA.
+Use this evidence for later optimization.
+
+9. POLLING / WAIT
+GitHub Actions is a durable executor. Foreground chat must not spin on unchanged Gradle state.
+Prefer event/material-change reconciliation. Once artifact-ready conditions are met, retrieve/deliver immediately.
+
+10. CURRENT MEASURED BASELINE — MUSICLAB LAB54
+Observed on run 37702761124:
+- update Gradle: 6m46s;
+- safety Gradle: 7m08s;
+- total duplicate Gradle wall time: ~13m54s;
+- update run restored dependency caches but had 0 FROM-CACHE Gradle tasks, 5 UP-TO-DATE and 79 executed tasks;
+- slow areas included KSP, Kotlin compile, dex/merge and ASM transforms.
+This is evidence, not a universal guarantee.
+
+11. SUCCESS CRITERIA
+- normal LAB path builds one APK family only;
+- paired safety recovery remains permanently reconstructible from GitHub source checkpoint;
+- requested artifact is delivered when it is ready, without waiting for unrelated work;
+- build-cache/configuration-cache improvements are evidence-based;
+- no application runtime/UI/player/domain behavior changes merely to speed the build;
+- package/signing/update-in-place guarantees remain intact.
+
+VERSION
+MOTORLAB-BUILD-FAST-LANE-V1.0
+Revision 1.0: r32 introduces deferred safety APK materialization, artifact-ready delivery and evidence-driven Gradle fast path.

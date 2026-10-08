@@ -12,7 +12,7 @@ BOOT
 2. Use VERIFIED local core immediately as fallback.
 3. When central is reachable, read release manifest and compare releases.
 4. Reconcile Project Continuity/live state before selecting a safe update boundary.
-5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status, r20 Pollicino continuity, r21 Four-Pillar adaptive Velocity/TTTA/learning semantics, r22 operational Execution Fabric dispatch/proof semantics and r23 incremental dynamic work-elimination/event-memory semantics.
+5. Load all release-required capabilities, including r12 Fast Iteration/No-Spin, r13 technical Change History, r14 Pre-Change Approval + visible restore register, r15 Artifact-First + deferred Root Cause, r16 Authority/Data Ownership + Persistent Operational State + Observability + Knowledge Tool Routing + Service Integration Status, r20 Pollicino continuity, r21 Four-Pillar adaptive Velocity/TTTA/learning semantics, r22 operational Execution Fabric dispatch/proof semantics, r23 incremental dynamic work-elimination/event-memory semantics and r32 Build Fast Lane/deferred safety materialization.
 
 SAFE UPDATE
 - pin one MotorLab release during active write/build/test/promotion;
@@ -263,7 +263,7 @@ R28+ RELEASE FANOUT / SESSION IMMUTABILITY
 - The previous VERIFIED local core remains LAST_GOOD.
 
 VERSION
-MOTORLAB-SATELLITE-SYNC-V1.31
+MOTORLAB-SATELLITE-SYNC-V1.32
 Revision 1.12: r16 adds authority/persistent-state/observability/knowledge-routing/service-status markers and explicit separation between policy adoption and live provider/plugin connection.
 Revision 1.13: r17 adds Android update-family lifecycle marker and fallback contract.
 
@@ -315,3 +315,14 @@ At every r31 satellite adoption boundary:
 - never alter application/domain/runtime code.
 
 Revision 1.31: r31 adds every-turn/resume re-entry synchronization and prompt-hook bootstrap inheritance.
+
+
+R32 BUILD FAST LANE SYNC
+At r32 adoption:
+- sync BUILD_FAST_LANE and deferred-safety markers into capsule/local core;
+- Android update-family adapters default to permanent safety-source checkpoint + on-demand safety APK;
+- normal LAB delivery must not run a second safety Gradle build solely for pre-materialization;
+- requested verified artifact becomes deliverable when uploaded/retrievable even if unrelated durable work remains;
+- preserve historical safety APKs and all application/native-engine behavior.
+
+Revision 1.32: r32 adds source-first safety checkpointing and artifact-ready Android/UAB delivery semantics.

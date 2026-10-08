@@ -31,7 +31,10 @@ C. PERSISTENT CACHE - MANDATORY
 3. Android/Gradle projects:
    - Use the official Gradle setup/cache action on GitHub Actions.
    - Invoke Gradle with --build-cache unless a project adapter explicitly documents an incompatibility.
+   - Use configuration cache and parallel execution when project-compatible; configuration-cache persistence outside the runner must be encrypted when it may contain credentials/secrets.
    - Preserve dependency/tool caches across runs; do not delete provider caches merely to obtain a clean build.
+   - Prefer stable same-family build/job/cache identity where feasible so successive LAB revisions can reuse valid state.
+   - Measure FROM-CACHE / UP-TO-DATE / executed-task counts and wall time; do not assume cache benefit.
    - Do not cache secrets, signing passwords, plaintext keystores or user-sensitive data.
    - 'clean' may be used when required by a project, but it must not disable the persistent Gradle build cache.
 4. Node/web projects:
@@ -94,7 +97,7 @@ Any new project added to MotorLab must declare:
 A project is not fully onboarded until these are defined.
 
 G. PRIORITY
-This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt and MOTORLAB_BACKGROUND_EXECUTION_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
+This contract is mandatory alongside UAB_UNIFIED_ENGINE_V1.txt, UAB_ADAPTER_SPEC_V1.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_BACKGROUND_EXECUTION_V1.txt and MOTORLAB_BUILD_FAST_LANE_V1.txt. If an older project workflow conflicts, the older workflow is legacy and must not be treated as the authoritative promotion path until aligned.
 
 H. MOTORLAB WATCHDOG / ANTI-STALL - MANDATORY
 1. Every substantial controllable operation must expose heartbeat and material-progress state when technically available.
@@ -141,5 +144,13 @@ J. MOTORLAB BACKGROUND EXECUTION + SINGLE-CHAT CONTINUITY - MANDATORY
 17. MotorLab should proactively avoid leaving long backgroundable phases solely inside normal-chat execution.
 18. Detailed semantics are mandatory in MOTORLAB_BACKGROUND_EXECUTION_V1.txt.
 
-Engine version: MOTORLAB-CORE-V1.5 (legacy UAB compatibility)
-Last updated: 2026-09-28.
+K. BUILD FAST LANE + SAFETY SOURCE CHECKPOINT - MANDATORY
+1. MOTORLAB_BUILD_FAST_LANE_V1.txt governs Android/UAB build acceleration.
+2. A verified LAB aggiornamento normally performs ONE update-family Gradle build.
+3. The paired LAB di sicurezza is preserved as an immutable GitHub SOURCE checkpoint plus materialization recipe; its APK is built only on demand by default.
+4. Requested update artifact delivery becomes eligible as soon as source/package/version/signing checks pass and the artifact is retrievable; unrelated/deferred work must not delay delivery.
+5. Historical eager safety APKs remain valid.
+6. Build acceleration may not weaken package identity, signing, update-in-place, source lineage or verification.
+
+Engine version: MOTORLAB-CORE-V1.6 (legacy UAB compatibility)
+Last updated: 2026-10-08.

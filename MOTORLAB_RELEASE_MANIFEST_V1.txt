@@ -4,19 +4,20 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.08-r31
-FANOUT_STATE=COMPLETE
+CURRENT_RELEASE=2026.10.08-r32
+FANOUT_STATE=IN_PROGRESS
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 BOOT_CAPSULE_MODULE=MOTORLAB_BOOT_CAPSULE_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt\nRELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=COMPLETE
+RELEASE_FANOUT_STATE=IN_PROGRESS
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
 FAST_ITERATION_NO_SPIN_MODULE=MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt
+BUILD_FAST_LANE_MODULE=MOTORLAB_BUILD_FAST_LANE_V1.txt
 CHANGE_HISTORY_REGISTRY_MODULE=MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt
 PRE_CHANGE_APPROVAL_GATE_MODULE=MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt
 MODIFICATION_RESTORE_REGISTER_MODULE=MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt
@@ -34,6 +35,7 @@ UPDATE_FAMILY_LIFECYCLE_MODULE=MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
 CURRENT REQUIRED CORE MODULES
 - MOTORLAB_BOOT_CAPSULE_V1.txt
 - MOTORLAB_REENTRY_GATE_V1.txt
+- MOTORLAB_BUILD_FAST_LANE_V1.txt
 - MOTORLAB_CORE_ENTRYPOINT_V1.txt
 - MOTORLAB_AUTO_BOOTSTRAP_V1.txt
 - MOTORLAB_GLOBAL_PERSISTENT_ACTIVATION_V1.txt
@@ -262,7 +264,7 @@ R27+ ZERO-IDLE DUAL-LANE ACTIVE WAIT
 - Existing single-writer, provider, runner-cap and single-integration-lane rules remain mandatory.
 
 VERSION
-MOTORLAB-RELEASE-MANIFEST-V1.31
+MOTORLAB-RELEASE-MANIFEST-V1.32
 Established: 2026-09-29
 Revision 1.16: r16 adds authority/data ownership, persistent operational state, observability diagnostics, service connection-status tracking and non-redundant knowledge/plugin routing while preserving all r15 gates.
 Revision 1.17: r17 adds Android update-family lifecycle with stable package/signing identity, Bruno-facing LAB aggiornamento naming, new-family CANDIDATA creation and same-family CANDIDATA->MADRE promotion.
@@ -318,3 +320,13 @@ R31+ EVERY-TURN RE-ENTRY
 - Pollicino prompt logging alone is not sufficient MotorLab activation.
 
 Revision 1.31: r31 adds mandatory every-turn/resume MotorLab re-entry and safe latest-verified-local release refresh.
+
+
+R32+ BUILD FAST LANE
+- MOTORLAB_BUILD_FAST_LANE_V1.txt is mandatory for Android/UAB build flows.
+- Paired safety defaults to permanent immutable GitHub source checkpoint + recovery recipe.
+- Safety APK materialization is on-demand; a second safety Gradle build is not part of the normal LAB critical path.
+- Requested verified artifacts are deliverable immediately once upload/retrieval is proven.
+- Gradle optimization is evidence-driven: safe cache/configuration-cache/parallel reuse, no unsafe secret cache and no duplicate build work.
+
+Revision 1.32: r32 introduces deferred safety materialization and artifact-ready build acceleration.

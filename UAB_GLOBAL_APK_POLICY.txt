@@ -23,6 +23,7 @@ CORE PRINCIPLES
 13. VISUAL SUCCESS. Every meaningful verified success must be surfaced to Bruno with 2-4 fireworks plus an explanation of what succeeded.
 14. FREQUENT PROGRESS. Substantial tasks must show verified percentage frequently throughout execution, including subtask/phase/status transitions. The same verified percentage may be repeated with new status instead of inventing progress.
 15. BACKGROUND CONTINUITY. Long background-capable phases must be handed proactively to a durable executor when available so execution can continue independently of the visible ChatGPT screen. The project chat remains the canonical user-facing thread.
+16. BUILD FAST LANE. Android update-family LABs use MOTORLAB_BUILD_FAST_LANE_V1.txt: one normal update Gradle build, permanent safety-source checkpoint, on-demand safety APK materialization, and immediate artifact-ready delivery.
 
 MANDATORY LIFECYCLE FLOW
 1. Identify and protect the current MADRE reference.
@@ -144,7 +145,7 @@ VISUAL SUCCESS STATUS - MANDATORY
 LIVE BUILD MONITORING + MOTORLAB WATCHDOG
 1. New/in-progress build requests are monitored while an execution/control surface is available.
 2. Report meaningful phase changes, not repeated identical status spam.
-3. Provider success alone is insufficient; verify requested artifacts and source state.
+3. Provider success alone is insufficient; verify requested artifacts and source state. Conversely, once the requested verified artifact is uploaded/retrievable, do not wait for unrelated deferred work or whole-workflow terminal state before delivery.
 4. Never deliver a stale artifact while a newer requested build is still running.
 5. Repeated identical provider/job state does not count as progress.
 6. Suspected stalls use adaptive thresholds based on operation class and provider evidence rather than one fixed timeout.
@@ -179,6 +180,7 @@ CANONICAL FILES
 - MOTORLAB_VISUAL_STATUS_V1.txt
 - MOTORLAB_PROGRESS_REPORTING_V1.txt
 - MOTORLAB_BACKGROUND_EXECUTION_V1.txt
+- MOTORLAB_BUILD_FAST_LANE_V1.txt
 
-Engine version: MOTORLAB-CORE-V1.5 (legacy UAB compatibility)
-Last policy update: 2026-09-28
+Engine version: MOTORLAB-CORE-V1.6 (legacy UAB compatibility)
+Last policy update: 2026-10-08

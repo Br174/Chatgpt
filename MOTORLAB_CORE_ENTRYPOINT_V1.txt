@@ -14,7 +14,7 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 2. Read .motorlab/MOTORLAB_SYNC_STATE.txt and .motorlab/MOTORLAB_LOCAL_CORE.txt.
 3. Use VERIFIED local core immediately as fallback.
 4. When central is available, read MOTORLAB_RELEASE_MANIFEST_V1.txt and MOTORLAB_SATELLITE_SYNC_V1.txt and safely reconcile release ids.
-5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_REENTRY_GATE_V1.txt, MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_EXECUTION_FABRIC_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_POLLICINO_CONTINUITY_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
+5. Load all manifest-required modules, explicitly including MOTORLAB_PRE_CHANGE_APPROVAL_GATE_V1.txt, MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt, MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt, MOTORLAB_REENTRY_GATE_V1.txt, MOTORLAB_BUILD_FAST_LANE_V1.txt, MOTORLAB_VELOCITY_LAYER_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_EXECUTION_FABRIC_V1.txt, MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1.txt, MOTORLAB_FAST_ITERATION_NO_SPIN_V1.txt, MOTORLAB_CHANGE_HISTORY_REGISTRY_V1.txt, MOTORLAB_MODIFICATION_RESTORE_REGISTER_V1.txt, MOTORLAB_AUTHORITY_DATA_OWNERSHIP_V1.txt, MOTORLAB_PERSISTENT_OPERATIONAL_STATE_V1.txt, MOTORLAB_POLLICINO_CONTINUITY_V1.txt, MOTORLAB_OBSERVABILITY_DIAGNOSTICS_V1.txt, MOTORLAB_KNOWLEDGE_TOOL_ROUTING_V1.txt, MOTORLAB_LIVE_CONTROL_V1.txt, MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt.
 6. Read Project Continuity ledger.
 7. Read technical Change History registry when present.
 8. Read visible Registro Modifiche e Ripristini when present.
@@ -172,7 +172,7 @@ R28 BOOT / RELEASE ADOPTION
 - Release fanout is release coordination only and does not replace Velocity, native project engines or project lifecycle authority.
 
 VERSION
-MOTORLAB-CORE-ENTRYPOINT-V1.25
+MOTORLAB-CORE-ENTRYPOINT-V1.26
 Revision 1.8: r16 adds multi-service authority, MOTORLAB_OPERATION_ID correlation, persistent operational state, observability boundaries and non-redundant auxiliary-tool routing while preserving all r15 obligations.
 Revision 1.11: r17 adds Android update-family lifecycle and stable same-family update identity.tions.
 Revision 1.9: adds MotorLab Live Control safe-point reconciliation and mandatory micro-progress without changing r16 release identity or project runtime.
@@ -224,3 +224,13 @@ R31 EVERY-TURN MOTORLAB RE-ENTRY
 - Velocity remains the sole scheduler; Re-entry Gate is a control-plane gate, not a second scheduler.
 
 Revision 1.25: r31 makes MotorLab mandatory for the whole project conversation lifecycle, not only new-chat SessionStart.
+
+
+R32 ANDROID/UAB BUILD FAST LANE
+- Load MOTORLAB_BUILD_FAST_LANE_V1.txt for Android/UAB build operations.
+- Normal update-family LAB path performs one requested update Gradle build; paired safety is preserved as immutable GitHub source + materialization recipe.
+- Safety APK is generated only on demand by default.
+- Deliver the requested verified artifact as soon as it is uploaded/retrievable; do not wait for unrelated/deferred workflow work.
+- Build timing/cache evidence is measured and used for later optimization without weakening signing/update identity.
+
+Revision 1.26: r32 removes eager safety APK compilation from the normal LAB critical path and adds evidence-driven build acceleration.

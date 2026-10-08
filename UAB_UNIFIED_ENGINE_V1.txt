@@ -12,7 +12,7 @@ MADRE -> LAB -> CANDIDATA -> NEW MADRE
 
 
 PAIRED SAFETY CHECKPOINTS
-For every verified LAB NN aggiornamento in Android update-family mode, MotorLab produces LAB di sicurezza NN from the exact same functional source state. The safety artifact uses a different package/family and a different test-only certificate, is immutable, and becomes a recovery checkpoint. If the active family breaks after many revisions, a new active update family may start from the last known-good safety checkpoint rather than returning to MADRE. Safety is not CANDIDATA and cannot promote directly to MADRE.
+For every verified LAB NN aggiornamento in Android update-family mode, MotorLab preserves LAB di sicurezza NN as an immutable permanent GitHub SOURCE checkpoint from the exact same functional source state. By default r32 does not build a second safety APK during normal LAB delivery. The recovery recipe preserves the distinct future safety package/family, versioning, toolchain and test-only signing policy. The safety APK is materialized on demand if recovery is needed. Historical already-built safety APKs remain valid. If the active family breaks after many revisions, a new active update family may start from the last known-good safety checkpoint rather than returning to MADRE. Safety is not CANDIDATA and cannot promote directly to MADRE.
 
 ANDROID UPDATE-FAMILY MODE
 For Android projects explicitly using Bruno's persistent test-family workflow:
@@ -182,7 +182,7 @@ WATCHDOG / ANTI-STALL CONTRACT
 - Detailed mandatory behavior is defined by MOTORLAB_WATCHDOG_V1.txt.
 
 CACHE CONTRACT
-Every adapter must use safe persistent cache when supported. Android/Gradle routes use official Gradle caching and --build-cache unless documented incompatible. Node/web routes persist package-manager download cache. Cache misses are allowed and repopulate automatically.
+Every adapter must use safe persistent cache when supported. Android/Gradle routes use official Gradle caching and --build-cache unless documented incompatible. Compatible projects also use configuration cache, parallel execution and measured same-family cache reuse under MOTORLAB_BUILD_FAST_LANE_V1.txt. Node/web routes persist package-manager download cache. Cache misses are allowed and repopulate automatically.
 
 ROUTING CONTRACT
 - Public repositories: standard GitHub-hosted runners are the normal remote route.
@@ -201,7 +201,7 @@ SINGLE-SOURCE-OF-TRUTH RULE
 Br174/Chatgpt is the private MotorLab control/registry repository. This file, UAB_ENGINE_CONTRACT.txt, UAB_GLOBAL_APK_POLICY.txt, UAB_PROJECT_ROUTING.txt, MOTORLAB_WATCHDOG_V1.txt, MOTORLAB_VISUAL_STATUS_V1.txt, MOTORLAB_PROGRESS_REPORTING_V1.txt and MOTORLAB_BACKGROUND_EXECUTION_V1.txt define canonical engine behavior. Project repositories keep only thin adapters/workflows required to execute their mechanics.
 
 ENGINE VERSION
-MOTORLAB-CORE-V1.5 (legacy UAB compatibility)
+MOTORLAB-CORE-V1.6 (legacy UAB compatibility)
 Established as UAB: 2026-09-24
 MotorLab Watchdog revision: 2026-09-28
 MotorLab Visual Status revision: 2026-09-28
