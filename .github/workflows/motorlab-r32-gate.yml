@@ -1,0 +1,23 @@
+name: MotorLab r32 Gate
+
+on:
+  push:
+    branches:
+      - 'motorlab-r32-*'
+  pull_request:
+    branches: [main]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Historical boot regressions
+        run: node --test tests/motorlab-r28-sync-pin.test.mjs tests/motorlab-r29-versioned-banner.test.mjs tests/motorlab-r30-critical-boot-capsule.test.mjs tests/motorlab-r31-reentry-gate.test.mjs
+      - name: Historical execution regressions
+        run: node --test tests/motorlab-execution-fabric.test.mjs tests/motorlab-r27-dual-lane.test.mjs
+      - name: r32 build fast lane regression
+        run: node --test tests/motorlab-r32-build-fast-lane.test.mjs
