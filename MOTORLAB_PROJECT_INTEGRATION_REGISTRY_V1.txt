@@ -237,7 +237,10 @@ MUSICLAB R32 ADAPTER
 - Stable workflow: .github/workflows/musiclab-family-01-fastlane.yml.
 - Current measured LAB54 baseline: update Gradle 406s; safety Gradle 428s.
 
-CURRENT R32 FANOUT
-State: IN_PROGRESS until every registered default/current active ref carries r32 markers and MusicLab fastlane adapter is verified.
+CURRENT R32 FANOUT — AUTHORITATIVE
+State: COMPLETE.
+Verified targets: MusicLab main + LAB50 + LAB52 + LAB53 + LAB54 + Family 01 fastlane; GeoVision-Test main; StudyBook-AI main + active LAB03; Visionflix main; Cover-Lab-AI main; streamflix-BV main; MotorAI main.
+All verified targets carry r32 capsule/core markers. MusicLab additionally has source-only Safety54 recovery checkpoint and the persistent same-family build lane.
+This r32 section supersedes older current build/safety behavior while preserving historical safety APKs.
 
 Revision 2.34: r32 adds deferred safety materialization, artifact-ready delivery and stable same-family Android build lanes.
