@@ -97,11 +97,11 @@ SAFETY_SECOND_GRADLE_DEFAULT=forbidden
 SAFETY_LAB=immutable_distinct_package_and_test_signing
 BUILD_FAST_LANE=required
 ARTIFACT_READY_DELIVERY=immediate_when_verified
-BUILD_MICRO_ACCELERATION=non_compiler_only
-CONFIG_CACHE_CROSS_RUN=encrypted_secret_only
-PRECOMPRESSED_ARTIFACT_UPLOAD=no_recompression
-PRIMARY_ARTIFACT_LOGS=separate
-KOTLIN_KSP_TUNING=forbidden_without_explicit_approval
+BUILD_MICRO_ACCEL=non_compiler
+CONFIG_CACHE_XRUN=encrypted_secret
+PRECOMPRESSED_UPLOAD=no_recompress
+PRIMARY_LOGS=separate
+KOTLIN_KSP_TUNING=explicit_approval_only
 
 LIFECYCLE
 FLOW=MADRE->LAB->CANDIDATA->NUOVA_MADRE
