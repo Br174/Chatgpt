@@ -81,9 +81,9 @@ Revision 1.2: r31 makes every-turn re-entry adapter/hook propagation part of rel
 
 R32 BUILD FAST LANE FANOUT
 A target is not UPDATED_VERIFIED for r32 unless local capsule/core carry:
-- BUILD_FAST_LANE=required_for_android_uab;
-- SAFETY_SOURCE_CHECKPOINT=permanent_immutable_github_ref;
-- SAFETY_APK_MATERIALIZATION=on_demand_by_default;
+- BUILD_FAST_LANE=required;
+- SAFETY_SOURCE_CHECKPOINT=github_immutable_ref;
+- SAFETY_APK_MATERIALIZATION=on_demand;
 - ARTIFACT_READY_DELIVERY=required.
 Android project adapters are aligned at safe approved build-infrastructure boundaries; non-Android projects inherit the policy markers without application/runtime changes.
 
