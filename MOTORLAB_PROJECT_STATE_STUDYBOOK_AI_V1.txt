@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=13
+STATE_REVISION=14
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab04-book-workspace-layout-20261009
-OPERATION_STATUS=LAB04_APK_VERIFIED_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB 04 aggiornamento source and signed APK verified. Approved book-open page layout is implemented; physical-device usability and in-place install acceptance pending.
-CURRENT_REF=lab/studybook-core-android-01-update-04
-CURRENT_HEAD_SHA=8af04f3dd6af7a65351497a4701810b0f749808b
+ACTIVE_OPERATION_ID=studybook-lab05-approved-read-study-pdf-tts-navigation-20261009
+OPERATION_STATUS=LAB05_SIGNED_APK_VERIFIED_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB05 source implemented: book placeholder and approved labels, reader vs study tools split, chapter and item navigation including swipe, Italian Android native TTS. CI web and Android signed build succeeded; physical Android voice and user UX acceptance pending.
+CURRENT_REF=lab/studybook-core-android-01-update-05
+CURRENT_HEAD_SHA=f6128e2141bd793759161b067fc41c6a23730b5d
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / UAB-CORE StudyBook AI adapter
-JOB_ID=UPDATE_ANDROID_37909219118; CORE_37909219165; PAIRED_SAFETY_SOURCE_SHA_8af04f3dd6af7a65351497a4701810b0f749808b
-JOB_STATUS=UPDATE_ANDROID completed success; CORE completed success; paired safety source checkpoint exists, safety APK on demand only
+JOB_ID=ANDROID_37970280358_SUCCESS_RUN20; UAB_37970384205_SUCCESS_RUN271; ANDROID_37970384236_TEST_ONLY_COMMIT
+JOB_STATUS=ANDROID run20 success, identity and signing verified; UAB adapter run271 success; another Android rebuild for source test-contract-only change has been initiated.
 LAST_VERIFIED_PROGRESS_PERCENT=95
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB04 signed Android APK completed. Book cover and metadata side by side; existing four actions preserved below in responsive 2x2; original fidelity and metric content preserved. VersionCode 2026100016, stable LAB certificate verified.
-NEXT_SAFE_STEP=Bruno installs LAB04 update over existing LAB, opens a real book on Android, verifies cover/title layout and all four action buttons, checks fidelity metrics, PDF/export, and confirms existing library persists. Wait for acceptance before CANDIDATA.
-PENDING_VERIFICATION=Real-device LAB04 update-in-place; responsive layout on actual phone; reader, study, PDF, export actions; book fidelity and metrics; existing library. Existing broader StudyBook behavior remains device-gated.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-04-AGGIORNAMENTO.apk sha256=9675cbe756dd65f3af3fe4e22396fc30cf21746b1bb761660f23610c9154f888
+LAST_COMPLETED_MATERIAL_STEP=LAB05 signed Android APK run20 0.3.20 produced successfully: appId it.studybook.ai.lab; cert SHA256 D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC. Regression tests updated and UAB adapter run271 succeeded.
+NEXT_SAFE_STEP=Bruno installs LAB05 0.3.20 over LAB04 and checks Reader vs Study separation, glossary and abbreviations, next/previous chapters, flashcard quiz and oral arrows/swipe, PDF view, book download, native Italian TTS on actual Android; preserve existing library. Later consider candidate after device acceptance.
+PENDING_VERIFICATION=Physical Android TTS engine availability/audio, reader/glossary chapter flow, chapter and item swipe gesture, in-place update and local book persistence; CI success alone cannot prove these.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-05-AGGIORNAMENTO.apk SHA256=f8b9bc0034345fa97178e7941920503c7b8dd39efe4c1cb889f5a3ae301319b2 versionCode=2026100020 Android run=37970280358 source=a2621551fb539600d5f77d46cf4388676ce42079
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=2472d0ebc765936737573d437ebea8993c17a1189f9c00a5e0b03349def1159d
+UPDATE_ZIP_SHA256=1045ec0f602113f3bcaa1bca18d50915c69eeeb722e78262dc71d080bdf90eb1
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=Apply Bruno-approved book-open page layout only: cover left/title right, unchanged four original actions in 2x2 grid beneath, unchanged book control metrics and navigation.
-STATE_SOURCE=LAB04 update source 8af04f3dd6af7a65351497a4701810b0f749808b; Android run 37909219118 success; applicationId it.studybook.ai.lab; versionCode 2026100016; signing D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC; APK sha256 9675cbe756dd65f3af3fe4e22396fc30cf21746b1bb761660f23610c9154f888; ZIP sha256 2472d0ebc765936737573d437ebea8993c17a1189f9c00a5e0b03349def1159d
-CONTINUITY_NOTE=LAB04 is the active tested-at-CI signed update; LAB03 remains preserved. On next chat use the LAB04 branch and safety checkpoint source 8af04f3dd6af7a65351497a4701810b0f749808b; do not recreate work. LAB04 is pending Bruno Android acceptance.
+LAST_USER_INTENT_SUMMARY=Use standard GitHub Android APK pipeline assisted by MotorLab Fantastici20 to implement approved StudyBook LAB05: book placeholder minimal; buttons Leggi sul telefono, Leggi in PDF, Studia sul telefono, Scarica libro; distinct reading with terms/abbreviations vs active study flashcards quiz map oral; chapter arrows/index and swipes; native Italian TTS.
+STATE_SOURCE=StudyBook-AI LAB05 branch f6128e2141bd793759161b067fc41c6a23730b5d (regression-test contract last change); Android run20 37970280358 source a2621551fb539600d5f77d46cf4388676ce42079 success and signed; MotorLab adapter run271 37970384205 success; safety branch lab/safety-studybook-core-android-01-update-05-final.
+CONTINUITY_NOTE=Resume from LAB05 latest branch, not LAB04. LAB05 signed APK 0.3.20 and ZIP produced/linked in 2026-10-09 conversation. Regression-test-only source change after APK was validated by adapter run271. Preserve LAB04 as fallback, no MADRE promotion until Bruno device feedback.
 UPDATED_DATE=2026-10-09
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,15 +44,15 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100016
-ANDROID_UPDATE_VERSION_NAME=0.3.16
+ANDROID_UPDATE_VERSION_CODE=2026100020
+ANDROID_UPDATE_VERSION_NAME=0.3.20
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 04 aggiornamento
-ANDROID_PAIRED_RECOVERY=LAB 04 sicurezza source checkpoint (APK materialization on demand)
+ANDROID_NEXT_VISIBLE_LAB=LAB 05 aggiornamento
+ANDROID_PAIRED_RECOVERY=LAB 05 sicurezza source checkpoint lab/safety-studybook-core-android-01-update-05-final (APK on demand)
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
@@ -82,3 +82,14 @@ LAB04_SAFETY_SOURCE_SHA=8af04f3dd6af7a65351497a4701810b0f749808b
 LAB04_SAFETY_APK=ON_DEMAND_NOT_YET_BUILT
 LAB03_PREVIOUS_UPDATE_APK=StudyBook-AI-LAB-03-AGGIORNAMENTO.apk sha256=6685b60797a6be47b5c70f678a32c84a42222701c4127ba80081d9c358ef0df5
 LAB03_PREVIOUS_RECOVERY_APK=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
+
+
+LAB05_CHANGE_RECORD=2026-10-09; approved reading/study split; chapter next/prev arrows and 3/12 navigation, swipe; per-tool pagination and 2/15; Android native Italian TTS with segmented reading and error indicator; minimal placeholder; export labels. CI build and package signer verified, pending device proof.
+LAB05_UPDATE_ARTIFACT_SOURCE_SHA=a2621551fb539600d5f77d46cf4388676ce42079
+LAB05_UPDATE_ARTIFACT_RUN=37970280358
+LAB05_VERIFIED_ANDROID_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB05_SIGNED_APK_SHA256=f8b9bc0034345fa97178e7941920503c7b8dd39efe4c1cb889f5a3ae301319b2
+LAB05_REGRESSION_TEST_ONLY_HEAD=f6128e2141bd793759161b067fc41c6a23730b5d
+LAB05_UAB_ADAPTER_TEST_SUCCESS=37970384205
+LAB05_SAFETY_REF=lab/safety-studybook-core-android-01-update-05-final
+LAB05_DEVICE_ACCEPTANCE=PENDING
