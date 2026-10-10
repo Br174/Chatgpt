@@ -1,0 +1,37 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'it.motorlab.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'it.motorlab.app'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0-LAB01'
+    }
+
+    signingConfigs {
+        lab {
+            storeFile file(System.getenv('MOTORLAB_LAB_KEYSTORE') ?: 'missing-test-only-keystore.jks')
+            storePassword System.getenv('MOTORLAB_LAB_PASSWORD') ?: 'disabled'
+            keyAlias 'motorlab-lab'
+            keyPassword System.getenv('MOTORLAB_LAB_PASSWORD') ?: 'disabled'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.lab
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
