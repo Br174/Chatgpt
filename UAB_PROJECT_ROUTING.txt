@@ -116,6 +116,9 @@ Canonical files:
 Background mode: registry/control-plane only. This repository defines durable job/checkpoint rules but is not itself a continuously running worker service.
 Canonical chat: MotorLab chat is used only to design/manage MotorLab itself, not as the required user-facing chat for other projects.
 
+COVER LAB AI DORMANCY OVERRIDE (2026-10-10)
+Br174/Cover-Lab-AI is DORMANT_RESERVED by explicit user approval. The numbered routing section below is historical only; do not infer active LAB, build, workflows, satellite version fanout, onboarding or automatic project work from it. Preserve repo, branches, source, artifacts, Cloudflare Worker and D1. MusicLab Cover is separate and active. Reactivate only on a later explicit user request after safety verification.
+
 7. Cover Lab AI
 Repository: Br174/Cover-Lab-AI
 Visibility: PUBLIC
