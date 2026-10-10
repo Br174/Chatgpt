@@ -67,6 +67,9 @@ streamflix-BV
 - Role: delivery-only adapter for Visionflix TV.
 - Stable Downloader pointer may follow GitHub latest while underlying release tags remain unique and immutable.
 
+DORMANT PROJECT OVERRIDE (2026-10-10)
+Cover Lab AI repository Br174/Cover-Lab-AI is preserved but excluded from all ordinary automatic builds, updates and MotorLab active project release fanout. The following Cover Lab AI lifecycle and UAB information is historical only. Reactivation requires explicit approval. MusicLab internal Cover remains active.
+
 Cover Lab AI
 - Repository: Br174/Cover-Lab-AI
 - Visibility: PUBLIC
