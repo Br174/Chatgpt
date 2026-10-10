@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=15
+STATE_REVISION=16
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab06-compact-study-nav-audio-standard-apk-20261010
-OPERATION_STATUS=LAB06_SIGNED_APK_VERIFIED_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB06 user-approved compact study screen and standard APK pipeline completed. Unified central StudyBook AI header with functional back button and shared minimal audio icon; one full chapter title selector with arrows replaces duplicated chapter panels; chapter change resets study scope to selected chapter. Web/MotorLab and Android CI green. Device UX/audio acceptance pending.
-CURRENT_REF=lab/studybook-core-android-01-update-06
-CURRENT_HEAD_SHA=acdcfcc55cf169e84cc1831d9c2da5da896efc37
+ACTIVE_OPERATION_ID=studybook-lab07-home-continua-full-book-screen-20261010
+OPERATION_STATUS=LAB07_SIGNED_APK_VERIFIED_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB07 micro-fix completed: tapping Home Continua now loads the selected latest book and navigates to full Libro aperto StudioScreen, without opening Reader overlay. Four actions, entire book cover and quality metrics, top and bottom navigation remain unchanged. Recenti and Libreria original open-reader path unchanged. UAB and Android CI pass; device confirmation pending.
+CURRENT_REF=lab/studybook-core-android-01-update-07
+CURRENT_HEAD_SHA=560e3b978c954a5b5f351f735ea30c792b02aab2
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / UAB-CORE StudyBook AI adapter
-JOB_ID=LAB06_ANDROID_38030532899_SUCCESS_RUN22; LAB06_UAB_38030532917_SUCCESS_RUN276
-JOB_STATUS=Android 38030532899 completed success, all signing/identity steps passed; UAB 38030532917 completed success including LAB06 static UI regression; no in-flight builds.
+JOB_ID=LAB07_ANDROID_38033174406_SUCCESS_RUN23; LAB07_UAB_38033174398_SUCCESS_RUN280
+JOB_STATUS=LAB07 Android successful: web build, signing, update identity and uploaded APK; LAB07 UAB successful including new Home Continua full overview static contract and prior regression tests. No writes/build pending.
 LAST_VERIFIED_PROGRESS_PERCENT=95
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB06 APK 0.3.22 signed and ZIP retrieved, unpacked and SHA256 compared. Android versionCode=2026100022, package it.studybook.ai.lab and original signing certificate verified. Test suite success.
-NEXT_SAFE_STEP=Bruno installs StudyBook-AI-LAB-06-AGGIORNAMENTO.apk in-place and verifies working back arrow, compact header, full chapter title, previous/next controls, native chapter selector, oral/flashcard/quiz navigation, consistent TTS icons and actual voice, no library loss. Do not promote before acceptance.
-PENDING_VERIFICATION=Physical Android inspection including readability full long chapter title and scroll, back to book, TTS audio and chapter navigation, update-in-place and persisted library. CI cannot confirm physical experience.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-06-AGGIORNAMENTO.apk sha256=8d633712f27db7989bb9c5c799040822e838c20a93e636c93730c83f5fbc0a81 versionCode=2026100022 AndroidRun=38030532899 sourceSha=acdcfcc55cf169e84cc1831d9c2da5da896efc37
+LAST_COMPLETED_MATERIAL_STEP=LAB07 signed Android APK version 0.3.23 versionCode 2026100023, package it.studybook.ai.lab, stable cert SHA256 D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC. ZIP downloaded, APK extracted, SHA256 matched archive manifest and ZIP CRC verified.
+NEXT_SAFE_STEP=Bruno installs LAB07 in-place without uninstalling previous LAB; taps Home Continua, verifies complete Libro aperto page with book cover, metadata, four action buttons and Controllo del libro, verifies returning Home and that other actions remain correct. Do not promote before real device acceptance.
+PENDING_VERIFICATION=Physical Android test of Home Continua opening full page rather than Reader, correct book selection and back navigation, in-place update and persisted library. All automated regression gates pass but device UX still unverified.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-07-AGGIORNAMENTO.apk sha256=32c00e0230da15744c3118703b536ae9630a44c6d18cab3fddb08edd8d10313d versionCode=2026100023 AndroidRun=38033174406 sourceSha=560e3b978c954a5b5f351f735ea30c792b02aab2
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=8ea11e16c33fa630c976685148cb9056e7328521348a729ce6a6c0b3e5002b9a
+UPDATE_ZIP_SHA256=55719bbb026d5c670ef012d98baf1b5df86e00f00685a6612014a84fadedea79
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=User approved LAB06 visual mockup: single full-title chapter navigator replaces two redundant panels, clear back arrow, compact centered StudyBook AI header, blue minimal sound icon consistently on all TTS controls; execute via standard GitHub APK+ZIP method and remember it.
-STATE_SOURCE=GitHub repository Br174/StudyBook-AI LAB06 commit acdcfcc55cf169e84cc1831d9c2da5da896efc37; AndroidRun=38030532899 success; UABRun=38030532917 success; artifact ID 11662122678; source safety branch lab/safety-studybook-core-android-01-update-06.
-CONTINUITY_NOTE=LAB06 is latest verified source and signed APK. Source policy .motorlab/STUDYBOOK_STANDARD_APK_METHOD.txt and MOTORLAB_PROJECT_HOOK.txt preserve user's standard GitHub build/delivery instruction across chats. LAB05 remains rollback source; safety LAB06 checkpoint prepared. Device acceptance pending.
+LAST_USER_INTENT_SUMMARY=Home Continua (circled red) must open THE COMPLETE existing Libro aperto page (cover/title, four actions, book quality statistics and navigation), not just four tiles and not Leggi sul telefono; no other UI modification. User clarified and approved after pre-change report.
+STATE_SOURCE=LAB07 GitHub SHA 560e3b978c954a5b5f351f735ea30c792b02aab2; UAB success run 38033174398; Android signed APK success run 38033174406; artifact 11663262382; source backup lab/safety-studybook-core-android-01-update-07.
+CONTINUITY_NOTE=LAB07 is current signed APK and sources, LAB06 remains previous fallback. No changes to book-open UI design, Reader, Study or Library beyond Home Continua dedicated navigation. Standard APK GitHub pipeline stays permanent in .motorlab/STUDYBOOK_STANDARD_APK_METHOD.txt. Device acceptance pending.
 UPDATED_DATE=2026-10-10
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,15 +44,15 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100022
-ANDROID_UPDATE_VERSION_NAME=0.3.22
+ANDROID_UPDATE_VERSION_CODE=2026100023
+ANDROID_UPDATE_VERSION_NAME=0.3.23
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 06 aggiornamento
-ANDROID_PAIRED_RECOVERY=LAB06 safety source branch lab/safety-studybook-core-android-01-update-06; recovery APK on demand
+ANDROID_NEXT_VISIBLE_LAB=LAB 07 aggiornamento
+ANDROID_PAIRED_RECOVERY=LAB07 source checkpoint lab/safety-studybook-core-android-01-update-07, APK on demand
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
@@ -98,3 +98,12 @@ LAB06_USER_PREFERENCE=Use project standard GitHub connector-to-Android pipeline 
 LAB06_UI_APPROVAL=Compact StudyBook AI header, back arrow, single chapter picker with full wrap title, chapter arrows, minimalist vector speaker on all current StudyMode TTS controls.
 LAB06_VERIFICATION=UAB_38030532917_SUCCESS; ANDROID_38030532899_SUCCESS; SOURCE_acdcfcc55cf169e84cc1831d9c2da5da896efc37; APK_SHA256_8d633712f27db7989bb9c5c799040822e838c20a93e636c93730c83f5fbc0a81
 LAB06_DEVICE_ACCEPTANCE=PENDING
+
+LAB07_CHANGE_RECORD=2026-10-10 • Home Continua uses onContinueBook(latest) -> openLibraryItem(item.id,{ original:false, openReader:false }) -> navigateTo('studio') -> setStudyModeOpen(false), full StudioScreen unchanged. Previous Home Recenti and Libreria routing unchanged.
+LAB07_ANDROID_TEST_RUN=38033174406 SUCCESS SHA=560e3b978c954a5b5f351f735ea30c792b02aab2
+LAB07_UAB_TEST_RUN=38033174398 SUCCESS including scripts/test-lab07-home-continue.mjs
+LAB07_ARTIFACT_SHA256=32c00e0230da15744c3118703b536ae9630a44c6d18cab3fddb08edd8d10313d
+LAB07_ARCHIVE_SHA256=55719bbb026d5c670ef012d98baf1b5df86e00f00685a6612014a84fadedea79
+LAB07_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB07_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-07
+LAB07_DEVICE_ACCEPTANCE=PENDING
