@@ -7,6 +7,9 @@ Central authority: Br174/Chatgpt.
 PURPOSE
 Start MotorLab first, reconcile verified current state, prevent unapproved writes, accelerate safe artifact delivery, preserve mandatory causal closure, keep progress visible, preserve project-native engines/lifecycle, and provide technical history, persistent operational continuity, runtime diagnostics and a Bruno-confirmed restore register without conflicting sources of truth.
 
+BIDIRECTIONAL FEEDBACK GATE — 2026-10-10
+During an authorized project execution cycle, reuse Project Continuity and Persistent Operational State to report verified material project feedback to central MotorLab and check reusable lessons, under MOTORLAB_BIDIRECTIONAL_SYNC_V1.txt. The rule has no second engine, scheduler or database. Check the registry before activation: explicitly reserved Cover Lab AI (Br174/Cover-Lab-AI) is DORMANT_RESERVED and excluded from automatic updates, bidirectional events and active project fanout until explicit reactivation. A missing authenticated always-on executor must be reported as PENDING_EXECUTOR; do not represent this policy as live cross-repository event propagation. Preserve MusicLab's independent Cover engine. Existing session pinned satellite r34 stays unchanged and app code is never modified by control-plane metadata.
+
 REGISTERED PROJECT BOOT ORDER - MANDATORY
 0. Emit `⚙️ MotorLab rNN attivo` before substantive first-session work when project context is identifiable, with rNN from the active pinned release.
 0A. Before EVERY supported project UserPromptSubmit and every resume/compact/clear, apply MOTORLAB_REENTRY_GATE_V1.txt: reinject the pinned Critical Boot Capsule and compact project identity/sync state before substantive project reasoning/tools/writes; safely refresh to a newer VERIFIED local release at a safe re-entry boundary when no explicit in-flight write/build/test/promotion lock is recorded.
