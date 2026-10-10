@@ -2,6 +2,21 @@ MOTORLAB PROJECT INTEGRATION REGISTRY V1
 
 STATUS
 Canonical current-state registry of MotorLab-managed projects.
+
+PROJECT OPERATING STATUS OVERRIDE — 2026-10-10
+PROJECT=Br174/Cover-Lab-AI
+STATUS=DORMANT_RESERVED
+ACTIVE_PROJECT=false
+FANOUT_TARGET=false
+BIDIRECTIONAL_SYNC_TARGET=false
+AUTO_ONBOARD_EXISTING=false
+AUTO_REACTIVATION=false
+GITHUB_REPOSITORY=preserve
+MOTORLAB_SATELLITE=preserve_pinned_r34_no_further_updates
+PROJECT_DOMAIN_CODE=preserve_unchanged
+EXTERNAL_CLOUDFLARE_D1=preserve_no_delete
+REACTIVATION=requires_explicit_user_approval_and_safe_boundary
+PRECEDENCE=This current operational override supersedes historical Cover Lab AI entries and old all-project language for THIS explicitly dormant repository only. Historic r28-r34 fanout evidence remains archival, not a future release target. Future NEW projects remain auto-onboarded. MusicLab internal Cover engine and external cover.info are separate and never excluded.
 Central authority: Br174/Chatgpt.
 
 CURRENT CENTRAL RELEASE
@@ -98,7 +113,7 @@ REGISTERED PROJECTS — R29 VERSIONED BOOT FANOUT VERIFIED 2026-10-07
    active LAB03 r29 commit: 54112aada6804f8beb104d607eaf7b5aa94e7fc8
 4. Visionflix / Verlezza Vision — Br174/Visionflix
    main r29 commit: 55a299fecf47aa7c74061b596f8c3d1a26336fa0
-5. Cover Lab AI — Br174/Cover-Lab-AI
+5. Cover Lab AI — Br174/Cover-Lab-AI [HISTORICAL r29 VERIFIED; CURRENT STATUS DORMANT_RESERVED, NOT ACTIVE]
    main r29 commit: dbbe1007e1bfcef9289a03c58c8ac122b4cde569
 6. streamflix-BV — Br174/streamflix-BV
    main r29 commit: 62c5c1f32c48b233ba264c8dd9e6afdd14fe318f
