@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=25
+STATE_REVISION=26
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab16-approved-home-20261010
-OPERATION_STATUS=LAB16_SIGNED_APK_DELIVERED_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB16 approved Home implemented: top Scanner/PDF eBook and Scannerizzati/Elaborati/Versioni originali, no redundant Nuovo libro/Studio header; open central workspace; real photo archive/processed/original horizontal Recenti with left-swipe; kept bottom Home/Libreria/Studio; scanner shutter and saved-photo confirmation before OCR, actual scan photo for generated study book. UAB CI successful and signed Android APK v0.3.38 verified; install on device pending.
-CURRENT_REF=lab/studybook-core-android-01-update-16
-CURRENT_HEAD_SHA=b1afa23f231ffee67d0ee97a023d8264e3c54e56
+ACTIVE_OPERATION_ID=studybook-lab17-scan-scroll-icons-fix-20261010
+OPERATION_STATUS=LAB17_SIGNED_APK_DELIVERED_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB17 user-approved corrections: remove nonfunctional document/book recent-thumbnail overlay while scanner panel active by suppressing Recenti; enable continuous vertical scrolling and safe-area bottom padding so scanner actions Svuota, Aggiungi pagina, Fine scansione · Crea libro are fully visible above fixed Home/Libreria/Studio. Normal LAB16 Home design and library/scans retained. CI passed, signed APK ZIP integrity verified. Physical Android acceptance pending.
+CURRENT_REF=lab/studybook-core-android-01-update-17
+CURRENT_HEAD_SHA=dae476acd74ec418e9cfa56184bece3b361995ff
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB16_ANDROID_38078033025_SUCCESS_RUN38; LAB16_UAB_38078072721_SUCCESS_RUN365; SECONDARY_ANDROID_38078072703_PENDING
-JOB_STATUS=Android run 38078033025 success; APK+ZIP independently CRC/SHA256 verified; original LAB signing fingerprint and monotonically increased Android version verified. UAB run 38078072721 success (same application code; later test/workflow-only commit); LAB16 new targeted static assertions passed via verified GitHub source.
+JOB_ID=LAB17_UAB_38079233710_SUCCESS_RUN370; LAB17_ANDROID_38079233650_SUCCESS_RUN41
+JOB_STATUS=Latest LAB17 UAB pass including legacy regressions + targeted scanner bottom scroll tests; latest LAB17 Android signed APK run success. Zip CRC, APK internal ZIP CRC, SHA256 manifest match, stable package and original LAB signing identity verified.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB16 APK versionName=0.3.38 versionCode=2026100038 package=it.studybook.ai.lab original signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC SHA256=e7a4bdcfc330cbb4c12dbd9ef2b7a7e0a23d874c118f8fa1a3a4d0d80d543d28; ZIP SHA256=95294bfc91a75a326c66607c72bc0b487c5b7716abd52d555930d21186b52a08.
-NEXT_SAFE_STEP=Bruno installs LAB16 v0.3.38 over LAB15 on Android; visually verifies Home against approved screenshot, Scanner/PDF top, 3 category counts and routes, swipeable mixed Recenti above bottom nav, device-photo preview, scanner shutter/confirmation, scan-derived book cover. Device acceptance required before CANDIDATA.
-PENDING_VERIFICATION=Real-device UI/render/performance confirmation, scanner camera permissions, capture animation feedback, original source image, scroll swipe and restore navigation. Signed APK verified, physical device not yet tested by user.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-16-AGGIORNAMENTO.apk sha256=e7a4bdcfc330cbb4c12dbd9ef2b7a7e0a23d874c118f8fa1a3a4d0d80d543d28 version=0.3.38 versionCode=2026100038 buildRun=38078033025 artifactID=11678628104 source=746e56dd87614bcc326a99dfb04f385c25d3b1af; matching UAB run=38078072721
+LAST_COMPLETED_MATERIAL_STEP=LAB17 APK versionName=0.3.41 versionCode=2026100041 package=it.studybook.ai.lab stable signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC. APK SHA256=162f1eddd88f7ea0916cae52712163556ce6ea5ae92e99f64cbb544407b66e57 ZIP SHA256=d884ea38754012fc7281715ca57451b1fba9a167bc8769ca912cf18654673365.
+NEXT_SAFE_STEP=Install LAB17 over LAB16 on Android. Scan a page, verify unwanted icons no longer overlay scanner, scroll until entire Svuota/Aggiungi pagina/Fine scansione buttons above bottom Home/Libreria/Studio and tap them. Confirm normal Home Recenti carousel returns when not scanning. Device acceptance pending.
+PENDING_VERIFICATION=Actual Android viewport and touch behavior: scanner long page scroll, final action button visibility and tappability under nav, icons absent during scan, Home recent carousel outside scan, no data loss.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-17-AGGIORNAMENTO.apk SHA256=162f1eddd88f7ea0916cae52712163556ce6ea5ae92e99f64cbb544407b66e57 versionName=0.3.41 versionCode=2026100041 AndroidRun=38079233650 artifactID=11680121003 source=dae476acd74ec418e9cfa56184bece3b361995ff
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=95294bfc91a75a326c66607c72bc0b487c5b7716abd52d555930d21186b52a08
+UPDATE_ZIP_SHA256=d884ea38754012fc7281715ca57451b1fba9a167bc8769ca912cf18654673365
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=User approved final StudyBook home screenshot, replace old Home with Scanner and PDF/eBook above Scannerizzati/Elaborati/Versioni originali, no Nuovo libro and no Studio header, keep blank central work area, horizontal right-to-left Recenti above bottom Home/Libreria/Studio. Preserve previously approved scanner camera capture confirmation and scanned book photo cover.
-STATE_SOURCE=Br174/StudyBook-AI branch lab/studybook-core-android-01-update-16 head b1afa23f231ffee67d0ee97a023d8264e3c54e56; safety branch lab/safety-studybook-core-android-01-update-16; APK source 746e56dd87614bcc326a99dfb04f385c25d3b1af; Android 38078033025 success UAB 38078072721 success
-CONTINUITY_NOTE=LAB16 signed APK and ZIP delivered. Old LAB15 source/release retained. All app behavior changed in isolated LAB16: Home dashboard, recent horizontal, scan photo cover and shutter feedback; visual verification on device pending. Secondary Android run 38078072703 is redundant and may complete later; do not silently promote artifact/build while Bruno tests delivered 0.3.38.
+LAST_USER_INTENT_SUMMARY=Approved LAB17: two blue doc/book icon thumbnails overlapping scanner contents should be removed; make scanner page scroll beyond fixed bottom Home/Libreria/Studio toolbar so Svuota, Aggiungi pagina and Fine scansione buttons are fully visible/clickable.
+STATE_SOURCE=Br174/StudyBook-AI branch lab/studybook-core-android-01-update-17 SHA dae476acd74ec418e9cfa56184bece3b361995ff, safety lab/safety-studybook-core-android-01-update-17. UAB 38079233710 success and Android 38079233650 success.
+CONTINUITY_NOTE=LAB17 signed Android 0.3.41 APK and ZIP delivered, source branch checkpoint verified. During scanning hide Recenti to prevent ghost icons and allow scrolling final controls above bottom nav. Normal LAB16 Home unchanged. Physical device testing pending before promotion.
 UPDATED_DATE=2026-10-10
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,15 +44,15 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100038
-ANDROID_UPDATE_VERSION_NAME=0.3.38
+ANDROID_UPDATE_VERSION_CODE=2026100041
+ANDROID_UPDATE_VERSION_NAME=0.3.41
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 16 aggiornamento
-ANDROID_PAIRED_RECOVERY=LAB16 verified safety source branch lab/safety-studybook-core-android-01-update-16; LAB15 previous source unchanged.
+ANDROID_NEXT_VISIBLE_LAB=LAB 17 aggiornamento
+ANDROID_PAIRED_RECOVERY=LAB17 safety source lab/safety-studybook-core-android-01-update-17; LAB16 previous release unchanged.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
@@ -180,3 +180,12 @@ LAB16_APK_SHA256=e7a4bdcfc330cbb4c12dbd9ef2b7a7e0a23d874c118f8fa1a3a4d0d80d543d2
 LAB16_ZIP_SHA256=95294bfc91a75a326c66607c72bc0b487c5b7716abd52d555930d21186b52a08
 LAB16_SAFETY_REF=lab/safety-studybook-core-android-01-update-16
 LAB16_DEVICE_ACCEPTANCE=PENDING
+
+LAB17_CHANGE_RECORD=2026-10-10; eliminate scanner-mode Recenti icon overlays and restore safe vertical scroll with Android navigation safe-area; normal Home unchanged; no scanner data deletion.
+LAB17_UAB_RUN=38079233710 SUCCESS sourceSha=dae476acd74ec418e9cfa56184bece3b361995ff
+LAB17_ANDROID_RUN=38079233650 SUCCESS sourceSha=dae476acd74ec418e9cfa56184bece3b361995ff
+LAB17_APK_SHA256=162f1eddd88f7ea0916cae52712163556ce6ea5ae92e99f64cbb544407b66e57
+LAB17_ZIP_SHA256=d884ea38754012fc7281715ca57451b1fba9a167bc8769ca912cf18654673365
+LAB17_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB17_SAFETY_REF=lab/safety-studybook-core-android-01-update-17
+LAB17_DEVICE_ACCEPTANCE=PENDING
