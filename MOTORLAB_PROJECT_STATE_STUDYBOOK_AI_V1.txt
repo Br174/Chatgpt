@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=24
+STATE_REVISION=25
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab15-direct-original-route-20261010
-OPERATION_STATUS=LAB15_SIGNED_APK_VERIFIED_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB15 completed: Home Versione originale now directly opens Libro aperto (last-selected or latest original), Library Originali routes directly, old original intermediary removed; original text read inline without switching screens; empty original library offers import in same StudyBook screen. Source untouched, existing modified books and exports preserved. UAB and Android CI passed; APK and ZIP SHA256/CRC independently verified. User device acceptance pending.
-CURRENT_REF=lab/studybook-core-android-01-update-15
-CURRENT_HEAD_SHA=1817b81109619d615d167a0f3b2983f80d5a2e27
+ACTIVE_OPERATION_ID=studybook-lab16-approved-home-20261010
+OPERATION_STATUS=LAB16_SIGNED_APK_DELIVERED_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB16 approved Home implemented: top Scanner/PDF eBook and Scannerizzati/Elaborati/Versioni originali, no redundant Nuovo libro/Studio header; open central workspace; real photo archive/processed/original horizontal Recenti with left-swipe; kept bottom Home/Libreria/Studio; scanner shutter and saved-photo confirmation before OCR, actual scan photo for generated study book. UAB CI successful and signed Android APK v0.3.38 verified; install on device pending.
+CURRENT_REF=lab/studybook-core-android-01-update-16
+CURRENT_HEAD_SHA=b1afa23f231ffee67d0ee97a023d8264e3c54e56
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB15_ANDROID_38060265046_SUCCESS_RUN37; LAB15_UAB_38060264987_SUCCESS_RUN357
-JOB_STATUS=LAB15 UAB success including LAB15 direct route test, prior LAB07/08/13/14 regressions and cloudflare checks; Android success with original LAB signing keystore and update identity checks. GitHub artifact downloaded, ZIP CRC and APK archive CRC verified and APK sha256 matches signed manifest.
+JOB_ID=LAB16_ANDROID_38078033025_SUCCESS_RUN38; LAB16_UAB_38078072721_SUCCESS_RUN365; SECONDARY_ANDROID_38078072703_PENDING
+JOB_STATUS=Android run 38078033025 success; APK+ZIP independently CRC/SHA256 verified; original LAB signing fingerprint and monotonically increased Android version verified. UAB run 38078072721 success (same application code; later test/workflow-only commit); LAB16 new targeted static assertions passed via verified GitHub source.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB15 signed APK package it.studybook.ai.lab versionName 0.3.37 versionCode 2026100037 original signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; APK SHA256=6f970cbdb1bce80a2d6f0e06a8d55dbf7d9d9a331466e0477d80490984fa98fc ZIP SHA256=81c6adf331965807bb95b08a3578c1b82403f816dbe1922ccb84934f9543d4af.
-NEXT_SAFE_STEP=User installs LAB15 over LAB14, checks Home Versione originale direct to Libro aperto, Libreria Originali direct open, optional inline original reading with Android back, PDF/export, no-original import in same screen; tests persistence and update in place on physical Android; feedback before promotion.
-PENDING_VERIFICATION=Device-specific tests original route, in-page original text display, open with external reader, export PDF/original raw, empty original library chooser and back navigation. CI verified, phone acceptance pending.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-15-AGGIORNAMENTO.apk SHA256=6f970cbdb1bce80a2d6f0e06a8d55dbf7d9d9a331466e0477d80490984fa98fc versionName=0.3.37 versionCode=2026100037 AndroidRun=38060265046 artifactID=11672981417 source=1817b81109619d615d167a0f3b2983f80d5a2e27
+LAST_COMPLETED_MATERIAL_STEP=LAB16 APK versionName=0.3.38 versionCode=2026100038 package=it.studybook.ai.lab original signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC SHA256=e7a4bdcfc330cbb4c12dbd9ef2b7a7e0a23d874c118f8fa1a3a4d0d80d543d28; ZIP SHA256=95294bfc91a75a326c66607c72bc0b487c5b7716abd52d555930d21186b52a08.
+NEXT_SAFE_STEP=Bruno installs LAB16 v0.3.38 over LAB15 on Android; visually verifies Home against approved screenshot, Scanner/PDF top, 3 category counts and routes, swipeable mixed Recenti above bottom nav, device-photo preview, scanner shutter/confirmation, scan-derived book cover. Device acceptance required before CANDIDATA.
+PENDING_VERIFICATION=Real-device UI/render/performance confirmation, scanner camera permissions, capture animation feedback, original source image, scroll swipe and restore navigation. Signed APK verified, physical device not yet tested by user.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-16-AGGIORNAMENTO.apk sha256=e7a4bdcfc330cbb4c12dbd9ef2b7a7e0a23d874c118f8fa1a3a4d0d80d543d28 version=0.3.38 versionCode=2026100038 buildRun=38078033025 artifactID=11678628104 source=746e56dd87614bcc326a99dfb04f385c25d3b1af; matching UAB run=38078072721
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=81c6adf331965807bb95b08a3578c1b82403f816dbe1922ccb84934f9543d4af
+UPDATE_ZIP_SHA256=95294bfc91a75a326c66607c72bc0b487c5b7716abd52d555930d21186b52a08
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=Approved LAB15: remove old Versione originale intermediate screen; Home Versione originale and Library Originali directly open Il tuo libro di studio, preserving original file and all study choices; maintain approved appearance, no auto-processing and no data deletion.
-STATE_SOURCE=Br174/StudyBook-AI branch lab/studybook-core-android-01-update-15 SHA 1817b81109619d615d167a0f3b2983f80d5a2e27; UAB 38060264987 success; Android 38060265046 success; safety ref lab/safety-studybook-core-android-01-update-15
-CONTINUITY_NOTE=LAB15 latest verified APK/ZIP. Direct original-to-book overview with original inline reader, empty-library chooser/import. Old original page removed. LAB14 remains intact, source safety checkpoint lab/safety-studybook-core-android-01-update-15. Physical Android test pending.
+LAST_USER_INTENT_SUMMARY=User approved final StudyBook home screenshot, replace old Home with Scanner and PDF/eBook above Scannerizzati/Elaborati/Versioni originali, no Nuovo libro and no Studio header, keep blank central work area, horizontal right-to-left Recenti above bottom Home/Libreria/Studio. Preserve previously approved scanner camera capture confirmation and scanned book photo cover.
+STATE_SOURCE=Br174/StudyBook-AI branch lab/studybook-core-android-01-update-16 head b1afa23f231ffee67d0ee97a023d8264e3c54e56; safety branch lab/safety-studybook-core-android-01-update-16; APK source 746e56dd87614bcc326a99dfb04f385c25d3b1af; Android 38078033025 success UAB 38078072721 success
+CONTINUITY_NOTE=LAB16 signed APK and ZIP delivered. Old LAB15 source/release retained. All app behavior changed in isolated LAB16: Home dashboard, recent horizontal, scan photo cover and shutter feedback; visual verification on device pending. Secondary Android run 38078072703 is redundant and may complete later; do not silently promote artifact/build while Bruno tests delivered 0.3.38.
 UPDATED_DATE=2026-10-10
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,15 +44,15 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100037
-ANDROID_UPDATE_VERSION_NAME=0.3.37
+ANDROID_UPDATE_VERSION_CODE=2026100038
+ANDROID_UPDATE_VERSION_NAME=0.3.38
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 15 aggiornamento
-ANDROID_PAIRED_RECOVERY=LAB15 source safety branch lab/safety-studybook-core-android-01-update-15; previous LAB14 retained unchanged.
+ANDROID_NEXT_VISIBLE_LAB=LAB 16 aggiornamento
+ANDROID_PAIRED_RECOVERY=LAB16 verified safety source branch lab/safety-studybook-core-android-01-update-16; LAB15 previous source unchanged.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
@@ -172,3 +172,11 @@ LAB15_UPDATE_ZIP_SHA256=81c6adf331965807bb95b08a3578c1b82403f816dbe1922ccb84934f
 LAB15_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
 LAB15_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-15
 LAB15_DEVICE_ACCEPTANCE=PENDING
+
+LAB16_CHANGE_RECORD=2026-10-10; visual approved screenshot implementation Home Dashboard V16; Scanner/PDF top with 3 categories, central workspace, horizontal mixed Recenti, no Nuovo libro; photo capture confirmation and scan source photo cover.
+LAB16_UAB_CI=run38078072721 SUCCESS sha=5a54e84493ff55afb850ff704eba2f5fc203ce9c
+LAB16_ANDROID_CI=run38078033025 SUCCESS sha=746e56dd87614bcc326a99dfb04f385c25d3b1af
+LAB16_APK_SHA256=e7a4bdcfc330cbb4c12dbd9ef2b7a7e0a23d874c118f8fa1a3a4d0d80d543d28
+LAB16_ZIP_SHA256=95294bfc91a75a326c66607c72bc0b487c5b7716abd52d555930d21186b52a08
+LAB16_SAFETY_REF=lab/safety-studybook-core-android-01-update-16
+LAB16_DEVICE_ACCEPTANCE=PENDING
