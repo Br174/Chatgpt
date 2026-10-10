@@ -7,7 +7,7 @@ on:
       - .github/workflows/motorlab-app-lab01.yml
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: motorlab-app-lab01
   cancel-in-progress: true
@@ -47,12 +47,18 @@ jobs:
           printf '%s\n' "MotorLab LAB01 TEST - firma debug effimera, upgrade-in-place NON garantito." > motorlab-lab01-dist/INSTALLAZIONE.txt
           (cd motorlab-lab01-dist && zip -q MotorLab-LAB01.zip MotorLab-LAB01.apk INSTALLAZIONE.txt)
           sha256sum motorlab-lab01-dist/MotorLab-LAB01.apk motorlab-lab01-dist/MotorLab-LAB01.zip
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MotorLab-LAB01-APK-ZIP
-          path: |
-            motorlab-lab01-dist/MotorLab-LAB01.apk
-            motorlab-lab01-dist/MotorLab-LAB01.zip
-            motorlab-lab01-dist/INSTALLAZIONE.txt
-          retention-days: 14
-          compression-level: 0
+      - name: Publish LAB-only prerelease (no Actions artifact quota)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="motorlab-app-lab01-test-${GITHUB_SHA:0:7}"
+          gh release create "$TAG" \
+            motorlab-lab01-dist/MotorLab-LAB01.apk \
+            motorlab-lab01-dist/MotorLab-LAB01.zip \
+            motorlab-lab01-dist/INSTALLAZIONE.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "MotorLab App LAB01 - prova Android" \
+            --notes "Pre-release LAB isolata da MotorLab CORE r34. APK debug test e ZIP: firma effimera, update-in-place non garantito. Gemini BYOK protetto; ChatGPT OAuth ancora non attivo. Nessuna modifica alla MADRE."
