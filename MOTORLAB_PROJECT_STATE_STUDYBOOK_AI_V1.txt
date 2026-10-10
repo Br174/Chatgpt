@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=31
+STATE_REVISION=32
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab21-gemini-existing-cloudflare-secret-verification-and-hotfix-20261010
-OPERATION_STATUS=LAB21_CLOUDFLARE_IMAGE_BACKEND_HOTFIX_DEPLOYED_EXISTING_SECRET_CONFIRMED_PROVIDER_QUOTA_429_BLOCKED
-CURRENT_PHASE=User requested confirmation and reuse of existing Gemini key inside Cloudflare. Verified original LAB21 Worker secret binding env.AI_API_KEY(hidden) via signed build logs. One true-generation smoke revealed 502 COVER_IMAGE_MODEL caused by malformed Gemini image aspectRatio request. Direct Google metadata checks with GitHub's existing GEMINI_API_KEY confirm model 200/generateContent YES. Exact provider request with old responseFormat returned HTTP400 INVALID_ARGUMENT at response_format.image.aspect_ratio='3:4'; corrected with generationConfig.imageConfig.aspectRatio='3:4'. Google then returned HTTP429 RESOURCE_EXHAUSTED exceeded quota and billing details. Backend hotfix deployed to same isolated Cloudflare Worker from branch lab/studybook-cover-gemini-cloudflare-hotfix-01: direct req.env AI_API_KEY binding, imageConfig corrected, explicit COVER_IMAGE_QUOTA message. Redeployed securely using the EXISTING GH GEMINI_API_KEY as temporary CI secret to rebind Cloudflare secret, never exposed. Final run 38090467494 SUCCESS: env.AI_API_KEY(hidden), endpoint GET405, provider POST429 COVER_IMAGE_QUOTA. No changes to LAB21 APK needed, no new image generated, provider billing/quota requires user action.
-CURRENT_REF=lab/studybook-core-android-01-update-21
-CURRENT_HEAD_SHA=6db8bb2136652c31d9ba3b88ec6078809cb26eca
+ACTIVE_OPERATION_ID=studybook-lab22-free-original-book-cover-and-public-domain-thematic-photo-20261010
+OPERATION_STATUS=LAB22_SIGNED_APK_AND_ZIP_DELIVERED_REAL_COVER_SOURCES_SMOKE_PASSED_ANDROID_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB22 authorized keyless lookup: user long-presses a book cover > Aggiungi copertina (exact approved wording). StudyBook reads title/subject/brief context and, via independent Cloudflare studybook-ai-coversearch-lab22 Worker, searches original covers with strict title matching Open Library/Google Books, then CC0/PD thematically relevant Commons photography only if no actual original. Downloads actual image including safe Open Library HTTPS 302 redirects to archive.org CDN, formats/persists JPEG in IndexedDB coverCustom with catalog/thematic metadata. No Gemini, AI image-generation billing, paid API, manual browser, changed book bytes or altered scanner archive. Real live smoke all 3 passed: original Gatsby/Open Library HTTP200, Roman thematic Wikimedia HTTP200, Biology thematic Wikimedia HTTP200. UAB CI and signed Android APK success; device application acceptance pending.
+CURRENT_REF=lab/studybook-core-android-01-update-22
+CURRENT_HEAD_SHA=f1b9ab6ee94c016988190ba5b793c228ce7973ff
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB21_UAB_38089375075_SUCCESS_RUN412; LAB21_ANDROID_38089375076_SUCCESS_RUN52
-JOB_STATUS=Final LAB21 UAB 38089375075 SUCCESS including scripts/test-lab21-true-ai-image.mjs mocked real Gemini generation request and legacy tests; final Android 38089375076 SUCCESS including isolated Cloudflare API-only Worker deploy route 405 smoke and stable signing. GitHub APK artifact 11683003502 retrieved; ZIP CRC and nested APK ZIP CRC pass; SHA256 matches workflow checksum. No LIVE paid image generation call executed; provider availability and billing remain unverified.
+JOB_ID=LAB22_UAB_38092107553_SUCCESS_RUN444; LAB22_ANDROID_38092107510_SUCCESS_RUN57; LAB22_WEB_REAL_IMAGES_38092176021_SUCCESS
+JOB_STATUS=Final LAB22 UAB run 38092107553 SUCCESS including old scanner/library, new keyless original-first cover, PD/CC0 license/security, safe redirect mock, native/API/web build gates; Android run 38092107510 SUCCESS signed update APK 0.3.57; external live smoke 38092176021 SUCCESS all 3 real image downloads from Open Library and Wikimedia Commons. User-visible APK ZIP verified sha/cert.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=Existing Cloudflare AI_API_KEY binding restored and verified hidden in Wrangler 38090467494. Cloudflare real POST returned HTTP429 code COVER_IMAGE_QUOTA, not 500 or invalid 400/404. Backend code tests and isolated deploy success. LAB21 APK and ZIP already delivered, unchanged. UAB branch 38090378078 success earlier; per-file regression pass on hotfix.
-NEXT_SAFE_STEP=User must review Gemini API project's billing/paid tier and rate limits in Google AI Studio; gemini-3.1-flash-image Free Tier is NOT AVAILABLE per Google official pricing, so paid billing/eligibility is generally required. Do NOT enable billing or spend for user without explicit consent. Once enabled, user retries LAB21 long-press > Crea copertina con vera AI immagini (same APK). If quota remains blocked, inspect account usage. Existing Cloudflare secret/Worker are correctly bound. No new APK or secret needed. Do not falsely claim actual image generation succeeded; it is provider-blocked.
-PENDING_VERIFICATION=Actual Gemini image 1K generation currently BLOCKED BY PROVIDER QUOTA HTTP429 RESOURCE_EXHAUSTED even after valid request and secret restoration; device preview/apply not yet verified. Billing/paid tier user-managed. Backend route and secure binding verified with CI. Complete actual real-image generation test only after user enables quota.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-21-AGGIORNAMENTO.apk SHA256=4848b5ced8e2774c0afcf5ce35bbc9dd4c7f22db7b0df9f50736d2859908a74a versionName=0.3.52 versionCode=2026100052 AndroidRun=38089375076 artifactID=11683003502 source=6db8bb2136652c31d9ba3b88ec6078809cb26eca
+LAST_COMPLETED_MATERIAL_STEP=LAB22 APK source f1b9ab6ee... compiled Android run57 signed versionName 0.3.57 versionCode 2026100057 appId it.studybook.ai.lab original cert SHA256 D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC. SHA256 APK efea1642d4dada5f635e3480ae397a9a943e731cd6536eda3f29b9ea257c898f. ZIP SHA256 66e6d53c762ddddfec088df4050d57a88ed5fd8f86a434b4308c2b312622b957. Both locally CRC verified and published links.
+NEXT_SAFE_STEP=Install StudyBook-AI-LAB-22-FINALE.apk over LAB21 without uninstall. Long press book cover -> Aggiungi copertina, verify original cover if strictly matching catalog and otherwise relevant CC0/PD illustration, saved instantly with source/license metadata. Check books/files and scanner photos preserved. If particular title not found, test screenshot/metadata; Google Books keyless may 429, Open Library and Commons verified. No automatic generative AI in LAB22, no quota/billing requirement; network required.
+PENDING_VERIFICATION=Real Android phone acceptance (tap+long press, server connectivity, photo preview/save and persistence); external live original & thematic backend API already verified. Not all books have original cover matching unambiguously or appropriate public-domain thematic photos; app truthfully reports no suitable match.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-22-FINALE.apk SHA256=efea1642d4dada5f635e3480ae397a9a943e731cd6536eda3f29b9ea257c898f versionName=0.3.57 versionCode=2026100057 AndroidRun=38092107510 artifactID=11684452583 source=f1b9ab6ee94c016988190ba5b793c228ce7973ff
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=f01312b6996b1f339bf12a3c2bb7a90fc61d61e1f4b5bebea41606c57cea3eff
+UPDATE_ZIP_SHA256=66e6d53c762ddddfec088df4050d57a88ed5fd8f86a434b4308c2b312622b957
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=User says use classic MotorLab/Magnifici20 method and deliver a real APK for LAB21: AI truly generate image cover from book TITLE and SHORT CONTEXT rather than fake local SVG; scanned photo originals remain; long press preview + accept/regenerate; fast app and update-in-place. User dislikes repeated conceptual explanations and expects files.
-STATE_SOURCE=LAB21 signed APK source Br174/StudyBook-AI lab/studybook-core-android-01-update-21 SHA 6db8bb2136652c31d9ba3b88ec6078809cb26eca. Cloudflare backend hotfix source Br174/StudyBook-AI lab/studybook-cover-gemini-cloudflare-hotfix-01 SHA f874c7ea1e5779aecde4abfd41dc5db7908f603c. Hotfix GitHub Actions run 38090467494 SUCCESS. Gemini diagnostics 38090124523 502 model due request bug, 38090167786 model metadata 200, 38090222830 provider400, 38090260630 quota429, final hotfix provider429 intentional signal.
-CONTINUITY_NOTE=LAB21 APK remains installed and compatible. Backend request fixed imageConfig:3:4, direct Cloudflare secret binding env.AI_API_KEY; Cloudflare Worker studybook-ai-covers-lab21 uses same existing GEMINI_API_KEY securely resubmitted in deploy secret file. On updates MUST include secrets-file; deploying without it dropped env.AI_API_KEY (observed hotfix run 38090378099), and follow-up run 38090467494 restored it. Provider image model has Free Tier NOT AVAILABLE according to Google pricing; true generation BLOCKED quota429 until billing/quota available. No new APK required and no other StudyBook functions changed.
+LAST_USER_INTENT_SUMMARY=User approved simpler free no Gemini cover retrieval: pressing book cover action searches genuine original cover first; otherwise relevant royalty-free/PD thematic photo using book title/context and auto-applies to book in StudyBook. Exact corrected menu wording from 'Aggiungi locandina' to 'Aggiungi copertina'. Provide directly installed APK+ZIP update-in-place, preserve scanned real photographs and approved UI.
+STATE_SOURCE=Br174/StudyBook-AI lab/studybook-core-android-01-update-22 SHA f1b9ab6ee94c016988190ba5b793c228ce7973ff; safety branch lab/safety-studybook-core-android-01-update-22; UAB run38092107553 SUCCESS, Android run38092107510 SUCCESS, no-secret image source real fetch smoke run38092176021 SUCCESS.
+CONTINUITY_NOTE=LAB22 supersedes LAB21 visible manual button for covers with 'Aggiungi copertina' (not 'locandina'), searches Open Library/Google Books original strict match then Wikimedia Commons CC0/PD theme and saves automatically; no Gemini image generation at all in LAB22 clicked path, no AI image API cost. Dedicated Worker studybook-ai-coversearch-lab22.brunoverlezza.workers.dev operates without secrets; live backend returns genuine original/Commons images 200. Safe 302 redirect fix from covers.openlibrary.org to archive.org critical. Original files and scanner archive intact, no GUI restyling. New APK update-in-place verified same cert. Google Books anonymous search can be quota-limited but nonblocking; fallback sources live verified.
 UPDATED_DATE=2026-10-10
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,15 +44,15 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100052
-ANDROID_UPDATE_VERSION_NAME=0.3.52
+ANDROID_UPDATE_VERSION_CODE=2026100057
+ANDROID_UPDATE_VERSION_NAME=0.3.57
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 21 aggiornamento
-ANDROID_PAIRED_RECOVERY=LAB21 safety branch lab/safety-studybook-core-android-01-update-21-final SHA 6db8bb2136652c31d9ba3b88ec6078809cb26eca; LAB20 unchanged for rollback.
+ANDROID_NEXT_VISIBLE_LAB=LAB 22 aggiornamento
+ANDROID_PAIRED_RECOVERY=LAB22 safety branch lab/safety-studybook-core-android-01-update-22 SHA f1b9ab6ee94c016988190ba5b793c228ce7973ff; LAB21 branch retained as rollback.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
@@ -233,3 +233,13 @@ LAB21_GEMINI_CLOUDFLARE_HOTFIX_SHA=f874c7ea1e5779aecde4abfd41dc5db7908f603c
 LAB21_GEMINI_CLOUDFLARE_HOTFIX_RUN=38090467494 SUCCESS
 LAB21_GEMINI_DIAGNOSTICS=Original provider HTTP400 INVALID_ARGUMENT aspect ratio in responseFormat; valid imageConfig corrected; provider HTTP429 RESOURCE_EXHAUSTED; Gemini-3.1-flash-image tier paid, free tier unavailable.
 LAB21_GEMINI_KEY_POLICY=Existing GitHub GEMINI_API_KEY securely bound as Cloudflare AI_API_KEY with --secrets-file on every deploy; never exposed in Android, logs or chat.
+
+LAB22_COMPLETION_20261010=User wording Aggiungi copertina; no Gemini cost; online original Open Library/Google Books strict matching; PD/CC0 Wikimedia themed imagery fallback; automatic IndexedDB save and original book unchanged.
+LAB22_CORE_RELEASE_PINNED=2026.10.08-r34
+LAB22_ANDROID_SIGNED_RUN=38092107510 SUCCESS versionCode=2026100057 versionName=0.3.57
+LAB22_CI_TEST_RUN=38092107553 SUCCESS
+LAB22_REAL_IMAGE_LIVE_ACCEPTANCE=38092176021 SUCCESS originals/Commons 3of3 verified
+LAB22_APK_SHA256=efea1642d4dada5f635e3480ae397a9a943e731cd6536eda3f29b9ea257c898f
+LAB22_ZIP_SHA256=66e6d53c762ddddfec088df4050d57a88ed5fd8f86a434b4308c2b312622b957
+LAB22_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB22_ENDUSER_DEVICE_ACCEPTANCE=PENDING
