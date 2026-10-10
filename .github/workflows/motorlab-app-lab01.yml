@@ -1,0 +1,56 @@
+name: MotorLab Android LAB01
+on:
+  push:
+    branches: [motorlab/app-lab01]
+    paths:
+      - apps/motorlab-android/**
+      - .github/workflows/motorlab-app-lab01.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: motorlab-app-lab01
+  cancel-in-progress: true
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Source safety and contract check
+        run: python3 apps/motorlab-android/tests/verify_lab01.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Android 35
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build LAB debug APK
+        run: gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+      - name: Verify and package APK + ZIP
+        run: |
+          set -euo pipefail
+          mkdir -p motorlab-lab01-dist
+          cp apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk motorlab-lab01-dist/MotorLab-LAB01.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs motorlab-lab01-dist/MotorLab-LAB01.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging motorlab-lab01-dist/MotorLab-LAB01.apk | grep -m1 "package: name='it.motorlab.app' versionCode='1'"
+          printf '%s\n' "MotorLab LAB01 TEST - firma debug effimera, upgrade-in-place NON garantito." > motorlab-lab01-dist/INSTALLAZIONE.txt
+          (cd motorlab-lab01-dist && zip -q MotorLab-LAB01.zip MotorLab-LAB01.apk INSTALLAZIONE.txt)
+          sha256sum motorlab-lab01-dist/MotorLab-LAB01.apk motorlab-lab01-dist/MotorLab-LAB01.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MotorLab-LAB01-APK-ZIP
+          path: |
+            motorlab-lab01-dist/MotorLab-LAB01.apk
+            motorlab-lab01-dist/MotorLab-LAB01.zip
+            motorlab-lab01-dist/INSTALLAZIONE.txt
+          retention-days: 14
+          compression-level: 0
