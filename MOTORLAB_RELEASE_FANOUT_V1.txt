@@ -13,6 +13,10 @@ A MotorLab release is not operationally COMPLETE until every registered project 
 - PENDING_SAFE_BOUNDARY with exact repository/ref/reason recorded for automatic adoption at the next safe boundary.
 
 TARGETS
+
+DORMANT / RESERVED PROJECT EXCLUSION — 2026-10-10
+Project onboarding and release target discovery MUST consult the current MotorLab Project Integration Registry project operating status before scanning or writing refs. A target marked DORMANT_RESERVED or FANOUT_TARGET=false is an explicitly reserved, non-operational project and MUST be excluded from active ref discovery, fanout, status denominator, progress, automatic onboarding and bidirectional event ingest/distribution. Historic successful-release evidence is archival and MUST NOT override current dormant status. Explicit user approval is required for reactivation after verifying preserved local satellite, native code and external resources. Do not delete GitHub repository/history, Worker or D1 merely because this status is applied. Preserve the current local release, session pin and LAST_GOOD. Future fresh projects remain eligible unless explicitly dormant. A future release must report active targets separately from dormant preserved targets. Specifically Br174/Cover-Lab-AI is DORMANT_RESERVED as of 2026-10-10; it is not an active r35+ release target. MotorLab itself and MusicLab's integrated cover engine remain fully active.
+
 - Every registered project default branch.
 - Every explicitly registered/current active LAB/CANDIDATA/work ref.
 - Future active refs discovered by Project Continuity before release closure.
