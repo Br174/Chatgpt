@@ -8,6 +8,9 @@ Primary operational backend target: Cloudflare D1, with Cloudflare KV as cache o
 PURPOSE
 Reduce forgotten steps, stale chat-state reconstruction, duplicated work and interrupted operations by maintaining a durable operational ledger outside ephemeral chat context.
 
+BIDIRECTIONAL LESSON ROUTING — 2026-10-10
+Existing operation_events and velocity_lessons are the only event journal and transferable lesson store for MOTORLAB_BIDIRECTIONAL_SYNC_V1.txt. Ingest evidence-backed events only from eligible non-dormant projects; dedupe by stable material event id and project/operation/ref fingerprint; record status and invalidation context, never secrets. Lessons from MusicLab, StudyBook AI, MotorAI and other eligible projects are advisory until verified cross-project compatibility; do not copy code or authorize writes based on a lesson. Emit/consult only at authorized safe event boundaries; if backend or permitted executor is unavailable mark PENDING_EXECUTOR and reconcile later. Br174/Cover-Lab-AI is excluded until explicitly reactivated. D1/KV roles and GitHub source-of-truth ordering are unchanged.
+
 PRIMARY MODEL
 GitHub remains the technical source of truth.
 D1 stores the live operational state needed to continue work correctly.
