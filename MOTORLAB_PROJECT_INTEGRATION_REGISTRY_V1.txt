@@ -19,6 +19,20 @@ REACTIVATION=requires_explicit_user_approval_and_safe_boundary
 PRECEDENCE=This current operational override supersedes historical Cover Lab AI entries and old all-project language for THIS explicitly dormant repository only. Historic r28-r34 fanout evidence remains archival, not a future release target. Future NEW projects remain auto-onboarded. MusicLab internal Cover engine and external cover.info are separate and never excluded.
 Central authority: Br174/Chatgpt.
 
+
+BIDIRECTIONAL CONTROL-PLANE REGISTRY — 2026-10-10
+CENTRAL_PROTOCOL=MOTORLAB_BIDIRECTIONAL_SYNC_V1.txt
+MODE=eligible_project_material_feedback_to_existing_project_continuity_and_velocity_lessons;core_release_back_to_projects_via_existing_fanout
+ELIGIBLE_REPOSITORIES=Br174/MusicLab;Br174/GeoVision-Test;Br174/StudyBook-AI;Br174/Visionflix;Br174/streamflix-BV;Br174/MotorAI
+EXCLUDED_DORMANT=Br174/Cover-Lab-AI
+FUTURE_PROJECTS=eligible_on_approved_onboarding_if_not_dormant
+AUTOMATIC_WHEN_AUTHORIZED_PROJECT_EXECUTOR_ACTIVE=true
+PERSISTENT_OUT_OF_SESSION_CROSS_REPOSITORY_DELIVERY=NOT_VERIFIED;requires_authorized_durable_executor_and_permissions
+SOURCE_TRUTH=GitHub_verified_ref_SHA
+GENERAL_LESSON_PROMOTION=approval_plus_compatibility_tests_required
+NO_APP_SOURCE_OR_RUNTIME_CHANGE=required
+NO_SECOND_SCHEDULER_OR_EVENT_DATABASE=required
+
 CURRENT CENTRAL RELEASE
 Release: 2026.10.08-r34
 Canonical entrypoint: MOTORLAB_CORE_ENTRYPOINT_V1.txt
