@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=20
+STATE_REVISION=21
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab11-scanner-turbo-scannerizzati-20261010
-OPERATION_STATUS=LAB11_APK_VERIFIED_DEVICE_TEST_PENDING
-CURRENT_PHASE=LAB11 Scanner Turbo + Scannerizzati complete: signed APK available; device speed and archive UX tests pending.
-CURRENT_REF=lab/studybook-core-android-01-update-11
-CURRENT_HEAD_SHA=40e1a282e4a904a05eb94e12e42eea9b85dcf173
+ACTIVE_OPERATION_ID=studybook-lab12-smart-titles-rename-20261010
+OPERATION_STATUS=LAB12_SIGNED_APK_VERIFIED_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB12 complete: title suggestions from OCR chapter headings while scanning and from whole study-book content when processed; rename scan collection and individual photo through Scannerizzati, rename processed book from Library and Libro aperto; manual names protected from automatic overrides. UAB tests and Android APK build passed. Android device functional acceptance pending.
+CURRENT_REF=lab/studybook-core-android-01-update-12
+CURRENT_HEAD_SHA=5917c58eaa0562e9d5661ff92ac9c699d29119ba
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB11_ANDROID_38044627355_SUCCESS_RUN27; LAB11_UAB_38044627302_SUCCESS_RUN313
-JOB_STATUS=LAB11 Android run 38044627355 success; UAB run 38044627302 success including IndexedDB archive integration checks.
+JOB_ID=LAB12_ANDROID_38046844429_SUCCESS_RUN29; LAB12_UAB_38046844577_SUCCESS_RUN330
+JOB_STATUS=LAB12 UAB build success incl. smart-title IndexedDB and library tests; Android Gradle build success, original signer and update identity verified; APK+ZIP extracted with CRC and SHA256 verification.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB11 signed APK v0.3.27 appId it.studybook.ai.lab versionCode 2026100027 original LAB signing certificate verified; ZIP CRC and APK hash checked.
-NEXT_SAFE_STEP=Install LAB11 over LAB10; test capture successive photographs while OCR runs; verify Scannerizzati archive, photo recovery, OCR text reuse and confirmed deletion. Record actual Android timings.
-PENDING_VERIFICATION=Physical Android speed, scanner camera stability, durable archive gallery UX, cached OCR reuse and image OCR accuracy.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-11-AGGIORNAMENTO.apk sha256=83cb34283db3450ce881d3207194d50ef7ab10d63eb4ba5976dc24299bf00613 AndroidRun=38044627355 artifactID=11667466987
+LAST_COMPLETED_MATERIAL_STEP=LAB12 signed APK version 0.3.29 versionCode 2026100029 package it.studybook.ai.lab with original LAB signing cert. ZIP integrity check passed and APK SHA256 matches manifest a457decf13d27b5d5b1c50136bffffae6750a108b8f47c657f9d825ec18ad273.
+NEXT_SAFE_STEP=Bruno installs LAB12 on Android over LAB11; tests Scannerizzati rename collection, rename individual photo, automatic OCR suggestion, scans reprocess into named book, rename book in Library and Libro aperto, export filenames and persistence after restarting app. Report any poor OCR naming or interface issues. Do not promote to mother until physical acceptance.
+PENDING_VERIFICATION=Device-specific visual, camera/OCR recognition and title relevance on real scanned documents, persistence and update-in-place. Automatic naming is heuristic using OCR and headings; not a guarantee of semantic understanding. Actual user test pending.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-12-AGGIORNAMENTO.apk SHA256=a457decf13d27b5d5b1c50136bffffae6750a108b8f47c657f9d825ec18ad273 versionCode=2026100029 versionName=0.3.29 AndroidRun=38046844429 artifactID=11668475310 source=5917c58eaa0562e9d5661ff92ac9c699d29119ba
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=a379899459884f135be239782119a8ec34456449fbe581aa449dc8b986043e27
+UPDATE_ZIP_SHA256=c685f514ecca93d2ad43654ff3504b299f7b7c3b5324bb7e960bcfcac3a09cd0
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=Approved LAB11 Scanner Turbo and Scannerizzati replacing Foto: continuous capture, reusable OCR, permanent image archive, reprocessing with stored OCR, multi-select and deletion while preserving book content.
-STATE_SOURCE=LAB11 source GitHub 40e1a282e4a904a05eb94e12e42eea9b85dcf173; UAB 38044627302 success; Android 38044627355 success; safety branch lab/safety-studybook-core-android-01-update-11.
-CONTINUITY_NOTE=LAB11 is latest, LAB10 previous. New photo archive in separate IndexedDB database leaves legacy scanner schema v1 untouched; prior cleared photos cannot be restored. Device acceptance pending.
+LAST_USER_INTENT_SUMMARY=Approved LAB12: in Scannerizzati rename scanned document collection and individual photos; also rename finished processed StudyBook titles; during scanning and processing analyze text and context and suggest pertinent automatic title for photographs and study book, always preserve manual titles. Same app graphics, data, update-in-place.
+STATE_SOURCE=Br174/StudyBook-AI branch lab/studybook-core-android-01-update-12 SHA 5917c58eaa0562e9d5661ff92ac9c699d29119ba; UAB 38046844577 success; Android 38046844429 success; safe checkpoint lab/safety-studybook-core-android-01-update-12.
+CONTINUITY_NOTE=LAB12 latest verified signed update 0.3.29 and ZIP, LAB11 previous. Non-destructive metadata renames of scanned collections, photos and library books, OCR-based local title suggestions with manual-preference precedence. Device acceptance pending, standard GitHub APK method preserved.
 UPDATED_DATE=2026-10-10
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,15 +44,15 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100027
-ANDROID_UPDATE_VERSION_NAME=0.3.27
+ANDROID_UPDATE_VERSION_CODE=2026100029
+ANDROID_UPDATE_VERSION_NAME=0.3.29
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 11 aggiornamento
-ANDROID_PAIRED_RECOVERY=LAB10 safety source checkpoint lab/safety-studybook-core-android-01-update-10; APK on demand
+ANDROID_NEXT_VISIBLE_LAB=LAB 12 aggiornamento
+ANDROID_PAIRED_RECOVERY=LAB12 safe source checkpoint lab/safety-studybook-core-android-01-update-12; LAB11 source remains intact.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
@@ -134,3 +134,12 @@ LAB10_ZIP_SHA256=36371a06299c0fc1309f6c2588ba8c2e944ce12c51e1a912d7054dc8dbf8908
 LAB10_DEVICE_ACCEPTANCE=PENDING
 
 LAB11_STATUS=2026-10-10: UAB 38044627302 successful; Android 38044627355 successful; source 40e1a282e4a904a05eb94e12e42eea9b85dcf173; signed APK SHA256 83cb34283db3450ce881d3207194d50ef7ab10d63eb4ba5976dc24299bf00613; device acceptance pending.
+
+LAB12_CHANGE_RECORD=2026-10-10; OCR local content/heading suggestions while scanning and after processing; manual rename of stored scan collection, individual photo and processed books in Library and Libro aperto. No change to image/OCR or book paragraph data on rename; manual names cannot be overridden by auto. New session resets name after completed book.
+LAB12_UAB_TEST_RUN=38046844577 SUCCESS incl. scripts/test-lab12-smart-titles.mjs
+LAB12_ANDROID_TEST_RUN=38046844429 SUCCESS RUN29 sourceSha=5917c58eaa0562e9d5661ff92ac9c699d29119ba
+LAB12_SIGNED_APK_SHA256=a457decf13d27b5d5b1c50136bffffae6750a108b8f47c657f9d825ec18ad273
+LAB12_ZIP_SHA256=c685f514ecca93d2ad43654ff3504b299f7b7c3b5324bb7e960bcfcac3a09cd0
+LAB12_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB12_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-12
+LAB12_DEVICE_ACCEPTANCE=PENDING
