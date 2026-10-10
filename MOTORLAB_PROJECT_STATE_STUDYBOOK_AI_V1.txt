@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=32
+STATE_REVISION=33
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab22-free-original-book-cover-and-public-domain-thematic-photo-20261010
-OPERATION_STATUS=LAB22_SIGNED_APK_AND_ZIP_DELIVERED_REAL_COVER_SOURCES_SMOKE_PASSED_ANDROID_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB22 authorized keyless lookup: user long-presses a book cover > Aggiungi copertina (exact approved wording). StudyBook reads title/subject/brief context and, via independent Cloudflare studybook-ai-coversearch-lab22 Worker, searches original covers with strict title matching Open Library/Google Books, then CC0/PD thematically relevant Commons photography only if no actual original. Downloads actual image including safe Open Library HTTPS 302 redirects to archive.org CDN, formats/persists JPEG in IndexedDB coverCustom with catalog/thematic metadata. No Gemini, AI image-generation billing, paid API, manual browser, changed book bytes or altered scanner archive. Real live smoke all 3 passed: original Gatsby/Open Library HTTP200, Roman thematic Wikimedia HTTP200, Biology thematic Wikimedia HTTP200. UAB CI and signed Android APK success; device application acceptance pending.
-CURRENT_REF=lab/studybook-core-android-01-update-22
-CURRENT_HEAD_SHA=f1b9ab6ee94c016988190ba5b793c228ce7973ff
+ACTIVE_OPERATION_ID=studybook-lab23-distinct-book-cover-no-duplicate-20261011
+OPERATION_STATUS=LAB23_SIGNED_APK_DELIVERED_TITLE_FIRST_RELEVANCE_DUPLICATE_REPAIR_REAL_THREE_BOOK_WEB_SMOKE_PASSED_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB23 screenshot root-cause closure: separate books I romani, Appunti fotografati 1 pagine, Tutti santi me compreso share same Roman Wikimedia theme illustration despite different titles. Root cause LAB22 findTheme considered arbitrary context mention Rome higher priority than title and always selected highest-ranked same image; no per-library source image dedup. LAB23 puts title before context, specific title saints/religion maps to religious-themed photo, generic scan titles use context only if generic, performs multiple keyless Wikimedia searches per theme to find diverse CC0/PD pictures. Client sends excludeAssets of photos already used by other book IDs; backend excludes matching Wikimedia source page and image, rechecking before saved. Auto-on-library scoped old duplicate repair: detect repeated online-thematic source URLs, keep most title-relevant owner, clear only duplicated web thematic coverCustom then try saving unique replacement, leave original scan/custom book bytes intact. All 3 screenshot titles external REAL backend smoke HTTP200 with unique commons asset IDs: commons:91903344, commons:91954879, commons:58611951 (run 38096333118). LAB23 complete UAB CI 38096279551 SUCCESS, signed Android 38096279519 SUCCESS version 0.3.60 update-in-place; user phone acceptance pending.
+CURRENT_REF=lab/studybook-core-android-01-update-23
+CURRENT_HEAD_SHA=0de38d462360e028b8c535edfe73031c1c30ddc5
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB22_UAB_38092107553_SUCCESS_RUN444; LAB22_ANDROID_38092107510_SUCCESS_RUN57; LAB22_WEB_REAL_IMAGES_38092176021_SUCCESS
-JOB_STATUS=Final LAB22 UAB run 38092107553 SUCCESS including old scanner/library, new keyless original-first cover, PD/CC0 license/security, safe redirect mock, native/API/web build gates; Android run 38092107510 SUCCESS signed update APK 0.3.57; external live smoke 38092176021 SUCCESS all 3 real image downloads from Open Library and Wikimedia Commons. User-visible APK ZIP verified sha/cert.
+JOB_ID=LAB23_UAB_38096279551_SUCCESS_RUN457; LAB23_ANDROID_38096279519_SUCCESS_RUN60; LAB23_WEB_THREE_BOOK_IMAGES_38096333118_SUCCESS; LAB23_PUBLIC_DOMAIN_QUERY_ANALYSIS_38096219145_SUCCESS
+JOB_STATUS=Final LAB23 UAB 38096279551 SUCCESS including baseline and new scripts/test-lab23-cover-uniqueness.mjs; Android 38096279519 SUCCESS signed update APP ID it.studybook.ai.lab cert D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; independent public-domain source query diagnostics 38096219145 found diverse Romans and saints; external live smoke 38096333118 SUCCESS all three books receive DIFFERENT real images HTTP200. Device still unverified.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB22 APK source f1b9ab6ee... compiled Android run57 signed versionName 0.3.57 versionCode 2026100057 appId it.studybook.ai.lab original cert SHA256 D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC. SHA256 APK efea1642d4dada5f635e3480ae397a9a943e731cd6536eda3f29b9ea257c898f. ZIP SHA256 66e6d53c762ddddfec088df4050d57a88ed5fd8f86a434b4308c2b312622b957. Both locally CRC verified and published links.
-NEXT_SAFE_STEP=Install StudyBook-AI-LAB-22-FINALE.apk over LAB21 without uninstall. Long press book cover -> Aggiungi copertina, verify original cover if strictly matching catalog and otherwise relevant CC0/PD illustration, saved instantly with source/license metadata. Check books/files and scanner photos preserved. If particular title not found, test screenshot/metadata; Google Books keyless may 429, Open Library and Commons verified. No automatic generative AI in LAB22, no quota/billing requirement; network required.
-PENDING_VERIFICATION=Real Android phone acceptance (tap+long press, server connectivity, photo preview/save and persistence); external live original & thematic backend API already verified. Not all books have original cover matching unambiguously or appropriate public-domain thematic photos; app truthfully reports no suitable match.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-22-FINALE.apk SHA256=efea1642d4dada5f635e3480ae397a9a943e731cd6536eda3f29b9ea257c898f versionName=0.3.57 versionCode=2026100057 AndroidRun=38092107510 artifactID=11684452583 source=f1b9ab6ee94c016988190ba5b793c228ce7973ff
+LAST_COMPLETED_MATERIAL_STEP=LAB23 APK versionName=0.3.60 versionCode=2026100060 package=it.studybook.ai.lab signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC, APK SHA256=956eb8911e5b0e7274a41fd3ec26890a3bb002b719c3beb04e23f2b05d47d7b5, ZIP SHA256=710d4d6d9ad59a0a57674799de6e10c09738934dc17201e50fd1a74f70fcc5b7; ZIP CRC and nested APK CRC valid; 3 distinct online photo smoke passed.
+NEXT_SAFE_STEP=Install StudyBook-AI-LAB-23-AGGIORNAMENTO.apk over LAB22 without uninstall; open Libreria and inspect I romani, Appunti fotografati, Tutti santi me compreso. The app should automatically reconcile duplicated online-thematic image source URLs and fetch different relevant photos. Never alter user-custom, original book, scanner archive photos. For titles with no suitable CC0/PD candidate, it may leave cover unset; user can long press -> Aggiungi copertina to retry. Android real on-device acceptance still needed. No new Gemini billing.
+PENDING_VERIFICATION=Real Android phone confirmation of existing three duplicate covers automatic repair and UI library persistence; end-to-end live server result confirmed for three title/context examples with different Commons page IDs. Auto-repair affects only online-thematic shared source metadata. User selected/imported covers and original scans intentionally excluded.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-23-AGGIORNAMENTO.apk SHA256=956eb8911e5b0e7274a41fd3ec26890a3bb002b719c3beb04e23f2b05d47d7b5 versionName=0.3.60 versionCode=2026100060 AndroidRun=38096279519 artifactId=11686115307 sourceSHA=0de38d462360e028b8c535edfe73031c1c30ddc5
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=66e6d53c762ddddfec088df4050d57a88ed5fd8f86a434b4308c2b312622b957
+UPDATE_ZIP_SHA256=710d4d6d9ad59a0a57674799de6e10c09738934dc17201e50fd1a74f70fcc5b7
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=User approved simpler free no Gemini cover retrieval: pressing book cover action searches genuine original cover first; otherwise relevant royalty-free/PD thematic photo using book title/context and auto-applies to book in StudyBook. Exact corrected menu wording from 'Aggiungi locandina' to 'Aggiungi copertina'. Provide directly installed APK+ZIP update-in-place, preserve scanned real photographs and approved UI.
-STATE_SOURCE=Br174/StudyBook-AI lab/studybook-core-android-01-update-22 SHA f1b9ab6ee94c016988190ba5b793c228ce7973ff; safety branch lab/safety-studybook-core-android-01-update-22; UAB run38092107553 SUCCESS, Android run38092107510 SUCCESS, no-secret image source real fetch smoke run38092176021 SUCCESS.
-CONTINUITY_NOTE=LAB22 supersedes LAB21 visible manual button for covers with 'Aggiungi copertina' (not 'locandina'), searches Open Library/Google Books original strict match then Wikimedia Commons CC0/PD theme and saves automatically; no Gemini image generation at all in LAB22 clicked path, no AI image API cost. Dedicated Worker studybook-ai-coversearch-lab22.brunoverlezza.workers.dev operates without secrets; live backend returns genuine original/Commons images 200. Safe 302 redirect fix from covers.openlibrary.org to archive.org critical. Original files and scanner archive intact, no GUI restyling. New APK update-in-place verified same cert. Google Books anonymous search can be quota-limited but nonblocking; fallback sources live verified.
+LAST_USER_INTENT_SUMMARY=Screenshot real Android LAB22 showing identical Colosseum image with different text labels on I romani, Appunti fotografati 1 pagine, Tutti santi me compreso. User insists each book must get DIFFERENT contextually relevant cover, original first then thematically accurate free photo, no Gemini, no reusing identical pictures. Wants bug fixed with APK signed update without UI changes.
+STATE_SOURCE=Br174/StudyBook-AI LAB23 branch lab/studybook-core-android-01-update-23 SHA 0de38d462360e028b8c535edfe73031c1c30ddc5; safety branch lab/safety-studybook-core-android-01-update-23, UAB run 38096279551 SUCCESS, signed Android run 38096279519 SUCCESS, live images run 38096333118 SUCCESS.
+CONTINUITY_NOTE=LAB23 source and APK immutable after success. Existing LAB22 book images are only repaired automatically if provably duplicated online-thematic same sourceURL, chosen original most title-relevant; manual/original/scan not touched. LAB23 dedicated keyless Worker https://studybook-ai-coversearch-lab23.brunoverlezza.workers.dev, independent of LAB22 and live assistant; sourced Commons PD/CC0 and original catalog. Server excludes previously used assets, client rechecks and saves asset identity. 3 real different Wikimedia image IDs confirmed via live CI run 38096333118. Android phone acceptance pending.
 UPDATED_DATE=2026-10-10
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,15 +44,15 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100057
-ANDROID_UPDATE_VERSION_NAME=0.3.57
+ANDROID_UPDATE_VERSION_CODE=2026100060
+ANDROID_UPDATE_VERSION_NAME=0.3.60
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 22 aggiornamento
-ANDROID_PAIRED_RECOVERY=LAB22 safety branch lab/safety-studybook-core-android-01-update-22 SHA f1b9ab6ee94c016988190ba5b793c228ce7973ff; LAB21 branch retained as rollback.
+ANDROID_NEXT_VISIBLE_LAB=LAB 23 aggiornamento
+ANDROID_PAIRED_RECOVERY=LAB23 safety branch lab/safety-studybook-core-android-01-update-23 SHA 0de38d462360e028b8c535edfe73031c1c30ddc5; LAB22 branch unchanged for rollback.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
@@ -243,3 +243,13 @@ LAB22_APK_SHA256=efea1642d4dada5f635e3480ae397a9a943e731cd6536eda3f29b9ea257c898
 LAB22_ZIP_SHA256=66e6d53c762ddddfec088df4050d57a88ed5fd8f86a434b4308c2b312622b957
 LAB22_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
 LAB22_ENDUSER_DEVICE_ACCEPTANCE=PENDING
+
+LAB23_CHANGE_RECORD=2026-10-11; screenshot three unrelated book covers same Rome image resolved via title authority, context-only generic fallback, separate topic queries and source dedup.
+LAB23_UAB_RUN=38096279551 SUCCESS source=0de38d462360e028b8c535edfe73031c1c30ddc5
+LAB23_ANDROID_RUN=38096279519 SUCCESS signed version=0.3.60 code=2026100060
+LAB23_THREE_BOOKS_LIVE_RUN=38096333118 SUCCESS image source ids=commons:91903344;commons:91954879;commons:58611951 all HTTP200 distinct.
+LAB23_APK_SHA256=956eb8911e5b0e7274a41fd3ec26890a3bb002b719c3beb04e23f2b05d47d7b5
+LAB23_ZIP_SHA256=710d4d6d9ad59a0a57674799de6e10c09738934dc17201e50fd1a74f70fcc5b7
+LAB23_EXTERNAL_SERVICE=studybook-ai-coversearch-lab23.brunoverlezza.workers.dev
+LAB23_APP_ORIGINALS_POLICY=Only online-thematic duplicated photographs from same source may be replaced. Scans, custom user imports, original PDF/eBook and other saved originals left intact.
+LAB23_DEVICE_ACCEPTANCE=PENDING
