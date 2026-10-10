@@ -1,0 +1,50 @@
+MOTORLAB BIDIRECTIONAL SYNC AND COVER LAB DORMANCY — IMPLEMENTATION LEDGER
+DATE=2026-10-10
+CENTRAL_RELEASE=2026.10.08-r34
+OPERATION_ID=motorlab-coverlab-freeze-and-bidir-20261010
+USER_APPROVAL=Cover Lab DORMANT_RESERVED confirmed 2026-10-10 after pre-change report; bidirectional controlled sync previously approved as sequential second scope.
+PHASE_A_COVER_LAB_FREEZE
+STATUS=CONTROL_PLANE_APPLIED_EXTERNAL_RESOURCES_NOT_VERIFIED
+PROJECT=Br174/Cover-Lab-AI
+GITHUB_REPOSITORY=preserved
+APP_SOURCE=unchanged
+NATIVE_ANDROID_APP=unchanged
+MUSICLAB_COVER_ENGINE=unchanged
+CENTRAL_REGISTRY_STATUS=DORMANT_RESERVED
+FUTURE_FANOUT=false
+FUTURE_BIDIR_EVENTS=false
+LOCAL_PROJECT_HOOK_DORMANT_MARKER=written
+VERIFICA_WORKFLOW_AUTOMATIC_EVENTS=disabled;manual_workflow_dispatch_only
+ANDROID_APK_WORKFLOW_AUTOMATIC_PUSH_TRIGGER=still_present;update attempt security-blocked
+CLOUDFLARE_DEPLOYED_CRON=not_verified
+CLOUDFLARE_WORKER_AND_D1=preserved_no_deletion
+REACTIVATION=explicit_user_approval_required
+PHASE_B_BIDIRECTIONAL
+STATUS=CENTRAL_POLICY_INTEGRATED_EXTERNAL_AUTONOMY_PENDING
+PROTOCOL=MOTORLAB_BIDIRECTIONAL_SYNC_V1.txt
+CORE_ENTRYPOINT=linked
+PROJECT_CONTINUITY=linked
+PERSISTENT_OPERATIONAL_STATE=linked_to_existing_operation_events_and_velocity_lessons
+INTEGRATION_REGISTRY=active_eligible_projects_plus_future_policy_added
+RELEASE_FANOUT=existing_single_downstream_coordinator_extended_for_dormancy
+FANOUT_BIDIRECTIONAL_RELEASE_PUBLISH=false;requires_actual_verified_target_distribution
+MANIFEST_MODULE_LINK=not_updated;write attempt safety-blocked
+SATELLITE_R34_CHANGE=none
+CROSS_REPO_ALWAYS_ON_EXECUTOR=not_installed_or_not_verified
+GITHUB_ACTIONS_CROSS_REPO_AUTH=not_verified;private actions secrets endpoint unavailable to connector
+CLOUDFLARE_CONTROL_API=not_available_in_connected_tools
+PROJECT_FEEDBACK_WHEN_AUTHORIZED_GITHUB_EXECUTOR_ACTIVE=via_existing_Project_Continuity_safe_write_through
+SAFETY=project-native engines preserved;one scheduler;no automatic unsafe lesson propagation;source hash, evidence, dedup, approvals required
+VERIFICATION
+- CoverLab repository still exists on GitHub
+- CoverLab project hook contains DORMANT_RESERVED marker
+- Central integration registry contains DORMANT_RESERVED override and eligible project list
+- Central fanout module excludes DORMANT_RESERVED targets
+- Core entrypoint, Project Continuity, Persistent Operational State reference governed bidirectional protocol
+- CoverLab GitHub verify workflow contains only workflow_dispatch
+BLOCKERS
+1. Cloudflare Worker scheduled cron may still run; no authenticated Cloudflare resource management in this session. Do not mark external freeze complete.
+2. CoverLab Android APK workflow still has push trigger; modification blocked by tool safety check. Do not mark build automation fully disabled.
+3. Full release-manifest registration and durable cross-repo actions not completed/verified; do not advertise always-on bidirectional sync.
+NEXT_SAFE_STEP=Use permitted user-connected cloud infrastructure tooling to verify/pause CoverLab Worker cron while keeping D1 intact; remove Android APK automatic trigger only through permitted authorized workflow; set up scoped GitHub App token/authorized event executor; test one MusicLab->MotorLab feedback event and one central->MusicLab release in safe isolated refs, then onboard each eligible project; do not mutate active app LAB or create APK for control-plane synchronization.
+NOTE=This ledger is operational truth; no background executor automatically continues from this document alone.
