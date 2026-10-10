@@ -19,6 +19,9 @@ ROLE / PRECEDENCE
 - Live repository/provider/job state is authoritative when newer than the ledger.
 This module must not become a second recovery engine or a replacement for project-native engines.
 
+BIDIRECTIONAL PROJECT FEEDBACK — 2026-10-10
+Per-project ledger write-through is the authoritative project-to-central leg of MOTORLAB_BIDIRECTIONAL_SYNC_V1.txt. When an already-approved project operation has a verified material transition, reconcile to the central ledger at the safe write boundary, and produce a deduplicated minimal technical event/lesson through existing Persistent Operational State where authorized. Never use independent competing status stores; respect same-operation idempotence, evidence, and no app-source changes. All feedback and future release fanout MUST exclude Br174/Cover-Lab-AI while DORMANT_RESERVED. Offline/inaccessible sinks are PENDING_EXECUTOR, not SUCCESS. Unverified proposals may not become globally applied lessons or trigger core promotion without separate approval.
+
 CORE PRINCIPLE
 CHAT IS THE INTERFACE; PROJECT STATE IS PERSISTENT CONTROL-PLANE DATA.
 A new chat must reconstruct current work from persistent project state plus live repository/provider evidence, not from a copied prompt or memory-only summary.
