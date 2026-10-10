@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=28
+STATE_REVISION=29
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab19-original-scans-and-ai-book-covers-20261010
-OPERATION_STATUS=LAB19_SIGNED_APK_DELIVERED_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB19 implemented: three ORIGINAL scan-photo thumbnails per row in Scannerizzati and Libreria Tutti, without AI replacing scans. Books: prefer actual PDF first-page cover if heuristically likely, EPUB embedded cover, or image original; otherwise immediate elegant placeholder and non-blocking AI-directed SVG book cover using existing /api/explain text AI provider. Long press opens rename/delete/choose local JPG PNG WebP/AI design/restore original controls. Original file never modified. Full UAB/Android CI success and signed APK/ZIP integrity checked. Android UI/network acceptance pending.
-CURRENT_REF=lab/studybook-core-android-01-update-19
-CURRENT_HEAD_SHA=771c3931c417ed6dbc446c365ecb30324626f81f
+ACTIVE_OPERATION_ID=studybook-lab20-single-scanner-grid-ai-cover-resilience-20261010
+OPERATION_STATUS=LAB20_SIGNED_APK_DELIVERED_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB20 root cause closure on user's 2026-10-10 phone screenshot: separate archive group cards prevented photos across collections from forming one 3-column row; archive now ONE flat grid with optional compact collection-rename chips, original scan photos preserved. AI cover manual command previously depended on online provider and scanned-derived STUDY BOOKS were misclassified as raw scan photos and rejected. Now instant locally composed context-matched SVG on command, asynchronously upgraded when existing online /api/explain AI available, saving library metadata only; processed scan books can receive covers, archived scan pictures remain original. Four substantive UI/logic fixes; CI UAB success run 38086543558, Android update APK run 38086543571 success. Device acceptance pending.
+CURRENT_REF=lab/studybook-core-android-01-update-20
+CURRENT_HEAD_SHA=b219e2b66fbe364ad08cbd0a6f1a03574e20146a
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB19_UAB_38085501286_SUCCESS_RUN383; LAB19_ANDROID_38085501276_SUCCESS_RUN43
-JOB_STATUS=LAB19 latest UAB passed including scripts/test-lab19-library-covers.mjs, all legacy regressions and web build. LAB19 latest Android run passed APK build, stable update signing, checksum. Artifact downloaded and independently CRC/SHA256 verified. Remote AI requires existing configured /api/explain provider; no new secrets required.
+JOB_ID=LAB20_UAB_38086543558_SUCCESS_RUN395; LAB20_ANDROID_38086543571_SUCCESS_RUN46
+JOB_STATUS=Latest LAB20 UAB 38086543558 SUCCESS including scripts/test-lab20-scans-covers-recovery.mjs, LAB19 updated regressions, all legacy tests and web build; LAB20 Android run 38086543571 SUCCESS source b219e2b66fbe364ad08cbd0a6f1a03574e20146a. Artifact ZIP CRC and internal APK ZIP CRC pass; SHA256 matches workflow manifest; signing certificate same as LAB19; stable package id and monotonic version verified.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB19 APK versionName=0.3.43 versionCode=2026100043 package=it.studybook.ai.lab stable signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; APK SHA256=55566a2a6962caaa7b171bf516a20177f781e4e611f051514316d10840173f1e ZIP SHA256=60d8597dd17ce535dd985f16805dd4719b9cfa8263044d32bdd632b61e19dd80. All test/build success.
-NEXT_SAFE_STEP=Install LAB19 over LAB18 on Android. Verify Scannerizzati shows 3 original photos/row (not AI), new imported books show actual original cover when detected or immediate elegant placeholder until AI-derived themed SVG cover is available, long-press menu rename/delete/upload JPG PNG WebP/AI regenerate and restore original; verify data retention and app speed. AI cloud requires a functioning network and existing /api/explain deployment.
-PENDING_VERIFICATION=Actual Android visual UI acceptance (3 scan images per row, long press actions and file picker, cover persistence and original PDF unchanged), remote AI availability from actual phone, PDF/ePub original-cover heuristic. These require device checks; CI and APK integrity passed.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-19-AGGIORNAMENTO.apk SHA256=55566a2a6962caaa7b171bf516a20177f781e4e611f051514316d10840173f1e versionName=0.3.43 versionCode=2026100043 AndroidRun=38085501276 artifactID=11682187015 source=771c3931c417ed6dbc446c365ecb30324626f81f
+LAST_COMPLETED_MATERIAL_STEP=LAB20 signed APK versionName=0.3.46 versionCode=2026100046 package=it.studybook.ai.lab stable signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; APK SHA256=c0aae8d6b56898bd5faa104517c5f5293da83c287bd5af80b9518c2f8f48de39 ZIP SHA256=94fb825676c5b4735ae9fa3ba33bbbc43fb1eb36561f10165ad4c2e5ba2a9bff. Both files verified in container and delivered.
+NEXT_SAFE_STEP=Install LAB20 APK over LAB19 on Android. In Libreria > Scannerizzati verify photo I romani and photo Appunti fotografati are SIDE BY SIDE in one 3-column gallery, not separated into large per-collection cards. Open Modificati/Tutti, long-press a book (including processed book from scanner) > Crea / rigenera copertina AI; verify immediate illustrated cover even offline, online theme enrichment optional and dependent on deployed AI endpoint, repeated regeneration different, files unchanged. Verify buttons/scanning/renaming/deleting unchanged. User device approval pending.
+PENDING_VERIFICATION=Real device acceptance: 3 columns spanning different named scanner collections, long press AI cover for processed scanner book, instant local fallback, original photo unchanged and book cover persistence, actual deployed online AI provider availability (not guaranteed by CI), update without uninstall. Automated source/CI APK integrity verified.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-20-AGGIORNAMENTO.apk SHA256=c0aae8d6b56898bd5faa104517c5f5293da83c287bd5af80b9518c2f8f48de39 versionName=0.3.46 versionCode=2026100046 AndroidRun=38086543571 artifactID=11682423556 source=b219e2b66fbe364ad08cbd0a6f1a03574e20146a
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=60d8597dd17ce535dd985f16805dd4719b9cfa8263044d32bdd632b61e19dd80
+UPDATE_ZIP_SHA256=94fb825676c5b4735ae9fa3ba33bbbc43fb1eb36561f10165ad4c2e5ba2a9bff
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=User repeatedly authorizes LAB19 APK with MotorLab Fantastici20. Scannerizzati use the actual scanned photo 3 per row, no AI cover. PDF/eBook books prefer original cover, else instant placeholder and AI design without slowing imports. Long press rename/delete/choose phone cover/generate AI/restore original. APK+ZIP signed update over LAB18, no loss of data.
-STATE_SOURCE=Br174/StudyBook-AI branch lab/studybook-core-android-01-update-19 SHA 771c3931c417ed6dbc446c365ecb30324626f81f; safety checkpoint lab/safety-studybook-core-android-01-update-19; UAB run 38085501286 SUCCESS Android run 38085501276 SUCCESS.
-CONTINUITY_NOTE=LAB19 APK and ZIP delivered direct download with independently verified zip CRC/hash, stable package signing. LAB18 previous source remains safe. AI-directed visual cover uses the existing configured text AI endpoint to select creative themes; SVG rendering is local, not photorealistic image-model diffusion. Offline/provider errors preserve placeholder, explicit retry via long press. Android device acceptance pending.
+LAST_USER_INTENT_SUMMARY=Two LAB19 user-device bugs: Scannerizzati has not three photos per row because each collection appears as an isolated large panel; holding book cover and selecting AI cover fails. User explicitly requests use MotorLab + Fantastici20 BEFORE code and corrective APK. LAB20 addressed root causes, including processed scanned-book misclassification and online dependency; no extra confirmation required.
+STATE_SOURCE=Br174/StudyBook-AI branch lab/studybook-core-android-01-update-20 SHA b219e2b66fbe364ad08cbd0a6f1a03574e20146a; safety ref lab/safety-studybook-core-android-01-update-20 SHA b219e2b66fbe364ad08cbd0a6f1a03574e20146a; UAB 38086543558 SUCCESS Android 38086543571 SUCCESS.
+CONTINUITY_NOTE=LAB20 verified artifacts delivered with update-in-place stable app ID and signer. Early pre-final Android run 44 succeeded but superseded; run 45 was cancelled as pending by GitHub; final run 46 exactly at final source is success. LAB19 original source intact. AI not guaranteed online: initial image SVG locally composed from heuristics, then optionally AI-refined via existing /api/explain. No fabricated diffusion/image generation. Physical phone test pending.
 UPDATED_DATE=2026-10-10
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,15 +44,15 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100043
-ANDROID_UPDATE_VERSION_NAME=0.3.43
+ANDROID_UPDATE_VERSION_CODE=2026100046
+ANDROID_UPDATE_VERSION_NAME=0.3.46
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 19 aggiornamento
-ANDROID_PAIRED_RECOVERY=LAB19 safety branch lab/safety-studybook-core-android-01-update-19; previous LAB18 source retained.
+ANDROID_NEXT_VISIBLE_LAB=LAB 20 aggiornamento
+ANDROID_PAIRED_RECOVERY=LAB20 safety branch lab/safety-studybook-core-android-01-update-20; previous LAB19 source retained.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
@@ -207,3 +207,12 @@ LAB19_ZIP_SHA256=60d8597dd17ce535dd985f16805dd4719b9cfa8263044d32bdd632b61e19dd8
 LAB19_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
 LAB19_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-19
 LAB19_DEVICE_ACCEPTANCE=PENDING
+
+LAB20_CHANGE_RECORD=2026-10-10; user's actual Android photo analyzed and defects reproduced by code inspection. Archive grouped photos in separate cards. AI failed because mandatory online request and processed scan book counted as raw scanner. Unified flat photo grid + three columns. Immediate locally illustrated book cover, optional AI theme refinement, manual long press actions preserved, LAB19 failed retries.
+LAB20_UAB_RUN=38086543558 SUCCESS sourceSha=b219e2b66fbe364ad08cbd0a6f1a03574e20146a
+LAB20_ANDROID_RUN=38086543571 SUCCESS sourceSha=b219e2b66fbe364ad08cbd0a6f1a03574e20146a
+LAB20_APK_SHA256=c0aae8d6b56898bd5faa104517c5f5293da83c287bd5af80b9518c2f8f48de39
+LAB20_ZIP_SHA256=94fb825676c5b4735ae9fa3ba33bbbc43fb1eb36561f10165ad4c2e5ba2a9bff
+LAB20_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB20_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-20
+LAB20_DEVICE_ACCEPTANCE=PENDING
