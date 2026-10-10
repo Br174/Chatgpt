@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=23
+STATE_REVISION=24
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab14-original-to-study-choice-20261010
-OPERATION_STATUS=LAB14_SIGNED_APK_VERIFIED_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB14 implemented and verified: Originale > Studia libro opens Libro aperto chooser without automatic reading or AI; both original-only and already-processed books supported; original read/PDF/export choices and optional study generation only after explicit confirmation; approved graphics preserved. UAB and Android passed, APK/ZIP hashes verified; phone acceptance pending.
-CURRENT_REF=lab/studybook-core-android-01-update-14
-CURRENT_HEAD_SHA=03e7f82bb14b79dda4d0e39aaf080abc26426e38
+ACTIVE_OPERATION_ID=studybook-lab15-direct-original-route-20261010
+OPERATION_STATUS=LAB15_SIGNED_APK_VERIFIED_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB15 completed: Home Versione originale now directly opens Libro aperto (last-selected or latest original), Library Originali routes directly, old original intermediary removed; original text read inline without switching screens; empty original library offers import in same StudyBook screen. Source untouched, existing modified books and exports preserved. UAB and Android CI passed; APK and ZIP SHA256/CRC independently verified. User device acceptance pending.
+CURRENT_REF=lab/studybook-core-android-01-update-15
+CURRENT_HEAD_SHA=1817b81109619d615d167a0f3b2983f80d5a2e27
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB14_ANDROID_38058024912_SUCCESS_RUN36; LAB14_UAB_38058024917_SUCCESS_RUN349
-JOB_STATUS=LAB14 UAB tests passed incl. original study entry and LAB13 regressions. Android Gradle built and stable signer/identity validated. GitHub Actions signed artifact ZIP extracted, CRC verified, APK CRC and manifest SHA256 verified.
+JOB_ID=LAB15_ANDROID_38060265046_SUCCESS_RUN37; LAB15_UAB_38060264987_SUCCESS_RUN357
+JOB_STATUS=LAB15 UAB success including LAB15 direct route test, prior LAB07/08/13/14 regressions and cloudflare checks; Android success with original LAB signing keystore and update identity checks. GitHub artifact downloaded, ZIP CRC and APK archive CRC verified and APK sha256 matches signed manifest.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB14 Android APK versionName=0.3.36 versionCode=2026100036 package=it.studybook.ai.lab cert D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; APK SHA256=96d4e4af3336a30cd71512fe256747fe14b84631cf7077905ac6f8249827f586 and artifact ZIP SHA256=d26efa0c8d2ed058db35cc84e1a527aa6f295de706ecac6fb1fb785fc90e0b5b.
-NEXT_SAFE_STEP=User installs LAB14 over LAB13, tests Originale > Studia libro > Libro aperto, chooses Leggi telefono/Leggi PDF/Studia sul telefono/Scarica libro, verifies original-only optional study confirmation and existing processed-book behavior, original file preserved. Do not promote to mother until physical acceptance.
-PENDING_VERIFICATION=Device-specific visual/functional tests: original-only study chooser, export/reader back navigation, optional preparation and retention across app restarts. Android install-in-place expected with matching cert but requires device confirmation.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-14-AGGIORNAMENTO.apk SHA256=96d4e4af3336a30cd71512fe256747fe14b84631cf7077905ac6f8249827f586 versionCode=2026100036 versionName=0.3.36 AndroidRun=38058024912 artifactID=11672039663 source=03e7f82bb14b79dda4d0e39aaf080abc26426e38
+LAST_COMPLETED_MATERIAL_STEP=LAB15 signed APK package it.studybook.ai.lab versionName 0.3.37 versionCode 2026100037 original signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; APK SHA256=6f970cbdb1bce80a2d6f0e06a8d55dbf7d9d9a331466e0477d80490984fa98fc ZIP SHA256=81c6adf331965807bb95b08a3578c1b82403f816dbe1922ccb84934f9543d4af.
+NEXT_SAFE_STEP=User installs LAB15 over LAB14, checks Home Versione originale direct to Libro aperto, Libreria Originali direct open, optional inline original reading with Android back, PDF/export, no-original import in same screen; tests persistence and update in place on physical Android; feedback before promotion.
+PENDING_VERIFICATION=Device-specific tests original route, in-page original text display, open with external reader, export PDF/original raw, empty original library chooser and back navigation. CI verified, phone acceptance pending.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-15-AGGIORNAMENTO.apk SHA256=6f970cbdb1bce80a2d6f0e06a8d55dbf7d9d9a331466e0477d80490984fa98fc versionName=0.3.37 versionCode=2026100037 AndroidRun=38060265046 artifactID=11672981417 source=1817b81109619d615d167a0f3b2983f80d5a2e27
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=d26efa0c8d2ed058db35cc84e1a527aa6f295de706ecac6fb1fb785fc90e0b5b
+UPDATE_ZIP_SHA256=81c6adf331965807bb95b08a3578c1b82403f816dbe1922ccb84934f9543d4af
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=User approved LAB14: change original-screen 'Leggi sul telefono' to 'Studia libro'; open existing 'Il tuo libro di studio' chooser, not immediate reader or AI; allow original-only and processed, preserve choice and stored original file.
-STATE_SOURCE=Br174/StudyBook-AI branch lab/studybook-core-android-01-update-14 SHA 03e7f82bb14b79dda4d0e39aaf080abc26426e38; UAB 38058024917 success; Android 38058024912 success; safety source lab/safety-studybook-core-android-01-update-14.
-CONTINUITY_NOTE=LAB14 latest verified signed update 0.3.36 and ZIP; LAB13 previous unchanged. Original Studia libro button opens existing Libro aperto with original-only chooser, optional processing behind explicit confirm, no auto-processing, raw file preserved. Device acceptance pending.
+LAST_USER_INTENT_SUMMARY=Approved LAB15: remove old Versione originale intermediate screen; Home Versione originale and Library Originali directly open Il tuo libro di studio, preserving original file and all study choices; maintain approved appearance, no auto-processing and no data deletion.
+STATE_SOURCE=Br174/StudyBook-AI branch lab/studybook-core-android-01-update-15 SHA 1817b81109619d615d167a0f3b2983f80d5a2e27; UAB 38060264987 success; Android 38060265046 success; safety ref lab/safety-studybook-core-android-01-update-15
+CONTINUITY_NOTE=LAB15 latest verified APK/ZIP. Direct original-to-book overview with original inline reader, empty-library chooser/import. Old original page removed. LAB14 remains intact, source safety checkpoint lab/safety-studybook-core-android-01-update-15. Physical Android test pending.
 UPDATED_DATE=2026-10-10
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,15 +44,15 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100036
-ANDROID_UPDATE_VERSION_NAME=0.3.36
+ANDROID_UPDATE_VERSION_CODE=2026100037
+ANDROID_UPDATE_VERSION_NAME=0.3.37
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 14 aggiornamento
-ANDROID_PAIRED_RECOVERY=LAB14 source checkpoint lab/safety-studybook-core-android-01-update-14; LAB13 source unchanged.
+ANDROID_NEXT_VISIBLE_LAB=LAB 15 aggiornamento
+ANDROID_PAIRED_RECOVERY=LAB15 source safety branch lab/safety-studybook-core-android-01-update-15; previous LAB14 retained unchanged.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
 MOTORLAB_R23_STATUS=VERIFIED_ADOPTED
@@ -163,3 +163,12 @@ LAB14_UPDATE_ZIP_SHA256=d26efa0c8d2ed058db35cc84e1a527aa6f295de706ecac6fb1fb785f
 LAB14_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
 LAB14_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-14
 LAB14_DEVICE_ACCEPTANCE=PENDING
+
+LAB15_CHANGE_RECORD=2026-10-10; user-approved direct Home Versione originale to shared Libro aperto, Library Originali direct, old intermediary removed, original inline reader, optional import if empty, no source corruption.
+LAB15_UAB_RUN=38060264987 success SHA=1817b81109619d615d167a0f3b2983f80d5a2e27
+LAB15_ANDROID_RUN=38060265046 success SHA=1817b81109619d615d167a0f3b2983f80d5a2e27
+LAB15_SIGNED_APK_SHA256=6f970cbdb1bce80a2d6f0e06a8d55dbf7d9d9a331466e0477d80490984fa98fc
+LAB15_UPDATE_ZIP_SHA256=81c6adf331965807bb95b08a3578c1b82403f816dbe1922ccb84934f9543d4af
+LAB15_SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB15_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-15
+LAB15_DEVICE_ACCEPTANCE=PENDING
