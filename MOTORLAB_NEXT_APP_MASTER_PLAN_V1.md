@@ -41,8 +41,8 @@ Create private release keystore not committed to repository, configure encrypted
 ### P4 GitHub private project access / guarded operations [PENDING]
 OAuth/App installation permissions, capability detection from session, least-privilege read-only first, proof of ref and SHA. Later allow LAB branch write/build only inside already-approved scope; permission checks and single-writer enforcement. Track run_id in logs. Do not treat a ChatGPT chat connector as accessible to the stand-alone APK.
 
-### P5 Factual, temporal and relational global memory [PENDING]
-Extend existing D1 operational schema additively after inspecting existing schema.js; record immutable source references, event valid_from/valid_to and version, relation type, confidence and verification; dedup, contradictions and revocation; index exact refs before vectors. No second scheduler, no duplicate operational log.
+### P5 Factual, temporal and relational global memory [SCHEMA SOURCE TESTED; LIVE DEPLOY PENDING]
+Existing D1 schema.js inspected and additive migration prepared in cloudflare/motorlab-state-bridge/migrations/motorlab-global-memory-v1.sql; existing tables unchanged. Offline SQLite gate passed in run 38135584392. Never treat this as deployed! Next live step requires D1 resource authorization, additive migration backup/rollback and validation. Then record immutable source references, event valid_from/valid_to and version, relation type, confidence and verification; dedup, contradictions and revocation; index exact refs before vectors. No second scheduler, no duplicate operational log.
 Gate: problem -> cause -> patch -> test -> artifact -> lesson can be reconstructed with GitHub proof.
 
 ### P6 Vector index & semantic lookup [PENDING]
@@ -74,4 +74,5 @@ Android crash and performance on real phone; sign-in lifecycle, plan quota stops
 - Current TEAM release tag: `motorlab-team-lab02-test-00306a2`.
 - Team build GitHub Actions: https://github.com/Br174/Chatgpt/actions/runs/38135185893 (success).
 - LAB01 remains `motorlab/app-lab01`; CORE main remains canonical; this plan is informational, not a production activation.
-- When resuming: review GitHub current heads and last release; don't rerun completed work; next safe priority = P3 stable signing and P2 device test, then authenticated P4.
+- Offline memory compatibility gate: https://github.com/Br174/Chatgpt/actions/runs/38135584392 (success, schema only, no D1 deployment).
+- When resuming: review current GitHub HEADs and releases; do not rerun completed work; next safe priority is P3 stable signing and P2 real-device test, then authenticated P4. Never deploy D1 schema without new deploy-safety verification.
