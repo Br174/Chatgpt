@@ -1,0 +1,23 @@
+MOTORLAB MUSICLAB TURBO LAB07 REAL-NETWORK POLLICINO CHECKPOINT
+DATE=2026-10-11
+MOTORLAB_CORE=Br174/Chatgpt CURRENT_RELEASE=2026.10.08-r34
+PROJECT=Br174/MusicLab
+BRANCH=uab-build/musiclab-turbo-lab07-strategy-lab-family-02
+LAST_VERIFIED_SOURCE_COMMIT=7e3884e182be5f69fd6a302807674d78023d449e
+WORKFLOW_FAST_SOURCE_RUN=38172241570
+WORKFLOW_FAST_SOURCE_TESTS=177 legacy + 4 LAB05 + 10 LAB06 + 40 LAB07 = 231 PASS 0 FAIL (job=114567088935)
+WORKFLOW_LIVE_NETWORK_RUN=38172241475, 20/20 real network tests PASS
+WORKFLOW_KOTLIN_COMPILE_RUN=38172241582; Gradle compile was IN PROGRESS at checkpoint time, DO NOT claim compiled until checked
+LIVE_PROVIDER_CASE=Se mi lasci non vale, Julio Iglesias, COVER.INFO publicly lists 7 follow-ups, 5 documented YouTube IDs
+LIVE_PROVIDER_RUN=38171821451, first live search 715ms, relation page 782ms, 5/5 YouTube oEmbed responses 95-143ms each, entire real chain 1641ms on GitHub runner; this does not measure Android
+LIVE_VIDEO_IDS=5S_55wVZjXk 7cw4ZkLJCwM YutV9x8nc38 SsTgKjFYnH8 dss4BGdjZw0
+CODE_FIX_1=source entry callbacks stream to a Kotlin coroutine channel ahead of serial provider awaits, preserving early matches
+CODE_FIX_2=empty completed searches can be retried
+CODE_FIX_3=COVER.INFO detail relations can admit documented foreign-title cover songs, including Ajda Pekkan / Yesim Salkim
+CODE_FIX_4=existing directly attached YouTube IDs verified before blind queries
+CODE_FIX_5=source own time budget4100ms, outer global5000ms; cloud lanes2500ms; adaptive verifier 2 when active playing OR buffering, 8 idle
+CODE_FIX_6=CompilationTrackResolver.isHardCompatible new optional documentedPerformerMatch false by default, only relaxes artist-field check when an exact COVER.INFO work-related bound ID is validated; title/version/duration hard gates preserved
+CODE_FIX_7=LAB07 Cover UI preparing message "Raccolgo e verifico tutte le cover disponibili entro 5 secondi…" rather than obsolete batch-of-5; one LazyColumn of up to 50
+CODE_PROTECTION=Original InnerTubeXPlayer unchanged; Mother LAB68 unchanged, Turbo app package it.verlezza.musiclab.turbo01 unchanged; no APK built/published in LAB07.
+TEST_FILES=turbo-lab07-strategy-portfolio.test.mjs, turbo-lab07-actual-flow-contract.test.mjs, turbo-lab07-winner-regression.test.mjs, turbo-lab07-documented-direct-video.test.mjs, turbo-lab07-live-coverinfo-probe.test.mjs, turbo-lab07-live-video-chain.test.mjs
+NEXT_SAFE_ACTION=Check compile run38172241582. If failing inspect job logs and fix Kotlin. If passing, expand repeatable real provider case coverage, distinguish GitHub network vs handset audio and 5-sec UI readiness, do not certify user handset or distribute LAB07 APK prematurely per explicit user acceptance instruction.
