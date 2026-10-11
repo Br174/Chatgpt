@@ -1,0 +1,16 @@
+MOTORLAB MUSICLAB POLLICINO CHECKPOINT: LAB08 video-ID availability and descending score priority
+DATE=2026-10-11
+CENTRAL_MOTORLAB_RELEASE=2026.10.08-r34; project satellite pinned r34, do not swap mid-edit
+PROJECT_REPO=Br174/MusicLab
+PROJECT_BRANCH=uab-build/musiclab-turbo-lab08-two-phase-family-02
+HEAD_SHA=e4a6ceb0f9e6b3e28dad3f8f59d27447a1bcfc00 IS WORKFLOW COMMIT? NOTE: use GitHub branch ref to retrieve actual current HEAD; see workflow run latest.
+CI_WORKFLOW=.github/workflows/turbo-lab08-dual-deadline-gate.yml
+CI_RUN=https://github.com/Br174/MusicLab/actions/runs/38179685966
+TEST_RESULT=311/311 green: 177 historic LAB46-68+TurboLAB01-04; 4 LAB05; 10 LAB06; 90 LAB07; 30 LAB08. GitHub validation job 114589409093 completed success.
+KOTLIN_COMPILE=job 114589444475 was in_progress at checkpoint write; must check real conclusion before claiming compile successful. No APK build in workflow.
+USER_INTENT=Locandine and video search start together at T+0. At T+5s one atomic poster publication up to 50 with real artwork. At T+10s one atomic verified-video-only list; remove any poster without verified metadata. Existing code maintains video discovery from T0 plus T+5..10 extension for original poster set only. Prioritize video candidates by attached ID presence then descending confidence 20→1. Example score19 without ID skips to score12 with ID; score19 still searched if time; if it obtains a verified ID by T+10 it regains high rank in final batch. Never invent missing videos.
+CODE_MODIFICATION=app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt: reusable videoLookupPriority(source) uses compareByDescending<bool attached nonblank video ID> thenByDescending confidenceScore (also work references/source ties); all 3 verification lanes use it; poster T+5 top50 prefers ID-bearing cover cards to blank-ID high scorers; T+10 verified survivors sortGroup(RELEVANCE) after mapNotNull() and publish atomically.
+TESTS_NEW=cloudflare/music-intelligence/test/turbo-lab08-five-second-atomic-posters.test.mjs (10), turbo-lab08-ten-second-video-seal.test.mjs (10), turbo-lab08-id-ready-score-priority.test.mjs (10).
+WORKFLOW=.github/workflows/turbo-lab08-dual-deadline-gate.yml pins legacy manifest+source at exact historical commits for old suites, restores current LAB08 source before 30 tests and compile-only Android. Initial run 38179633601 failed merely from LAB06 manifest versionCode mismatch (1007 vs expected 1006), fixed in workflow by temporary checkout of LAB06 manifest 1006; rerun 38179685966 validate success 311/311.
+PROTECTED=app/native player InnerTubeXPlayer exact old hash, Madre and LAB68 untouched; LAB07 APK stable, LAB08 separate experimental branch; no LAB08 APK produced/distributed.
+NEXT=check Kotlin compile job 114589444475 result. If failure use logs and fix minimum necessary then rerun. If green report test result and no APK until user requests/release gates satisfied, keep phone latency/audio as not instrumented. Continue to uphold 5s+10s behavior user-defined.
