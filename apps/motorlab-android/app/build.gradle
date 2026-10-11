@@ -7,26 +7,39 @@ android {
     compileSdk 35
 
     defaultConfig {
-        applicationId 'it.motorlab.app.lab02'
+        applicationId (project.findProperty('motorlabStableBuild') == 'true' ? 'it.motorlab.app.stable' : 'it.motorlab.app.lab02')
         minSdk 26
         targetSdk 35
-        versionCode 2
-        versionName '0.2.0-LAB02'
+        versionCode 3
+        versionName '0.3.0-LAB03'
     }
 
     signingConfigs {
-        lab {
-            storeFile file(System.getenv('MOTORLAB_LAB_KEYSTORE') ?: 'missing-test-only-keystore.jks')
-            storePassword System.getenv('MOTORLAB_LAB_PASSWORD') ?: 'disabled'
-            keyAlias 'motorlab-lab'
-            keyPassword System.getenv('MOTORLAB_LAB_PASSWORD') ?: 'disabled'
+        if (project.findProperty('motorlabSignRelease') == 'true') {
+            def signingFile = System.getenv('MOTORLAB_APP_KEYSTORE_FILE')
+            def storePass = System.getenv('MOTORLAB_APP_STORE_PASSWORD')
+            def keyAlias = System.getenv('MOTORLAB_APP_KEY_ALIAS')
+            def keyPass = System.getenv('MOTORLAB_APP_KEY_PASSWORD')
+            if (!signingFile || !storePass || !keyAlias || !keyPass) {
+                throw new GradleException('Required private signing material is missing')
+            }
+            if (!file(signingFile).isFile()) {
+                throw new GradleException('Private signing keystore is unavailable')
+            }
+            production {
+                storeFile file(signingFile)
+                storePassword storePass
+                keyAlias keyAlias
+                keyPassword keyPass
+            }
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false
-            signingConfig signingConfigs.lab
+            if (project.findProperty('motorlabSignRelease') == 'true') {
+                signingConfig signingConfigs.production
+            }
         }
     }
 

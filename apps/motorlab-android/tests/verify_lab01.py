@@ -27,5 +27,5 @@ assert teamlogic.count("reserveDailyTrialCall()") == 2
 assert "TeamChatActivity" in manifest and 'android:exported="false"' in manifest
 assert "ACTION_CREATE_DOCUMENT" in teamui and "TeamCoordinator.run" in teamui
 assert "it.motorlab.app.lab02" in (p/"app/build.gradle").read_text()
-assert "versionCode 2" in (p/"app/build.gradle").read_text()
+assert "versionCode 3" in (p/"app/build.gradle").read_text()
 print("LAB02 Team Chat contract: PASS - runtime and live AI not proven")
