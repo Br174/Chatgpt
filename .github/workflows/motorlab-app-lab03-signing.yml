@@ -1,0 +1,114 @@
+name: MotorLab Stable Signing LAB03
+on:
+  push:
+    branches: [motorlab/app-lab03-signing]
+    paths:
+      - apps/motorlab-android/**
+      - .github/workflows/motorlab-app-lab03-signing.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motorlab-app-lab03-signing
+  cancel-in-progress: false
+
+jobs:
+  signing-source-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify old app modules and stable signing source contract
+        run: |
+          python3 apps/motorlab-android/tests/verify_lab01.py
+          python3 apps/motorlab-android/tests/verify_signing_gate.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Use hosted SDK
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Debug compile sanity test - never release this APK
+        run: gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+
+  signing-lab-release:
+    if: github.event_name == 'workflow_dispatch'
+    needs: signing-source-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Prepare SDK
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Verify protected secrets, sign LAB and refuse certificate mismatch
+        env:
+          MOTORLAB_APP_SIGNING_KEYSTORE_B64: ${{ secrets.MOTORLAB_APP_SIGNING_KEYSTORE_B64 }}
+          MOTORLAB_APP_STORE_PASSWORD: ${{ secrets.MOTORLAB_APP_STORE_PASSWORD }}
+          MOTORLAB_APP_KEY_PASSWORD: ${{ secrets.MOTORLAB_APP_KEY_PASSWORD }}
+          MOTORLAB_APP_KEY_ALIAS: ${{ secrets.MOTORLAB_APP_KEY_ALIAS }}
+          MOTORLAB_APP_EXPECTED_CERT_SHA256: ${{ secrets.MOTORLAB_APP_EXPECTED_CERT_SHA256 }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          umask 077
+          for name in MOTORLAB_APP_SIGNING_KEYSTORE_B64 MOTORLAB_APP_STORE_PASSWORD MOTORLAB_APP_KEY_PASSWORD MOTORLAB_APP_KEY_ALIAS MOTORLAB_APP_EXPECTED_CERT_SHA256; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error::Missing required protected secret: $name. Refusing to publish."
+              exit 1
+            fi
+          done
+          EXPECTED="$(printf '%s' "$MOTORLAB_APP_EXPECTED_CERT_SHA256" | tr -cd '[:xdigit:]' | tr '[:upper:]' '[:lower:]')"
+          test "${#EXPECTED}" -eq 64 || { echo "::error::Invalid expected certificate fingerprint"; exit 1; }
+          TEMP_SIGN="$(mktemp -d)"
+          trap 'rm -rf "$TEMP_SIGN"' EXIT
+          export MOTORLAB_APP_KEYSTORE_FILE="$TEMP_SIGN/stable-private.jks"
+          printf '%s' "$MOTORLAB_APP_SIGNING_KEYSTORE_B64" | base64 --decode > "$MOTORLAB_APP_KEYSTORE_FILE"
+          chmod 600 "$MOTORLAB_APP_KEYSTORE_FILE"
+          test -s "$MOTORLAB_APP_KEYSTORE_FILE"
+          gradle --no-daemon --build-cache -p apps/motorlab-android \
+            -PmotorlabStableBuild=true -PmotorlabSignRelease=true :app:assembleRelease
+          mkdir -p motorlab-stable-lab03-dist
+          APK=motorlab-stable-lab03-dist/MotorLab-Stable-LAB03.apk
+          cp apps/motorlab-android/app/build/outputs/apk/release/app-release.apk "$APK"
+          SIGN_INFO="$("$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK")"
+          ACTUAL="$(printf '%s\n' "$SIGN_INFO" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | tr -cd '[:xdigit:]' | tr '[:upper:]' '[:lower:]')"
+          if [[ "$ACTUAL" != "$EXPECTED" ]]; then
+            echo "::error::Certificate fingerprint mismatch. Refusing publication."
+            exit 1
+          fi
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -m1 "package: name='it.motorlab.app.stable' versionCode='3'"
+          printf '%s\n' "MotorLab LAB03, signed test candidate. Physical Android verification and update test pending." > motorlab-stable-lab03-dist/INSTALLAZIONE.txt
+          (cd motorlab-stable-lab03-dist && zip -q MotorLab-Stable-LAB03.zip MotorLab-Stable-LAB03.apk INSTALLAZIONE.txt)
+          sha256sum "$APK" motorlab-stable-lab03-dist/MotorLab-Stable-LAB03.zip
+          TAG="motorlab-stable-lab03-${GITHUB_SHA:0:7}"
+          gh release create "$TAG" motorlab-stable-lab03-dist/MotorLab-Stable-LAB03.apk \
+            motorlab-stable-lab03-dist/MotorLab-Stable-LAB03.zip \
+            motorlab-stable-lab03-dist/INSTALLAZIONE.txt \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --prerelease --title "MotorLab Stable LAB03 - signing test" \
+            --notes "Only test signed candidate. Actual phone install and update-in-place remain unverified. No CORE promotion."
