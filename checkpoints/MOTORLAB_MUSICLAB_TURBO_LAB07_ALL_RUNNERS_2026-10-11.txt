@@ -1,0 +1,17 @@
+MOTORLAB MUSICLAB POLLICINO — ALL-RUNNERS / ATOMIC-50 / AUDIO-PRIORITY
+DATE=2026-10-11
+CORE_RELEASE=2026.10.08-r34; SATELLITE=verified same release
+PROJECT=Br174/MusicLab
+CURRENT_BRANCH=uab-build/musiclab-turbo-lab07-strategy-lab-family-02
+HEAD_SHA=33207ffb2c3b9768652a214ee55812f388973507
+APPROVED_INTENT=Turbo discovery starts all enabled services at once; MusicLab memory and COVER.INFO prioritized, Discogs, Apple/iTunes, Spotify, MusicBrainz, LRCLIB also participate. Max 5 second total, max 50 play-valid cover cards ranked 20..1, publish once in one LazyColumn scroll; cancel ongoing search/verification, restore full music priority. Source limits avoid external 503.
+THIS_TURN_DIAGNOSIS=CoverDiscoverySources concurrent lanes already start (COVER.INFO independent; MusicBrainz, Apple/iTunes, Spotify, LRCLIB, AI scout under bounded semaphore); firstPage Discogs, cloud archive, cloud memory run in parallel. But cloud/memory could not be verified until aggregate await, and verifier idled if no new source callbacks while Discogs results awaited.
+FIX_A=Added Channel<List<DiscogsVersionSeed>> supplementalSeeds, fed as soon as Cloud archive or memory candidates finish, alongside streaming external callbacks. Native MusicLab video cache reused before blind YouTube search (prior turn).
+FIX_B=StreamingVerifier keeps examinedBindings (fingerprint + videoId), continues checking pending Discogs/cloud/provider candidates every ~110ms even without callbacks, prioritizes provider-attached video IDs, serial UI state and IO networking.
+FIX_C=After 5s seal closes both candidate channels, cancels Archive HTTP, verification, pagination, preloading and background resume; native governor reset active=false heavy=false. Published snapshot max 50 and UI one scroll. No new APK.
+FIX_D=Previous LAB07 Kotlin compilation failed at missing close brace for if/else in CoverDiscoverySources.kt. Fixed in commit 6cd8e486350ea8f520d4813bdea65e88282a9eef before runner changes. Needs current compile confirmation.
+TESTS=261/261 source contracts PASS on GitHub Actions run 38174365287, job 114573509416 (177 historic+4 LAB05+10 LAB06+70 LAB07). New ten contracts cover simultaneous runner starts, early channels, discogs standalone progress, atomic max 50, shutdown, native audio priority.
+ANDROID_KOTLIN_COMPILE=GitHub workflow run 38174365471, validate pass and compile-Android-without-APK in progress as of checkpoint. DO NOT falsely claim Kotlin success until checked. URL=https://github.com/Br174/MusicLab/actions/runs/38174365471
+REAL_50_SONG_GATE=NOT PASSING; live COVER.INFO only means 12.8 linked IDs on average (50 real originals), NOT fully verified video average >=25. Overload test with double queries led to many 503s. Precise then fallback only when needed. Full Android in-app 5sec/avg25/audio nonstutter still UNVERIFIED.
+PROTECTED=Stable Mother and LAB68 unchanged; native player InnerTubeXPlayer untouched; MusicLab Turbo family source only. NO LAB07 APK built/published per user gate. Avoid future redundant 50-song hammering of COVER.INFO.
+NEXT=Check run 38174365471 Kotlin result. If red, inspect job log then make minimum correction and rerun tests. Independently design instrumented 50-song real app + audio scenario. Distinguish static pass from actual audio performance. Keep APK gated.
