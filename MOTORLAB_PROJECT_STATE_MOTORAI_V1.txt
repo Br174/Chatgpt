@@ -1,19 +1,19 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=39
+STATE_REVISION=40
 STATE_STATUS=SEED021R3R3_LAB_CI_VERIFIED_ANDROID_MANUAL_TRAINING_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.08-r34
 ACTIVE_OPERATION_ID=MOTORAI-SEED021R3R3-TRAINING-MENU-20261011
-OPERATION_STATUS=seed021r3r3_android_manual_controls_confirmed_L4_validation_passed_real_device_final_TEST_pending
-CURRENT_PHASE=SEED021R3R3_DEVICE_L4_VALIDATED_FINAL_TEST_PENDING
+OPERATION_STATUS=seed021r3r3_device_manual_controls_and_L5_test_100_verified_goal1_0pct
+CURRENT_PHASE=SEED021R3R3_L5_DEVICE_100_TEST_GOAL1_TRAINING_PENDING
 CURRENT_REF=lab/seed021r3r3-manual-training-menu
 CURRENT_HEAD_SHA=bb0a5c8af2f52b5648e413fe2f1ff2160d9af3f9
 LAST_VERIFIED_PROGRESS_PERCENT=99
 LAST_COMPLETED_MATERIAL_STEP=After accidental uninstall and Android partial restore, current L4 step1760 and previous historic MOTAI008 L3 step1760 have been recovered; user exported and verified external SOS ZIP, and actual previous passed isolated native load on-device with TEST L3 100 percent and retention L3 100 percent, current unchanged. User unlocked SOS and requested manual L4 training, but reported no 'Impara manualmente' in visible UI. Root cause: MainActivity had learn and pause wired but excluded both from popup and home layout. After user-approved plan, built isolated R3R3 LAB with two new popup menu routes to existing learn and pause handlers, preserved atomic foreground mutual exclusion, SOS, native engine and checkpoint format. GitHub CI run 38106092630 SUCCESS including menu wiring test, L0-L5 and Goal1-10 regression gates, Android build/sign. APK SHA256 177a7cdbf76352ea9bec7c354225a4b783cef9db97d2d47dd7d1fc78f01bcf6f, ZIP SHA256 72bd06790247d677d33808e577106ead9fce4758e6e2c11c7f0f0532491d9b20. Android signer certificate matches prior R3R2. APK and ZIP delivered. Device acceptance pending.
-NEXT_SAFE_STEP=Bruno open MotorAI main menu overflow > Diagnostica, read TEST disponibile, Validation and Memoria L0-L3 with errors, send screenshot before L5 Auto-Training. Current L4 step2853 validation passed on-device; do not claim final TEST done.
+NEXT_SAFE_STEP=Real device L5 consolidated TEST 100 percent at step2933, retention L4 95.4 and L0-L3 97.8-100; user return to MotorAI, check Goal1, if idle use menu Avvia/Riprendi training (NOT manual), report progress screenshot; preserve verified SOS backup. Historical threshold errors logged before L4 pass.
 PENDING_VERIFICATION=Real Android update-in-place preserving data and current/previous; two menu commands visible and operative; manual L4 training step advances, pause stops; no concurrent foreground training; inherited background and SOS behavior; eventual L4 >=95 percent and memories retention, then automatic training.
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
@@ -535,3 +535,15 @@ MOTORAI_SEED021R3R3_DEVICE_CURRENT_TEMP_C=36.1
 MOTORAI_SEED021R3R3_DEVICE_GOALS_COMPLETED=0_OF_10
 MOTORAI_SEED021R3R3_DEVICE_TEST_FINAL=NOT_YET_MEASURED
 MOTORAI_SEED021R3R3_DEVICE_NEXT_ACTION=MENU_DIAGNOSTICA_GET_L4_TEST_VALIDATION_RETENTION_L0_L3_ERRORS_SCREENSHOT_BEFORE_AUTO_L5
+
+
+MOTORAI_SEED021R3R3_DEVICE_L5_CONSOLIDATED=YES_BACKGROUND
+MOTORAI_SEED021R3R3_DEVICE_L5_TEST=100_PERCENT
+MOTORAI_SEED021R3R3_DEVICE_L5_VALIDATION=100_PERCENT
+MOTORAI_SEED021R3R3_DEVICE_L5_TOTAL_STEP=2933
+MOTORAI_SEED021R3R3_DEVICE_L5_LEVEL_STEP=80
+MOTORAI_SEED021R3R3_DEVICE_L5_RETENTION=L4_95_4_L3_100_L2_100_L1_100_L0_97_8
+MOTORAI_SEED021R3R3_DEVICE_L5_CHECKPOINTS=CURRENT_OK_PREVIOUS_OK_AUTO_BASELINE_OK
+MOTORAI_SEED021R3R3_DEVICE_L5_ISSUES=OLD_BACKGROUND_L4_THRESHOLD_ERRORS_BEFORE_045740
+MOTORAI_SEED021R3R3_DEVICE_NEXT_GOAL=GOAL1_OF_10_0_PERCENT_NOT_YET_VERIFIED_STARTED
+MOTORAI_SEED021R3R3_DEVICE_NEXT_SAFE_STEP=RETURN_TO_LAB_CHECK_GOAL1_IF_IDLE_USE_AVVIA_RIPRENDI_TRAINING_IN_MENU_NOT_MANUAL
