@@ -1,0 +1,21 @@
+MOTORLAB MUSICLAB STRATEGY-PORTFOLIO POLLICINO
+DATE=2026-10-11
+PROJECT=Br174/MusicLab
+CENTRAL_RELEASE_PIN=2026.10.08-r34
+APPROVAL_SCOPE=Optimize Cover discovery, compare 20 strategies plus mixed strategies; repeated 10+10 tests, prioritize 5 second useful verified videos and fluid audio; DO NOT ISSUE APK until tests pass.
+USER_EVIDENCE=Screenshot Se mi lasci non vale, Julio Iglesias, no Cover cards, misleading old "5-song block" message from LAB06.
+BRANCH=uab-build/musiclab-turbo-lab07-strategy-lab-family-02
+BASE_SHA=97f2ac5dd3c0c2b46d6355fd5b3072dbc376663c
+CURRENT_HEAD=77c5bef3b6f3a849bd2a4d1523029ece947bfc16
+WORKFLOW=.github/workflows/turbo-lab07-strategy-gate.yml
+WORKFLOW_RUN=https://github.com/Br174/MusicLab/actions/runs/38170738894
+STATE=211/211 AUTOMATED SOURCE AND SIMULATION TESTS VERIFIED; ANDROID KOTLIN COMPILE IN PROGRESS; NO LAB07 APK REQUESTED, BUILT OR DISTRIBUTED.
+CORE_BUG_1=Earlier implementation starts parallel provider calls but serial-awaits them before beginning video resolution, risking zero output on 5000ms deadline.
+CORE_BUG_2=Empty verified snapshot sealed and repeat search skipped network forever for same song.
+CHANGED_BROWSER=app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt
+FIX=Coroutine Channel streams provider callbacks into immediately started verifier on Compose dispatcher while other providers are in flight. Requires metadata proof before publishing; merges results, no incremental visible cards, allows retry on zero, changes text to five-second full search. No player engine change.
+PORTFOLIO=20 candidate mixes, 600 deterministic SYNTHETIC scenarios, 10 comparison tests, 10 source flow contracts. Rankings: #20 adaptive playback eight 86.61/100, 15.17 synthetic video avg; #16 cover-info six 83.29; #19 adaptive playback six 83.29. This is simulated, NOT actual network/device yield or audio proof. Best config still needs validation and compatibility before native release.
+REGRESSIONS=177/177 historic +4/4 LAB05 +10/10 LAB06 +20/20 LAB07 =211/211, PASS validate-once (114562628237) on run 38170738894.
+COMPILATION=compile-only job 114562683791 was IN PROGRESS at checkpoint.
+NO_APK_GATE=Explicit user instruction; workflow purposely uses :app:compileFossDebugKotlin and does NOT package APK.
+NEXT_STEPS=Check Kotlin compile conclusion. If fails, inspect job logs and correct on LAB07. Confirm chosen mix conditional fanout remains small when audio is buffering, not merely when isEffectivelyPlaying is true. Further test real external providers/search for Se mi lasci non vale and other songs under five seconds; synthetic results cannot prove real yield or zero audio stalls. Iterate and only after enough independent green evidence consider APK build; don't certify phone success absent actual device testing. Do not modify Mother/LAB68 or original native player.
