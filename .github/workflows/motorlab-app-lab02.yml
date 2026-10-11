@@ -20,7 +20,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Source safety and contract check
-        run: python3 apps/motorlab-android/tests/verify_lab02.py
+        run: python3 apps/motorlab-android/tests/verify_lab01.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
