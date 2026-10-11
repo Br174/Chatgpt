@@ -1,0 +1,21 @@
+name: MotorLab Global Memory LAB schema gate
+on:
+  push:
+    branches: [motorlab/app-lab02-teamchat]
+    paths:
+      - cloudflare/motorlab-state-bridge/migrations/**
+      - cloudflare/motorlab-state-bridge/test/global-memory-schema.test.py
+      - .github/workflows/motorlab-global-memory-lab.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sqlite-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Test memory schema against existing MotorLab D1 schema
+        run: python3 cloudflare/motorlab-state-bridge/test/global-memory-schema.test.py
