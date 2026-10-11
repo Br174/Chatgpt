@@ -68,16 +68,16 @@ public final class MainActivity extends Activity {
         root=new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(BG); root.setPadding(dp(16),dp(12),dp(16),dp(8));
         TextView title=text("⚙ MotorLab",24,INK,true); root.addView(title);
-        TextView tagline=text("LAB01  •  Centro operativo sperimentale",12,MUTE,false);
+        TextView tagline=text("LAB02  •  Team Chat e laboratorio AI",12,MUTE,false);
         root.addView(tagline);
         ScrollView sc=new ScrollView(this); sc.setFillViewport(true);
         page=new LinearLayout(this); page.setOrientation(LinearLayout.VERTICAL);
         page.setPadding(0,dp(16),0,dp(16)); sc.addView(page);
         root.addView(sc,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL);
-        for(String t:new String[]{"Home","Chat","Lavori","Impostazioni"}) {
+        for(String t:new String[]{"Home","Chat","Team","Lavori","Impostazioni"}) {
             Button b=new Button(this); b.setText(t); b.setTextSize(10); b.setAllCaps(false);
-            b.setOnClickListener(v -> show(t.equals("Home")?"home":t.equals("Chat")?"chat":t.equals("Lavori")?"works":"settings"));
+            b.setOnClickListener(v -> { if(t.equals("Team")) { startActivity(new Intent(this,TeamChatActivity.class)); return; } show(t.equals("Home")?"home":t.equals("Chat")?"chat":t.equals("Lavori")?"works":"settings"); });
             nav.addView(b,new LinearLayout.LayoutParams(0,dp(54),1));
         }
         root.addView(nav); setContentView(root);
@@ -90,7 +90,7 @@ public final class MainActivity extends Activity {
     }
     private void home() {
         label("MotorLab diventa un'app");
-        note("LAB01 è un client Android reale. Non modifica il CORE, non avvia rilasci e non finge di avere una sincronizzazione che non esiste.");
+        note("LAB02 aggiunge una Team Chat locale persistente. Questo client Android Non modifica il CORE, non avvia rilasci e non finge di avere una sincronizzazione che non esiste.");
         gap(); label("CORE centrale");
         note("Baseline sorgente attesa: MotorLab r34. Stato live del repository privato ancora da collegare con autenticazione.");
         gap(); label("Progetti iniziali");
@@ -102,6 +102,7 @@ public final class MainActivity extends Activity {
              ()->open("https://app.notion.com/p/3eb101125bf18199ae89d45eaa804c3a"));
         gap(); label("Modelli AI");
         note("Gemini configurabile e ChatGPT predisposto. Provider selezionato: "+cfg.provider());
+        button("Apri Team Chat - Analista e Tester",()->startActivity(new Intent(this,TeamChatActivity.class)));
         button("Vai alle impostazioni AI",()->show("settings"));
     }
     private void chat() {

@@ -1,0 +1,64 @@
+name: MotorLab Android LAB02
+on:
+  push:
+    branches: [motorlab/app-lab02-teamchat]
+    paths:
+      - apps/motorlab-android/**
+      - .github/workflows/motorlab-app-lab02.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: motorlab-app-lab02
+  cancel-in-progress: true
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Source safety and contract check
+        run: python3 apps/motorlab-android/tests/verify_lab02.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Reuse hosted Android SDK, install SDK 35 when needed
+        run: |
+          set -euo pipefail
+          test -d "$ANDROID_HOME"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build LAB debug APK
+        run: gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+      - name: Verify and package APK + ZIP
+        run: |
+          set -euo pipefail
+          mkdir -p motorlab-team-lab02-dist
+          cp apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk motorlab-team-lab02-dist/MotorLab-Team-LAB02.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs motorlab-team-lab02-dist/MotorLab-Team-LAB02.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging motorlab-team-lab02-dist/MotorLab-Team-LAB02.apk | grep -m1 "package: name='it.motorlab.app.lab02' versionCode='2'"
+          printf '%s\n' "MotorLab LAB02 TEST - pacchetto separato LAB02, non sovrascrive LAB01; firma debug effimera." > motorlab-team-lab02-dist/INSTALLAZIONE.txt
+          (cd motorlab-team-lab02-dist && zip -q MotorLab-Team-LAB02.zip MotorLab-Team-LAB02.apk INSTALLAZIONE.txt)
+          sha256sum motorlab-team-lab02-dist/MotorLab-Team-LAB02.apk motorlab-team-lab02-dist/MotorLab-Team-LAB02.zip
+      - name: Publish LAB-only prerelease (no Actions artifact quota)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="motorlab-team-lab02-test-${GITHUB_SHA:0:7}"
+          gh release create "$TAG" \
+            motorlab-team-lab02-dist/MotorLab-Team-LAB02.apk \
+            motorlab-team-lab02-dist/MotorLab-Team-LAB02.zip \
+            motorlab-team-lab02-dist/INSTALLAZIONE.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "MotorLab App LAB02 - prova Android" \
+            --notes "Team Chat LAB02: chat SQLite locale e Analista->Tester. Pre-release isolata da CORE r34. APK debug test e ZIP: firma effimera, update-in-place non garantito. Gemini BYOK protetto; ChatGPT OAuth ancora non attivo. Nessuna modifica alla MADRE."

@@ -25,3 +25,13 @@ Flusso richiesto: host ID stabile, OAuth state/nonce/PKCE, callback sicuro, issu
 ## Vincoli
 Budget nuovi servizi = 0 euro; nessun servizio 24/7; nessuna modifica ai motori MusicLab, StudyBook AI, MotorAI o al CORE; nessuna promozione MADRE automatica; nessuna operazione scrivente GitHub; nessun segreto nel repository.
 La modalità Google da smartphone per una chiave personale BYOK resta un prototipo: per una distribuzione ampia andrà adottato un backend proxy autorizzato e protetto. Verificare sempre che la fatturazione Google sia disabilitata prima di inviare richieste.
+
+## LAB02 Team Chat (nuova funzione)
+
+- Stanza locale per MotorLab, MusicLab, StudyBook AI, MotorAI. Storico SQLite persistente sul telefono; nessun cloud Sync preteso.
+- Handoff vero (due chiamate al Gemini API) Analista -> Tester con run id, fonte, stato, parentId. Soltanto su conferma nella UI e dopo verifica manuale delle quote gratuite. Non sono agenti esecutori con accesso a repository: è un prototipo AI collaborativo a ruoli.
+- Registro di lezioni tecniche non verificate e esportazione JSON mediante il selettore documenti Android.
+- Sicurezza: nessuna lettura/scrittura del CORE privato, nessun token nei log, nessuna AI può avviare build o promuovere MADRE, niente 24/7.
+- ChatGPT OAuth non attivo: Sign in with ChatGPT richiede una distribuzione e un client effettivamente idonei, inclusa la condizione OSS dove applicabile; il CORE rimane privato.
+- LIMITAZIONE TEST: LAB02 usa un applicationId separato (`it.motorlab.app.lab02`), perché non possediamo una chiave di firma Android di release stabile. L'APK di prova può essere installata accanto alla LAB01 invece di richiederne la disinstallazione. I dati delle due app NON si uniscono automaticamente. Futura versione MADRE con signing-key privata configurata tramite secrets sicuri.
+- Non sono ancora disponibili backend multi-dispositivo, sincronizzazione Notion/D1, vettori, GitHub privato OAuth, agente continuo o installazione ChatGPT con autorizzazione reale.
