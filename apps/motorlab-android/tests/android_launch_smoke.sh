@@ -14,21 +14,23 @@ if ! adb shell pidof "$PKG" >/dev/null; then
   adb logcat -d -s AndroidRuntime:E ActivityTaskManager:E | tail -180
   exit 1
 fi
-echo '--- Navigate to Team Chat via the central tab ---'
-SIZE="$(adb shell wm size | tr -d '\r' | tail -1 | awk '{print $3}')"
-DENSITY="$(adb shell wm density | tr -d '\r' | tail -1 | awk '{print $3}')"
-WIDTH="${SIZE%x*}"
-HEIGHT="${SIZE#*x}"
-BOTTOM="$(( HEIGHT - (DENSITY * 36 / 160) ))"
-if ! [[ "$WIDTH" =~ ^[0-9]+$ && "$HEIGHT" =~ ^[0-9]+$ && "$DENSITY" =~ ^[0-9]+$ ]]; then
-  echo "::error::Could not parse Android emulator dimensions for UI test"
+echo '--- Navigate to Team Chat using Android UI hierarchy ---'
+adb shell uiautomator dump /sdcard/motorlab-window.xml >/dev/null
+XML="$(adb shell cat /sdcard/motorlab-window.xml | tr -d '\r')"
+COORDS="$(printf '%s' "$XML" | python3 -c 'import sys,re,xml.etree.ElementTree as E; root=E.fromstring(sys.stdin.read()); nodes=[n for n in root.iter() if n.attrib.get("text")=="Team" and n.attrib.get("class")=="android.widget.Button"]; assert len(nodes)==1, "Team tab not found uniquely"; a=[int(v) for v in re.findall(r"\\d+",nodes[0].attrib["bounds"])]; assert len(a)==4; print((a[0]+a[2])//2,(a[1]+a[3])//2)')"
+if [[ ! "$COORDS" =~ ^[0-9]+\ [0-9]+$ ]]; then
+  echo "::error::Team button bounds could not be located"
   exit 1
 fi
-adb shell input tap "$((WIDTH / 2))" "$BOTTOM"
+read -r TAP_X TAP_Y <<< "$COORDS"
+echo "Tapping Team button at x=$TAP_X y=$TAP_Y"
+adb shell input tap "$TAP_X" "$TAP_Y"
 sleep 3
-if ! adb shell dumpsys activity activities | grep -q 'it.motorlab.app.TeamChatActivity'; then
-  echo "::error::Team Chat screen did not open after tapping its navigation button"
-  adb shell dumpsys activity activities | tail -65
+ACTIVITIES="$(adb shell dumpsys activity activities)"
+if ! grep -Fq 'it.motorlab.app.TeamChatActivity' <<< "$ACTIVITIES"; then
+  echo "::error::Team Chat Activity did not open from its real UI button"
+  echo "$ACTIVITIES" | grep -E 'mResumed|topResumed|Hist |ActivityRecord|Task' | tail -40 || true
+  adb logcat -d -s AndroidRuntime:E | tail -90
   exit 1
 fi
 if ! adb shell pidof "$PKG" >/dev/null; then
