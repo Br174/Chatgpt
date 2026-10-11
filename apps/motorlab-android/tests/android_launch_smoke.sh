@@ -17,7 +17,7 @@ fi
 echo '--- Navigate to Team Chat using Android UI hierarchy ---'
 adb shell uiautomator dump /sdcard/motorlab-window.xml >/dev/null
 XML="$(adb shell cat /sdcard/motorlab-window.xml | tr -d '\r')"
-COORDS="$(printf '%s' "$XML" | python3 -c 'import sys,re,xml.etree.ElementTree as E; root=E.fromstring(sys.stdin.read()); nodes=[n for n in root.iter() if n.attrib.get("text")=="Team" and n.attrib.get("class")=="android.widget.Button"]; assert len(nodes)==1, "Team tab not found uniquely"; a=[int(v) for v in re.findall(r"\\d+",nodes[0].attrib["bounds"])]; assert len(a)==4; print((a[0]+a[2])//2,(a[1]+a[3])//2)')"
+COORDS="$(printf '%s' "$XML" | python3 -c 'import sys,re,xml.etree.ElementTree as E; root=E.fromstring(sys.stdin.read()); nodes=[n for n in root.iter() if n.attrib.get("text")=="Team" and n.attrib.get("class")=="android.widget.Button"]; assert len(nodes)==1, "Team tab not found uniquely"; a=[int(v) for v in re.findall(r"\d+",nodes[0].attrib["bounds"])]; assert len(a)==4; print((a[0]+a[2])//2,(a[1]+a[3])//2)')"
 if [[ ! "$COORDS" =~ ^[0-9]+\ [0-9]+$ ]]; then
   echo "::error::Team button bounds could not be located"
   exit 1
