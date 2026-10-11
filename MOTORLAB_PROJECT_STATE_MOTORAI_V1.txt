@@ -1,7 +1,7 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=41
+STATE_REVISION=42
 STATE_STATUS=SEED021R3R3_LAB_CI_VERIFIED_ANDROID_MANUAL_TRAINING_TEST_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
@@ -13,7 +13,7 @@ CURRENT_REF=lab/seed021r3r3-manual-training-menu
 CURRENT_HEAD_SHA=bb0a5c8af2f52b5648e413fe2f1ff2160d9af3f9
 LAST_VERIFIED_PROGRESS_PERCENT=99
 LAST_COMPLETED_MATERIAL_STEP=After accidental uninstall and Android partial restore, current L4 step1760 and previous historic MOTAI008 L3 step1760 have been recovered; user exported and verified external SOS ZIP, and actual previous passed isolated native load on-device with TEST L3 100 percent and retention L3 100 percent, current unchanged. User unlocked SOS and requested manual L4 training, but reported no 'Impara manualmente' in visible UI. Root cause: MainActivity had learn and pause wired but excluded both from popup and home layout. After user-approved plan, built isolated R3R3 LAB with two new popup menu routes to existing learn and pause handlers, preserved atomic foreground mutual exclusion, SOS, native engine and checkpoint format. GitHub CI run 38106092630 SUCCESS including menu wiring test, L0-L5 and Goal1-10 regression gates, Android build/sign. APK SHA256 177a7cdbf76352ea9bec7c354225a4b783cef9db97d2d47dd7d1fc78f01bcf6f, ZIP SHA256 72bd06790247d677d33808e577106ead9fce4758e6e2c11c7f0f0532491d9b20. Android signer certificate matches prior R3R2. APK and ZIP delivered. Device acceptance pending.
-NEXT_SAFE_STEP=User screenshot 05:05 shows Goal1 complete, Goal2 99% step1380 waiting; resume in foreground with menu Avvia/Riprendi training, not Impara manualmente, monitor Goal2 final certification. If no advancement inspect diagnostics. External SOS ZIP preserved.
+NEXT_SAFE_STEP=User device screenshot 05:06: Goal2 still 99%, step2180 (+800 from screenshot05:05), in attesa, Goal1 100%. Goal2 final separate certification still missing, at most 820 steps to safety limit 3000. One more bounded auto training may be tested; if fails pause/diagnostics and investigate, no reinstall or restart weights.
 PENDING_VERIFICATION=Real Android update-in-place preserving data and current/previous; two menu commands visible and operative; manual L4 training step advances, pause stops; no concurrent foreground training; inherited background and SOS behavior; eventual L4 >=95 percent and memories retention, then automatic training.
 LAST_USER_INTENT_SUMMARY=Build MotorAI from scratch on Android using MotorLab-Training, GitHub public/free build infrastructure, no Cloudflare in initial phase and minimal manual site configuration
 FIRST_APK_RUN_ID=37534929516
@@ -553,3 +553,11 @@ MOTORAI_SEED021R3R3_GOAL2_99_PERCENT=REAL_DEVICE_STEP1380_IN_ATTESA_NOT_CERTIFIE
 MOTORAI_SEED021R3R3_GOALS_REAL_DEVICE=1_OF_10_COMPLETED_19_9_PERCENT_TOTAL
 MOTORAI_SEED021R3R3_GOAL2_RULE=FOUR_STABLE_VALIDATION_60_PERCENT_PLUS_SEPARATE_TEST_55_PERCENT
 MOTORAI_SEED021R3R3_NEXT_STEP=OWNER_OPEN_LAB_OVERFLOW_AVVIA_RIPRENDI_TRAINING_TO_RESUME_GOAL2_THEN_SEND_PROGRESS_OR_DIAGNOSTICS_IF_IDLE
+
+MOTORAI_SEED021R3R3_GOAL2_DEVICE_0506=99_PERCENT_STEP2180_IN_ATTESA
+MOTORAI_SEED021R3R3_GOAL2_STEPS_SINCE_0505=800
+MOTORAI_SEED021R3R3_GOAL2_NOT_YET_CERTIFIED=TRUE
+MOTORAI_SEED021R3R3_GOAL2_MAX_STEPS_CODE=3000
+MOTORAI_SEED021R3R3_GOAL2_STEPS_TO_GUARD=820
+MOTORAI_SEED021R3R3_GOAL2_DIAG_REASON=UNKNOWN_VALIDATION_STABILITY_OR_SEPARATE_TEST
+MOTORAI_SEED021R3R3_GOAL2_NEXT_SAFE_STEP=ALLOW_ONE_MORE_AUTOTRAIN_RESUME_NOT_MANUAL_UP_TO_3000_GUARD_THEN_DIAGNOSTICS_IF_STILL_99
