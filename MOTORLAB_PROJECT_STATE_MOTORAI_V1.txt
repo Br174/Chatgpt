@@ -1,17 +1,17 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MotorAI
 PROJECT_REPOSITORY=Br174/MotorAI
-STATE_REVISION=43
+STATE_REVISION=44
 STATE_STATUS=SEED021R3R4_GOAL10_FORENSIC_LAB_CI_SUCCESS_REAL_DEVICE_PENDING
 RECONCILE_ON_BOOT=required
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MotorAI evidence
 MOTORLAB_CONTROL_PLANE_RELEASE=2026.10.08-r34
 ACTIVE_OPERATION_ID=MOTORAI-SEED021R3R4-GOAL10-FORENSICS-20261011
 OPERATION_STATUS=R3R4 signed APK and ZIP verified, ten read-only Goal10 probes and Goal10 protective hold implemented, CI SUCCESS, on-device diagnostic pending
-CURRENT_PHASE=SEED021R3R4_READONLY_DEVICE_DIAG_THEN_TARGETED_GOAL10_REPAIR
+CURRENT_PHASE=SEED021R3R4_DEVICE_FORENSIC_9_OF_10_GOAL1_LOW_CONFIDENCE_R3R5_SHADOW_REPAIR_IN_PROGRESS
 CURRENT_REF=lab/seed021r3r4-goal10-diagnostic
 CURRENT_HEAD_SHA=5fff1582ab3ff72edc51f3f770269d2b2a2ab397
-LAST_VERIFIED_PROGRESS_PERCENT=96
+LAST_VERIFIED_PROGRESS_PERCENT=99
 LAST_COMPLETED_MATERIAL_STEP=Device reached Goal1-9 complete, total 96 percent; Goal10 integration fails comprehension, memory and two Goal9 selfcheck tests (6/10). 05:10:34 Goal10 targeted recovery rolled back comprehension and locked that capability. User approved staged R3R4 repair. Stage A code has a new non-invasive Goal10 Inspector with all 10 native test outputs, expected values and confidence; Goal10 auto-train is on hold in foreground/background; acceptance thresholds, native training and nine accepted Goals unchanged. CI run 38108199804 SUCCESS; APK versionCode 30, signer certificate matches R3R3, APK SHA256 63b08cb84351a0abda5e0b04396fe6b5efe6f71c0d2358f2c732f6e9e17d2d09. APK and ZIP delivered. Stage B awaits actual device native JSON evidence before safe targeted changes.
 NEXT_SAFE_STEP=User save fresh SOS ZIP of actual 96 percent checkpoint from R3R3 including goal prefs, then install R3R4 code30 in-place (never uninstall), open overflow > Diagnostica > Verifica Goal10 sola lettura and copy actual responses. Keep Goal10 paused. Stage B repair based on observed labels and confidence, no threshold downgrade or test-data memorization.
 PENDING_VERIFICATION=Android install-in-place preserving 96 percent and nine completed Goals; new inspector native outputs on four failed cases; goal10 holds in foreground and background; later Stage B safe training fix and full 10/10 certification.
@@ -574,3 +574,9 @@ MOTORAI_SEED021R3R4_VERSION_CODE=30
 MOTORAI_SEED021R3R4_DEVICE_STATE=96_PERCENT_9_OF_10_ACCEPTED_6_OF_10_GOAL10_TESTS
 MOTORAI_SEED021R3R4_DEVICE_ACCEPTANCE=PENDING
 MOTORAI_SEED021R3R4_STAGE_B=WAITING_ACTUAL_DIAGNOSTIC_EVIDENCE
+
+MOTORAI_GOAL10_DEVICE_FORENSIC_0838=9_OF_10_INTEGRATION_PASSED
+MOTORAI_GOAL10_DEVICE_COMPREHENSION=INTENT_calcolo_CORRECT_CONFIDENCE_0.3706_THRESHOLD_0.50
+MOTORAI_GOAL10_STAGE_B=ISOLATED_GOAL1_SHADOW_PROTOTYPE_NOT_COMMITTED_NO_ANDROID_CI_NO_APK
+MOTORAI_GOAL10_STAGE_B_SOURCE_BRANCH=lab/seed021r3r5-goal1-shadow-training
+MOTORAI_GOAL10_NEXT_SAFE_STEP=KEEP_R3R4_DIAG_HOLD_KEEP_SOS_ZIP_NEVER_UNINSTALL_OR_FORCE_TRAIN_WAIT_FOR_VERIFIED_SHADOW_RECOVERY_CANDIDATE
