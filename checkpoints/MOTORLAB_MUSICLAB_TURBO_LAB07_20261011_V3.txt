@@ -1,0 +1,19 @@
+MOTORLAB PROJECT CONTINUITY — MUSICLAB TURBO LAB07 V3
+DATETIME=2026-10-11
+CORE_PIN=2026.10.08-r34 (Br174/Chatgpt)
+REPO=Br174/MusicLab
+BRANCH=uab-build/musiclab-turbo-lab07-strategy-lab-family-02
+CURRENT_COMMIT=a9972c842e29bfa35b026fd5594397a018deb496
+DO_NOT_PACKAGE_OR_DISTRIBUTE_APK_UNTIL_VALIDATION_GREEN=true
+USER_OBJECTIVE=Maximum genuinely playable Cover versions from all available sources within 5000ms, publish together in one continuous scroll, no background search afterward, flawless audio, HOME navigation.
+CONFIRMED_CODE_BUGS_AND_FIXES=Producer earlier serially waited for all sources before verifying; now concurrent streaming verifier. Previous zero-result sessions sealed permanently; explicit repeat retry restored. COVER.INFO translations excluded; documented direct relations admitted. Source-attached valid video IDs verified first. YouTube uploader names not always performer; documented exact COVER.INFO video+work binding may certify performer, while song title/version/duration checks remain hard and all unrelated videos retain strict artist check. Old '5-block' message replaced for Turbo. Provider query now uses documented song:/artist: syntax. COVER.INFO receives up to 4100ms inside unchanged 5000ms global deadline, video metadata concurrency adapts 2 lanes during player playback/buffering and 8 idle.
+REAL_NETWORK_FIXTURE=Se mi lasci non vale (Julio Iglesias) has seven COVER.INFO related recordings with five valid YouTube metadata URLs; live GitHub runner complete chain 1641ms for 5/5 IDs, note this is not Android.
+LIVE_SEARCH_VARIANTS_FIVE_SONGS=Se mi lasci non vale, Thriller, Yesterday, Hallelujah, Hey!: official source syntax raises song links on Yesterday 8 vs 2 and Hey! 4 vs 2; all checks < 1000ms in sampled run, no claims on phone.
+STATIC_SOURCE_TESTS=231/231 pass (177 old +4 LAB05 +10 LAB06 +40 LAB07).
+REAL_NETWORK_TESTS=30/30 pass (10 live single song response +10 full 5-video chain +10 5-song query-syntax checks), on latest source SHA a9972c842e29bfa35b026fd5594397a018deb496 in GitHub CI.
+LATEST_RAPID_TEST_RUN=38172614056 SUCCESS
+LATEST_LIVE_TEST_RUN=38172614059 SUCCESS
+ANDROID_COMPILE_LAST_VERIFIED=LAB07 initial branch 77c5bef3... on run38170738894 success. Latest source commit Android compilation still queued/pending behind other Gradle compile jobs. MUST NOT ASSERT FINAL COMPILE SUCCESS UNTIL COMPLETE.
+LATEST_FULL_COMPILE_RUN=38172614066
+OTHER_RELEVANT=core player InnerTubeXPlayer unchanged; stable LAB68 unchanged; Turbo family not bumped (LAB07 strategy-only); no LAB07 APK published.
+NEXT_SAFE_STEP=Check GitHub run 38172614066 final Kotlin compile, inspect errors if any. Then device performance and player UI stability remain UNVERIFIED; never claim green device runtime without actual device/instrumentation acceptance. Keep 5sec strict and authentic video proof, no invented 50-per-song. Stay on LAB07 until validation complete; use separate experimental branch for risky changes.
