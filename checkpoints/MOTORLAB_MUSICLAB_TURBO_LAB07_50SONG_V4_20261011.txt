@@ -1,0 +1,17 @@
+MOTORLAB / MUSICLAB PROGRESS - 50-SONG BENCHMARK & NATIVE-MEMORY-FIRST
+DATE=2026-10-11
+CORE_PIN=2026.10.08-r34
+REPOS: PROJECT Br174/MusicLab, MOTORLAB Br174/Chatgpt
+BRANCH=uab-build/musiclab-turbo-lab07-strategy-lab-family-02
+HEAD_COMMIT=d64d6a566feae8df278dc0477944f46b505fc525
+USER_GOAL=single five-second Cover search, max 50 validated linked videos per original, requested 25 verified-cover average measured across 50 ORIGINAL SONGS (not 2 or 5). Native MusicLab internal video search/cache prioritized ahead of redundant YouTube searches; no APK until user gate is genuinely passed.
+NATIVE_SEARCH_VERIFIED=CompilationTrackResolver.fastMusicLabRace currently wraps YouTube Music metadata/search providers; MusicLab is NOT a completely separate internet video host. Native MusicLab knownVideoBindings and preparedVideoSongs were present, but knownMusicLabVideo was defined and unused. Now wired into resolveVideoChunk before expensive CompilationTrackResolver.resolveTrack. Source player core remains unchanged.
+REAL_FIFTY_SOURCE_BASELINE=CI 38173064896 job 114569574110, 50 actual song queries, max 5s each, mean 17.72 documentary candidates, mean 12.8 documentary VIDEO IDs per original, median 16, 5 zero ID songs; these IDs are NOT validated metadata or playable streams. Catalog-only result fails requested verified mean >=25. 9/10 catalog tests pass, release gate fails as intended.
+SOURCE_BENCHMARK_SNAPSHOT=cloudflare/music-intelligence/test/fixtures/turbo-lab07-real-fifty-song-catalog-baseline.json, all 50 authentic results and test metadata copied from actual CI logs. Reuse fixture to avoid re-querying remote service on every commit.
+REAL_FIFTY_OVERLOAD_CASE=Second run 38173226072 job 114570132227 using two queries per original * 4 concurrent songs, all 50 results failed: HTTP 503 and 5s timeout. Do NOT interpret as no cover data. DO NOT keep hammering service. Root cause may include server availability/throttling, not proven.
+FIX_SOURCE_OVERLOAD=Turbo COVER.INFO now first exact title+artist search, falls back to title-only ONLY on no matching work; nonTurbo simultaneous dual queries preserved. Source HTTP cancellable. Separate live-provider and 50-song benchmarks narrowed push paths (or manual dispatch); duplicate embedded live-provider job removed from generic compile workflow.
+CODE_STATIC_TESTS=251/251 pass, run 38173547244 job 114571029744 (177 historic +4 LAB05 +10 LAB06 +60 LAB07) on latest HEAD. Tests source-only not real-device.
+LATEST_KOTLIN_COMPILE=run 38173547252 was pending at checkpoint; earlier code run 38172614066 compiled success. Do NOT certify latest Kotlin until verified.
+NO_APK_BUILT_OR_RELEASED for LAB07, per user's explicit gate.
+PROMOTED_STRATEGY=memory-first, verified direct COVER.INFO/MusicBrainz/cloud IDs, no blind YouTube if already cached; bounded native YouTube Music fallback; protect audio and 5000ms; single virtualized 50-card scroll, UI no group-of-five Turbo text.
+NEXT=verify latest Kotlin compile, gather REAL 50 ORIGINAL end-to-end verified-video scores from all in-app sources including YouTube Music and cache without overloading providers. Prefer instrumented Android/network tests; do not fake 25 or infer from documentary IDs. Keep APK blocked while avg25 verified video result and audio-stall-free real playback remain unproven.
