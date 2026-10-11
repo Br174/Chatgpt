@@ -1,0 +1,47 @@
+name: MotorLab LAB02 Android 11 opening smoke
+on:
+  push:
+    branches: [motorlab/app-lab02-launch-diagnostics]
+    paths:
+      - apps/motorlab-android/**
+      - .github/workflows/motorlab-app-lab02-opening-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android-11-opening-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify source contracts
+        run: python3 apps/motorlab-android/tests/verify_lab01.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: SDK 35 reuse hosted tools
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build app for emulator
+        run: gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+      - name: Enable KVM
+        run: |
+          if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; fi
+      - name: Android 11 real launch smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          emulator-boot-timeout: 900
+          disable-animations: true
+          script: bash apps/motorlab-android/tests/android_launch_smoke.sh
