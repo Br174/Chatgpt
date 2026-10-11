@@ -1,0 +1,17 @@
+MOTORLAB MUSICLAB LAB07 POLLICINO / EARLY STOP & 50 VIDEO META CACHE
+DATE=2026-10-11 / UTC source GitHub
+CENTRAL=Br174/Chatgpt r34 (2026.10.08-r34), LOCAL=Br174/MusicLab r34 VERIFIED
+REPO=Br174/MusicLab
+BRANCH=uab-build/musiclab-turbo-lab07-strategy-lab-family-02
+LAST_HEAD_SHA=fece46142d9b5fb7dc1dd30ef60eda5e0c33495c
+CONTINUITY_FROM=checkpoints/MOTORLAB_MUSICLAB_TURBO_LAB07_EARLY_QUOTA_2026-10-11.txt
+USER_APPROVAL=Continue approved optimization, no APK until 5-second results, verified average 25 out of max 50 per original song and audio fluidity real gates are green.
+SOURCE_CHANGES=app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt quotaReached at 50 certified video cards, cancels only producer deferred jobs (COVER.INFO+MusicBrainz+iTunes+Spotify/LRCLIB, first-page Discogs, cloud archive and memory), preserves parent to publish atomic top-50 list; handles cached fast quota before providerJobs registration; safe catch on canceled child await only at full quota; no restart after sealed. Warming thumbnails bounded max400ms/first12 and skipped during playback or buffering. Bounded video SongItem metadata cache increased 48 to 64 so all 50 results remain immediately actionable without evicting 2 metadata records.
+REGRESSION_SUITES=271/271 PASS on run38175392295 (177 historic +4 LAB05 +10 LAB06 +80 LAB07 including 10 early-stop tests).
+KOTLIN_PREVIOUS=run38175059200 SUCCEEDED before 64-cache-size edit.
+KOTLIN_LATEST=run38175392299 pending at checkpoint. DO NOT claim success until checked.
+CI_LATEST=https://github.com/Br174/MusicLab/actions/runs/38175392299
+NO_LAB07_APK_GENERATED=true
+REAL_YIELD_STATUS=BLOCKED/unverified: 50 distinct real source originals mean12.8 linked COVER.INFO IDs, not metadata-verified playback; target25 metadata-verified videos per song remains unproven. Some HTTP503 when source hammered. No real Android 5second audio-zero-stutter verification.
+NO_MOTHER_CHANGE=true, NATIVE_AUDIO_ENGINE_UNCHANGED=true.
+NEXT=Inspect compile run38175392299, if fail inspect logs correct. If green, do not package APK until actual device/performance acceptance; user wants continuous iterative tests and no false claims. Future instrumented test strategy may require private build/emulator only with consent given user's strict no APK until gates green.
