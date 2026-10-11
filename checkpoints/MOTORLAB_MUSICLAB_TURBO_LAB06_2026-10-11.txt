@@ -1,0 +1,23 @@
+MOTORLAB MUSICLAB TURBO LAB06 CONTINUITY CHECKPOINT
+DATE=2026-10-11
+MOTORLAB_RELEASE=2026.10.08-r34
+PROJECT_REPO=Br174/MusicLab
+OPERATION_ID=musiclab-20261011-turbo-lab06-five-second-cover-audio-navigation
+USER_APPROVAL=Explicit: apply settings, make ten tests, iterate until all code checks green; do not claim live device results from static tests.
+BASE_SHA=dec1876513a70a783f187ba5ddf3978e149db536
+BRANCH=uab-build/musiclab-turbo-lab06-family-02
+HEAD_SHA=97f2ac5dd3c0c2b46d6355fd5b3072dbc376663c
+WORKFLOW=.github/workflows/turbo-lab06-artifact-gate.yml
+WORKFLOW_RUN_ID=38167842862
+WORKFLOW_URL=https://github.com/Br174/MusicLab/actions/runs/38167842862
+TESTS=177/177 historical + 4/4 LAB05 + 10/10 LAB06 = 191/191 PASS in validate-once.
+BUILD=In progress at checkpoint writing; requires final success and APK signature/package/version verification.
+APP_ID=it.verlezza.musiclab.turbo01
+VERSION_CODE=1006
+APP_LABEL=MusicLab Turbo LAB 06
+PINNED_SIGNING_SHA=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
+CHANGES=Turbo discovery hard cap 5000ms; provider wait <=2500ms; cloud archive cap 1800ms; thumbnails 400ms reserve, callbacks retain completed sources; native audio priority less provider/video/image fanout; all up to 50 verified covers visible in one LazyColumn without manual next-page; cleanup background jobs; disable post-seal swipe remote pagination and cloud write in Turbo; Home direct onClick both navigation bar and rail; canceling screen search does not seal empty session; same original Meld player.
+TOUCHED=app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt ; app/src/main/kotlin/com/metrolist/music/ui/component/AppNavigation.kt ; uab-project.env ; cloudflare/music-intelligence/test/turbo-lab06-five-second-audio-home-regression.test.mjs ; .github/workflows/turbo-lab06-artifact-gate.yml
+PROTECTED=LAB05 branch, LAB68/MADRE, core player source, approved UI geometry, signing identity.
+NEXT_STEP=Inspect CI 38167842862 status. If signed and passed: download MusicLab-Turbo-LAB06 artifact ID, materialize exact APK and ZIP to sandbox, verify sha, share links and device acceptance steps. If compilation failed, inspect logs and fix on LAB06 branch in approved iterative cycle. Do not assert real five-second delivery/audio fluidity before device logs.
+LIVE_DEVICE_RESULT=UNVERIFIED, must remain honest.
