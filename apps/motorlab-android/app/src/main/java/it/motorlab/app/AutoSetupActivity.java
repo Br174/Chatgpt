@@ -93,6 +93,7 @@ public final class AutoSetupActivity extends Activity {
         url=editor(top,"Sito HTTPS, per esempio https://example.com");
         goal=editor(top,"Cosa vuoi fare su questo sito?");
         button(top,"Apri sito dentro MotorLab",this::openSite);
+        button(top,"Prova modulo generico offline",this::openDemo);
         button(top,"Riconosci i campi del modulo",this::inspectForm);
         button(top,"Inserisci token protetto per questo sito",this::saveToken);
         button(top,"Elimina token di questo sito",this::removeToken);
@@ -133,6 +134,22 @@ public final class AutoSetupActivity extends Activity {
         root.addView(browser,new LinearLayout.LayoutParams(-1,0,2));
         button(root,"← Torna alla Team Chat",this::finish);
         setContentView(root);
+    }
+
+    private void openDemo() {
+        activeOrigin="https://autosetup-demo.example";
+        url.setText(activeOrigin);
+        goal.setText("Dimostrazione locale senza servizi esterni");
+        pageReady=false;controls.clear();fields.removeAllViews();
+        say("MotorLab: prova offline. Nessuna connessione a servizi esterni o login.");
+        String html="<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head>"+
+            "<body><h2>Modulo dimostrativo MotorLab</h2><form>"+
+            "<label for='nome'>Nome della prova</label><input id='nome' name='nome' type='text'>"+
+            "<label for='tema'>Tema</label><textarea id='tema' name='tema'></textarea>"+
+            "<label for='riservato'>Password da escludere</label><input id='riservato' type='password'>"+
+            "</form></body></html>";
+        browser.loadDataWithBaseURL(activeOrigin+"/",html,"text/html","UTF-8",null);
+        status("Caricamento modulo dimostrativo offline…");
     }
 
     private void openSite() {
