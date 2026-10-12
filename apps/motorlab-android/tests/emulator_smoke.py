@@ -50,6 +50,8 @@ def tap(node):
     bounds=node.get("bounds","")
     pts=[int(i) for i in re.findall(r"\d+",bounds)]
     if len(pts)!=4:raise AssertionError("missing bounds: "+repr(bounds))
+    if pts[0]>=pts[2] or pts[1]>=pts[3]:
+        raise AssertionError("UI accessibility bounds are empty for "+repr(node.get("text",""))+": "+bounds)
     x=(pts[0]+pts[2])//2
     y=(pts[1]+pts[3])//2
     if x<0 or y<0 or y>2500:raise AssertionError("Invalid UI bounds")
@@ -114,8 +116,6 @@ def no_crash():
 
 def main():
     adb("wait-for-device",timeout=120)
-    adb("shell","wm","size","720x1280")
-    adb("shell","wm","density","240")
     adb("shell","settings","put","system","screen_off_timeout","600000")
     adb("shell","input","keyevent","KEYCODE_WAKEUP")
     adb("shell","wm","dismiss-keyguard",check=False)
