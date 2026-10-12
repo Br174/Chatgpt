@@ -19,3 +19,5 @@ jobs:
           node-version: '22'
       - name: Test r35 Regola Madre, preserved safety contracts and live boot
         run: node --test tests/motorlab-r35-verified-supersession.test.mjs
+      - name: Test target-aware chat routing and non-regression
+        run: node --test tests/motorlab-chat-context-routing.test.mjs
