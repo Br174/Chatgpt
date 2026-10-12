@@ -126,7 +126,7 @@ def autosetup_smoke():
     click("Prova modulo generico offline",exact=True)
     print("MOTORLAB_AUTOSETUP_OFFLINE_DEMO_LAUNCH=PASSED",flush=True)
     time.sleep(2)
-    click("Riconosci i campi",exact=True)
+    click("Riconosci i campi del modulo",exact=True)
     # Form controls are below the chat header inside the bounded ScrollView.
     for _ in range(3):
         if matches("Campi rilevati nel sito · 2"):
