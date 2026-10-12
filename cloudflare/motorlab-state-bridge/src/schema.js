@@ -13,6 +13,28 @@ CREATE TABLE IF NOT EXISTS live_directives (directive_id TEXT PRIMARY KEY,projec
 CREATE TABLE IF NOT EXISTS pollicino_sessions (session_id TEXT PRIMARY KEY,operation_id TEXT NOT NULL,project_id TEXT NOT NULL,canonical_chat_ref TEXT,executor_type TEXT NOT NULL,executor_id TEXT,liveness_mode TEXT NOT NULL,liveness_state TEXT NOT NULL,progress_state TEXT NOT NULL,progress_fingerprint TEXT,unchanged_pulse_count INTEGER NOT NULL DEFAULT 0,last_signal_at TEXT,last_progress_at TEXT,lease_ms INTEGER NOT NULL,terminal_seal TEXT,terminal_at TEXT,phase TEXT,last_completed_action TEXT,current_action TEXT,next_action TEXT,verified_progress INTEGER,source_ref TEXT,source_head TEXT,provider_job_id TEXT,provider_job_status TEXT,changed_resources TEXT,test_status TEXT,build_status TEXT,artifact_status TEXT,blocker TEXT,root_cause TEXT,updated_at TEXT NOT NULL,FOREIGN KEY (operation_id) REFERENCES operations(operation_id),FOREIGN KEY (project_id) REFERENCES projects(project_id));
 CREATE TABLE IF NOT EXISTS pollicino_session_events (event_id TEXT PRIMARY KEY,session_id TEXT NOT NULL,operation_id TEXT NOT NULL,event_type TEXT NOT NULL,event_summary TEXT NOT NULL,progress_fingerprint TEXT,created_at TEXT NOT NULL,FOREIGN KEY (session_id) REFERENCES pollicino_sessions(session_id),FOREIGN KEY (operation_id) REFERENCES operations(operation_id));
 CREATE TABLE IF NOT EXISTS pollicino_resume_packets (resume_id TEXT PRIMARY KEY,project_id TEXT NOT NULL,operation_id TEXT NOT NULL,session_id TEXT NOT NULL,status TEXT NOT NULL,prepared_at TEXT NOT NULL,observed_at TEXT NOT NULL,verified_progress INTEGER,phase TEXT,source_ref TEXT,source_head TEXT,last_completed_action TEXT,current_action TEXT,next_action TEXT,changed_resources TEXT,test_status TEXT,build_status TEXT,artifact_status TEXT,provider_job_status TEXT,blocker TEXT,root_cause TEXT,evidence_summary TEXT,live_write_recheck_required INTEGER NOT NULL DEFAULT 1 CHECK (live_write_recheck_required IN (0,1)),FOREIGN KEY (project_id) REFERENCES projects(project_id),FOREIGN KEY (operation_id) REFERENCES operations(operation_id),FOREIGN KEY (session_id) REFERENCES pollicino_sessions(session_id));
+CREATE TABLE IF NOT EXISTS velocity_lessons (
+ lesson_id TEXT PRIMARY KEY,
+ project_id TEXT NOT NULL,
+ source_repository TEXT NOT NULL,
+ source_sha TEXT NOT NULL,
+ source_evidence TEXT NOT NULL,
+ context_signature TEXT NOT NULL,
+ dependency_signature TEXT NOT NULL,
+ source_version TEXT NOT NULL,
+ safety_class TEXT NOT NULL,
+ category TEXT NOT NULL,
+ strategy TEXT NOT NULL,
+ observed_outcome TEXT NOT NULL,
+ applicability TEXT NOT NULL CHECK(applicability IN ('project_only','candidate_cross_project','approved_global')),
+ invalidation_condition TEXT NOT NULL,
+ status TEXT NOT NULL CHECK(status IN ('ACTIVE','STALE','SUPERSEDED','REJECTED')),
+ created_at TEXT NOT NULL,
+ last_verified_at TEXT NOT NULL,
+ FOREIGN KEY (project_id) REFERENCES projects(project_id)
+);
+CREATE INDEX IF NOT EXISTS idx_velocity_lessons_project_status ON velocity_lessons(project_id,status,last_verified_at DESC);
+CREATE INDEX IF NOT EXISTS idx_velocity_lessons_scope_status ON velocity_lessons(applicability,status,last_verified_at DESC);
 CREATE INDEX IF NOT EXISTS idx_operations_project_status ON operations(project_id,status);
 CREATE INDEX IF NOT EXISTS idx_checkpoints_operation_created ON checkpoints(operation_id,created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_events_operation_created ON operation_events(operation_id,created_at DESC);
