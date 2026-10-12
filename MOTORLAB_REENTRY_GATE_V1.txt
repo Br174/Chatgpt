@@ -26,6 +26,9 @@ F. apply current progress/visual/Velocity/Pollicino/artifact/lifecycle/safety se
 
 A user prompt such as "continua", "procedi", "ok", "⚡", a correction, or a new in-scope request must not bypass this gate merely because the same chat is already open.
 
+1A. CHANGE-TARGET CHAT CONTEXT CHECK (2026-10-12; non-blocking)
+At each supported UserPromptSubmit, after current project identity and active-operation recovery have been reconciled and before new CORE/project mutations, apply the canonical UAB_PROJECT_ROUTING.txt CHAT CONTEXT GUARD. This is a routing decision at the EXISTING Re-entry Gate, not a new runtime or scheduler. Never warn solely because MotorLab is mentioned or used to change the current project. Recommend a dedicated project chat only when the effective change target is different from the identifiable chat/project context; central MotorLab CORE self-changes belong in the MotorLab administration chat. Preserve explicitly chosen cross-chat transfer by operation_id/checkpoint; do not duplicate approved operations or force a chat migration. If host chat identity is unavailable, report uncertainty conservatively rather than inventing UI access. Approval/compatibility/single-writer gates remain unaffected.
+
 2. RESUME / COMPACT / CLEAR RE-ENTRY
 SessionStart sources resume, compact and clear are also mandatory re-entry points.
 The same pinned capsule is re-established before project work. A host compaction or interruption must not silently strip MotorLab critical behavior.

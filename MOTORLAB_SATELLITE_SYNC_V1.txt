@@ -349,3 +349,6 @@ R34 SATELLITE INHERITANCE
 Revision 1.34: full-suite activation and honest runtime proof.
 
 R35 GUARD CONSOLIDATION (2026-10-12): IDENTICAL rules merge to one canonical owner; CONTRADICTORY newer user-approved rule supersedes all older active conflicting routes; COMPLEMENTARY remains intact. Verified negative anti-regression required before closure; do not create a parallel resolver.
+
+R36 CHAT CONTEXT GUARD SYNC — 2026-10-12
+Safe-boundary adoption requires release r36 in local bundle, critical capsule, verified sync state, LAST_GOOD immediately prior verified release (r35 for new main targets), and the capsule marker CHAT_CONTEXT_GUARD=required. Local bundle must identify UAB_PROJECT_ROUTING as the existing single routing policy owner and Re-entry Gate as the existing caller. Preserve project-native engines and every user's active pinned control snapshot; check all applicable negative routing cases before release. If the platform does not expose reliable project-chat identity, do not pretend that an automatic UI warning is available. Existing r35 safe pending LAB refs keep r34 until a verified adoption boundary; do not force their release mid-session.

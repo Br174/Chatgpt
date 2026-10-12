@@ -4,19 +4,22 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.12-r35
-FANOUT_STATE=COMPLETE
+CURRENT_RELEASE=2026.10.12-r36
+FANOUT_STATE=IN_PROGRESS
 SATELLITE_SCHEMA=1
-FANOUT_MAIN_VERIFIED=6/6
-FANOUT_PENDING_SAFE_BOUNDARY=4
+FANOUT_MAIN_VERIFIED=0/6
+FANOUT_PENDING_SAFE_BOUNDARY=0
 FANOUT_COMPLETE_MEANS=all_active_mains_verified_or_pending_safe_boundary_explicit;not_all_LABs_current
+CHAT_CONTEXT_GUARD_OWNER=UAB_PROJECT_ROUTING.txt
+CHAT_CONTEXT_GUARD_CALLER=MOTORLAB_REENTRY_GATE_V1.txt
+CHAT_CONTEXT_GUARD_STATUS=R36_PREPARED_NOT_YET_FANNED_OUT
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 BOOT_CAPSULE_MODULE=MOTORLAB_BOOT_CAPSULE_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
 RELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=COMPLETE
+RELEASE_FANOUT_STATE=IN_PROGRESS
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -369,3 +372,12 @@ R35 REGOLA MADRE CONSOLIDATION (2026-10-12)
 
 R35 FINAL FANOUT ACCOUNTING — 2026-10-12
 The central r35 release fanout TRANSACTION is COMPLETE under MOTORLAB_RELEASE_FANOUT_V1.txt: 6/6 current main satellites are r35 with r34 LAST_GOOD, and four active LAB/work refs remain explicitly PENDING_SAFE_BOUNDARY and not yet adopted. These four are enumerated with exact repository/ref/reason in MOTORLAB_RELEASE_FANOUT_STATE_V1.txt. Cover-Lab-AI remains dormant and excluded. This is NOT a claim that all LABs are current. No project-native application code changed in the release fanout.
+
+R36 NEXT RELEASE — CHAT CONTEXT GUARD (2026-10-12)
+- This is a NEW release transaction following completed r35; r35 main fanout 6/6 remains archival and protected, with four r35 LAB safe-boundary entries still pending.
+- One existing UAB_PROJECT_ROUTING contract owns change-target classification; Re-entry Gate invokes the same routing, Change Compatibility Guard still owns overlap/rule precedence and Velocity remains the only scheduler.
+- Distinguish central MotorLab CORE self-modification from using MotorLab to modify the native/local satellite of the current project. Do not warn merely because MotorLab is mentioned.
+- Recommend the appropriate project chat for cross-project changes only; explanation-only requests and explicit voluntary cross-chat transfers do not trigger repeated warnings.
+- Do not claim access to the ChatGPT app's private chat metadata when host hooks do not expose it.
+- No application/native code, new model dependency, second scheduler or new database is authorized.
+- REQUIRED before global COMPLETE: central tests, verified local capsule/bundle/sync + LAST_GOOD=r35 on six active main refs, four current LAB refs marked PENDING_SAFE_BOUNDARY with exact repos and reasons unless safely adopted.

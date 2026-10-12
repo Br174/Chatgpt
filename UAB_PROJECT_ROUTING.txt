@@ -1,4 +1,4 @@
-UAB PROJECT ROUTING - MOTORLAB-CORE-V1.5
+UAB PROJECT ROUTING - MOTORLAB-CORE-V1.6
 
 Purpose
 Repository-specific adapter/routing state for the single MotorLab engine. No repository gets an independent lifecycle engine. All projects follow MADRE -> LAB -> CANDIDATA -> NEW MADRE using the atomic/exact-promotion method in UAB_UNIFIED_ENGINE_V1.txt.
@@ -6,6 +6,42 @@ Last verified: 2026-09-28.
 
 GLOBAL SINGLE-CHAT PRINCIPLE
 For every project, the chat in which Bruno initiates/continues that project task remains the canonical user-facing thread when a usable chat reference exists. Backend jobs may run on GitHub Actions, workers, runners or other durable executors, but Bruno must not be required to migrate manually to another conversation just because the executor changes.
+
+CHAT CONTEXT GUARD — TARGET-OF-CHANGE ROUTING (APPROVED 2026-10-12; PROPOSAL BRANCH)
+Sole owner of chat/project target routing: THIS UAB_PROJECT_ROUTING contract. Reuse MotorLab's existing Auto Bootstrap for activation and Re-entry Gate for per-turn checks; Change Compatibility Guard remains the sole pre-change compatibility authority. This rule does NOT add a scheduler, process, independent classifier service, database, or second chat state ledger.
+
+CORE IDEA
+Classify the effective TARGET of the requested change, not whether the user mentions or asks to USE MotorLab as the shared orchestrator.
+
+ROUTING DECISION
+1. Detect CURRENT_CHAT_PROJECT from the reliable identifiable conversation/workspace/project context; do not confuse GitHub repo used as a TOOL (Br174/Chatgpt) with the user's project conversation.
+2. Detect CHANGE_TARGET from the substance of the user request:
+   A. MOTORLAB_CORE_SELF_CHANGE = add/change/remove central MotorLab governance, scheduler, release/fanout rules, CORE architecture, canonical cross-project policy or central implementation.
+   B. CURRENT_PROJECT_CHANGE = use MotorLab to build, configure, accelerate, test or modify the current project's app, domain engine or authorized local satellite/adapter.
+   C. OTHER_PROJECT_CHANGE = change a different project's app/native/satellite rather than the current chat's project.
+   D. EXPLANATION_ONLY = ask about MotorLab or another project without a change request.
+3. If CURRENT_CHAT_PROJECT is reliable and CHANGE_TARGET is MOTORLAB_CORE_SELF_CHANGE while current chat is NOT MotorLab's canonical administration conversation: show a short polite recommendation to use the dedicated MotorLab chat BEFORE any CORE mutation. Do not falsely claim that ChatGPT can automatically move or rename conversations.
+4. If CHANGE_TARGET is CURRENT_PROJECT_CHANGE: DO NOT WARN merely because the user says "MotorLab", uses its capabilities, or an authorized local MotorLab satellite/adapter is involved.
+5. If CHANGE_TARGET is OTHER_PROJECT_CHANGE: recommend the target project's chat; do not apply writes to the wrong project just because MotorLab is shared.
+6. If CHANGE_TARGET is EXPLANATION_ONLY: do not warn. If identity/target remains uncertain, do not manufacture a mismatch; request clarification only where needed for safe write routing.
+7. EXPLICIT VOLUNTARY CHAT TRANSFER: If Bruno intentionally moves an existing approved MotorLab operation to a new chat, accept that as the canonical user-facing continuation for that operation after reconciling its real operation_id, approvals, locks, release pin and latest checkpoint. Do not re-run already completed steps, duplicate writers or force a return to an abandoned chat.
+
+NO REGRESSION / BOUNDARIES
+- Chat guidance is a recommendation, not a platform-level control, migration or mandatory roadblock.
+- The GLOBAL SINGLE-CHAT PRINCIPLE still governs a project's ongoing user-facing thread; a background executor does NOT require chat migration.
+- The canonical MotorLab administration chat is for MotorLab CORE self-changes. MotorLab is used routinely INSIDE every project chat.
+- Chat context routing never grants modification approval or changes protected native engines, signing, update families or LAST_GOOD.
+- In surfaces without accessible chat/project identity or prompt callbacks, this rule is applied at the next available supported reasoning/control point; do not claim independent 24/7 ChatGPT UI monitoring.
+- The canonical authority for implementation/rule overlap remains MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt, including IDENTICAL / CONTRADICTORY / COMPLEMENTARY and old-path retirement tests.
+
+REQUIRED ROUTING EXAMPLES / NEGATIVE TESTS
+- MusicLab chat + "MotorLab accelerate MusicLab covers" => CURRENT_PROJECT_CHANGE => NO_WARNING.
+- GeoVision chat + "Use MotorLab to configure GeoVision" => CURRENT_PROJECT_CHANGE => NO_WARNING.
+- MusicLab chat + "Change CORE MotorLab central release/guard" => MOTORLAB_CORE_SELF_CHANGE => RECOMMEND_MOTORLAB_CHAT.
+- MusicLab chat + "Change GeoVision native app" => OTHER_PROJECT_CHANGE => RECOMMEND_GEOVISION_CHAT.
+- MotorLab administration chat + "Change CORE MotorLab" => MOTORLAB_CORE_SELF_CHANGE => NO_WARNING.
+- Any chat + "Explain how MotorLab works" => EXPLANATION_ONLY => NO_WARNING.
+- Explicit approved transfer of a pending operation to this chat => RESUME_IN_NEW_CHAT_WITH_CHECKPOINT, NO_REPEAT.
 
 1. MusicLab
 Repository: Br174/MusicLab
