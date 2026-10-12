@@ -28,16 +28,23 @@ def ui():
             time.sleep(1.0)
     raise AssertionError("Cannot retrieve uiautomator hierarchy")
 
-def matches(token):
-    return [node for node in ui() if token in (node.get("text","")+" "+node.get("content-desc",""))]
+def matches(token,exact=False,clickable=False):
+    found=[]
+    for node in ui():
+        label=(node.get("text","") or node.get("content-desc","")).strip()
+        if (label==token if exact else token in label):
+            if clickable and (node.get("clickable")!="true" or node.get("class")!="android.widget.Button"):
+                continue
+            found.append(node)
+    return found
 
-def wait(token,seconds=17):
+def wait(token,seconds=17,exact=False,clickable=False):
     until=time.monotonic()+seconds
     while time.monotonic()<until:
-        m=matches(token)
+        m=matches(token,exact=exact,clickable=clickable)
         if m:return m[0]
         time.sleep(1)
-    raise AssertionError("Screen did not contain "+token)
+    raise AssertionError("Screen missing "+("clickable " if clickable else "")+"text: "+token)
 
 def tap(node):
     bounds=node.get("bounds","")
@@ -49,8 +56,9 @@ def tap(node):
     adb("shell","input","tap",str(x),str(y))
     time.sleep(0.8)
 
-def click(token):
-    node=wait(token)
+def click(token,exact=False):
+    # Prevent false taps on labels/taglines containing the same word as a button.
+    node=wait(token,exact=exact,clickable=True)
     tap(node)
 
 def edit(fieldHint,content):
@@ -65,17 +73,17 @@ def edit(fieldHint,content):
 
 def launch():
     adb("shell","am","start","-W","-n",MAIN,timeout=35)
-    wait("MotorLab")
+    wait("⚙ MotorLab",exact=True)
     print("LAB04_APP_LAUNCH=PASSED",flush=True)
 
 def open_team():
-    click("Team")
-    wait("Team Chat")
+    click("Team",exact=True)
+    wait("Team Chat · Sala Operativa",exact=True)
     print("LAB04_TEAM_CHAT_OPEN=PASSED",flush=True)
 
 def open_archive():
     click("Archivio Team Chat")
-    wait("Archivio Team Chat")
+    wait("📁 Archivio Team Chat",exact=True)
     wait("Messaggi trovati:")
     print("LAB04_ARCHIVE_OPEN=PASSED",flush=True)
 
@@ -123,7 +131,7 @@ def main():
     wait("Messaggi trovati: 1")
     wait(CANARY)
     print("LAB04_ARCHIVE_SEARCH=PASSED",flush=True)
-    click("MusicLab")
+    click("MusicLab",exact=True)
     wait("Messaggi trovati: 0")
     print("LAB04_ROOM_FILTER_ISOLATION=PASSED",flush=True)
     verify_db_canary()
