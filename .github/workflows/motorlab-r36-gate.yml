@@ -1,0 +1,23 @@
+name: MotorLab r36 Chat Context Guard gate
+on:
+  push:
+    branches:
+      - 'motorlab-r36-*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test r36 preserved compatibility guard and full-suite boot
+        run: node --test tests/motorlab-r36-guard-and-boot.test.mjs
+      - name: Test existing target-aware chat routing and no false warnings
+        run: node --test tests/motorlab-chat-context-routing.test.mjs
