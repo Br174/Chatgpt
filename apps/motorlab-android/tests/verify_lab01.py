@@ -9,6 +9,13 @@ openai=(p/"app/src/main/java/it/motorlab/app/ChatGptPlan.java").read_text()
 assert "applicationId 'it.motorlab.app'" in (p/"app/build.gradle").read_text()
 assert "applicationId 'it.motorlab.app.lab" not in (p/"app/build.gradle").read_text()
 assert "versionCode 5" in (p/"app/build.gradle").read_text()
+# Main release signing must never fall back to the disposable LAB/test certificate.
+gradle=(p/"app/build.gradle").read_text()
+assert "signingConfig signingConfigs.mainApp" in gradle
+assert "signingConfig signingConfigs.lab" not in gradle
+assert "MOTORLAB_MAIN_KEYSTORE" in gradle
+assert "MOTORLAB_MAIN_STORE_PASSWORD" in gradle
+assert "MOTORLAB_MAIN_KEY_PASSWORD" in gradle
 assert 'android:allowBackup="false"' in manifest
 assert "GeminiClient.reply" in source
 assert "KeyGenParameterSpec" in key and "AES/GCM/NoPadding" in key
