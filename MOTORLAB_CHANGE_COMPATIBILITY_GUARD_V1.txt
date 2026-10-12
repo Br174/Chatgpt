@@ -19,6 +19,19 @@ It cannot be bypassed by Fast Iteration, Velocity Layer, background execution, a
 
 PILLAR INVARIANT
 ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR.
+
+REGOLA MADRE DELLE REGOLE — VERIFIED SUPERSESSION (approved 2026-10-12)
+When an explicitly user-approved NEW rule replaces a previous behavior for the SAME responsibility, the old conflicting rule and all its ACTIVE execution paths must be retired. Adding the new behavior beside the old does NOT satisfy the change. The present Change Compatibility Guard is the only coordinator for this requirement; NEVER create a second rules engine.
+
+MANDATORY REPLACEMENT PROOF
+1. Locate the former governing rule and every active enforcement route: source logic, callbacks, workers, UI, provider adapters, error/empty fallbacks, cache or persisted decisions, player/preview metadata, navigation/re-entry and release defaults.
+2. Record an OLD -> NEW map (affected responsibility, precise path, prior owner, new owner, REPLACED/MERGED/RETIRED/INDEPENDENT disposition, protected areas). The newest EXPLICITLY APPROVED user requirement wins within its scope against incompatible prior behavior, not against safety or independent protected requirements.
+3. Replace, redirect or deactivate each conflicting active legacy route; migrate/invalidate stale stored behavior safely. Old Git history and VERIFIED LAST_GOOD remain intentionally available only for provenance and rollback.
+4. Test NEW behavior positively AND old behavior negatively across applicable normal, empty/error, cache, offline, re-entry, playback and fallback routes. An old path that can still return is a failed change.
+5. Before claiming success, verify the map: ACTIVE_NEW=yes, OLD_CONFLICTING_PATHS=retired, ANTI_REGRESSION=pass, or report BLOCKED/PENDING. Do not promote a supposedly complete artifact while a known legacy path contradicts the newly approved behavior.
+6. Never bypass the approval gate, single writer, integrity, package/signing/update family, project-native engine, independent compatible functions, immutable session release pin or LAST_GOOD. Do not indiscriminately delete safe old data: revoke its runtime authority or migrate narrowly. Stop for fresh approval when required scope expands.
+
+
 Before adding a new rule/function/path that overlaps an existing responsibility:
 - identify the existing responsible mechanism;
 - determine whether the requested behavior should extend it, replace it, merge into it or explicitly supersede it;
@@ -58,6 +71,7 @@ Inspect the relevant current state and determine:
 - whether the requested behavior already exists fully or partially under another name/path;
 - whether the proposed change would create two sources of truth, two writers, two retries, two caches, two resolvers, two state machines or two UI/domain decisions for one responsibility;
 - whether an older rule should be explicitly superseded rather than silently left active.
+- OLD -> NEW mapping and hidden cache/fallback/re-entry routes; negative proof old behavior cannot return.
 
 3. CLASSIFICATION
 Classify findings as:
@@ -119,7 +133,8 @@ For substantial changes, the internal Change Capsule/preflight should include at
 - existing overlapping mechanisms;
 - conflict classification;
 - chosen resolution/precedence;
-- regression checks required;
+- regression checks required, including positive new-path and negative legacy-path tests;
+- OLD -> NEW supersession map and retirement proof;
 - rollback/checkpoint plan.
 
 10. FAST PATH
@@ -151,9 +166,12 @@ The guard is active when:
 - unresolved unsafe conflicts stop safely rather than being worked around blindly;
 - no avoidable duplicate active path remains for the changed responsibility;
 - the implementation records which existing mechanism was reused/extended/merged/superseded when overlap existed;
+- no replacement is complete until every known conflicting prior active route is retired and negative regression checks pass;
 - current and future projects inherit the same invariant through central CORE/satellite bootstrap rather than relying on conversational memory.
 
 VERSION
-MOTORLAB-CHANGE-COMPATIBILITY-GUARD-V1.1
+MOTORLAB-CHANGE-COMPATIBILITY-GUARD-V1.2
 Established: 2026-09-29
 Revision 1.1: elevated to foundational MotorLab pillar for all current/future projects; adds ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR invariant, mandatory read-only preflight, duplicate-path/source-of-truth detection and explicit supersession/merge requirements.
+
+Revision 1.2 (2026-10-12): Regola Madre delle Regole — verified old-to-new supersession, legacy path retirement, negative anti-regression proof, no second engine.

@@ -83,3 +83,11 @@ UPDATED_VERIFIED_TARGETS_R34
 - MotorAI main = UPDATED_VERIFIED r34
 LAST_GOOD_RELEASE=r33
 NOTICE=Other historical r33 target rows are archival, not current adoption state.
+
+R35 FANOUT START — 2026-10-12
+RELEASE_R35=2026.10.12-r35
+R35_GLOBAL_STATE=IN_PROGRESS
+R35_RULE=verified-old-to-new-supersession
+R35_DORMANT_EXCLUSION=Br174/Cover-Lab-AI
+R35_LAST_GOOD=r34
+R35_TARGET_CLOSURE=not_verified_yet

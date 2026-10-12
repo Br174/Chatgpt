@@ -339,6 +339,9 @@ At r33 adoption:
 
 Revision 1.33: r33 adds safe non-compiler micro-acceleration to build satellites.
 
+R35 VERIFIED SUPERSESSION SYNC
+At r35 adoption require RULE_RETIREMENT_PROOF=required in local core and capsule. For an approved same-responsibility replacement the existing Compatibility Guard identifies and retires conflicting old code/fallback/cache/re-entry and verifies both positive behavior and negative regression. Preserve native engines, approval, safety, signing, session pins and LAST_GOOD. Future projects inherit the canonical r35 bundle. Explicitly DORMANT_RESERVED targets are excluded until reactivation.
+
 R34 SATELLITE INHERITANCE
 - Sync complete-suite capsule and existing Codex adapter at safe boundaries; verify both new session lines and mandatory capability markers.
 - Every supported prompt loads pinned suite through existing Re-entry Gate; session pins do not change during writes/builds/tests.

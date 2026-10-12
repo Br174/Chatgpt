@@ -4,8 +4,8 @@ STATUS
 Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
-CURRENT_RELEASE=2026.10.08-r34
-FANOUT_STATE=COMPLETE
+CURRENT_RELEASE=2026.10.12-r35
+FANOUT_STATE=IN_PROGRESS
 SATELLITE_SCHEMA=1
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 BOOT_CAPSULE_MODULE=MOTORLAB_BOOT_CAPSULE_V1.txt
@@ -13,7 +13,7 @@ SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
 RELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=COMPLETE
+RELEASE_FANOUT_STATE=IN_PROGRESS
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -131,7 +131,7 @@ MotorLab control-plane metadata alone must not alter application runtime/UI/pack
 
 R19+ FOUNDATIONAL CHANGE COMPATIBILITY PILLAR
 MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is a permanent mandatory pillar for MotorLab and every current/future managed software project.
-Before any write-capable change, read authoritative current state and classify existing overlap/redundancy/conflict. Apply ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR: reuse/extend/merge existing behavior or explicitly supersede obsolete/conflicting paths. Do not accumulate parallel implementations for the same responsibility. Fast paths, Velocity, automation, restore, migration and optimization may not bypass this pillar.
+Before any write-capable change, read authoritative current state and classify existing overlap/redundancy/conflict. For an approved replacement, inventory old rules and all active fallback/cache/re-entry paths, retire conflicting ones and require negative anti-regression proof; never call the change complete while old behavior can still execute. Apply ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR: reuse/extend/merge existing behavior or explicitly supersede obsolete/conflicting paths. Do not accumulate parallel implementations for the same responsibility. Fast paths, Velocity, automation, restore, migration and optimization may not bypass this pillar.
 
 R18+ PAIRED SAFETY LABS
 Every verified LAB NN aggiornamento in update-family mode must also produce LAB di sicurezza NN from the same exact functional source state, with a distinct package/family and unique test-only signing certificate. Safety checkpoints are immutable and provide a recovery floor from which a new active update family may be created.
@@ -352,3 +352,9 @@ R34 VERIFIED FANOUT COMPLETION — 2026-10-08
 - Spot-checked the identical r34 dual banner capsule and Codex capability bootstrap on MusicLab LAB58, Cover-Lab-AI, StudyBook-AI and MotorAI.
 - Remaining host limitations and third-party liveness are not represented as runtime execution.
 - r33 preserved as verified satellite LAST_GOOD.
+
+R35 VERIFIED SUPERSESSION RELEASE — 2026-10-12
+- Compatibility Guard v1.2 is the sole Regola Madre delle Regole owner.
+- Map OLD -> NEW, retire all active conflicting legacy behavior including cache/fallback/re-entry and prove old-route absence via negative tests.
+- Preserve independent/safety/rollback contracts.
+- Fanout remains IN_PROGRESS until all eligible safe targets are verified or recorded PENDING_SAFE_BOUNDARY.

@@ -30,7 +30,7 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 13. Resume unfinished already-approved scope through Resume Recovery + Watchdog before unrelated writes.
 14. Preserve project-native/domain engine authority and lifecycle identity.
 15. For EVERY NEW write-capable application/project modification request, apply hard pre-change approval: initial mutation wording is intent only; perform read-only preparation, including Change Compatibility Guard overlap/redundancy/conflict analysis, present the pre-change report, then wait for Bruno approval.
-16. After approval, resolve any Change Compatibility Guard classification before the first write, enforce ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR + single-writer safety, then MOTORLAB_EXECUTION_CONTINUITY_V1.txt continues the agreed operation through implementation/recovery/deploy/verification until verified completion or a genuine external blocker, without repeated intermediate confirmation requests.
+16. After approval, resolve any Change Compatibility Guard classification before the first write, enforce ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR + VERIFIED OLD-TO-NEW SUPERSESSION (retire conflicting old fallback/cache/re-entry paths, negative tests) + single-writer safety, then MOTORLAB_EXECUTION_CONTINUITY_V1.txt continues the agreed operation through implementation/recovery/deploy/verification until verified completion or a genuine external blocker, without repeated intermediate confirmation requests.
 17. Assign/reuse one MOTORLAB_OPERATION_ID for the logical operation and use it to correlate checkpoints, artifacts, Root Cause records and optional observability/dashboard projections.
 18. For defect/regression operations that request APK/ZIP/testable artifacts, apply Artifact-First ordering: repair/contain + risk-appropriate verification + artifact delivery first when safe; defer eligible causal/prevention work into POST_ARTIFACT_ROOT_CAUSE_QUEUE.
 19. Non-deferrable high-risk causes remain on the artifact critical path.
@@ -56,7 +56,7 @@ REGISTERED PROJECT BOOT ORDER - MANDATORY
 FOUNDATIONAL COMPATIBILITY PILLAR - R19+
 MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt is mandatory for MotorLab self-changes and every current/future managed project.
 Before writes, inspect authoritative current state for equivalent/overlapping rules, functions, writers, resolvers, caches, state machines, UI/domain decisions and source-of-truth paths.
-Reuse/extend/merge the existing responsible mechanism when possible. If an older path is weaker/conflicting, explicitly supersede/deactivate it. Never leave avoidable competing implementations active for one responsibility.
+Reuse/extend/merge the existing responsible mechanism when possible. If an older path is weaker/conflicting, explicitly supersede/deactivate it. Never leave avoidable competing implementations active for one responsibility. A replacement is complete only after its OLD -> NEW map verifies every conflicting previous route (including cached/fallback/re-entry) is retired and negative anti-regression checks pass. Preserve independent behavior and protected safety, signing, native engines and LAST_GOOD.
 Fast/Velocity/background/restore/migration/optimization flows cannot bypass this pillar.
 
 
@@ -246,3 +246,5 @@ R33 BUILD MICRO-ACCELERATION
 - Kotlin/KSP/compiler tuning requires separate explicit approval and is not implied by general build optimization.
 
 Revision 1.27: r33 adds safe non-compiler micro-acceleration without altering Kotlin/KSP or application runtime.
+
+R35 (2026-10-12): existing Compatibility Guard v1.2 owns approved Regola Madre delle Regole; no second governance engine or approval shortcut.
