@@ -197,3 +197,17 @@ Revision 1.18: Pollicino r20 marked E2E PASSED on Worker 1.3.5. OIDC D1 relay, s
 Revision 1.19: final MusicLab satellite moved to abf77afc4ae74f629cdf2d5c665211a20ed7b368 with V2.14, V2.13 LAST_GOOD and real stable proof marker 966c40dbfb3746d56de199c8beb35558bf150a92. Worker live proof acceptance is verified; the newest OIDC snapshot/canary revalidation is queued only because GitHub Actions runner assignment is degraded externally on 2026-10-05.
 
 Revision 1.20: final Pollicino r20 revalidation COMPLETE_PASSED after GitHub Actions recovery; MusicLab is V2.15 with V2.14 LAST_GOOD, final OIDC snapshot and exact sidecar lifecycle canary are green, and no external gate remains pending.
+
+
+PHASE 2 — BIDIRECTIONAL SYNC R36 CONTROLLED PILOT, 2026-10-12
+VISIONFLIX_R36_INTERACTIVE_BIDIRECTIONAL_PILOT=VERIFIED_GITHUB_GITHUB
+DOWNSTREAM_CORE_TO_PROJECT=Br174/Visionflix main commit ed94df544764d9f4d05b1969ade946f49618155e with release r36 verified; LAST_GOOD r35
+UPSTREAM_PROJECT_TO_CORE=Br174/Chatgpt MOTORLAB_PROJECT_STATE_VISIONFLIX_V1.txt central write-through commit 0b71e624e94b3cf495ea13ec71f6f2b4002d1f3c and successful readback
+PILOT_OPERATING_MODE=authorized_interactive_MotorLab_execution_cycle_only
+PILOT_EVENT_CLASS=MOTORLAB_CONTROL_PLANE_no_native_app_mutation
+PILOT_EVENT_DEDUP_AUTOMATION=NOT_VERIFIED
+CROSS_REPOSITORY_ALWAYS_ON_EXECUTOR=NOT_VERIFIED_PENDING_EXECUTOR
+CLOUDFLARE_D1_OPERATION_EVENT_WRITE_FOR_THIS_PILOT=NOT_VERIFIED
+AUTOMATIC_LESSON_FANOUT_FOR_THIS_PILOT=NOT_VERIFIED
+DECLARED_PROVIDER_CONNECTION=GitHub_tool_connected_verified;D1_backend_known_from_prior_integrations_not_revalidated_in_this_pilot
+NEXT_ACCEPTANCE=authenticated_durable_existing_executor_writes_deduped_event_through_existing_Persistent_Operational_State_and_replays_safely;verified_two_direction_event_evidence;no_second_scheduler_or_db
