@@ -58,6 +58,15 @@ test('same session pin is stable until a later release safely refreshes it at re
   await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=Test\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), await capsuleFor('2026.10.07-r28'));
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.07-r28\nSTATE=VERIFIED\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.07-r28'));
+  await copyFile(join(repo, 'templates', 'codex', 'motorlab', 'motorlab_boot.py'), join(temp, '.codex', 'hooks', 'motorlab_boot.py'));
+  spawnSync('git', ['init'], { cwd: temp, encoding: 'utf8' });
+
+  const first = runBoot(temp, pinDir, 'startup', 'session-A');
+  assert.match(first, /SESSION_RELEASE_PIN=2026\.10\.07-r28/);
+  assert.match(first, /SESSION_RELEASE_PIN_MODE=PIN_CREATED/);
+
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.08-r29\nSTATE=VERIFIED\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.08-r29'));
 
   const resumed = runBoot(temp, pinDir, 'resume', 'session-A');

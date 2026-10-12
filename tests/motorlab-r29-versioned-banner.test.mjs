@@ -27,6 +27,15 @@ test('r29 bootstrap keeps exact versioned banner and later releases may refresh 
   await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=FutureProject\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), await capsuleFor('2026.10.07-r29'));
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.07-r29\nSTATE=VERIFIED\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.07-r29'));
+  await copyFile(join(repo, 'templates', 'codex', 'motorlab', 'motorlab_boot.py'), join(temp, '.codex', 'hooks', 'motorlab_boot.py'));
+  spawnSync('git', ['init'], { cwd: temp, encoding: 'utf8' });
+
+  const first = boot(temp, pinDir, 'startup', 'session-A');
+  assert.match(first, /First two visible lines: "⚙️ MotorLab r29 attivo"\./);
+  assert.match(first, /SESSION_RELEASE_PIN=2026\.10\.07-r29/);
+
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.08-r30\nSTATE=VERIFIED\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.08-r30'));
 
   const resumed = boot(temp, pinDir, 'resume', 'session-A');
