@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "motorlab-phase2-visionflix-feedback-r36-20261012-001",
+  "sent_at": "2026-10-12T18:29:00.000Z",
+  "projects": [
+    {
+      "project_id": "MotorLab-SyncPilot",
+      "repository": "Br174/Chatgpt",
+      "lifecycle_stage": "CONTROL_PLANE_ONLY",
+      "source_ref": "main",
+      "source_head": "14115e8913ddeb9a28946def525dd416bebac48a",
+      "local_satellite_release_state": "r36|isolated-evidence-canary|no-app-mutation",
+      "updated_at": "2026-10-12T18:29:00.000Z"
+    }
+  ],
+  "operations": [
+    {
+      "operation_id": "motorlab-r36-visionflix-feedback-pilot-20261012",
+      "project_id": "MotorLab-SyncPilot",
+      "title": "MotorLab isolated Visionflix r36 feedback canary",
+      "type": "control_plane_sync_canary",
+      "requested_scope": "Verify authenticated existing OIDC relay and D1 event ingestion without replacing native project state.",
+      "approved_scope": "Isolated control-plane canary only; no app writes, no new executor, no production project ledger rewrite.",
+      "approval_status": "approved",
+      "lifecycle_stage": "CONTROL_PLANE_ONLY",
+      "risk_class": "LOW",
+      "status": "COMPLETED_CONTROL_PLANE_CHECK",
+      "phase": "GitHub evidence readback and OIDC relay validation",
+      "artifact_progress": 100,
+      "overall_progress": 100,
+      "source_ref": "main",
+      "source_head": "14115e8913ddeb9a28946def525dd416bebac48a",
+      "created_at": "2026-10-12T18:29:00.000Z",
+      "updated_at": "2026-10-12T18:29:00.000Z"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "visionflix-r36-control-feedback-ed94df544764d9f4",
+      "operation_id": "motorlab-r36-visionflix-feedback-pilot-20261012",
+      "event_type": "SATELLITE_RELEASE_FEEDBACK_OBSERVED",
+      "event_summary": "Visionflix main verified r36 control-plane commit ed94df544764d9f4d05b1969ade946f49618155e, LAST_GOOD r35; existing GitHub Project Continuity feedback commit 0b71e624e94b3cf495ea13ec71f6f2b4002d1f3c. No native app changes; isolated authenticated OIDC-to-D1 canary, not proof of unattended project-to-core triggers.",
+      "created_at": "2026-10-12T18:29:00.000Z"
+    }
+  ]
+}
