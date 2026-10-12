@@ -105,3 +105,25 @@ STATO=BACKLOG_MEMORIZZATO_NON_IMPLEMENTATO
 PRIORITA_ATTUALE=AutoSetup_AS1_AS2_AS3
 RIPRESA=continuare test e correzioni AutoSetup sul ramo LAB05 AutoSetup,
 single writer, CORE r36 invariato, no APK/promozione prematura.
+
+
+## AS1 estensione: suggerimenti di compilazione facoltativi via Gemini (2026-10-13)
+LAB SOURCE_READY, test sul telefono e chiamata Google LIVE non ancora verificati.
+Nel medesimo AutoSetup universale il pulsante "Suggerisci valori con Gemini
+(facoltativo)" compare quando i campi del sito sono stati riconosciuti.
+- L'utente deve avere già configurato Gemini in LAB05, avere confermato
+  il piano gratuito e autorizzare espressamente la chiamata.
+- All'AI vengono inviati solo la descrizione dell'incarico fornita dall'utente
+  e i nomi dei campi non sensibili estratti dal DOM; nessun token salvato,
+  cookie, HTML completo, password, screenshot o valore preesistente.
+- Risposta richiesta come JSON limitato. Convalida di indice, lunghezza
+  e numero di proposte; non sovrascrivere input compilati dall'utente.
+- I valori proposti appaiono negli editor MotorLab e NON vengono inseriti
+  automaticamente nel sito né viene inviato il modulo; serve nuovo comando
+  esplicito per applicarli alla pagina. Il sito potrebbe salvare automaticamente
+  le modifiche già al successivo comando di compilazione.
+- Riusa il limite locale di 5 prove Gemini/giorno. Non equivale a una verifica
+  della fatturazione reale di Google e non può garantire zero costi se il
+  progetto Google dell'utente ha abilitato servizi a pagamento.
+- L'AI planner indipendente Qwen/Ling/Kimi, l'automazione multi-pagina, l'OAuth
+  e il browser server-side restano passi successivi, NON attivi ora.
