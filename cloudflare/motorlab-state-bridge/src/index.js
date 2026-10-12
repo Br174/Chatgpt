@@ -208,7 +208,7 @@ async function verifyGitHubSignature(secret, signatureHeader, rawBody) {
   return crypto.subtle.verify('HMAC', key, signature, textEncoder.encode(rawBody));
 }
 
-async function ensureSchema(db) {
+export async function ensureSchema(db) {
   if (!db || typeof db.exec !== 'function') throw new Error('d1_not_configured');
   if (initializedDbs.has(db)) return;
   await db.exec(SCHEMA_SQL);

@@ -1,5 +1,6 @@
 import core, { sha256Hex, validateSnapshot, persistSnapshot } from './index.js';
 import { verifyGitHubActionsOidc } from './github-oidc.js';
+import { handleProjectFeedbackOidc } from './project-feedback.js';
 export { PollicinoSentinel } from './pollicino-sentinel.js';
 
 export { sha256Hex, validateSnapshot };
@@ -299,6 +300,7 @@ export default {
       return issueRelay(request, env);
     }
     if (request.method === 'POST' && url.pathname === '/control/v1/oidc-relay') return oidcRelay(request, env);
+    if (request.method === 'POST' && url.pathname === '/control/v1/project-feedback-oidc') return handleProjectFeedbackOidc(request, env);
     if (request.method === 'POST' && url.pathname === '/continuity/v1/enroll') return pollicinoEnroll(request, env);
     if (request.method === 'POST' && url.pathname === '/continuity/v1/pulse') return pollicinoPulse(request, env);
     if (request.method === 'POST' && url.pathname === '/continuity/v1/seal') return pollicinoSeal(request, env);
