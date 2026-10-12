@@ -5,15 +5,18 @@ Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
 CURRENT_RELEASE=2026.10.12-r35
-FANOUT_STATE=IN_PROGRESS
+FANOUT_STATE=COMPLETE
 SATELLITE_SCHEMA=1
+FANOUT_MAIN_VERIFIED=6/6
+FANOUT_PENDING_SAFE_BOUNDARY=4
+FANOUT_COMPLETE_MEANS=all_active_mains_verified_or_pending_safe_boundary_explicit;not_all_LABs_current
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 BOOT_CAPSULE_MODULE=MOTORLAB_BOOT_CAPSULE_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
 RELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=IN_PROGRESS
+RELEASE_FANOUT_STATE=COMPLETE
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -363,3 +366,6 @@ R35 REGOLA MADRE CONSOLIDATION (2026-10-12)
 - Existing Compatibility Guard remains one owner, now explicitly classifying IDENTICAL / CONTRADICTORY / COMPLEMENTARY with latest user-approved precedence in same domain scope.
 - Old unconditional additive preference and ambiguous older-rule priority explicitly superseded. Retain rollback and protected independent code.
 - Static/boot regression gate required before r35 satellite adoption.
+
+R35 FINAL FANOUT ACCOUNTING — 2026-10-12
+The central r35 release fanout TRANSACTION is COMPLETE under MOTORLAB_RELEASE_FANOUT_V1.txt: 6/6 current main satellites are r35 with r34 LAST_GOOD, and four active LAB/work refs remain explicitly PENDING_SAFE_BOUNDARY and not yet adopted. These four are enumerated with exact repository/ref/reason in MOTORLAB_RELEASE_FANOUT_STATE_V1.txt. Cover-Lab-AI remains dormant and excluded. This is NOT a claim that all LABs are current. No project-native application code changed in the release fanout.

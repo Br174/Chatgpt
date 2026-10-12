@@ -19,3 +19,5 @@ jobs:
           node-version: '22'
       - name: Test r35 Regola Madre, preserved safety contracts and live boot
         run: node --test tests/motorlab-r35-verified-supersession.test.mjs
+      - name: Verify safe r35 fanout closure and pending adoption
+        run: node --test tests/motorlab-r35-fanout-closure.test.mjs
