@@ -43,6 +43,19 @@ jobs:
           echo "LAB04_APK_BUILD_SECONDS=$((end-start))"
           echo "LAB04_APK_FIRST_TESTABLE_ARTIFACT=VERIFIED"
           echo "LAB04 measured build step: $((end-start)) seconds; runner is GitHub ubuntu-latest, warm Gradle cache may affect repeat runs." >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify Android emulator KVM acceleration on runner
+        run: |
+          set -euo pipefail
+          if [[ ! -c /dev/kvm ]]; then
+            echo "LAB04_EMULATOR_INFRA_BLOCKED=no_KVM_character_device"
+            exit 1
+          fi
+          sudo chmod 0666 /dev/kvm
+          if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
+            echo "LAB04_EMULATOR_INFRA_BLOCKED=KVM_not_accessible"
+            exit 1
+          fi
+          echo "LAB04_RUNNER_KVM_ACCELERATION=ENABLED"
       - name: Emulator API 30 offline Team Chat navigation, archive, filter and persistence
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -51,10 +64,12 @@ jobs:
           target: default
           profile: pixel_5
           cores: 2
-          ram-size: 2048M
+          ram-size: 3072M
+          disable-linux-hw-accel: false
           heap-size: 256M
           disable-animations: true
-          emulator-boot-timeout: 720
+          emulator-boot-timeout: 420
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
             adb install -r apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk
             python3 apps/motorlab-android/tests/emulator_smoke.py

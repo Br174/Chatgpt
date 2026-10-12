@@ -85,8 +85,14 @@ def verify_db_canary():
                      capture_output=True,timeout=20)
     if p.returncode:
         raise AssertionError("Cannot verify local SQLite: "+p.stderr.decode(errors="ignore")[-180:])
-    if not p.stdout.startswith(b"SQLite format 3") or CANARY.encode() not in p.stdout:
-        raise AssertionError("SQLite database does not contain synthetic canary")
+    if not p.stdout.startswith(b"SQLite format 3"):
+        raise AssertionError("Missing valid SQLite database header")
+    if CANARY.encode() not in p.stdout:
+        # Android SQLite often retains current rows in the uncheckpointed WAL file.
+        wal=subprocess.run(["adb","exec-out","run-as",PACKAGE,"cat","databases/motorlab_team_v1.db-wal"],
+                           capture_output=True,timeout=20)
+        if wal.returncode or CANARY.encode() not in wal.stdout:
+            raise AssertionError("Synthetic canary absent from SQLite DB and WAL")
     print("LAB04_SQLITE_PERSISTENCE=PASSED",flush=True)
 
 def no_crash():
@@ -99,9 +105,11 @@ def no_crash():
 
 def main():
     adb("wait-for-device",timeout=120)
-    adb("shell","wm","size","1080x2280")
-    adb("shell","wm","density","420")
+    adb("shell","wm","size","720x1280")
+    adb("shell","wm","density","240")
     adb("shell","settings","put","system","screen_off_timeout","600000")
+    adb("shell","input","keyevent","KEYCODE_WAKEUP")
+    adb("shell","wm","dismiss-keyguard",check=False)
     adb("logcat","-c",check=False)
     launch()
     open_team()

@@ -9,3 +9,11 @@ Differenziare:
 - `ANDROID_EMULATOR_E2E` è prova operativa in emulatore API 30, non su Samsung fisico.
 - Import/export del backup SAF in cartella utente e restore LAB02 richiedono prove dedicate; non inferirne successo dal solo smoke.
 - Il ramo `motorlab/app-lab04-archive` e il CORE `main` restano invariati, nessuna promozione a MADRE o nuova release di prodotto.
+
+## Diagnosi e correzione del primo tentativo — 2026-10-12
+- GitHub Actions run [38299066213](https://github.com/Br174/Chatgpt/actions/runs/38299066213): compilazione valida, `LAB04_APK_BUILD_SECONDS=49`, package id e apksigner OK.
+- Emulatore API30 fallito **prima della schermata**: `LAB04_ANDROID_EMULATOR_E2E=FAILED Screen did not contain MotorLab`, dialogo `System UI isn't responding`.
+- Diagnosi nei log runner: `ProbeKVM: This user doesn't have permissions to use KVM (/dev/kvm)` e `disable Linux hardware acceleration: true`. Emulazione x86_64 software (boot ~4 min) ha impedito una prova affidabile dell'interfaccia.
+- Correzione SOLO nel workflow di test: verificare che `/dev/kvm` esista, renderlo accessibile all'utente effimero GitHub (`sudo chmod 0666`) e avviare emulatore con accelerazione esplicitamente abilitata, interrompendo subito la prova se KVM non disponibile. Nessun permesso modificato sul telefono, sul computer dell'utente o sul repository di produzione.
+- Script di smoke: dimensioni ridotte dell'emulatore, attivazione schermo e verifica del dato sintetico anche in `SQLite -wal` prima del checkpoint.
+- Test dell'app non ancora superato finché un nuovo run E2E non sarà completato. Codice Java/Grafica/release LAB04 invariati.
