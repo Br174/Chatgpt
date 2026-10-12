@@ -56,3 +56,28 @@ assert 'android:label="MotorLab"' in manifest
 assert 'android:label="MotorLab Archivio"' not in manifest
 assert "TeamChatActivity" in source and "TeamArchiveActivity" in teamui
 print("Unified app identity/Team Chat/Archive: PASS (signing and device acceptance not yet verified)")
+
+
+# Generic AutoSetup LAB: provider-neutral, user-scoped HTTPS origin & zero implicit writes.
+autosetup=(p/"app/src/main/java/it/motorlab/app/AutoSetupActivity.java").read_text()
+vault=(p/"app/src/main/java/it/motorlab/app/SecureServiceToken.java").read_text()
+assert 'class AutoSetupActivity' in autosetup
+assert "SecureServiceToken.checkedOrigin" in autosetup
+assert "Riconosci i campi" in autosetup and "Compila i campi" in autosetup
+assert "Prova modulo generico offline" in autosetup
+assert "Password da escludere" in autosetup
+assert "querySelectorAll('input,textarea,select')" in autosetup
+assert "password','hidden','file" in autosetup
+assert "setAllowFileAccess(false)" in autosetup
+assert "setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW)" in autosetup
+assert "new Intent(Intent.ACTION_VIEW" in autosetup
+assert "new SecureServiceToken(this)" in autosetup
+assert "checkedOrigin(String siteUrl)" in vault and "IDN.toASCII" in vault
+assert "new URI(siteUrl.trim())" in vault and '"https".equalsIgnoreCase' in vault
+assert 'originUrl' in vault and "KeyStore.getInstance(\"AndroidKeyStore\")" in vault
+assert "AES/GCM/NoPadding" in vault
+assert '"github".equals(service)' not in vault and '"cloudflare".equals(service)' not in vault
+assert "AutoSetupActivity" in manifest and 'android:exported="false"' in manifest
+assert "AutoSetupActivity.class" in teamui and "AutoSetupActivity.class" in source
+assert "versionCode 5" in (p/"app/build.gradle").read_text()
+print("AutoSetup universal HTTPS-origin + local encrypted vault static contract: PASS (live website automation not proven)")
