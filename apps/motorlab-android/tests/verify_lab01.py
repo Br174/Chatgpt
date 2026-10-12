@@ -80,4 +80,10 @@ assert '"github".equals(service)' not in vault and '"cloudflare".equals(service)
 assert "AutoSetupActivity" in manifest and 'android:exported="false"' in manifest
 assert "AutoSetupActivity.class" in teamui and "AutoSetupActivity.class" in source
 assert "versionCode 5" in (p/"app/build.gradle").read_text()
-print("AutoSetup universal HTTPS-origin + local encrypted vault static contract: PASS (live website automation not proven)")
+assert "private void suggestValues()" in autosetup
+assert "Suggerisci valori con Gemini (facoltativo)" in autosetup
+assert "Nessun campo sarà compilato sul sito" in autosetup
+assert "new SecureGeminiKey(this).load()" in autosetup
+assert "appSettings.reserveDailyTrialCall()" in autosetup
+assert "f.editor.getText().length()==0" in autosetup
+print("AutoSetup universal HTTPS + optional consented AI suggestion source contract: PASS (live provider call not proven)")
