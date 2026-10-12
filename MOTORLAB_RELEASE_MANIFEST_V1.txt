@@ -5,21 +5,21 @@ Canonical MotorLab release/version manifest.
 Repository authority: Br174/Chatgpt.
 
 CURRENT_RELEASE=2026.10.12-r36
-FANOUT_STATE=IN_PROGRESS
+FANOUT_STATE=COMPLETE
 SATELLITE_SCHEMA=1
-FANOUT_MAIN_VERIFIED=0/6
-FANOUT_PENDING_SAFE_BOUNDARY=0
+FANOUT_MAIN_VERIFIED=6/6
+FANOUT_PENDING_SAFE_BOUNDARY=4
 FANOUT_COMPLETE_MEANS=all_active_mains_verified_or_pending_safe_boundary_explicit;not_all_LABs_current
 CHAT_CONTEXT_GUARD_OWNER=UAB_PROJECT_ROUTING.txt
 CHAT_CONTEXT_GUARD_CALLER=MOTORLAB_REENTRY_GATE_V1.txt
-CHAT_CONTEXT_GUARD_STATUS=R36_PREPARED_NOT_YET_FANNED_OUT
+CHAT_CONTEXT_GUARD_STATUS=R36_MAIN6_VERIFIED_FOUR_LABS_PENDING_SAFE_BOUNDARY
 CORE_ENTRYPOINT=MOTORLAB_CORE_ENTRYPOINT_V1.txt
 BOOT_CAPSULE_MODULE=MOTORLAB_BOOT_CAPSULE_V1.txt
 SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
 RELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=IN_PROGRESS
+RELEASE_FANOUT_STATE=COMPLETE
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -381,3 +381,6 @@ R36 NEXT RELEASE — CHAT CONTEXT GUARD (2026-10-12)
 - Do not claim access to the ChatGPT app's private chat metadata when host hooks do not expose it.
 - No application/native code, new model dependency, second scheduler or new database is authorized.
 - REQUIRED before global COMPLETE: central tests, verified local capsule/bundle/sync + LAST_GOOD=r35 on six active main refs, four current LAB refs marked PENDING_SAFE_BOUNDARY with exact repos and reasons unless safely adopted.
+
+R36 FINAL RELEASE FANOUT ACCOUNTING — 2026-10-12
+All six ACTIVE main repos adopted r36 CHAT_CONTEXT_GUARD=required with core and critical capsule release=r36 and last-good verified r35. Four current LAB/work refs remain on prior verified r34 pending SAFE_BOUNDARY and are documented with full repository/ref/reason in the central fanout ledger. Cover-Lab-AI is DORMANT_RESERVED and excluded. This is release transaction COMPLETE, not proof that ALL LABs or all chat host UI paths have been upgraded; prompt/chat-identity-dependent warning behavior is host-limited. MotorLab central CORE does not replace native app/domain engines. No project app source files changed.
