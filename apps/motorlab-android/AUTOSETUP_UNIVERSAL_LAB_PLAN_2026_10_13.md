@@ -84,3 +84,24 @@ AS9. Suite di compatibilità, quote €0, regressioni, firma,
   né dimostra il funzionamento a telefono spento.
 - Un unico coordinatore MotorLab, un solo writer, nessun fork di motor engine
   e preservazione del ramo LAB05 finché la migrazione è verificata.
+
+
+## REALTEST — FUNZIONE FUTURA REGISTRATA, NON IN SVILUPPO ADESSO
+Decisione 2026-10-13: aggiungere RealTest alla roadmap persistente MotorLab,
+**ma continuare esclusivamente lo sviluppo attuale di AutoSetup universale**.
+Non implementare RealTest, non aprire nuovi rami, non cambiare APK/CORE/progetti
+satellite per questa funzione nella presente iterazione.
+
+Obiettivo futuro: MotorLab potrà aprire applicazioni Android realmente installate,
+come MusicLab, ed eseguire prove d'uso su dispositivo fisico autorizzato:
+riproduzione/cambio brani, sezioni Cover, tempi di avvio, fluidità e blocchi,
+con report evidenziati da log e controlli sul dispositivo. La verifica fisica
+complementa, non sostituisce, CI GitHub, test di codice ed emulatore.
+Studiare in una fase separata UI Automator su dispositivo e strumenti diagnostici
+consensuali; niente accessibilità o automazione di terze app senza i permessi
+legittimi. Il motore nativo MusicLab non deve essere modificato implicitamente.
+
+STATO=BACKLOG_MEMORIZZATO_NON_IMPLEMENTATO
+PRIORITA_ATTUALE=AutoSetup_AS1_AS2_AS3
+RIPRESA=continuare test e correzioni AutoSetup sul ramo LAB05 AutoSetup,
+single writer, CORE r36 invariato, no APK/promozione prematura.
