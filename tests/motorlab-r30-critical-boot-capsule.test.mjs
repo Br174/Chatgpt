@@ -1,3 +1,4 @@
+import { capsuleFor, coreFor } from './helpers/motorlab-boot-fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, readFile, writeFile, copyFile } from 'node:fs/promises';
@@ -45,19 +46,18 @@ test('huge hook/core cannot push critical rules beyond host boot context cap', a
   await mkdir(join(temp, '.motorlab'), { recursive: true });
   await mkdir(join(temp, '.codex', 'hooks'), { recursive: true });
   const capsule = await readFile(join(repo, 'MOTORLAB_BOOT_CAPSULE_V1.txt'), 'utf8');
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), capsule);
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), await capsuleFor('2026.10.07-r30'))
   await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'),
     'PROJECT_NAME=HugeProject\nPROJECT_REPOSITORY=Br174/HugeProject\n' + 'HOOK_FILLER=x\n'.repeat(5000));
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'),
     'PROJECT=HugeProject\nLOCAL_RELEASE=2026.10.07-r30\nSTATE=VERIFIED\nLAST_GOOD_RELEASE=2026.10.07-r29\n' + 'SYNC_FILLER=y\n'.repeat(2000));
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'),
-    'MOTORLAB SATELLITE BUNDLE\nRELEASE=2026.10.07-r30\n' + 'CORE_FILLER=z\n'.repeat(6000));
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), (await coreFor('2026.10.07-r30')) + 'CORE_FILLER=z\n'.repeat(6000));
   await copyFile(join(repo, 'templates', 'codex', 'motorlab', 'motorlab_boot.py'), join(temp, '.codex', 'hooks', 'motorlab_boot.py'));
   spawnSync('git', ['init'], { cwd: temp, encoding: 'utf8' });
 
   const ctx = runBoot(temp, pinDir);
   assert.ok(ctx.length <= 5500, 'emitted bootstrap context must fit soft cap');
-  assert.match(ctx, /First user-visible line exactly: "⚙️ MotorLab r30 attivo"/);
+  assert.match(ctx, /First two visible lines: "⚙️ MotorLab r30 attivo"/);
   assert.match(ctx, /NUMERIC_PROGRESS=required/);
   assert.match(ctx, /HARD_PROGRESS_VISIBILITY=required/);
   assert.match(ctx, /ZERO_ARTIFICIAL_WAIT_BEFORE_USEFUL_SIDEWORK=required/);
@@ -74,8 +74,7 @@ test('oversized capsule fails closed instead of silently truncating', async () =
   const pinDir = join(temp, 'pins');
   await mkdir(join(temp, '.motorlab'), { recursive: true });
   await mkdir(join(temp, '.codex', 'hooks'), { recursive: true });
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'),
-    'MOTORLAB CRITICAL BOOT CAPSULE V1\n' + 'X'.repeat(7000));
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), (await capsuleFor('2026.10.07-r30')) + 'X'.repeat(7000));
   await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=Oversize\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.07-r30\nSTATE=VERIFIED\n');
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'RELEASE=2026.10.07-r30\n');

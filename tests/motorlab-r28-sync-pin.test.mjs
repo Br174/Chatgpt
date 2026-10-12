@@ -1,3 +1,4 @@
+import { capsuleFor, coreFor } from './helpers/motorlab-boot-fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, readFile, writeFile, copyFile } from 'node:fs/promises';
@@ -55,18 +56,9 @@ test('same session pin is stable until a later release safely refreshes it at re
   await mkdir(join(temp, '.motorlab'), { recursive: true });
   await mkdir(join(temp, '.codex', 'hooks'), { recursive: true });
   await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=Test\n');
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), 'MOTORLAB CRITICAL BOOT CAPSULE V1\nNUMERIC_PROGRESS=required\nVISUAL_STATUS=required\nSESSION_RELEASE_PIN=required\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), await capsuleFor('2026.10.07-r28'));
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.07-r28\nSTATE=VERIFIED\n');
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'MOTORLAB SATELLITE BUNDLE\nRELEASE=2026.10.07-r28\nVISUAL_STATUS=required\n');
-  await copyFile(join(repo, 'templates', 'codex', 'motorlab', 'motorlab_boot.py'), join(temp, '.codex', 'hooks', 'motorlab_boot.py'));
-  spawnSync('git', ['init'], { cwd: temp, encoding: 'utf8' });
-
-  const first = runBoot(temp, pinDir, 'startup', 'session-A');
-  assert.match(first, /SESSION_RELEASE_PIN=2026\.10\.07-r28/);
-  assert.match(first, /SESSION_RELEASE_PIN_MODE=PIN_CREATED/);
-
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.08-r29\nSTATE=VERIFIED\n');
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'MOTORLAB SATELLITE BUNDLE\nRELEASE=2026.10.08-r29\nVISUAL_STATUS=required\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.08-r29'));
 
   const resumed = runBoot(temp, pinDir, 'resume', 'session-A');
   assert.match(resumed, /SESSION_RELEASE_PIN=2026\.10\.08-r29/);

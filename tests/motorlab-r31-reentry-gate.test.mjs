@@ -1,3 +1,4 @@
+import { capsuleFor, coreFor } from './helpers/motorlab-boot-fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, readFile, writeFile, copyFile } from 'node:fs/promises';
@@ -20,12 +21,10 @@ function runEvent(cwd, pinDir, event, source, sessionId='session-A') {
 }
 
 async function writeSnapshot(root, release, extraSync='') {
-  await writeFile(join(root, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'),
-    'MOTORLAB CRITICAL BOOT CAPSULE V1\nREENTRY_GATE=required_every_project_user_prompt_and_resume\nNUMERIC_PROGRESS=required\nSESSION_RELEASE_PIN=required\n');
+  await writeFile(join(root, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), await capsuleFor(release));
   await writeFile(join(root, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'),
     `PROJECT=Demo\nLOCAL_RELEASE=${release}\nSTATE=VERIFIED\n${extraSync}`);
-  await writeFile(join(root, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'),
-    `MOTORLAB SATELLITE BUNDLE\nRELEASE=${release}\nREENTRY_GATE=required_every_project_user_prompt_and_resume\n`);
+  await writeFile(join(root, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor(release));
 }
 
 test('r31 contracts require every-turn MotorLab re-entry', async () => {
