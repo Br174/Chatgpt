@@ -23,6 +23,14 @@ Snapshot: 2026-10-11 · Authorization: user requested execution of the complete 
 | Android stable signing | MISSING | Debug keys are runner-specific; LAB02 uses separate package to protect installed LAB01 |
 | Team Chat agent collaboration | COMPILED_TWO_ROLE_FLOW; LIVE_KEY_TEST_PENDING | TeamCoordinator.java, SQLite links and timestamps |
 
+## LAB04 — Archivio Team Chat, recapito verificato (2026-10-12)
+- **Ramo isolato:** `motorlab/app-lab04-archive`; package Android test `it.motorlab.app.lab04`, distinto dalla LAB02 per evitare conflitti di firma debug e proteggere i messaggi già presenti.
+- **Rilascio LAB04:** [APK/ZIP in prerelease](https://github.com/Br174/Chatgpt/releases/tag/motorlab-archivio-lab04-eaa5a98). [GitHub build #38218618933](https://github.com/Br174/Chatgpt/actions/runs/38218618933): PASS su test statici, Gradle compile, apksigner, aapt package e pubblicazione asset. Android 11 emulator run #38217853591 è un test separato, NON considerare passato finché non risulta completed success.
+- **Nuove funzioni nel codice:** archivio in-app con ricerca dei messaggi e filtri per progetto; pulsante Team Chat; cartella `Chat Team MotorLab` via Android SAF scelta una sola volta; snapshot locali per quattro progetti dopo messaggi e risposte; import LAB02 JSON con transazione, dedupe e marcatura provenance `IMPORTED_UNVERIFIED`.
+- **Dati LAB02:** il package LAB04 non accede allo storage privato LAB02. L'utente deve importare il JSON già esportato da LAB02. Non disinstallare LAB02 e non dichiarare update-in-place. Non c'è alcuna migrazione automatica.
+- **Limiti non verificati:** avvio su telefono reale, corretta importazione del precedente JSON, ricerca su backup importato, scrittura cartella SAF nel filesystem del telefono, backup automatico e roundtrip file. Testare uno alla volta prima di una CANDIDATA o MADRE.
+- **Sicurezza:** JSON dei backup non cifrato, quindi contiene dati privati: scelta consapevole della cartella e permesso persistente SAF Android. Non c'è cloud sync e nessuna chiave provider incorporata.
+
 ## Execution sequence and acceptance gates
 
 ### P0 Baseline / rollback [COMPLETE]
