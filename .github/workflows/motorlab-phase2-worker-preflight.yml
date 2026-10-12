@@ -1,0 +1,46 @@
+name: MotorLab Phase2 Worker Live Preflight
+on:
+  push:
+    branches:
+      - 'motorlab-phase2-worker-live-preflight-*'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-readonly-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Read-only Worker endpoint check and deploy-credential existence flags
+        run: |
+          python3 - <<'PY'
+          import os, urllib.error, urllib.request, json
+          base='https://motorlab-state-bridge.brunoverlezza.workers.dev'
+          print('MOTORLAB_CF_DEPLOY_TOKEN_AVAILABLE='+str(bool(os.environ.get('CLOUDFLARE_API_TOKEN'))))
+          print('MOTORLAB_CF_ACCOUNT_ID_AVAILABLE='+str(bool(os.environ.get('CLOUDFLARE_ACCOUNT_ID'))))
+          request=urllib.request.Request(base+'/health',headers={'Accept':'application/json'})
+          with urllib.request.urlopen(request,timeout=12) as r:
+              health=json.load(r)
+          print('MOTORLAB_CF_LIVE_HEALTH_STATUS='+str(health.get('status')))
+          print('MOTORLAB_CF_LIVE_WORKER_ENGINE='+str(health.get('engine_version')))
+          req=urllib.request.Request(base+'/control/v1/project-feedback-oidc',
+              method='POST',data=b'{}',headers={'Content-Type':'application/json'})
+          try:
+              with urllib.request.urlopen(req,timeout=12) as response:
+                  status=response.status
+          except urllib.error.HTTPError as exc:
+              status=exc.code
+          if status not in (401,404,503):
+              raise SystemExit('Unexpected endpoint preflight status='+str(status))
+          print('MOTORLAB_CF_PROJECT_FEEDBACK_STATUS_WITHOUT_TOKEN='+str(status))
+          print('MOTORLAB_CF_PROJECT_FEEDBACK_DEPLOYED='+str(status==401))
+          if status==503:
+              print('MOTORLAB_CF_PROJECT_FEEDBACK_DEPLOYMENT=SERVICE_UNAVAILABLE')
+          elif status==404:
+              print('MOTORLAB_CF_PROJECT_FEEDBACK_DEPLOYMENT=PENDING')
+          else:
+              print('MOTORLAB_CF_PROJECT_FEEDBACK_DEPLOYMENT=ROUTE_PRESENT_AUTH_REQUIRED')
+          PY
