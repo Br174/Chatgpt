@@ -90,7 +90,7 @@ public final class TeamArchiveActivity extends Activity {
         });
         saveButton=button(root,"💾 Salva/aggiorna backup nella cartella",()->saveFolder());
         saveButton.setEnabled(TeamBackupFolder.configured(this));
-        button(root,"📥 Importa vecchio backup LAB02 (JSON)",()->{
+        button(root,"📥 Importa backup LAB02/LAB04 (JSON)",()->{
             Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);
             i.addCategory(Intent.CATEGORY_OPENABLE);
             i.setType("*/*");
@@ -141,7 +141,7 @@ public final class TeamArchiveActivity extends Activity {
         }else if(request==IMPORT_JSON){
             Uri uri=data.getData();if(uri==null)return;
             new AlertDialog.Builder(this).setTitle("Importare le conversazioni?")
-                .setMessage("I messaggi del file JSON saranno aggiunti all'archivio LAB04 senza eliminare nulla. "+
+                .setMessage("I messaggi del file JSON saranno aggiunti all'archivio MotorLab senza eliminare nulla. "+
                     "I risultati AI importati restano NON verificati. Continuare?")
                 .setNegativeButton("Annulla",null)
                 .setPositiveButton("Importa",(dialog,which)->importFile(uri)).show();
