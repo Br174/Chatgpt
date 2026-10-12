@@ -1,0 +1,36 @@
+name: MotorLab Phase7 Independent Adapters and Skill Export
+on:
+  push:
+    branches: ['motorlab-phase7-*']
+  pull_request:
+    branches: [main]
+    paths:
+      - 'templates/interop/**'
+      - 'tools/motorlab_skill_export.py'
+      - 'tests/motorlab-phase7-portable-adapters.test.mjs'
+      - '.github/workflows/motorlab-phase7-interoperability-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prove Node and Python adapter parity, fail-closed behavior and Skill ZIP integrity
+        run: node --test tests/motorlab-phase7-portable-adapters.test.mjs
+      - name: Export a separate optional Skill Creator ZIP
+        if: success()
+        run: python3 tools/motorlab_skill_export.py --root . --out dist/MotorLab-Skill-Export-r36.zip
+      - name: Publish optional portable skill artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MotorLab-Skill-Export-r36
+          path: dist/MotorLab-Skill-Export-r36.zip
+          if-no-files-found: error
+          retention-days: 30
