@@ -32,14 +32,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - name: Checkout
+      - name: Checkout complete history for push delta
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Select fresh authorized outbox (never silently replay stale legacy state)
         id: select
         shell: bash
         env:
           RELAY_SOURCE: ${{ inputs.relay_source || 'none' }}
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
           legacy="relay/MOTORLAB_D1_OUTBOX.json"
@@ -53,7 +56,9 @@ jobs:
               *) echo "Unauthorized relay selector"; exit 1 ;;
             esac
           elif [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
-            changed="$(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA")"
+            if [[ ! "$GITHUB_EVENT_BEFORE" =~ ^[0-9a-f]{40}$ ]]; then echo "No authoritative previous push commit"; exit 1; fi
+            git cat-file -e "${GITHUB_EVENT_BEFORE}^{commit}" || { echo "Push parent not fetched"; exit 1; }
+            changed="$(git diff --name-only "$GITHUB_EVENT_BEFORE" "$GITHUB_SHA")"
             if printf '%s\n' "$changed" | grep -Fqx "$event"; then selected="$event"; fi
             if printf '%s\n' "$changed" | grep -Fqx "$legacy"; then
               if [[ -n "$selected" ]]; then echo "Multiple outboxes changed: fail closed"; exit 1; fi
@@ -69,6 +74,7 @@ jobs:
           fi
 
       - name: Relay snapshot with GitHub OIDC
+        id: relay
         if: steps.select.outputs.source != ''
         env:
           MOTORLAB_BASE: https://motorlab-state-bridge.brunoverlezza.workers.dev
@@ -129,3 +135,19 @@ jobs:
 
           print(f"MOTORLAB_D1_OIDC_RELAY=PASSED snapshot_id={snapshot_id} sha256={payload_hash} idempotent={result.get('idempotent', False)} source={path}")
           PY
+      - name: Distinguish delivered event from intentionally skipped workflow-only push
+        if: always()
+        shell: bash
+        env:
+          SELECTED_SOURCE: ${{ steps.select.outputs.source }}
+          RELAY_OUTCOME: ${{ steps.relay.outcome }}
+        run: |
+          if [[ -n "$SELECTED_SOURCE" ]]; then
+            if [[ "$RELAY_OUTCOME" != "success" ]]; then
+              echo "DELIVERY_FAILED or skipped for selected snapshot" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+            echo "MOTORLAB_OIDC_D1_EVENT_DELIVERY=VERIFIED selected=$SELECTED_SOURCE" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "MOTORLAB_OIDC_D1_EVENT_DELIVERY=NOT_TRIGGERED (no fresh outbox)" >> "$GITHUB_STEP_SUMMARY"
+          fi

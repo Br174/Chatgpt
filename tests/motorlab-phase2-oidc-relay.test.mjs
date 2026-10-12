@@ -23,7 +23,10 @@ test('phase2 relay uses existing OIDC workflow, verified hash and safe file sele
  const source=await read('cloudflare/motorlab-state-bridge/src/index.js');
  const entry=await read('cloudflare/motorlab-state-bridge/src/entry.js');
  assert.match(workflow,/id-token: write/);
- assert.match(workflow,/git diff-tree --no-commit-id --name-only/);
+ assert.match(workflow,/fetch-depth: 0/);
+ assert.match(workflow,/git diff --name-only/);
+ assert.match(workflow,/GITHUB_EVENT_BEFORE/);
+ assert.match(workflow,/DELIVERY_FAILED or skipped for selected snapshot/);
  assert.match(workflow,/Multiple outboxes changed: fail closed/);
  assert.match(workflow,/No explicit replay selected; no D1 write/);
  assert.match(workflow,/cancel-in-progress: false/);
