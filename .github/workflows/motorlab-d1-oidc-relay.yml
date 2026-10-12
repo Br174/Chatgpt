@@ -5,8 +5,19 @@ on:
     branches: [main]
     paths:
       - 'relay/MOTORLAB_D1_OUTBOX.json'
+      - 'relay/MOTORLAB_EVENT_OUTBOX.json'
       - '.github/workflows/motorlab-d1-oidc-relay.yml'
   workflow_dispatch:
+    inputs:
+      relay_source:
+        description: 'Explicit authorized relay replay (none by default)'
+        required: true
+        type: choice
+        default: none
+        options:
+          - none
+          - event
+          - legacy
 
 permissions:
   contents: read
@@ -14,7 +25,7 @@ permissions:
 
 concurrency:
   group: motorlab-d1-oidc-relay
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   relay:
@@ -24,19 +35,57 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select fresh authorized outbox (never silently replay stale legacy state)
+        id: select
+        shell: bash
+        env:
+          RELAY_SOURCE: ${{ inputs.relay_source || 'none' }}
+        run: |
+          set -euo pipefail
+          legacy="relay/MOTORLAB_D1_OUTBOX.json"
+          event="relay/MOTORLAB_EVENT_OUTBOX.json"
+          selected=""
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            case "$RELAY_SOURCE" in
+              event) selected="$event" ;;
+              legacy) selected="$legacy" ;;
+              none) echo "No explicit replay selected; no D1 write." ;;
+              *) echo "Unauthorized relay selector"; exit 1 ;;
+            esac
+          elif [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            changed="$(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA")"
+            if printf '%s\n' "$changed" | grep -Fqx "$event"; then selected="$event"; fi
+            if printf '%s\n' "$changed" | grep -Fqx "$legacy"; then
+              if [[ -n "$selected" ]]; then echo "Multiple outboxes changed: fail closed"; exit 1; fi
+              selected="$legacy"
+            fi
+          else
+            echo "Unknown workflow event: no write."
+          fi
+          if [[ -n "$selected" ]]; then
+            test -f "$selected" || { echo "Missing selected outbox"; exit 1; }
+            echo "source=$selected" >> "$GITHUB_OUTPUT"
+            echo "Selected $selected for authenticated OIDC relay"
+          fi
+
       - name: Relay snapshot with GitHub OIDC
+        if: steps.select.outputs.source != ''
         env:
           MOTORLAB_BASE: https://motorlab-state-bridge.brunoverlezza.workers.dev
+          MOTORLAB_RELAY_SOURCE: ${{ steps.select.outputs.source }}
         run: |
           python3 - <<'PY'
-          import json, os, urllib.error, urllib.parse, urllib.request
+          import hashlib, json, os, urllib.error, urllib.parse, urllib.request
 
           base = os.environ["MOTORLAB_BASE"].rstrip("/")
-          path = "relay/MOTORLAB_D1_OUTBOX.json"
+          path = os.environ["MOTORLAB_RELAY_SOURCE"]
+          if path not in ("relay/MOTORLAB_D1_OUTBOX.json", "relay/MOTORLAB_EVENT_OUTBOX.json"):
+              raise SystemExit("Unapproved relay source")
           with open(path, "rb") as fh:
               raw = fh.read()
           snapshot = json.loads(raw.decode("utf-8"))
           snapshot_id = snapshot["snapshot_id"]
+          payload_hash = hashlib.sha256(raw).hexdigest()
 
           request_url = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"]
           request_token = os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]
@@ -66,7 +115,7 @@ jobs:
           except urllib.error.HTTPError as error:
               detail = error.read().decode("utf-8", errors="replace")
               raise SystemExit(f"OIDC relay HTTP {error.code}: {detail}")
-          if result.get("snapshot_id") != snapshot_id:
+          if result.get("snapshot_id") != snapshot_id or result.get("payload_hash") != payload_hash:
               raise SystemExit("OIDC relay returned unexpected snapshot identity")
 
           verify_req = urllib.request.Request(
@@ -75,8 +124,8 @@ jobs:
           )
           with urllib.request.urlopen(verify_req, timeout=10) as response:
               verified = json.loads(response.read().decode("utf-8"))
-          if verified.get("snapshot_id") != snapshot_id:
+          if verified.get("snapshot_id") != snapshot_id or verified.get("payload_hash") != payload_hash:
               raise SystemExit("D1 verification failed")
 
-          print(f"MOTORLAB_D1_OIDC_RELAY=PASSED snapshot_id={snapshot_id}")
+          print(f"MOTORLAB_D1_OIDC_RELAY=PASSED snapshot_id={snapshot_id} sha256={payload_hash} idempotent={result.get('idempotent', False)} source={path}")
           PY

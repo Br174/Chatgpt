@@ -70,3 +70,8 @@ Check: dormant exclusion and no auto-activation; same-event dedup; invalid evide
 VERSION
 MOTORLAB-BIDIRECTIONAL-SYNC-V1.0
 ESTABLISHED=2026-10-10
+
+
+PHASE 2 — EXISTING GITHUB OIDC EVENT PILOT, 2026-10-12
+Pilot uses the pre-existing `.github/workflows/motorlab-d1-oidc-relay.yml`, Cloudflare state bridge and D1 operation_events. A separate minimal JSON *payload file* is not a new database, scheduler or event-bus authority. On a main-branch push, only a freshly changed, explicitly allowlisted relay file is submitted; workflow-only changes do not replay stale operational state. Manual workflow_dispatch requires an explicit payload choice, default none. Simultaneous changes to both outbox types fail closed; repository/ref/workflow OIDC claims are already restricted in Worker. GitHub concurrency queues pending runs instead of cancellation. The relay compares both returned D1 hash and /verify hash with the local SHA-256; persistence is idempotent by snapshot_id and operation_events.event_id.
+Pilot payload MotorLab-SyncPilot is an isolated control-plane record in existing D1 tables. Do not overwrite an actual app project row or count this as a real app lifecycle operation. D1 snapshot verification does not expose private event row content, so claim only authenticated batch acceptance when evidenced by a successful run. The pilot is NOT a private-project webhook, an always-on cross-repository executor, or universal user-chat liveness proof; missing per-project authenticated emitters remain PENDING_EXECUTOR. No unapproved background polling or paid fallback; existing GitHub, Cloudflare and native engines remain independent.

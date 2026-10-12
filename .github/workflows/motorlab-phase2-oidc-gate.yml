@@ -1,0 +1,25 @@
+name: MotorLab Phase2 OIDC Event Relay Gate
+on:
+  push:
+    branches: ['motorlab-phase2-*']
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/motorlab-d1-oidc-relay.yml'
+      - '.github/workflows/motorlab-phase2-oidc-gate.yml'
+      - 'relay/MOTORLAB_EVENT_OUTBOX.json'
+      - 'tests/motorlab-phase2-oidc-relay.test.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate isolated event, OIDC source control and replay defenses
+        run: node --test tests/motorlab-phase2-oidc-relay.test.mjs

@@ -1,0 +1,41 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { validateSnapshot } from '../cloudflare/motorlab-state-bridge/src/index.js';
+const read=(p)=>readFile(new URL('../'+p,import.meta.url),'utf8');
+test('phase2 event uses existing D1 entities without app-state overwrite',async()=>{
+ const payload=JSON.parse(await read('relay/MOTORLAB_EVENT_OUTBOX.json'));
+ const valid=validateSnapshot(payload);
+ assert.equal(valid.schema_version,1);
+ assert.equal(valid.projects.length,1);
+ assert.equal(valid.projects[0].project_id,'MotorLab-SyncPilot');
+ assert.equal(valid.projects[0].lifecycle_stage,'CONTROL_PLANE_ONLY');
+ assert.equal(valid.operations.length,1);
+ assert.equal(valid.operations[0].project_id,'MotorLab-SyncPilot');
+ assert.equal(valid.events.length,1);
+ assert.equal(valid.events[0].operation_id,valid.operations[0].operation_id);
+ assert.match(valid.events[0].event_summary,/ed94df544764d9f4d05b1969ade946f49618155e/);
+ assert.match(valid.events[0].event_summary,/No native app changes/);
+ assert.ok(!(await read('relay/MOTORLAB_D1_OUTBOX.json')).includes(payload.snapshot_id),'legacy state never reused as event canary');
+});
+test('phase2 relay uses existing OIDC workflow, verified hash and safe file selector',async()=>{
+ const workflow=await read('.github/workflows/motorlab-d1-oidc-relay.yml');
+ const source=await read('cloudflare/motorlab-state-bridge/src/index.js');
+ const entry=await read('cloudflare/motorlab-state-bridge/src/entry.js');
+ assert.match(workflow,/id-token: write/);
+ assert.match(workflow,/git diff-tree --no-commit-id --name-only/);
+ assert.match(workflow,/Multiple outboxes changed: fail closed/);
+ assert.match(workflow,/No explicit replay selected; no D1 write/);
+ assert.match(workflow,/cancel-in-progress: false/);
+ assert.match(workflow,/payload_hash = hashlib.sha256\(raw\).hexdigest\(\)/);
+ assert.match(workflow,/verified.get\("payload_hash"\) != payload_hash/);
+ assert.match(entry,/OIDC_ALLOWED_REPOSITORY/);
+ assert.match(entry,/OIDC_ALLOWED_WORKFLOW_REF/);
+ assert.match(source,/INSERT OR IGNORE INTO operation_events/);
+ assert.match(source,/snapshot_conflict/);
+});
+test('malformed or duplicate evidence does not gain alternate schema privileges',async()=>{
+ const raw=JSON.parse(await read('relay/MOTORLAB_EVENT_OUTBOX.json'));
+ assert.throws(()=>validateSnapshot({...raw,events:[{...raw.events[0],event_id:'unsafe <html>'}]}),/invalid_event_id/);
+ assert.throws(()=>validateSnapshot({...raw,projects:[{...raw.projects[0],updated_at:'not-a-date'}]}),/invalid_project_updated_at/);
+});
