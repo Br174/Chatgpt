@@ -39,7 +39,9 @@ public final class AutoSetupActivity extends Activity {
     private String activeOrigin="";
     private String inspectedUrl="";
     private boolean pageReady=false;
+    private boolean demoMode=false;
     private boolean suggestionRunning=false;
+    private static final String DEMO_ORIGIN="https://autosetup-demo.example";
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
 
     static final class FormField {
@@ -121,6 +123,12 @@ public final class AutoSetupActivity extends Activity {
                 pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
             }
             @Override public void onPageFinished(WebView w,String page) {
+                if(demoMode) {
+                    // loadDataWithBaseURL can report about:blank on some Android WebViews.
+                    // Confirm actual in-memory DOM content rather than trusting its callback URL.
+                    checkDemoReady(0);
+                    return;
+                }
                 try{
                     activeOrigin=SecureServiceToken.checkedOrigin(page);
                     pageReady=true;
@@ -139,8 +147,28 @@ public final class AutoSetupActivity extends Activity {
         setContentView(root);
     }
 
+    private void checkDemoReady(int retry) {
+        if(!demoMode || browser==null) return;
+        browser.evaluateJavascript(
+            "(function(){return document.querySelectorAll('input,textarea,select').length;})()",
+            result->{
+                if(!demoMode) return;
+                if("3".equals(result)){
+                    pageReady=true;
+                    activeOrigin=DEMO_ORIGIN;
+                    status("Demo offline pronta: 3 campi HTML. Premere Riconosci i campi.");
+                } else if(retry<12) {
+                    browser.postDelayed(()->checkDemoReady(retry+1),300);
+                } else {
+                    pageReady=false;
+                    status("La demo non ha completato il caricamento dei campi.");
+                }
+            });
+    }
+
     private void openDemo() {
-        activeOrigin="https://autosetup-demo.example";
+        demoMode=true;
+        activeOrigin=DEMO_ORIGIN;
         url.setText(activeOrigin);
         goal.setText("Dimostrazione locale senza servizi esterni");
         pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
@@ -158,6 +186,7 @@ public final class AutoSetupActivity extends Activity {
     private void openSite() {
         String address=url.getText().toString().trim();
         try{
+            demoMode=false;
             activeOrigin=SecureServiceToken.checkedOrigin(address);
             controls.clear();fields.removeAllViews();pageReady=false;inspectedUrl="";
             say("Richiesta: "+limit(goal.getText().toString(),180)+
@@ -168,6 +197,7 @@ public final class AutoSetupActivity extends Activity {
     }
 
     private String currentOrigin() {
+        if(demoMode && pageReady && DEMO_ORIGIN.equals(activeOrigin)) return DEMO_ORIGIN;
         if(!pageReady||browser.getUrl()==null)
             throw new IllegalStateException("Prima apri un sito HTTPS.");
         String live=SecureServiceToken.checkedOrigin(browser.getUrl());
@@ -366,6 +396,7 @@ public final class AutoSetupActivity extends Activity {
     }
 
     private void saveToken() {
+        if(demoMode){alert("Il modulo dimostrativo non accetta credenziali reali.");return;}
         String origin;
         try{origin=currentOrigin();}
         catch(Exception e){alert("Apri prima il sito HTTPS a cui appartiene la credenziale.");return;}
