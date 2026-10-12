@@ -26,6 +26,19 @@ assert 'GEMINI_UNVERIFIED' in teamlogic and teamlogic.count("GeminiClient.reply"
 assert teamlogic.count("reserveDailyTrialCall()") == 2
 assert "TeamChatActivity" in manifest and 'android:exported="false"' in manifest
 assert "ACTION_CREATE_DOCUMENT" in teamui and "TeamCoordinator.run" in teamui
-assert "it.motorlab.app.lab02" in (p/"app/build.gradle").read_text()
-assert "versionCode 2" in (p/"app/build.gradle").read_text()
+assert "it.motorlab.app.lab04" in (p/"app/build.gradle").read_text()
+assert "versionCode 4" in (p/"app/build.gradle").read_text()
 print("LAB02 Team Chat contract: PASS - runtime and live AI not proven")
+
+archive=(p/"app/src/main/java/it/motorlab/app/TeamArchiveActivity.java").read_text()
+folder=(p/"app/src/main/java/it/motorlab/app/TeamBackupFolder.java").read_text()
+assert "TeamArchiveActivity" in teamui and "Archivio Team Chat" in teamui
+assert "TeamArchiveActivity" in manifest and 'android:exported="false"' in manifest
+assert "ACTION_OPEN_DOCUMENT_TREE" in archive and "ACTION_OPEN_DOCUMENT" in archive
+assert "renderList()" in archive and "importBackup" in archive
+assert "exportRoomJson" in teamstore and "synchronized ImportReport importBackup" in teamstore
+assert "imported_message_keys" in teamstore and "db.beginTransaction()" in teamstore
+assert "Chat Team MotorLab" in folder and "takePersistableUriPermission" in folder
+assert "DocumentsContract.createDocument" in folder and "Executors.newSingleThreadExecutor()" in folder
+assert "TeamBackupFolder.schedule" in teamui
+print("LAB04 static archive contract: PASS (not equivalent to a phone test)")

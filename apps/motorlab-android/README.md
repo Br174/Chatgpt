@@ -35,3 +35,14 @@ La modalità Google da smartphone per una chiave personale BYOK resta un prototi
 - ChatGPT OAuth non attivo: Sign in with ChatGPT richiede una distribuzione e un client effettivamente idonei, inclusa la condizione OSS dove applicabile; il CORE rimane privato.
 - LIMITAZIONE TEST: LAB02 usa un applicationId separato (`it.motorlab.app.lab02`), perché non possediamo una chiave di firma Android di release stabile. L'APK di prova può essere installata accanto alla LAB01 invece di richiederne la disinstallazione. I dati delle due app NON si uniscono automaticamente. Futura versione MADRE con signing-key privata configurata tramite secrets sicuri.
 - Non sono ancora disponibili backend multi-dispositivo, sincronizzazione Notion/D1, vettori, GitHub privato OAuth, agente continuo o installazione ChatGPT con autorizzazione reale.
+
+## LAB04 — Archivio Team Chat
+
+- Nuovo pulsante **Archivio Team Chat — Apri messaggi** accanto agli altri comandi nella Team Chat.
+- Consultazione e ricerca diretta nella memoria SQLite locale, con filtri per MotorLab, MusicLab, StudyBook AI e MotorAI. Non occorre il gestore file di Android.
+- Facoltativo: scelta *una volta* della cartella padre attraverso il selettore Android (Storage Access Framework), e creazione automatica della sottocartella **Chat Team MotorLab**. Quattro file JSON separati (`MotorLab.json`, `MusicLab.json`, `StudyBook-AI.json`, `MotorAI.json`) vengono aggiornati in background dopo nuovi messaggi e al rientro nell'app. Il salvataggio manuale segnala errori esplicitamente; lo storico SQLite rimane indipendente da eventuali errori di backup.
+- Su Android 11 il selettore SAF potrebbe non permettere di scegliere la radice Downloads o Memoria interna. Scegliere **Documenti** o una cartella personale consentita. L'archivio in-app funziona anche senza permessi aggiuntivi.
+- Importazione del file JSON **LAB02** esportato dall'utente, tramite selettore Android: verifica dimensione, struttura e nomi stanza, transazione SQLite senza cancellazione, deduplicazione, marcatura delle fonti importate come `IMPORTED_UNVERIFIED`.
+- Per non interferire con la LAB02 già installata, LAB04 ha `applicationId it.motorlab.app.lab04` e versione `0.4.0-LAB04`. Non può accedere direttamente alla memoria privata della LAB02; per trasferire messaggi, l'utente usa `Importa vecchio backup LAB02 (JSON)`. LAB02 rimane intatta e consultabile.
+- Cartella e JSON esportati non sono cifrati: contengono messaggi privati, conservarli in una posizione protetta.
+- ChatGPT OAuth, D1 condiviso e agenti programmatori non sono attivi nella LAB04. Nessuna modifica al CORE r34.

@@ -1,0 +1,74 @@
+name: MotorLab Android LAB04
+on:
+  push:
+    branches: [motorlab/app-lab04-archive]
+    paths:
+      - apps/motorlab-android/**
+      - .github/workflows/motorlab-app-lab04.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: motorlab-app-lab04
+  cancel-in-progress: true
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Source safety and contract check
+        run: python3 apps/motorlab-android/tests/verify_lab01.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Reuse hosted Android SDK, install SDK 35 when needed
+        run: |
+          set -euo pipefail
+          test -d "$ANDROID_HOME"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build LAB debug APK
+        run: gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+      - name: Android 11 actual launch and Archive UI smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          emulator-boot-timeout: 900
+          disable-animations: true
+          script: bash apps/motorlab-android/tests/android_archive_smoke.sh
+      - name: Verify and package APK + ZIP
+        run: |
+          set -euo pipefail
+          mkdir -p motorlab-archive-lab04-dist
+          cp apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk motorlab-archive-lab04-dist/MotorLab-Archive-LAB04.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs motorlab-archive-lab04-dist/MotorLab-Archive-LAB04.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging motorlab-archive-lab04-dist/MotorLab-Archive-LAB04.apk | grep -m1 "package: name='it.motorlab.app.lab04' versionCode='4'"
+          printf '%s\n' "MotorLab LAB04 TEST - installa accanto a LAB02, usa Importa backup LAB02 da Archivio Team Chat. Firma debug effimera." > motorlab-archive-lab04-dist/INSTALLAZIONE.txt
+          (cd motorlab-archive-lab04-dist && zip -q MotorLab-Archive-LAB04.zip MotorLab-Archive-LAB04.apk INSTALLAZIONE.txt)
+          sha256sum motorlab-archive-lab04-dist/MotorLab-Archive-LAB04.apk motorlab-archive-lab04-dist/MotorLab-Archive-LAB04.zip
+      - name: Publish LAB-only prerelease (no Actions artifact quota)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="motorlab-archive-lab04-test-${GITHUB_SHA:0:7}"
+          gh release create "$TAG" \
+            motorlab-archive-lab04-dist/MotorLab-Archive-LAB04.apk \
+            motorlab-archive-lab04-dist/MotorLab-Archive-LAB04.zip \
+            motorlab-archive-lab04-dist/INSTALLAZIONE.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "MotorLab App LAB04 Archivio - prova Android" \
+            --notes "LAB04: archivio ricerca interno, cartella backup per progetto e importazione sicura LAB02. Pre-release isolata da CORE r34. APK debug test e ZIP: firma effimera, update-in-place non garantito. Gemini BYOK protetto; ChatGPT OAuth ancora non attivo. Nessuna modifica alla MADRE."
