@@ -1,0 +1,60 @@
+name: MotorLab LAB04 APK ZIP delivery
+on:
+  push:
+    branches: [motorlab/app-lab04-archive]
+    paths:
+      - .github/workflows/motorlab-app-lab04-delivery.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: motorlab-app-lab04-delivery
+  cancel-in-progress: true
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify local source contracts
+        run: python3 apps/motorlab-android/tests/verify_lab01.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Prepare Android SDK 35
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build LAB04 debug APK
+        run: gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+      - name: Verify APK identity, package ZIP and checksums
+        run: |
+          set -euo pipefail
+          mkdir -p motorlab-lab04-files
+          cp apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk motorlab-lab04-files/MotorLab-Archivio-LAB04.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs motorlab-lab04-files/MotorLab-Archivio-LAB04.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging motorlab-lab04-files/MotorLab-Archivio-LAB04.apk | grep -m1 "package: name='it.motorlab.app.lab04' versionCode='4'"
+          printf '%s\n' "MotorLab LAB04 TEST - Installare accanto a LAB02, poi Team -> Archivio -> Importa backup LAB02 JSON. Firma debug effimera." > motorlab-lab04-files/INSTALLAZIONE.txt
+          (cd motorlab-lab04-files && zip -q MotorLab-Archivio-LAB04.zip MotorLab-Archivio-LAB04.apk INSTALLAZIONE.txt)
+          sha256sum motorlab-lab04-files/MotorLab-Archivio-LAB04.apk motorlab-lab04-files/MotorLab-Archivio-LAB04.zip
+      - name: Publish APK and ZIP as LAB-only prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="motorlab-archivio-lab04-$(printf '%s' "$GITHUB_SHA" | cut -c1-7)"
+          gh release create "$TAG" \
+            motorlab-lab04-files/MotorLab-Archivio-LAB04.apk \
+            motorlab-lab04-files/MotorLab-Archivio-LAB04.zip \
+            motorlab-lab04-files/INSTALLAZIONE.txt \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --prerelease --title "MotorLab LAB04 Archivio - APK TEST" \
+            --notes "LAB04: Archivio interno, ricerca, cartella backup opzionale e importazione LAB02. Compile e firma verificate. Test sul telefono ancora da effettuare. CORE non modificato."
