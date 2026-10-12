@@ -37,6 +37,7 @@ public final class AutoSetupActivity extends Activity {
     private SecureServiceToken vault;
     private final ArrayList<FormField> controls=new ArrayList<>();
     private String activeOrigin="";
+    private String inspectedUrl="";
     private boolean pageReady=false;
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
 
@@ -115,7 +116,7 @@ public final class AutoSetupActivity extends Activity {
                 catch(Exception ignored){runOnUiThread(()->status("Navigazione non HTTPS bloccata."));return true;}
             }
             @Override public void onPageStarted(WebView w,String page,android.graphics.Bitmap favicon){
-                pageReady=false;controls.clear();fields.removeAllViews();
+                pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
             }
             @Override public void onPageFinished(WebView w,String page) {
                 try{
@@ -140,7 +141,7 @@ public final class AutoSetupActivity extends Activity {
         activeOrigin="https://autosetup-demo.example";
         url.setText(activeOrigin);
         goal.setText("Dimostrazione locale senza servizi esterni");
-        pageReady=false;controls.clear();fields.removeAllViews();
+        pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
         say("MotorLab: prova offline. Nessuna connessione a servizi esterni o login.");
         String html="<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head>"+
             "<body><h2>Modulo dimostrativo MotorLab</h2><form>"+
@@ -156,7 +157,7 @@ public final class AutoSetupActivity extends Activity {
         String address=url.getText().toString().trim();
         try{
             activeOrigin=SecureServiceToken.checkedOrigin(address);
-            controls.clear();fields.removeAllViews();pageReady=false;
+            controls.clear();fields.removeAllViews();pageReady=false;inspectedUrl="";
             say("Richiesta: "+limit(goal.getText().toString(),180)+
                 " · Sito: "+activeOrigin+" · Apertura autorizzata.");
             browser.loadUrl(address);
@@ -200,7 +201,7 @@ public final class AutoSetupActivity extends Activity {
                 if(!origin.equals(currentOrigin()))return;
                 Object decoded=new JSONTokener(value).nextValue();
                 JSONArray found=new JSONArray((String)decoded);
-                controls.clear();fields.removeAllViews();
+                controls.clear();fields.removeAllViews();inspectedUrl=browser.getUrl();
                 fields.addView(text("Campi rilevati nel sito · "+found.length(),14,true));
                 for(int i=0;i<found.length();i++){
                     JSONObject f=found.getJSONObject(i);
@@ -213,7 +214,7 @@ public final class AutoSetupActivity extends Activity {
                 }else{
                     say("MotorLab: ho trovato "+controls.size()+
                         " campi ordinari. Inserisci i valori qui nella chat; "+
-                        "non saranno inviati alla pagina finché non premi Compila.");
+                        "verranno trasmessi al sito solo quando premi Compila. Alcuni siti salvano automaticamente.");
                     button(fields,"Compila i campi sulla pagina (senza inviare il modulo)",this::fillForm);
                     status("Compilazione disponibile · nessun modulo è stato inviato.");
                 }
@@ -222,8 +223,12 @@ public final class AutoSetupActivity extends Activity {
     }
 
     private void fillForm() {
-        try{currentOrigin();}
-        catch(Exception e){alert("Pagina non più disponibile.");return;}
+        try{
+            currentOrigin();
+            if(inspectedUrl.isEmpty()||!inspectedUrl.equals(browser.getUrl())){
+                alert("La pagina è cambiata: analizza di nuovo i campi.");return;
+            }
+        }catch(Exception e){alert("Pagina non più disponibile.");return;}
         JSONArray updates=new JSONArray();
         try{
             for(FormField f:controls){
@@ -249,9 +254,9 @@ public final class AutoSetupActivity extends Activity {
                 try{
                     if(!origin.equals(currentOrigin()))return;
                     String count=String.valueOf(new JSONTokener(result).nextValue());
-                    status("Compilati "+count+" campi; nessun modulo inviato. Controlla la pagina.");
+                    status("Compilati "+count+" campi; nessun clic su Invia. Alcuni siti salvano automaticamente.");
                     say("MotorLab: compilazione effettuata su "+origin+
-                        ". Per inviare definitivamente il modulo è necessaria una conferma separata.");
+                        ". Non ho premuto Invia; controlla eventuali modifiche salvate automaticamente dal sito.");
                 }catch(Exception e){status("Non posso confermare la compilazione della pagina.");}
             });
         }catch(Exception e){alert("Impossibile preparare i campi.");}
