@@ -114,6 +114,18 @@ def no_crash():
         raise AssertionError("LAB04 FATAL EXCEPTION in logcat")
     print("LAB04_NO_FATAL_EXCEPTION=PASSED",flush=True)
 
+def autosetup_smoke():
+    # Launch a fresh main screen: no account, token, network or destructive action.
+    adb("shell","am","start","-W","-n",MAIN,timeout=35)
+    click("Chat",exact=True)
+    click("AutoSetup")
+    wait("MotorLab AutoSetup")
+    wait("Prova modulo generico offline",clickable=True)
+    print("MOTORLAB_AUTOSETUP_CHAT_ENTRY=PASSED",flush=True)
+    click("Prova modulo generico offline",exact=True)
+    print("MOTORLAB_AUTOSETUP_OFFLINE_DEMO_LAUNCH=PASSED",flush=True)
+    no_crash()
+
 def main():
     adb("wait-for-device",timeout=120)
     adb("shell","settings","put","system","screen_off_timeout","600000")
@@ -143,6 +155,7 @@ def main():
     wait(CANARY)
     print("LAB04_REOPEN_HISTORY_PERSISTENT=PASSED",flush=True)
     no_crash()
+    autosetup_smoke()
     print("LAB04_ANDROID_EMULATOR_E2E=PASSED",flush=True)
 
 if __name__=="__main__":
