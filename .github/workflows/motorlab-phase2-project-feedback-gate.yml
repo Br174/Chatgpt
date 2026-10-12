@@ -1,0 +1,27 @@
+name: MotorLab Phase2 Project Feedback OIDC Pilot Gate
+on:
+  push:
+    branches: ['motorlab-phase2-*']
+  pull_request:
+    branches: [main]
+    paths:
+      - 'cloudflare/motorlab-state-bridge/src/**'
+      - 'tests/motorlab-project-feedback-oidc.test.mjs'
+      - '.github/workflows/motorlab-phase2-project-feedback-gate.yml'
+      - 'templates/motorlab-feedback-oidc-visionflix.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate project OIDC source and existing D1 idempotence
+        run: node --test tests/motorlab-project-feedback-oidc.test.mjs
+      - name: Check original Worker Live Control and Pollicino safety invariants
+        run: node --test cloudflare/motorlab-state-bridge/test/*.test.mjs
