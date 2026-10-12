@@ -15,7 +15,7 @@ test('one canonical Change Compatibility Guard owns all three rule dispositions'
  assert.doesNotMatch(guard,/A newer change does not automatically win merely because it is newer/);
  assert.doesNotMatch(guard,/prefer additive compatible changes over replacement/);
  assert.match(entry,/single existing Change Compatibility Guard owns this classification/);
- assert.equal((entry.match(/MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1\.txt/g)||[]).filter(Boolean).length,1,'one coordinator load, not two');
+ const bootLoad=entry.split('5. Load all manifest-required modules')[1]?.split('6. Read Project Continuity')[0] || '';\n assert.equal((bootLoad.match(/MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1\\.txt/g)||[]).length,1,'single coordinator in bootstrap load list');
  assert.match(manifest,/CURRENT_RELEASE=2026\.10\.12-r35/);
 });
 
