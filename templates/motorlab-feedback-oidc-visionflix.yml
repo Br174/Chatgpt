@@ -1,0 +1,58 @@
+name: MotorLab Visionflix OIDC feedback (pilot)
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: motorlab-feedback-main
+  cancel-in-progress: false
+jobs:
+  feedback:
+    if: github.repository == 'Br174/Visionflix'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Send signed commit-only evidence to existing MotorLab state bridge
+        env:
+          MOTORLAB_BASE: https://motorlab-state-bridge.brunoverlezza.workers.dev
+          COMMIT_SHA: ${{ github.sha }}
+          SOURCE_REPO: ${{ github.repository }}
+          SOURCE_REF: ${{ github.ref }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.error, urllib.parse, urllib.request
+          assert os.environ["SOURCE_REPO"] == "Br174/Visionflix"
+          assert os.environ["SOURCE_REF"] == "refs/heads/main"
+          sha=os.environ["COMMIT_SHA"]
+          assert len(sha)==40 and all(c in "0123456789abcdef" for c in sha)
+          body=json.dumps({
+              "schema_version":1,"source_repository":os.environ["SOURCE_REPO"],
+              "source_ref":os.environ["SOURCE_REF"],"source_sha":sha,
+              "event_type":"GITHUB_PUSH_OBSERVED"
+          },separators=(",",":")).encode()
+          url=os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"]
+          sep="&" if "?" in url else "?"
+          url+=sep+urllib.parse.urlencode({"audience":"motorlab-project-feedback"})
+          oidc=urllib.request.Request(url,headers={
+              "Authorization":"bearer "+os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"],
+              "Accept":"application/json"
+          })
+          with urllib.request.urlopen(oidc,timeout=10) as resp:
+              token=json.load(resp)["value"]
+          relay=urllib.request.Request(os.environ["MOTORLAB_BASE"]+"/control/v1/project-feedback-oidc",
+              data=body,method="POST",headers={
+                  "Authorization":"Bearer "+token,"Content-Type":"application/json",
+                  "Accept":"application/json"
+              })
+          try:
+              with urllib.request.urlopen(relay,timeout=15) as response:
+                  result=json.load(response)
+          except urllib.error.HTTPError as exc:
+              raise SystemExit("MotorLab project feedback HTTP "+str(exc.code))
+          assert result["event_id"]=="motorlab-feedback-visionflix-"+sha
+          assert result["source_sha"]==sha
+          print("MOTORLAB_FEEDBACK_ACCEPTED event_id="+result["event_id"]+
+                " idempotent="+str(result["idempotent"]))
+          PY
