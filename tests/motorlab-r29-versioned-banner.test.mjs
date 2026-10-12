@@ -32,7 +32,7 @@ test('r29 bootstrap keeps exact versioned banner and later releases may refresh 
   spawnSync('git', ['init'], { cwd: temp, encoding: 'utf8' });
 
   const first = boot(temp, pinDir, 'startup', 'session-A');
-  assert.match(first, /First two visible lines: "⚙️ MotorLab r29 attivo"\./);
+  assert.match(first, /First two visible lines: "⚙️ MotorLab r29 attivo" then "✨ MotorLab — I Fantastici 20 attivati"\./);
   assert.match(first, /SESSION_RELEASE_PIN=2026\.10\.07-r29/);
 
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.08-r30\nSTATE=VERIFIED\n');
@@ -40,11 +40,11 @@ test('r29 bootstrap keeps exact versioned banner and later releases may refresh 
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.08-r30'));
 
   const resumed = boot(temp, pinDir, 'resume', 'session-A');
-  assert.match(resumed, /First two visible lines: "⚙️ MotorLab r30 attivo"\./);
+  assert.match(resumed, /First two visible lines: "⚙️ MotorLab r30 attivo" then "✨ MotorLab — I Fantastici 20 attivati"\./);
   assert.match(resumed, /SESSION_RELEASE_PIN_MODE=PIN_REFRESHED_SAFE_REENTRY/);
 
   const fresh = boot(temp, pinDir, 'startup', 'session-B');
-  assert.match(fresh, /First two visible lines: "⚙️ MotorLab r30 attivo"\./);
+  assert.match(fresh, /First two visible lines: "⚙️ MotorLab r30 attivo" then "✨ MotorLab — I Fantastici 20 attivati"\./);
   assert.match(fresh, /SESSION_RELEASE_PIN=2026\.10\.08-r30/);
 });
 
