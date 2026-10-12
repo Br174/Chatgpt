@@ -23,3 +23,5 @@ jobs:
           node-version: '22'
       - name: Validate project OIDC source and existing D1 idempotence
         run: node --test tests/motorlab-project-feedback-oidc.test.mjs
+      - name: Check original Worker Live Control and Pollicino safety invariants
+        run: node --test cloudflare/motorlab-state-bridge/test/*.test.mjs
