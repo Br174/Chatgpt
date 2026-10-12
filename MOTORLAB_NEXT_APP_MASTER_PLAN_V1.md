@@ -23,6 +23,13 @@ Snapshot: 2026-10-11 · Authorization: user requested execution of the complete 
 | Android stable signing | MISSING | Debug keys are runner-specific; LAB02 uses separate package to protect installed LAB01 |
 | Team Chat agent collaboration | COMPILED_TWO_ROLE_FLOW; LIVE_KEY_TEST_PENDING | TeamCoordinator.java, SQLite links and timestamps |
 
+## LAB04 — Nome distinto, nuova APK R2 (2026-10-12)
+- L'utente ha mostrato il 12 ottobre la schermata **LAB02** (non LAB04). Nome precedente di entrambe le installazioni nel launcher: «MotorLab», causando confusione.
+- Modifica approvata in scope LAB04: etichetta app Android `MotorLab Archivio` (solo la LAB04), con test statico e compilazione/firma verificate.
+- [APK/ZIP con etichetta distinta](https://github.com/Br174/Chatgpt/releases/tag/motorlab-archivio-lab04-4fbacc5) · [GitHub run 38241999387 riuscita](https://github.com/Br174/Chatgpt/actions/runs/38241999387).
+- La precedente LAB04 aveva lo stesso package `it.motorlab.app.lab04` ma chiave debug effimera: **non garantire aggiornamento diretto** sulla vecchia LAB04. Se Android rifiuta installazione per firma incompatibile, non disinstallare senza prima verificare backup dei dati LAB04. LAB02 e dati LAB02 NON sono coinvolti.
+- Test di apertura nuova APK sul telefono e import LAB02 ancora pendenti.
+
 ## LAB04 — Archivio Team Chat, recapito verificato (2026-10-12)
 - **Ramo isolato:** `motorlab/app-lab04-archive`; package Android test `it.motorlab.app.lab04`, distinto dalla LAB02 per evitare conflitti di firma debug e proteggere i messaggi già presenti.
 - **Rilascio LAB04:** [APK/ZIP in prerelease](https://github.com/Br174/Chatgpt/releases/tag/motorlab-archivio-lab04-eaa5a98). [GitHub build #38218618933](https://github.com/Br174/Chatgpt/actions/runs/38218618933): PASS su test statici, Gradle compile, apksigner, aapt package e pubblicazione asset. Android 11 emulator run #38217853591 è un test separato, NON considerare passato finché non risulta completed success.
