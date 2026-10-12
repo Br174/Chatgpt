@@ -347,3 +347,5 @@ R34 SATELLITE INHERITANCE
 - Every supported prompt loads pinned suite through existing Re-entry Gate; session pins do not change during writes/builds/tests.
 - Missing external hooks are reported honestly; no additional scheduler or application-runtime coupling.
 Revision 1.34: full-suite activation and honest runtime proof.
+
+R35 GUARD CONSOLIDATION (2026-10-12): IDENTICAL rules merge to one canonical owner; CONTRADICTORY newer user-approved rule supersedes all older active conflicting routes; COMPLEMENTARY remains intact. Verified negative anti-regression required before closure; do not create a parallel resolver.

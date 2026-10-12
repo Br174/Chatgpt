@@ -20,12 +20,16 @@ It cannot be bypassed by Fast Iteration, Velocity Layer, background execution, a
 PILLAR INVARIANT
 ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR.
 
-REGOLA MADRE DELLE REGOLE — VERIFIED SUPERSESSION (approved 2026-10-12)
-When an explicitly user-approved NEW rule replaces a previous behavior for the SAME responsibility, the old conflicting rule and all its ACTIVE execution paths must be retired. Adding the new behavior beside the old does NOT satisfy the change. The present Change Compatibility Guard is the only coordinator for this requirement; NEVER create a second rules engine.
+REGOLA MADRE DELLE REGOLE — VERIFIED SUPERSESSION (approved 2026-10-12; consolidated)
+This section SUPERSEDES overlapping earlier guidance inside this very Guard: it is the ONE canonical coordinator for rule equivalence, conflict, precedence, cleanup and verification. Do NOT create another resolver/guard/legacy rule engine. Each NEW expressly approved rule is canonical in its APPROVED RESPONSIBILITY and scope:
+- IDENTICAL: where an earlier active rule has the same scope and meaning, adopt the newest approval as the single canonical rule; merge or retire the obsolete active duplicate (without changing the compatible working outcome).
+- CONTRADICTORY: where the newer approved rule changes the earlier behavior, the newest approved rule prevails; retire the earlier conflicting rule and EVERY active legacy enforcement route. No silent fallback to the old behavior.
+- COMPLEMENTARY: where the rules address independent or genuinely compatible behavior, retain both with unambiguous ownership; do not delete unrelated functions.
+No blind recency rule applies to unapproved edits, broader changes, safety protections, package/signing identity, data integrity, native-engine contracts or LAST_GOOD. Git history remains available for recovery, never as an alternate ACTIVE authority.
 
 MANDATORY REPLACEMENT PROOF
 1. Locate the former governing rule and every active enforcement route: source logic, callbacks, workers, UI, provider adapters, error/empty fallbacks, cache or persisted decisions, player/preview metadata, navigation/re-entry and release defaults.
-2. Record an OLD -> NEW map (affected responsibility, precise path, prior owner, new owner, REPLACED/MERGED/RETIRED/INDEPENDENT disposition, protected areas). The newest EXPLICITLY APPROVED user requirement wins within its scope against incompatible prior behavior, not against safety or independent protected requirements.
+2. Record an OLD -> NEW map (affected responsibility, precise path, prior owner, new owner, IDENTICAL_MERGED / CONFLICT_REPLACED / RETIRED / INDEPENDENT disposition, protected areas). For IDENTICAL retire duplicate authority, for CONFLICT replace the previous behavior, for COMPLEMENTARY keep separately owned behavior.
 3. Replace, redirect or deactivate each conflicting active legacy route; migrate/invalidate stale stored behavior safely. Old Git history and VERIFIED LAST_GOOD remain intentionally available only for provenance and rollback.
 4. Test NEW behavior positively AND old behavior negatively across applicable normal, empty/error, cache, offline, re-entry, playback and fallback routes. An old path that can still return is a failed change.
 5. Before claiming success, verify the map: ACTIVE_NEW=yes, OLD_CONFLICTING_PATHS=retired, ANTI_REGRESSION=pass, or report BLOCKED/PENDING. Do not promote a supposedly complete artifact while a known legacy path contradicts the newly approved behavior.
@@ -36,7 +40,7 @@ Before adding a new rule/function/path that overlaps an existing responsibility:
 - identify the existing responsible mechanism;
 - determine whether the requested behavior should extend it, replace it, merge into it or explicitly supersede it;
 - do not leave equivalent competing paths active;
-- if two pre-existing rules conflict, compare both against current user intent, canonical precedence, verified behavior and regression risk, then keep/merge the stronger compatible rule and explicitly retire/supersede the weaker conflicting path;
+- if the user explicitly approved a newer contradictory rule for the same responsibility, keep the new one and retire EVERY old contradictory path; for conflicts among previously established rules with no new approval, compare canonical authority, explicit user intent and safety, then resolve safely;
 - if no safe winner/merge can be established from evidence, stop before writes.
 
 A change is not considered safely designed merely because its own code works. It must also fit the surrounding system without avoidable duplication, contradiction or hidden precedence ambiguity.
@@ -76,6 +80,7 @@ Inspect the relevant current state and determine:
 3. CLASSIFICATION
 Classify findings as:
 - CLEAR: no meaningful overlap/conflict found;
+- IDENTICAL_RULE: equivalent previous responsibility/semantics; newest explicitly approved rule is canonical, retire duplicate active authority;
 - COMPLEMENTARY: overlap exists but responsibilities are distinct and compatible;
 - MERGE_REQUIRED: a new behavior should be integrated into an existing mechanism rather than added independently;
 - PRECEDENCE_REQUIRED: both mechanisms are valid but explicit priority/order is required;
@@ -85,8 +90,9 @@ Classify findings as:
 
 4. RESOLUTION RULE
 If anything other than CLEAR is found, MotorLab must resolve it before or as part of implementation.
+For a newly approved conflicting requirement, direct supersession and retirement of the old behavior take precedence over any additive default.
 Preferred order:
-A. reuse/extend the existing responsible mechanism;
+A. reuse/extend the existing responsible mechanism when semantics remain compatible, otherwise replace old semantics;
 B. merge duplicate responsibilities;
 C. define explicit non-ambiguous precedence;
 D. preserve backward compatibility where required;
@@ -105,7 +111,7 @@ When rules overlap, apply this order unless a more specific canonical contract e
 6. new additive behavior;
 7. speed/optimization/convenience behavior.
 
-A newer change does not automatically win merely because it is newer. It must be intentionally integrated or explicitly supersede the prior rule.
+An explicitly newest USER-APPROVED rule prevails over earlier contradictory behavior of the SAME responsibility and scope. The older route is intentionally retired and tested absent. Unapproved changes or unrelated changes have no automatic precedence; preserve safety, single-writer, domain authority and LAST_GOOD.
 
 6. MOTORLAB SELF-CHANGE RULE
 When changing MotorLab itself, inspect the relevant CORE modules before writing. New MotorLab capabilities must be harmonized with existing Watchdog, Resume Recovery, Foreground Stall Guard, Background Execution, Progress Reporting, Governance, Velocity, External Service Guard, lifecycle, checkpoint and single-writer rules as applicable.
@@ -118,7 +124,7 @@ When changing MusicLab, GeoVision, Cover Lab AI, StudyBook-AI, Visionflix/Verlez
 - identify the native/domain engine responsible for the affected behavior;
 - check adjacent components and dependent flows;
 - preserve approved working behavior not included in the change request;
-- prefer additive compatible changes over replacement;
+- prefer additive compatible changes ONLY when the new approved behavior is genuinely complementary; replace and retire old contradictory behavior, and merge identical active duplicates;
 - include conflict/overlap findings in the implementation plan when material;
 - run regression verification proportional to the blast radius.
 
@@ -175,3 +181,5 @@ Established: 2026-09-29
 Revision 1.1: elevated to foundational MotorLab pillar for all current/future projects; adds ONE RESPONSIBILITY = ONE ACTIVE COORDINATOR invariant, mandatory read-only preflight, duplicate-path/source-of-truth detection and explicit supersession/merge requirements.
 
 Revision 1.2 (2026-10-12): Regola Madre delle Regole — verified old-to-new supersession, legacy path retirement, negative anti-regression proof, no second engine.
+
+Revision 1.3 (2026-10-12): R35 consolidation integrates IDENTICAL / CONTRADICTORY / COMPLEMENTARY into the existing v1 Guard, expressly retires ambiguous former precedence and unconditional additive wording, requires old-path negative test proof. No second coordinator.

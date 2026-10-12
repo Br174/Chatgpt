@@ -358,3 +358,8 @@ R35 VERIFIED SUPERSESSION RELEASE — 2026-10-12
 - Map OLD -> NEW, retire all active conflicting legacy behavior including cache/fallback/re-entry and prove old-route absence via negative tests.
 - Preserve independent/safety/rollback contracts.
 - Fanout remains IN_PROGRESS until all eligible safe targets are verified or recorded PENDING_SAFE_BOUNDARY.
+
+R35 REGOLA MADRE CONSOLIDATION (2026-10-12)
+- Existing Compatibility Guard remains one owner, now explicitly classifying IDENTICAL / CONTRADICTORY / COMPLEMENTARY with latest user-approved precedence in same domain scope.
+- Old unconditional additive preference and ambiguous older-rule priority explicitly superseded. Retain rollback and protected independent code.
+- Static/boot regression gate required before r35 satellite adoption.
