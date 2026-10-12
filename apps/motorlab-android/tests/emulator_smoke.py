@@ -124,6 +124,24 @@ def autosetup_smoke():
     print("MOTORLAB_AUTOSETUP_CHAT_ENTRY=PASSED",flush=True)
     click("Prova modulo generico offline",exact=True)
     print("MOTORLAB_AUTOSETUP_OFFLINE_DEMO_LAUNCH=PASSED",flush=True)
+    time.sleep(2)
+    click("Riconosci i campi",exact=True)
+    # Form controls are below the chat header inside the bounded ScrollView.
+    for _ in range(3):
+        if matches("Campi rilevati nel sito · 2"):
+            break
+        scrolls=[n for n in ui() if n.get("class")=="android.widget.ScrollView"]
+        if not scrolls:
+            break
+        bounds=[int(v) for v in re.findall(r"\d+",scrolls[0].get("bounds",""))]
+        if len(bounds)!=4 or bounds[3]-bounds[1]<180:
+            break
+        x=(bounds[0]+bounds[2])//2
+        adb("shell","input","swipe",str(x),str(bounds[3]-35),
+            str(x),str(bounds[1]+35),"400")
+        time.sleep(.8)
+    wait("Campi rilevati nel sito · 2",seconds=10)
+    print("MOTORLAB_AUTOSETUP_GENERIC_FORM_SCAN=PASSED_FIELDS_2_PASSWORD_EXCLUDED",flush=True)
     no_crash()
 
 def main():
