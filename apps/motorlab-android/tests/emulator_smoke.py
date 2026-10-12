@@ -116,93 +116,90 @@ def no_crash():
 
 
 def saf_backup_gate():
-    """Test Android 11 DocumentsUI export with synthetic-only data."""
+    """Verify Android 11 SAF export using a fresh user-selected private test folder."""
     import json
-    folder="/sdcard/Documents/Chat Team MotorLab"
-    adb("shell","mkdir","-p","/sdcard/Documents")
+    parent="MotorLabSAFProof"
+    folder="/sdcard/"+parent+"/Chat Team MotorLab"
     click("Scegli dove creare")
     time.sleep(2)
 
-    def picker_nodes(label):
+    def snapshot(label):
         nodes=ui()
         print("LAB04_SAF_"+label+"="+repr([
             (n.get("text",""),n.get("content-desc",""),n.get("class",""),
              n.get("clickable",""),n.get("enabled",""),n.get("bounds",""))
             for n in nodes if n.get("text") or n.get("content-desc")
-        ])[:3700],flush=True)
+        ])[:4000],flush=True)
         return nodes
 
-    def visible_choose_button(nodes):
-        tokens=("use this folder","usa questa cartella",
-                "select this folder","seleziona questa cartella")
-        for n in nodes:
-            label=(n.get("text","")+" "+n.get("content-desc","")).lower()
-            b=[int(i) for i in re.findall(r"\d+",n.get("bounds",""))]
-            if any(x in label for x in tokens) and n.get("enabled")!="false":
-                if len(b)==4 and b[0]<b[2] and b[1]<b[3]:
-                    return n
-        return None
+    def nonempty(n):
+        b=[int(i) for i in re.findall(r"\d+",n.get("bounds",""))]
+        return len(b)==4 and b[0]<b[2] and b[1]<b[3]
 
-    nodes=picker_nodes("PICKER_INITIAL")
-    # Never click an off-screen/disabled DocumentsUI confirmation ([0,0][0,0]).
-    # If the picker starts at storage root, enter the Documents directory first.
-    choose=visible_choose_button(nodes)
+    def select_enabled(nodes):
+        tokens=("use this folder","usa questa cartella","select this folder",
+                "seleziona questa cartella")
+        return next((n for n in nodes if nonempty(n) and n.get("enabled")!="false"
+            and any(s in (n.get("text","")+" "+n.get("content-desc","")).lower()
+                for s in tokens)),None)
+
+    initial=snapshot("INITIAL")
+    choose=select_enabled(initial)
     if not choose:
-        labels=[n for n in nodes if n.get("text","")=="Documents"]
-        if not labels:
-            raise AssertionError("Documents not visible in picker; no silent root fallback")
-        folder_label=labels[-1]
-        tap(folder_label)
+        # Android API30 forbids selecting the storage root. DocumentsUI explicitly
+        # offers CREATE NEW FOLDER; use it instead of tapping a blocked root grid.
+        create=[n for n in initial if n.get("text","").lower()=="create new folder"
+            and n.get("enabled")!="false" and nonempty(n)]
+        if not create:
+            raise AssertionError("Blocked storage root without CREATE NEW FOLDER action")
+        tap(create[0])
+        time.sleep(1.1)
+        nodes=snapshot("NEW_FOLDER_DIALOG")
+        field=[n for n in nodes if n.get("class")=="android.widget.EditText"
+               and nonempty(n)]
+        if not field:raise AssertionError("New-folder name input not found")
+        tap(field[-1])
+        adb("shell","input","keyevent","KEYCODE_MOVE_END")
+        for _ in range(24):
+            adb("shell","input","keyevent","KEYCODE_DEL")
+        adb("shell","input","text",parent)
+        adb("shell","input","keyevent","4")
+        nodes=snapshot("NEW_FOLDER_NAMED")
+        submit=[n for n in nodes if n.get("class")=="android.widget.Button"
+            and n.get("enabled")!="false" and nonempty(n)
+            and n.get("text","").lower() in ("create","crea","ok","save","salva")]
+        if not submit:raise AssertionError("New-folder CREATE confirmation missing")
+        tap(submit[-1])
         time.sleep(2)
-        nodes=picker_nodes("AFTER_DOCUMENTS_FIRST_TAP")
-        choose=visible_choose_button(nodes)
+        nodes=snapshot("NEW_FOLDER_CREATED")
+        choose=select_enabled(nodes)
         if not choose:
-            # Some DocumentsUI builds make only the row container clickable.
-            raw=adb("shell","cat","/sdcard/window-motorlab.xml",timeout=20)
-            root=ET.fromstring(raw[raw.index("<?xml"):])
-            parent={c:p for p in root.iter("node") for c in p}
-            docs=[n for n in root.iter("node") if n.get("text","")=="Documents"]
-            if not docs:
-                raise AssertionError("Documents row disappeared without folder selection")
-            cursor=docs[-1]
-            clickable=None
-            while cursor is not None:
-                if cursor.get("clickable")=="true":
-                    clickable=cursor
-                    break
-                cursor=parent.get(cursor)
-            if clickable is not None:
-                print("LAB04_SAF_DOCUMENTS_ROW_PARENT="+repr((
-                    clickable.get("class"),clickable.get("bounds"))),flush=True)
-                tap(clickable)
-            else:
-                # Plain second tap is a safe UI fallback, not an app/runtime edit.
-                tap(docs[-1])
-            time.sleep(2)
-            nodes=picker_nodes("AFTER_DOCUMENTS_ROW_TAP")
-            choose=visible_choose_button(nodes)
+            named=[n for n in nodes if n.get("text","")==parent and nonempty(n)]
+            if named:
+                tap(named[0])
+                time.sleep(1.5)
+                nodes=snapshot("AFTER_NAMED_FOLDER")
+                choose=select_enabled(nodes)
     if not choose:
-        raise AssertionError("DocumentsUI never enabled USE THIS FOLDER after selecting Documents")
+        raise AssertionError("No selectable personal folder in DocumentsUI")
 
     tap(choose)
-    time.sleep(1.2)
-    prompts=[n for n in picker_nodes("PERMISSION_DIALOG")
-        if n.get("text","").lower() in ("allow","consenti")]
+    time.sleep(1)
+    prompts=[n for n in snapshot("PERMISSION_DIALOG")
+        if n.get("text","").lower() in ("allow","consenti") and nonempty(n)]
     if prompts:tap(prompts[-1])
     wait("Backup aggiornato:",seconds=35)
-    files=("MotorLab.json","MusicLab.json","StudyBook-AI.json","MotorAI.json")
-    for f in files:
-        # Explicit shell quoting preserves the required directory name with spaces.
+    for f in ("MotorLab.json","MusicLab.json","StudyBook-AI.json","MotorAI.json"):
         data=adb("shell","sh","-c","cat '"+folder+"/"+f+"'",timeout=15)
         j=json.loads(data)
         expected=f.replace(".json","").replace("StudyBook-AI","StudyBook AI")
         if j.get("roomBackup")!=expected:
-            raise AssertionError("JSON room mismatch "+f+": "+repr(j.get("roomBackup")))
+            raise AssertionError("JSON room mismatch "+f)
         if f=="MotorLab.json":
             if not any(CANARY in m.get("body","") for m in j.get("messages",[])):
-                raise AssertionError("Synthetic message not in MotorLab backup")
+                raise AssertionError("Missing synthetic message in MotorLab JSON")
         elif any(CANARY in m.get("body","") for m in j.get("messages",[])):
-            raise AssertionError("Cross-room synthetic message leak: "+f)
+            raise AssertionError("Cross-room message leak: "+f)
     print("LAB04_SAF_FOUR_JSON_EXPORT=PASSED",flush=True)
 
 def main():
