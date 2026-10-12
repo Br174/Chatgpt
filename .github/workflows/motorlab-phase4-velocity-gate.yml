@@ -1,0 +1,53 @@
+name: MotorLab Phase4 Measured Velocity Gate
+on:
+  push:
+    branches:
+      - 'motorlab-phase4-*'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/motorlab-phase4-velocity-gate.yml'
+      - 'templates/execution/motorlab_execution_fabric.mjs'
+      - 'tests/motorlab-execution-fabric.test.mjs'
+      - 'tests/motorlab-intrinsic-speed-benchmark.mjs'
+      - 'tests/motorlab-r26-adaptive-runtime-benchmark.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify real DAG parallelism, single-writer and cache safety
+        run: node --test tests/motorlab-execution-fabric.test.mjs
+      - name: Measure dispatch overhead on 1200-task dependency graph (nine rounds)
+        run: |
+          node tests/motorlab-intrinsic-speed-benchmark.mjs | tee intrinsic.json
+          python3 - <<'PY'
+          import json
+          data=json.load(open("intrinsic.json"))
+          assert data["kind"]=="intrinsic-dispatcher"
+          assert data["count"]==1200 and data["rounds"]==9
+          assert data["medianMs"]>0 and data["p90Ms"]>0
+          print("MOTORLAB_INTRINSIC_MEASURED=PASSED median_ms="+str(data["medianMs"])+" p90_ms="+str(data["p90Ms"]))
+          with open(__import__("os").environ["GITHUB_STEP_SUMMARY"],"a") as f:
+            f.write(f"**Dispatcher intrinsic (1200 task / 9 runs):** median {data['medianMs']} ms, p90 {data['p90Ms']} ms. No app build measured.\n\n")
+          PY
+      - name: Measure adaptive hedge gain and 429 throttling behavior
+        run: |
+          node tests/motorlab-r26-adaptive-runtime-benchmark.mjs | tee adaptive.json
+          python3 - <<'PY'
+          import json,os
+          d=json.load(open("adaptive.json"))
+          assert d["kind"]=="r26-adaptive-runtime" and d["rounds"]==5
+          assert d["laneTrace"]==[3,1,1,2]
+          assert d["hedgeAvgMs"]<d["baselineAvgMs"]*.65
+          print("MOTORLAB_ADAPTIVE_MEASURED=PASSED base_ms="+str(d["baselineAvgMs"])+" hedge_ms="+str(d["hedgeAvgMs"])+" speedup="+str(d["speedup"]))
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as f:
+            f.write(f"**Synthetic slow-source hedge (5 runs):** base {d['baselineAvgMs']} ms, hedge {d['hedgeAvgMs']} ms, speedup {d['speedup']}x. This is a controlled simulated wait, not an APK build.\n\n")
+          PY
