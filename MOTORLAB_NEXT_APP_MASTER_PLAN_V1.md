@@ -15,7 +15,7 @@ Snapshot: 2026-10-11 · Authorization: user requested execution of the complete 
 | --- | --- | --- |
 | CORE baseline | VERIFIED_EXISTING r34 | MotorLab main release manifest |
 | MotorLab App LAB01 | CI_PASSED, APK_ZIP_RELEASED; DEVICE_TEST_PENDING | https://github.com/Br174/Chatgpt/releases/tag/motorlab-app-lab01-test-7b44048 |
-| MotorLab App LAB02 Team Chat | CI_PASSED, APK_ZIP_RELEASED; DEVICE_TEST_PENDING | https://github.com/Br174/Chatgpt/releases/tag/motorlab-team-lab02-test-00306a2 |
+| MotorLab App LAB02 Team Chat | CI_PASSED, APK_ZIP_RELEASED; REAL_PHONE_INSTALL_HOME_TEAM_AND_LOCAL_PERSISTENCE_VERIFIED; GEMINI_LIVE_PENDING | https://github.com/Br174/Chatgpt/releases/tag/motorlab-team-lab02-test-00306a2 |
 | LAB02 source | COMMITTED isolated branch | https://github.com/Br174/Chatgpt/tree/motorlab/app-lab02-teamchat/apps/motorlab-android |
 | Notion r34 projection | UPDATED_VERIFIED content readback | https://app.notion.com/p/3eb101125bf18199ae89d45eaa804c3a |
 | Google Gemini BYOK | COMPILED_WITH_GUARDS, ACTUAL_API_TEST_PENDING | Lab app settings and GeminiClient |
@@ -31,9 +31,9 @@ Exact source refs and verified existing service roles. Preserve old LAB01 releas
 ### P1 Android executable shell [COMPLETE CI]
 LAB01 home, settings, Gemini adapter, GitHub public read probe, Notion link, APK + ZIP. Hardware installation not verified.
 
-### P2 Team Chat / local handoff [COMPLETE CI, DEVICE_PENDING]
+### P2 Team Chat / local handoff [PHONE INSTALL, UI AND LOCAL MESSAGE PERSISTENCE VERIFIED; LIVE MODEL HANDOFF PENDING]
 LAB02 has rooms, locally persistent SQLite history, author, recipient, run ID, parent message ID, timestamps, source, lesson UNVERIFIED, explicit user-initiated JSON export. Two independent Gemini role requests are sequenced so Tester receives Analyst output. A synthetic test is not equivalent to real API/hardware acceptance.
-Gate: install on physical Android; no crashing; messages survive restart; Google key manual free-tier confirmation; two distinct model outputs and correct parent refs.
+Confirmed by user on physical Android 2026-10-12: installed LAB02 via file manager after browser download screen did not open installer; Home and Team Chat open; all four rooms visible; test message survived closing and reopening app. Issue #31 closed: https://github.com/Br174/Chatgpt/issues/31. Emulator opening smoke: https://github.com/Br174/Chatgpt/actions/runs/38182985265. NOT yet verified: live Gemini calls, Analyst->Tester model handoff, JSON export, other room isolation or persistence after device restart. Gate remaining: Google free-tier confirmation and real two model outputs with correct parent refs. No secrets in repository.
 
 ### P3 Stable signing / update-in-place [SIGNING GATE VERIFIED; SECRET PROVISIONING + DEVICE UPDATE TEST PENDING]
 Created LAB03 signing gate on motorlab/app-lab03-signing with separate it.motorlab.app.stable family, versionCode 3, private keystore via protected Actions secrets, fail-closed secret and pinned signing certificate check, manual workflow_dispatch release only. Source contract and Gradle debug compile PASSED: https://github.com/Br174/Chatgpt/actions/runs/38168997258. No signing keystore configured; no production/stable APK signed or published. Still must provision a permanent private key, inspect/secure backup and prove update-in-place on actual Android while preserving SQLite and Android Keystore. Keep test package separate until signed production family works. No app uninstall requirement for production upgrades.
@@ -75,4 +75,4 @@ Android crash and performance on real phone; sign-in lifecycle, plan quota stops
 - Team build GitHub Actions: https://github.com/Br174/Chatgpt/actions/runs/38135185893 (success).
 - LAB01 remains `motorlab/app-lab01`; CORE main remains canonical; this plan is informational, not a production activation.
 - Offline memory compatibility gate: https://github.com/Br174/Chatgpt/actions/runs/38135584392 (success, schema only, no D1 deployment).
-- When resuming: review current GitHub HEADs and releases; do not rerun completed work; next safe priority is P3 stable signing and P2 real-device test, then authenticated P4. Never deploy D1 schema without new deploy-safety verification.
+- When resuming: review current GitHub HEADs and releases; do not rerun completed work; next safe priority is P3 protected stable-signing provision, then authenticated P4; P2 Android install, UI and SQLite message-persistence test have passed on real phone, while live Gemini handoff remains unverified. Never deploy D1 schema without new deploy-safety verification.
