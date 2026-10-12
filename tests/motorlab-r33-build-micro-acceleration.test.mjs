@@ -16,7 +16,7 @@ test('r33 keeps non-compiler build micro-acceleration explicit', async () => {
     read('MOTORLAB_CORE_ENTRYPOINT_V1.txt'),
     read('MOTORLAB_RELEASE_FANOUT_V1.txt'),
   ]);
-  const version=manifest.match(/^CURRENT_RELEASE=(\\d{4}\\.\\d{2}\\.\\d{2}-r(\\d+))$/m);
+  const version=manifest.match(/^CURRENT_RELEASE=(\d{4}\.\d{2}\.\d{2}-r(\d+))$/m);
   assert.ok(version && Number(version[2]) >= 33, 'r33 build protections must survive newer releases');
   assert.ok(capsule.length < 4000, 'critical capsule must remain < 4000 chars');
   assert.ok(capsule.includes('RELEASE='+version[1]), 'boot capsule must match the canonical release');
