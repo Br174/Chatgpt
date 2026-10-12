@@ -77,3 +77,31 @@ Gate: stesso contratto verificato con almeno due host/adapters indipendenti, con
 
 ## Prossimo passo immediato
 Chiudere la transazione r35 corrente (CI già verde) e verificare il ledger dei target attivi prima di ogni fanout. In parallelo, preparare sul ramo isolato la regola Chat Context Guard e i test anti-regressione; integrare in un prossimo rilascio sicuro, senza mutazioni premature dei satelliti.
+
+
+## CHECKPOINT CONSOLIDATO — 2026-10-12 — fasi 1–7
+Questo è un aggiornamento di prova, **non** un secondo registro autoritativo; per release, blocchi e progetti fa sempre fede il manifest/registro attuale e il dato GitHub live.
+
+| Fase | Stato verificato | Evidenza | Limite aperto |
+|---|---|---|---|
+| 1. Regola Madre e fanout | VERIFIED per sei repository principali; r36 COMPLETE | PR [#33](https://github.com/Br174/Chatgpt/pull/33), [#34](https://github.com/Br174/Chatgpt/pull/34), [#35](https://github.com/Br174/Chatgpt/pull/35) | Quattro LAB pinned PENDING_SAFE_BOUNDARY, Cover-Lab-AI dormiente escluso |
+| 2. Sincronizzazione | PARTIAL_VERIFIED: centrale GitHub OIDC → D1 e replay idempotente veri | [Run 38292289283](https://github.com/Br174/Chatgpt/actions/runs/38292289283), tentativi 1 e 2; PR [#36](https://github.com/Br174/Chatgpt/pull/36), [#37](https://github.com/Br174/Chatgpt/pull/37), [#38](https://github.com/Br174/Chatgpt/pull/38) | Worker esteso non distribuito/verificato, test health runner HTTP403; credenziali deploy Cloudflare non disponibili in Actions; workflow emittente Visionflix rifiutato dai controlli di sicurezza, NON installato; non proclamare cross-repo 24/7 |
+| 3. Pollicino/Watchdog/Recovery | VERIFIED su GitHub runner e sidecar supportati | [Run 38293797063](https://github.com/Br174/Chatgpt/actions/runs/38293797063) | Non prova chiusura/crash di un'app ChatGPT mobile priva di host hook |
+| 4. Velocità | VERIFIED_SIMULATED_BENCHMARK, CI | PR [#39](https://github.com/Br174/Chatgpt/pull/39), [Run 38294940705](https://github.com/Br174/Chatgpt/actions/runs/38294940705): 32/32, dispatcher 1200 task mediana 60.609 ms/p90 123.893 ms, sorgente lenta simulata 2.76× | Tempi reali APK/TTTA, callback API e UI Android ancora da misurare |
+| 5. App MotorLab Team Chat | BUILD_PUBLISHED_AND_SOURCE_TESTED, NON_ACCEPTED_ON_DEVICE | [LAB04 APK/ZIP](https://github.com/Br174/Chatgpt/releases/tag/motorlab-archivio-lab04-4fbacc5) compilati su branch `motorlab/app-lab04-archive` | Android reale, backup/import e privacy dei JSON non cifrati da verificare; app LAB04 è separata dalla LAB02, non aggiorna in-place e non implica runtime CORE r36 |
+| 6. Memoria tecnica | SOURCE_READY_AND_CI_VERIFIED nel D1 già esistente, nessuna seconda memoria | PR [#40](https://github.com/Br174/Chatgpt/pull/40), [Run 38297389738](https://github.com/Br174/Chatgpt/actions/runs/38297389738): tabella `velocity_lessons`, dedup/idempotenza e prova positiva/negativa anti-contaminazione | Worker live e riuso di una vera lezione tra progetti non ancora verificati |
+| 7. Host indipendenti, Skill Creator | SOURCE_READY_AND_CI_VERIFIED: parità protocollo su Python e Node; skill ZIP pubblicato come **export opzionale** | PR [#41](https://github.com/Br174/Chatgpt/pull/41), [Run 38297939041](https://github.com/Br174/Chatgpt/actions/runs/38297939041), [ZIP prerelease](https://github.com/Br174/Chatgpt/releases/tag/motorlab-optional-skill-r36-4bf929c5) | Non equivale a installazione automatica di Skill Creator né ad agenti autonomi su due host |
+
+### Prossime priorità vincolate dalle prove
+1. **Fase 2**: ottenere l'autorizzazione normale per deploy del Worker attuale e verifica live dell'endpoint; successivamente attivare l'emittente nel repository Visionflix solo attraverso un writer autorizzato. Non aggirare i controlli.
+2. **Fase 5**: testare LAB04 su Android reale prima di parlare di app stabile; verificare archivio, sottocartella `Chat Team MotorLab`, ricerca e import JSON. Prima di usare backup reali ricordare che la copia JSON non è cifrata.
+3. **Fase 6–7**: dimostrare reale riuso di una lezione firmata e indipendenza di due adapter con host e servizi effettivi; nessuna propagazione automatica di codice o credenziali.
+4. **Fase 4**: misurare tempi reali di un artefatto APK equivalente, non inferirli dal benchmark sintetico.
+
+RELEASE_AT_CHECKPOINT=2026.10.12-r36
+MAIN_FANOUT=6/6
+PENDING_CURRENT_LABS=4
+NEW_APP_NATIVE_CODE_MUTATIONS=none_by_phase_2_3_4_6_7
+SERVICE_PAYMENT=none_introduced
+SECURITY_BLOCK_BYPASS=none
+CHECKPOINT_MEANS=accurate_state_now;not_all_seven_phases_closed
