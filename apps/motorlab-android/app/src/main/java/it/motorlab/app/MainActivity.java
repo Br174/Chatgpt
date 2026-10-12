@@ -68,7 +68,7 @@ public final class MainActivity extends Activity {
         root=new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(BG); root.setPadding(dp(16),dp(12),dp(16),dp(8));
         TextView title=text("⚙ MotorLab",24,INK,true); root.addView(title);
-        TextView tagline=text("LAB02  •  Team Chat e laboratorio AI",12,MUTE,false);
+        TextView tagline=text("LAB04  •  Archivio Team Chat",12,MUTE,false);
         root.addView(tagline);
         ScrollView sc=new ScrollView(this); sc.setFillViewport(true);
         page=new LinearLayout(this); page.setOrientation(LinearLayout.VERTICAL);

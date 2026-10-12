@@ -57,7 +57,7 @@ public final class TeamChatActivity extends Activity {
         LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(12),dp(10),dp(12),dp(8));root.setBackgroundColor(0xfff8fafc);
         root.addView(text("Team Chat · Sala Operativa",21,true));
-        root.addView(text("LAB02 · Locale sul telefono · Non sincronizzata con il cloud",12,false));
+        root.addView(text("LAB04 · Archivio locale e backup automatico opzionale",12,false));
         for(int row=0;row<2;row++){
             LinearLayout line=new LinearLayout(this);line.setOrientation(LinearLayout.HORIZONTAL);
             root.addView(line);
@@ -94,6 +94,7 @@ public final class TeamChatActivity extends Activity {
             if(body.length()>10000){alert("Massimo 10.000 caratteri.");return;}
             messages.append(room,"manual-"+UUID.randomUUID(),"Utente","Tutti","MESSAGE",
                 body,"USER_LOCAL",0);
+            TeamBackupFolder.schedule(getApplicationContext());
             status="Messaggio salvato sul telefono.";redraw();
         });
         Button start=button(root,"▶ Analista → Tester con Gemini",()->begin());
@@ -103,9 +104,11 @@ public final class TeamChatActivity extends Activity {
             if(recent==null)recent=messages.latest(room,"Analista");
             if(recent==null){alert("Non ci sono risposte AI.");return;}
             boolean inserted=messages.pin(room,recent.id);
+            if(inserted)TeamBackupFolder.schedule(getApplicationContext());
             alert(inserted?"Nota tecnica NON VERIFICATA salvata con fonte #"+recent.id:
                 "Nota già presente oppure fonte non valida.");
         });
+        button(root,"📁 Archivio Team Chat — Apri messaggi",()->startActivity(new Intent(this,TeamArchiveActivity.class)));
         button(root,"Esporta Team Chat e lezioni in JSON",()->{
             Intent i=new Intent(Intent.ACTION_CREATE_DOCUMENT);
             i.addCategory(Intent.CATEGORY_OPENABLE);i.setType("application/json");
@@ -135,7 +138,7 @@ public final class TeamChatActivity extends Activity {
                 new Thread(()->{
                     TeamCoordinator.run(messages,settings,key,currentRoom,user,newStatus->
                         runOnUiThread(()->{
-                            status=newStatus;if(currentRoom.equals(room))redraw();
+                            status=newStatus;TeamBackupFolder.schedule(getApplicationContext());if(currentRoom.equals(room))redraw();
                         }));
                     runOnUiThread(()->{
                         running=false;if(currentRoom.equals(room))redraw();
@@ -153,5 +156,6 @@ public final class TeamChatActivity extends Activity {
             alert("JSON esportato. Il documento contiene messaggi privati: custodiscilo con cura.");
         }catch(Exception e){alert("Impossibile esportare il JSON.");}
     }
+    @Override protected void onResume(){super.onResume();TeamBackupFolder.schedule(getApplicationContext());}
     @Override protected void onDestroy(){if(messages!=null)messages.close();super.onDestroy();}
 }
