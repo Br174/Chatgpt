@@ -145,7 +145,7 @@ def saf_backup_gate():
 
     initial=snapshot("INITIAL")
     choose=select_enabled(initial)
-    if not choose:
+    if choose is None:
         # Android API30 forbids selecting the storage root. DocumentsUI explicitly
         # offers CREATE NEW FOLDER; use it instead of tapping a blocked root grid.
         create=[n for n in initial if n.get("text","").lower()=="create new folder"
@@ -173,7 +173,7 @@ def saf_backup_gate():
         time.sleep(2)
         nodes=snapshot("NEW_FOLDER_CREATED")
         choose=select_enabled(nodes)
-    if not choose:
+    if choose is None:
         raise AssertionError("No enabled personal folder selection in DocumentsUI")
 
     if nonempty(choose):
