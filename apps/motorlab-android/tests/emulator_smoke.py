@@ -53,8 +53,9 @@ def tap(node):
     x=(pts[0]+pts[2])//2
     y=(pts[1]+pts[3])//2
     if x<0 or y<0 or y>2500:raise AssertionError("Invalid UI bounds")
+    print("LAB04_UI_TAP="+repr(node.get("text",""))+" class="+node.get("class","")+" bounds="+bounds+" xy="+str(x)+","+str(y),flush=True)
     adb("shell","input","tap",str(x),str(y))
-    time.sleep(0.8)
+    time.sleep(1.3)
 
 def click(token,exact=False):
     # Prevent false taps on labels/taglines containing the same word as a button.
@@ -152,5 +153,19 @@ if __name__=="__main__":
             for x in ui()[:100]:
                 val=x.get("text","")
                 if val:print("VISIBLE: "+val[:120])
-        except Exception:pass
+        except Exception as diag:
+            print("UI_DIAGNOSTIC_UNAVAILABLE="+str(diag)[:220],flush=True)
+        try:
+            a=adb("shell","dumpsys","activity","activities",timeout=25,check=False)
+            for line in a.splitlines():
+                if any(q in line for q in ("topResumedActivity","mResumedActivity","mFocusedApp","Hist #0","ResumedActivity","it.motorlab.app")):
+                    print("ACTIVITY_DIAGNOSTIC: "+line.strip()[:370],flush=True)
+        except Exception as diag:
+            print("ACTIVITY_DIAGNOSTIC_UNAVAILABLE="+str(diag)[:220],flush=True)
+        try:
+            raw=adb("logcat","-d","-v","brief","-s","AndroidRuntime:E","ActivityTaskManager:W",timeout=25,check=False)
+            for line in raw.splitlines()[-70:]:
+                if line.strip():print("ANDROID_LOG_DIAGNOSTIC: "+line[:420],flush=True)
+        except Exception as diag:
+            print("ANDROID_LOG_DIAGNOSTIC_UNAVAILABLE="+str(diag)[:220],flush=True)
         sys.exit(1)
