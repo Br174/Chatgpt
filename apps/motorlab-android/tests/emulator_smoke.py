@@ -116,7 +116,8 @@ def no_crash():
 
 def autosetup_smoke():
     # Launch a fresh main screen: no account, token, network or destructive action.
-    adb("shell","am","start","-W","-n",MAIN,timeout=35)
+    adb("shell","am","force-stop",PACKAGE)
+    launch()
     click("Chat",exact=True)
     click("AutoSetup")
     wait("MotorLab AutoSetup")
