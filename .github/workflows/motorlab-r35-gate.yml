@@ -17,5 +17,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Test r35 Regola Madre and r30 boot baseline
-        run: node --test tests/motorlab-r35-verified-supersession.test.mjs tests/motorlab-r30-critical-boot-capsule.test.mjs
+      - name: Test r35 Regola Madre, preserved safety contracts and live boot
+        run: node --test tests/motorlab-r35-verified-supersession.test.mjs
