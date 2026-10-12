@@ -4,6 +4,7 @@ on:
     branches: [motorlab/app-lab04-archive]
     paths:
       - .github/workflows/motorlab-app-lab04-delivery.yml
+      - apps/motorlab-android/**
   workflow_dispatch:
 permissions:
   contents: write
@@ -42,6 +43,7 @@ jobs:
           cp apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk motorlab-lab04-files/MotorLab-Archivio-LAB04.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs motorlab-lab04-files/MotorLab-Archivio-LAB04.apk
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging motorlab-lab04-files/MotorLab-Archivio-LAB04.apk | grep -m1 "package: name='it.motorlab.app.lab04' versionCode='4'"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging motorlab-lab04-files/MotorLab-Archivio-LAB04.apk | grep -F "application-label:'MotorLab Archivio'"
           printf '%s\n' "MotorLab LAB04 TEST - Installare accanto a LAB02, poi Team -> Archivio -> Importa backup LAB02 JSON. Firma debug effimera." > motorlab-lab04-files/INSTALLAZIONE.txt
           (cd motorlab-lab04-files && zip -q MotorLab-Archivio-LAB04.zip MotorLab-Archivio-LAB04.apk INSTALLAZIONE.txt)
           sha256sum motorlab-lab04-files/MotorLab-Archivio-LAB04.apk motorlab-lab04-files/MotorLab-Archivio-LAB04.zip

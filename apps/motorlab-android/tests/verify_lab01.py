@@ -42,3 +42,6 @@ assert "Chat Team MotorLab" in folder and "takePersistableUriPermission" in fold
 assert "DocumentsContract.createDocument" in folder and "Executors.newSingleThreadExecutor()" in folder
 assert "TeamBackupFolder.schedule" in teamui
 print("LAB04 static archive contract: PASS (not equivalent to a phone test)")
+
+assert 'android:label="MotorLab Archivio"' in manifest
+print('LAB04 launcher name distinct from LAB02: PASS')
