@@ -7,11 +7,11 @@ android {
     compileSdk 35
 
     defaultConfig {
-        applicationId 'it.motorlab.app.lab04'
+        applicationId 'it.motorlab.app'
         minSdk 26
         targetSdk 35
-        versionCode 4
-        versionName '0.4.0-LAB04'
+        versionCode 5
+        versionName '0.5.0-unified-LAB'
     }
 
     signingConfigs {
@@ -21,12 +21,20 @@ android {
             keyAlias 'motorlab-lab'
             keyPassword System.getenv('MOTORLAB_LAB_PASSWORD') ?: 'disabled'
         }
+        // Canonical MotorLab must NEVER use the disposable LAB certificate.
+        // GitHub Actions must provision main-app signing secrets through protected storage.
+        mainApp {
+            storeFile file(System.getenv('MOTORLAB_MAIN_KEYSTORE') ?: 'missing-protected-main-signing.jks')
+            storePassword System.getenv('MOTORLAB_MAIN_STORE_PASSWORD') ?: 'UNCONFIGURED'
+            keyAlias System.getenv('MOTORLAB_MAIN_KEY_ALIAS') ?: 'unconfigured-main-signing'
+            keyPassword System.getenv('MOTORLAB_MAIN_KEY_PASSWORD') ?: 'UNCONFIGURED'
+        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            signingConfig signingConfigs.lab
+            signingConfig signingConfigs.mainApp
         }
     }
 

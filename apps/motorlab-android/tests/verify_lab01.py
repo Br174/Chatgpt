@@ -6,7 +6,16 @@ manifest=(p/"app/src/main/AndroidManifest.xml").read_text()
 gemini=(p/"app/src/main/java/it/motorlab/app/GeminiClient.java").read_text()
 key=(p/"app/src/main/java/it/motorlab/app/SecureGeminiKey.java").read_text()
 openai=(p/"app/src/main/java/it/motorlab/app/ChatGptPlan.java").read_text()
-assert "it.motorlab.app" in (p/"app/build.gradle").read_text()
+assert "applicationId 'it.motorlab.app'" in (p/"app/build.gradle").read_text()
+assert "applicationId 'it.motorlab.app.lab" not in (p/"app/build.gradle").read_text()
+assert "versionCode 5" in (p/"app/build.gradle").read_text()
+# Main release signing must never fall back to the disposable LAB/test certificate.
+gradle=(p/"app/build.gradle").read_text()
+assert "signingConfig signingConfigs.mainApp" in gradle
+assert "signingConfig signingConfigs.lab" not in gradle
+assert "MOTORLAB_MAIN_KEYSTORE" in gradle
+assert "MOTORLAB_MAIN_STORE_PASSWORD" in gradle
+assert "MOTORLAB_MAIN_KEY_PASSWORD" in gradle
 assert 'android:allowBackup="false"' in manifest
 assert "GeminiClient.reply" in source
 assert "KeyGenParameterSpec" in key and "AES/GCM/NoPadding" in key
@@ -26,8 +35,8 @@ assert 'GEMINI_UNVERIFIED' in teamlogic and teamlogic.count("GeminiClient.reply"
 assert teamlogic.count("reserveDailyTrialCall()") == 2
 assert "TeamChatActivity" in manifest and 'android:exported="false"' in manifest
 assert "ACTION_CREATE_DOCUMENT" in teamui and "TeamCoordinator.run" in teamui
-assert "it.motorlab.app.lab04" in (p/"app/build.gradle").read_text()
-assert "versionCode 4" in (p/"app/build.gradle").read_text()
+assert "applicationId 'it.motorlab.app'" in (p/"app/build.gradle").read_text()
+assert "versionCode 5" in (p/"app/build.gradle").read_text()
 print("LAB02 Team Chat contract: PASS - runtime and live AI not proven")
 
 archive=(p/"app/src/main/java/it/motorlab/app/TeamArchiveActivity.java").read_text()
@@ -43,5 +52,7 @@ assert "DocumentsContract.createDocument" in folder and "Executors.newSingleThre
 assert "TeamBackupFolder.schedule" in teamui
 print("LAB04 static archive contract: PASS (not equivalent to a phone test)")
 
-assert 'android:label="MotorLab Archivio"' in manifest
-print('LAB04 launcher name distinct from LAB02: PASS')
+assert 'android:label="MotorLab"' in manifest
+assert 'android:label="MotorLab Archivio"' not in manifest
+assert "TeamChatActivity" in source and "TeamArchiveActivity" in teamui
+print("Unified app identity/Team Chat/Archive: PASS (signing and device acceptance not yet verified)")

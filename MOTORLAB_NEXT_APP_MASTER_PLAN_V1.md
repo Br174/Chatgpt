@@ -91,3 +91,22 @@ Android crash and performance on real phone; sign-in lifecycle, plan quota stops
 - LAB01 remains `motorlab/app-lab01`; CORE main remains canonical; this plan is informational, not a production activation.
 - Offline memory compatibility gate: https://github.com/Br174/Chatgpt/actions/runs/38135584392 (success, schema only, no D1 deployment).
 - When resuming: review current GitHub HEADs and releases; do not rerun completed work; next safe priority is P3 stable signing and P2 real-device test, then authenticated P4. Never deploy D1 schema without new deploy-safety verification.
+
+## 2026-10-12 — approved single-final-app policy (LAB05 integration staging)
+OPERATION_ID=motorlab-main-app-unification-20261012
+CORE_POLICY_BRANCH=motorlab/unified-app-policy-r37-prep-20261012
+APP_SOURCE_BRANCH=motorlab/app-lab05-unified-20261012
+USER_APPROVED=standalone LAB APKs allowed only for testing; accepted feature modules must be merged into ONE MotorLab Android main app, maintaining the same installed app update family.
+CANONICAL_APPLICATION_ID=it.motorlab.app
+SOURCE_BASIS=motorlab/app-lab04-archive (contains LAB01 shell, LAB02 Team Chat, LAB04 Archive)
+LAB05_STAGED_COMPONENTS=MainActivity + TeamChatActivity + TeamArchiveActivity + TeamChatStore + TeamBackupFolder + existing Gemini opt-in client; no native engines touched.
+ANDROID_LAB05_VERSION_CODE=5; experimental build package is the canonical main package, but NOT yet certified as an update.
+LAST_GOOD_APP_RELEASE=MotorLab LAB01 / it.motorlab.app (debug signed with unverified ephemeral cert); published LAB02 and LAB04 remain intact as independent historical testing packages.
+HARD_BLOCKER_SIGNING=LAB01 debug certificate key provenance is not stable/reverified. Android cannot update an installed package with a different cert, even when applicationId matches. No production or update-in-place compatibility claim from LAB05 Gradle build alone.
+HARD_BLOCKER_MIGRATION=LAB02 and LAB04 use separate Android sandboxes and cannot directly contribute private SQLite, tokens or SAF grants. Preserve the old test app installs until explicit user-controlled JSON backup and transactional import are tested on device. The existing archive importer is the allowed message migration path; credential entries require user-controlled reauthorization.
+ACCEPTANCE_GATE_1=CI exact package it.motorlab.app, versionCode 5, archive/chat manifest, static security protections, emulator open/send/search/reopen (all runnable without cloud or Gemini).
+ACCEPTANCE_GATE_2=verify stable protected signing certificate and exact same-family APK update over installed LAB01 with existing settings intact; if unavailable report BLOCKED without publishing as a safe update.
+ACCEPTANCE_GATE_3=real Android 11 phone device verifies old LAB02/04 JSON export/import, counts/dedupe, privacy, no data loss, plus SAF folder four-JSON round-trip; no uninstall/automatic data copying.
+ACCEPTANCE_GATE_4=previous app functionality, layout and optional providers not regressed; only now promote one unified main-app release/ZIP. Separate LABs stay available for testing/rollback but are never a required final second app.
+CORE_RECONCILIATION=policy prepared in isolated branch; do not mark canonical CORE r36 as changed or presume satellite fanout.
+NO_AUTO_PROMOTION=TRUE

@@ -68,7 +68,7 @@ public final class MainActivity extends Activity {
         root=new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(BG); root.setPadding(dp(16),dp(12),dp(16),dp(8));
         TextView title=text("⚙ MotorLab",24,INK,true); root.addView(title);
-        TextView tagline=text("LAB04  •  Archivio Team Chat",12,MUTE,false);
+        TextView tagline=text("MotorLab  •  Team Chat e Archivio",12,MUTE,false);
         root.addView(tagline);
         ScrollView sc=new ScrollView(this); sc.setFillViewport(true);
         page=new LinearLayout(this); page.setOrientation(LinearLayout.VERTICAL);
@@ -90,7 +90,7 @@ public final class MainActivity extends Activity {
     }
     private void home() {
         label("MotorLab diventa un'app");
-        note("LAB02 aggiunge una Team Chat locale persistente. Questo client Android Non modifica il CORE, non avvia rilasci e non finge di avere una sincronizzazione che non esiste.");
+        note("Team Chat e Archivio sono integrati in MotorLab. I messaggi sono locali: non sono una sincronizzazione cloud né un agente programmatore autonomo.");
         gap(); label("CORE centrale");
         note("Baseline sorgente attesa: MotorLab r34. Stato live del repository privato ancora da collegare con autenticazione.");
         gap(); label("Progetti iniziali");
