@@ -67,6 +67,7 @@ test('same session pin is stable until a later release safely refreshes it at re
   assert.match(first, /SESSION_RELEASE_PIN_MODE=PIN_CREATED/);
 
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.08-r29\nSTATE=VERIFIED\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), await capsuleFor('2026.10.08-r29'));
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.08-r29'));
 
   const resumed = runBoot(temp, pinDir, 'resume', 'session-A');

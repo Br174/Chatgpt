@@ -36,6 +36,7 @@ test('r29 bootstrap keeps exact versioned banner and later releases may refresh 
   assert.match(first, /SESSION_RELEASE_PIN=2026\.10\.07-r29/);
 
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.08-r30\nSTATE=VERIFIED\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), await capsuleFor('2026.10.08-r30'));
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.08-r30'));
 
   const resumed = boot(temp, pinDir, 'resume', 'session-A');
