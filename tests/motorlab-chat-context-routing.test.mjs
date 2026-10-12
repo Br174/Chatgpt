@@ -28,7 +28,7 @@ test('negative warning routing examples: use of MotorLab inside the right projec
  'Any chat + "Explain how MotorLab works" => EXPLANATION_ONLY => NO_WARNING',
  'Explicit approved transfer of a pending operation to this chat => RESUME_IN_NEW_CHAT_WITH_CHECKPOINT, NO_REPEAT'
  ])assert.ok(s.includes(example), 'missing negative example: '+example);
- assert.match(s,/never warn solely because MotorLab is mentioned or used to change the current project/i);
+ assert.match(s,/DO NOT WARN merely because the user says "MotorLab"/);
 });
 
 test('positive warning routing examples and protected no-migration principle remain',async()=>{
@@ -36,8 +36,8 @@ test('positive warning routing examples and protected no-migration principle rem
  assert.match(s,/MusicLab chat \+ "Change CORE MotorLab central release\/guard" => MOTORLAB_CORE_SELF_CHANGE => RECOMMEND_MOTORLAB_CHAT/);
  assert.match(s,/MusicLab chat \+ "Change GeoVision native app" => OTHER_PROJECT_CHANGE => RECOMMEND_GEOVISION_CHAT/);
  assert.match(s,/must not be required to migrate manually to another conversation/);
- assert.match(s,/explicitly chosen cross-chat transfer by operation_id\/checkpoint/);
- assert.match(s,/does not add a scheduler/);
+ assert.match(s,/EXPLICIT VOLUNTARY CHAT TRANSFER/);\n assert.match(s,/real operation_id, approvals, locks/);
+ assert.match(s,/does NOT add a scheduler/);
  assert.match(s,/If CURRENT_CHAT_PROJECT is reliable/);
  assert.match(s,/without accessible chat\/project identity/);
 });
