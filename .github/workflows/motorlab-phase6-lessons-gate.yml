@@ -1,0 +1,26 @@
+name: MotorLab Phase6 Global Learning Safety Gate
+on:
+  push:
+    branches: ['motorlab-phase6-*']
+  pull_request:
+    branches: [main]
+    paths:
+      - 'cloudflare/motorlab-state-bridge/src/velocity-lessons.js'
+      - 'cloudflare/motorlab-state-bridge/src/schema.js'
+      - 'tests/motorlab-phase6-lesson-routing.test.mjs'
+      - '.github/workflows/motorlab-phase6-lessons-gate.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify lesson validation and negative cross-project contamination tests
+        run: node --test tests/motorlab-phase6-lesson-routing.test.mjs
+      - name: Prevent Pollicino/Live Control schema and runtime regressions
+        run: node --test cloudflare/motorlab-state-bridge/test/*.test.mjs
