@@ -108,6 +108,7 @@ public final class TeamChatActivity extends Activity {
             alert(inserted?"Nota tecnica NON VERIFICATA salvata con fonte #"+recent.id:
                 "Nota già presente oppure fonte non valida.");
         });
+        button(root,"🌐 AutoSetup — configura qualsiasi sito",()->startActivity(new Intent(this,AutoSetupActivity.class)));
         button(root,"📁 Archivio Team Chat — Apri messaggi",()->startActivity(new Intent(this,TeamArchiveActivity.class)));
         button(root,"Esporta Team Chat e lezioni in JSON",()->{
             Intent i=new Intent(Intent.ACTION_CREATE_DOCUMENT);
