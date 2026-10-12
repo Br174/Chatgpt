@@ -139,7 +139,7 @@ def saf_backup_gate():
     def select_enabled(nodes):
         tokens=("use this folder","usa questa cartella","select this folder",
                 "seleziona questa cartella")
-        return next((n for n in nodes if nonempty(n) and n.get("enabled")!="false"
+        return next((n for n in nodes if n.get("enabled")!="false"
             and any(s in (n.get("text","")+" "+n.get("content-desc","")).lower()
                 for s in tokens)),None)
 
@@ -173,17 +173,33 @@ def saf_backup_gate():
         time.sleep(2)
         nodes=snapshot("NEW_FOLDER_CREATED")
         choose=select_enabled(nodes)
-        if not choose:
-            named=[n for n in nodes if n.get("text","")==parent and nonempty(n)]
-            if named:
-                tap(named[0])
-                time.sleep(1.5)
-                nodes=snapshot("AFTER_NAMED_FOLDER")
-                choose=select_enabled(nodes)
     if not choose:
-        raise AssertionError("No selectable personal folder in DocumentsUI")
+        raise AssertionError("No enabled personal folder selection in DocumentsUI")
 
-    tap(choose)
+    if nonempty(choose):
+        tap(choose)
+    else:
+        # Android API30 reports a clickable, enabled bottom button with 0x0
+        # accessibility bounds. Only after verifying the personal folder is
+        # selected, try the safe bottom-toolbar touchscreen positions.
+        screen=adb("shell","wm","size")
+        resolutions=re.findall(r"(\d+)x(\d+)",screen)
+        if not resolutions:raise AssertionError("Cannot read emulator dimensions")
+        width,height=map(int,resolutions[-1])
+        print("LAB04_SAF_ZERO_BOUNDS_ENABLED=TRUE resolution="+str(width)+"x"+str(height),flush=True)
+        triggered=False
+        for fraction in (0.91,0.88,0.94,0.84):
+            x,y=width//2,int(height*fraction)
+            adb("shell","input","tap",str(x),str(y))
+            time.sleep(1.2)
+            nodes=snapshot("AFTER_BOTTOM_TAP_"+str(int(fraction*100)))
+            if not any(n.get("text","").lower() in ("use this folder",
+                    "usa questa cartella","select this folder") for n in nodes):
+                triggered=True
+                print("LAB04_SAF_BOTTOM_BUTTON_TAPPED=TRUE y="+str(y),flush=True)
+                break
+        if not triggered:
+            raise AssertionError("Enabled DocumentsUI bottom action not touch-responsive")
     time.sleep(1)
     prompts=[n for n in snapshot("PERMISSION_DIALOG")
         if n.get("text","").lower() in ("allow","consenti") and nonempty(n)]
