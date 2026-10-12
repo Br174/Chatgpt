@@ -211,3 +211,24 @@ CLOUDFLARE_D1_OPERATION_EVENT_WRITE_FOR_THIS_PILOT=NOT_VERIFIED
 AUTOMATIC_LESSON_FANOUT_FOR_THIS_PILOT=NOT_VERIFIED
 DECLARED_PROVIDER_CONNECTION=GitHub_tool_connected_verified;D1_backend_known_from_prior_integrations_not_revalidated_in_this_pilot
 NEXT_ACCEPTANCE=authenticated_durable_existing_executor_writes_deduped_event_through_existing_Persistent_Operational_State_and_replays_safely;verified_two_direction_event_evidence;no_second_scheduler_or_db
+
+
+PHASE 2 — LIVE OIDC REPLAY AND AUTHORIZED PROJECT EMITTER STATUS — 2026-10-12
+CENTRAL_RELAY_FIRST_RUN=https://github.com/Br174/Chatgpt/actions/runs/38292289283 attempt=1 SUCCESS
+FIRST_SNAPSHOT_ID=motorlab-phase2-visionflix-feedback-r36-20261012-001
+FIRST_SHA256=62df3dad1c4250f30546471dad40a7919b2aa6e30475a71ab6139c4a42f128db
+FIRST_DELIVERY=OIDC_authenticated_D1_persistSnapshot_and_/verify PASSED idempotent=False
+CENTRAL_RELAY_REPLAY=https://github.com/Br174/Chatgpt/actions/runs/38292289283 attempt=2 SUCCESS
+REPLAY_D1_IDEMPOTENCE=PASSED idempotent=True with exact same snapshot_id and SHA256
+CENTRAL_WORKER_PROJECT_FEEDBACK_SOURCE=MERGED PR38 commit=f633132d5f583498d2e1a8ac433ad6e9efb5f3d3
+CENTRAL_SOURCE_TESTS=PASS includes signed source claims, negative unauthorized/dormant/forged cases, event ID dedup and Pollicino/LiveControl regression
+WORKER_RUNTIME_PROJECT_ENDPOINT=NOT_VERIFIED_DEPLOYED
+WORKER_DEPLOYMENT_GITHUB_ACTIONS_CREDENTIAL_FLAGS=CLOUDFLARE_API_TOKEN_FALSE CLOUDFLARE_ACCOUNT_ID_FALSE (Run 38293920307; no secret values read)
+WORKER_READ_ONLY_HEALTH_PROBE=HTTP403 from runner, interpreted as access block only, not as evidence of Worker down
+VISIONFLIX_EMITTER_WORKFLOW=NOT_INSTALLED no_main_write; workflow write request rejected by connector safety, no bypass
+VISIONFLIX_PREP_BRANCH=motorlab-phase2-feedback-oidc-pilot-prepared-20261012 created without workflow activation
+UNATTENDED_REPOSITORY_TO_CORE_FEEDBACK=BLOCKED_EXTERNAL_AUTHORIZATION_DEPLOYMENT_AND_WORKFLOW_WRITE
+VERIFIED_SCOPE=central authenticated GitHub_to_D1 OIDC and exact replay idempotence; not an automatic cross-repository Visionflix->D1 push
+NEXT_SAFE_ACTION=authorized Cloudflare Worker deployment after secure account/workflow access, then live auth-negative canary, then authorized Visionflix workflow installation and real signed event readback; never bypass connector controls
+PROJECT_NATIVE_ENGINE=UNCHANGED
+FANOUT_RELEASE=r36 COMPLETE main6/6 four LAB safe-boundary pending
