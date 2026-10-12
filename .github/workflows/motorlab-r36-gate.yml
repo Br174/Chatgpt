@@ -21,3 +21,5 @@ jobs:
         run: node --test tests/motorlab-r36-guard-and-boot.test.mjs
       - name: Test existing target-aware chat routing and no false warnings
         run: node --test tests/motorlab-chat-context-routing.test.mjs
+      - name: Verify r36 central fanout closure and explicit safe pending LAB refs
+        run: node --test tests/motorlab-r36-fanout-closure.test.mjs

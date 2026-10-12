@@ -77,6 +77,6 @@ test('r36 integrates chat target guard into one existing control-plane lane',asy
  assert.match(bundle,/CHAT_CONTEXT_GUARD_INVOKER=EXISTING_REENTRY_GATE/);
  assert.match(capsule,/CHAT_CONTEXT_GUARD=required/);
  assert.ok(Buffer.byteLength(capsule,'utf8')<4000, 'critical boot capsule must stay <4000 bytes');
- assert.match(manifest,/FANOUT_STATE=IN_PROGRESS/);
- assert.match(manifest,/CHAT_CONTEXT_GUARD_STATUS=R36_PREPARED_NOT_YET_FANNED_OUT/);
+ assert.match(manifest,/FANOUT_STATE=COMPLETE/);
+ assert.match(manifest,/CHAT_CONTEXT_GUARD_STATUS=R36_MAIN6_VERIFIED_FOUR_LABS_PENDING_SAFE_BOUNDARY/);
 });
