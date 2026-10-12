@@ -1,3 +1,4 @@
+import { capsuleFor, coreFor } from './helpers/motorlab-boot-fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, copyFile } from 'node:fs/promises';
@@ -24,25 +25,26 @@ test('r29 bootstrap keeps exact versioned banner and later releases may refresh 
   await mkdir(join(temp, '.motorlab'), { recursive: true });
   await mkdir(join(temp, '.codex', 'hooks'), { recursive: true });
   await writeFile(join(temp, 'MOTORLAB_PROJECT_HOOK.txt'), 'PROJECT_NAME=FutureProject\n');
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), 'MOTORLAB CRITICAL BOOT CAPSULE V1\nNUMERIC_PROGRESS=required\nVISUAL_STATUS=required\nSESSION_RELEASE_PIN=required\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), await capsuleFor('2026.10.07-r29'));
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.07-r29\nSTATE=VERIFIED\n');
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'MOTORLAB SATELLITE BUNDLE\nRELEASE=2026.10.07-r29\nVERSIONED_BOOT_BANNER=required\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.07-r29'));
   await copyFile(join(repo, 'templates', 'codex', 'motorlab', 'motorlab_boot.py'), join(temp, '.codex', 'hooks', 'motorlab_boot.py'));
   spawnSync('git', ['init'], { cwd: temp, encoding: 'utf8' });
 
   const first = boot(temp, pinDir, 'startup', 'session-A');
-  assert.match(first, /First user-visible line exactly: "⚙️ MotorLab r29 attivo"\./);
+  assert.match(first, /First two visible lines: "⚙️ MotorLab r29 attivo" then "✨ MotorLab — I Fantastici 20 attivati"\./);
   assert.match(first, /SESSION_RELEASE_PIN=2026\.10\.07-r29/);
 
   await writeFile(join(temp, '.motorlab', 'MOTORLAB_SYNC_STATE.txt'), 'LOCAL_RELEASE=2026.10.08-r30\nSTATE=VERIFIED\n');
-  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), 'MOTORLAB SATELLITE BUNDLE\nRELEASE=2026.10.08-r30\nVERSIONED_BOOT_BANNER=required\n');
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_BOOT_CAPSULE.txt'), await capsuleFor('2026.10.08-r30'));
+  await writeFile(join(temp, '.motorlab', 'MOTORLAB_LOCAL_CORE.txt'), await coreFor('2026.10.08-r30'));
 
   const resumed = boot(temp, pinDir, 'resume', 'session-A');
-  assert.match(resumed, /First user-visible line exactly: "⚙️ MotorLab r30 attivo"\./);
+  assert.match(resumed, /First two visible lines: "⚙️ MotorLab r30 attivo" then "✨ MotorLab — I Fantastici 20 attivati"\./);
   assert.match(resumed, /SESSION_RELEASE_PIN_MODE=PIN_REFRESHED_SAFE_REENTRY/);
 
   const fresh = boot(temp, pinDir, 'startup', 'session-B');
-  assert.match(fresh, /First user-visible line exactly: "⚙️ MotorLab r30 attivo"\./);
+  assert.match(fresh, /First two visible lines: "⚙️ MotorLab r30 attivo" then "✨ MotorLab — I Fantastici 20 attivati"\./);
   assert.match(fresh, /SESSION_RELEASE_PIN=2026\.10\.08-r30/);
 });
 
