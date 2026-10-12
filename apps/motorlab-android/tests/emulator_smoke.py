@@ -114,6 +114,55 @@ def no_crash():
         raise AssertionError("LAB04 FATAL EXCEPTION in logcat")
     print("LAB04_NO_FATAL_EXCEPTION=PASSED",flush=True)
 
+
+def saf_backup_gate():
+    """Physical files / Android DocumentsUI gate using synthetic messages only."""
+    folder="/sdcard/Documents/Chat Team MotorLab"
+    adb("shell","mkdir","-p","/sdcard/Documents")
+    click("Scegli dove creare")
+    time.sleep(2)
+    def dump_picker(label):
+        print("LAB04_SAF_"+label+"="+repr([(n.get("text",""),n.get("content-desc","")) for n in ui()
+            if n.get("text") or n.get("content-desc")])[:2100],flush=True)
+    dump_picker("PICKER_INITIAL")
+    # Android 11 DocumentsUI starts from Recents on some emulators.
+    try:
+        tap(wait("Documents",seconds=8,exact=True))
+    except AssertionError:
+        adb("shell","input","tap","45","84")
+        time.sleep(1)
+        dump_picker("PICKER_NAVIGATION")
+        nodes=ui()
+        roots=[n for n in nodes if ("Pixel" in n.get("text","") or
+            "sdk_gphone" in n.get("text","") or "Internal storage" in n.get("text",""))]
+        if not roots:raise AssertionError("DocumentsUI storage root unavailable")
+        tap(roots[0])
+        tap(wait("Documents",seconds=12,exact=True))
+    dump_picker("PICKER_DOCUMENTS")
+    # Button text varies with emulator locale, so inspect actual accessibility label.
+    candidates=[n for n in ui() if any(x in (n.get("text","")+" "+n.get("content-desc","")).lower()
+        for x in ("use this folder","usa questa cartella","select this folder","seleziona questa cartella"))]
+    if not candidates:raise AssertionError("DocumentsUI choose-folder confirmation missing")
+    tap(candidates[-1])
+    time.sleep(.9)
+    prompts=[n for n in ui() if n.get("text","").lower() in ("allow","consenti")]
+    if prompts:tap(prompts[-1])
+    wait("Backup aggiornato:",seconds=28)
+    files=("MotorLab.json","MusicLab.json","StudyBook-AI.json","MotorAI.json")
+    for f in files:
+        data=adb("shell","cat",folder+"/"+f,timeout=15)
+        import json
+        j=json.loads(data)
+        expected=f.replace(".json","").replace("StudyBook-AI","StudyBook AI")
+        if j.get("roomBackup")!=expected:
+            raise AssertionError("JSON room mismatch "+f+": "+repr(j.get("roomBackup")))
+        if f=="MotorLab.json":
+            if not any(CANARY in m.get("body","") for m in j.get("messages",[])):
+                raise AssertionError("Synthetic message not in MotorLab backup")
+        elif any(CANARY in m.get("body","") for m in j.get("messages",[])):
+            raise AssertionError("Cross-room synthetic message leak: "+f)
+    print("LAB04_SAF_FOUR_JSON_EXPORT=PASSED",flush=True)
+
 def main():
     adb("wait-for-device",timeout=120)
     adb("shell","settings","put","system","screen_off_timeout","600000")
@@ -143,6 +192,7 @@ def main():
     wait(CANARY)
     print("LAB04_REOPEN_HISTORY_PERSISTENT=PASSED",flush=True)
     no_crash()
+    saf_backup_gate()
     print("LAB04_ANDROID_EMULATOR_E2E=PASSED",flush=True)
 
 if __name__=="__main__":
