@@ -116,42 +116,84 @@ def no_crash():
 
 
 def saf_backup_gate():
-    """Physical files / Android DocumentsUI gate using synthetic messages only."""
+    """Test Android 11 DocumentsUI export with synthetic-only data."""
+    import json
     folder="/sdcard/Documents/Chat Team MotorLab"
     adb("shell","mkdir","-p","/sdcard/Documents")
     click("Scegli dove creare")
     time.sleep(2)
-    def dump_picker(label):
-        print("LAB04_SAF_"+label+"="+repr([(n.get("text",""),n.get("content-desc","")) for n in ui()
-            if n.get("text") or n.get("content-desc")])[:2100],flush=True)
-    dump_picker("PICKER_INITIAL")
-    # Android 11 DocumentsUI starts from Recents on some emulators.
-    try:
-        tap(wait("Documents",seconds=8,exact=True))
-    except AssertionError:
-        adb("shell","input","tap","45","84")
-        time.sleep(1)
-        dump_picker("PICKER_NAVIGATION")
+
+    def picker_nodes(label):
         nodes=ui()
-        roots=[n for n in nodes if ("Pixel" in n.get("text","") or
-            "sdk_gphone" in n.get("text","") or "Internal storage" in n.get("text",""))]
-        if not roots:raise AssertionError("DocumentsUI storage root unavailable")
-        tap(roots[0])
-        tap(wait("Documents",seconds=12,exact=True))
-    dump_picker("PICKER_DOCUMENTS")
-    # Button text varies with emulator locale, so inspect actual accessibility label.
-    candidates=[n for n in ui() if any(x in (n.get("text","")+" "+n.get("content-desc","")).lower()
-        for x in ("use this folder","usa questa cartella","select this folder","seleziona questa cartella"))]
-    if not candidates:raise AssertionError("DocumentsUI choose-folder confirmation missing")
-    tap(candidates[-1])
-    time.sleep(.9)
-    prompts=[n for n in ui() if n.get("text","").lower() in ("allow","consenti")]
+        print("LAB04_SAF_"+label+"="+repr([
+            (n.get("text",""),n.get("content-desc",""),n.get("class",""),
+             n.get("clickable",""),n.get("enabled",""),n.get("bounds",""))
+            for n in nodes if n.get("text") or n.get("content-desc")
+        ])[:3700],flush=True)
+        return nodes
+
+    def visible_choose_button(nodes):
+        tokens=("use this folder","usa questa cartella",
+                "select this folder","seleziona questa cartella")
+        for n in nodes:
+            label=(n.get("text","")+" "+n.get("content-desc","")).lower()
+            b=[int(i) for i in re.findall(r"\d+",n.get("bounds",""))]
+            if any(x in label for x in tokens) and n.get("enabled")!="false":
+                if len(b)==4 and b[0]<b[2] and b[1]<b[3]:
+                    return n
+        return None
+
+    nodes=picker_nodes("PICKER_INITIAL")
+    # Never click an off-screen/disabled DocumentsUI confirmation ([0,0][0,0]).
+    # If the picker starts at storage root, enter the Documents directory first.
+    choose=visible_choose_button(nodes)
+    if not choose:
+        labels=[n for n in nodes if n.get("text","")=="Documents"]
+        if not labels:
+            raise AssertionError("Documents not visible in picker; no silent root fallback")
+        folder_label=labels[-1]
+        tap(folder_label)
+        time.sleep(2)
+        nodes=picker_nodes("AFTER_DOCUMENTS_FIRST_TAP")
+        choose=visible_choose_button(nodes)
+        if not choose:
+            # Some DocumentsUI builds make only the row container clickable.
+            raw=adb("shell","cat","/sdcard/window-motorlab.xml",timeout=20)
+            root=ET.fromstring(raw[raw.index("<?xml"):])
+            parent={c:p for p in root.iter("node") for c in p}
+            docs=[n for n in root.iter("node") if n.get("text","")=="Documents"]
+            if not docs:
+                raise AssertionError("Documents row disappeared without folder selection")
+            cursor=docs[-1]
+            clickable=None
+            while cursor is not None:
+                if cursor.get("clickable")=="true":
+                    clickable=cursor
+                    break
+                cursor=parent.get(cursor)
+            if clickable is not None:
+                print("LAB04_SAF_DOCUMENTS_ROW_PARENT="+repr((
+                    clickable.get("class"),clickable.get("bounds"))),flush=True)
+                tap(clickable)
+            else:
+                # Plain second tap is a safe UI fallback, not an app/runtime edit.
+                tap(docs[-1])
+            time.sleep(2)
+            nodes=picker_nodes("AFTER_DOCUMENTS_ROW_TAP")
+            choose=visible_choose_button(nodes)
+    if not choose:
+        raise AssertionError("DocumentsUI never enabled USE THIS FOLDER after selecting Documents")
+
+    tap(choose)
+    time.sleep(1.2)
+    prompts=[n for n in picker_nodes("PERMISSION_DIALOG")
+        if n.get("text","").lower() in ("allow","consenti")]
     if prompts:tap(prompts[-1])
-    wait("Backup aggiornato:",seconds=28)
+    wait("Backup aggiornato:",seconds=35)
     files=("MotorLab.json","MusicLab.json","StudyBook-AI.json","MotorAI.json")
     for f in files:
-        data=adb("shell","cat",folder+"/"+f,timeout=15)
-        import json
+        # Explicit shell quoting preserves the required directory name with spaces.
+        data=adb("shell","sh","-c","cat '"+folder+"/"+f+"'",timeout=15)
         j=json.loads(data)
         expected=f.replace(".json","").replace("StudyBook-AI","StudyBook AI")
         if j.get("roomBackup")!=expected:
