@@ -9,7 +9,7 @@ test('one existing routing owner, Re-entry is only the caller',async()=>{
  read('MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt'),read('MOTORLAB_PIANO_UNICO_2026_10_12.md')]);
  assert.match(route,/Sole owner of chat\/project target routing: THIS UAB_PROJECT_ROUTING contract/);
  assert.match(reentry,/apply the canonical UAB_PROJECT_ROUTING\.txt CHAT CONTEXT GUARD/);
- assert.match(route,/not a scheduler, process, independent classifier service, database/);
+ assert.match(route,/does NOT add a scheduler, process, independent classifier service, database/);
  assert.match(route,/MOTORLAB_CORE_SELF_CHANGE/);
  assert.match(route,/CURRENT_PROJECT_CHANGE/);
  assert.match(route,/OTHER_PROJECT_CHANGE/);
@@ -36,7 +36,8 @@ test('positive warning routing examples and protected no-migration principle rem
  assert.match(s,/MusicLab chat \+ "Change CORE MotorLab central release\/guard" => MOTORLAB_CORE_SELF_CHANGE => RECOMMEND_MOTORLAB_CHAT/);
  assert.match(s,/MusicLab chat \+ "Change GeoVision native app" => OTHER_PROJECT_CHANGE => RECOMMEND_GEOVISION_CHAT/);
  assert.match(s,/must not be required to migrate manually to another conversation/);
- assert.match(s,/EXPLICIT VOLUNTARY CHAT TRANSFER/);\n assert.match(s,/real operation_id, approvals, locks/);
+ assert.match(s,/EXPLICIT VOLUNTARY CHAT TRANSFER/);
+ assert.match(s,/real operation_id, approvals, locks/);
  assert.match(s,/does NOT add a scheduler/);
  assert.match(s,/If CURRENT_CHAT_PROJECT is reliable/);
  assert.match(s,/without accessible chat\/project identity/);
