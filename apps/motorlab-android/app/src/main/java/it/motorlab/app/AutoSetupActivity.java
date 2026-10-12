@@ -99,7 +99,7 @@ public final class AutoSetupActivity extends Activity {
         button(top,"Inserisci token protetto per questo sito",this::saveToken);
         button(top,"Elimina token di questo sito",this::removeToken);
         button(top,"Apri login ufficiale nel browser",this::externalLogin);
-        status=text("Pronto · nessuna azione esterna eseguita.",12,false);top.addView(status);
+        state=text("Pronto · nessuna azione esterna eseguita.",12,false);top.addView(state);
         fields=new LinearLayout(this);fields.setOrientation(LinearLayout.VERTICAL);top.addView(fields);
 
         browser=new WebView(this);
