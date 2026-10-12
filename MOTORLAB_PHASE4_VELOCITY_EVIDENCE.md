@@ -14,4 +14,4 @@ This is a **measurement-only** gate, not a new scheduler or release.
 
 ## Measured results
 
-Pending corresponding successful GitHub Actions run. Interpret results only in the stated controlled benchmark scope.
+Verified GitHub Actions run: [38294940705](https://github.com/Br174/Chatgpt/actions/runs/38294940705), UTC 2026-10-12, workflow successful. Existing DAG execution fabric regression suite: **32 passed, 0 failed**. Intrinsic dispatcher on 1,200 simulated dependency tasks (nine rounds): median **60.609 ms**, p90 **123.893 ms**. Simulated delayed source with adaptive safe hedge (five rounds): baseline mean **81.28 ms**, hedge mean **29.47 ms**, synthetic speedup **2.76x**. These are actual GitHub runner measurements, not claims about Android APK completion, ChatGPT response latency, provider connectivity, or general acceleration. Hedging with safe simulation does not authorize speculative unsafe duplicate writes. The four busy LAB refs remain unmodified.
