@@ -11,7 +11,7 @@ on:
       - '.github/workflows/motorlab-phase7-interoperability-gate.yml'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -26,11 +26,24 @@ jobs:
       - name: Export a separate optional Skill Creator ZIP
         if: success()
         run: python3 tools/motorlab_skill_export.py --root . --out dist/MotorLab-Skill-Export-r36.zip
-      - name: Publish optional portable skill artifact
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: MotorLab-Skill-Export-r36
-          path: dist/MotorLab-Skill-Export-r36.zip
-          if-no-files-found: error
-          retention-days: 30
+      - name: Publish optional skill ZIP as private prerelease asset (not a CORE release)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/motorlab-phase7-')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s dist/MotorLab-Skill-Export-r36.zip
+          TAG="motorlab-optional-skill-r36-${GITHUB_SHA:0:8}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/MotorLab-Skill-Export-r36.zip --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" dist/MotorLab-Skill-Export-r36.zip \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --prerelease --latest=false \
+              --title "MotorLab optional Skill Creator export — r36" \
+              --notes "Optional read-only CORE reference generated from approved allowlist and SHA256 manifest. NOT a CORE release; no native project modification, no external AI provider, no automatic Skill Creator installation."
+          fi
+          sha256sum dist/MotorLab-Skill-Export-r36.zip
+          echo "MOTORLAB_OPTIONAL_SKILL_PRERELEASE=$TAG" >> "$GITHUB_STEP_SUMMARY"
+
