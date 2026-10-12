@@ -57,7 +57,7 @@ public final class TeamChatActivity extends Activity {
         LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(12),dp(10),dp(12),dp(8));root.setBackgroundColor(0xfff8fafc);
         root.addView(text("Team Chat · Sala Operativa",21,true));
-        root.addView(text("LAB04 · Archivio locale e backup automatico opzionale",12,false));
+        root.addView(text("Archivio locale e backup automatico opzionale",12,false));
         for(int row=0;row<2;row++){
             LinearLayout line=new LinearLayout(this);line.setOrientation(LinearLayout.HORIZONTAL);
             root.addView(line);
