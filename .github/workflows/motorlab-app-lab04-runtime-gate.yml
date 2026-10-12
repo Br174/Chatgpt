@@ -1,0 +1,65 @@
+name: MotorLab LAB04 Android Runtime and TTTA Gate
+on:
+  push:
+    branches: ['motorlab/app-lab04-runtime-*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: motorlab-lab04-runtime-validation
+  cancel-in-progress: false
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Confirm LAB04 source unchanged and offline archive contracts
+        run: python3 apps/motorlab-android/tests/verify_lab01.py
+      - name: Prepare Android SDK 35
+        run: |
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$SDKMANAGER"
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - name: Build APK and record first testable artifact time
+        run: |
+          set -euo pipefail
+          start="$(date +%s)"
+          gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+          end="$(date +%s)"
+          apk=apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep -m1 "package: name='it.motorlab.app.lab04' versionCode='4'"
+          echo "LAB04_APK_BUILD_SECONDS=$((end-start))"
+          echo "LAB04_APK_FIRST_TESTABLE_ARTIFACT=VERIFIED"
+          echo "LAB04 measured build step: $((end-start)) seconds; runner is GitHub ubuntu-latest, warm Gradle cache may affect repeat runs." >> "$GITHUB_STEP_SUMMARY"
+      - name: Emulator API 30 offline Team Chat navigation, archive, filter and persistence
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          profile: pixel_5
+          cores: 2
+          ram-size: 2048M
+          heap-size: 256M
+          disable-animations: true
+          emulator-boot-timeout: 720
+          script: |
+            adb install -r apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk
+            python3 apps/motorlab-android/tests/emulator_smoke.py
+      - name: Record gate outcome without publishing altered APK
+        if: success()
+        run: |
+          echo "LAB04_ANDROID_RUNTIME_AND_BUILD_GATE=PASSED"
+          echo "Emulator API 30 smoke PASSED. This does NOT replace physical Samsung/Android 11 phone acceptance." >> "$GITHUB_STEP_SUMMARY"
