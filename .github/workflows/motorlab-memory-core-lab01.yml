@@ -1,0 +1,41 @@
+name: MotorLab Memory CORE LAB01 Isolated Tests
+on:
+  push:
+    branches:
+      - motorlab/memory-core-lab01-20261014
+    paths:
+      - 'cloudflare/motorlab-state-bridge/src/memory-catalog.mjs'
+      - 'cloudflare/motorlab-state-bridge/test/memory-catalog.test.mjs'
+      - 'cloudflare/motorlab-state-bridge/test/memory_catalog_sqlite.py'
+      - 'docs/memory-core-lab01/**'
+      - '.github/workflows/motorlab-memory-core-lab01.yml'
+  pull_request:
+    paths:
+      - 'cloudflare/motorlab-state-bridge/src/memory-catalog.mjs'
+      - 'cloudflare/motorlab-state-bridge/test/memory-catalog.test.mjs'
+      - 'cloudflare/motorlab-state-bridge/test/memory_catalog_sqlite.py'
+      - 'docs/memory-core-lab01/**'
+permissions:
+  contents: read
+jobs:
+  isolated-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Node catalog, anti-conflict and memory tests
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-catalog.test.mjs
+      - name: SQLite schema idempotency and isolation tests
+        run: python3 cloudflare/motorlab-state-bridge/test/memory_catalog_sqlite.py
+      - name: Confirm no production Worker import or routing
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -F 'memory-catalog.mjs' cloudflare/motorlab-state-bridge/src/entry.js; then
+            echo 'Unexpected production catalog import'; exit 1
+          fi
+          test -f cloudflare/motorlab-state-bridge/src/memory-catalog.mjs
+          echo 'LAB01 only: catalog is inert; no deploy, API keys, credentials or signing.'
