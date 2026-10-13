@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "operation_id": "MOTORLAB-AUTOSETUP-LAB06-CLOUDFLARE-CHAT-FIRST",
+  "worker": "motorlab-state-bridge",
+  "source_head": "91d14b8e50d0a1cfb66d93cae5e1e6e4667d5d66",
+  "approved": true,
+  "deploy_production": true,
+  "probe_only": true,
+  "writes_enabled": false,
+  "expires_at": "2026-10-13T21:13:31Z",
+  "scope": "synthetic-test-only-PAT-entered-exclusively-in-browser",
+  "approval_basis": "explicit user approval to enable temporary isolated 45-minute probe in this conversation"
+}
