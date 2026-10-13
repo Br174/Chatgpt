@@ -89,14 +89,34 @@ jobs:
           test "$GITHUB_REF" = 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
 
           get_active_version() {
-            local response
-            response="$(curl --silent --show-error --fail --max-time 20 \
+            local http_code body_file active_version codes
+            if [[ ! "$CLOUDFLARE_ACCOUNT_ID" =~ ^[a-fA-F0-9]{32}$ ]]; then
+              echo 'Cloudflare preflight BLOCKED: Account ID must contain exactly 32 hexadecimal characters.' >&2
+              return 1
+            fi
+            body_file="$(mktemp)"
+            http_code="$(curl --silent --show-error --max-time 20 \
+              --output "$body_file" --write-out '%{http_code}' \
               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/$WORKER_NAME/deployments")" || return 1
-            jq -er '
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/$WORKER_NAME/deployments")" || {
+                rm -f "$body_file"
+                return 1
+              }
+            if [[ "$http_code" != 200 ]]; then
+              codes="$(jq -r '[.errors[]?.code | tostring] | join(",")' "$body_file" 2>/dev/null || true)"
+              printf 'Cloudflare deployments preflight BLOCKED: HTTP %s, public error codes: %s\\n' "$http_code" "${codes:-none}" >&2
+              rm -f "$body_file"
+              return 1
+            fi
+            active_version="$(jq -er '
               [.result.deployments[0].versions[]? | select(.percentage == 100) | .version_id]
               | if length == 1 then .[0] else error("active deployment is not a single 100% version") end
-            ' <<< "$response"
+            ' "$body_file")" || {
+              rm -f "$body_file"
+              return 1
+            }
+            rm -f "$body_file"
+            printf '%s\\n' "$active_version"
           }
 
           LAST_GOOD_VERSION="$(get_active_version)"
@@ -197,14 +217,34 @@ jobs:
           test "$GITHUB_REF" = 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
 
           get_active_version() {
-            local response
-            response="$(curl --silent --show-error --fail --max-time 20 \
+            local http_code body_file active_version codes
+            if [[ ! "$CLOUDFLARE_ACCOUNT_ID" =~ ^[a-fA-F0-9]{32}$ ]]; then
+              echo 'Cloudflare preflight BLOCKED: Account ID must contain exactly 32 hexadecimal characters.' >&2
+              return 1
+            fi
+            body_file="$(mktemp)"
+            http_code="$(curl --silent --show-error --max-time 20 \
+              --output "$body_file" --write-out '%{http_code}' \
               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/$WORKER_NAME/deployments")" || return 1
-            jq -er '
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/$WORKER_NAME/deployments")" || {
+                rm -f "$body_file"
+                return 1
+              }
+            if [[ "$http_code" != 200 ]]; then
+              codes="$(jq -r '[.errors[]?.code | tostring] | join(",")' "$body_file" 2>/dev/null || true)"
+              printf 'Cloudflare deployments preflight BLOCKED: HTTP %s, public error codes: %s\\n' "$http_code" "${codes:-none}" >&2
+              rm -f "$body_file"
+              return 1
+            fi
+            active_version="$(jq -er '
               [.result.deployments[0].versions[]? | select(.percentage == 100) | .version_id]
               | if length == 1 then .[0] else error("active deployment is not a single 100% version") end
-            ' <<< "$response"
+            ' "$body_file")" || {
+              rm -f "$body_file"
+              return 1
+            }
+            rm -f "$body_file"
+            printf '%s\\n' "$active_version"
           }
 
           health_ok() {
