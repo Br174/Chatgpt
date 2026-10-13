@@ -145,3 +145,11 @@ sostituisce la conferma umana. Prima prova sul modulo demo: richiesta contenente
 "impostazioni", collegamento "Impostazioni demo"; test Android mostra
 l'indicazione, oltre ai collaudi di navigazione e piano preesistenti.
 Verifiche sull'ultima HEAD ancora da chiudere prima di promuovere la LAB.
+
+
+## AS3D — Esecutore guidato di un singolo passo (2026-10-13)
+- `Esegui passo suggerito` appare solo dopo un match locale dell'obiettivo con un collegamento HTTPS same-origin. La pagina e l'origine devono essere ancora identiche a quelle analizzate.
+- `Apri e analizza` richiede conferma esplicita. Dopo la navigazione AUTORIZZATA, AutoSetup esegue una scansione in SOLA LETTURA del nuovo modulo e dei collegamenti; non compila, non invia moduli, non segue ulteriori pagine senza nuova approvazione.
+- Blocco della navigazione main-frame verso origini differenti, inclusi redirect: per cambiare sito occorre apertura esplicita.
+- Test E2E offline esteso a percorso automatico di sola lettura dopo approvazione su pagina 2, con protezioni anti-cambio pagina. Non equivale al Browser Agent autonomo multi-sito né a una prova su siti reali.
+- Versione LAB soltanto: non promuovere alla MADRE, non firmare update release senza verifica delle chiavi.

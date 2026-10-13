@@ -43,6 +43,8 @@ public final class AutoSetupActivity extends Activity {
     private boolean demoSettingsPage=false;
     private boolean suggestionRunning=false;
     private boolean guidedAnalysisPending=false;
+    private boolean scanAfterNavigation=false;
+    private String nextStepUrl="",nextStepSource="",nextStepOrigin="";
     private AutoSetupTaskPlan taskPlan;
     private static final String DEMO_ORIGIN="https://autosetup-demo.example";
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
@@ -128,13 +130,23 @@ public final class AutoSetupActivity extends Activity {
                     runOnUiThread(()->status("Navigazione esterna bloccata nella demo offline."));
                     return true;
                 }
-                try{SecureServiceToken.checkedOrigin(r.getUrl().toString());return false;}
-                catch(Exception ignored){runOnUiThread(()->status("Navigazione non HTTPS bloccata."));return true;}
+                try{
+                    String requested=SecureServiceToken.checkedOrigin(r.getUrl().toString());
+                    if(!activeOrigin.isEmpty()&&!activeOrigin.equals(requested)){
+                        runOnUiThread(()->status("Navigazione verso altro sito bloccata. Aprilo esplicitamente."));
+                        return true;
+                    }
+                    return false;
+                }catch(Exception ignored){
+                    runOnUiThread(()->status("Navigazione non HTTPS bloccata."));return true;
+                }
             }
             @Override public void onPageStarted(WebView w,String page,android.graphics.Bitmap favicon){
                 if(demoMode && page!=null && !"about:blank".equals(page)
                         && !page.startsWith(DEMO_ORIGIN+"/")) demoMode=false;
-                pageReady=false;inspectedUrl="";taskPlan=null;guidedAnalysisPending=false;controls.clear();fields.removeAllViews();
+                pageReady=false;inspectedUrl="";taskPlan=null;guidedAnalysisPending=false;
+                nextStepUrl="";nextStepSource="";nextStepOrigin="";
+                controls.clear();fields.removeAllViews();
                 navigation.removeAllViews();
             }
             @Override public void onPageFinished(WebView w,String page) {
@@ -145,9 +157,16 @@ public final class AutoSetupActivity extends Activity {
                     return;
                 }
                 try{
-                    activeOrigin=SecureServiceToken.checkedOrigin(page);
+                    String destinationOrigin=SecureServiceToken.checkedOrigin(page);
+                    if(!destinationOrigin.equals(activeOrigin)){
+                        scanAfterNavigation=false;
+                        pageReady=false;
+                        status("Il sito ha cambiato origine: aprilo esplicitamente per continuare.");
+                        return;
+                    }
                     pageReady=true;
                     status("Pagina pronta: "+activeOrigin+". Premere Riconosci i campi.");
+                    finishGuidedNavigation();
                 }catch(Exception e){
                     pageReady=false;status("Pagina non supportata per l'autocompilazione.");
                 }
@@ -178,6 +197,7 @@ public final class AutoSetupActivity extends Activity {
                     pageReady=true;
                     activeOrigin=DEMO_ORIGIN;
                     status("Demo offline pronta: "+(demoSettingsPage?"2":"3")+" campi HTML. Premere Riconosci i campi.");
+                    finishGuidedNavigation();
                 } else if(retry<12) {
                     browser.postDelayed(()->checkDemoReady(retry+1),300);
                 } else {
@@ -190,6 +210,8 @@ public final class AutoSetupActivity extends Activity {
     private void openDemo() {
         demoMode=true;
         demoSettingsPage=false;
+        scanAfterNavigation=false;
+        nextStepUrl="";nextStepSource="";nextStepOrigin="";
         activeOrigin=DEMO_ORIGIN;
         url.setText(activeOrigin);
         goal.setText("Apri le impostazioni demo senza utilizzare servizi esterni");
@@ -230,6 +252,8 @@ public final class AutoSetupActivity extends Activity {
         try{
             demoMode=false;
             demoSettingsPage=false;
+            scanAfterNavigation=false;
+            nextStepUrl="";nextStepSource="";nextStepOrigin="";
             activeOrigin=SecureServiceToken.checkedOrigin(address);
             controls.clear();fields.removeAllViews();navigation.removeAllViews();pageReady=false;inspectedUrl="";
             say("Richiesta: "+limit(goal.getText().toString(),180)+
@@ -263,6 +287,7 @@ public final class AutoSetupActivity extends Activity {
         try {origin=currentOrigin();}
         catch(Exception e){alert("Apri prima un sito HTTPS compatibile.");return;}
         navigation.removeAllViews();
+        nextStepUrl="";nextStepSource="";nextStepOrigin="";
         final String expectedPage=browser.getUrl();
         final String js="(function(){var seen=new Set(),out=[];"+
             "var a=Array.from(document.querySelectorAll('a[href]'));"+
@@ -285,6 +310,7 @@ public final class AutoSetupActivity extends Activity {
                 int shown=0;
                 int bestScore=0;
                 String suggestedTitle="";
+                String suggestedUrl="";
                 for(int i=0;i<links.length();i++){
                     JSONObject link=links.optJSONObject(i);
                     if(link==null)continue;
@@ -295,7 +321,7 @@ public final class AutoSetupActivity extends Activity {
                     if(!target.startsWith("https://"))continue;
                     final String dest=target;
                     int relevance=AutoSetupGoalRouter.score(goal.getText().toString(),label);
-                    if(relevance>bestScore){bestScore=relevance;suggestedTitle=label;}
+                    if(relevance>bestScore){bestScore=relevance;suggestedTitle=label;suggestedUrl=target;}
                     shown++;
                     button(navigation,"Apri: "+label,()->{
                         try{
@@ -319,8 +345,12 @@ public final class AutoSetupActivity extends Activity {
                     });
                 }
                 if(bestScore>0) {
+                    nextStepUrl=suggestedUrl;
+                    nextStepSource=expectedPage;
+                    nextStepOrigin=origin;
                     navigation.addView(text("Percorso suggerito: "+suggestedTitle+
                         " · indicazione locale, confermare prima di aprire.",13,true));
+                    button(navigation,"Esegui passo suggerito",this::executeSuggestedStep);
                 }
                 currentTaskPlan().links(shown);
                 status("Collegamenti interni verificati: "+shown+
@@ -330,6 +360,58 @@ public final class AutoSetupActivity extends Activity {
                 status("Collegamenti non disponibili su questa pagina.");
             }
         });
+    }
+
+    /**
+     * Single approved navigation step. It is not an unattended browser agent:
+     * every hop requires user confirmation and only read-only analysis follows.
+     */
+    private void executeSuggestedStep() {
+        final String destination=nextStepUrl;
+        final String origin=nextStepOrigin;
+        try{
+            if(destination.isEmpty()||origin.isEmpty()||
+                !origin.equals(currentOrigin())||!nextStepSource.equals(browser.getUrl())||
+                !origin.equals(SecureServiceToken.checkedOrigin(destination))||
+                destination.contains("?")||destination.contains("#")){
+                alert("Il percorso suggerito non è più valido. Ripeti la ricerca.");return;
+            }
+        }catch(Exception e){alert("La pagina è cambiata. Ripeti la ricerca.");return;}
+        new AlertDialog.Builder(this).setTitle("Eseguire il prossimo passo?")
+            .setMessage("Aprirò una pagina interna di "+origin+
+                " e poi leggerò soltanto i campi e i collegamenti. "+
+                "Non compilerò né invierò alcun modulo, non userò token e "+
+                "non seguirò altre pagine senza una nuova conferma.")
+            .setNegativeButton("Annulla",null)
+            .setPositiveButton("Apri e analizza",(d,w)->{
+                try{
+                    if(!origin.equals(currentOrigin())||
+                       !nextStepSource.equals(browser.getUrl())||
+                       !destination.equals(nextStepUrl))throw new IllegalStateException();
+                    nextStepUrl="";nextStepSource="";nextStepOrigin="";
+                    scanAfterNavigation=true;
+                    navigation.removeAllViews();
+                    if(demoMode && (DEMO_ORIGIN+"/impostazioni").equals(destination)){
+                        openDemoSettingsPage();
+                    }else if(!demoMode){
+                        browser.loadUrl(destination);
+                    }else{
+                        scanAfterNavigation=false;
+                        alert("Destinazione demo non consentita.");
+                    }
+                }catch(Exception e){
+                    scanAfterNavigation=false;
+                    alert("Navigazione annullata: origine o pagina cambiate.");
+                }
+            }).show();
+    }
+
+    /** After a user-approved hop, perform ONE new read-only scan, never a submit. */
+    private void finishGuidedNavigation() {
+        if(!scanAfterNavigation||!pageReady)return;
+        scanAfterNavigation=false;
+        say("MotorLab: pagina autorizzata aperta. Analizzo in sola lettura, senza inviare dati.");
+        browser.post(this::analyzeAndPlan);
     }
 
     /** Show the generic step checklist without executing any site operation. */

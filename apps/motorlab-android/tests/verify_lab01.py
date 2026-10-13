@@ -97,6 +97,10 @@ assert ".applied(Integer.parseInt(count))" in autosetup
 assert "MOTORLAB_AUTOSETUP_STAGED_PLAN=PASSED_NO_AUTO_SUBMIT" in (p/"tests/emulator_smoke.py").read_text()
 assert "Analizza pagina e pianifica" in autosetup and "guidedAnalysisPending" in autosetup
 assert "MOTORLAB_AUTOSETUP_GUIDED_READONLY_ANALYSIS=PASSED" in (p/"tests/emulator_smoke.py").read_text()
+assert "private void executeSuggestedStep()" in autosetup and "private void finishGuidedNavigation()" in autosetup
+assert "Esegui passo suggerito" in autosetup and "Apri e analizza" in autosetup
+assert "destinationOrigin.equals(activeOrigin)" in autosetup
+assert "MOTORLAB_AUTOSETUP_APPROVED_STEP_AND_READONLY_RESCAN=PASSED_OFFLINE" in (p/"tests/emulator_smoke.py").read_text()
 assert "private void openDemoSettingsPage()" in autosetup
 goalrouter=(p/"app/src/main/java/it/motorlab/app/AutoSetupGoalRouter.java").read_text()
 assert "class AutoSetupGoalRouter" in goalrouter
