@@ -142,7 +142,7 @@ jobs:
           npx --yes wrangler@4 versions upload --name "$WORKER_NAME" --tag "$VERSION_TAG" --keep-vars --strict --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc
 
           DEPLOY_COMMAND_OK=true
-          if ! npx --yes wrangler@4 versions deploy "$VERSION_TAG@100%" --name "$WORKER_NAME" --version-tag "$VERSION_TAG@100%" --yes --message "MotorLab AutoSetup LAB06 ${GITHUB_SHA:0:12}" --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc; then
+          if ! npx --yes wrangler@4 versions deploy --name "$WORKER_NAME" --version-tag "$VERSION_TAG@100%" --yes --message "MotorLab AutoSetup LAB06 ${GITHUB_SHA:0:12}" --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc; then
             DEPLOY_COMMAND_OK=false
           fi
 
