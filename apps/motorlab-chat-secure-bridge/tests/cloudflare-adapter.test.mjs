@@ -100,7 +100,8 @@ test("same-origin secure panel is served with restrictive headers and no-store",
   const html = await response.text();
   assert.match(html, /<script nonce="[a-f0-9]+">/);
   assert.match(html, /<style nonce="[a-f0-9]+">/);
-  assert.match(html, /autosetup\/v1\/api\/repository-secret/);
+  assert.match(html, /API_BASE="https:\/\/[^"]+\/autosetup\/v1"/);
+  assert.match(html, /API_BASE\+"\/api\/repository-secret"/);
   assert.ok(!html.includes("__MOTORLAB_PUBLIC_ORIGIN__"));
   assert.ok(!html.includes("fake-demo-token-never-real"));
 });
