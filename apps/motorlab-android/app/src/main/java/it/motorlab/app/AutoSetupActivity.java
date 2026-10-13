@@ -51,6 +51,10 @@ public final class AutoSetupActivity extends Activity {
     private boolean scanAfterNavigation=false;
     private String nextStepUrl="",nextStepSource="",nextStepOrigin="";
     private AutoSetupTaskPlan taskPlan;
+    // LAB06: deterministic bounded AUTO -> CHAT -> RECOVERY -> LAST_RESORT.
+    // This is an Android-local UI, not a simulated bridge into the ChatGPT client.
+    private final AutoSetupHybridFlow hybridFlow=new AutoSetupHybridFlow();
+    private int hybridHops=0;
     private static final String DEMO_ORIGIN="https://autosetup-demo.example";
     private static final int PICK_CHECKPOINT_JSON=4403;
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
@@ -148,6 +152,7 @@ public final class AutoSetupActivity extends Activity {
         button(top,"Mostra piano operazioni",this::showTaskPlan);
         button(top,"Importa checkpoint dalla chat",this::pickCheckpoint);
         button(top,"Analizza pagina e pianifica",this::analyzeAndPlan);
+        button(top,"Avvia AutoSetup ibrido",this::startHybrid);
         button(top,"Apri sito dentro MotorLab",this::openSite);
         button(top,"Prova modulo generico offline",this::openDemo);
         button(top,"Riconosci i campi del modulo",this::inspectForm);
@@ -214,6 +219,10 @@ public final class AutoSetupActivity extends Activity {
                         return;
                     }
                     pageReady=true;
+                    if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.AUTO){
+                        try{hybridFlow.visited(activeOrigin,page);}
+                        catch(Exception stopped){hybridFlow.blocked("Origine o pagina inattesa.");}
+                    }
                     status("Pagina pronta: "+activeOrigin+". Premere Riconosci i campi.");
                     finishGuidedNavigation();
                 }catch(Exception e){
@@ -254,6 +263,10 @@ public final class AutoSetupActivity extends Activity {
                 if((demoSettingsPage?"2":"3").equals(result)){
                     pageReady=true;
                     activeOrigin=DEMO_ORIGIN;
+                    if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.AUTO){
+                        try{hybridFlow.visited(activeOrigin,DEMO_ORIGIN+(demoSettingsPage?"/impostazioni":"/"));}
+                        catch(Exception stopped){hybridFlow.blocked("La demo ha cambiato pagina inattesa.");}
+                    }
                     status("Demo offline pronta: "+(demoSettingsPage?"2":"3")+" campi HTML. Premere Riconosci i campi.");
                     finishGuidedNavigation();
                 } else if(retry<12) {
@@ -266,6 +279,7 @@ public final class AutoSetupActivity extends Activity {
     }
 
     private void openDemo() {
+        hybridFlow.reset();hybridHops=0;
         demoMode=true;
         demoSettingsPage=false;
         scanAfterNavigation=false;
@@ -308,6 +322,7 @@ public final class AutoSetupActivity extends Activity {
     }
 
     private void openSite() {
+        hybridFlow.reset();hybridHops=0;
         String address=url.getText().toString().trim();
         try{
             demoMode=false;
@@ -415,13 +430,165 @@ public final class AutoSetupActivity extends Activity {
                     button(navigation,"Esegui passo suggerito",this::executeSuggestedStep);
                 }
                 currentTaskPlan().links(shown);
+                if(handleHybridDiscovery(origin,expectedPage,bestScore,suggestedUrl))return;
                 status("Collegamenti interni verificati: "+shown+
                     ". Scegli una pagina dalla chat; nessuna navigazione automatica.");
             }catch(Exception e){
                 navigation.removeAllViews();
+                if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.RECOVERY){
+                    onHybridRecoveryFailure("Collegamenti non disponibili.");
+                }else if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.AUTO){
+                    pauseHybridForChat("Navigazione automatica non disponibile.");
+                }
                 status("Collegamenti non disponibili su questa pagina.");
             }
         });
+    }
+
+
+    /**
+     * First-path automation: user's explicit start delegates read-only analysis and at
+     * most two same-origin, query-free, goal-matched GET navigations. No forms, submits,
+     * stored secrets, cross-origin links, or irreversible website operations.
+     */
+    private void startHybrid() {
+        try {
+            String origin=currentOrigin();
+            String page=browser.getUrl();
+            if(page==null||"about:blank".equals(page)){
+                if(!demoMode)throw new IllegalStateException("Pagina non pronta.");
+                page=DEMO_ORIGIN+(demoSettingsPage?"/impostazioni":"/");
+            }
+            hybridFlow.start(origin,page);
+            hybridHops=0;
+            activateAutoSetup();
+            say("AutoSetup ibrido: inizio analisi e navigazione limitata in sola lettura. "+
+                "Se serve una decisione, vedrai i controlli qui. "+
+                "Nessuna password o conferma finale viene automatizzata.");
+            analyzeAndPlan();
+        }catch(Exception e){alert("Apri prima una pagina HTTPS compatibile.");}
+    }
+
+    /** Return true if hybrid flow handled the discovery; normal UI is unchanged otherwise. */
+    private boolean handleHybridDiscovery(String origin,String page,int score,String target) {
+        AutoSetupHybridFlow.Stage stage=hybridFlow.stage();
+        if(stage!=AutoSetupHybridFlow.Stage.AUTO &&
+           stage!=AutoSetupHybridFlow.Stage.RECOVERY)return false;
+        if(stage==AutoSetupHybridFlow.Stage.RECOVERY) {
+            if(score>0||!controls.isEmpty()){
+                hybridFlow.repairSucceeded();
+                say("Recupero riuscito: controlli o percorso rilevati. Riprendo AutoSetup.");
+            }else{
+                onHybridRecoveryFailure("Nessun controllo o percorso utilizzabile.");
+                return true;
+            }
+        }
+        try {
+            String actual=browser.getUrl();
+            if(demoMode && ("about:blank".equals(actual)||actual==null))
+                actual=DEMO_ORIGIN+(demoSettingsPage?"/impostazioni":"/");
+            if(!hybridFlow.isCurrent(origin,actual)) {
+                hybridFlow.blocked("Pagina modificata durante il controllo automatico.");
+                status("Stop di sicurezza: pagina inattesa.");return true;
+            }
+            if(score>0&&hybridHops<2&&!target.isEmpty()
+                 &&!target.contains("?")&&!target.contains("#")
+                 &&origin.equals(SecureServiceToken.checkedOrigin(target))) {
+                // Only a link chosen by existing local goal matcher, same HTTPS origin.
+                hybridHops++;
+                scanAfterNavigation=true;
+                say("AUTO: passo "+hybridHops+"/2 · apro e analizzo una pagina "+
+                    "interna pertinente all'obiettivo, senza inviare moduli.");
+                navigation.removeAllViews();
+                if(demoMode && (DEMO_ORIGIN+"/impostazioni").equals(target)){
+                    openDemoSettingsPage();
+                }else if(!demoMode){
+                    browser.loadUrl(target);
+                }else{
+                    scanAfterNavigation=false;
+                    pauseHybridForChat("La pagina demo richiesta non è supportata.");
+                }
+                return true;
+            }
+            pauseHybridForChat(controls.isEmpty()?
+                "Nessun percorso automatico sicuro identificato.":
+                "Serve una scelta o compilazione nella chat.");
+            return true;
+        }catch(Exception e){
+            pauseHybridForChat("La pagina o il percorso è cambiato.");
+            return true;
+        }
+    }
+
+    /** Local native controls, not a credential-collecting ChatGPT form. */
+    private void pauseHybridForChat(String reason) {
+        if(hybridFlow.stage()!=AutoSetupHybridFlow.Stage.AUTO)return;
+        hybridFlow.requestHumanChoice(reason);
+        say("CHAT: "+reason+" "+
+            (controls.isEmpty()?
+                "Non posso creare controlli funzionanti per questo passo.":
+                "I campi riconosciuti sono nella sezione qui sotto. "+
+                "La compilazione richiede il tuo comando, non sarà inviata automaticamente.")+
+            " Password, token e OTP non vanno inseriti nei campi ordinari.");
+        button(navigation,"Non riesco da qui · tenta recupero tecnico",this::recoverHybrid);
+    }
+
+    /** Twice, at most, a fresh safe DOM+links scan; never silently edits site code. */
+    private void recoverHybrid() {
+        if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.CHAT)
+            hybridFlow.cannotUseChat("Controlli chat non applicabili al passo.");
+        if(hybridFlow.stage()!=AutoSetupHybridFlow.Stage.RECOVERY)return;
+        try {
+            if(!hybridFlow.requestRepair()){
+                onHybridRecoveryFailure("Tentativi di recupero esauriti.");
+                return;
+            }
+            say("RECOVERY: verifica tecnica "+hybridFlow.recoveryAttempts()+"/"+
+                hybridFlow.maxRecoveryAttempts()+" in sola lettura.");
+            guidedAnalysisPending=true;
+            inspectForm();
+        }catch(Exception e){
+            onHybridRecoveryFailure("Rilettura del sito non riuscita.");
+        }
+    }
+
+    private void onHybridRecoveryFailure(String reason) {
+        if(hybridFlow.stage()!=AutoSetupHybridFlow.Stage.RECOVERY)return;
+        hybridFlow.repairFailed(reason);
+        if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.RECOVERY){
+            // Bounded second attempt; no unending retry or unintended writes.
+            browser.postDelayed(this::recoverHybrid,650);
+        }else if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.LAST_RESORT){
+            say("AUTO e CHAT non hanno risolto il passo; due tentativi "+
+                "di recupero locale non riusciti. Fallback solo su tua scelta.");
+            button(navigation,"Ultima risorsa · apri sito ufficiale",this::apriUltimaRisorsa);
+        }
+    }
+
+    /** Last resort NEVER uses an invented deep link and never bypasses site login. */
+    private void apriUltimaRisorsa() {
+        try {
+            String origin=currentOrigin();
+            if(demoMode){alert("La demo offline non può aprire un sito reale.");return;}
+            String destination=hybridFlow.officialFallbackUrl(origin,browser.getUrl());
+            new AlertDialog.Builder(this).setTitle("Ultima risorsa: sito ufficiale?")
+                .setMessage("Solo ora puoi continuare sul sito ufficiale. "+
+                    "Aprirò la pagina corrente, se sicura e priva di parametri riservati; "+
+                    "altrimenti soltanto il dominio. "+
+                    "Non posso garantire che il browser selezioni automaticamente "+
+                    "un campo, né condividere con esso la sessione WebView. "+
+                    "Inserisci password o conferme SOLO sul sito ufficiale. "+
+                    "Il risultato remoto richiede una nuova verifica: nessun successo presunto.")
+                .setNegativeButton("Annulla",null)
+                .setPositiveButton("Apri sito ufficiale",(d,w)->{
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(destination)));
+                        status("Passaggio esterno avviato. Esito remoto NON verificato; "+
+                            "task in pausa al checkpoint.");
+                    }catch(Exception e){alert("Apertura esterna non disponibile.");}
+                }).show();
+        }catch(Exception e){alert("Fallback bloccato: non sono esaurite le altre strade "+
+            "oppure è cambiata la pagina.");}
     }
 
     /**
@@ -910,6 +1077,16 @@ public final class AutoSetupActivity extends Activity {
         }
         String receipt=AutoSetupOperationEvidence.record(this,origin,requested,applied,
             observed,state,true);
+        if("dom_confirmed".equals(state) &&
+           hybridFlow.stage()==AutoSetupHybridFlow.Stage.CHAT){
+            try{
+                if(hybridFlow.isCurrent(origin,browser.getUrl())){
+                    hybridFlow.approvedChatOperationObserved();
+                    // Continue only with read-only analysis. No automatic submit.
+                    browser.postDelayed(this::analyzeAndPlan,650);
+                }
+            }catch(Exception ignored){status("La pagina è cambiata: ripresa sospesa.");}
+        }
         String check=observed<0?"non disponibile":observed+"/"+requested;
         status("Compilati "+applied+" campi · Verifica DOM "+check+
             " · salvataggio server NON verificato.");
