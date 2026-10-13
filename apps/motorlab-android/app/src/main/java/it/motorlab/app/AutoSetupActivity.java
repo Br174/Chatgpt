@@ -192,7 +192,7 @@ public final class AutoSetupActivity extends Activity {
         demoSettingsPage=false;
         activeOrigin=DEMO_ORIGIN;
         url.setText(activeOrigin);
-        goal.setText("Dimostrazione locale senza servizi esterni");
+        goal.setText("Apri le impostazioni demo senza utilizzare servizi esterni");
         pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
         navigation.removeAllViews();
         say("MotorLab: prova offline. Nessuna connessione a servizi esterni o login.");
@@ -283,6 +283,8 @@ public final class AutoSetupActivity extends Activity {
                 navigation.removeAllViews();
                 navigation.addView(text("Collegamenti interni · "+links.length(),14,true));
                 int shown=0;
+                int bestScore=0;
+                String suggestedTitle="";
                 for(int i=0;i<links.length();i++){
                     JSONObject link=links.optJSONObject(i);
                     if(link==null)continue;
@@ -292,6 +294,8 @@ public final class AutoSetupActivity extends Activity {
                         ||!origin.equals(SecureServiceToken.checkedOrigin(target)))continue;
                     if(!target.startsWith("https://"))continue;
                     final String dest=target;
+                    int relevance=AutoSetupGoalRouter.score(goal.getText().toString(),label);
+                    if(relevance>bestScore){bestScore=relevance;suggestedTitle=label;}
                     shown++;
                     button(navigation,"Apri: "+label,()->{
                         try{
@@ -313,6 +317,10 @@ public final class AutoSetupActivity extends Activity {
                                 }).show();
                         }catch(Exception e){alert("La pagina è cambiata.");}
                     });
+                }
+                if(bestScore>0) {
+                    navigation.addView(text("Percorso suggerito: "+suggestedTitle+
+                        " · indicazione locale, confermare prima di aprire.",13,true));
                 }
                 currentTaskPlan().links(shown);
                 status("Collegamenti interni verificati: "+shown+

@@ -134,3 +134,14 @@ Nel medesimo AutoSetup universale il pulsante "Suggerisci valori con Gemini
 - Questa analisi e' di sola lettura: nessuna navigazione, compilazione, submit, token use o pagamento; per scrivere o passare a un'altra pagina servono azioni separate e conferme.
 - Test offline end-to-end: dopo aver approvato la navigazione alla pagina 2, il nuovo comando deve mostrare 2 campi e 0 collegamenti interni, poi il piano aggiornato.
 - Implementazione LAB, non certificata su Android fisico ne' su siti reali. Verifiche CI da valutare sullo SHA esatto della nuova HEAD.
+
+
+## AS3C — Indicazione locale del prossimo collegamento (13/10/2026)
+Per l'obiettivo espresso dall'utente, AutoSetup può evidenziare un collegamento
+interno compatibile in base alle parole presenti nel titolo. E' un semplice
+suggerimento deterministico locale (non semantica AI, non garanzia di correttezza):
+non usa API o credenziali, non apre la pagina, non concede autorizzazioni e non
+sostituisce la conferma umana. Prima prova sul modulo demo: richiesta contenente
+"impostazioni", collegamento "Impostazioni demo"; test Android mostra
+l'indicazione, oltre ai collaudi di navigazione e piano preesistenti.
+Verifiche sull'ultima HEAD ancora da chiudere prima di promuovere la LAB.
