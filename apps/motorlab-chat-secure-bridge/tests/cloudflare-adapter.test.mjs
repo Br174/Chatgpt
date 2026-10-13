@@ -85,3 +85,47 @@ test("approved synthetic write may call ONE injected gateway with verified origi
   assert.equal(receipt.value_readable,false);
   assert.equal(JSON.stringify(receipt).includes(payload.value),false);
 });
+
+test("same-origin secure panel is served with restrictive headers and no-store", async () => {
+  const response = await handleAutoSetupCloudflare(new Request(base + "/autosetup/v1/panel"), env);
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("Content-Type"), /text\/html/);
+  assert.match(response.headers.get("Cache-Control"), /no-store/);
+  assert.equal(response.headers.get("X-Frame-Options"), "DENY");
+  const csp = response.headers.get("Content-Security-Policy");
+  assert.match(csp, /default-src 'none'/);
+  assert.match(csp, /script-src 'nonce-[a-f0-9]+'/);
+  assert.match(csp, /style-src 'nonce-[a-f0-9]+'/);
+  assert.match(csp, /frame-ancestors 'none'/);
+  const html = await response.text();
+  assert.match(html, /<script nonce="[a-f0-9]+">/);
+  assert.match(html, /<style nonce="[a-f0-9]+">/);
+  assert.match(html, /autosetup\/v1\/api\/repository-secret/);
+  assert.ok(!html.includes("__MOTORLAB_PUBLIC_ORIGIN__"));
+  assert.ok(!html.includes("fake-demo-token-never-real"));
+});
+test("same-origin panel write is allowed once while cross-origin requests stay denied", async () => {
+  let calls = 0;
+  const gateway = async ({name,value,approval,liveEnabled}) => {
+    calls++;
+    assert.equal(name,"MOTORLAB_MAIN_KEY_ALIAS");
+    assert.equal(value,"synthetic_alias");
+    assert.equal(approval,true);
+    assert.equal(liveEnabled,true);
+    return {status:"GITHUB_METADATA_VERIFIED",name,updated_at:"2026-10-13T00:00:00Z",value_readable:false};
+  };
+  const payload = {secret_name:"MOTORLAB_MAIN_KEY_ALIAS",value:"synthetic_alias",approval:true};
+  const sameOrigin = await handleAutoSetupCloudflare(json("/autosetup/v1/api/repository-secret",payload,base), {
+    MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"true"
+  }, {gateway});
+  assert.equal(sameOrigin.status,200);
+  assert.equal(sameOrigin.headers.get("Access-Control-Allow-Origin"),base);
+  const receipt = await sameOrigin.json();
+  assert.equal(receipt.value_readable,false);
+  assert.equal(JSON.stringify(receipt).includes(payload.value),false);
+  const denied = await handleAutoSetupCloudflare(json("/autosetup/v1/api/repository-secret",payload,"https://attacker.example"), {
+    MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"true"
+  }, {gateway});
+  assert.equal(denied.status,403);
+  assert.equal(calls,1);
+});
