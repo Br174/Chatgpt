@@ -232,8 +232,12 @@ def autosetup_smoke():
     assert "autosetup-demo.example" in receipt_xml
     assert "MotorLabTest" not in receipt_xml and "ProvaAutoSetup" not in receipt_xml
     print("MOTORLAB_AUTOSETUP_RECEIPT_PRIVATE_REDACTED=PASSED",flush=True)
-    scroll_top()
-    wait("Avanzamento locale: 100%",seconds=12)
+    # The status TextView can be scrolled out of the accessibility viewport.
+    # Require the visible operation receipt to prove stage 100% AFTER the
+    # second DOM readback; a stale timer/status string is not sufficient.
+    verified_message=scroll_until_visible("[100% percorso locale] MotorLab: esito AutoSetup")
+    assert "verifica DOM 2/2" in verified_message.get("text",""), (
+        "100% must belong to the verified 2/2 DOM receipt, not an earlier stage")
     print("MOTORLAB_AUTOSETUP_STAGE_PROGRESS=PASSED_LOCAL_100_NOT_REMOTE",flush=True)
     print("MOTORLAB_AUTOSETUP_DOM_SECOND_READBACK=PASSED_FIELDS_2",flush=True)
     print("MOTORLAB_AUTOSETUP_FORM_REVIEW_CONSENT_CANCEL=PASSED",flush=True)
@@ -297,6 +301,29 @@ def autosetup_smoke():
     print("MOTORLAB_AUTOSETUP_RECEIPT_REOPEN_PERSISTENCE=PASSED",flush=True)
     no_crash()
 
+def verify_same_apk_reinstall_preserves_local_data():
+    # This is an Android install -r retention smoke with the SAME debug APK.
+    # It is NOT proof of cross-version upgrade or LAB01 production signing.
+    apk="apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk"
+    verify_db_canary()
+    before=adb("shell","run-as",PACKAGE,"cat",
+               "shared_prefs/autosetup_operation_evidence_v1.xml",timeout=25)
+    assert "dom_confirmed" in before and "not_verified" in before
+    out=adb("install","-r",apk,timeout=100)
+    assert "Success" in out, "Same-signed APK reinstall failed"
+    verify_db_canary()
+    after=adb("shell","run-as",PACKAGE,"cat",
+              "shared_prefs/autosetup_operation_evidence_v1.xml",timeout=25)
+    assert "dom_confirmed" in after and "not_verified" in after
+    assert "MotorLabTest" not in after and "ProvaAutoSetup" not in after
+    launch()
+    open_team()
+    open_archive()
+    wait(CANARY)
+    no_crash()
+    print("MOTORLAB_SAME_APK_REINSTALL_DATA_RETAINED=PASSED_TEST_ONLY",flush=True)
+
+
 def main():
     adb("wait-for-device",timeout=120)
     adb("shell","settings","put","system","screen_off_timeout","600000")
@@ -327,6 +354,7 @@ def main():
     print("LAB04_REOPEN_HISTORY_PERSISTENT=PASSED",flush=True)
     no_crash()
     autosetup_smoke()
+    verify_same_apk_reinstall_preserves_local_data()
     print("LAB04_ANDROID_EMULATOR_E2E=PASSED",flush=True)
 
 if __name__=="__main__":
