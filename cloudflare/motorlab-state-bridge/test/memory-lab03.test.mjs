@@ -132,3 +132,20 @@ test('refuse falsified blob attestation and retain existing records',t=>{
  assert.match(dbRun(c,'ingest',['--bundle',c.bundle],false).stderr,/untrusted_file_receipt/);
  assert.equal(read(c).records.length,9);
 });
+
+test('abrupt process death during transaction leaves no partial records; next process recovers',t=>{
+ const c=ctx(t);stage(c,fixture());dbRun(c,'init');
+ const crash=spawnSync('python3',[py,'ingest','--database',c.db,'--bundle',c.bundle],{
+  cwd:root,encoding:'utf8',timeout:30000,env:{...process.env,MOTORLAB_LAB03_FAILPOINT:'CRASH_AFTER_FIRST_RECORD'}
+ });
+ assert.equal(crash.status,75);
+ const afterCrash=read(c);
+ assert.equal(afterCrash.records.length,0);
+ assert.equal(afterCrash.links.length,0);
+ assert.equal(afterCrash.lineage.length,0);
+ const retried=JSON.parse(dbRun(c,'ingest',['--bundle',c.bundle]).stdout);
+ assert.equal(retried.written,9);
+ const restored=JSON.parse(invoke(process.execPath,[reader,c.db]).stdout);
+ assert.equal(restored.state,'RESTORED_FROM_SQLITE_NEW_PROCESS');
+ assert.equal(restored.records,9);
+});
