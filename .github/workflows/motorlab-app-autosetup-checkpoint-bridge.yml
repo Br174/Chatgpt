@@ -10,7 +10,7 @@ permissions:
   contents: write
 concurrency:
   group: motorlab-chat-apk-checkpoint-bridge
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   android:
     name: Checkpoint schema, Android 11 picker and full regressions
