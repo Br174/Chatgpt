@@ -7,6 +7,18 @@
         android:usesCleartextTraffic="false"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity android:name=".AutoSetupActivity" android:exported="false"/>
+        <!-- External text shares are validated and then reviewed inside AutoSetup;
+             never export its browser/activity or any credential-handling screen. -->
+        <activity android:name=".AutoSetupShareReceiverActivity"
+            android:exported="true"
+            android:label="MotorLab AutoSetup - Checkpoint">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+                <data android:mimeType="application/json"/>
+            </intent-filter>
+        </activity>
         <activity android:name=".TeamArchiveActivity" android:exported="false"/>
         <activity android:name=".TeamChatActivity" android:exported="false"/>
         <activity android:name=".MainActivity"
