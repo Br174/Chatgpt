@@ -40,6 +40,7 @@
     "OIDC_ALLOWED_REPOSITORY": "Br174/Chatgpt",
     "OIDC_ALLOWED_REPOSITORY_ID": "1363281702",
     "OIDC_ALLOWED_REF": "refs/heads/main",
-    "OIDC_ALLOWED_WORKFLOW_REF": "Br174/Chatgpt/.github/workflows/motorlab-d1-oidc-relay.yml@refs/heads/main"
+    "OIDC_ALLOWED_WORKFLOW_REF": "Br174/Chatgpt/.github/workflows/motorlab-d1-oidc-relay.yml@refs/heads/main",
+    "MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE": "false"
   }
 }
