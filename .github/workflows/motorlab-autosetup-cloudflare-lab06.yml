@@ -59,7 +59,7 @@ jobs:
 
   preview:
     needs: verify
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
