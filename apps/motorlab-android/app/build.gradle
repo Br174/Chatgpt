@@ -10,8 +10,15 @@ android {
         applicationId 'it.motorlab.app'
         minSdk 26
         targetSdk 35
-        versionCode 5
-        versionName '0.5.0-unified-LAB'
+        versionCode 6
+        // Only the isolated signing-family emulator test may temporarily build
+        // versionCode 7. The protected release always uses the default code 6.
+        if (project.hasProperty('motorlabVersionCode')) {
+            int candidateCode = project.property('motorlabVersionCode').toString().toInteger()
+            if (candidateCode < 6) throw new GradleException('MotorLab update-family versionCode must be >= 6')
+            versionCode candidateCode
+        }
+        versionName '0.6.0-unified-LAB'
     }
 
     signingConfigs {
@@ -32,6 +39,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Opt-in TEMPORARY signing for CI's v6->v7 upgrade test only.
+            // Never part of production releases, never publish test APKs.
+            if (project.hasProperty('motorlabSignedUpdateTest')) {
+                signingConfig signingConfigs.mainApp
+            }
+        }
         release {
             minifyEnabled false
             signingConfig signingConfigs.mainApp
