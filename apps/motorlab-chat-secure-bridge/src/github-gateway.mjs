@@ -49,22 +49,40 @@ function headers(token) {
     "User-Agent": "MotorLab-AutoSetup-SecureBridge-LAB06"
   };
 }
-async function request(fetchImpl, url, options) {
-  // The only allowed URLs are this repository's GitHub Actions Secrets routes.
+// Only server-authored stage names: never expose URL data, exception messages,
+// token contents, or upstream response bodies in any user-visible diagnostic.
+const READ_STAGES = new Set([
+  "KEY_FETCH","SIGN_READBACK","PROBE_PRECHECK","PROBE_READBACK","PROBE_CLEANUP_VERIFY"
+]);
+const REQUEST_STAGES = new Set([
+  ...READ_STAGES,"SIGN_CREATE","PROBE_CREATE","PROBE_DELETE"
+]);
+async function request(fetchImpl, url, options, stage) {
   if (!url.startsWith(API + "/")) throw new PublicSafeError("TARGET_FORBIDDEN");
-  let response;
-  try {
-    response = await fetchImpl(url, { ...options, redirect: "error",
-      signal: AbortSignal.timeout(12000) });
-  } catch (_) {
-    throw new PublicSafeError("GITHUB_CONNECTION_FAILED");
+  if (!REQUEST_STAGES.has(stage)) throw new PublicSafeError("BRIDGE_UNAVAILABLE");
+  const isRead = options?.method === "GET";
+  const attempts = isRead && READ_STAGES.has(stage) ? 2 : 1;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    let response;
+    try {
+      response = await fetchImpl(url, { ...options, redirect: "error",
+        signal: AbortSignal.timeout(12000) });
+    } catch (error) {
+      const timeout = error?.name === "TimeoutError" || error?.name === "AbortError";
+      if (attempt + 1 < attempts) continue;
+      throw new PublicSafeError("GITHUB_" + stage + "_" + (timeout ? "TIMEOUT" : "TRANSPORT"));
+    }
+    // Never follow a redirect with an Authorization-bearing request.
+    if (response.status >= 300 && response.status <= 399)
+      throw new PublicSafeError("GITHUB_" + stage + "_REDIRECT");
+    return response;
   }
-  return response;
+  throw new PublicSafeError("BRIDGE_UNAVAILABLE");
 }
 export async function getPublicKey({ token, fetchImpl = fetch }) {
   assertToken(token);
   const res = await request(fetchImpl, API + "/public-key",
-    { method: "GET", headers: headers(token) });
+    { method: "GET", headers: headers(token) }, "KEY_FETCH");
   if (res.status === 401 || res.status === 403 || res.status === 404) {
     throw new PublicSafeError("GITHUB_PERMISSION_MISSING");
   }
@@ -117,14 +135,14 @@ export async function setRepositorySecret({
     method: "PUT",
     headers: { ...headers(token), "Content-Type": "application/json" },
     body: JSON.stringify({ encrypted_value: encrypted, key_id: pub.key_id })
-  });
+  }, "SIGN_CREATE");
   if (![201, 204].includes(put.status)) {
     throw new PublicSafeError(put.status === 401 || put.status === 403 ?
       "GITHUB_PERMISSION_MISSING" : "GITHUB_REJECTED_WRITE");
   }
   const get = await request(fetchImpl, url, {
     method: "GET", headers: headers(token)
-  });
+  }, "SIGN_READBACK");
   if (!get.ok) throw new PublicSafeError("GITHUB_READBACK_FAILED");
   let metadata;
   try { metadata = await get.json(); } catch (_) {
@@ -148,7 +166,8 @@ export async function probeRepositorySecrets({
   if (approval !== true) throw new PublicSafeError("USER_APPROVAL_REQUIRED");
   assertToken(token);
   const url = API + "/" + PROBE_SECRET_NAME;
-  const before = await request(fetchImpl, url, { method: "GET", headers: headers(token) });
+  const before = await request(fetchImpl, url,
+    { method: "GET", headers: headers(token) }, "PROBE_PRECHECK");
   if (before.status !== 404) {
     if (before.ok) throw new PublicSafeError("PROBE_SECRET_ALREADY_EXISTS");
     if (before.status === 401 || before.status === 403)
@@ -156,27 +175,29 @@ export async function probeRepositorySecrets({
     throw new PublicSafeError("PROBE_PRECHECK_FAILED");
   }
 
-  const syntheticValue = "motorlab-lab06-probe-" + crypto.randomUUID();
+  // Read the public key before trying to write anything.
   const pub = await getPublicKey({ token, fetchImpl });
+  const syntheticValue = "motorlab-lab06-probe-" + crypto.randomUUID();
   const encrypted = await encryptForGitHub(syntheticValue, pub.key);
-  const put = await request(fetchImpl, url, {
-    method: "PUT",
-    headers: { ...headers(token), "Content-Type": "application/json" },
-    body: JSON.stringify({ encrypted_value: encrypted, key_id: pub.key_id })
-  });
-  if (![201, 204].includes(put.status)) {
-    throw new PublicSafeError(put.status === 401 || put.status === 403
-      ? "GITHUB_PERMISSION_MISSING" : "GITHUB_REJECTED_WRITE");
-  }
 
   let receipt, failure;
   try {
-    const get = await request(fetchImpl, url, { method: "GET", headers: headers(token) });
+    // A failed PUT may still have reached GitHub: do not retry the PUT.
+    const put = await request(fetchImpl, url, {
+      method: "PUT",
+      headers: { ...headers(token), "Content-Type": "application/json" },
+      body: JSON.stringify({ encrypted_value: encrypted, key_id: pub.key_id })
+    }, "PROBE_CREATE");
+    if (![201, 204].includes(put.status))
+      throw new PublicSafeError(put.status === 401 || put.status === 403
+        ? "GITHUB_PERMISSION_MISSING" : "GITHUB_REJECTED_WRITE");
+
+    const get = await request(fetchImpl, url,
+      { method: "GET", headers: headers(token) }, "PROBE_READBACK");
     if (!get.ok) throw new PublicSafeError("GITHUB_READBACK_FAILED");
     let metadata;
-    try { metadata = await get.json(); } catch {
-      throw new PublicSafeError("GITHUB_READBACK_FAILED");
-    }
+    try { metadata = await get.json(); }
+    catch { throw new PublicSafeError("GITHUB_READBACK_FAILED"); }
     if (!metadata || metadata.name !== PROBE_SECRET_NAME || !metadata.updated_at)
       throw new PublicSafeError("GITHUB_READBACK_MISMATCH");
     receipt = {
@@ -190,11 +211,25 @@ export async function probeRepositorySecrets({
     failure = error instanceof PublicSafeError ? error : new PublicSafeError("BRIDGE_UNAVAILABLE");
   }
 
-  // Always remove the temporary secret after a successful GitHub create/update response.
-  const del = await request(fetchImpl, url, { method: "DELETE", headers: headers(token) });
-  if (del.status !== 204) throw new PublicSafeError("PROBE_CLEANUP_FAILED");
-  const after = await request(fetchImpl, url, { method: "GET", headers: headers(token) });
-  if (after.status !== 404) throw new PublicSafeError("PROBE_CLEANUP_FAILED");
+  // This cleanup runs even if the PUT timed out or its network state is unknown.
+  try {
+    let del;
+    try {
+      del = await request(fetchImpl, url,
+        { method: "DELETE", headers: headers(token) }, "PROBE_DELETE");
+    } catch (error) {
+      if (!(error instanceof PublicSafeError)) throw error;
+      del = null; // delete might have succeeded; confirm with GET
+    }
+    if (del !== null && del.status !== 204 && del.status !== 404)
+      throw new PublicSafeError("PROBE_CLEANUP_FAILED");
+    const after = await request(fetchImpl, url,
+      { method: "GET", headers: headers(token) }, "PROBE_CLEANUP_VERIFY");
+    if (after.status !== 404) throw new PublicSafeError("PROBE_CLEANUP_FAILED");
+  } catch {
+    // Do not claim success unless absence has been verified.
+    throw new PublicSafeError("PROBE_CLEANUP_UNVERIFIED");
+  }
   if (failure) throw failure;
   return receipt;
 }
