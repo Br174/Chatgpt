@@ -190,6 +190,7 @@ public final class AutoSetupActivity extends Activity {
             "<label for='nome'>Nome della prova</label><input id='nome' name='nome' type='text'>"+
             "<label for='tema'>Tema</label><textarea id='tema' name='tema'></textarea>"+
             "<label for='riservato'>Password da escludere</label><input id='riservato' type='password'>"+
+            "<a href='https://autosetup-demo.example/impostazioni'>Impostazioni demo</a>"+
             "</form></body></html>";
         browser.loadDataWithBaseURL(activeOrigin+"/",html,"text/html","UTF-8",null);
         browser.postDelayed(()->checkDemoReady(0),350);
@@ -238,7 +239,7 @@ public final class AutoSetupActivity extends Activity {
             "var a=Array.from(document.querySelectorAll('a[href]'));"+
             "for(var i=0;i<a.length&&out.length<12;i++){"+
             "try{var u=new URL(a[i].href,document.baseURI);"+
-            "if(u.protocol!=='https:'||u.origin!==location.origin||u.username||u.password"+
+            "if(u.protocol!=='https:'||u.origin!==(new URL(document.baseURI)).origin||u.username||u.password"+
             "||u.search||u.hash||u.pathname===location.pathname)continue;"+
             "var label=(a[i].innerText||a[i].getAttribute('aria-label')||'').trim();"+
             "if(!label||label.length>100||seen.has(u.href))continue;"+
