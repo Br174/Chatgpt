@@ -684,14 +684,14 @@ public final class AutoSetupActivity extends Activity {
                 if(f.editor.getText().length()==0)continue;
                 count++;
                 if(count<=8)names.append("• ").append(limit(
-                    f.label.replace('\n',' ').replace('\r',' '),80)).append("\\n");
+                    f.label.replace('\n',' ').replace('\r',' '),80)).append("\n");
             }
             if(count==0){alert("Compila almeno un campo nella chat.");return;}
             new AlertDialog.Builder(this).setTitle("Confermare la compilazione?")
-                .setMessage("Sito: "+activeOrigin+"\\n"+count+
-                    " campi ordinari da compilare:\\n"+names+
-                    (count>8?"…e altri "+(count-8)+" campi.\\n":"")+
-                    "\\nI valori non vengono mostrati qui. Attenzione: alcuni siti "+
+                .setMessage("Sito: "+activeOrigin+"\n"+count+
+                    " campi ordinari da compilare:\n"+names+
+                    (count>8?"…e altri "+(count-8)+" campi.\n":"")+
+                    "\nI valori non vengono mostrati qui. Attenzione: alcuni siti "+
                     "SALVANO AUTOMATICAMENTE dopo input/change, anche senza premere Invia.")
                 .setNegativeButton("Annulla",null)
                 .setPositiveButton("Conferma compilazione",(dialog,which)->applyApprovedFormChanges()).show();
