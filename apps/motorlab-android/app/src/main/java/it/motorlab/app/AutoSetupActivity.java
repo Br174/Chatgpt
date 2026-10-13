@@ -260,8 +260,7 @@ public final class AutoSetupActivity extends Activity {
                     String label=link.optString("title","").trim();
                     if(label.isEmpty()||label.length()>100||target.contains("?")||target.contains("#")
                         ||!origin.equals(SecureServiceToken.checkedOrigin(target)))continue;
-                    Uri parsedUrl=Uri.parse(target);
-                    if(!"https".equals(parsedUrl.getScheme())||parsedUrl.getUserInfo()!=null)continue;
+                    if(!target.startsWith("https://"))continue;
                     final String dest=target;
                     shown++;
                     button(navigation,"Apri: "+label,()->{
