@@ -48,7 +48,7 @@ jobs:
       - name: Compile current Cloudflare Worker with AutoSetup (NO DEPLOY)
         working-directory: apps/motorlab-chat-secure-bridge
         run: |
-          npx --yes wrangler@4 deploy --dry-run --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc --outdir /tmp/motorlab-autosetup-dryrun
+          npx --yes wrangler@4.136.3 deploy --dry-run --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc --outdir /tmp/motorlab-autosetup-dryrun
       - name: Confirm existing Worker/CORE preserved and no paid integrations
         run: |
           test -f cloudflare/motorlab-state-bridge/src/project-feedback.js
@@ -56,8 +56,118 @@ jobs:
           ! grep -Eq '(netlify|vercel|tinyfish)' apps/motorlab-chat-secure-bridge/cloudflare/worker-adapter.mjs
           echo 'CORE and adapter checks passed. Live deployment requires a separate manual dispatch and Cloudflare Actions secrets.' >> "$GITHUB_STEP_SUMMARY"
 
-  deploy:
+
+  preview:
     needs: verify
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: motorlab-state-bridge-production
+      cancel-in-progress: false
+    outputs:
+      preview_url: ${{ steps.preview_gate.outputs.preview_url }}
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WORKER_NAME: motorlab-state-bridge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Install reused secure gateway dependencies
+        working-directory: apps/motorlab-chat-secure-bridge
+        run: npm install --no-audit --no-fund --ignore-scripts
+      - id: preview_gate
+        name: Deploy isolated LAB06 Preview and verify before any production traffic
+        working-directory: apps/motorlab-chat-secure-bridge
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test "$GITHUB_REF" = 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
+
+          get_active_version() {
+            local response
+            response="$(curl --silent --show-error --fail --max-time 20 \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/$WORKER_NAME/deployments")" || return 1
+            jq -er '
+              [.result.deployments[0].versions[]? | select(.percentage == 100) | .version_id]
+              | if length == 1 then .[0] else error("active deployment is not a single 100% version") end
+            ' <<< "$response"
+          }
+
+          LAST_GOOD_VERSION="$(get_active_version)"
+          test -n "$LAST_GOOD_VERSION"
+
+          # New Cloudflare Worker Previews are scoped under this SAME Worker.
+          # --ignore-base-config prevents inherited production credentials/bindings.
+          # Wrangler config binds NO production D1/KV resources in previews.
+          PREVIEW_JSON="$(npx --yes wrangler@4.136.3 preview \
+            --name autosetup-lab06-49 --json --ignore-base-config \
+            --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc)"
+          PREVIEW_URL="$(jq -er '.preview.urls[0]' <<< "$PREVIEW_JSON")"
+          [[ "$PREVIEW_URL" =~ ^https://[a-zA-Z0-9.-]+\.workers\.dev/?$ ]]
+          PREVIEW_URL="${PREVIEW_URL%/}"
+
+          headers="$(mktemp)"
+          body="$(mktemp)"
+          trap 'rm -f "$headers" "$body"' EXIT
+
+          health_ok=false
+          for attempt in 1 2 3 4 5; do
+            code="$(curl --silent --output "$body" --write-out '%{http_code}' \
+              --max-time 12 "$PREVIEW_URL/autosetup/v1/health" || true)"
+            if [[ "$code" == 200 ]] && jq -e '
+              .service == "motorlab-autosetup-cloudflare" and
+              .write_enabled == false and
+              .github_write_verified == false and
+              .chat_connected_verified == false
+            ' "$body" >/dev/null 2>&1; then
+              health_ok=true
+              break
+            fi
+            sleep 3
+          done
+          test "$health_ok" = true
+
+          code="$(curl --silent --output "$body" --dump-header "$headers" \
+            --write-out '%{http_code}' --max-time 15 "$PREVIEW_URL/autosetup/v1/panel" || true)"
+          test "$code" = 200
+          grep -q 'AutoSetup · Firma MotorLab' "$body"
+          grep -qi '^cache-control: no-store' "$headers"
+          grep -qi '^x-frame-options: DENY' "$headers"
+          grep -qi "frame-ancestors 'none'" "$headers"
+          grep -qi "script-src 'nonce-" "$headers"
+
+          # Synthetic, unauthenticated negative tests: never send a real PAT.
+          denied="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --max-time 12 -X OPTIONS -H 'Origin: https://blocked.invalid' \
+            "$PREVIEW_URL/autosetup/v1/api/probe" || true)"
+          test "$denied" = 403
+          disabled="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --max-time 12 -X POST -H "Origin: $PREVIEW_URL" \
+            -H 'Content-Type: application/json' --data '{"approval":true}' \
+            "$PREVIEW_URL/autosetup/v1/api/probe" || true)"
+          test "$disabled" = 423
+
+          # Preview must never move the currently active Worker version.
+          test "$(get_active_version)" = "$LAST_GOOD_VERSION"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          {
+            echo '### MotorLab LAB06 isolated Preview'
+            echo "- URL verified: $PREVIEW_URL"
+            echo '- Worker: existing motorlab-state-bridge (no parallel Worker).'
+            echo '- Active production version unchanged after Preview.'
+            echo '- Preview uses no production D1/KV binding; Pollicino DO isolated.'
+            echo '- Health, protected panel, cross-origin denial and write-off gate: PASS.'
+            echo '- No PAT, secret value or request body was logged.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: [verify, preview]
     if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -139,13 +249,15 @@ jobs:
           echo "Rollback target captured: $LAST_GOOD_VERSION"
 
           VERSION_TAG="lab06-${GITHUB_SHA:0:12}-${GITHUB_RUN_ID}"
-          npx --yes wrangler@4 versions upload --name "$WORKER_NAME" --tag "$VERSION_TAG" --keep-vars --strict --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc
+          npx --yes wrangler@4.136.3 versions upload --name "$WORKER_NAME" --tag "$VERSION_TAG" --keep-vars --strict --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc
 
           DEPLOY_COMMAND_OK=true
-          if ! npx --yes wrangler@4 versions deploy --name "$WORKER_NAME" --version-tag "$VERSION_TAG@100%" --yes --message "MotorLab AutoSetup LAB06 ${GITHUB_SHA:0:12}" --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc; then
+          if ! npx --yes wrangler@4.136.3 versions deploy --name "$WORKER_NAME" --version-tag "$VERSION_TAG@100%" --yes --message "MotorLab AutoSetup LAB06 ${GITHUB_SHA:0:12}" --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc; then
             DEPLOY_COMMAND_OK=false
           fi
 
+          # A successful isolated Preview on this same exact run is mandatory.
+          test -n "${{ needs.preview.outputs.preview_url }}"
           if [[ "$DEPLOY_COMMAND_OK" == true ]] && health_ok && panel_ok; then
             {
               echo '### MotorLab LAB06 Cloudflare deploy'
@@ -158,7 +270,7 @@ jobs:
           fi
 
           echo 'Deployment smoke check failed; restoring the captured active Worker version.'
-          npx --yes wrangler@4 rollback "$LAST_GOOD_VERSION" --name "$WORKER_NAME" --message "Automatic rollback after failed MotorLab LAB06 smoke check" --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc
+          npx --yes wrangler@4.136.3 rollback "$LAST_GOOD_VERSION" --name "$WORKER_NAME" --message "Automatic rollback after failed MotorLab LAB06 smoke check" --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc
 
           ROLLED_BACK=false
           for attempt in 1 2 3 4 5; do
