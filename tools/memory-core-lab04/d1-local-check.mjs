@@ -92,8 +92,8 @@ try{
  const reloaded=execute('SELECT memory_key,content,state,recorded_at FROM memory_records ORDER BY memory_key;',{json:true});
  const wanted=new Map(source.records.map(r=>[r.memory_key,r.content]));
  must(reloaded.length===9&&reloaded.every(r=>r.state==='VERIFIED'&&r.recorded_at===recordedAt&&wanted.get(r.memory_key)===r.content),'failed_restart_recall');
- const integrity=execute('PRAGMA integrity_check;',{json:true});
- must(integrity.some(r=>Object.values(r).includes('ok')),'integrity_check_failed');
+ // Wrangler D1 rejects PRAGMA integrity_check with SQLITE_AUTH; verify supported SQL constraints instead.
+ // The full PRAGMA integrity_check remains covered in LAB03's local SQLite integration tests.
  // D1 must reject invalid FK and conflicting identity without altering previously stored facts.
  execute("INSERT INTO memory_links (from_id,to_id,relation,evidence_ref) VALUES ('not-a-real-memory','unknown','RELATED_TO','lab04://synthetic');",{negative:true});
  const first=source.records[0];execute(insert('memory_records',{...first,content:'TAMPER_ATTEMPT'},''),{negative:true});
@@ -103,7 +103,7 @@ try{
   memories:Number(after.memories),links:Number(after.links),source_pointers:Number(after.sources),
   old_ledger_rows:Number(after.old_events)+Number(after.old_lessons),repeat_added:0,
   distinct_wrangler_processes:true,duplicate_id_rejected:true,foreign_key_rejected:true,
-  integrity:'ok',production_d1_writes:0,
+  integrity:'verified_record_counts_content_pk_and_fk',production_d1_writes:0,
   remote_d1:'NOT_ATTEMPTED_NO_VERIFIED_STAGING_RESOURCE'
  },null,2)+'\n');
 }finally{rmSync(folder,{recursive:true,force:true});}
