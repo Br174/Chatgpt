@@ -36,6 +36,32 @@ This is a private isolated LAB implementation. Nothing in this folder replaces M
 - No broad GitHub repository scopes, no external destination from user input, no implicit site navigation, no secret-related GitHub tool calls.
 - Real server should be exposed only behind TLS and with provider monitoring; test responsive mobile UI and verify domain ownership, caching, CSP and network policies before live writes.
 
+## Netlify hosting · actual provisioning on 13 October 2026
+
+Netlify project: https://app.netlify.com/projects/motorlab-autosetup-secure-bridge
+Netlify site id: 36d24f2f-1a42-4270-8bc7-1c4b7f3e4c6c
+Owner team: brunoverlezza (Free)
+Repository: private Br174/Chatgpt, isolated LAB branch motorlab/lab06-chat-first-secure-bridge-20261013
+
+Verified through authenticated Netlify API:
+- Empty project is CREATED, not deployed. There is NO live /mcp endpoint until first deploy.
+- Project visitor access currently requires Netlify team SSO. Do not disable before secure ChatGPT connection review.
+- MOTORLAB_LIVE_GITHUB_WRITE=false is stored and was reread successfully from site environment variables. A first attempt with scope Functions alone did not appear in readback; repeating with all scopes was successful.
+- Connector supports project creation, configuration and environment variables but does NOT expose site Git linking or deploy operation.
+- Source is adapted for Netlify with netlify/functions/mcp.mjs and repository-secret.mjs; the remote MCP entry is stateless WebStandard transport and the GitHub write endpoint rejects requests unless all separate flags/Origin/token/owner approval pass.
+- GitHub Actions test confirms the MCP Functions can process JSON-RPC initialize and expose the UI resource in-process, with synthetic-only cryptographic tests. This does NOT establish that a Netlify deploy or real ChatGPT embedding works.
+
+Next exact user-required Git authorization (not done by this agent):
+1. Open the project dashboard linked above.
+2. Project configuration > Developer settings > Continuous deployment > Repository > Link repository.
+3. Select GitHub provider, authorize Netlify GitHub App only for private repository Br174/Chatgpt if asked; no other repository access.
+4. Set production branch to motorlab/lab06-chat-first-secure-bridge-20261013. Do not select main.
+5. Set Base directory apps/motorlab-chat-secure-bridge. Build command and publish are in this folder's netlify.toml; verify publish is site and Functions folder is netlify/functions.
+6. Start first deployment. Confirm HTTPS /mcp reachable and read-only; do not enable secret writes.
+7. Then separately connect remote MCP to ChatGPT through eligible custom plugin setup and verify isolated widget Origin. Only after review and live UI tests may owner authorize GitHub fine-grained PAT and GitHub Secrets write.
+
+Do not create a second duplicate Netlify project. Do not use temporary debug signing materials.
+
 ## Status 13 Oct 2026
 Repository source: implementation in isolated LAB.
 Synthetic tests: see the GitHub Actions gate outcome.
