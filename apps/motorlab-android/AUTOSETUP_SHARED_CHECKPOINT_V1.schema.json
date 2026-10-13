@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motorlab.invalid/contracts/autosetup-checkpoint-v1",
+  "title": "MotorLab AutoSetup portable redacted checkpoint v1",
+  "description": "Portable observations only. It never imports consent, sessions or credentials. Source-specific evidence must be verified separately.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "version",
+    "source",
+    "origin",
+    "stage",
+    "observations",
+    "permissions",
+    "privacy",
+    "verification"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "motorlab.autosetup.checkpoint"
+    },
+    "version": {
+      "const": 1
+    },
+    "source": {
+      "enum": [
+        "motorlab_android",
+        "chatgpt_tools"
+      ]
+    },
+    "origin": {
+      "type": "string",
+      "maxLength": 300,
+      "pattern": "^https://[A-Za-z0-9.-]+(?::[0-9]+)?$"
+    },
+    "stage": {
+      "enum": [
+        "draft",
+        "page_ready",
+        "scan_complete",
+        "preview_prepared",
+        "fields_applied"
+      ]
+    },
+    "observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "page_loaded",
+        "ordinary_fields",
+        "internal_links",
+        "prepared_fields",
+        "applied_fields"
+      ],
+      "properties": {
+        "page_loaded": {
+          "type": "boolean"
+        },
+        "ordinary_fields": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 30
+        },
+        "internal_links": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 12
+        },
+        "prepared_fields": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 30
+        },
+        "applied_fields": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 30
+        }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "can_execute",
+        "requires_new_consent"
+      ],
+      "properties": {
+        "can_execute": {
+          "const": false
+        },
+        "requires_new_consent": {
+          "const": true
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contains_goal",
+        "contains_field_values",
+        "contains_credentials"
+      ],
+      "properties": {
+        "contains_goal": {
+          "const": false
+        },
+        "contains_field_values": {
+          "const": false
+        },
+        "contains_credentials": {
+          "const": false
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "remote_outcome"
+      ],
+      "properties": {
+        "scope": {
+          "enum": [
+            "local_ui_observation",
+            "connector_tool_result"
+          ]
+        },
+        "remote_outcome": {
+          "enum": [
+            "not_verified",
+            "verified_separately"
+          ]
+        }
+      }
+    }
+  }
+}

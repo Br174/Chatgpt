@@ -109,6 +109,7 @@ public final class MainActivity extends Activity {
         label("Chat MotorLab"); 
         note("La LAB01 consente richieste dirette al modello Gemini. Non modifica repository né esegue comandi di sistema.");
         note("Provider attivo: "+cfg.provider());
+        button("🌐 AutoSetup — configura siti dalla chat",()->startActivity(new Intent(this,AutoSetupActivity.class)));
         if(cfg.provider().equals("chatgpt")) {
             gap(); label(ChatGptPlan.NAME); note(ChatGptPlan.status());
             button("Leggi la guida ufficiale ChatGPT",()->open(ChatGptPlan.DOCS));

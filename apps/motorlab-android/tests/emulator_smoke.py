@@ -114,6 +114,221 @@ def no_crash():
         raise AssertionError("LAB04 FATAL EXCEPTION in logcat")
     print("LAB04_NO_FATAL_EXCEPTION=PASSED",flush=True)
 
+def scroll_to_click(token,tries=7):
+    # Works inside AutoSetup's upper Android ScrollView; never touches the WebView.
+    for attempt in range(tries):
+        found=matches(token,clickable=True)
+        if found:
+            box=[int(v) for v in re.findall(r"\d+",found[0].get("bounds",""))]
+            if len(box)==4 and box[2]>box[0] and box[3]>box[1] and 0<box[1]<2150:
+                tap(found[0])
+                return
+        scrolls=[n for n in ui() if n.get("class")=="android.widget.ScrollView"]
+        if not scrolls:
+            raise AssertionError("AutoSetup scroll area missing before "+token)
+        coords=[int(v) for v in re.findall(r"\d+",scrolls[0].get("bounds",""))]
+        if len(coords)!=4 or coords[3]-coords[1]<220:
+            raise AssertionError("AutoSetup scroll bounds missing")
+        x=(coords[0]+coords[2])//2
+        adb("shell","input","swipe",str(x),str(coords[3]-50),
+            str(x),str(coords[1]+50),"420")
+        time.sleep(.7)
+    raise AssertionError("AutoSetup button could not be reached: "+token)
+
+def scroll_until_visible(token,tries=10):
+    for _ in range(tries):
+        nodes=matches(token)
+        for node in nodes:
+            bounds=[int(v) for v in re.findall(r"\d+",node.get("bounds",""))]
+            if len(bounds)==4 and bounds[2]>bounds[0] and bounds[3]>bounds[1]:
+                return node
+        scrolls=[n for n in ui() if n.get("class")=="android.widget.ScrollView"]
+        if not scrolls:break
+        bounds=[int(v) for v in re.findall(r"\d+",scrolls[0].get("bounds",""))]
+        if len(bounds)!=4 or bounds[3]-bounds[1]<220:break
+        x=(bounds[0]+bounds[2])//2
+        adb("shell","input","swipe",str(x),str(bounds[3]-45),
+            str(x),str(bounds[1]+45),"370")
+        time.sleep(.6)
+    raise AssertionError("AutoSetup text not visible after scrolling: "+token)
+
+def scroll_top():
+    scrolls=[n for n in ui() if n.get("class")=="android.widget.ScrollView"]
+    if not scrolls:raise AssertionError("AutoSetup scroll missing")
+    coords=[int(v) for v in re.findall(r"\d+",scrolls[0].get("bounds",""))]
+    if len(coords)!=4:raise AssertionError("AutoSetup scroll bounds missing")
+    x=(coords[0]+coords[2])//2
+    for _ in range(3):
+        adb("shell","input","swipe",str(x),str(coords[1]+60),
+            str(x),str(coords[3]-60),"350")
+        time.sleep(.4)
+
+def autosetup_smoke():
+    # Launch a fresh main screen: no account, token, network or destructive action.
+    adb("shell","am","force-stop",PACKAGE)
+    launch()
+    click("Chat",exact=True)
+    click("AutoSetup")
+    wait("MotorLab AutoSetup")
+    wait("Prova modulo generico offline",clickable=True)
+    print("MOTORLAB_AUTOSETUP_CHAT_ENTRY=PASSED",flush=True)
+    # No AutoSetup avatar is inserted into the idle introductory message.
+    assert not any(n.get("class")=="android.widget.ImageView" and
+                   n.get("content-desc")=="AutoSetup attivo" for n in ui())
+    click("Prova modulo generico offline",exact=True)
+    scroll_top()
+    wait("AutoSetup attivo",seconds=12)
+    icons=[n for n in ui() if n.get("class")=="android.widget.ImageView" and
+           n.get("content-desc")=="AutoSetup attivo"]
+    assert icons, "Original AutoSetup avatar missing from active chat"
+    print("MOTORLAB_AUTOSETUP_ORIGINAL_AVATAR=PASSED_ACTIVE_ONLY",flush=True)
+    print("MOTORLAB_AUTOSETUP_OFFLINE_DEMO_LAUNCH=PASSED",flush=True)
+    time.sleep(2)
+    scroll_until_visible("Avanzamento locale: 20%")
+    print("MOTORLAB_AUTOSETUP_PROGRESS_20_PAGE_READY=PASSED",flush=True)
+    scroll_to_click("Riconosci i campi del modulo")
+    # Form controls are below the chat header inside the bounded ScrollView.
+    for _ in range(3):
+        if matches("Campi rilevati nel sito · 2"):
+            break
+        scrolls=[n for n in ui() if n.get("class")=="android.widget.ScrollView"]
+        if not scrolls:
+            break
+        bounds=[int(v) for v in re.findall(r"\d+",scrolls[0].get("bounds",""))]
+        if len(bounds)!=4 or bounds[3]-bounds[1]<180:
+            break
+        x=(bounds[0]+bounds[2])//2
+        adb("shell","input","swipe",str(x),str(bounds[3]-35),
+            str(x),str(bounds[1]+35),"400")
+        time.sleep(.8)
+    wait("Campi rilevati nel sito · 2",seconds=10)
+    print("MOTORLAB_AUTOSETUP_GENERIC_FORM_SCAN=PASSED_FIELDS_2_PASSWORD_EXCLUDED",flush=True)
+    scroll_until_visible("Avanzamento locale: 40%")
+    print("MOTORLAB_AUTOSETUP_PROGRESS_40_SCAN=PASSED",flush=True)
+    scroll_to_click("Prepara valori dimostrativi")
+    scroll_top()
+    scroll_until_visible("Preparati 2 valori nella chat")
+    wait("Avanzamento locale: 60%",seconds=12)
+    print("MOTORLAB_AUTOSETUP_PROGRESS_60_PREPARED=PASSED",flush=True)
+    scroll_to_click("Compila i campi sulla pagina")
+    wait("Confermare la compilazione?",seconds=12)
+    wait("2 campi ordinari da compilare",seconds=12)
+    click("ANNULLA",exact=True)
+    assert not matches("Compilati 2 campi"), "Cancellation unexpectedly applied form values"
+    scroll_until_visible("Avanzamento locale: 60%")
+    print("MOTORLAB_AUTOSETUP_PROGRESS_CANCEL_RETAINS_60=PASSED",flush=True)
+    scroll_to_click("Compila i campi sulla pagina")
+    wait("Confermare la compilazione?",seconds=12)
+    click("CONFERMA COMPILAZIONE",exact=True)
+    scroll_top()
+    scroll_until_visible("Compilati 2 campi")
+    scroll_top()
+    scroll_until_visible("Verifica DOM 2/2")
+    # Check the private, redacted Android receipt: never retain the synthetic values.
+    receipt_xml=adb("shell","run-as",PACKAGE,"cat",
+                    "shared_prefs/autosetup_operation_evidence_v1.xml",timeout=25)
+    assert "motorlab.autosetup.operation-evidence" in receipt_xml
+    assert "not_verified" in receipt_xml
+    assert "autosetup-demo.example" in receipt_xml
+    assert "MotorLabTest" not in receipt_xml and "ProvaAutoSetup" not in receipt_xml
+    print("MOTORLAB_AUTOSETUP_RECEIPT_PRIVATE_REDACTED=PASSED",flush=True)
+    # The receipt in the scrollable chat may be outside the accessibility
+    # viewport. Assert the canonical, visible progress TextView instead, and
+    # require the matching DOM 2/2 result in the SAME text node. This proves
+    # that 100% is tied to readback, never to a timer or remote save.
+    verified_status=scroll_until_visible("Avanzamento locale: 100% · Compilati 2 campi · Verifica DOM 2/2")
+    assert "salvataggio server NON verificato" in verified_status.get("text",""), (
+        "Progress 100% must not claim successful remote persistence")
+    print("MOTORLAB_AUTOSETUP_STAGE_PROGRESS=PASSED_LOCAL_100_NOT_REMOTE",flush=True)
+    print("MOTORLAB_AUTOSETUP_DOM_SECOND_READBACK=PASSED_FIELDS_2",flush=True)
+    print("MOTORLAB_AUTOSETUP_FORM_REVIEW_CONSENT_CANCEL=PASSED",flush=True)
+    print("MOTORLAB_AUTOSETUP_GENERIC_FORM_FILL=PASSED_FIELDS_2_VERIFIED",flush=True)
+    scroll_top()
+    scroll_to_click("Trova collegamenti del sito")
+    scroll_until_visible("Collegamenti interni · 1")
+    scroll_until_visible("Apri: Impostazioni demo")
+    print("MOTORLAB_AUTOSETUP_GENERIC_LINK_DISCOVERY=PASSED_SAME_ORIGIN_DEMO",flush=True)
+    scroll_until_visible("Percorso suggerito: Impostazioni demo")
+    print("MOTORLAB_AUTOSETUP_LOCAL_GOAL_ROUTE_HINT=PASSED_NO_AUTO_NAVIGATION",flush=True)
+    scroll_top()
+    scroll_to_click("Apri: Impostazioni demo")
+    wait("Navigare sul sito?",seconds=12)
+    click("APRI PAGINA",exact=True)
+    wait("Impostazioni demo",seconds=16)
+    scroll_until_visible("Avanzamento locale: 20%")
+    # The second page starts at the ready milestone, not the previous 100%.
+    assert not matches("Avanzamento locale: 100%"), "Progress carried across page navigation"
+    print("MOTORLAB_AUTOSETUP_PROGRESS_NEW_PAGE_RESET=PASSED",flush=True)
+    # The progress/status view is BELOW the top action buttons. Return to the
+    # top before locating the Analyze button; otherwise scroll_to_click only
+    # scrolls farther DOWN and can falsely report that an existing button is gone.
+    scroll_top()
+    scroll_to_click("Analizza pagina e pianifica")
+    scroll_top()
+    scroll_until_visible("Campi rilevati nel sito · 2")
+    scroll_top()
+    scroll_until_visible("Collegamenti interni · 0")
+    print("MOTORLAB_AUTOSETUP_MULTIPAGE_CONSENT_AND_SCAN=PASSED_OFFLINE",flush=True)
+    print("MOTORLAB_AUTOSETUP_GUIDED_READONLY_ANALYSIS=PASSED",flush=True)
+    scroll_top()
+    scroll_to_click("Mostra piano operazioni")
+    wait("Piano AutoSetup",seconds=12)
+    wait("Campi riconosciuti: 2",seconds=12)
+    click("CONDIVIDI CHECKPOINT",exact=True)
+    wait("Condividere checkpoint AutoSetup?",seconds=12)
+    wait("NON contiene obiettivo",seconds=12)
+    click("ANNULLA",exact=True)
+    print("MOTORLAB_AUTOSETUP_REDACTED_CHECKPOINT_SHARE_CONSENT=PASSED",flush=True)
+    print("MOTORLAB_AUTOSETUP_STAGED_PLAN=PASSED_NO_AUTO_SUBMIT",flush=True)
+    scroll_top()
+    scroll_to_click("Prova modulo generico offline")
+    time.sleep(2)
+    scroll_to_click("Trova collegamenti del sito")
+    scroll_top()
+    scroll_until_visible("Percorso suggerito: Impostazioni demo")
+    scroll_to_click("Esegui passo suggerito")
+    wait("Eseguire il prossimo passo?",seconds=12)
+    click("APRI E ANALIZZA",exact=True)
+    wait("Impostazioni demo",seconds=17)
+    scroll_top()
+    scroll_until_visible("Campi rilevati nel sito · 2")
+    scroll_top()
+    scroll_until_visible("Collegamenti interni · 0")
+    print("MOTORLAB_AUTOSETUP_APPROVED_STEP_AND_READONLY_RESCAN=PASSED_OFFLINE",flush=True)
+    # Kill and reopen the process: receipts must persist, input values must not.
+    adb("shell","am","force-stop",PACKAGE)
+    launch()
+    receipt_after_restart=adb("shell","run-as",PACKAGE,"cat",
+                               "shared_prefs/autosetup_operation_evidence_v1.xml",timeout=25)
+    assert "dom_confirmed" in receipt_after_restart
+    assert "not_verified" in receipt_after_restart
+    assert "MotorLabTest" not in receipt_after_restart
+    print("MOTORLAB_AUTOSETUP_RECEIPT_REOPEN_PERSISTENCE=PASSED",flush=True)
+    no_crash()
+
+def verify_same_apk_reinstall_preserves_local_data():
+    # This is an Android install -r retention smoke with the SAME debug APK.
+    # It is NOT proof of cross-version upgrade or LAB01 production signing.
+    apk="apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk"
+    verify_db_canary()
+    before=adb("shell","run-as",PACKAGE,"cat",
+               "shared_prefs/autosetup_operation_evidence_v1.xml",timeout=25)
+    assert "dom_confirmed" in before and "not_verified" in before
+    out=adb("install","-r",apk,timeout=100)
+    assert "Success" in out, "Same-signed APK reinstall failed"
+    verify_db_canary()
+    after=adb("shell","run-as",PACKAGE,"cat",
+              "shared_prefs/autosetup_operation_evidence_v1.xml",timeout=25)
+    assert "dom_confirmed" in after and "not_verified" in after
+    assert "MotorLabTest" not in after and "ProvaAutoSetup" not in after
+    launch()
+    open_team()
+    open_archive()
+    wait(CANARY)
+    no_crash()
+    print("MOTORLAB_SAME_APK_REINSTALL_DATA_RETAINED=PASSED_TEST_ONLY",flush=True)
+
+
 def main():
     adb("wait-for-device",timeout=120)
     adb("shell","settings","put","system","screen_off_timeout","600000")
@@ -143,6 +358,8 @@ def main():
     wait(CANARY)
     print("LAB04_REOPEN_HISTORY_PERSISTENT=PASSED",flush=True)
     no_crash()
+    autosetup_smoke()
+    verify_same_apk_reinstall_preserves_local_data()
     print("LAB04_ANDROID_EMULATOR_E2E=PASSED",flush=True)
 
 if __name__=="__main__":
