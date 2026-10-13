@@ -676,6 +676,33 @@ public final class AutoSetupActivity extends Activity {
         try{
             currentOrigin();
             if(inspectedUrl.isEmpty()||!inspectedUrl.equals(browser.getUrl())){
+                alert("La pagina è cambiata: analizza nuovamente i campi.");return;
+            }
+            int count=0;
+            StringBuilder names=new StringBuilder();
+            for(FormField f:controls){
+                if(f.editor.getText().length()==0)continue;
+                count++;
+                if(count<=8)names.append("• ").append(limit(
+                    f.label.replace('\n',' ').replace('\r',' '),80)).append("\\n");
+            }
+            if(count==0){alert("Compila almeno un campo nella chat.");return;}
+            new AlertDialog.Builder(this).setTitle("Confermare la compilazione?")
+                .setMessage("Sito: "+activeOrigin+"\\n"+count+
+                    " campi ordinari da compilare:\\n"+names+
+                    (count>8?"…e altri "+(count-8)+" campi.\\n":"")+
+                    "\\nI valori non vengono mostrati qui. Attenzione: alcuni siti "+
+                    "SALVANO AUTOMATICAMENTE dopo input/change, anche senza premere Invia.")
+                .setNegativeButton("Annulla",null)
+                .setPositiveButton("Conferma compilazione",(dialog,which)->applyApprovedFormChanges()).show();
+        }catch(Exception e){alert("Pagina non disponibile per la compilazione.");}
+    }
+
+    /** Runs only after a distinct user approval; the DOM preflight is all-or-nothing. */
+    private void applyApprovedFormChanges() {
+        try{
+            currentOrigin();
+            if(inspectedUrl.isEmpty()||!inspectedUrl.equals(browser.getUrl())){
                 alert("La pagina è cambiata: analizza di nuovo i campi.");return;
             }
         }catch(Exception e){alert("Pagina non più disponibile.");return;}
@@ -691,6 +718,14 @@ public final class AutoSetupActivity extends Activity {
             String origin=activeOrigin;
             final String js="(function(){var values="+updates.toString()+";"+
                 "var all=Array.from(document.querySelectorAll('input,textarea,select'));"+
+                "for(var k=0;k<values.length;k++){var x=values[k],t=all[x.i];"+
+                "if(!t||[t.tagName,(t.getAttribute('type')||'text').toLowerCase(),"+
+                "t.name||'',t.id||''].join('|')!==x.s||t.disabled)return 'PAGE_CHANGED';"+
+                "var ty=(t.getAttribute('type')||'text').toLowerCase();"+
+                "if(['password','hidden','file','checkbox','radio','submit','button','reset'].indexOf(ty)>=0)"+
+                "return 'PAGE_CHANGED';"+
+                "if(t.tagName==='SELECT'&&!Array.from(t.options).some(function(o){return o.value===x.v;}))"+
+                "return 'PAGE_CHANGED';}"+
                 "var filled=0;for(var j=0;j<values.length;j++){var v=values[j];var el=all[v.i];"+
                 "if(!el||[el.tagName,(el.getAttribute('type')||'text').toLowerCase(),el.name||'',el.id||''].join('|')!==v.s)continue;"+
                 "var typ=(el.getAttribute('type')||'text').toLowerCase();"+
@@ -705,6 +740,10 @@ public final class AutoSetupActivity extends Activity {
                 try{
                     if(!origin.equals(currentOrigin()))return;
                     String count=String.valueOf(new JSONTokener(result).nextValue());
+                    if("PAGE_CHANGED".equals(count)){
+                        status("Modulo modificato: nessun campo scritto. Ripeti la scansione.");
+                        return;
+                    }
                     currentTaskPlan().applied(Integer.parseInt(count));
                     status("Compilati "+count+" campi; nessun clic su Invia. Alcuni siti salvano automaticamente.");
                     say("MotorLab: compilazione effettuata su "+origin+

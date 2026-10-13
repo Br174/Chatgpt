@@ -20,3 +20,7 @@ L'utente indica sito e obiettivo. La chat usa gli strumenti reali disponibili, c
 ## Lavoro ancora aperto
 Bridge/auth tra ChatGPT e APK, sincronizzazione automatica con consenso e revoca, executor persistente remoto, accesso ai siti reali, update-in-place con firma release e test fisico: non implementati/attestati.
 RealTest rimane backlog, non parte del lavoro AutoSetup.
+
+
+## Regola AS5 per AutoSetup in questa chat
+Prima di ogni scrittura su un modulo reale: anteprima del dominio e dei nomi dei campi non sensibili, avviso che input/change può salvare dati senza submit e approvazione specifica. Una precedente autorizzazione a leggere o navigare non autorizza a compilare. Ricontrollare il sito e documentare il risultato reale.

@@ -219,3 +219,10 @@ PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
 - `AutoSetupActivity.say()`: `ImageView` con PNG originale a trasparenza alpha, `setBackground(null)` e nessun padding o cerchio/badge. Icona 38dp direttamente sullo sfondo chiaro della chat.
 - Il PNG originale non viene modificato, rigenerato né ridisegnato. Intro inattiva e tutte le altre schermate restano immutate.
 - Gate statico rinforzato per vietare `GradientDrawable`/cerchio attorno all'icona; gate runtime Android 11 preesistente conferma l'avatar solo durante AutoSetup. Non cambiare l'avatar di sistema ChatGPT: non è controllabile da questo progetto.
+
+
+## AS5 — Conferma preventiva e DOM preflight prima di compilare (13/10/2026)
+- Ora `Compila i campi sulla pagina` apre una revisione con origine, numero e nomi (NON valori) dei campi. I siti che salvano agli eventi input/change sono esplicitamente segnalati. `Annulla` non scrive nulla.
+- Dopo `Conferma compilazione` il codice ricontrolla il sito, quindi esegue una preflight per *tutti* i target DOM: firma, tipo di controllo, opzione select presente, disabilitazione e campi sensibili. Se il modulo è cambiato, non modifica alcun campo e richiede una nuova scansione.
+- Test Android offline: doppia apertura, annullamento, conferma, risultato effettivo di 2 campi, regressioni Team Chat/Archivio. Non dichiara autenticazioni a siti reali né salvataggi server verificati.
+- Interfaccia/icone originali immutate, RealTest sempre backlog, niente MADRE/CORE.

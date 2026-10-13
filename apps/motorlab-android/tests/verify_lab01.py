@@ -160,3 +160,11 @@ assert 'private void activateAutoSetup()' in autosetup
 assert 'activateAutoSetup();' in autosetup
 assert 'MOTORLAB_AUTOSETUP_ORIGINAL_AVATAR=PASSED_ACTIVE_ONLY' in emulator
 print("AutoSetup user-original inline avatar resource and active state: PASS")
+
+assert 'setTitle("Confermare la compilazione?")' in autosetup
+assert 'setPositiveButton("Conferma compilazione"' in autosetup
+assert "private void applyApprovedFormChanges()" in autosetup
+assert "return 'PAGE_CHANGED';" in autosetup
+assert "SALVANO AUTOMATICAMENTE" in autosetup
+assert "MOTORLAB_AUTOSETUP_FORM_REVIEW_CONSENT_CANCEL=PASSED" in emulator
+print("AutoSetup explicit pre-write approval and complete DOM preflight: PASS")
