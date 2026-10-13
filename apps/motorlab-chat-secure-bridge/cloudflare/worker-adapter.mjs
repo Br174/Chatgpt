@@ -1,6 +1,6 @@
 // AutoSetup LAB06: Cloudflare adapter for the EXISTING MotorLab Worker.
 // Uses the already tested secure panel and GitHub sealed-box gateway. No parallel authority.
-// This module is inactive unless explicitly wired/deployed. Live secrets fail closed.
+// The feature remains inactive for writes unless explicitly enabled and origin-checked.
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { registerAppTool, registerAppResource, RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server";
@@ -32,9 +32,38 @@ function widgetOrigin(env, publicOrigin) {
   const origin = originOnly(env.MOTORLAB_AUTOSETUP_WIDGET_ORIGIN);
   return origin && origin !== publicOrigin ? origin : null;
 }
-function liveEnabled(env, publicOrigin) {
-  return env.MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE === "true" &&
-    Boolean(widgetOrigin(env, publicOrigin));
+function liveEnabled(env) {
+  return env.MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE === "true";
+}
+function securePanel(apiBase, { embedded = false } = {}) {
+  const bytes = new Uint8Array(18);
+  crypto.getRandomValues(bytes);
+  const nonce = [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
+  let html = panelHtml
+    .replaceAll("__MOTORLAB_PUBLIC_ORIGIN__", apiBase)
+    .replace("<style>", '<style nonce="' + nonce + '">')
+    .replace("<script>", '<script nonce="' + nonce + '">');
+  if (embedded) html = html.replace(
+    '"/api/repository-secret"',
+    '"/autosetup/v1/api/repository-secret"'
+  );
+  return { html, nonce };
+}
+function panelResponse(publicOrigin) {
+  const { html, nonce } = securePanel(publicOrigin + PREFIX);
+  return new Response(html, {
+    status: 200,
+    headers: {
+      ...HEADERS,
+      "Content-Type": "text/html; charset=utf-8",
+      "X-Frame-Options": "DENY",
+      "Cross-Origin-Resource-Policy": "same-origin",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+      "Content-Security-Policy": "default-src 'none'; script-src 'nonce-" + nonce +
+        "'; style-src 'nonce-" + nonce + "'; connect-src 'self'; form-action 'self'; " +
+        "base-uri 'none'; frame-ancestors 'none'"
+    }
+  });
 }
 function createMcp(publicOrigin, env) {
   const mcp = new McpServer(
@@ -57,11 +86,8 @@ function createMcp(publicOrigin, env) {
     };
     const origin = widgetOrigin(env, publicOrigin);
     if (origin) metadata.domain = origin;
-    // The original approved HTML is reused; only the endpoint is redirected.
-    const text = panelHtml
-      .replaceAll("__MOTORLAB_PUBLIC_ORIGIN__", publicOrigin)
-      .replace('"/api/repository-secret"', '"/autosetup/v1/api/repository-secret"');
-    return { contents: [{ uri: URI, mimeType: RESOURCE_MIME_TYPE, text,
+    const { html, nonce } = securePanel(publicOrigin, { embedded: true });
+    return { contents: [{ uri: URI, mimeType: RESOURCE_MIME_TYPE, text: html,
       _meta: { ui: metadata } }] };
   });
   return mcp;
@@ -89,20 +115,21 @@ async function serveMcp(request, env, publicOrigin) {
   }
 }
 async function serveSecret(request, env, publicOrigin, gateway) {
-  const origin = widgetOrigin(env, publicOrigin);
-  // Reject requests until the real ChatGPT widget sandbox origin is verified.
-  if (!origin || request.headers.get("origin") !== origin)
-    return errorResponse("WIDGET_ORIGIN_NOT_VERIFIED", 403);
+  const requestOrigin = originOnly(request.headers.get("origin"));
+  const approvedWidgetOrigin = widgetOrigin(env, publicOrigin);
+  const originAllowed = requestOrigin === publicOrigin ||
+    (approvedWidgetOrigin !== null && requestOrigin === approvedWidgetOrigin);
+  if (!originAllowed) return errorResponse("REQUEST_ORIGIN_NOT_ALLOWED", 403);
   const cors = {
     ...HEADERS,
-    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Origin": requestOrigin,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "authorization, content-type",
     "Vary": "Origin"
   };
   if (request.method === "OPTIONS") return new Response(null, {status: 204, headers: cors});
   if (request.method !== "POST") return errorResponse("METHOD_NOT_ALLOWED", 405);
-  if (!liveEnabled(env, publicOrigin))
+  if (!liveEnabled(env))
     return new Response(JSON.stringify({error:"LIVE_WRITES_DISABLED"}), {
       status:423, headers:{...cors,"Content-Type":"application/json"}
     });
@@ -123,7 +150,7 @@ async function serveSecret(request, env, publicOrigin, gateway) {
       approval: input?.approval === true, liveEnabled: true
     });
     return new Response(JSON.stringify(receipt), {
-      status: 200, headers: {...cors, "Content-Type":"application/json"}
+      status: 200, headers: {...cors, "Content-Type": "application/json"}
     });
   } catch (error) {
     // Never return/log upstream messages or request body.
@@ -147,10 +174,14 @@ export async function handleAutoSetupCloudflare(request, env, {gateway = setRepo
     if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
     return new Response(JSON.stringify({
       service: "motorlab-autosetup-cloudflare",
-      write_enabled: liveEnabled(env, publicOrigin),
+      write_enabled: liveEnabled(env),
       github_write_verified: false,
       chat_connected_verified: false
     }), { headers: { ...HEADERS, "Content-Type": "application/json" } });
+  }
+  if (url.pathname === PREFIX + "/panel") {
+    if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
+    return panelResponse(publicOrigin);
   }
   if (url.pathname === PREFIX + "/mcp") return serveMcp(request, env, publicOrigin);
   if (url.pathname === PREFIX + "/api/repository-secret")
