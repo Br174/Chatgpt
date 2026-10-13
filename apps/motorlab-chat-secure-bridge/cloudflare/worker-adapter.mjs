@@ -41,7 +41,7 @@ function probeEnabled(env, now = Date.now()) {
   if (env.MOTORLAB_AUTOSETUP_PROBE_ONLY !== "true" || liveEnabled(env)) return false;
   const untilText = env.MOTORLAB_AUTOSETUP_PROBE_UNTIL;
   if (typeof untilText !== "string" ||
-      !/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$/.test(untilText)) return false;
+      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(untilText)) return false;
   const until = Date.parse(untilText);
   return Number.isFinite(until) && until > now && until - now <= 45 * 60 * 1000;
 }
