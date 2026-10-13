@@ -100,8 +100,24 @@ jobs:
             sha256sum MotorLab-LAB06-ChatBridge-TEST.apk > SHA256-ChatBridge.txt
             zip -q -9 MotorLab-LAB06-ChatBridge-TEST.zip MotorLab-LAB06-ChatBridge-TEST.apk Checkpoint-ChatGPT-Esempio.json LEGGIMI-ChatBridge.txt SHA256-ChatBridge.txt
           )
-          gh release create "$TAG" "$out/MotorLab-LAB06-ChatBridge-TEST.apk" "$out/MotorLab-LAB06-ChatBridge-TEST.zip" "$out/Checkpoint-ChatGPT-Esempio.json" "$out/LEGGIMI-ChatBridge.txt" "$out/SHA256-ChatBridge.txt" \
+          if gh release create "$TAG" "$out/MotorLab-LAB06-ChatBridge-TEST.apk" "$out/MotorLab-LAB06-ChatBridge-TEST.zip" "$out/Checkpoint-ChatGPT-Esempio.json" "$out/LEGGIMI-ChatBridge.txt" "$out/SHA256-ChatBridge.txt" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
             --title "MotorLab LAB06 PROVA - ponte AutoSetup ChatGPT APK" \
-            --notes "Trasferimento manuale checkpoint JSON, senza chiavi o sincronizzazione automatica. Firma debug temporanea: installazione pulita; dati vecchi non conservati. Android 11 testato solo in emulatore."
-          echo "MOTORLAB_AUTOSETUP_CHAT_BRIDGE_TEST_APK_ZIP=PUBLISHED"
+            --notes "Trasferimento manuale checkpoint JSON, senza chiavi o sincronizzazione automatica. Firma debug temporanea: installazione pulita; dati vecchi non conservati. Android 11 testato solo in emulatore."; then
+            echo "MOTORLAB_AUTOSETUP_CHAT_BRIDGE_GITHUB_RELEASE=PUBLISHED"
+          else
+            echo "::warning::Release endpoint refused the workflow token. Secure Actions artifact remains available without changing repository permissions."
+            echo "MOTORLAB_AUTOSETUP_CHAT_BRIDGE_GITHUB_RELEASE=NOT_AUTHORIZED"
+          fi
+      - name: Deliver TEST APK and ZIP as GitHub Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MotorLab-LAB06-ChatBridge-TEST-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/motorlab-chat-bridge-test/MotorLab-LAB06-ChatBridge-TEST.apk
+            ${{ runner.temp }}/motorlab-chat-bridge-test/MotorLab-LAB06-ChatBridge-TEST.zip
+            ${{ runner.temp }}/motorlab-chat-bridge-test/Checkpoint-ChatGPT-Esempio.json
+            ${{ runner.temp }}/motorlab-chat-bridge-test/LEGGIMI-ChatBridge.txt
+            ${{ runner.temp }}/motorlab-chat-bridge-test/SHA256-ChatBridge.txt
+          if-no-files-found: error
+          retention-days: 30
