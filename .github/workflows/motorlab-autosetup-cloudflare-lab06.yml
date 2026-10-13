@@ -1,5 +1,12 @@
 name: MotorLab LAB06 AutoSetup Cloudflare Final Gate
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/motorlab-chat-secure-bridge/**'
+      - 'cloudflare/motorlab-state-bridge/src/entry.js'
+      - 'cloudflare/motorlab-state-bridge/wrangler.jsonc'
+      - '.github/workflows/motorlab-autosetup-cloudflare-lab06.yml'
   push:
     branches: ['motorlab/autosetup-cloudflare-lab06-*']
     paths:
