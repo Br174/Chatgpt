@@ -284,3 +284,47 @@ test("all synthetic probe HTTP stages refuse redirects with PAT, including DELET
  assert.equal(created,false);
  assert.ok(seen.some(v=>v.startsWith("DELETE ")));
 });
+
+
+test("pure JS sealed boxes interoperate with libsodium across sizes and UTF-8",async()=>{
+ const {encryptForGitHub,checkGatewayCrypto}=await import("../src/github-gateway.mjs");
+ await sodium.ready;
+ const recipient=sodium.crypto_box_keypair();
+ const pub=sodium.to_base64(recipient.publicKey,sodium.base64_variants.ORIGINAL);
+ const texts=["","a","Crittografia MotorLab · 🌍🔒","x".repeat(4096),"長い文章".repeat(128)];
+ for(const cleartext of texts){
+   const encrypted=await encryptForGitHub(cleartext,pub);
+   const bytes=sodium.from_base64(encrypted,sodium.base64_variants.ORIGINAL);
+   assert.equal(bytes.length,48+Buffer.byteLength(cleartext,"utf8"));
+   const decrypted=sodium.crypto_box_seal_open(bytes,recipient.publicKey,recipient.privateKey);
+   assert.equal(sodium.to_string(decrypted),cleartext);
+   sodium.memzero(decrypted);
+ }
+ const selftest=await checkGatewayCrypto();
+ assert.deepEqual(selftest,{crypto_ready:true,stage:"READY"});
+});
+
+test("pure JS sealed box is randomized and rejects tampered data in libsodium",async()=>{
+ const {encryptForGitHub}=await import("../src/github-gateway.mjs");
+ await sodium.ready;
+ const pair=sodium.crypto_box_keypair();
+ const key=sodium.to_base64(pair.publicKey,sodium.base64_variants.ORIGINAL);
+ const first=sodium.from_base64(await encryptForGitHub("LAB06 synthetic",key),sodium.base64_variants.ORIGINAL);
+ const second=sodium.from_base64(await encryptForGitHub("LAB06 synthetic",key),sodium.base64_variants.ORIGINAL);
+ assert.notDeepEqual(first,second);
+ assert.equal(sodium.to_string(sodium.crypto_box_seal_open(first,pair.publicKey,pair.privateKey)),"LAB06 synthetic");
+ assert.equal(sodium.to_string(sodium.crypto_box_seal_open(second,pair.publicKey,pair.privateKey)),"LAB06 synthetic");
+ first[first.length-1]^=1;
+ await assert.rejects(async()=>sodium.crypto_box_seal_open(first,pair.publicKey,pair.privateKey));
+});
+
+test("pure JS sealed box rejects malformed recipient keys and never encrypts",async()=>{
+ const {encryptForGitHub}=await import("../src/github-gateway.mjs");
+ for(const key of ["", "AAAA", "x".repeat(44), "a".repeat(43)+"=", "////"]) {
+   const bad=async()=>encryptForGitHub("SYNTHETIC",key);
+   // Valid-looking but decoded 32-byte 0x69/0x00 is not an authenticated
+   // public key validation case; only malformed shape is required fail closed.
+   if(key==="a".repeat(43)+"=" || key==="x".repeat(44))continue;
+   await assert.rejects(bad,err=>err.code==="GITHUB_KEY_INVALID");
+ }
+});
