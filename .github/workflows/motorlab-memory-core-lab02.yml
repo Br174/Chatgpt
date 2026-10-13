@@ -1,0 +1,46 @@
+name: MotorLab Memory CORE LAB02 Read Only Integration
+on:
+  push:
+    branches:
+      - motorlab/memory-core-lab02-20261014
+    paths:
+      - 'cloudflare/motorlab-state-bridge/src/memory-github-lab02.mjs'
+      - 'cloudflare/motorlab-state-bridge/test/memory-github-lab02.test.mjs'
+      - 'tools/motorlab-memory-lab02.mjs'
+      - 'docs/memory-core-lab02/**'
+      - '.github/workflows/motorlab-memory-core-lab02.yml'
+  pull_request:
+    paths:
+      - 'cloudflare/motorlab-state-bridge/src/memory-github-lab02.mjs'
+      - 'cloudflare/motorlab-state-bridge/test/memory-github-lab02.test.mjs'
+      - 'tools/motorlab-memory-lab02.mjs'
+      - 'docs/memory-core-lab02/**'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  isolated-memory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: LAB01 catalog regression tests
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-catalog.test.mjs
+      - name: LAB02 evidence verification and recall tests
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-github-lab02.test.mjs
+      - name: LAB01 SQLite integrity and baseline preservation
+        run: python3 cloudflare/motorlab-state-bridge/test/memory_catalog_sqlite.py
+      - name: GitHub real source read-only acquisition and recall
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/motorlab-memory-lab02.mjs
+      - name: Assert LAB02 never imports into live Worker
+        run: |
+          set -euo pipefail
+          if grep -F 'memory-github-lab02' cloudflare/motorlab-state-bridge/src/entry.js; then
+            echo 'Forbidden production Worker import'; exit 1
+          fi
+          echo 'LAB02 isolated; GitHub API read-only; no D1 migration or Worker deployment.'
