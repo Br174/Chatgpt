@@ -259,6 +259,10 @@ def autosetup_smoke():
     # The second page starts at the ready milestone, not the previous 100%.
     assert not matches("Avanzamento locale: 100%"), "Progress carried across page navigation"
     print("MOTORLAB_AUTOSETUP_PROGRESS_NEW_PAGE_RESET=PASSED",flush=True)
+    # The progress/status view is BELOW the top action buttons. Return to the
+    # top before locating the Analyze button; otherwise scroll_to_click only
+    # scrolls farther DOWN and can falsely report that an existing button is gone.
+    scroll_top()
     scroll_to_click("Analizza pagina e pianifica")
     scroll_top()
     scroll_until_visible("Campi rilevati nel sito · 2")
