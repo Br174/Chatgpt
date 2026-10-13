@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "operation_id": "MOTORLAB-AUTOSETUP-LAB06-CLOUDFLARE-CHAT-FIRST",
+  "worker": "motorlab-state-bridge",
+  "source_head": "de36ccc38cd8cae249922c65de044dfdb9973eb3",
+  "approved": true,
+  "writes_enabled": false,
+  "deploy_production": true,
+  "scope": "same-worker-LAB06-with-tested-preview-and-LAST_GOOD-rollback",
+  "approval_basis": "explicit user go-ahead in this chat on 2026-10-13"
+}
