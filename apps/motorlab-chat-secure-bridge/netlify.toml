@@ -1,0 +1,14 @@
+# Set Netlify Base directory to: apps/motorlab-chat-secure-bridge
+[build]
+  command = "npm install --no-audit --no-fund --ignore-scripts && npm test"
+  publish = "site"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[context.production]
+  command = "npm install --no-audit --no-fund --ignore-scripts && npm test"
