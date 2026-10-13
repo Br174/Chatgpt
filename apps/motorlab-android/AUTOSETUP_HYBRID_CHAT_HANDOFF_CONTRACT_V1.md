@@ -40,6 +40,21 @@ USER GOAL -> AUTOMATIC PLAN AND EXECUTION (within consent scope) -> INTERVENTION
 - The user's goal is to avoid going to a website to hunt for UI controls: perform available operations through the chat and expose only required handoffs.
 - No paid API, browser-service charge or AI account is mandatory without specific consent.
 
+## Terza strada: fallback di ultimissima istanza (non flusso normale)
+Ordine di priorita **obbligatorio**, nell'ordine e senza saltare le prime due alternative:
+1. **AUTO** — esecuzione autonoma per le operazioni tecnicamente supportate entro i permessi gia concessi.
+2. **CHAT** — solo quando serve l'utente, mostrare qui i controlli equivalenti (campo protetto tramite canale sicuro, pulsanti, menu, interruttori, approvazioni). Applicare la scelta autorizzata al sito, verificarla e riprendere il lavoro autonomo.
+3. **FALLBACK UFFICIALE ESTREMO** — **solo quando sia AUTO sia CHAT non possono completare correttamente il singolo passaggio**, portare l'utente sulla pagina reale ufficiale, **direttamente alla schermata/sezione e, se tecnicamente consentito, al campo esatto gia selezionato**. La persona deve soltanto inserire password o segreto / concedere autorizzazione / premere OK. Dopo tale passaggio, AutoSetup verifica la conclusione dell'operazione e **riparte autonomamente dallo stesso checkpoint**, senza rifare il lavoro concluso.
+
+Vincoli non negoziabili:
+- Non rendere il sito esterno il percorso predefinito, ne un prerequisito sistematico, ne sostituire il telecomando nella chat con un collegamento generico.
+- Aprire soltanto URL, deep link o callback ufficiali e verificati. Se il sito non permette tecnicamente di aprire direttamente un campo o focalizzarlo, descrivere con precisione il limite: non promettere un focus impossibile e non inventare deep link.
+- Nessuna password, OTP, sessione, token o segreto in URL, link, query, log, checkpoint o conversazione. Il fallback raccoglie segreti esclusivamente sul sito ufficiale.
+- Prima del trasferimento salvare il checkpoint con origine, schermata, passo e identificatore dell'operazione, senza valori riservati. Le sessioni del browser esterno non si presumono condivise con quelle della WebView Android/ChatGPT.
+- Il ritorno dopo l'OK deve avvenire con segnale attendibile o verifica della persistenza lato provider, quando disponibile. Non dedurre il successo dal solo click su OK. Se il ritorno automatico e il controllo dello stato non sono disponibili, mantenere il lavoro in pausa e dichiarare il limite, senza millantare la ripresa.
+- Un blocco CAPTCHA/MFA/protezione del sito si risolve soltanto attraverso il percorso ufficiale, senza aggirarlo.
+- Test di accettazione obbligatori: auto quando possibile, chat quando necessario, fallback solo se entrambi impediti, apertura sulla destinazione precisa ove supportata, protezione dati segreti, ripresa dal checkpoint, dichiarazione onesta dei casi non supportati.
+
 ## LAB06 acceptance tests
 1. Safe multi-step task continues automatically without requiring user UI clicks.
 2. A simulated ordinary form barrier yields a real chat field/button; user intervention resumes exactly the paused step.
