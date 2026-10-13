@@ -14,6 +14,7 @@ on:
       - 'cloudflare/motorlab-state-bridge/src/entry.js'
       - 'cloudflare/motorlab-state-bridge/wrangler.jsonc'
       - '.github/workflows/motorlab-autosetup-cloudflare-lab06.yml'
+      - '.github/autosetup/LAB06_PRODUCTION_APPROVAL.json'
   workflow_dispatch:
     inputs:
       deploy_production:
@@ -218,7 +219,14 @@ jobs:
 
   deploy:
     needs: [verify, preview]
-    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == true && github.ref == 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
+    # A one-shot commit, not an ordinary push/PR. NEVER use main/MADRE.
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013' &&
+      github.actor == 'Br174' &&
+      github.event.head_commit.message == 'MOTORLAB LAB06 AUTHORIZE PRODUCTION DEPLOY' &&
+      needs.preview.result == 'success' &&
+      needs.verify.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
@@ -232,8 +240,33 @@ jobs:
       PANEL_URL: https://motorlab-state-bridge.brunoverlezza.workers.dev/autosetup/v1/panel
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
+      - name: Verify single-purpose production authorization from approved LAB06
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = 'push'
+          test "$GITHUB_REF" = 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
+          test "$GITHUB_ACTOR" = 'Br174'
+          test "$(git log -1 --pretty=%s)" = 'MOTORLAB LAB06 AUTHORIZE PRODUCTION DEPLOY'
+          test "$(git rev-list --parents -n 1 HEAD | wc -w)" -eq 2
+          marker='.github/autosetup/LAB06_PRODUCTION_APPROVAL.json'
+          test -f "$marker"
+          approved_sha="$(git rev-parse HEAD^)"
+          test "$(git diff --name-only "$approved_sha" HEAD)" = "$marker"
+          jq -e --arg sha "$approved_sha" '
+            .schema == 1 and
+            .operation_id == "MOTORLAB-AUTOSETUP-LAB06-CLOUDFLARE-CHAT-FIRST" and
+            .worker == "motorlab-state-bridge" and
+            .source_head == $sha and
+            .approved == true and
+            .writes_enabled == false and
+            .deploy_production == true
+          ' "$marker" >/dev/null
+          echo 'LAB06 one-shot deployment authorization verified without secrets.'
       - name: Install Wrangler dependencies
         working-directory: apps/motorlab-chat-secure-bridge
         run: npm install --no-audit --no-fund --ignore-scripts
@@ -314,6 +347,8 @@ jobs:
             return 1
           }
 
+          # A successful preview on this exact push MUST exist before changing production.
+          test -n "${{ needs.preview.outputs.preview_url }}"
           LAST_GOOD_VERSION="$(get_active_version)"
           test -n "$LAST_GOOD_VERSION"
           echo "Rollback target captured: $LAST_GOOD_VERSION"
@@ -326,14 +361,27 @@ jobs:
             DEPLOY_COMMAND_OK=false
           fi
 
-          # A successful isolated Preview on this same exact run is mandatory.
-          test -n "${{ needs.preview.outputs.preview_url }}"
-          if [[ "$DEPLOY_COMMAND_OK" == true ]] && health_ok && panel_ok; then
+          core_ok() {
+            local code body
+            body="$(mktemp)"
+            code="$(curl --silent --output "$body" --write-out '%{http_code}' --max-time 12 \
+              "https://motorlab-state-bridge.brunoverlezza.workers.dev/health" || true)"
+            if [[ "$code" != 200 ]] || ! jq -e '.status == "ok" and .service == "motorlab-state-bridge"' "$body" >/dev/null 2>&1; then
+              rm -f "$body"
+              return 1
+            fi
+            code="$(curl --silent --output "$body" --write-out '%{http_code}' --max-time 12 \
+              "https://motorlab-state-bridge.brunoverlezza.workers.dev/continuity/v1/context" || true)"
+            rm -f "$body"
+            test "$code" = 400
+          }
+
+          if [[ "$DEPLOY_COMMAND_OK" == true ]] && health_ok && panel_ok && core_ok; then
             {
               echo '### MotorLab LAB06 Cloudflare deploy'
               echo '- Worker version deployed and smoke checks passed.'
               echo '- AutoSetup GitHub writes remain disabled.'
-              echo '- Health endpoint and protected panel headers were verified.'
+              echo '- Health, panel CSP/no-store/anti-frame and CORE/Pollicino delegation verified.'
               echo '- No credential values or response bodies were recorded.'
             } >> "$GITHUB_STEP_SUMMARY"
             exit 0
