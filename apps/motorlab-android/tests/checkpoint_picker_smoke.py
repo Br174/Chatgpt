@@ -27,6 +27,11 @@ def main():
     wait("Prova modulo generico offline",clickable=True)
     no_crash()
     print("MOTORLAB_AUTOSETUP_CHAT_CHECKPOINT_CANCEL_NO_WRITE=PASSED",flush=True)
+    # Do not leave the previous test activity over the canonical Main screen.
+    # The full legacy smoke begins at MainActivity and must remain independent.
+    adb("shell","input","keyevent","KEYCODE_BACK")
+    wait("⚙ MotorLab",seconds=15,exact=True)
+    print("MOTORLAB_AUTOSETUP_CHAT_CHECKPOINT_MAIN_RETURN=PASSED",flush=True)
 
 if __name__=="__main__":
     try:main()
