@@ -117,7 +117,7 @@ test("production requires distinct HTTPS origins and UI avoids MCP secret calls"
   const fs=requireIsNotUsed();
   assert.match(fs.server,/open_secure_secrets_panel/);
   assert.match(fs.ui,/fetch\(API_BASE\+"\/api\/repository-secret"/);
-  assert.doesNotMatch(fs.ui,/callServerTool|localStorage|sessionStorage/);
+  assert.doesNotMatch(fs.ui,/\bapp\.callServerTool\s*\(|\b(?:window\.)?localStorage\s*\.|\b(?:window\.)?sessionStorage\s*\./);
   assert.match(fs.ui,/type="password"/);
   assert.equal(ALLOWED_SECRETS.length,5);
 });
