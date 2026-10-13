@@ -130,3 +130,21 @@ test("same-origin panel write is allowed once while cross-origin requests stay d
   assert.equal(denied.status,403);
   assert.equal(calls,1);
 });
+
+test("same-origin GitHub probe uses only the injected safe probe gateway",async()=>{
+ let calls=0;
+ const probeGateway=async({token,approval,liveEnabled})=>{
+   calls++;assert.equal(token,"fake-demo-token-never-real");
+   assert.equal(approval,true);assert.equal(liveEnabled,true);
+   return {status:"GITHUB_PROBE_VERIFIED_AND_REMOVED",name:"MOTORLAB_AUTOSETUP_LAB06_PROBE",value_readable:false};
+ };
+ const response=await handleAutoSetupCloudflare(
+   json("/autosetup/v1/api/probe",{approval:true},base),
+   {MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"true"},{probeGateway}
+ );
+ assert.equal(response.status,200);assert.equal(calls,1);
+ const receipt=await response.json();
+ assert.equal(receipt.status,"GITHUB_PROBE_VERIFIED_AND_REMOVED");
+ assert.equal(receipt.value_readable,false);
+ assert.equal(JSON.stringify(receipt).includes("fake-demo-token-never-real"),false);
+});

@@ -138,3 +138,63 @@ export async function setRepositorySecret({
     updated_at: String(metadata.updated_at).slice(0, 40),
     value_readable: false, destination: REPOSITORY };
 }
+
+
+export const PROBE_SECRET_NAME = "MOTORLAB_AUTOSETUP_LAB06_PROBE";
+export async function probeRepositorySecrets({
+  token, approval, fetchImpl = fetch, liveEnabled = false
+}) {
+  if (!liveEnabled) throw new PublicSafeError("LIVE_WRITES_DISABLED");
+  if (approval !== true) throw new PublicSafeError("USER_APPROVAL_REQUIRED");
+  assertToken(token);
+  const url = API + "/" + PROBE_SECRET_NAME;
+  const before = await request(fetchImpl, url, { method: "GET", headers: headers(token) });
+  if (before.status !== 404) {
+    if (before.ok) throw new PublicSafeError("PROBE_SECRET_ALREADY_EXISTS");
+    if (before.status === 401 || before.status === 403)
+      throw new PublicSafeError("GITHUB_PERMISSION_MISSING");
+    throw new PublicSafeError("PROBE_PRECHECK_FAILED");
+  }
+
+  const syntheticValue = "motorlab-lab06-probe-" + crypto.randomUUID();
+  const pub = await getPublicKey({ token, fetchImpl });
+  const encrypted = await encryptForGitHub(syntheticValue, pub.key);
+  const put = await request(fetchImpl, url, {
+    method: "PUT",
+    headers: { ...headers(token), "Content-Type": "application/json" },
+    body: JSON.stringify({ encrypted_value: encrypted, key_id: pub.key_id })
+  });
+  if (![201, 204].includes(put.status)) {
+    throw new PublicSafeError(put.status === 401 || put.status === 403
+      ? "GITHUB_PERMISSION_MISSING" : "GITHUB_REJECTED_WRITE");
+  }
+
+  let receipt, failure;
+  try {
+    const get = await request(fetchImpl, url, { method: "GET", headers: headers(token) });
+    if (!get.ok) throw new PublicSafeError("GITHUB_READBACK_FAILED");
+    let metadata;
+    try { metadata = await get.json(); } catch {
+      throw new PublicSafeError("GITHUB_READBACK_FAILED");
+    }
+    if (!metadata || metadata.name !== PROBE_SECRET_NAME || !metadata.updated_at)
+      throw new PublicSafeError("GITHUB_READBACK_MISMATCH");
+    receipt = {
+      status: "GITHUB_PROBE_VERIFIED_AND_REMOVED",
+      name: PROBE_SECRET_NAME,
+      updated_at: String(metadata.updated_at).slice(0, 40),
+      value_readable: false,
+      destination: REPOSITORY
+    };
+  } catch (error) {
+    failure = error instanceof PublicSafeError ? error : new PublicSafeError("BRIDGE_UNAVAILABLE");
+  }
+
+  // Always remove the temporary secret after a successful GitHub create/update response.
+  const del = await request(fetchImpl, url, { method: "DELETE", headers: headers(token) });
+  if (del.status !== 204) throw new PublicSafeError("PROBE_CLEANUP_FAILED");
+  const after = await request(fetchImpl, url, { method: "GET", headers: headers(token) });
+  if (after.status !== 404) throw new PublicSafeError("PROBE_CLEANUP_FAILED");
+  if (failure) throw failure;
+  return receipt;
+}

@@ -6,7 +6,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { registerAppTool, registerAppResource, RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { panelHtml } from "../src/generated-panel.mjs";
-import { setRepositorySecret, PublicSafeError } from "../src/github-gateway.mjs";
+import { setRepositorySecret, probeRepositorySecrets, PublicSafeError } from "../src/github-gateway.mjs";
 
 const PREFIX = "/autosetup/v1";
 const URI = "ui://motorlab-autosetup/secure-secrets-v1.html";
@@ -43,10 +43,9 @@ function securePanel(apiBase, { embedded = false } = {}) {
     .replaceAll("__MOTORLAB_PUBLIC_ORIGIN__", apiBase)
     .replace("<style>", '<style nonce="' + nonce + '">')
     .replace("<script>", '<script nonce="' + nonce + '">');
-  if (embedded) html = html.replace(
-    '"/api/repository-secret"',
-    '"/autosetup/v1/api/repository-secret"'
-  );
+  if (embedded) html = html
+    .replace('"/api/repository-secret"', '"/autosetup/v1/api/repository-secret"')
+    .replace('"/api/probe"', '"/autosetup/v1/api/probe"');
   return { html, nonce };
 }
 function panelResponse(publicOrigin) {
@@ -164,7 +163,53 @@ async function serveSecret(request, env, publicOrigin, gateway) {
     raw = null; input = null;
   }
 }
-export async function handleAutoSetupCloudflare(request, env, {gateway = setRepositorySecret} = {}) {
+
+async function serveProbe(request, env, publicOrigin, probeGateway) {
+  const requestOrigin = originOnly(request.headers.get("origin"));
+  const approvedWidgetOrigin = widgetOrigin(env, publicOrigin);
+  const originAllowed = requestOrigin === publicOrigin ||
+    (approvedWidgetOrigin !== null && requestOrigin === approvedWidgetOrigin);
+  if (!originAllowed) return errorResponse("REQUEST_ORIGIN_NOT_ALLOWED", 403);
+  const cors = {
+    ...HEADERS,
+    "Access-Control-Allow-Origin": requestOrigin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "authorization, content-type",
+    "Vary": "Origin"
+  };
+  if (request.method === "OPTIONS") return new Response(null, {status:204,headers:cors});
+  if (request.method !== "POST") return errorResponse("METHOD_NOT_ALLOWED",405);
+  if (!liveEnabled(env))
+    return new Response(JSON.stringify({error:"LIVE_WRITES_DISABLED"}), {
+      status:423,headers:{...cors,"Content-Type":"application/json"}
+    });
+  if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json"))
+    return errorResponse("JSON_REQUIRED",415);
+  let raw,input;
+  try {
+    raw=await request.text();
+    if(enc.encode(raw).byteLength>4096)return errorResponse("PAYLOAD_TOO_LARGE",413);
+    input=JSON.parse(raw);
+  } catch { return errorResponse("INVALID_REQUEST",400); }
+  const bearer=/^Bearer ([^\s]+)$/.exec(request.headers.get("authorization")||"");
+  try {
+    const receipt=await probeGateway({
+      token:bearer?.[1],approval:input?.approval===true,liveEnabled:true
+    });
+    return new Response(JSON.stringify(receipt),{
+      status:200,headers:{...cors,"Content-Type":"application/json"}
+    });
+  } catch(error) {
+    const code=error instanceof PublicSafeError?error.code:"BRIDGE_UNAVAILABLE";
+    const status=code==="AUTH_REQUIRED"||code==="GITHUB_PERMISSION_MISSING"?401
+      :code==="BRIDGE_UNAVAILABLE"||code==="GITHUB_CONNECTION_FAILED"?502:400;
+    return new Response(JSON.stringify({error:code}),{
+      status,headers:{...cors,"Content-Type":"application/json"}
+    });
+  } finally { raw=null;input=null; }
+}
+
+export async function handleAutoSetupCloudflare(request, env, {gateway = setRepositorySecret, probeGateway = probeRepositorySecrets} = {}) {
   const url = new URL(request.url);
   if (!url.pathname.startsWith(PREFIX + "/") && url.pathname !== PREFIX)
     return null; // Let the existing MotorLab Worker handle every legacy route unchanged.
@@ -186,5 +231,7 @@ export async function handleAutoSetupCloudflare(request, env, {gateway = setRepo
   if (url.pathname === PREFIX + "/mcp") return serveMcp(request, env, publicOrigin);
   if (url.pathname === PREFIX + "/api/repository-secret")
     return serveSecret(request, env, publicOrigin, gateway);
+  if (url.pathname === PREFIX + "/api/probe")
+    return serveProbe(request, env, publicOrigin, probeGateway);
   return errorResponse("NOT_FOUND", 404);
 }
