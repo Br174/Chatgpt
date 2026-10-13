@@ -143,7 +143,7 @@ test("same-origin GitHub probe uses only the injected safe probe gateway",async(
    {
      MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"false",
      MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",
-     MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(Date.now()+25*60*1000).toISOString().replace(".000","")
+     MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(Date.now()+25*60*1000).toISOString().replace(/\.\d{3}Z$/, "Z")
    },{probeGateway}
  );
  assert.equal(response.status,200);assert.equal(calls,1);
@@ -161,10 +161,10 @@ test("LAB06 temporary probe stays fail-closed without explicit bounded UTC windo
  const envs=[
    {MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"false"},
    {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true"},
-   {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(now-1000).toISOString().replace(".000","")},
-   {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(now+46*60*1000).toISOString().replace(".000","")},
+   {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(now-1000).toISOString().replace(/\.\d{3}Z$/, "Z")},
+   {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(now+46*60*1000).toISOString().replace(/\.\d{3}Z$/, "Z")},
    {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:"INVALID"},
-   {MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"true",MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(now+25*60*1000).toISOString().replace(".000","")}
+   {MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"true",MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(now+25*60*1000).toISOString().replace(/\.\d{3}Z$/, "Z")}
  ];
  for(const env of envs){
    const response=await handleAutoSetupCloudflare(request(),env,{probeGateway});
@@ -178,7 +178,7 @@ test("LAB06 45-minute probe cannot enable any of the five real signing writes",a
  const env={
    MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"false",
    MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",
-   MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(Date.now()+25*60*1000).toISOString().replace(".000","")
+   MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(Date.now()+25*60*1000).toISOString().replace(/\.\d{3}Z$/, "Z")
  };
  let calls=0;
  const gateway=async()=>{calls++;return {status:"SHOULD_NOT_RUN"};};
