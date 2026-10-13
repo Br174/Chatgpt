@@ -7,6 +7,7 @@ This importer validates the attestation shape and consistency; it does not re-co
 import argparse
 import datetime as dt
 import json
+import os
 import re
 import sqlite3
 import subprocess
@@ -197,6 +198,9 @@ def ingest(db, payload):
             db.execute("INSERT INTO memory_records("+",".join(RECORD_FIELDS)+") VALUES ("+
                        ",".join("?" for _ in RECORD_FIELDS)+")", values)
             new_records += 1
+            # LAB-ONLY fault injection: verify SQLite rolls back on abrupt process death.
+            if new_records == 1 and os.environ.get('MOTORLAB_LAB03_FAILPOINT') == 'CRASH_AFTER_FIRST_RECORD':
+                os._exit(75)
         for l in links:
             present = db.execute("SELECT evidence_ref FROM memory_links WHERE from_id=? AND to_id=? AND relation=?",
                                  (l["from_id"], l["to_id"], l["relation"])).fetchone()
