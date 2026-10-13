@@ -35,6 +35,16 @@ function widgetOrigin(env, publicOrigin) {
 function liveEnabled(env) {
   return env.MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE === "true";
 }
+// Isolated LAB06 probe window. The five signing secrets NEVER inherit this gate.
+// Missing/invalid flags, clock outside the window, or a window over 45 min => CLOSED.
+function probeEnabled(env, now = Date.now()) {
+  if (env.MOTORLAB_AUTOSETUP_PROBE_ONLY !== "true" || liveEnabled(env)) return false;
+  const untilText = env.MOTORLAB_AUTOSETUP_PROBE_UNTIL;
+  if (typeof untilText !== "string" ||
+      !/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$/.test(untilText)) return false;
+  const until = Date.parse(untilText);
+  return Number.isFinite(until) && until > now && until - now <= 45 * 60 * 1000;
+}
 function securePanel(apiBase, { embedded = false } = {}) {
   const bytes = new Uint8Array(18);
   crypto.getRandomValues(bytes);
@@ -179,8 +189,8 @@ async function serveProbe(request, env, publicOrigin, probeGateway) {
   };
   if (request.method === "OPTIONS") return new Response(null, {status:204,headers:cors});
   if (request.method !== "POST") return errorResponse("METHOD_NOT_ALLOWED",405);
-  if (!liveEnabled(env))
-    return new Response(JSON.stringify({error:"LIVE_WRITES_DISABLED"}), {
+  if (!probeEnabled(env))
+    return new Response(JSON.stringify({error:"PROBE_WINDOW_CLOSED"}), {
       status:423,headers:{...cors,"Content-Type":"application/json"}
     });
   if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json"))
@@ -220,6 +230,7 @@ export async function handleAutoSetupCloudflare(request, env, {gateway = setRepo
     return new Response(JSON.stringify({
       service: "motorlab-autosetup-cloudflare",
       write_enabled: liveEnabled(env),
+      probe_enabled: probeEnabled(env),
       github_write_verified: false,
       chat_connected_verified: false
     }), { headers: { ...HEADERS, "Content-Type": "application/json" } });
