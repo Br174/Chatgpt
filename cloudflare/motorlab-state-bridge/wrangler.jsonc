@@ -49,7 +49,8 @@
     "vars": {
       "ENGINE_VERSION": "1.3.5-lab06-preview",
       "MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE": "false",
-      "MOTORLAB_AUTOSETUP_PROBE_ONLY": "false"
+      "MOTORLAB_AUTOSETUP_PROBE_ONLY": "false",
+      "MOTORLAB_AUTOSETUP_CRYPTO_DIAGNOSTIC": "preview-only"
     },
     "durable_objects": {
       "bindings": [
