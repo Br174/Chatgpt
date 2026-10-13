@@ -114,6 +114,38 @@ def no_crash():
         raise AssertionError("LAB04 FATAL EXCEPTION in logcat")
     print("LAB04_NO_FATAL_EXCEPTION=PASSED",flush=True)
 
+def scroll_to_click(token,tries=7):
+    # Works inside AutoSetup's upper Android ScrollView; never touches the WebView.
+    for attempt in range(tries):
+        found=matches(token,clickable=True)
+        if found:
+            box=[int(v) for v in re.findall(r"\d+",found[0].get("bounds",""))]
+            if len(box)==4 and box[2]>box[0] and box[3]>box[1] and 0<box[1]<2150:
+                tap(found[0])
+                return
+        scrolls=[n for n in ui() if n.get("class")=="android.widget.ScrollView"]
+        if not scrolls:
+            raise AssertionError("AutoSetup scroll area missing before "+token)
+        coords=[int(v) for v in re.findall(r"\d+",scrolls[0].get("bounds",""))]
+        if len(coords)!=4 or coords[3]-coords[1]<220:
+            raise AssertionError("AutoSetup scroll bounds missing")
+        x=(coords[0]+coords[2])//2
+        adb("shell","input","swipe",str(x),str(coords[3]-50),
+            str(x),str(coords[1]+50),"420")
+        time.sleep(.7)
+    raise AssertionError("AutoSetup button could not be reached: "+token)
+
+def scroll_top():
+    scrolls=[n for n in ui() if n.get("class")=="android.widget.ScrollView"]
+    if not scrolls:raise AssertionError("AutoSetup scroll missing")
+    coords=[int(v) for v in re.findall(r"\d+",scrolls[0].get("bounds",""))]
+    if len(coords)!=4:raise AssertionError("AutoSetup scroll bounds missing")
+    x=(coords[0]+coords[2])//2
+    for _ in range(3):
+        adb("shell","input","swipe",str(x),str(coords[1]+60),
+            str(x),str(coords[3]-60),"350")
+        time.sleep(.4)
+
 def autosetup_smoke():
     # Launch a fresh main screen: no account, token, network or destructive action.
     adb("shell","am","force-stop",PACKAGE)
@@ -143,6 +175,13 @@ def autosetup_smoke():
         time.sleep(.8)
     wait("Campi rilevati nel sito · 2",seconds=10)
     print("MOTORLAB_AUTOSETUP_GENERIC_FORM_SCAN=PASSED_FIELDS_2_PASSWORD_EXCLUDED",flush=True)
+    scroll_to_click("Prepara valori dimostrativi")
+    scroll_top()
+    wait("Preparati 2 valori nella chat",seconds=12)
+    scroll_to_click("Compila i campi sulla pagina")
+    scroll_top()
+    wait("Compilati 2 campi",seconds=12)
+    print("MOTORLAB_AUTOSETUP_GENERIC_FORM_FILL=PASSED_FIELDS_2_VERIFIED",flush=True)
     no_crash()
 
 def main():
