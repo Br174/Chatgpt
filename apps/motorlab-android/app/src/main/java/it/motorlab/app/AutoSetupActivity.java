@@ -30,7 +30,7 @@ import java.util.ArrayList;
  * Does NOT submit forms, bypass site protections, or claim OAuth/browser-agent autonomy.
  */
 public final class AutoSetupActivity extends Activity {
-    private LinearLayout conversation,fields;
+    private LinearLayout conversation,fields,navigation;
     private TextView state;
     private EditText url,goal;
     private WebView browser;
@@ -100,11 +100,13 @@ public final class AutoSetupActivity extends Activity {
         button(top,"Apri sito dentro MotorLab",this::openSite);
         button(top,"Prova modulo generico offline",this::openDemo);
         button(top,"Riconosci i campi del modulo",this::inspectForm);
+        button(top,"Trova collegamenti del sito",this::discoverLinks);
         button(top,"Inserisci token protetto per questo sito",this::saveToken);
         button(top,"Elimina token di questo sito",this::removeToken);
         button(top,"Apri login ufficiale nel browser",this::externalLogin);
         state=text("Pronto · nessuna azione esterna eseguita.",12,false);top.addView(state);
         fields=new LinearLayout(this);fields.setOrientation(LinearLayout.VERTICAL);top.addView(fields);
+        navigation=new LinearLayout(this);navigation.setOrientation(LinearLayout.VERTICAL);top.addView(navigation);
 
         browser=new WebView(this);
         WebSettings settings=browser.getSettings();
@@ -123,6 +125,7 @@ public final class AutoSetupActivity extends Activity {
                 if(demoMode && page!=null && !"about:blank".equals(page)
                         && !page.startsWith(DEMO_ORIGIN+"/")) demoMode=false;
                 pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
+                navigation.removeAllViews();
             }
             @Override public void onPageFinished(WebView w,String page) {
                 if(demoMode) {
@@ -180,6 +183,7 @@ public final class AutoSetupActivity extends Activity {
         url.setText(activeOrigin);
         goal.setText("Dimostrazione locale senza servizi esterni");
         pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
+        navigation.removeAllViews();
         say("MotorLab: prova offline. Nessuna connessione a servizi esterni o login.");
         String html="<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head>"+
             "<body><h2>Modulo dimostrativo MotorLab</h2><form>"+
@@ -197,7 +201,7 @@ public final class AutoSetupActivity extends Activity {
         try{
             demoMode=false;
             activeOrigin=SecureServiceToken.checkedOrigin(address);
-            controls.clear();fields.removeAllViews();pageReady=false;inspectedUrl="";
+            controls.clear();fields.removeAllViews();navigation.removeAllViews();pageReady=false;inspectedUrl="";
             say("Richiesta: "+limit(goal.getText().toString(),180)+
                 " · Sito: "+activeOrigin+" · Apertura autorizzata.");
             browser.loadUrl(address);
@@ -216,6 +220,74 @@ public final class AutoSetupActivity extends Activity {
 
     private static String limit(String s,int max){
         return s==null?"":s.substring(0,Math.min(max,s.length()));
+    }
+
+
+    /**
+     * Read-only navigation aid for any same-origin HTTPS website.
+     * No provider-specific selectors, no credentials, no click without user approval.
+     * Query-bearing links are deliberately skipped to avoid exposing signed URLs.
+     */
+    private void discoverLinks() {
+        final String origin;
+        try {origin=currentOrigin();}
+        catch(Exception e){alert("Apri prima un sito HTTPS compatibile.");return;}
+        navigation.removeAllViews();
+        final String expectedPage=browser.getUrl();
+        final String js="(function(){var seen=new Set(),out=[];"+
+            "var a=Array.from(document.querySelectorAll('a[href]'));"+
+            "for(var i=0;i<a.length&&out.length<12;i++){"+
+            "try{var u=new URL(a[i].href,document.baseURI);"+
+            "if(u.protocol!=='https:'||u.origin!==location.origin||u.username||u.password"+
+            "||u.search||u.hash||u.pathname===location.pathname)continue;"+
+            "var label=(a[i].innerText||a[i].getAttribute('aria-label')||'').trim();"+
+            "if(!label||label.length>100||seen.has(u.href))continue;"+
+            "seen.add(u.href);out.push({title:label,url:u.href});}catch(e){}"+
+            "}return JSON.stringify(out);})()";
+        status("Ricerca dei collegamenti interni del sito…");
+        browser.evaluateJavascript(js,response->{
+            try{
+                if(!expectedPage.equals(browser.getUrl())||!origin.equals(currentOrigin()))return;
+                Object parsed=new JSONTokener(response).nextValue();
+                JSONArray links=new JSONArray((String)parsed);
+                navigation.removeAllViews();
+                navigation.addView(text("Collegamenti interni · "+links.length(),14,true));
+                int shown=0;
+                for(int i=0;i<links.length();i++){
+                    JSONObject link=links.optJSONObject(i);
+                    if(link==null)continue;
+                    String target=link.optString("url","");
+                    String label=link.optString("title","").trim();
+                    if(label.isEmpty()||label.length()>100||target.contains("?")||target.contains("#")
+                        ||!origin.equals(SecureServiceToken.checkedOrigin(target)))continue;
+                    Uri parsedUrl=Uri.parse(target);
+                    if(!"https".equals(parsedUrl.getScheme())||parsedUrl.getUserInfo()!=null)continue;
+                    final String dest=target;
+                    shown++;
+                    button(navigation,"Apri: "+label,()->{
+                        try{
+                            if(!origin.equals(currentOrigin())){
+                                alert("Il sito è cambiato, ripeti la ricerca.");return;
+                            }
+                            new AlertDialog.Builder(this).setTitle("Navigare sul sito?")
+                                .setMessage("MotorLab aprirà una pagina interna di "+origin+
+                                    ". Non invierà moduli e non utilizzerà credenziali salvate.")
+                                .setNegativeButton("Annulla",null)
+                                .setPositiveButton("Apri pagina",(d,w)->{
+                                    navigation.removeAllViews();
+                                    browser.loadUrl(dest);
+                                    status("Navigazione autorizzata verso "+origin+"…");
+                                }).show();
+                        }catch(Exception e){alert("La pagina è cambiata.");}
+                    });
+                }
+                status("Collegamenti interni verificati: "+shown+
+                    ". Scegli una pagina dalla chat; nessuna navigazione automatica.");
+            }catch(Exception e){
+                navigation.removeAllViews();
+                status("Collegamenti non disponibili su questa pagina.");
+            }
+        });
     }
 
     private void inspectForm() {
