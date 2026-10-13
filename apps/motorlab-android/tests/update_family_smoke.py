@@ -29,7 +29,7 @@ def apk_details(path):
     found = re.search(r"^Signer #1 certificate SHA-256 digest: ([0-9a-fA-F]{64})$", cert, re.M)
     assert found, "Cannot establish single APK certificate"
     badging = tool("aapt", "dump", "badging", path)
-    pkg = re.search(r"^package: name='([^']+)' versionCode='(\\d+)'", badging, re.M)
+    pkg = re.search(r"^package: name='([^']+)' versionCode='(\d+)'", badging, re.M)
     assert pkg, "Cannot establish package and versionCode"
     assert pkg.group(1) == PACKAGE, "Wrong Android family"
     return int(pkg.group(2)), found.group(1).lower()
