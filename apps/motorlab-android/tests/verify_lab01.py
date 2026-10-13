@@ -86,4 +86,10 @@ assert "Nessun campo sarà compilato sul sito" in autosetup
 assert "new SecureGeminiKey(this).load()" in autosetup
 assert "appSettings.reserveDailyTrialCall()" in autosetup
 assert "f.editor.getText().length()==0" in autosetup
+assert "private void openDemoSettingsPage()" in autosetup
+assert "private void discoverLinks()" in autosetup
+assert 'new AlertDialog.Builder(this).setTitle("Navigare sul sito?")' in autosetup
+assert "Navigazione esterna bloccata nella demo offline." in autosetup
+emulator=(p/"tests/emulator_smoke.py").read_text()
+assert "MOTORLAB_AUTOSETUP_MULTIPAGE_CONSENT_AND_SCAN=PASSED_OFFLINE" in emulator
 print("AutoSetup universal HTTPS + optional consented AI suggestion source contract: PASS (live provider call not proven)")
