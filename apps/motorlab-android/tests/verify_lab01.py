@@ -95,6 +95,8 @@ assert "taskPlan=null" in autosetup and ".scanned(found.length())" in autosetup
 assert ".links(shown)" in autosetup and ".prepared(updates.length())" in autosetup
 assert ".applied(Integer.parseInt(count))" in autosetup
 assert "MOTORLAB_AUTOSETUP_STAGED_PLAN=PASSED_NO_AUTO_SUBMIT" in (p/"tests/emulator_smoke.py").read_text()
+assert "Analizza pagina e pianifica" in autosetup and "guidedAnalysisPending" in autosetup
+assert "MOTORLAB_AUTOSETUP_GUIDED_READONLY_ANALYSIS=PASSED" in (p/"tests/emulator_smoke.py").read_text()
 assert "private void openDemoSettingsPage()" in autosetup
 assert "private void discoverLinks()" in autosetup
 assert 'new AlertDialog.Builder(this).setTitle("Navigare sul sito?")' in autosetup

@@ -127,3 +127,10 @@ Nel medesimo AutoSetup universale il pulsante "Suggerisci valori con Gemini
   progetto Google dell'utente ha abilitato servizi a pagamento.
 - L'AI planner indipendente Qwen/Ling/Kimi, l'automazione multi-pagina, l'OAuth
   e il browser server-side restano passi successivi, NON attivi ora.
+
+
+## AS3B — Analisi guidata in un comando (13/10/2026)
+- Comando `Analizza pagina e pianifica`: legge metadati di campi ordinari e collegamenti same-origin in un'unica sequenza coordinata, aggiornando il piano locale.
+- Questa analisi e' di sola lettura: nessuna navigazione, compilazione, submit, token use o pagamento; per scrivere o passare a un'altra pagina servono azioni separate e conferme.
+- Test offline end-to-end: dopo aver approvato la navigazione alla pagina 2, il nuovo comando deve mostrare 2 campi e 0 collegamenti interni, poi il piano aggiornato.
+- Implementazione LAB, non certificata su Android fisico ne' su siti reali. Verifiche CI da valutare sullo SHA esatto della nuova HEAD.

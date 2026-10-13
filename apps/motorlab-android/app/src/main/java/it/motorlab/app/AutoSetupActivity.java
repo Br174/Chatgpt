@@ -42,6 +42,7 @@ public final class AutoSetupActivity extends Activity {
     private boolean demoMode=false;
     private boolean demoSettingsPage=false;
     private boolean suggestionRunning=false;
+    private boolean guidedAnalysisPending=false;
     private AutoSetupTaskPlan taskPlan;
     private static final String DEMO_ORIGIN="https://autosetup-demo.example";
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
@@ -100,6 +101,7 @@ public final class AutoSetupActivity extends Activity {
         url=editor(top,"Sito HTTPS, per esempio https://example.com");
         goal=editor(top,"Cosa vuoi fare su questo sito?");
         button(top,"Mostra piano operazioni",this::showTaskPlan);
+        button(top,"Analizza pagina e pianifica",this::analyzeAndPlan);
         button(top,"Apri sito dentro MotorLab",this::openSite);
         button(top,"Prova modulo generico offline",this::openDemo);
         button(top,"Riconosci i campi del modulo",this::inspectForm);
@@ -132,7 +134,7 @@ public final class AutoSetupActivity extends Activity {
             @Override public void onPageStarted(WebView w,String page,android.graphics.Bitmap favicon){
                 if(demoMode && page!=null && !"about:blank".equals(page)
                         && !page.startsWith(DEMO_ORIGIN+"/")) demoMode=false;
-                pageReady=false;inspectedUrl="";taskPlan=null;controls.clear();fields.removeAllViews();
+                pageReady=false;inspectedUrl="";taskPlan=null;guidedAnalysisPending=false;controls.clear();fields.removeAllViews();
                 navigation.removeAllViews();
             }
             @Override public void onPageFinished(WebView w,String page) {
@@ -338,9 +340,18 @@ public final class AutoSetupActivity extends Activity {
         }catch(Exception e){alert("Apri prima una pagina HTTPS compatibile.");}
     }
 
+    /** One authorized read-only action: inspect form and then same-origin links. */
+    private void analyzeAndPlan() {
+        try {currentOrigin();}
+        catch(Exception e){alert("Apri prima una pagina HTTPS compatibile.");return;}
+        guidedAnalysisPending=true;
+        status("Analisi guidata: riconoscimento campi, poi collegamenti interni.");
+        inspectForm();
+    }
+
     private void inspectForm() {
         try{currentOrigin();}
-        catch(Exception e){alert("Apri prima un sito compatibile.");return;}
+        catch(Exception e){guidedAnalysisPending=false;alert("Apri prima un sito compatibile.");return;}
         // No input values, passwords, tokens, cookies, or page content are collected.
         String js="(function(){var all=Array.from(document.querySelectorAll('input,textarea,select'));"+
           "return JSON.stringify(all.map(function(el,i){"+
@@ -382,7 +393,14 @@ public final class AutoSetupActivity extends Activity {
                     button(fields,"Compila i campi sulla pagina (senza inviare il modulo)",this::fillForm);
                     status("Compilazione disponibile · nessun modulo è stato inviato.");
                 }
-            }catch(Exception e){status("Il sito non consente questa analisi oppure il modulo è cambiato.");}
+                if(guidedAnalysisPending) {
+                    guidedAnalysisPending=false;
+                    discoverLinks();
+                }
+            }catch(Exception e){
+                guidedAnalysisPending=false;
+                status("Il sito non consente questa analisi oppure il modulo è cambiato.");
+            }
         });
     }
 
