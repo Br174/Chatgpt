@@ -206,7 +206,7 @@ def autosetup_smoke():
     print("MOTORLAB_AUTOSETUP_GENERIC_LINK_DISCOVERY=PASSED_SAME_ORIGIN_DEMO",flush=True)
     scroll_to_click("Apri: Impostazioni demo")
     wait("Navigare sul sito?",seconds=12)
-    click("Apri pagina",exact=True)
+    click("APRI PAGINA",exact=True)
     wait("Impostazioni demo",seconds=16)
     scroll_top()
     scroll_to_click("Riconosci i campi del modulo")
