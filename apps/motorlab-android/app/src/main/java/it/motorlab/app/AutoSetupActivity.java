@@ -23,6 +23,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Provider-neutral first AutoSetup LAB:
@@ -49,6 +52,7 @@ public final class AutoSetupActivity extends Activity {
     private String nextStepUrl="",nextStepSource="",nextStepOrigin="";
     private AutoSetupTaskPlan taskPlan;
     private static final String DEMO_ORIGIN="https://autosetup-demo.example";
+    private static final int PICK_CHECKPOINT_JSON=4403;
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
 
     static final class FormField {
@@ -142,6 +146,7 @@ public final class AutoSetupActivity extends Activity {
         url=editor(top,"Sito HTTPS, per esempio https://example.com");
         goal=editor(top,"Cosa vuoi fare su questo sito?");
         button(top,"Mostra piano operazioni",this::showTaskPlan);
+        button(top,"Importa checkpoint dalla chat",this::pickCheckpoint);
         button(top,"Analizza pagina e pianifica",this::analyzeAndPlan);
         button(top,"Apri sito dentro MotorLab",this::openSite);
         button(top,"Prova modulo generico offline",this::openDemo);
@@ -493,6 +498,63 @@ public final class AutoSetupActivity extends Activity {
                 try{startActivity(Intent.createChooser(share,"Condividi checkpoint AutoSetup"));}
                 catch(Exception e){alert("Non è disponibile una app per la condivisione.");}
             }).show();
+    }
+
+
+    /** User-selected document only: no browser call, API access or credential import. */
+    private void pickCheckpoint() {
+        Intent chooser=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        chooser.addCategory(Intent.CATEGORY_OPENABLE);
+        chooser.setType("*/*");
+        chooser.putExtra(Intent.EXTRA_MIME_TYPES,
+            new String[]{"application/json","text/plain","application/octet-stream"});
+        chooser.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        try{startActivityForResult(chooser,PICK_CHECKPOINT_JSON);}
+        catch(Exception e){alert("Selezione file JSON non disponibile.");}
+    }
+
+    @Override protected void onActivityResult(int requestCode,int resultCode,Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode!=PICK_CHECKPOINT_JSON||resultCode!=RESULT_OK||data==null||
+           data.getData()==null)return;
+        try {
+            ByteArrayOutputStream bytes=new ByteArrayOutputStream();
+            try(InputStream input=getContentResolver().openInputStream(data.getData())) {
+                if(input==null)throw new IllegalArgumentException("Documento non leggibile");
+                byte[] buffer=new byte[2048];
+                int n;
+                while((n=input.read(buffer))!=-1){
+                    if(bytes.size()+n>AutoSetupCheckpointBridge.MAX_BYTES)
+                        throw new IllegalArgumentException("Checkpoint oltre il limite");
+                    bytes.write(buffer,0,n);
+                }
+            }
+            String json=new String(bytes.toByteArray(),StandardCharsets.UTF_8);
+            final AutoSetupCheckpointBridge.Preview preview=AutoSetupCheckpointBridge.inspect(json);
+            new AlertDialog.Builder(this)
+                .setTitle("Checkpoint AutoSetup dalla chat")
+                .setMessage(preview.review())
+                .setNegativeButton("Annulla",null)
+                .setPositiveButton("Prepara sito",(d,w)->{
+                    // A transfer is an UNTRUSTED observation, never consent to
+                    // resume a session, inherit passwords or execute remote writes.
+                    browser.stopLoading();
+                    demoMode=false;demoSettingsPage=false;scanAfterNavigation=false;
+                    guidedAnalysisPending=false;nextStepUrl="";nextStepSource="";nextStepOrigin="";
+                    activeOrigin="";inspectedUrl="";pageReady=false;taskPlan=null;
+                    controls.clear();fields.removeAllViews();navigation.removeAllViews();
+                    goal.setText("");
+                    url.setText(preview.origin);
+                    browser.loadUrl("about:blank"); // local reset, NO network access
+                    activateAutoSetup();
+                    say("Checkpoint dalla chat letto come dato non verificato: "+preview.origin+
+                        ". Nessuna sessione, autorizzazione o credenziale importata.");
+                    status("Sito preparato, NON aperto. Premi Apri sito per nuova verifica.");
+                }).show();
+        }catch(Exception e){
+            // Never echo raw input, URLs from rejected files or JSON containing secrets.
+            alert("Importazione respinta: JSON incompatibile o non sicuro. Nessun dato applicato.");
+        }
     }
 
     /** One authorized read-only action: inspect form and then same-origin links. */
