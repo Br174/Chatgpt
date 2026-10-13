@@ -256,6 +256,7 @@ public final class AutoSetupActivity extends Activity {
                     say("MotorLab: ho trovato "+controls.size()+
                         " campi ordinari. Inserisci i valori qui nella chat; "+
                         "verranno trasmessi al sito solo quando premi Compila. Alcuni siti salvano automaticamente.");
+                    if(demoMode)button(fields,"Prepara valori dimostrativi",this::prepareDemoValues);
                     button(fields,"Suggerisci valori con Gemini (facoltativo)",this::suggestValues);
                     button(fields,"Compila i campi sulla pagina (senza inviare il modulo)",this::fillForm);
                     status("Compilazione disponibile · nessun modulo è stato inviato.");
@@ -364,6 +365,24 @@ public final class AutoSetupActivity extends Activity {
             }).show();
     }
 
+    /** Synthetic data only, restricted to the offline demo; no website request. */
+    private void prepareDemoValues() {
+        if(!demoMode || !pageReady || !DEMO_ORIGIN.equals(activeOrigin)) {
+            alert("I valori dimostrativi sono disponibili soltanto nel modulo offline.");return;
+        }
+        int filled=0;
+        for(FormField f:controls) {
+            if("Nome della prova".equals(f.label)) {
+                f.editor.setText("MotorLabTest");
+                filled++;
+            } else if("Tema".equals(f.label)) {
+                f.editor.setText("ProvaAutoSetup");
+                filled++;
+            }
+        }
+        status("Preparati "+filled+" valori nella chat; nessun campo web compilato.");
+    }
+
     private void fillForm() {
         try{
             currentOrigin();
@@ -390,7 +409,7 @@ public final class AutoSetupActivity extends Activity {
                 "var p=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;"+
                 "var d=Object.getOwnPropertyDescriptor(p,'value');if(d&&d.set)d.set.call(el,v.v);else el.value=v.v;}"+
                 "el.dispatchEvent(new Event('input',{bubbles:true}));"+
-                "el.dispatchEvent(new Event('change',{bubbles:true}));filled++;}"+
+                "el.dispatchEvent(new Event('change',{bubbles:true}));if(el.value===v.v)filled++;}"+
                 "return String(filled);})()";
             browser.evaluateJavascript(js,result->{
                 try{
