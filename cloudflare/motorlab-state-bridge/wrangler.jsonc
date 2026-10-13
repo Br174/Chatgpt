@@ -43,7 +43,7 @@
     "OIDC_ALLOWED_WORKFLOW_REF": "Br174/Chatgpt/.github/workflows/motorlab-d1-oidc-relay.yml@refs/heads/main",
     "MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE": "false",
     "MOTORLAB_AUTOSETUP_PROBE_ONLY": "true",
-    "MOTORLAB_AUTOSETUP_PROBE_UNTIL": "2026-10-13T21:45:14Z"
+    "MOTORLAB_AUTOSETUP_PROBE_UNTIL": "2026-10-13T21:58:31Z"
   },
   "previews": {
     "vars": {
