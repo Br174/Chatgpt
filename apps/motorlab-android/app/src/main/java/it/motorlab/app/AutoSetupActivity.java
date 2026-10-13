@@ -481,11 +481,14 @@ public final class AutoSetupActivity extends Activity {
         if(stage!=AutoSetupHybridFlow.Stage.AUTO &&
            stage!=AutoSetupHybridFlow.Stage.RECOVERY)return false;
         if(stage==AutoSetupHybridFlow.Stage.RECOVERY) {
-            if(score>0||!controls.isEmpty()){
+            // Merely seeing the same ordinary fields after a failed chat handoff
+            // is NOT recovery. Require a newly usable, safety-vetted route.
+            // Otherwise advance the bounded failure counter toward last resort.
+            if(score>0){
                 hybridFlow.repairSucceeded();
-                say("Recupero riuscito: controlli o percorso rilevati. Riprendo AutoSetup.");
+                say("Recupero riuscito: nuovo percorso di sola lettura disponibile.");
             }else{
-                onHybridRecoveryFailure("Nessun controllo o percorso utilizzabile.");
+                onHybridRecoveryFailure("Nessuna alternativa sicura alla fase bloccata.");
                 return true;
             }
         }
