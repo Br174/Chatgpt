@@ -234,3 +234,9 @@ PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
 - Ricevute locali limitate alle ultime 20 operazioni in SharedPreferences private: dominio HTTPS (senza percorso/query), identificatore, data, contatori e stato tecnico. MAI input/obiettivi/credenziali/cookie/HTML. Le ricevute possono essere consultate dalla finestra `Mostra piano operazioni`, senza modificare la grafica approvata. La condivisione checkpoint v1 resta separata e non contiene le ricevute.
 - Anche il comando Annulla genera un esito senza alcuna chiamata JS di scrittura, se la conservazione privata locale riesce. In caso di errore di verifica, non inventare risultati.
 - E2E offline esteso alla seconda lettura dei 2 campi della demo, test anti-regressione invariati. Test live siti reali, verifica lato server, update-in-place e fisico restano aperti.
+
+
+## AS6B — hardening collaudo ricevute (13/10/2026)
+- Dopo AS6 si verifica direttamente dentro l'emulatore Android 11 il file privato `SharedPreferences`: contiene una ricevuta tecnica e l'indicazione esplicita `remote_save=not_verified`, ma NON i valori sintetici usati per compilare il form.
+- Si forza la chiusura e si riapre il processo Android: il registro tecnico deve essere ancora presente senza contenere valori privati. Questo dimostra la persistenza della ricevuta, NON il salvataggio del form sul server.
+- Test esclusivamente con valori sintetici. Nessuna modifica di grafica, MADRE, CORE o motori degli altri progetti.

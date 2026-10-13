@@ -184,3 +184,9 @@ assert "browser.postDelayed(()->verifyAppliedDomValues(" in autosetup
 assert "AutoSetupOperationEvidence.latestSummary(this)" in autosetup
 assert "MOTORLAB_AUTOSETUP_DOM_SECOND_READBACK=PASSED_FIELDS_2" in emulator
 print("AS6 redacted bounded receipt and second read-only DOM verification: PASS")
+
+# AS6B runtime verification: private receipts, no synthetic form values, survive process restart.
+assert "MOTORLAB_AUTOSETUP_RECEIPT_PRIVATE_REDACTED=PASSED" in emulator
+assert "MOTORLAB_AUTOSETUP_RECEIPT_REOPEN_PERSISTENCE=PASSED" in emulator
+assert "shared_prefs/autosetup_operation_evidence_v1.xml" in emulator
+print("AS6B local receipt privacy and persistence gate: PASS")

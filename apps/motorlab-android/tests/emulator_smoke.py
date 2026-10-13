@@ -216,6 +216,14 @@ def autosetup_smoke():
     scroll_until_visible("Compilati 2 campi")
     scroll_top()
     scroll_until_visible("Verifica DOM 2/2")
+    # Check the private, redacted Android receipt: never retain the synthetic values.
+    receipt_xml=adb("shell","run-as",PACKAGE,"cat",
+                    "shared_prefs/autosetup_operation_evidence_v1.xml",timeout=25)
+    assert "motorlab.autosetup.operation-evidence" in receipt_xml
+    assert "not_verified" in receipt_xml
+    assert "autosetup-demo.example" in receipt_xml
+    assert "MotorLabTest" not in receipt_xml and "ProvaAutoSetup" not in receipt_xml
+    print("MOTORLAB_AUTOSETUP_RECEIPT_PRIVATE_REDACTED=PASSED",flush=True)
     print("MOTORLAB_AUTOSETUP_DOM_SECOND_READBACK=PASSED_FIELDS_2",flush=True)
     print("MOTORLAB_AUTOSETUP_FORM_REVIEW_CONSENT_CANCEL=PASSED",flush=True)
     print("MOTORLAB_AUTOSETUP_GENERIC_FORM_FILL=PASSED_FIELDS_2_VERIFIED",flush=True)
@@ -264,6 +272,15 @@ def autosetup_smoke():
     scroll_top()
     scroll_until_visible("Collegamenti interni · 0")
     print("MOTORLAB_AUTOSETUP_APPROVED_STEP_AND_READONLY_RESCAN=PASSED_OFFLINE",flush=True)
+    # Kill and reopen the process: receipts must persist, input values must not.
+    adb("shell","am","force-stop",PACKAGE)
+    launch()
+    receipt_after_restart=adb("shell","run-as",PACKAGE,"cat",
+                               "shared_prefs/autosetup_operation_evidence_v1.xml",timeout=25)
+    assert "dom_confirmed" in receipt_after_restart
+    assert "not_verified" in receipt_after_restart
+    assert "MotorLabTest" not in receipt_after_restart
+    print("MOTORLAB_AUTOSETUP_RECEIPT_REOPEN_PERSISTENCE=PASSED",flush=True)
     no_crash()
 
 def main():
