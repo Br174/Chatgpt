@@ -140,11 +140,57 @@ test("same-origin GitHub probe uses only the injected safe probe gateway",async(
  };
  const response=await handleAutoSetupCloudflare(
    json("/autosetup/v1/api/probe",{approval:true},base),
-   {MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"true"},{probeGateway}
+   {
+     MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"false",
+     MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",
+     MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(Date.now()+25*60*1000).toISOString().replace(".000","")
+   },{probeGateway}
  );
  assert.equal(response.status,200);assert.equal(calls,1);
  const receipt=await response.json();
  assert.equal(receipt.status,"GITHUB_PROBE_VERIFIED_AND_REMOVED");
  assert.equal(receipt.value_readable,false);
  assert.equal(JSON.stringify(receipt).includes("fake-demo-token-never-real"),false);
+});
+
+test("LAB06 temporary probe stays fail-closed without explicit bounded UTC window", async()=>{
+ const request=()=>json("/autosetup/v1/api/probe",{approval:true},base);
+ let calls=0;
+ const probeGateway=async()=>{calls++;return {status:"GITHUB_PROBE_VERIFIED_AND_REMOVED"};};
+ const now=Date.now();
+ const envs=[
+   {MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"false"},
+   {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true"},
+   {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(now-1000).toISOString().replace(".000","")},
+   {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(now+46*60*1000).toISOString().replace(".000","")},
+   {MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:"INVALID"},
+   {MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"true",MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(now+25*60*1000).toISOString().replace(".000","")}
+ ];
+ for(const env of envs){
+   const response=await handleAutoSetupCloudflare(request(),env,{probeGateway});
+   assert.equal(response.status,423);
+   assert.equal((await response.json()).error,"PROBE_WINDOW_CLOSED");
+ }
+ assert.equal(calls,0);
+});
+
+test("LAB06 45-minute probe cannot enable any of the five real signing writes",async()=>{
+ const env={
+   MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE:"false",
+   MOTORLAB_AUTOSETUP_PROBE_ONLY:"true",
+   MOTORLAB_AUTOSETUP_PROBE_UNTIL:new Date(Date.now()+25*60*1000).toISOString().replace(".000","")
+ };
+ let calls=0;
+ const gateway=async()=>{calls++;return {status:"SHOULD_NOT_RUN"};};
+ const response=await handleAutoSetupCloudflare(json("/autosetup/v1/api/repository-secret",{
+   secret_name:"MOTORLAB_MAIN_KEY_ALIAS",value:"should_not_write",approval:true
+ },base),env,{gateway});
+ assert.equal(response.status,423);
+ assert.equal((await response.json()).error,"LIVE_WRITES_DISABLED");
+ assert.equal(calls,0);
+ const health=await handleAutoSetupCloudflare(new Request(base+"/autosetup/v1/health"),env);
+ const receipt=await health.json();
+ assert.equal(receipt.write_enabled,false);
+ assert.equal(receipt.probe_enabled,true);
+ assert.equal(receipt.github_write_verified,false);
 });
