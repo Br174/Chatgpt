@@ -1,0 +1,66 @@
+name: MotorLab LAB06 Hybrid AutoSetup Gates
+on:
+  push:
+    branches: ['motorlab/app-lab06-signing-autosetup-*']
+    paths:
+      - 'apps/motorlab-android/**'
+      - '.github/workflows/motorlab-lab06-hybrid-gates.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: motorlab-lab06-hybrid-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  java_state_and_android11:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Verify hybrid actual Java state transitions, no fake fallback
+        run: python3 apps/motorlab-android/tests/verify_hybrid_flow.py
+      - name: Verify current unified app and checkpoint regressions
+        run: |
+          python3 apps/motorlab-android/tests/verify_lab01.py
+          python3 apps/motorlab-android/tests/verify_checkpoint_bridge.py
+      - name: Android SDK preparation
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          "$sdkmanager" "platforms;android-35" "build-tools;35.0.0"
+      - name: Compile same-package LAB06 Android app
+        run: |
+          set -euo pipefail
+          gradle --no-daemon -p apps/motorlab-android :app:assembleDebug
+          APK=apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -m1 "package: name='it.motorlab.app' versionCode='6'"
+      - name: Verify Android emulator accelerator
+        run: test -c /dev/kvm && sudo chmod 0666 /dev/kvm
+      - name: Android 11 offline hybrid AUTO -> CHAT -> RECOVERY smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          profile: pixel_5
+          cores: 2
+          ram-size: 3072M
+          disable-linux-hw-accel: false
+          heap-size: 256M
+          disable-animations: true
+          emulator-boot-timeout: 420
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: adb install -r apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk && python3 apps/motorlab-android/tests/hybrid_ui_smoke.py
+      - name: Unpublished test certificate disclaimer
+        run: |
+          echo "LAB06 hybrid app compile and Android 11 UI verified (if prior gates passed)." >> "$GITHUB_STEP_SUMMARY"
+          echo "No production APK: the test build uses disposable debug signing, not user's existing certificate." >> "$GITHUB_STEP_SUMMARY"

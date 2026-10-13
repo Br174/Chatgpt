@@ -14,6 +14,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.Spinner;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,11 +49,16 @@ public final class AutoSetupActivity extends Activity {
     private boolean demoMode=false;
     private boolean autosetupActive=false;
     private boolean demoSettingsPage=false;
+    private boolean demoChoicesPage=false;
     private boolean suggestionRunning=false;
     private boolean guidedAnalysisPending=false;
     private boolean scanAfterNavigation=false;
     private String nextStepUrl="",nextStepSource="",nextStepOrigin="";
     private AutoSetupTaskPlan taskPlan;
+    // LAB06: deterministic bounded AUTO -> CHAT -> RECOVERY -> LAST_RESORT.
+    // This is an Android-local UI, not a simulated bridge into the ChatGPT client.
+    private final AutoSetupHybridFlow hybridFlow=new AutoSetupHybridFlow();
+    private int hybridHops=0;
     private static final String DEMO_ORIGIN="https://autosetup-demo.example";
     private static final int PICK_CHECKPOINT_JSON=4403;
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
@@ -60,7 +68,28 @@ public final class AutoSetupActivity extends Activity {
         final String signature;
         final String label;
         final EditText editor;
-        FormField(int i,String s,String label,EditText e){index=i;signature=s;this.label=label;editor=e;}
+        final Spinner picker;
+        final CheckBox toggle;
+        final JSONArray options;
+        boolean toggleModified;
+        FormField(int i,String s,String label,EditText e,Spinner p,CheckBox t,JSONArray o){
+            index=i;signature=s;this.label=label;editor=e;
+            picker=p;toggle=t;options=o;
+        }
+        /** null means no user change; empty is valid only as a site-defined menu option. */
+        String pendingValue(){
+            if(toggle!=null)return toggleModified?(toggle.isChecked()?"true":"false"):null;
+            if(picker!=null){
+                int selected=picker.getSelectedItemPosition();
+                if(selected<=0||options==null||selected>options.length())return null;
+                JSONObject opt=options.optJSONObject(selected-1);
+                return opt==null?null:opt.optString("value","");
+            }
+            if(editor==null)return null;
+            String value=editor.getText().toString();
+            return value.isEmpty()?null:value;
+        }
+        String kind(){return toggle==null?"value":"checkbox";}
     }
 
     private TextView text(String value,int size,boolean bold) {
@@ -148,8 +177,10 @@ public final class AutoSetupActivity extends Activity {
         button(top,"Mostra piano operazioni",this::showTaskPlan);
         button(top,"Importa checkpoint dalla chat",this::pickCheckpoint);
         button(top,"Analizza pagina e pianifica",this::analyzeAndPlan);
+        button(top,"Avvia AutoSetup ibrido",this::startHybrid);
         button(top,"Apri sito dentro MotorLab",this::openSite);
         button(top,"Prova modulo generico offline",this::openDemo);
+        button(top,"Prova scelte e interruttori offline",this::openDemoChoices);
         button(top,"Riconosci i campi del modulo",this::inspectForm);
         button(top,"Trova collegamenti del sito",this::discoverLinks);
         button(top,"Inserisci token protetto per questo sito",this::saveToken);
@@ -214,6 +245,10 @@ public final class AutoSetupActivity extends Activity {
                         return;
                     }
                     pageReady=true;
+                    if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.AUTO){
+                        try{hybridFlow.visited(activeOrigin,page);}
+                        catch(Exception stopped){hybridFlow.blocked("Origine o pagina inattesa.");}
+                    }
                     status("Pagina pronta: "+activeOrigin+". Premere Riconosci i campi.");
                     finishGuidedNavigation();
                 }catch(Exception e){
@@ -251,10 +286,14 @@ public final class AutoSetupActivity extends Activity {
             "(function(){return document.querySelectorAll('input,textarea,select').length;})()",
             result->{
                 if(!demoMode) return;
-                if((demoSettingsPage?"2":"3").equals(result)){
+                if((demoSettingsPage||demoChoicesPage?"2":"3").equals(result)){
                     pageReady=true;
                     activeOrigin=DEMO_ORIGIN;
-                    status("Demo offline pronta: "+(demoSettingsPage?"2":"3")+" campi HTML. Premere Riconosci i campi.");
+                    if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.AUTO){
+                        try{hybridFlow.visited(activeOrigin,DEMO_ORIGIN+(demoSettingsPage?"/impostazioni":"/"));}
+                        catch(Exception stopped){hybridFlow.blocked("La demo ha cambiato pagina inattesa.");}
+                    }
+                    status("Demo offline pronta: "+(demoSettingsPage||demoChoicesPage?"2":"3")+" campi HTML. Premere Riconosci i campi.");
                     finishGuidedNavigation();
                 } else if(retry<12) {
                     browser.postDelayed(()->checkDemoReady(retry+1),300);
@@ -266,8 +305,10 @@ public final class AutoSetupActivity extends Activity {
     }
 
     private void openDemo() {
+        hybridFlow.reset();hybridHops=0;
         demoMode=true;
         demoSettingsPage=false;
+        demoChoicesPage=false;
         scanAfterNavigation=false;
         nextStepUrl="";nextStepSource="";nextStepOrigin="";
         activeOrigin=DEMO_ORIGIN;
@@ -289,10 +330,35 @@ public final class AutoSetupActivity extends Activity {
         status("Caricamento modulo dimostrativo offline…");
     }
 
+    /** Typed-controls proof: no passwords, server requests or third-party domains. */
+    private void openDemoChoices() {
+        hybridFlow.reset();hybridHops=0;
+        demoMode=true;demoSettingsPage=false;demoChoicesPage=true;
+        scanAfterNavigation=false;
+        nextStepUrl="";nextStepSource="";nextStepOrigin="";
+        activeOrigin=DEMO_ORIGIN;
+        url.setText(DEMO_ORIGIN+"/scelte");
+        goal.setText("Configurare le scelte e gli interruttori dimostrativi");
+        pageReady=false;inspectedUrl="";taskPlan=null;
+        controls.clear();fields.removeAllViews();navigation.removeAllViews();
+        activateAutoSetup();
+        say("AutoSetup: verifica scelte e interruttori offline, senza credenziali reali.");
+        String html="<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head>"+
+            "<body><h2>Controlli dimostrativi</h2><form>"+
+            "<label for='tema'>Tema visivo</label><select id='tema' name='tema'>"+
+            "<option value='chiaro'>Chiaro</option><option value='scuro'>Scuro</option></select>"+
+            "<label for='avvisi'>Abilita avvisi demo</label><input id='avvisi' name='avvisi' type='checkbox'>"+
+            "</form></body></html>";
+        browser.loadDataWithBaseURL(DEMO_ORIGIN+"/scelte",html,"text/html","UTF-8",null);
+        browser.postDelayed(()->checkDemoReady(0),350);
+        status("Caricamento scelte dimostrative offline…");
+    }
+
     /** Second in-memory test page; no request to a remote website. */
     private void openDemoSettingsPage() {
         if(!demoMode || !DEMO_ORIGIN.equals(activeOrigin)) return;
         demoSettingsPage=true;
+        demoChoicesPage=false;
         // Second in-memory page must NEVER inherit the first page's 100% progress.
         pageReady=false;inspectedUrl="";taskPlan=null;controls.clear();fields.removeAllViews();
         navigation.removeAllViews();
@@ -308,10 +374,12 @@ public final class AutoSetupActivity extends Activity {
     }
 
     private void openSite() {
+        hybridFlow.reset();hybridHops=0;
         String address=url.getText().toString().trim();
         try{
             demoMode=false;
             demoSettingsPage=false;
+            demoChoicesPage=false;
             scanAfterNavigation=false;
             nextStepUrl="";nextStepSource="";nextStepOrigin="";
             activeOrigin=SecureServiceToken.checkedOrigin(address);
@@ -373,6 +441,8 @@ public final class AutoSetupActivity extends Activity {
                 int bestScore=0;
                 String suggestedTitle="";
                 String suggestedUrl="";
+                int safeScore=0;
+                String safeSuggestedUrl="";
                 for(int i=0;i<links.length();i++){
                     JSONObject link=links.optJSONObject(i);
                     if(link==null)continue;
@@ -384,6 +454,10 @@ public final class AutoSetupActivity extends Activity {
                     final String dest=target;
                     int relevance=AutoSetupGoalRouter.score(goal.getText().toString(),label);
                     if(relevance>bestScore){bestScore=relevance;suggestedTitle=label;suggestedUrl=target;}
+                    if(relevance>safeScore&&AutoSetupHybridFlow.safeReadOnlyLink(origin,target,label)){
+                        safeScore=relevance;
+                        safeSuggestedUrl=target;
+                    }
                     shown++;
                     button(navigation,"Apri: "+label,()->{
                         try{
@@ -415,13 +489,168 @@ public final class AutoSetupActivity extends Activity {
                     button(navigation,"Esegui passo suggerito",this::executeSuggestedStep);
                 }
                 currentTaskPlan().links(shown);
+                if(handleHybridDiscovery(origin,expectedPage,safeScore,safeSuggestedUrl))return;
                 status("Collegamenti interni verificati: "+shown+
                     ". Scegli una pagina dalla chat; nessuna navigazione automatica.");
             }catch(Exception e){
                 navigation.removeAllViews();
+                if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.RECOVERY){
+                    onHybridRecoveryFailure("Collegamenti non disponibili.");
+                }else if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.AUTO){
+                    pauseHybridForChat("Navigazione automatica non disponibile.");
+                }
                 status("Collegamenti non disponibili su questa pagina.");
             }
         });
+    }
+
+
+    /**
+     * First-path automation: user's explicit start delegates read-only analysis and at
+     * most two same-origin, query-free, goal-matched GET navigations. No forms, submits,
+     * stored secrets, cross-origin links, or irreversible website operations.
+     */
+    private void startHybrid() {
+        try {
+            String origin=currentOrigin();
+            String page=browser.getUrl();
+            if(page==null||"about:blank".equals(page)){
+                if(!demoMode)throw new IllegalStateException("Pagina non pronta.");
+                page=DEMO_ORIGIN+(demoSettingsPage?"/impostazioni":"/");
+            }
+            hybridFlow.start(origin,page);
+            hybridHops=0;
+            activateAutoSetup();
+            say("AutoSetup ibrido: inizio analisi e navigazione limitata in sola lettura. "+
+                "Se serve una decisione, vedrai i controlli qui. "+
+                "Nessuna password o conferma finale viene automatizzata.");
+            analyzeAndPlan();
+        }catch(Exception e){alert("Apri prima una pagina HTTPS compatibile.");}
+    }
+
+    /** Return true if hybrid flow handled the discovery; normal UI is unchanged otherwise. */
+    private boolean handleHybridDiscovery(String origin,String page,int score,String target) {
+        AutoSetupHybridFlow.Stage stage=hybridFlow.stage();
+        if(stage!=AutoSetupHybridFlow.Stage.AUTO &&
+           stage!=AutoSetupHybridFlow.Stage.RECOVERY)return false;
+        if(stage==AutoSetupHybridFlow.Stage.RECOVERY) {
+            // Merely seeing the same ordinary fields after a failed chat handoff
+            // is NOT recovery. Require a newly usable, safety-vetted route.
+            // Otherwise advance the bounded failure counter toward last resort.
+            if(score>0){
+                hybridFlow.repairSucceeded();
+                say("Recupero riuscito: nuovo percorso di sola lettura disponibile.");
+            }else{
+                onHybridRecoveryFailure("Nessuna alternativa sicura alla fase bloccata.");
+                return true;
+            }
+        }
+        try {
+            String actual=browser.getUrl();
+            if(demoMode && ("about:blank".equals(actual)||actual==null))
+                actual=DEMO_ORIGIN+(demoSettingsPage?"/impostazioni":"/");
+            if(!hybridFlow.isCurrent(origin,actual)) {
+                hybridFlow.blocked("Pagina modificata durante il controllo automatico.");
+                status("Stop di sicurezza: pagina inattesa.");return true;
+            }
+            if(score>0&&hybridHops<2&&!target.isEmpty()
+                 &&AutoSetupHybridFlow.safeReadOnlyLink(origin,target,"Pagina interna consentita")
+                 &&origin.equals(SecureServiceToken.checkedOrigin(target))) {
+                // Only a link chosen by existing local goal matcher, same HTTPS origin.
+                hybridHops++;
+                scanAfterNavigation=true;
+                say("AUTO: passo "+hybridHops+"/2 · apro e analizzo una pagina "+
+                    "interna pertinente all'obiettivo, senza inviare moduli.");
+                navigation.removeAllViews();
+                if(demoMode && (DEMO_ORIGIN+"/impostazioni").equals(target)){
+                    openDemoSettingsPage();
+                }else if(!demoMode){
+                    browser.loadUrl(target);
+                }else{
+                    scanAfterNavigation=false;
+                    pauseHybridForChat("La pagina demo richiesta non è supportata.");
+                }
+                return true;
+            }
+            pauseHybridForChat(controls.isEmpty()?
+                "Nessun percorso automatico sicuro identificato.":
+                "Serve una scelta o compilazione nella chat.");
+            return true;
+        }catch(Exception e){
+            pauseHybridForChat("La pagina o il percorso è cambiato.");
+            return true;
+        }
+    }
+
+    /** Local native controls, not a credential-collecting ChatGPT form. */
+    private void pauseHybridForChat(String reason) {
+        if(hybridFlow.stage()!=AutoSetupHybridFlow.Stage.AUTO)return;
+        hybridFlow.requestHumanChoice(reason);
+        say("CHAT: "+reason+" "+
+            (controls.isEmpty()?
+                "Non posso creare controlli funzionanti per questo passo.":
+                "I campi riconosciuti sono nella sezione qui sotto. "+
+                "La compilazione richiede il tuo comando, non sarà inviata automaticamente.")+
+            " Password, token e OTP non vanno inseriti nei campi ordinari.");
+        button(navigation,"Non riesco da qui · tenta recupero tecnico",this::recoverHybrid);
+    }
+
+    /** Twice, at most, a fresh safe DOM+links scan; never silently edits site code. */
+    private void recoverHybrid() {
+        if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.CHAT)
+            hybridFlow.cannotUseChat("Controlli chat non applicabili al passo.");
+        if(hybridFlow.stage()!=AutoSetupHybridFlow.Stage.RECOVERY)return;
+        try {
+            if(!hybridFlow.requestRepair()){
+                onHybridRecoveryFailure("Tentativi di recupero esauriti.");
+                return;
+            }
+            say("RECOVERY: verifica tecnica "+hybridFlow.recoveryAttempts()+"/"+
+                hybridFlow.maxRecoveryAttempts()+" in sola lettura.");
+            guidedAnalysisPending=true;
+            inspectForm();
+        }catch(Exception e){
+            onHybridRecoveryFailure("Rilettura del sito non riuscita.");
+        }
+    }
+
+    private void onHybridRecoveryFailure(String reason) {
+        if(hybridFlow.stage()!=AutoSetupHybridFlow.Stage.RECOVERY)return;
+        hybridFlow.repairFailed(reason);
+        if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.RECOVERY){
+            // Bounded second attempt; no unending retry or unintended writes.
+            browser.postDelayed(this::recoverHybrid,650);
+        }else if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.LAST_RESORT){
+            say("AUTO e CHAT non hanno risolto il passo; due tentativi "+
+                "di recupero locale non riusciti. Fallback solo su tua scelta.");
+            button(navigation,"Ultima risorsa · apri sito ufficiale",this::apriUltimaRisorsa);
+        }
+    }
+
+    /** Last resort NEVER uses an invented deep link and never bypasses site login. */
+    private void apriUltimaRisorsa() {
+        try {
+            String origin=currentOrigin();
+            if(demoMode){alert("La demo offline non può aprire un sito reale.");return;}
+            String destination=hybridFlow.officialFallbackUrl(origin,browser.getUrl());
+            new AlertDialog.Builder(this).setTitle("Ultima risorsa: sito ufficiale?")
+                .setMessage("Solo ora puoi continuare sul sito ufficiale. "+
+                    "Aprirò la pagina corrente, se sicura e priva di parametri riservati; "+
+                    "altrimenti soltanto il dominio. "+
+                    "Non posso garantire che il browser selezioni automaticamente "+
+                    "un campo, né condividere con esso la sessione WebView. "+
+                    "Inserisci password o conferme SOLO sul sito ufficiale. "+
+                    "Il risultato remoto richiede una nuova verifica: nessun successo presunto.")
+                .setNegativeButton("Annulla",null)
+                .setPositiveButton("Apri sito ufficiale",(d,w)->{
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(destination)));
+                        status("Passaggio esterno avviato. Esito remoto NON verificato; "+
+                            "task in pausa al checkpoint.");
+                    }catch(Exception e){alert("Apertura esterna non disponibile.");}
+                }).show();
+        }catch(Exception e){alert("Fallback bloccato: non sono esaurite le altre strade "+
+            "oppure è cambiata la pagina.");}
     }
 
     /**
@@ -604,9 +833,14 @@ public final class AutoSetupActivity extends Activity {
           "var sig=[el.tagName,typ,el.name||'',el.id||''].join('|');"+
           "var sensitive=/password|passwort|token|secret|api.?key|auth|credential|otp|2fa|codice.*accesso/i.test("+
           "label+' '+(el.name||'')+' '+(el.id||''));"+
-          "if(['password','hidden','file','checkbox','radio','submit','button','reset'].indexOf(typ)>=0||sensitive)return null;"+
+          "if(['password','hidden','file','radio','submit','button','reset'].indexOf(typ)>=0||sensitive)return null;"+
           "if(['input','textarea','select'].indexOf(tag)<0||el.disabled)return null;"+
-          "return {i:i,s:sig,label:String(label).slice(0,90)};"+
+          "if(tag==='select'&&(el.multiple||el.options.length>25))return null;"+
+          "var options=tag==='select'?Array.from(el.options).filter(function(o){return !o.disabled;})."+
+          "map(function(o){return {value:String(o.value).slice(0,150),title:String(o.textContent||o.label||o.value).trim().slice(0,90)};}):[];"+
+          "if(tag==='select'&&!options.length)return null;"+
+          "return {i:i,s:sig,label:String(label).slice(0,90),kind:typ==='checkbox'?'checkbox':tag,"+
+          "checked:typ==='checkbox'?!!el.checked:false,options:options};"+
           "}).filter(Boolean).slice(0,30));})()";
         String origin=activeOrigin;
         status("Rilevazione campi in corso…");
@@ -621,8 +855,38 @@ public final class AutoSetupActivity extends Activity {
                 for(int i=0;i<found.length();i++){
                     JSONObject f=found.getJSONObject(i);
                     String title=f.optString("label","Campo");
-                    EditText input=editor(fields,title);
-                    controls.add(new FormField(f.getInt("i"),f.getString("s"),title,input));
+                    String kind=f.optString("kind","input");
+                    int fieldIndex=f.getInt("i");
+                    String signature=f.getString("s");
+                    if("checkbox".equals(kind)){
+                        CheckBox toggle=new CheckBox(this);
+                        toggle.setText(title);
+                        toggle.setChecked(f.optBoolean("checked",false));
+                        fields.addView(toggle,new LinearLayout.LayoutParams(-1,-2));
+                        FormField control=new FormField(fieldIndex,signature,title,null,null,toggle,null);
+                        toggle.setOnCheckedChangeListener((view,checked)->control.toggleModified=true);
+                        controls.add(control);
+                    }else if("select".equals(kind)){
+                        JSONArray options=f.optJSONArray("options");
+                        if(options==null||options.length()==0)continue;
+                        fields.addView(text(title,13,true));
+                        Spinner picker=new Spinner(this);
+                        ArrayList<String> names=new ArrayList<>();
+                        names.add("— Non modificare —");
+                        for(int k=0;k<options.length();k++){
+                            JSONObject opt=options.optJSONObject(k);
+                            names.add(opt==null?"Opzione":opt.optString("title","Opzione"));
+                        }
+                        ArrayAdapter<String> adapter=new ArrayAdapter<>(this,
+                            android.R.layout.simple_spinner_item,names);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        picker.setAdapter(adapter);
+                        fields.addView(picker,new LinearLayout.LayoutParams(-1,dp(48)));
+                        controls.add(new FormField(fieldIndex,signature,title,null,picker,null,options));
+                    }else{
+                        EditText input=editor(fields,title);
+                        controls.add(new FormField(fieldIndex,signature,title,input,null,null,null));
+                    }
                 }
                 if(controls.isEmpty()){
                     status("Nessun campo ordinario riconosciuto. Il sito potrebbe usare moduli speciali.");
@@ -725,7 +989,7 @@ public final class AutoSetupActivity extends Activity {
                                     String value=suggestion.optString("value","").trim();
                                     if(value.isEmpty()||value.length()>1000)continue;
                                     for(FormField f:controls){
-                                        if(f.index==index&&f.editor.getText().length()==0){
+                                        if(f.index==index&&f.editor!=null&&f.editor.getText().length()==0){
                                             f.editor.setText(value);
                                             accepted++;break;
                                         }
@@ -773,18 +1037,22 @@ public final class AutoSetupActivity extends Activity {
                 alert("La pagina è cambiata: analizza nuovamente i campi.");return;
             }
             int count=0;
+            boolean typed=false;
             StringBuilder names=new StringBuilder();
             for(FormField f:controls){
-                if(f.editor.getText().length()==0)continue;
+                if(f.pendingValue()==null)continue;
+                if(f.toggle!=null||f.picker!=null)typed=true;
                 count++;
                 if(count<=8)names.append("• ").append(limit(
                     f.label.replace('\n',' ').replace('\r',' '),80)).append("\n");
             }
             if(count==0){alert("Compila almeno un campo nella chat.");return;}
             final int countAtReview=count;
+            final boolean hasTypedControls=typed;
             new AlertDialog.Builder(this).setTitle("Confermare la compilazione?")
                 .setMessage("Sito: "+activeOrigin+"\n"+count+
-                    " campi ordinari da compilare:\n"+names+
+                    (hasTypedControls?" controlli da applicare:\n":
+                        " campi ordinari da compilare:\n")+names+
                     (count>8?"…e altri "+(count-8)+" campi.\n":"")+
                     "\nI valori non vengono mostrati qui. Attenzione: alcuni siti "+
                     "SALVANO AUTOMATICAMENTE dopo input/change, anche senza premere Invia.")
@@ -811,9 +1079,9 @@ public final class AutoSetupActivity extends Activity {
         JSONArray updates=new JSONArray();
         try{
             for(FormField f:controls){
-                String val=f.editor.getText().toString();
-                if(!val.isEmpty())updates.put(new JSONObject().put("i",f.index)
-                    .put("s",f.signature).put("v",val));
+                String val=f.pendingValue();
+                if(val!=null)updates.put(new JSONObject().put("i",f.index)
+                    .put("s",f.signature).put("v",val).put("k",f.kind()));
             }
             if(updates.length()==0){alert("Compila almeno un campo nella chat.");return;}
             currentTaskPlan().prepared(updates.length());
@@ -824,19 +1092,23 @@ public final class AutoSetupActivity extends Activity {
                 "if(!t||[t.tagName,(t.getAttribute('type')||'text').toLowerCase(),"+
                 "t.name||'',t.id||''].join('|')!==x.s||t.disabled)return 'PAGE_CHANGED';"+
                 "var ty=(t.getAttribute('type')||'text').toLowerCase();"+
-                "if(['password','hidden','file','checkbox','radio','submit','button','reset'].indexOf(ty)>=0)"+
+                "if(['password','hidden','file','radio','submit','button','reset'].indexOf(ty)>=0)"+
                 "return 'PAGE_CHANGED';"+
+                "if(ty==='checkbox'){if(x.k!=='checkbox'||(x.v!=='true'&&x.v!=='false'))return 'PAGE_CHANGED';}"+
+                "else if(x.k!=='value')return 'PAGE_CHANGED';"+
                 "if(t.tagName==='SELECT'&&!Array.from(t.options).some(function(o){return o.value===x.v;}))"+
                 "return 'PAGE_CHANGED';}"+
                 "var filled=0;for(var j=0;j<values.length;j++){var v=values[j];var el=all[v.i];"+
                 "if(!el||[el.tagName,(el.getAttribute('type')||'text').toLowerCase(),el.name||'',el.id||''].join('|')!==v.s)continue;"+
                 "var typ=(el.getAttribute('type')||'text').toLowerCase();"+
-                "if(['password','hidden','file','checkbox','radio','submit','button','reset'].indexOf(typ)>=0||el.disabled)continue;"+
-                "if(el.tagName==='SELECT'){el.value=v.v;}else{"+
+                "if(['password','hidden','file','radio','submit','button','reset'].indexOf(typ)>=0||el.disabled)continue;"+
+                "if(typ==='checkbox'){el.checked=v.v==='true';}"+
+                "else if(el.tagName==='SELECT'){el.value=v.v;}else{"+
                 "var p=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;"+
                 "var d=Object.getOwnPropertyDescriptor(p,'value');if(d&&d.set)d.set.call(el,v.v);else el.value=v.v;}"+
                 "el.dispatchEvent(new Event('input',{bubbles:true}));"+
-                "el.dispatchEvent(new Event('change',{bubbles:true}));if(el.value===v.v)filled++;}"+
+                "el.dispatchEvent(new Event('change',{bubbles:true}));"+
+                "if(typ==='checkbox'?(el.checked===(v.v==='true')):el.value===v.v)filled++;}"+
                 "return String(filled);})()";
             browser.evaluateJavascript(js,result->{
                 try{
@@ -876,7 +1148,8 @@ public final class AutoSetupActivity extends Activity {
                 "var matches=0;for(var j=0;j<values.length;j++){var v=values[j];var el=all[v.i];"+
                 "if(!el||[el.tagName,(el.getAttribute('type')||'text').toLowerCase(),"+
                 "el.name||'',el.id||''].join('|')!==v.s)return 'PAGE_CHANGED';"+
-                "if(el.value===v.v)matches++;}return String(matches);})()";
+                "if(v.k==='checkbox'? (el.type==='checkbox'&&el.checked===(v.v==='true')):"+
+                "(el.type!=='checkbox'&&el.value===v.v))matches++;}return String(matches);})()";
             browser.evaluateJavascript(js,result->{
                 try{
                     if(!expectedPage.equals(browser.getUrl())||!origin.equals(currentOrigin())){
@@ -910,6 +1183,16 @@ public final class AutoSetupActivity extends Activity {
         }
         String receipt=AutoSetupOperationEvidence.record(this,origin,requested,applied,
             observed,state,true);
+        if("dom_confirmed".equals(state) &&
+           hybridFlow.stage()==AutoSetupHybridFlow.Stage.CHAT){
+            try{
+                if(hybridFlow.isCurrent(origin,browser.getUrl())){
+                    hybridFlow.approvedChatOperationObserved();
+                    // Continue only with read-only analysis. No automatic submit.
+                    browser.postDelayed(this::analyzeAndPlan,650);
+                }
+            }catch(Exception ignored){status("La pagina è cambiata: ripresa sospesa.");}
+        }
         String check=observed<0?"non disponibile":observed+"/"+requested;
         status("Compilati "+applied+" campi · Verifica DOM "+check+
             " · salvataggio server NON verificato.");
