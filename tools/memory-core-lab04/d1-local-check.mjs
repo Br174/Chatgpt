@@ -40,7 +40,7 @@ const parse=(stdout)=>{
  throw Error('LAB04_FAIL:d1_json_not_parsed:'+stdout.slice(0,200));
 };
 const q=(v)=>v===null?'NULL':typeof v==='number'?String(v):"'"+String(v).replaceAll("'","''")+"'";
-const insert=(table,record,mode='OR IGNORE')=>{
+const insert=(table,record,mode='IGNORE')=>{
  const cols=Object.keys(record);
  must(cols.every(c=>/^[a-z_]+$/.test(c)),'invalid_sql_column');
  return 'INSERT '+(mode?'OR '+mode+' ':'')+'INTO '+table+' ('+cols.join(',')+') VALUES ('+cols.map(c=>q(record[c])).join(',')+');';
