@@ -194,3 +194,21 @@ test("LAB06 45-minute probe cannot enable any of the five real signing writes",a
  assert.equal(receipt.probe_enabled,true);
  assert.equal(receipt.github_write_verified,false);
 });
+
+test("PAT-free crypto self-test is inaccessible in Worker production", async () => {
+  const url=base+"/autosetup/v1/crypto-selftest";
+  const response=await handleAutoSetupCloudflare(new Request(url),env);
+  assert.equal(response.status,404);
+  assert.equal((await response.json()).error,"NOT_FOUND");
+});
+
+test("PAT-free crypto self-test in isolated preview encrypts and decrypts locally", async () => {
+  const url=base+"/autosetup/v1/crypto-selftest";
+  const response=await handleAutoSetupCloudflare(new Request(url),{
+    ...env,MOTORLAB_AUTOSETUP_CRYPTO_DIAGNOSTIC:"preview-only"
+  });
+  assert.equal(response.status,200);
+  const result=await response.json();
+  assert.deepEqual(result,{crypto_ready:true,stage:"READY"});
+  assert.ok(!JSON.stringify(result).includes("github_pat_"));
+});
