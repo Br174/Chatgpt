@@ -56,6 +56,13 @@ final class AutoSetupHybridFlow {
         reason = limited(why);
     }
 
+    void approvedChatOperationObserved() {
+        if (stage != Stage.CHAT)
+            throw new IllegalStateException("No pending chat action");
+        stage = Stage.AUTO;
+        reason = "Effetto osservato nella pagina, esito remoto non verificato";
+    }
+
     void cannotUseChat(String why) {
         if (stage != Stage.CHAT)
             throw new IllegalStateException("Chat path has not been attempted");
