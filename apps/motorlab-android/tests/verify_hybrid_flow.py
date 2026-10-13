@@ -8,6 +8,7 @@ source=p/"app/src/main/java/it/motorlab/app/AutoSetupHybridFlow.java"
 activity=(p/"app/src/main/java/it/motorlab/app/AutoSetupActivity.java").read_text()
 assert "Avvia AutoSetup ibrido" in activity
 assert "new AutoSetupHybridFlow()" in activity
+assert "AutoSetupHybridFlow.safeReadOnlyLink(origin,target,label)" in activity
 assert "apriUltimaRisorsa" in activity
 assert "Apri login ufficiale nel browser" in activity # preserve the existing explicit option
 assert "setAllowFileAccess(false)" in activity
@@ -24,6 +25,20 @@ public class HybridFlowCheck {
     String origin="https://github.com", page="https://github.com/Br174/Chatgpt/settings";
     AutoSetupHybridFlow flow=new AutoSetupHybridFlow();
     denied(() -> flow.officialFallbackUrl(origin,page));
+    yes(AutoSetupHybridFlow.safeReadOnlyLink(origin,
+      "https://github.com/Br174/Chatgpt/settings","Impostazioni repository"));
+    yes(!AutoSetupHybridFlow.safeReadOnlyLink(origin,
+      "https://github.com/Br174/Chatgpt/delete","Elimina repository"));
+    yes(!AutoSetupHybridFlow.safeReadOnlyLink(origin,
+      "https://github.com/Br174/Chatgpt/settings","Elimina repository"));
+    yes(!AutoSetupHybridFlow.safeReadOnlyLink(origin,
+      "https://github.com/Br174/Chatgpt/billing","Piani e fatturazione"));
+    yes(!AutoSetupHybridFlow.safeReadOnlyLink(origin,
+      "https://github.com/Br174/Chatgpt/settings?confirm=1","Impostazioni"));
+    yes(!AutoSetupHybridFlow.safeReadOnlyLink(origin,
+      "https://github.com/Br174/Chatgpt/%64elete","Impostazioni"));
+    yes(!AutoSetupHybridFlow.safeReadOnlyLink(origin,
+      "https://another.example/settings","Impostazioni"));
     flow.start(origin,page);
     yes(flow.stage()==AutoSetupHybridFlow.Stage.AUTO);
     denied(() -> flow.cannotUseChat("bypass"));
