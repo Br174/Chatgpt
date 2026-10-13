@@ -203,3 +203,17 @@ assert "autosetup_provider_readback:" in workflow
 assert "pull-requests: read" in workflow
 assert "GH_TOKEN: "+"$"+"{{ secrets.GITHUB_TOKEN }}" in workflow
 print("AS7 provider-readback gate static contracts: PASS")
+
+# Progress is milestone-based for the *local form workflow*, never wall-clock or server save.
+taskplan=(p/"app/src/main/java/it/motorlab/app/AutoSetupTaskPlan.java").read_text()
+assert "int progressPercent()" in taskplan
+assert "void domVerified(int requested,int observed)" in taskplan
+assert "if(domConfirmed)return 100;" in taskplan
+assert "if(appliedFields>0)return 80;" in taskplan
+assert "if(scannedFields>=0)return 40;" in taskplan
+assert "non è salvataggio sul server" in taskplan
+assert "Avanzamento locale: " in autosetup
+assert "[\"+localProgressPercent()+\"% percorso locale]" in autosetup
+assert 'taskPlan.domVerified(requested,observed)' in autosetup
+assert "MOTORLAB_AUTOSETUP_STAGE_PROGRESS=PASSED_LOCAL_100_NOT_REMOTE" in emulator
+print("AutoSetup percentage progress is stage-derived, local-only and tested: PASS")

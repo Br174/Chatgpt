@@ -247,3 +247,10 @@ PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
 - "VERIFIED_GITHUB_BRANCH_AND_PR" è una prova del commit esistente sul provider GitHub (es. operazione avviata qui nella chat e pubblicata dalla LAB). NON prova salvataggio di moduli su siti web né autenticazioni.
 - Un run precedente alla HEAD corrente è "STALE_SHA_NOT_ATTESTED", mai un falso successo. Errori API e discordanza branch/PR fanno fallire il job. Il confronto locale ha test con match, stale, repo errato e SHA discordante.
 - Tutto resta nella LAB e nella chat con connettori reali; APK, CORE, MADRE, RealTest e grafica invariati. Nessun provider diverso da GitHub dichiarato testato.
+
+
+## AS8 — Percentuali visibili nei messaggi e nello stato AutoSetup (13/10/2026)
+- Richiesta utente: indicare le percentuali di avanzamento durante lo sviluppo e nella chat AutoSetup, senza ridisegnare la UI. Nel client Android si usa la `TextView` di stato esistente e si aggiunge il prefisso `[X% percorso locale]` nei messaggi AutoSetup. Nessun nuovo pannello o icona.
+- Progresso deterministico di una *singola compilazione locale* basato su milestone: 0% non pronto, 20% pagina pronta, 40% scansione completata, 60% valori preparati, 80% compilazione applicata, 100% rilettura DOM corrispondente. I link interni sono facoltativi; non fanno salire artificialmente la percentuale. Una pagina cambiata riparte da 0%; un modulo rianalizzato resetta i progressi downstream.
+- Non è un timer, previsione di minuti o % di completamento del progetto intero. **100% indica soltanto il flusso locale**, mai salvataggio remoto. Non scrivere segreti nel progresso o nei checkpoint; contratto condiviso v1 invariato.
+- Test emulator Android esteso per la stringa `Avanzamento locale: 100%` dopo la seconda lettura dei due campi della demo. E2E e sicurezza esistenti invariati.

@@ -224,6 +224,9 @@ def autosetup_smoke():
     assert "autosetup-demo.example" in receipt_xml
     assert "MotorLabTest" not in receipt_xml and "ProvaAutoSetup" not in receipt_xml
     print("MOTORLAB_AUTOSETUP_RECEIPT_PRIVATE_REDACTED=PASSED",flush=True)
+    scroll_top()
+    wait("Avanzamento locale: 100%",seconds=12)
+    print("MOTORLAB_AUTOSETUP_STAGE_PROGRESS=PASSED_LOCAL_100_NOT_REMOTE",flush=True)
     print("MOTORLAB_AUTOSETUP_DOM_SECOND_READBACK=PASSED_FIELDS_2",flush=True)
     print("MOTORLAB_AUTOSETUP_FORM_REVIEW_CONSENT_CANCEL=PASSED",flush=True)
     print("MOTORLAB_AUTOSETUP_GENERIC_FORM_FILL=PASSED_FIELDS_2_VERIFIED",flush=True)

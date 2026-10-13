@@ -15,6 +15,7 @@ final class AutoSetupTaskPlan {
     private int discoveredLinks=-1;
     private int preparedFields=-1;
     private int appliedFields=-1;
+    private boolean domConfirmed=false;
 
     AutoSetupTaskPlan(String origin,String objective) {
         if(origin==null||!origin.startsWith("https://")||origin.length()>300)
@@ -34,7 +35,7 @@ final class AutoSetupTaskPlan {
 
     void scanned(int count) {
         if(!pageReady||count<0||count>30)throw new IllegalStateException("Scansione non valida");
-        scannedFields=count;preparedFields=-1;appliedFields=-1;
+        scannedFields=count;preparedFields=-1;appliedFields=-1;domConfirmed=false;
     }
 
     void links(int count) {
@@ -45,13 +46,32 @@ final class AutoSetupTaskPlan {
     void prepared(int count) {
         if(scannedFields<0||count<0||count>scannedFields)
             throw new IllegalStateException("Anteprima non valida");
-        preparedFields=count;
+        preparedFields=count;domConfirmed=false;
     }
 
     void applied(int count) {
         if(scannedFields<0||count<0||count>scannedFields)
             throw new IllegalStateException("Compilazione non valida");
-        appliedFields=count;
+        appliedFields=count;domConfirmed=false;
+    }
+
+    /** 0,20,40,60,80,100 are verified milestones of local form handling,
+     * not time estimates or proof of remote server persistence.
+     * Optional link discovery does not change the form completion percentage.
+     */
+    int progressPercent(){
+        if(domConfirmed)return 100;
+        if(appliedFields>0)return 80;
+        if(preparedFields>0)return 60;
+        if(scannedFields>=0)return 40;
+        if(pageReady)return 20;
+        return 0;
+    }
+
+    void domVerified(int requested,int observed){
+        if(requested<=0||observed!=requested||appliedFields!=requested)
+            throw new IllegalStateException("Verifica DOM non valida");
+        domConfirmed=true;
     }
 
     /**
@@ -91,7 +111,8 @@ final class AutoSetupTaskPlan {
     }
 
     String summary() {
-        return "Sito: "+origin+"\nObiettivo: "+objective+"\n\n"+
+        return "Sito: "+origin+"\nObiettivo: "+objective+"\n"+
+            "Avanzamento percorso locale: "+progressPercent()+"% (non è salvataggio sul server)\n\n"+
             (pageReady?"✓":"○")+" Pagina HTTPS aperta\n"+
             (scannedFields>=0?"✓":"○")+" Campi riconosciuti"+
             (scannedFields>=0?": "+scannedFields:"")+"\n"+

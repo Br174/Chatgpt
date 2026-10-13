@@ -32,3 +32,7 @@ Ogni operazione su strumenti connessi deve separare: (1) esecuzione richiesta e 
 
 ## AS7 — prova di provider esterno in questa chat e in CI
 Per i commit GitHub: rileggere dopo il push sia l'oggetto PR sia il ramo con accesso provider reale, controllare che repository, ref e commit SHA coincidano. Il job "autosetup_provider_readback" esegue questo test tramite GitHub Actions con autorizzazioni di sola lettura. Un vecchio SHA non è attestato. La prova GitHub NON conferma salvataggi su altri siti né su form WebView. Senza connettore autenticato nell'APK lo stato remoto resta "not_verified".
+
+
+## AS8 — Percentuali progresso di MotorLab in questa chat
+Ogni aggiornamento deve distinguere chiaramente `percentuale fase` basata su verifiche effettivamente concluse (esempio: 1/2 gate superati = 50%) e `percentuale percorso locale AutoSetup` (0/20/40/60/80/100). Mai usare la percentuale di una fase come percentuale dell'intera roadmap o come garanzia di esito lato server. Evitare stime arbitrarie del tempo; aggiornare quando i run pubblicano evidenza reale.

@@ -97,7 +97,7 @@ public final class AutoSetupActivity extends Activity {
         LinearLayout.LayoutParams emblem=new LinearLayout.LayoutParams(dp(38),dp(38));
         emblem.setMargins(0,dp(3),dp(8),0);
         message.addView(avatar,emblem);
-        message.addView(text(msg,13,false),
+        message.addView(text("["+localProgressPercent()+"% percorso locale] "+msg,13,false),
             new LinearLayout.LayoutParams(0,-2,1));
         LinearLayout.LayoutParams placement=new LinearLayout.LayoutParams(-1,-2);
         placement.setMargins(0,0,0,dp(4));
@@ -109,7 +109,15 @@ public final class AutoSetupActivity extends Activity {
         autosetupActive=true;
         say("AutoSetup attivo");
     }
-    private void status(String msg) {state.setText(msg);}
+    // Stage-based local progress, never a timer or a claim of server-side saving.
+    private int localProgressPercent() {
+        if(!pageReady)return 0;
+        return taskPlan==null?20:taskPlan.progressPercent();
+    }
+    private void status(String msg) {
+        state.setText(autosetupActive?
+            "Avanzamento locale: "+localProgressPercent()+"% · "+msg:msg);
+    }
     private void alert(String msg){new AlertDialog.Builder(this).setMessage(msg).setPositiveButton("OK",null).show();}
 
     @Override public void onCreate(Bundle saved) {
@@ -246,7 +254,7 @@ public final class AutoSetupActivity extends Activity {
         activeOrigin=DEMO_ORIGIN;
         url.setText(activeOrigin);
         goal.setText("Apri le impostazioni demo senza utilizzare servizi esterni");
-        pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
+        pageReady=false;inspectedUrl="";taskPlan=null;controls.clear();fields.removeAllViews();
         navigation.removeAllViews();
         activateAutoSetup();
         say("MotorLab: prova offline. Nessuna connessione a servizi esterni o login.");
@@ -287,7 +295,7 @@ public final class AutoSetupActivity extends Activity {
             scanAfterNavigation=false;
             nextStepUrl="";nextStepSource="";nextStepOrigin="";
             activeOrigin=SecureServiceToken.checkedOrigin(address);
-            controls.clear();fields.removeAllViews();navigation.removeAllViews();pageReady=false;inspectedUrl="";
+            controls.clear();fields.removeAllViews();navigation.removeAllViews();pageReady=false;inspectedUrl="";taskPlan=null;
             activateAutoSetup();
             say("Richiesta: "+limit(goal.getText().toString(),180)+
                 " · Sito: "+activeOrigin+" · Apertura autorizzata.");
@@ -810,6 +818,10 @@ public final class AutoSetupActivity extends Activity {
 
     /** Event ID and counts only: never persist entered values or claim server success. */
     private void publishDomReceipt(String origin,int requested,int applied,int observed,String state){
+        if("dom_confirmed".equals(state)&&taskPlan!=null){
+            try{taskPlan.domVerified(requested,observed);}
+            catch(Exception ignored){/* Do not falsely claim 100% when the plan changed. */}
+        }
         String receipt=AutoSetupOperationEvidence.record(this,origin,requested,applied,
             observed,state,true);
         String check=observed<0?"non disponibile":observed+"/"+requested;
