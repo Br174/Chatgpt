@@ -226,3 +226,11 @@ PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
 - Dopo `Conferma compilazione` il codice ricontrolla il sito, quindi esegue una preflight per *tutti* i target DOM: firma, tipo di controllo, opzione select presente, disabilitazione e campi sensibili. Se il modulo è cambiato, non modifica alcun campo e richiede una nuova scansione.
 - Test Android offline: doppia apertura, annullamento, conferma, risultato effettivo di 2 campi, regressioni Team Chat/Archivio. Non dichiara autenticazioni a siti reali né salvataggi server verificati.
 - Interfaccia/icone originali immutate, RealTest sempre backlog, niente MADRE/CORE.
+
+
+## AS6 — Esito delle operazioni separato da prova di salvataggio (13/10/2026)
+- Dopo il comando di compilazione e il consenso AS5, attendere che gli eventi JS input/change siano stati elaborati e fare una **seconda lettura DOM**, senza modificare la pagina, per confrontare i campi con i valori autorizzati.
+- Gli esiti distinguono: numero campi richiesti, applicati, tuttora visibili nel DOM; salvataggio sul server **NON verificato** in ogni caso finché non sia verificato tramite risposta effettiva dell'API o nuovo caricamento appropriato. Nessuna affermazione di persistenza backend a partire dal solo DOM.
+- Ricevute locali limitate alle ultime 20 operazioni in SharedPreferences private: dominio HTTPS (senza percorso/query), identificatore, data, contatori e stato tecnico. MAI input/obiettivi/credenziali/cookie/HTML. Le ricevute possono essere consultate dalla finestra `Mostra piano operazioni`, senza modificare la grafica approvata. La condivisione checkpoint v1 resta separata e non contiene le ricevute.
+- Anche il comando Annulla genera un esito senza alcuna chiamata JS di scrittura, se la conservazione privata locale riesce. In caso di errore di verifica, non inventare risultati.
+- E2E offline esteso alla seconda lettura dei 2 campi della demo, test anti-regressione invariati. Test live siti reali, verifica lato server, update-in-place e fisico restano aperti.

@@ -168,3 +168,19 @@ assert "return 'PAGE_CHANGED';" in autosetup
 assert "SALVANO AUTOMATICAMENTE" in autosetup
 assert "MOTORLAB_AUTOSETUP_FORM_REVIEW_CONSENT_CANCEL=PASSED" in emulator
 print("AutoSetup explicit pre-write approval and complete DOM preflight: PASS")
+
+# AS6: distinct DOM observation and server persistence, redacted local receipts.
+receipt=(p/"app/src/main/java/it/motorlab/app/AutoSetupOperationEvidence.java").read_text()
+assert 'class AutoSetupOperationEvidence' in receipt
+assert 'MAX_EVENTS=20' in receipt and 'SharedPreferences' in receipt
+assert '"remote_save","not_verified"' in receipt
+assert '"contains_field_values",false' in receipt
+assert '"contains_credentials",false' in receipt
+assert '"requested_fields",requested' in receipt
+assert "String latestSummary(Context context)" in receipt
+assert "private void verifyAppliedDomValues(" in autosetup
+assert "private void publishDomReceipt(" in autosetup
+assert "browser.postDelayed(()->verifyAppliedDomValues(" in autosetup
+assert "AutoSetupOperationEvidence.latestSummary(this)" in autosetup
+assert "MOTORLAB_AUTOSETUP_DOM_SECOND_READBACK=PASSED_FIELDS_2" in emulator
+print("AS6 redacted bounded receipt and second read-only DOM verification: PASS")

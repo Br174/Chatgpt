@@ -459,7 +459,7 @@ public final class AutoSetupActivity extends Activity {
     private void showTaskPlan() {
         try {
             new AlertDialog.Builder(this).setTitle("Piano AutoSetup")
-                .setMessage(currentTaskPlan().summary())
+                .setMessage(currentTaskPlan().summary()+"\n\n"+AutoSetupOperationEvidence.latestSummary(this))
                 .setNeutralButton("Condividi checkpoint",(d,w)->shareTaskCheckpoint())
                 .setPositiveButton("OK",null).show();
         }catch(Exception e){alert("Apri prima una pagina HTTPS compatibile.");}
@@ -687,13 +687,21 @@ public final class AutoSetupActivity extends Activity {
                     f.label.replace('\n',' ').replace('\r',' '),80)).append("\n");
             }
             if(count==0){alert("Compila almeno un campo nella chat.");return;}
+            final int countAtReview=count;
             new AlertDialog.Builder(this).setTitle("Confermare la compilazione?")
                 .setMessage("Sito: "+activeOrigin+"\n"+count+
                     " campi ordinari da compilare:\n"+names+
                     (count>8?"…e altri "+(count-8)+" campi.\n":"")+
                     "\nI valori non vengono mostrati qui. Attenzione: alcuni siti "+
                     "SALVANO AUTOMATICAMENTE dopo input/change, anche senza premere Invia.")
-                .setNegativeButton("Annulla",null)
+                .setNegativeButton("Annulla",(dialog,which)->{
+                    String receipt=AutoSetupOperationEvidence.record(this,activeOrigin,countAtReview,
+                        0,-1,"cancelled",false);
+                    status("Compilazione annullata: nessun comando di scrittura eseguito.");
+                    say("AutoSetup: operazione annullata senza scrittura."+
+                        (receipt.isEmpty()?"":" Esito #"+receipt)+
+                        " · salvataggio server NON verificato.");
+                })
                 .setPositiveButton("Conferma compilazione",(dialog,which)->applyApprovedFormChanges()).show();
         }catch(Exception e){alert("Pagina non disponibile per la compilazione.");}
     }
@@ -741,16 +749,75 @@ public final class AutoSetupActivity extends Activity {
                     if(!origin.equals(currentOrigin()))return;
                     String count=String.valueOf(new JSONTokener(result).nextValue());
                     if("PAGE_CHANGED".equals(count)){
+                        AutoSetupOperationEvidence.record(this,origin,updates.length(),0,
+                            -1,"target_changed",true);
                         status("Modulo modificato: nessun campo scritto. Ripeti la scansione.");
                         return;
                     }
-                    currentTaskPlan().applied(Integer.parseInt(count));
-                    status("Compilati "+count+" campi; nessun clic su Invia. Alcuni siti salvano automaticamente.");
-                    say("MotorLab: compilazione effettuata su "+origin+
-                        ". Non ho premuto Invia; controlla eventuali modifiche salvate automaticamente dal sito.");
+                    int applied=Integer.parseInt(count);
+                    currentTaskPlan().applied(applied);
+                    status("Compilati "+applied+" campi; verifica DOM in corso. Server NON verificato.");
+                    final String expectedPage=browser.getUrl();
+                    browser.postDelayed(()->verifyAppliedDomValues(updates,origin,expectedPage,applied),450);
                 }catch(Exception e){status("Non posso confermare la compilazione della pagina.");}
             });
         }catch(Exception e){alert("Impossibile preparare i campi.");}
+    }
+
+
+    /** A second, read-only DOM check after the input/change events have run. */
+    private void verifyAppliedDomValues(JSONArray updates,String origin,
+                                        String expectedPage,int applied){
+        if(expectedPage==null||!expectedPage.equals(browser.getUrl())||!pageReady){
+            publishDomReceipt(origin,updates.length(),applied,-1,"page_changed");
+            return;
+        }
+        try{
+            if(!origin.equals(currentOrigin())){
+                publishDomReceipt(origin,updates.length(),applied,-1,"page_changed");
+                return;
+            }
+            final String js="(function(){var values="+updates.toString()+";"+
+                "var all=Array.from(document.querySelectorAll('input,textarea,select'));"+
+                "var matches=0;for(var j=0;j<values.length;j++){var v=values[j];var el=all[v.i];"+
+                "if(!el||[el.tagName,(el.getAttribute('type')||'text').toLowerCase(),"+
+                "el.name||'',el.id||''].join('|')!==v.s)return 'PAGE_CHANGED';"+
+                "if(el.value===v.v)matches++;}return String(matches);})()";
+            browser.evaluateJavascript(js,result->{
+                try{
+                    if(!expectedPage.equals(browser.getUrl())||!origin.equals(currentOrigin())){
+                        publishDomReceipt(origin,updates.length(),applied,-1,"page_changed");
+                        return;
+                    }
+                    String checked=String.valueOf(new JSONTokener(result).nextValue());
+                    if("PAGE_CHANGED".equals(checked)){
+                        publishDomReceipt(origin,updates.length(),applied,-1,"dom_mismatch");
+                        return;
+                    }
+                    int observed=Integer.parseInt(checked);
+                    if(observed<0||observed>updates.length())throw new IllegalStateException();
+                    publishDomReceipt(origin,updates.length(),applied,observed,
+                        observed==updates.length()&&applied==updates.length()?
+                            "dom_confirmed":"dom_mismatch");
+                }catch(Exception e){
+                    publishDomReceipt(origin,updates.length(),applied,-1,"unavailable");
+                }
+            });
+        }catch(Exception e){
+            publishDomReceipt(origin,updates.length(),applied,-1,"unavailable");
+        }
+    }
+
+    /** Event ID and counts only: never persist entered values or claim server success. */
+    private void publishDomReceipt(String origin,int requested,int applied,int observed,String state){
+        String receipt=AutoSetupOperationEvidence.record(this,origin,requested,applied,
+            observed,state,true);
+        String check=observed<0?"non disponibile":observed+"/"+requested;
+        status("Compilati "+applied+" campi · Verifica DOM "+check+
+            " · salvataggio server NON verificato.");
+        say("MotorLab: esito AutoSetup"+(receipt.isEmpty()?"":" #"+receipt)+
+            ". Campi compilati "+applied+"/"+requested+
+            "; verifica DOM "+check+". Salvataggio sul server NON verificato.");
     }
 
     private void saveToken() {
