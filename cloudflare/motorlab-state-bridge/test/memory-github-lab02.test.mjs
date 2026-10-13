@@ -121,3 +121,11 @@ test('cross-document evidence and generated book use one catalog, not separate a
  const idset=new Set(v.records.map(r=>r.memory_id));
  assert(v.links.every(l=>idset.has(l.from_id)&&idset.has(l.to_id)));
 });
+
+test('search ranks exact hierarchy keys ahead of incidental prose matches',async()=>{
+ const {value:v}=await load();
+ assert.equal(recallVerifiedMemory(v,{query:'release'}).results[0].key,'core.release');
+ assert.equal(recallVerifiedMemory(v,{query:'GitHub'}).results[0].key,'authority.github');
+ assert(['authority.d1','infra.d1'].includes(recallVerifiedMemory(v,{query:'D1'}).results[0].key));
+ assert(recallVerifiedMemory(v,{query:'LAB01'}).results[0].key.startsWith('memory.lab01.'));
+});
