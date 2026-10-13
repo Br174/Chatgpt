@@ -44,8 +44,12 @@ final class AutoSetupCheckpointBridge {
 
     private static void keys(JSONObject o,String... required) {
         Set<String> expected=new HashSet<>(Arrays.asList(required));
-        if(o.length()!=expected.size()||!o.keySet().equals(expected))
+        if(o.length()!=expected.size())
             throw new IllegalArgumentException("Checkpoint: struttura inattesa");
+        for(java.util.Iterator<String> cursor=o.keys();cursor.hasNext();) {
+            if(!expected.contains(cursor.next()))
+                throw new IllegalArgumentException("Checkpoint: campo sconosciuto");
+        }
     }
 
     private static String str(JSONObject o,String name) throws Exception {
