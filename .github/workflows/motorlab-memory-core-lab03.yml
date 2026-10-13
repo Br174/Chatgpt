@@ -1,0 +1,48 @@
+name: MotorLab Memory CORE LAB03 Local Persistence
+on:
+  push:
+    branches:
+      - motorlab/memory-core-lab03-20261014
+    paths:
+      - 'tools/motorlab-memory-lab03*'
+      - 'cloudflare/motorlab-state-bridge/test/memory-lab03.test.mjs'
+      - 'docs/memory-core-lab03/**'
+      - '.github/workflows/motorlab-memory-core-lab03.yml'
+  pull_request:
+    paths:
+      - 'tools/motorlab-memory-lab03*'
+      - 'cloudflare/motorlab-state-bridge/test/memory-lab03.test.mjs'
+      - 'docs/memory-core-lab03/**'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  lab03-sqlite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: LAB01 immutable catalog regressions
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-catalog.test.mjs
+      - name: LAB02 verified-source recall regressions
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-github-lab02.test.mjs
+      - name: LAB01 SQLite schema parity test
+        run: python3 cloudflare/motorlab-state-bridge/test/memory_catalog_sqlite.py
+      - name: LAB03 actual SQLite persistence and interruption tests
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-lab03.test.mjs
+      - name: LAB03 read-only live GitHub to SQLite and cold process restart
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/motorlab-memory-lab03.mjs
+      - name: Production Worker, main and signing isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -E 'memory-(catalog|github-lab02)|memory-lab03' cloudflare/motorlab-state-bridge/src/entry.js; then
+            echo 'FORBIDDEN: lab memory imported in Worker'; exit 1
+          fi
+          test -f tools/motorlab-memory-lab03-db.py
+          echo 'LAB03 database is ephemeral local SQLite; no production Cloudflare routes or migrations.'
