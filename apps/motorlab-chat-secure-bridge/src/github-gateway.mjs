@@ -159,6 +159,45 @@ export async function setRepositorySecret({
 }
 
 
+// PAT-free, offline diagnostic executed IN the Cloudflare workerd runtime.
+// Uses only synthetic constants and an ephemeral local keypair; no GitHub requests.
+export async function checkGatewayCrypto() {
+  let stage = "SODIUM_READY";
+  let keyPair;
+  let clear;
+  try {
+    let timer;
+    try {
+      await Promise.race([
+        sodium.ready,
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error("local crypto initialization timeout")), 3500);
+        })
+      ]);
+    } finally {
+      clearTimeout(timer);
+    }
+    stage = "KEYPAIR";
+    keyPair = sodium.crypto_box_keypair();
+    const pub = sodium.to_base64(keyPair.publicKey, sodium.base64_variants.ORIGINAL);
+    stage = "ENCRYPT";
+    const encrypted = await encryptForGitHub("MotorLab-LAB06-offline-crypto-test", pub);
+    stage = "DECRYPT";
+    const ciphertext = sodium.from_base64(encrypted, sodium.base64_variants.ORIGINAL);
+    clear = sodium.crypto_box_seal_open(ciphertext,keyPair.publicKey,keyPair.privateKey);
+    if (sodium.to_string(clear) !== "MotorLab-LAB06-offline-crypto-test")
+      throw new Error("local sealed box roundtrip failure");
+    stage = "RANDOM_UUID";
+    if (typeof crypto.randomUUID() !== "string") throw new Error("local UUID missing");
+    return { crypto_ready: true, stage: "READY" };
+  } catch (_) {
+    return { crypto_ready: false, stage };
+  } finally {
+    if (clear instanceof Uint8Array) sodium.memzero(clear);
+    if (keyPair?.privateKey instanceof Uint8Array) sodium.memzero(keyPair.privateKey);
+  }
+}
+
 export const PROBE_SECRET_NAME = "MOTORLAB_AUTOSETUP_LAB06_PROBE";
 export async function probeRepositorySecrets({
   token, approval, fetchImpl = fetch, liveEnabled = false
