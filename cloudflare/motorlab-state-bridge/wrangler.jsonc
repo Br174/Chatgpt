@@ -42,5 +42,19 @@
     "OIDC_ALLOWED_REF": "refs/heads/main",
     "OIDC_ALLOWED_WORKFLOW_REF": "Br174/Chatgpt/.github/workflows/motorlab-d1-oidc-relay.yml@refs/heads/main",
     "MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE": "false"
+  },
+  "previews": {
+    "vars": {
+      "ENGINE_VERSION": "1.3.5-lab06-preview",
+      "MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE": "false"
+    },
+    "durable_objects": {
+      "bindings": [
+        {
+          "name": "POLLICINO_SENTINEL",
+          "class_name": "PollicinoSentinel"
+        }
+      ]
+    }
   }
 }
