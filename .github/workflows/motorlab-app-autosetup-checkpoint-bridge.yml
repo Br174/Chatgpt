@@ -68,6 +68,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: adb install -r apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk && python3 apps/motorlab-android/tests/checkpoint_picker_smoke.py && python3 apps/motorlab-android/tests/checkpoint_share_smoke.py && python3 apps/motorlab-android/tests/emulator_smoke.py
       - name: Publish TEMPORARY test APK and ZIP if all gates pass
+        id: publish
         env:
           GH_TOKEN: '${{ github.token }}'
         run: |
@@ -75,6 +76,7 @@ jobs:
           TAG="motorlab-lab06-chatbridge-$(git rev-parse --short=7 HEAD)"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "MOTORLAB_AUTOSETUP_CHAT_BRIDGE_RELEASE=EXISTS"
+            echo "ready=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           out="$RUNNER_TEMP/motorlab-chat-bridge-test"
@@ -84,7 +86,8 @@ jobs:
           cat > "$out/LEGGIMI-ChatBridge.txt" <<'TXT'
           MotorLab LAB06 - AutoSetup ponte ChatGPT <-> APK (PROVA)
           Esporta dall'app con 'Condividi checkpoint'. Importa nella app
-          un JSON della chat attraverso 'Importa checkpoint dalla chat'.
+          un JSON della chat attraverso 'Importa checkpoint dalla chat',
+          oppure condividi un testo JSON verso MotorLab AutoSetup dal telefono.
           Il file contiene solo URL origine e conteggi non sensibili.
           L'importazione richiede selezione manuale e conferma. Non apre
           siti, esegue login, importa autorizzazioni o sincronizza account.
@@ -103,13 +106,16 @@ jobs:
           if gh release create "$TAG" "$out/MotorLab-LAB06-ChatBridge-TEST.apk" "$out/MotorLab-LAB06-ChatBridge-TEST.zip" "$out/Checkpoint-ChatGPT-Esempio.json" "$out/LEGGIMI-ChatBridge.txt" "$out/SHA256-ChatBridge.txt" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
             --title "MotorLab LAB06 PROVA - ponte AutoSetup ChatGPT APK" \
-            --notes "Trasferimento manuale checkpoint JSON, senza chiavi o sincronizzazione automatica. Firma debug temporanea: installazione pulita; dati vecchi non conservati. Android 11 testato solo in emulatore."; then
+            --notes "Trasferimento manuale checkpoint JSON da file o Condividi Android, senza chiavi o sincronizzazione automatica. Firma debug temporanea: installazione pulita; dati vecchi non conservati. Android 11 testato solo in emulatore."; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "MOTORLAB_AUTOSETUP_CHAT_BRIDGE_GITHUB_RELEASE=PUBLISHED"
           else
             echo "::warning::Release endpoint refused the workflow token. Secure Actions artifact remains available without changing repository permissions."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
             echo "MOTORLAB_AUTOSETUP_CHAT_BRIDGE_GITHUB_RELEASE=NOT_AUTHORIZED"
           fi
-      - name: Deliver TEST APK and ZIP as GitHub Actions artifact
+      - name: Deliver TEST APK and ZIP as GitHub Actions artifact (release unavailable only)
+        if: steps.publish.outputs.ready != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: MotorLab-LAB06-ChatBridge-TEST-${{ github.run_id }}
