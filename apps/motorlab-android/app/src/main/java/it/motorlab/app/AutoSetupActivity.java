@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
@@ -91,11 +90,10 @@ public final class AutoSetupActivity extends Activity {
         avatar.setImageResource(R.drawable.autosetup_avatar);
         avatar.setScaleType(ImageView.ScaleType.FIT_CENTER);
         avatar.setContentDescription("AutoSetup attivo");
-        GradientDrawable circle=new GradientDrawable();
-        circle.setShape(GradientDrawable.OVAL);
-        circle.setColor(0xff252b33);
-        avatar.setBackground(circle);
-        avatar.setPadding(dp(3),dp(3),dp(3),dp(3));
+        // Show only the user's original transparent gears; no dark circle,
+        // badge, card, background color or additional border.
+        avatar.setBackground(null);
+        avatar.setPadding(0,0,0,0);
         LinearLayout.LayoutParams emblem=new LinearLayout.LayoutParams(dp(38),dp(38));
         emblem.setMargins(0,dp(3),dp(8),0);
         message.addView(avatar,emblem);

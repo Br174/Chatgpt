@@ -213,3 +213,9 @@ PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
 - `AutoSetupActivity.say()` mostra l'icona come avatar circolare 38dp ai messaggi dell'operazione DOPO attivazione. Il messaggio introduttivo in stato inattivo resta invariato. All'apertura di una demo o sito (e sulle azioni attive consentite) `activateAutoSetup()` pubblica il messaggio di stato con l'avatar.
 - Test Android: prima dell'attivazione non appare l'avatar specifico; dopo l'avvio della demo compare `ImageView` con contentDescription `AutoSetup attivo`. La UI è modificata solo nel punto esplicitamente approvato.
 - In questa chat ChatGPT è possibile *mostrare* l'icona accanto al testo di stato, ma non cambiare l'avatar di sistema dell'interfaccia ChatGPT dall'interno della conversazione. Non affermare che la sostituzione nel client ChatGPT sia implementata.
+
+## Avatar AutoSetup — correzione grafica definitiva (13/10/2026)
+- L'utente ha approvato l'avatar dei due ingranaggi in posizione della M, ma ha chiesto espressamente di ELIMINARE il cerchio nero attorno all'immagine.
+- `AutoSetupActivity.say()`: `ImageView` con PNG originale a trasparenza alpha, `setBackground(null)` e nessun padding o cerchio/badge. Icona 38dp direttamente sullo sfondo chiaro della chat.
+- Il PNG originale non viene modificato, rigenerato né ridisegnato. Intro inattiva e tutte le altre schermate restano immutate.
+- Gate statico rinforzato per vietare `GradientDrawable`/cerchio attorno all'icona; gate runtime Android 11 preesistente conferma l'avatar solo durante AutoSetup. Non cambiare l'avatar di sistema ChatGPT: non è controllabile da questo progetto.
