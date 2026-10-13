@@ -1,0 +1,44 @@
+name: MotorLab LAB06 AutoSetup Cloudflare Final Gate
+on:
+  push:
+    branches: ['motorlab/autosetup-cloudflare-lab06-*']
+    paths:
+      - 'apps/motorlab-chat-secure-bridge/**'
+      - 'cloudflare/motorlab-state-bridge/src/entry.js'
+      - 'cloudflare/motorlab-state-bridge/wrangler.jsonc'
+      - '.github/workflows/motorlab-autosetup-cloudflare-lab06.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: motorlab-autosetup-cloudflare-{{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Install ONLY reused secure gateway dependencies
+        working-directory: apps/motorlab-chat-secure-bridge
+        run: npm install --no-audit --no-fund --ignore-scripts
+      - name: Test original GitHub encrypted gateway and Cloudflare route safety
+        working-directory: apps/motorlab-chat-secure-bridge
+        env:
+          MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE: 'false'
+        run: |
+          node --check cloudflare/worker-adapter.mjs
+          node --check src/github-gateway.mjs
+          npm test
+      - name: Compile current Cloudflare Worker with AutoSetup (NO DEPLOY)
+        working-directory: apps/motorlab-chat-secure-bridge
+        run: |
+          npx --yes wrangler@4 deploy --dry-run --config ../../cloudflare/motorlab-state-bridge/wrangler.jsonc --outdir /tmp/motorlab-autosetup-dryrun
+      - name: Confirm existing Worker/CORE preserved and no paid integrations
+        run: |
+          test -f cloudflare/motorlab-state-bridge/src/project-feedback.js
+          test -f cloudflare/motorlab-state-bridge/src/pollicino-sentinel.js
+          ! grep -Eq '(netlify|vercel|tinyfish)' apps/motorlab-chat-secure-bridge/cloudflare/worker-adapter.mjs
+          echo 'Cloudflare adapter tested with synthetic credentials only. No Worker deployment, real GitHub secret write or ChatGPT plugin connection.' >> "$GITHUB_STEP_SUMMARY"
