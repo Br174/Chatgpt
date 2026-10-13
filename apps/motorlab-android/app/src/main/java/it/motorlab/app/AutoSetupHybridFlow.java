@@ -140,6 +140,43 @@ final class AutoSetupHybridFlow {
         return value.length() > 130 ? value.substring(0, 130) : value;
     }
 
+    /**
+     * Conservative navigation gate. GET is usually read-only, but an untrusted
+     * website may expose write operations via GET. These link names/paths always
+     * require human review; a negative match is NOT a proof of remote safety.
+     */
+    static boolean safeReadOnlyLink(String origin, String candidate, String label) {
+        if (!sameOrigin(origin, candidate) || label == null || label.trim().isEmpty())
+            return false;
+        try {
+            URI u = new URI(candidate);
+            if (u.getRawQuery() != null || u.getRawFragment() != null ||
+                u.getRawUserInfo() != null || u.getRawPath() == null ||
+                u.getRawPath().contains("%") || u.getRawPath().length() > 300)
+                return false;
+            String route = u.getRawPath().toLowerCase(java.util.Locale.ROOT);
+            String title = label.toLowerCase(java.util.Locale.ROOT);
+            String[] unsafe = {
+                "delete","remove","revoke","reset","disable","logout","signout",
+                "purchase","payment","checkout","billing","buy","transfer",
+                "confirm","submit","send","save","apply","publish","deploy",
+                "install","terminate","disconnect","withdraw","unsubscribe",
+                "elimina","cancella","rimuovi","revoca","disattiva","paga",
+                "acquista","salva","invia","conferma","pubblica","installa"
+            };
+            for (String token : unsafe) {
+                if (java.util.regex.Pattern.compile(
+                        "(?:^|[^a-z0-9])" + token + "(?:$|[^a-z0-9])")
+                        .matcher(route).find() ||
+                    java.util.regex.Pattern.compile(
+                        "(?:^|[^a-z0-9])" + token + "(?:$|[^a-z0-9])")
+                        .matcher(title).find())
+                    return false;
+            }
+            return true;
+        } catch (Exception ex) { return false; }
+    }
+
     private static boolean sameOrigin(String expectedOrigin, String currentPage) {
         try {
             URI origin = new URI(expectedOrigin);
