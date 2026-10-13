@@ -40,8 +40,8 @@ public class HybridFlowCheck {
     yes(flow.lastResortAllowed(origin,page));
     yes(flow.officialFallbackUrl(origin,page).equals(page));
     denied(() -> flow.officialFallbackUrl("https://evil.example",page));
-    yes(flow.officialFallbackUrl(origin,"https://github.com/Br174/Chatgpt/settings?token=secret").equals(origin)
-       == false); // Page fingerprint mismatch prevents exposing any URL
+    denied(() -> flow.officialFallbackUrl(origin,
+         "https://github.com/Br174/Chatgpt/settings?token=secret")); // Stale page blocked
     flow.reset();
     yes(flow.stage()==AutoSetupHybridFlow.Stage.IDLE);
     denied(() -> flow.start("http://github.com","http://github.com/x"));
