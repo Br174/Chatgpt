@@ -388,6 +388,8 @@ public final class AutoSetupActivity extends Activity {
                 int bestScore=0;
                 String suggestedTitle="";
                 String suggestedUrl="";
+                int safeScore=0;
+                String safeSuggestedUrl="";
                 for(int i=0;i<links.length();i++){
                     JSONObject link=links.optJSONObject(i);
                     if(link==null)continue;
@@ -399,6 +401,10 @@ public final class AutoSetupActivity extends Activity {
                     final String dest=target;
                     int relevance=AutoSetupGoalRouter.score(goal.getText().toString(),label);
                     if(relevance>bestScore){bestScore=relevance;suggestedTitle=label;suggestedUrl=target;}
+                    if(relevance>safeScore&&AutoSetupHybridFlow.safeReadOnlyLink(origin,target,label)){
+                        safeScore=relevance;
+                        safeSuggestedUrl=target;
+                    }
                     shown++;
                     button(navigation,"Apri: "+label,()->{
                         try{
@@ -430,7 +436,7 @@ public final class AutoSetupActivity extends Activity {
                     button(navigation,"Esegui passo suggerito",this::executeSuggestedStep);
                 }
                 currentTaskPlan().links(shown);
-                if(handleHybridDiscovery(origin,expectedPage,bestScore,suggestedUrl))return;
+                if(handleHybridDiscovery(origin,expectedPage,safeScore,safeSuggestedUrl))return;
                 status("Collegamenti interni verificati: "+shown+
                     ". Scegli una pagina dalla chat; nessuna navigazione automatica.");
             }catch(Exception e){
@@ -492,7 +498,7 @@ public final class AutoSetupActivity extends Activity {
                 status("Stop di sicurezza: pagina inattesa.");return true;
             }
             if(score>0&&hybridHops<2&&!target.isEmpty()
-                 &&!target.contains("?")&&!target.contains("#")
+                 &&AutoSetupHybridFlow.safeReadOnlyLink(origin,target,"Pagina interna consentita")
                  &&origin.equals(SecureServiceToken.checkedOrigin(target))) {
                 // Only a link chosen by existing local goal matcher, same HTTPS origin.
                 hybridHops++;
