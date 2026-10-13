@@ -1,4 +1,61 @@
-import sodium from "libsodium-wrappers";
+import nacl from "tweetnacl";
+import { blake2b } from "@noble/hashes/blake2.js";
+
+// Pure JavaScript crypto_box_seal compatible with libsodium (GitHub Actions):
+// ephemeral Curve25519 public key || XSalsa20-Poly1305 box;
+// nonce = BLAKE2b-192(ephemeral public key || recipient public key).
+const SEAL_HEADER_BYTES = 48;
+const encoder = new TextEncoder();
+const decoder = new TextDecoder("utf-8", { fatal: true });
+function decodePublicKey(keyBase64) {
+  if (typeof keyBase64 !== "string" ||
+      !/^[A-Za-z0-9+/]{43}=$/.test(keyBase64))
+    throw new PublicSafeError("GITHUB_KEY_INVALID");
+  let data;
+  try { data = Uint8Array.from(atob(keyBase64), c => c.charCodeAt(0)); }
+  catch { throw new PublicSafeError("GITHUB_KEY_INVALID"); }
+  if (data.length !== nacl.box.publicKeyLength) throw new PublicSafeError("GITHUB_KEY_INVALID");
+  return data;
+}
+function encodeBase64(bytes) {
+  // Worker / Node modern runtimes support btoa. Do not log plaintext or bytes.
+  let value = "";
+  for (let i = 0; i < bytes.length; i += 8192) {
+    value += String.fromCharCode(...bytes.subarray(i, i + 8192));
+  }
+  return btoa(value);
+}
+function sealedBox(plaintextBytes, recipientPublicKey) {
+  const entropy = globalThis.crypto?.getRandomValues?.bind(globalThis.crypto);
+  if (typeof entropy !== "function")
+    throw new PublicSafeError("CRYPTO_ENTROPY_UNAVAILABLE");
+  // Explicitly require WebCrypto CSPRNG; no Math.random, no Node-only polyfill.
+  nacl.setPRNG((output, length) => {
+    for (let at = 0; at < length; at += 65536)
+      entropy(output.subarray(at, Math.min(at + 65536, length)));
+  });
+  const ephemeral = nacl.box.keyPair();
+  let nonce, authBox;
+  try {
+    const input = new Uint8Array(64);
+    input.set(ephemeral.publicKey);
+    input.set(recipientPublicKey, 32);
+    nonce = blake2b(input, { dkLen: 24 });
+    input.fill(0);
+    authBox = nacl.box(plaintextBytes, nonce, recipientPublicKey, ephemeral.secretKey);
+    const result = new Uint8Array(ephemeral.publicKey.length + authBox.length);
+    result.set(ephemeral.publicKey);
+    result.set(authBox, ephemeral.publicKey.length);
+    if (result.length !== plaintextBytes.length + SEAL_HEADER_BYTES)
+      throw new PublicSafeError("CRYPTO_SEAL_FAILED");
+    return result;
+  } finally {
+    ephemeral.secretKey.fill(0);
+    if (nonce) nonce.fill(0);
+    if (authBox) authBox.fill(0);
+  }
+}
+
 
 // Fixed private repository: caller cannot override the target via MCP or HTTP.
 // The token must be a user-created, fine-grained PAT restricted to this repository
@@ -96,26 +153,22 @@ export async function getPublicKey({ token, fetchImpl = fetch }) {
       !/^[a-zA-Z0-9+/=]{40,100}$/.test(data.key)) {
     throw new PublicSafeError("GITHUB_KEY_INVALID");
   }
-  await sodium.ready;
-  const publicKey = sodium.from_base64(data.key, sodium.base64_variants.ORIGINAL);
-  if (publicKey.length !== sodium.crypto_box_PUBLICKEYBYTES) {
-    throw new PublicSafeError("GITHUB_KEY_INVALID");
-  }
+  decodePublicKey(data.key);
   return { key_id: data.key_id, key: data.key };
 }
 
-/** Pure bytes -> sealed box for testing. Never put plaintext in a tool result. */
+/** Pure JS/libsodium-compatible sealed box. Never expose or log plaintext. */
 export async function encryptForGitHub(plaintext, keyBase64) {
-  await sodium.ready;
-  const key = sodium.from_base64(keyBase64, sodium.base64_variants.ORIGINAL);
-  if (key.length !== sodium.crypto_box_PUBLICKEYBYTES)
-    throw new PublicSafeError("GITHUB_KEY_INVALID");
-  const bytes = sodium.from_string(plaintext);
+  const key = decodePublicKey(keyBase64);
+  const bytes = encoder.encode(plaintext);
+  let ciphertext;
   try {
-    const cipher = sodium.crypto_box_seal(bytes, key);
-    return sodium.to_base64(cipher, sodium.base64_variants.ORIGINAL);
+    ciphertext = sealedBox(bytes, key);
+    return encodeBase64(ciphertext);
   } finally {
-    sodium.memzero(bytes);
+    bytes.fill(0);
+    key.fill(0);
+    if (ciphertext) ciphertext.fill(0);
   }
 }
 
@@ -159,42 +212,43 @@ export async function setRepositorySecret({
 }
 
 
-// PAT-free, offline diagnostic executed IN the Cloudflare workerd runtime.
-// Uses only synthetic constants and an ephemeral local keypair; no GitHub requests.
+// PAT-free diagnostic executed INSIDE isolated Cloudflare Worker Preview.
+// Ephemeral keypair and synthetic plaintext only; no GitHub requests or secrets.
 export async function checkGatewayCrypto() {
-  let stage = "SODIUM_READY";
-  let keyPair;
-  let clear;
+  let stage = "ENTROPY";
+  let recipient, decoded, cipher, nonce, opened;
   try {
-    let timer;
-    try {
-      await Promise.race([
-        sodium.ready,
-        new Promise((_, reject) => {
-          timer = setTimeout(() => reject(new Error("local crypto initialization timeout")), 3500);
-        })
-      ]);
-    } finally {
-      clearTimeout(timer);
-    }
-    stage = "KEYPAIR";
-    keyPair = sodium.crypto_box_keypair();
-    const pub = sodium.to_base64(keyPair.publicKey, sodium.base64_variants.ORIGINAL);
+    if (typeof globalThis.crypto?.getRandomValues !== "function")
+      throw new Error("WebCrypto CSPRNG is unavailable");
+    const seed = new Uint8Array(32);
+    globalThis.crypto.getRandomValues(seed);
+    recipient = nacl.box.keyPair.fromSecretKey(seed);
+    seed.fill(0);
+    const publicKey = encodeBase64(recipient.publicKey);
     stage = "ENCRYPT";
-    const encrypted = await encryptForGitHub("MotorLab-LAB06-offline-crypto-test", pub);
+    const ciphertextBase64 = await encryptForGitHub("MotorLab-LAB06-offline-crypto-test", publicKey);
+    cipher = Uint8Array.from(atob(ciphertextBase64), ch => ch.charCodeAt(0));
     stage = "DECRYPT";
-    const ciphertext = sodium.from_base64(encrypted, sodium.base64_variants.ORIGINAL);
-    clear = sodium.crypto_box_seal_open(ciphertext,keyPair.publicKey,keyPair.privateKey);
-    if (sodium.to_string(clear) !== "MotorLab-LAB06-offline-crypto-test")
-      throw new Error("local sealed box roundtrip failure");
+    const nonceInput = new Uint8Array(64);
+    nonceInput.set(cipher.subarray(0,32));
+    nonceInput.set(recipient.publicKey,32);
+    nonce = blake2b(nonceInput, { dkLen: 24 });
+    nonceInput.fill(0);
+    opened = nacl.box.open(cipher.subarray(32),nonce,cipher.subarray(0,32),recipient.secretKey);
+    if (!opened || decoder.decode(opened) !== "MotorLab-LAB06-offline-crypto-test")
+      throw new Error("Sealed box did not round-trip");
     stage = "RANDOM_UUID";
-    if (typeof crypto.randomUUID() !== "string") throw new Error("local UUID missing");
-    return { crypto_ready: true, stage: "READY" };
-  } catch (_) {
-    return { crypto_ready: false, stage };
+    if (typeof globalThis.crypto.randomUUID !== "function")
+      throw new Error("Missing randomUUID");
+    globalThis.crypto.randomUUID();
+    return {crypto_ready:true,stage:"READY"};
+  } catch {
+    return {crypto_ready:false,stage};
   } finally {
-    if (clear instanceof Uint8Array) sodium.memzero(clear);
-    if (keyPair?.privateKey instanceof Uint8Array) sodium.memzero(keyPair.privateKey);
+    if (recipient?.secretKey) recipient.secretKey.fill(0);
+    if (opened) opened.fill(0);
+    if (cipher) cipher.fill(0);
+    if (nonce) nonce.fill(0);
   }
 }
 
