@@ -109,6 +109,39 @@ test("wrong Origin rejected, default live writes locked, and no values leak",asy
   } finally {await new Promise(resolve=>http.close(resolve));}
 });
 
+test("MCP client discovers UI-only tool and protected UI resource",async()=>{
+  const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
+  const { StreamableHTTPClientTransport } = await import(
+    "@modelcontextprotocol/sdk/client/streamableHttp.js");
+  const { app } = createBridge({publicUrl:"http://localhost:8787",
+    widgetOrigin:"http://localhost:8787",liveEnabled:false});
+  const http = app.listen(0,"127.0.0.1");
+  const client = new Client({name:"motorlab-secure-bridge-test",version:"0.1.0"});
+  try {
+    await new Promise(resolve=>http.once("listening",resolve));
+    const base = "http://127.0.0.1:" + http.address().port;
+    await client.connect(new StreamableHTTPClientTransport(new URL(base+"/mcp")));
+    const list = await client.listTools();
+    assert.deepEqual(list.tools.map(x=>x.name),["open_secure_secrets_panel"]);
+    assert.equal(list.tools[0]._meta.ui.resourceUri,
+      "ui://motorlab-autosetup/secure-secrets-v1.html");
+    const result = await client.callTool({name:"open_secure_secrets_panel",arguments:{}});
+    assert.equal(result.isError,undefined);
+    assert.ok(!JSON.stringify(result).includes("PRIVATE_KEY"));
+    const resources=await client.listResources();
+    assert.ok(resources.resources.some(r=>r.uri==="ui://motorlab-autosetup/secure-secrets-v1.html"));
+    const raw=await client.readResource({uri:"ui://motorlab-autosetup/secure-secrets-v1.html"});
+    assert.equal(raw.contents[0].mimeType,"text/html;profile=mcp-app");
+    assert.equal(raw.contents[0]._meta.ui.csp.connectDomains[0],
+      "http://localhost:8787");
+    assert.match(raw.contents[0].text,/MOTORLAB_MAIN_STORE_PASSWORD/);
+    assert.doesNotMatch(raw.contents[0].text,/github_pat_FAKE_UNIT_TEST_TOKEN/);
+  } finally {
+    await client.close().catch(()=>{});
+    await new Promise(resolve=>http.close(resolve));
+  }
+});
+
 test("production requires distinct HTTPS origins and UI avoids MCP secret calls",()=>{
   assert.throws(()=>createBridge({publicUrl:"http://localhost:8787",
     widgetOrigin:"https://widget.example",production:true}),/PUBLIC_ORIGIN_INVALID/);
