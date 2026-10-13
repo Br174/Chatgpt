@@ -40,6 +40,7 @@ public final class AutoSetupActivity extends Activity {
     private String inspectedUrl="";
     private boolean pageReady=false;
     private boolean demoMode=false;
+    private boolean demoSettingsPage=false;
     private boolean suggestionRunning=false;
     private static final String DEMO_ORIGIN="https://autosetup-demo.example";
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
@@ -118,6 +119,11 @@ public final class AutoSetupActivity extends Activity {
         browser.setWebViewClient(new WebViewClient(){
             @Override public boolean shouldOverrideUrlLoading(WebView w,WebResourceRequest r) {
                 if(!r.isForMainFrame())return false;
+                if(demoMode) {
+                    // An offline demo must never open the internet, even through embedded links.
+                    runOnUiThread(()->status("Navigazione esterna bloccata nella demo offline."));
+                    return true;
+                }
                 try{SecureServiceToken.checkedOrigin(r.getUrl().toString());return false;}
                 catch(Exception ignored){runOnUiThread(()->status("Navigazione non HTTPS bloccata."));return true;}
             }
@@ -164,10 +170,10 @@ public final class AutoSetupActivity extends Activity {
             "(function(){return document.querySelectorAll('input,textarea,select').length;})()",
             result->{
                 if(!demoMode) return;
-                if("3".equals(result)){
+                if((demoSettingsPage?"2":"3").equals(result)){
                     pageReady=true;
                     activeOrigin=DEMO_ORIGIN;
-                    status("Demo offline pronta: 3 campi HTML. Premere Riconosci i campi.");
+                    status("Demo offline pronta: "+(demoSettingsPage?"2":"3")+" campi HTML. Premere Riconosci i campi.");
                 } else if(retry<12) {
                     browser.postDelayed(()->checkDemoReady(retry+1),300);
                 } else {
@@ -179,6 +185,7 @@ public final class AutoSetupActivity extends Activity {
 
     private void openDemo() {
         demoMode=true;
+        demoSettingsPage=false;
         activeOrigin=DEMO_ORIGIN;
         url.setText(activeOrigin);
         goal.setText("Dimostrazione locale senza servizi esterni");
@@ -197,10 +204,28 @@ public final class AutoSetupActivity extends Activity {
         status("Caricamento modulo dimostrativo offline…");
     }
 
+    /** Second in-memory test page; no request to a remote website. */
+    private void openDemoSettingsPage() {
+        if(!demoMode || !DEMO_ORIGIN.equals(activeOrigin)) return;
+        demoSettingsPage=true;
+        pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
+        navigation.removeAllViews();
+        say("MotorLab: seconda pagina demo aperta dopo conferma. Nessun servizio contattato.");
+        String html="<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head>"+
+            "<body><h2>Impostazioni demo</h2><form>"+
+            "<label for='profilo'>Profilo di prova</label><input id='profilo' name='profilo' type='text'>"+
+            "<label for='nota'>Nota di configurazione</label><textarea id='nota' name='nota'></textarea>"+
+            "</form></body></html>";
+        browser.loadDataWithBaseURL(DEMO_ORIGIN+"/impostazioni",html,"text/html","UTF-8",null);
+        browser.postDelayed(()->checkDemoReady(0),350);
+        status("Caricamento della seconda pagina demo offline…");
+    }
+
     private void openSite() {
         String address=url.getText().toString().trim();
         try{
             demoMode=false;
+            demoSettingsPage=false;
             activeOrigin=SecureServiceToken.checkedOrigin(address);
             controls.clear();fields.removeAllViews();navigation.removeAllViews();pageReady=false;inspectedUrl="";
             say("Richiesta: "+limit(goal.getText().toString(),180)+
@@ -275,8 +300,12 @@ public final class AutoSetupActivity extends Activity {
                                 .setNegativeButton("Annulla",null)
                                 .setPositiveButton("Apri pagina",(d,w)->{
                                     navigation.removeAllViews();
-                                    browser.loadUrl(dest);
-                                    status("Navigazione autorizzata verso "+origin+"…");
+                                    if(demoMode && (DEMO_ORIGIN+"/impostazioni").equals(dest)){
+                                        openDemoSettingsPage();
+                                    }else{
+                                        browser.loadUrl(dest);
+                                        status("Navigazione autorizzata verso "+origin+"…");
+                                    }
                                 }).show();
                         }catch(Exception e){alert("La pagina è cambiata.");}
                     });
