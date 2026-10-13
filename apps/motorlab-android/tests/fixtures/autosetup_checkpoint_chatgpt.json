@@ -1,0 +1,27 @@
+{
+  "protocol": "motorlab.autosetup.checkpoint",
+  "version": 1,
+  "source": "chatgpt_tools",
+  "origin": "https://example.com",
+  "stage": "scan_complete",
+  "observations": {
+    "page_loaded": true,
+    "ordinary_fields": 2,
+    "internal_links": 1,
+    "prepared_fields": null,
+    "applied_fields": null
+  },
+  "permissions": {
+    "can_execute": false,
+    "requires_new_consent": true
+  },
+  "privacy": {
+    "contains_goal": false,
+    "contains_field_values": false,
+    "contains_credentials": false
+  },
+  "verification": {
+    "scope": "connector_tool_result",
+    "remote_outcome": "not_verified"
+  }
+}
