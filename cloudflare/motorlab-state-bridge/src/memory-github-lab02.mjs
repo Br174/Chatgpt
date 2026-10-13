@@ -99,7 +99,7 @@ export async function acquireVerifiedGithubMemory({token,fetchImpl=fetch}={}){
   source_pins:{main:MAIN_BASE_SHA,lab01:LAB01_SHA}};
 }
 const strip=(s)=>s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const words=(s)=>new Set((strip(s).match(/[a-z0-9][a-z0-9._/-]*/g)||[]).filter(w=>w.length>1));
+const words=(s)=>new Set((strip(s).match(/[a-z0-9]+/g)||[]).filter(w=>w.length>1));
 export function recallVerifiedMemory(snapshot,{query,projectId='MotorLab',limit=6}={}){
  if(typeof query!=='string'||!query.trim()||query.length>250)throw Error('invalid_memory_query');
  if(!Number.isInteger(limit)||limit<1||limit>20)throw Error('invalid_recall_limit');
