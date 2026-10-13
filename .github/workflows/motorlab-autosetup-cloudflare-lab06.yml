@@ -104,7 +104,7 @@ jobs:
               }
             if [[ "$http_code" != 200 ]]; then
               codes="$(jq -r '[.errors[]?.code | tostring] | join(",")' "$body_file" 2>/dev/null || true)"
-              printf 'Cloudflare deployments preflight BLOCKED: HTTP %s, public error codes: %s\\n' "$http_code" "${codes:-none}" >&2
+              printf 'Cloudflare deployments preflight BLOCKED: HTTP %s, public error codes: %s\n' "$http_code" "${codes:-none}" >&2
               rm -f "$body_file"
               return 1
             fi
@@ -116,7 +116,7 @@ jobs:
               return 1
             }
             rm -f "$body_file"
-            printf '%s\\n' "$active_version"
+            printf '%s\n' "$active_version"
           }
 
           LAST_GOOD_VERSION="$(get_active_version)"
@@ -232,7 +232,7 @@ jobs:
               }
             if [[ "$http_code" != 200 ]]; then
               codes="$(jq -r '[.errors[]?.code | tostring] | join(",")' "$body_file" 2>/dev/null || true)"
-              printf 'Cloudflare deployments preflight BLOCKED: HTTP %s, public error codes: %s\\n' "$http_code" "${codes:-none}" >&2
+              printf 'Cloudflare deployments preflight BLOCKED: HTTP %s, public error codes: %s\n' "$http_code" "${codes:-none}" >&2
               rm -f "$body_file"
               return 1
             fi
@@ -244,7 +244,7 @@ jobs:
               return 1
             }
             rm -f "$body_file"
-            printf '%s\\n' "$active_version"
+            printf '%s\n' "$active_version"
           }
 
           health_ok() {
