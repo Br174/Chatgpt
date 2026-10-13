@@ -1,0 +1,83 @@
+name: MotorLab LAB06 Test APK ZIP Byte Attestation
+on:
+  push:
+    branches: ['motorlab/app-lab06-autosetup-checkpoint-*']
+    paths:
+      - '.github/workflows/motorlab-lab06-offline-binary-delivery.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: motorlab-lab06-binary-delivery
+  cancel-in-progress: true
+jobs:
+  build:
+    name: Private source-verified TEST APK and ZIP bytes
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Verify unchanged app contracts and share bridge
+        run: |
+          set -euo pipefail
+          python3 apps/motorlab-android/tests/verify_lab01.py
+          python3 apps/motorlab-android/tests/verify_checkpoint_bridge.py
+      - name: Prepare Android SDK
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$sdkmanager"
+          "$sdkmanager" "platforms;android-35" "build-tools;35.0.0"
+      - name: Compile verified TEST-only debug APK and ZIP locally
+        run: |
+          set -euo pipefail
+          gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+          apk=apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" |
+            grep -m1 "package: name='it.motorlab.app' versionCode='6'"
+          mkdir -p deliver
+          cp "$apk" deliver/MotorLab-LAB06-ChatBridge-TEST.apk
+          cp apps/motorlab-android/tests/fixtures/autosetup_checkpoint_chatgpt.json deliver/Checkpoint-ChatGPT-Esempio.json
+          cat > deliver/ISTRUZIONI.txt <<'TXT'
+          MotorLab LAB06 AutoSetup ChatBridge PROVA - FIRMA DEBUG TEMPORANEA.
+          GitHub E2E Android11 run 38355061731: complete suite passed.
+          Questa APK NON e' una release definitiva e NON puo' aggiornare
+          direttamente le vecchie LAB01 o LAB06 a firma diversa.
+          Prima scaricare tutti i file. Se si desidera installare la nuova
+          prova, disinstallare SOLO la vecchia MotorLab: cio' cancella i
+          dati locali. Non occorre alcuna chiave da configurare.
+          AutoSetup riceve checkpoint da Condividi Android o da file JSON.
+          Non e' sincronizzazione automatica degli account ChatGPT.
+          Non sono state effettuate prove sul telefono fisico.
+          TXT
+          (cd deliver; sha256sum MotorLab-LAB06-ChatBridge-TEST.apk > SHA256-ChatBridge.txt
+            zip -q -9 MotorLab-LAB06-ChatBridge-TEST.zip MotorLab-LAB06-ChatBridge-TEST.apk Checkpoint-ChatGPT-Esempio.json ISTRUZIONI.txt SHA256-ChatBridge.txt)
+          echo "MOTORLAB_TEST_ONLY_APK_BUILD=PASSED"
+      - name: Print bounded debug APK and ZIP bytes to private CI log for verified Git blob recovery
+        run: |
+          python3 - <<'PY'
+          import base64,hashlib,pathlib
+          files={
+            "apk":pathlib.Path("deliver/MotorLab-LAB06-ChatBridge-TEST.apk"),
+            "zip":pathlib.Path("deliver/MotorLab-LAB06-ChatBridge-TEST.zip"),
+          }
+          for name,path in files.items():
+              blob=path.read_bytes()
+              if len(blob)>512000 or len(blob)==0:
+                  raise SystemExit("unexpected binary size")
+              encoded=base64.b64encode(blob).decode("ascii")
+              digest=hashlib.sha256(blob).hexdigest()
+              print(f"MOTORLAB_BIN_EXPORT_BEGIN|{name}|{len(blob)}|{digest}",flush=True)
+              for i in range(0,len(encoded),640):
+                  print(f"MOTORLAB_BIN_EXPORT_CHUNK|{name}|{i//640:06d}|{encoded[i:i+640]}",flush=True)
+              print(f"MOTORLAB_BIN_EXPORT_END|{name}|{len(encoded)}",flush=True)
+          print("MOTORLAB_BIN_EXPORT_READY=TEST_ONLY_PRIVATE_LOG_NO_CREDENTIALS",flush=True)
+          PY
