@@ -65,14 +65,15 @@ async function request(fetchImpl, url, options, stage) {
   for (let attempt = 0; attempt < attempts; attempt++) {
     let response;
     try {
-      response = await fetchImpl(url, { ...options, redirect: "error",
+      response = await fetchImpl(url, { ...options, redirect: "manual",
         signal: AbortSignal.timeout(12000) });
     } catch (error) {
       const timeout = error?.name === "TimeoutError" || error?.name === "AbortError";
       if (attempt + 1 < attempts) continue;
       throw new PublicSafeError("GITHUB_" + stage + "_" + (timeout ? "TIMEOUT" : "TRANSPORT"));
     }
-    // Never follow a redirect with an Authorization-bearing request.
+    // Cloudflare Workers rejects redirect:"error" at runtime, even without a 3xx.
+    // redirect:"manual" avoids following redirects with the PAT; reject every 3xx.
     if (response.status >= 300 && response.status <= 399)
       throw new PublicSafeError("GITHUB_" + stage + "_REDIRECT");
     return response;
