@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import json
 p=Path(__file__).resolve().parents[1]
 source=(p/"app/src/main/java/it/motorlab/app/MainActivity.java").read_text()
 manifest=(p/"app/src/main/AndroidManifest.xml").read_text()
@@ -113,3 +114,30 @@ assert "Navigazione esterna bloccata nella demo offline." in autosetup
 emulator=(p/"tests/emulator_smoke.py").read_text()
 assert "MOTORLAB_AUTOSETUP_MULTIPAGE_CONSENT_AND_SCAN=PASSED_OFFLINE" in emulator
 print("AutoSetup universal HTTPS + optional consented AI suggestion source contract: PASS (live provider call not proven)")
+
+# Cross-surface (ChatGPT tools ↔ Android APK) portable checkpoint contract.
+contract=json.loads((p/"AUTOSETUP_SHARED_CHECKPOINT_V1.schema.json").read_text())
+fixture=json.loads((p/"tests/fixtures/autosetup_checkpoint_demo.json").read_text())
+assert contract["properties"]["protocol"]["const"]=="motorlab.autosetup.checkpoint"
+assert contract["properties"]["version"]["const"]==1
+assert contract["properties"]["permissions"]["properties"]["requires_new_consent"]["const"] is True
+assert contract["properties"]["permissions"]["properties"]["can_execute"]["const"] is False
+assert set(fixture)==set(contract["required"])
+assert fixture["protocol"]=="motorlab.autosetup.checkpoint" and fixture["version"]==1
+assert fixture["source"] in contract["properties"]["source"]["enum"]
+assert fixture["origin"]=="https://autosetup-demo.example"
+assert fixture["permissions"]=={"can_execute":False,"requires_new_consent":True}
+assert fixture["privacy"]=={"contains_goal":False,"contains_field_values":False,"contains_credentials":False}
+assert fixture["verification"]=={"scope":"local_ui_observation","remote_outcome":"not_verified"}
+assert set(fixture["observations"])==set(contract["properties"]["observations"]["required"])
+assert all(isinstance(v,bool) if k=="page_loaded" else (v is None or isinstance(v,int) and 0<=v<=30)
+    for k,v in fixture["observations"].items())
+tp=(p/"app/src/main/java/it/motorlab/app/AutoSetupTaskPlan.java").read_text()
+assert "String checkpointJson() throws JSONException" in tp
+method=tp.split("String checkpointJson()",1)[1].split("String summary()",1)[0]
+assert "objective" not in method and "f.editor" not in method and "password" not in method
+assert 'put("requires_new_consent",true)' in method and 'put("can_execute",false)' in method
+assert "Condividi checkpoint" in autosetup and "Intent.ACTION_SEND" in autosetup
+assert "Condividere checkpoint AutoSetup?" in autosetup and "NON contiene obiettivo" in autosetup
+assert "MOTORLAB_AUTOSETUP_REDACTED_CHECKPOINT_SHARE_CONSENT=PASSED" in emulator
+print("AutoSetup shared redacted contract and explicit Android share: PASS")

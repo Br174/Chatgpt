@@ -426,8 +426,30 @@ public final class AutoSetupActivity extends Activity {
         try {
             new AlertDialog.Builder(this).setTitle("Piano AutoSetup")
                 .setMessage(currentTaskPlan().summary())
+                .setNeutralButton("Condividi checkpoint",(d,w)->shareTaskCheckpoint())
                 .setPositiveButton("OK",null).show();
         }catch(Exception e){alert("Apri prima una pagina HTTPS compatibile.");}
+    }
+
+    /** Explicit Android share sheet; never synchronizes with ChatGPT silently. */
+    private void shareTaskCheckpoint() {
+        final String checkpoint;
+        try {checkpoint=currentTaskPlan().checkpointJson();}
+        catch(Exception e){alert("Impossibile creare il checkpoint tecnico.");return;}
+        new AlertDialog.Builder(this)
+            .setTitle("Condividere checkpoint AutoSetup?")
+            .setMessage("Il checkpoint contiene il DOMINIO del sito e i soli conteggi " +
+                "delle operazioni. NON contiene obiettivo, valori dei campi, password, " +
+                "token o cookie. La condivisione non trasferisce autorizzazioni e non " +
+                "sincronizza automaticamente l'APK con ChatGPT.")
+            .setNegativeButton("Annulla",null)
+            .setPositiveButton("Condividi",(d,w)->{
+                Intent share=new Intent(Intent.ACTION_SEND);
+                share.setType("text/plain");
+                share.putExtra(Intent.EXTRA_TEXT,checkpoint);
+                try{startActivity(Intent.createChooser(share,"Condividi checkpoint AutoSetup"));}
+                catch(Exception e){alert("Non è disponibile una app per la condivisione.");}
+            }).show();
     }
 
     /** One authorized read-only action: inspect form and then same-origin links. */

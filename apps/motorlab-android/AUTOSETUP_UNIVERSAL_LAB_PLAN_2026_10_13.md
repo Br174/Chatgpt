@@ -198,3 +198,11 @@ STATO_CHAT=CAPACITA_PARZIALI_REALI_GIA_UTILIZZABILI_CON_TOOL_CONNESSI
 STATO_APK=LAB_AUTOSETUP_VERIFICATO_SU_EMULATORE_MA_NON_RELEASE
 STATO_SINCRONIZZAZIONE_CHAT_APK=REQUISITO_NON_IMPLEMENTATO
 PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
+
+
+## AS4 — checkpoint tecnico portabile ChatGPT ↔ APK (v1, 13 ottobre 2026)
+- Contratto JSON condiviso versionato, con soli conteggi e dominio del sito: il testo dell'obiettivo, password, token, cookie e valori dei campi non vi entrano.
+- Dentro la LAB Android il dialogo del piano offre una condivisione esplicita con secondo consenso. Nessuna trasmissione automatica verso ChatGPT o un server.
+- Questa chat può utilizzare subito i plugin/connettori reali disponibili e leggere il checkpoint condiviso dall'utente. Le approvazioni per eseguire azioni devono essere raccolte nuovamente.
+- Schema, fixture e test aggiornati nella stessa LAB, mantenendo firma release e REALTEST fuori perimetro.
+- Futuro bridge bidirezionale autenticato NON implementato e NON simulato.
