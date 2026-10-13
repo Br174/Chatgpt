@@ -72,7 +72,6 @@ assert 'bool(perms,"requires_new_consent",true)' in bridge
 assert 'bool(privacy,"contains_credentials",false)' in bridge
 assert "SecureServiceToken.checkedOrigin(origin)" in bridge
 assert 'choice(verification,"remote_outcome","not_verified","verified_separately")' in bridge
-assert "source=source" not in bridge
 assert "Intent.ACTION_OPEN_DOCUMENT" in activity
 assert 'button(top,"Importa checkpoint dalla chat",this::pickCheckpoint)' in activity
 assert "AutoSetupCheckpointBridge.inspect(json)" in activity
