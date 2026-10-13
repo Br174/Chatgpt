@@ -46,6 +46,19 @@ Ordine di priorita **obbligatorio**, nell'ordine e senza saltare le prime due al
 2. **CHAT** — solo quando serve l'utente, mostrare qui i controlli equivalenti (campo protetto tramite canale sicuro, pulsanti, menu, interruttori, approvazioni). Applicare la scelta autorizzata al sito, verificarla e riprendere il lavoro autonomo.
 3. **FALLBACK UFFICIALE ESTREMO** — **solo quando sia AUTO sia CHAT non possono completare correttamente il singolo passaggio**, portare l'utente sulla pagina reale ufficiale, **direttamente alla schermata/sezione e, se tecnicamente consentito, al campo esatto gia selezionato**. La persona deve soltanto inserire password o segreto / concedere autorizzazione / premere OK. Dopo tale passaggio, AutoSetup verifica la conclusione dell'operazione e **riparte autonomamente dallo stesso checkpoint**, senza rifare il lavoro concluso.
 
+## Recovery-first: tentare di risolvere prima del fallback
+Prima di attivare la terza strada **FALLBACK UFFICIALE ESTREMO**, AutoSetup deve esaurire i tentativi ragionevoli e legittimi per conservare il percorso autonomo o quello assistito nella chat:
+
+1. **Diagnosi del blocco**: distinguere errore transitorio, sito cambiato, campi non identificati, collegamento/sessione interrotti, autenticazione scaduta, permesso mancante, limitazione tecnica, protezione di sicurezza del provider.
+2. **Ripristino automatico controllato**: rivalidare origine e stato pagina, aggiornare i selettori o i metadati, recuperare checkpoint, riutilizzare sessioni valide, ritentare operazioni idempotenti con numero massimo finito di tentativi, oppure usare un connettore/API ufficiale gia autorizzato. Non eseguire due volte scritture non idempotenti.
+3. **Ripristino dell'interfaccia CHAT**: se il renderer o il bridge non funzionano, tentare alternative equivalenti realmente collegate al medesimo passo e con verifica del risultato; non presentare bottoni non funzionanti, password in chat normale o un'interfaccia inventata.
+4. **Correzione tecnica o del codice**: quando il problema dipende da MotorLab stesso, predisporre una correzione isolata LAB, verificare conflitti e regressioni, compilare e testare, poi riprovare. Una nuova modifica software fuori dal perimetro precedentemente autorizzato segue il pre-change approval gate CORE; un errore non autorizza la scrittura incontrollata di codice. Non aggiornare il software durante una transazione sensibile senza checkpoint sicuro.
+5. **Fallback estremo soltanto dopo una diagnosi reale** che attesti perché AUTO e CHAT non sono riusciti neppure dopo i percorsi di recupero ammissibili. La password, l'OTP, la MFA, i CAPTCHA, i consensi obbligatori o le protezioni di terze parti non possono essere aggirati scrivendo codice.
+
+Nessuna escalation infinita: usare budget di tentativi limitati, deduplicazione degli errori, scadenza dei checkpoint e stop chiaro per blocchi definitivi. «Provare sempre» significa tentare ogni soluzione appropriata, non cicli senza fine, modifica automatica di infrastrutture non autorizzate o aggiramento delle regole dei siti.
+
+**Ripresa post-fallback**: conservare un riferimento verificabile al task e al passo; dopo l'intervento utente sul sito ufficiale, verificare lo stato lato provider prima di marcare il passo completato. Se non si puo osservare l'esito o riconciliare la sessione, mantenere lo stato in attesa ed evitare false dichiarazioni di successo o restart completo.
+
 Vincoli non negoziabili:
 - Non rendere il sito esterno il percorso predefinito, ne un prerequisito sistematico, ne sostituire il telecomando nella chat con un collegamento generico.
 - Aprire soltanto URL, deep link o callback ufficiali e verificati. Se il sito non permette tecnicamente di aprire direttamente un campo o focalizzarlo, descrivere con precisione il limite: non promettere un focus impossibile e non inventare deep link.
