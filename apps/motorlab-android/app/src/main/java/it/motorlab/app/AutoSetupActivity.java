@@ -120,6 +120,8 @@ public final class AutoSetupActivity extends Activity {
                 catch(Exception ignored){runOnUiThread(()->status("Navigazione non HTTPS bloccata."));return true;}
             }
             @Override public void onPageStarted(WebView w,String page,android.graphics.Bitmap favicon){
+                if(demoMode && page!=null && !"about:blank".equals(page)
+                        && !page.startsWith(DEMO_ORIGIN+"/")) demoMode=false;
                 pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
             }
             @Override public void onPageFinished(WebView w,String page) {
@@ -149,6 +151,12 @@ public final class AutoSetupActivity extends Activity {
 
     private void checkDemoReady(int retry) {
         if(!demoMode || browser==null) return;
+        String live=browser.getUrl();
+        if(live!=null && !"about:blank".equals(live)
+                && !live.startsWith(DEMO_ORIGIN+"/")) {
+            demoMode=false;pageReady=false;
+            status("La pagina non è più la demo offline.");return;
+        }
         browser.evaluateJavascript(
             "(function(){return document.querySelectorAll('input,textarea,select').length;})()",
             result->{
@@ -180,6 +188,7 @@ public final class AutoSetupActivity extends Activity {
             "<label for='riservato'>Password da escludere</label><input id='riservato' type='password'>"+
             "</form></body></html>";
         browser.loadDataWithBaseURL(activeOrigin+"/",html,"text/html","UTF-8",null);
+        browser.postDelayed(()->checkDemoReady(0),350);
         status("Caricamento modulo dimostrativo offline…");
     }
 
