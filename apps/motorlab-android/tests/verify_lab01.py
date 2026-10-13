@@ -102,7 +102,7 @@ goalrouter=(p/"app/src/main/java/it/motorlab/app/AutoSetupGoalRouter.java").read
 assert "class AutoSetupGoalRouter" in goalrouter
 assert "static int score(String goal,String linkLabel)" in goalrouter
 assert "Percorso suggerito:" in autosetup
-assert "MOTORLAB_AUTOSETUP_LOCAL_GOAL_ROUTE_HINT=PASSED_NO_AUTO_NAVIGATION" in emulator
+assert "MOTORLAB_AUTOSETUP_LOCAL_GOAL_ROUTE_HINT=PASSED_NO_AUTO_NAVIGATION" in (p/"tests/emulator_smoke.py").read_text()
 assert "private void discoverLinks()" in autosetup
 assert 'new AlertDialog.Builder(this).setTitle("Navigare sul sito?")' in autosetup
 assert "Navigazione esterna bloccata nella demo offline." in autosetup

@@ -206,6 +206,7 @@ def autosetup_smoke():
     print("MOTORLAB_AUTOSETUP_GENERIC_LINK_DISCOVERY=PASSED_SAME_ORIGIN_DEMO",flush=True)
     scroll_until_visible("Percorso suggerito: Impostazioni demo")
     print("MOTORLAB_AUTOSETUP_LOCAL_GOAL_ROUTE_HINT=PASSED_NO_AUTO_NAVIGATION",flush=True)
+    scroll_top()
     scroll_to_click("Apri: Impostazioni demo")
     wait("Navigare sul sito?",seconds=12)
     click("APRI PAGINA",exact=True)
