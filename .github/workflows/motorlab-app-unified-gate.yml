@@ -78,3 +78,20 @@ jobs:
         run: |
           echo "MOTORLAB_UNIFIED_ANDROID_RUNTIME_AND_BUILD_GATE=PASSED"
           echo "Emulator API 30 smoke PASSED. This DOES NOT certify stable update signing, preservation of LAB01 data, LAB02/LAB04 migration or acceptance on a physical device." >> "$GITHUB_STEP_SUMMARY"
+
+  autosetup_provider_readback:
+    if: github.ref_name == 'motorlab/app-lab05-unified-autosetup-20261013'
+    name: AutoSetup GitHub provider read-back (read only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check provider comparison logic locally
+        run: python3 apps/motorlab-android/tests/verify_github_provider_readback.py --self-test
+      - name: Verify remote GitHub branch and PR agree with this revision
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 apps/motorlab-android/tests/verify_github_provider_readback.py

@@ -28,3 +28,7 @@ Prima di ogni scrittura su un modulo reale: anteprima del dominio e dei nomi dei
 
 ## AS6 — regola evidenze verificabili nelle azioni di questa chat
 Ogni operazione su strumenti connessi deve separare: (1) esecuzione richiesta e autorizzata; (2) riscontro locale/verifica letta; (3) conferma lato servizio/provider. Una scrittura in un browser o un DOM non dimostra persistenza sul backend. Le risposte dirette dei connettori, commit SHA e run ID sono prove utili per i rispettivi scope; non fingere di avere una conferma remota se manca. Mai includere dati sensibili nelle ricevute.
+
+
+## AS7 — prova di provider esterno in questa chat e in CI
+Per i commit GitHub: rileggere dopo il push sia l'oggetto PR sia il ramo con accesso provider reale, controllare che repository, ref e commit SHA coincidano. Il job "autosetup_provider_readback" esegue questo test tramite GitHub Actions con autorizzazioni di sola lettura. Un vecchio SHA non è attestato. La prova GitHub NON conferma salvataggi su altri siti né su form WebView. Senza connettore autenticato nell'APK lo stato remoto resta "not_verified".

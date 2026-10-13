@@ -190,3 +190,16 @@ assert "MOTORLAB_AUTOSETUP_RECEIPT_PRIVATE_REDACTED=PASSED" in emulator
 assert "MOTORLAB_AUTOSETUP_RECEIPT_REOPEN_PERSISTENCE=PASSED" in emulator
 assert "shared_prefs/autosetup_operation_evidence_v1.xml" in emulator
 print("AS6B local receipt privacy and persistence gate: PASS")
+
+# AS7 read-only GitHub provider readback, separate from website-form persistence.
+readback=(p/"tests/verify_github_provider_readback.py").read_text()
+workflow=(p.parent.parent/".github/workflows/motorlab-app-unified-gate.yml").read_text()
+assert "def compare(branch, pull, ref_name, expected_sha, repo):" in readback
+assert "ERROR_PROVIDER_INCONSISTENT" in readback
+assert "STALE_RUN" in readback
+assert "VERIFIED_GITHUB_BRANCH_AND_PR" in readback
+assert "GITHUB_COMMIT_ONLY_NOT_WEBSITE_FORM" in readback
+assert "autosetup_provider_readback:" in workflow
+assert "pull-requests: read" in workflow
+assert "GH_TOKEN: "+"$"+"{{ secrets.GITHUB_TOKEN }}" in workflow
+print("AS7 provider-readback gate static contracts: PASS")

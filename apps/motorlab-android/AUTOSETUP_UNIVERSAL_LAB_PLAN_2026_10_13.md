@@ -240,3 +240,10 @@ PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
 - Dopo AS6 si verifica direttamente dentro l'emulatore Android 11 il file privato `SharedPreferences`: contiene una ricevuta tecnica e l'indicazione esplicita `remote_save=not_verified`, ma NON i valori sintetici usati per compilare il form.
 - Si forza la chiusura e si riapre il processo Android: il registro tecnico deve essere ancora presente senza contenere valori privati. Questo dimostra la persistenza della ricevuta, NON il salvataggio del form sul server.
 - Test esclusivamente con valori sintetici. Nessuna modifica di grafica, MADRE, CORE o motori degli altri progetti.
+
+
+## AS7 — Provider readback reale (GitHub, sola lettura)
+- Un nuovo job GitHub Actions, limitato al ramo AutoSetup, ottiene via API GitHub REST il branch e la PR #44, confrontandone ref, repository e SHA con il commit esatto testato dalla CI. Usa il GITHUB_TOKEN effimero con permessi contents:read / pull-requests:read; niente log di segreti o scritture.
+- "VERIFIED_GITHUB_BRANCH_AND_PR" è una prova del commit esistente sul provider GitHub (es. operazione avviata qui nella chat e pubblicata dalla LAB). NON prova salvataggio di moduli su siti web né autenticazioni.
+- Un run precedente alla HEAD corrente è "STALE_SHA_NOT_ATTESTED", mai un falso successo. Errori API e discordanza branch/PR fanno fallire il job. Il confronto locale ha test con match, stale, repo errato e SHA discordante.
+- Tutto resta nella LAB e nella chat con connettori reali; APK, CORE, MADRE, RealTest e grafica invariati. Nessun provider diverso da GitHub dichiarato testato.
