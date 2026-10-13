@@ -1,0 +1,107 @@
+name: MotorLab LAB06 APK PROVA - firma debug temporanea
+on:
+  push:
+    branches: ['motorlab/app-lab06-ephemeral-apk-*']
+    paths:
+      - 'apps/motorlab-android/**'
+      - '.github/workflows/motorlab-lab06-temporary-apk.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: motorlab-lab06-temporary-apk
+  cancel-in-progress: false
+jobs:
+  temporary_test_apk:
+    name: Build, emulator acceptance, TEST prerelease APK + ZIP
+    runs-on: ubuntu-latest
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Validate LAB06 source and no-regression contracts
+        run: python3 apps/motorlab-android/tests/verify_lab01.py
+      - name: Use Android SDK 35
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$sdkmanager"
+          "$sdkmanager" "platforms;android-35" "build-tools;35.0.0"
+      - name: Build ephemeral DEBUG APK - never use for production
+        run: |
+          set -euo pipefail
+          gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+          apk=apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep -m1 "package: name='it.motorlab.app' versionCode='6'"
+          echo "MOTORLAB_LAB06_EPHEMERAL_DEBUG_APK=BUILT_TEST_ONLY"
+      - name: Confirm emulator KVM
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chmod 0666 /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
+      - name: Full AutoSetup and Team Chat Android11 smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          profile: pixel_5
+          cores: 2
+          ram-size: 3072M
+          disable-linux-hw-accel: false
+          heap-size: 256M
+          disable-animations: true
+          emulator-boot-timeout: 420
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: adb install -r apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk && python3 apps/motorlab-android/tests/emulator_smoke.py
+      - name: Publish clearly labeled temporary TEST APK and ZIP
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        run: |
+          set -euo pipefail
+          short_sha="$(printf '%s' "$GITHUB_SHA" | cut -c1-7)"
+          TAG="motorlab-lab06-temporary-$short_sha"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "MOTORLAB_LAB06_TEST_RELEASE=ALREADY_EXISTS_UNCHANGED"
+            exit 0
+          fi
+          apk=apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$apk"
+          out="$RUNNER_TEMP/motorlab-lab06-test-dist"
+          mkdir -p "$out"
+          cp "$apk" "$out/MotorLab-LAB06-TEST.apk"
+          cat > "$out/LEGGIMI-LAB06-TEST.txt" <<'TXT'
+          MOTORLAB LAB06 - APK DI PROVA (FIRMA DEBUG TEMPORANEA)
+          Questa NON e' una release definitiva; AutoSetup incluso.
+          Package Android: it.motorlab.app / versionCode: 6.
+          Se hai gia' MotorLab LAB01 installata, la firma e' DIVERSA:
+          scarica prima APK e ZIP; poi disinstalla la vecchia MotorLab,
+          quindi installa questa APK. La disinstallazione cancella i dati locali.
+          Non cancellare altre app ne' file.
+          La famiglia definitiva richiedera' UN'ULTERIORE REINSTALLAZIONE:
+          questa firma debug e' effimera e non servira' per i prossimi aggiornamenti.
+          Le chiavi API e le credenziali personali non sono contenute nella APK.
+          Test automatici su emulatore Android 11, NON su telefono fisico.
+          Conserva ZIP come copia di questa versione di prova.
+          TXT
+          ( cd "$out"; sha256sum MotorLab-LAB06-TEST.apk > SHA256-LAB06-TEST.txt
+            zip -q -9 MotorLab-LAB06-TEST.zip MotorLab-LAB06-TEST.apk LEGGIMI-LAB06-TEST.txt SHA256-LAB06-TEST.txt )
+          gh release create "$TAG" \
+            "$out/MotorLab-LAB06-TEST.apk" "$out/MotorLab-LAB06-TEST.zip" \
+            "$out/LEGGIMI-LAB06-TEST.txt" "$out/SHA256-LAB06-TEST.txt" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "MotorLab LAB06 PROVA - firma temporanea, APK e ZIP" \
+            --notes "APK di prova con firma debug temporanea. AutoSetup e Archivio Team Chat inclusi. NON aggiornabile direttamente sopra LAB01: installazione pulita dopo il download APK/ZIP. La firma definitiva futura richiedera' ancora reinstallazione. Test Android 11 solo emulatore. Nessuna configurazione chiavi richiesta."
+          echo "MOTORLAB_LAB06_TEST_APK_ZIP_PUBLISHED_AFTER_EMULATOR=YES"
+          echo "MotorLab LAB06 TEST: tag $TAG (firma debug temporanea)." >> "$GITHUB_STEP_SUMMARY"
