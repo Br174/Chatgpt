@@ -82,5 +82,32 @@ PLAN_ACCEPTED != SOURCE_IMPLEMENTED != STATIC_TEST_PASS != ANDROID_EMULATOR_PASS
 Current hybrid automatic handoff to this ChatGPT conversation: NOT_IMPLEMENTED.
 Do not change CORE, MADRE, other project engines or already approved graphics.
 
+## CHATGPT-FIRST — priorita operativa esplicita del 13/10/2026
+
+**PRIORITA IMMEDIATA: AutoSetup deve funzionare dalla chat ChatGPT del progetto MotorLab, prima di essere portato nella APK.** La APK attuale non ha ancora un motore AI nativo completo e non deve bloccare l'utilizzo presente di AutoSetup. Qwen, un ulteriore modello locale, un bridge ChatGPT-APK e una firma Android finale NON sono prerequisiti per iniziare a usare connettori reali in questa chat.
+
+Obiettivo operativo: Bruno da un incarico qui in ChatGPT; AutoSetup tenta le azioni concrete autorizzate attraverso i connettori gia disponibili. Per ogni scelta, modulo, toggle, pulsante, permesso o altro passo non autonomamente risolvibile, visualizza direttamente nella chat un controllo realmente collegato a una successiva operazione supportata; riceve il consenso e prosegue con controllo del risultato. Non simulare invii, form o risultati. Il trasferimento all'interfaccia reale del sito resta extrema ratio.
+
+### Fasi ChatGPT-first
+C1. Verificare catalogo strumenti e permessi provider in questa chat (GitHub Br174/Chatgpt gia collegato); readback dal provider di origine.
+C2. Instradare l'intento utente ad azioni realmente disponibili. Autonomia dentro il perimetro autorizzato; interfaccia chat per scelte e conferme necessarie, non conferme a ogni click.
+C3. Renderizzare in chat controlli interattivi per testo ordinario, selezioni, autorizzazioni, pulsanti e toggle soltanto con un handler effettivo. Il pulsante puo invocare un nuovo turno per eseguire l'azione con gli strumenti e riportare un esito verificato.
+C4. Segreti, token, private key, keystore, password e OTP non devono essere raccolti nel testo della conversazione ne con un ordinario controllo visivo mascherato. Occorre un vero canale protetto autenticato, non ancora integrato; se manca, dichiarare limitazione. Nessuna password in log, checkpoint o prompt AI.
+C5. Prova reale end-to-end dalla chat: analisi permessi GitHub, azione non sensibile autorizzata, commit e rilettura esatta SHA. Per configurare i cinque GitHub Actions Secrets occorre una funzione di scrittura specifica e autenticata che la connessione GitHub attuale NON fornisce.
+C6. Solo dopo completare la trasposizione del protocollo nell'unica APK MotorLab con AI/bridge propri e Test RealTest: nessuna dipendenza permanente da ChatGPT.
+
+### Stato da non confondere
+- GitHub read e autorizzazioni repo dalla chat: VERIFICATI.
+- Scritture a file/branch della repo tramite connettore con consenso: DISPONIBILI.
+- Actions Secrets write con il connettore GitHub: NON DISPONIBILE.
+- Replica universale di siti esterni nella chat: NON IMPLEMENTATA/ATTESTATA.
+- Canale segreti protetto CHAT -> provider: NON IMPLEMENTATO.
+- Bridge ChatGPT -> APK Android: NON IMPLEMENTATO.
+- Android LAB06 e verifiche demo offline: tecnologia di supporto, NON prova di funzionalita ChatGPT-first.
+
+STOP sviluppi nuovi puramente APK-first finche le funzionalita CHAT-FIRST non sono state attestate. Conservare il codice LAB06 sperimentale gia prodotto, senza promuovere MADRE, cambiare CORE, motori satelliti, grafica o APK installata.
+
+Questa decisione modifica la priorita della sezione Order of work seguente, non abbandona l'autonomia realizzata.
+
 ## Order of work
 Preserve existing LAB06 AutoSetup branch and stable-signing plan; implement typed action protocol and on-device hybrid controller in the same MotorLab app, then secure chat/app handoff and real-site provider integration, run emulator/device tests, and only promote after all required gates. RealTest follows completed AutoSetup consolidation in the MotorLab Madre V2 roadmap.
