@@ -96,7 +96,7 @@ assert "credenziali non sono incluse" in plan
 assert "Mostra piano operazioni" in autosetup and "currentTaskPlan()" in autosetup
 assert "taskPlan=null" in autosetup and ".scanned(found.length())" in autosetup
 assert ".links(shown)" in autosetup and ".prepared(updates.length())" in autosetup
-assert ".applied(Integer.parseInt(count))" in autosetup
+assert "currentTaskPlan().applied(applied);" in autosetup
 assert "MOTORLAB_AUTOSETUP_STAGED_PLAN=PASSED_NO_AUTO_SUBMIT" in (p/"tests/emulator_smoke.py").read_text()
 assert "Analizza pagina e pianifica" in autosetup and "guidedAnalysisPending" in autosetup
 assert "MOTORLAB_AUTOSETUP_GUIDED_READONLY_ANALYSIS=PASSED" in (p/"tests/emulator_smoke.py").read_text()
