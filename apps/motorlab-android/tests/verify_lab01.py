@@ -11,7 +11,7 @@ key=(p/"app/src/main/java/it/motorlab/app/SecureGeminiKey.java").read_text()
 openai=(p/"app/src/main/java/it/motorlab/app/ChatGptPlan.java").read_text()
 assert "applicationId 'it.motorlab.app'" in (p/"app/build.gradle").read_text()
 assert "applicationId 'it.motorlab.app.lab" not in (p/"app/build.gradle").read_text()
-assert "versionCode 5" in (p/"app/build.gradle").read_text()
+assert "versionCode 6" in (p/"app/build.gradle").read_text()
 # Main release signing must never fall back to the disposable LAB/test certificate.
 gradle=(p/"app/build.gradle").read_text()
 assert "signingConfig signingConfigs.mainApp" in gradle
@@ -39,7 +39,7 @@ assert teamlogic.count("reserveDailyTrialCall()") == 2
 assert "TeamChatActivity" in manifest and 'android:exported="false"' in manifest
 assert "ACTION_CREATE_DOCUMENT" in teamui and "TeamCoordinator.run" in teamui
 assert "applicationId 'it.motorlab.app'" in (p/"app/build.gradle").read_text()
-assert "versionCode 5" in (p/"app/build.gradle").read_text()
+assert "versionCode 6" in (p/"app/build.gradle").read_text()
 print("LAB02 Team Chat contract: PASS - runtime and live AI not proven")
 
 archive=(p/"app/src/main/java/it/motorlab/app/TeamArchiveActivity.java").read_text()
@@ -82,7 +82,7 @@ assert "AES/GCM/NoPadding" in vault
 assert '"github".equals(service)' not in vault and '"cloudflare".equals(service)' not in vault
 assert "AutoSetupActivity" in manifest and 'android:exported="false"' in manifest
 assert "AutoSetupActivity.class" in teamui and "AutoSetupActivity.class" in source
-assert "versionCode 5" in (p/"app/build.gradle").read_text()
+assert "versionCode 6" in (p/"app/build.gradle").read_text()
 assert "private void suggestValues()" in autosetup
 assert "Suggerisci valori con Gemini (facoltativo)" in autosetup
 assert "Nessun campo sarà compilato sul sito" in autosetup
@@ -226,3 +226,10 @@ assert "MOTORLAB_AUTOSETUP_PROGRESS_60_PREPARED=PASSED" in emulator
 assert "MOTORLAB_AUTOSETUP_PROGRESS_CANCEL_RETAINS_60=PASSED" in emulator
 assert "MOTORLAB_AUTOSETUP_PROGRESS_NEW_PAGE_RESET=PASSED" in emulator
 print("AutoSetup AS8B percentage milestones and page reset regressions: PASS")
+
+# LAB06 approved clean-install replacement: private signing stays out of source.
+assert "motorlabVersionCode" in gradle and "motorlabSignedUpdateTest" in gradle
+assert "signingConfig signingConfigs.mainApp" in gradle
+assert "applicationId 'it.motorlab.app'" in gradle
+assert "versionCode 6" in gradle
+print("LAB06 immutable package and guarded signing-family source contract: PASS")

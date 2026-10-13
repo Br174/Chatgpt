@@ -1,0 +1,182 @@
+name: MotorLab LAB06 Stable Family and Signed Update Gate
+on:
+  push:
+    branches: ['motorlab/app-lab06-stable-signing-*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: motorlab-lab06-signing-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  family_update_emulator:
+    name: Android 11 v6-to-v7 same-cert upgrade (test key only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Verify source identity, archive and AutoSetup contracts
+        run: python3 apps/motorlab-android/tests/verify_lab01.py
+      - name: Prepare Android SDK 35
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$sdkmanager"
+          "$sdkmanager" "platforms;android-35" "build-tools;35.0.0"
+      - name: Generate isolated signing key for emulator TEST ONLY
+        run: |
+          set -euo pipefail
+          pass="$(openssl rand -hex 28)"
+          echo "::add-mask::$pass"
+          keystore="$RUNNER_TEMP/motorlab-lab06-CI-TEMPORARY-DO-NOT-PUBLISH.p12"
+          keytool -genkeypair -noprompt -storetype PKCS12 \
+            -keystore "$keystore" -alias motorlab-ci-test \
+            -storepass "$pass" -keypass "$pass" \
+            -keyalg RSA -keysize 3072 -validity 30 \
+            -dname "CN=MotorLab CI TEMPORARY TEST,OU=Emulator,O=MotorLab,C=IT"
+          chmod 600 "$keystore"
+          {
+            echo "MOTORLAB_MAIN_KEYSTORE=$keystore"
+            echo "MOTORLAB_MAIN_STORE_PASSWORD=$pass"
+            echo "MOTORLAB_MAIN_KEY_ALIAS=motorlab-ci-test"
+            echo "MOTORLAB_MAIN_KEY_PASSWORD=$pass"
+          } >> "$GITHUB_ENV"
+          echo "MOTORLAB_LAB06_EPHEMERAL_EMULATOR_CERT_ONLY=GENERATED_NOT_FOR_RELEASE"
+      - name: Compile two successive test APKs with the SAME temporary key
+        run: |
+          set -euo pipefail
+          gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug \
+            -PmotorlabSignedUpdateTest=true -PmotorlabVersionCode=6
+          apk=apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$apk"
+          cp "$apk" "$RUNNER_TEMP/motorlab-test-v6.apk"
+          gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug \
+            -PmotorlabSignedUpdateTest=true -PmotorlabVersionCode=7
+          test -s "$apk"
+          cp "$apk" "$RUNNER_TEMP/motorlab-test-v7.apk"
+          echo "MOTORLAB_LAB06_EMULATOR_APKS_BUILT=TEST_ONLY_NOT_DISTRIBUTABLE"
+      - name: Confirm Android emulator acceleration
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chmod 0666 /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
+      - name: Emulator v6->v7 signed in-place upgrade and SQLite preservation
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          profile: pixel_5
+          cores: 2
+          ram-size: 3072M
+          disable-linux-hw-accel: false
+          heap-size: 256M
+          disable-animations: true
+          emulator-boot-timeout: 420
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 apps/motorlab-android/tests/update_family_smoke.py "$RUNNER_TEMP/motorlab-test-v6.apk" "$RUNNER_TEMP/motorlab-test-v7.apk"
+      - name: Seal successful test-family gate
+        run: |
+          echo "MOTORLAB_LAB06_SIGNED_UPDATE_FAMILY_EMULATOR=PASSED_TEST_CERT_ONLY"
+          echo "Verified emulator v6->v7 same-certificate upgrade and preserved local SQLite. This is NOT a release-signing certificate." >> "$GITHUB_STEP_SUMMARY"
+
+  protected_release:
+    name: Protected LAB06 release (owner secrets required; no fallback key)
+    needs: family_update_emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    permissions:
+      contents: read
+    env:
+      MOTORLAB_MAIN_KEYSTORE_B64: '${{ secrets.MOTORLAB_MAIN_KEYSTORE_B64 }}'
+      MOTORLAB_MAIN_STORE_PASSWORD: '${{ secrets.MOTORLAB_MAIN_STORE_PASSWORD }}'
+      MOTORLAB_MAIN_KEY_ALIAS: '${{ secrets.MOTORLAB_MAIN_KEY_ALIAS }}'
+      MOTORLAB_MAIN_KEY_PASSWORD: '${{ secrets.MOTORLAB_MAIN_KEY_PASSWORD }}'
+      MOTORLAB_MAIN_CERT_SHA256: '${{ secrets.MOTORLAB_MAIN_CERT_SHA256 }}'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Validate protected signing material is provisioned
+        id: check_signing
+        run: |
+          set -euo pipefail
+          if [[ -z "$MOTORLAB_MAIN_KEYSTORE_B64" ||
+                -z "$MOTORLAB_MAIN_STORE_PASSWORD" ||
+                -z "$MOTORLAB_MAIN_KEY_ALIAS" ||
+                -z "$MOTORLAB_MAIN_KEY_PASSWORD" ||
+                -z "$MOTORLAB_MAIN_CERT_SHA256" ]]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "MOTORLAB_LAB06_PROTECTED_RELEASE=PENDING_OWNER_SECRETS"
+            echo "No APK released. Owner must configure all 5 protected Actions secrets; no test signing fallback." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if ! [[ "$MOTORLAB_MAIN_CERT_SHA256" =~ ^[0-9a-fA-F]{64}$ ]]; then
+            echo "::error::Invalid protected certificate SHA-256 format"
+            exit 1
+          fi
+          keyfile="$RUNNER_TEMP/motorlab-protected-main.p12"
+          umask 077
+          printf '%s' "$MOTORLAB_MAIN_KEYSTORE_B64" | base64 --decode > "$keyfile"
+          test -s "$keyfile"
+          chmod 600 "$keyfile"
+          echo "MOTORLAB_MAIN_KEYSTORE=$keyfile" >> "$GITHUB_ENV"
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+      - name: Build and attest protected LAB06 release APK
+        if: steps.check_signing.outputs.ready == 'true'
+        id: release
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$sdkmanager"
+          "$sdkmanager" "platforms;android-35" "build-tools;35.0.0"
+          gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleRelease
+          apk=apps/motorlab-android/app/build/outputs/apk/release/app-release.apk
+          test -s "$apk"
+          signer="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$signer" verify "$apk"
+          actual="$("$signer" verify --print-certs "$apk" |
+            sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)"
+          test -n "$actual"
+          actual="$(printf '%s' "$actual" | tr '[:upper:]' '[:lower:]')"
+          expected="$(printf '%s' "$MOTORLAB_MAIN_CERT_SHA256" | tr '[:upper:]' '[:lower:]')"
+          if [[ "$actual" != "$expected" ]]; then
+            echo "::error::Signing certificate mismatch; refusing artifact publication"
+            exit 1
+          fi
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" |
+            grep -m1 "package: name='it.motorlab.app' versionCode='6'"
+          mkdir -p apps/motorlab-android/dist
+          cp "$apk" apps/motorlab-android/dist/MotorLab-LAB06.apk
+          (
+            cd apps/motorlab-android/dist
+            sha256sum MotorLab-LAB06.apk > MotorLab-LAB06.sha256
+            zip -9 MotorLab-LAB06.zip MotorLab-LAB06.apk MotorLab-LAB06.sha256
+          )
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          echo "MOTORLAB_LAB06_RELEASE_SIGNING_CERT_PINNED=PASSED"
+          echo "MotorLab LAB06 signed with owner-protected certificate, package it.motorlab.app and versionCode 6. Back up keystore before first install." >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload signed APK and ZIP privately
+        if: steps.release.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MotorLab-LAB06-Protected-APK-and-ZIP
+          path: |
+            apps/motorlab-android/dist/MotorLab-LAB06.apk
+            apps/motorlab-android/dist/MotorLab-LAB06.zip
+            apps/motorlab-android/dist/MotorLab-LAB06.sha256
+          if-no-files-found: error
+          retention-days: 30
