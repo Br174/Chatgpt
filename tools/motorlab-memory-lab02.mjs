@@ -8,6 +8,8 @@ try{
  const demonstrations=queries.map(query=>{
   const result=recallVerifiedMemory(s,{query});
   if(!result.found)throw Error('live_recall_not_found:'+query);
+  if(query==='release'&&result.results[0]?.key!=='core.release')throw Error('incorrect_release_ranking');
+  if(query==='GitHub'&&result.results[0]?.key!=='authority.github')throw Error('incorrect_github_ranking');
   return {query,found:result.found,topKeys:result.results.slice(0,3).map(x=>x.key)};
  });
  const expected=['core.release','authority.github','authority.d1','authority.kv','authority.notion','infra.d1','infra.kv','memory.lab01.scope','memory.lab01.ci'];
