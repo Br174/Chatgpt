@@ -15,6 +15,7 @@ on:
       - 'cloudflare/motorlab-state-bridge/wrangler.jsonc'
       - '.github/workflows/motorlab-autosetup-cloudflare-lab06.yml'
       - '.github/autosetup/LAB06_PRODUCTION_APPROVAL.json'
+      - '.github/autosetup/LAB06_PROBE_APPROVAL.json'
   workflow_dispatch:
     inputs:
       deploy_production:
@@ -174,6 +175,7 @@ jobs:
             if [[ "$code" == 200 ]] && jq -e '
               .service == "motorlab-autosetup-cloudflare" and
               .write_enabled == false and
+              .probe_enabled == false and
               .github_write_verified == false and
               .chat_connected_verified == false
             ' "$body" >/dev/null 2>&1; then
@@ -224,7 +226,7 @@ jobs:
       github.event_name == 'push' &&
       github.ref == 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013' &&
       github.actor == 'Br174' &&
-      github.event.head_commit.message == 'MOTORLAB LAB06 AUTHORIZE PRODUCTION DEPLOY' &&
+      github.event.head_commit.message == 'MOTORLAB LAB06 AUTHORIZE PROBE WINDOW' &&
       needs.preview.result == 'success' &&
       needs.verify.result == 'success'
     runs-on: ubuntu-latest
@@ -251,9 +253,9 @@ jobs:
           test "$GITHUB_EVENT_NAME" = 'push'
           test "$GITHUB_REF" = 'refs/heads/motorlab/autosetup-cloudflare-lab06-20261013'
           test "$GITHUB_ACTOR" = 'Br174'
-          test "$(git log -1 --pretty=%s)" = 'MOTORLAB LAB06 AUTHORIZE PRODUCTION DEPLOY'
+          test "$(git log -1 --pretty=%s)" = 'MOTORLAB LAB06 AUTHORIZE PROBE WINDOW'
           test "$(git rev-list --parents -n 1 HEAD | wc -w)" -eq 2
-          marker='.github/autosetup/LAB06_PRODUCTION_APPROVAL.json'
+          marker='.github/autosetup/LAB06_PROBE_APPROVAL.json'
           test -f "$marker"
           approved_sha="$(git rev-parse HEAD^)"
           test "$(git diff --name-only "$approved_sha" HEAD)" = "$marker"
@@ -264,9 +266,21 @@ jobs:
             .source_head == $sha and
             .approved == true and
             .writes_enabled == false and
-            .deploy_production == true
+            .probe_only == true and
+            .deploy_production == true and
+            (.expires_at | type == "string")
           ' "$marker" >/dev/null
-          echo 'LAB06 one-shot deployment authorization verified without secrets.'
+          config='cloudflare/motorlab-state-bridge/wrangler.jsonc'
+          test "$(jq -r '.vars.MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE' "$config")" = false
+          test "$(jq -r '.vars.MOTORLAB_AUTOSETUP_PROBE_ONLY' "$config")" = true
+          test "$(jq -r '.previews.vars.MOTORLAB_AUTOSETUP_PROBE_ONLY' "$config")" = false
+          expires="$(jq -r '.expires_at' "$marker")"
+          test "$expires" = "$(jq -r '.vars.MOTORLAB_AUTOSETUP_PROBE_UNTIL' "$config")"
+          exp_epoch="$(date -u -d "$expires" +%s)"
+          now_epoch="$(date -u +%s)"
+          test "$exp_epoch" -gt "$now_epoch"
+          test "$exp_epoch" -le "$((now_epoch+45*60))"
+          echo 'LAB06 synthetic-only 45-minute window authorized; signing writes remain disabled.'
       - name: Install Wrangler dependencies
         working-directory: apps/motorlab-chat-secure-bridge
         run: npm install --no-audit --no-fund --ignore-scripts
@@ -318,6 +332,7 @@ jobs:
               if [[ "$code" == '200' ]] && jq -e '
                 .service == "motorlab-autosetup-cloudflare" and
                 .write_enabled == false and
+                .probe_enabled == true and
                 .github_write_verified == false and
                 .chat_connected_verified == false
               ' "$body" >/dev/null 2>&1; then
@@ -380,7 +395,7 @@ jobs:
             {
               echo '### MotorLab LAB06 Cloudflare deploy'
               echo '- Worker version deployed and smoke checks passed.'
-              echo '- AutoSetup GitHub writes remain disabled.'
+              echo '- Only synthetic GitHub probe is enabled temporarily; all five signing secret writes remain disabled.'
               echo '- Health, panel CSP/no-store/anti-frame and CORE/Pollicino delegation verified.'
               echo '- No credential values or response bodies were recorded.'
             } >> "$GITHUB_STEP_SUMMARY"
