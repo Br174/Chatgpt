@@ -135,6 +135,23 @@ def scroll_to_click(token,tries=7):
         time.sleep(.7)
     raise AssertionError("AutoSetup button could not be reached: "+token)
 
+def scroll_until_visible(token,tries=10):
+    for _ in range(tries):
+        nodes=matches(token)
+        for node in nodes:
+            bounds=[int(v) for v in re.findall(r"\d+",node.get("bounds",""))]
+            if len(bounds)==4 and bounds[2]>bounds[0] and bounds[3]>bounds[1]:
+                return node
+        scrolls=[n for n in ui() if n.get("class")=="android.widget.ScrollView"]
+        if not scrolls:break
+        bounds=[int(v) for v in re.findall(r"\d+",scrolls[0].get("bounds",""))]
+        if len(bounds)!=4 or bounds[3]-bounds[1]<220:break
+        x=(bounds[0]+bounds[2])//2
+        adb("shell","input","swipe",str(x),str(bounds[3]-45),
+            str(x),str(bounds[1]+45),"370")
+        time.sleep(.6)
+    raise AssertionError("AutoSetup text not visible after scrolling: "+token)
+
 def scroll_top():
     scrolls=[n for n in ui() if n.get("class")=="android.widget.ScrollView"]
     if not scrolls:raise AssertionError("AutoSetup scroll missing")
@@ -182,6 +199,11 @@ def autosetup_smoke():
     scroll_top()
     wait("Compilati 2 campi",seconds=12)
     print("MOTORLAB_AUTOSETUP_GENERIC_FORM_FILL=PASSED_FIELDS_2_VERIFIED",flush=True)
+    scroll_top()
+    click("Trova collegamenti del sito",exact=True)
+    scroll_until_visible("Collegamenti interni · 1")
+    scroll_until_visible("Apri: Impostazioni demo")
+    print("MOTORLAB_AUTOSETUP_GENERIC_LINK_DISCOVERY=PASSED_SAME_ORIGIN_DEMO",flush=True)
     no_crash()
 
 def main():
