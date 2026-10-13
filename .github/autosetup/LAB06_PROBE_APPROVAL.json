@@ -2,12 +2,12 @@
   "schema": 1,
   "operation_id": "MOTORLAB-AUTOSETUP-LAB06-CLOUDFLARE-CHAT-FIRST",
   "worker": "motorlab-state-bridge",
-  "source_head": "f3cc11754a4f22f9c55459ba8a201afdc886903e",
+  "source_head": "f693312f37410c25961ed3e973365893ecdcebaa",
   "approved": true,
   "deploy_production": true,
   "probe_only": true,
   "writes_enabled": false,
-  "expires_at": "2026-10-13T21:45:14Z",
+  "expires_at": "2026-10-13T21:58:31Z",
   "scope": "synthetic-test-only-PAT-entered-exclusively-in-browser",
-  "approval_basis": "User approved GitHub connection-stage and cleanup correction, guarded redeploy/retest in this conversation"
+  "approval_basis": "Original approved LAB06 GitHub transport causal fix and protected synthetic-only test; Cloudflare redirect manual gate"
 }
