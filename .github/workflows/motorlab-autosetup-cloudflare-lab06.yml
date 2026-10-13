@@ -195,6 +195,29 @@ jobs:
           grep -qi "frame-ancestors 'none'" "$headers"
           grep -qi "script-src 'nonce-" "$headers"
 
+          # Validate libsodium sealed-box and UUID INSIDE the actual Cloudflare
+          # runtime, using an ephemeral local key and NO PAT or GitHub network.
+          crypto_ok=false
+          for attempt in 1 2 3; do
+            code="$(curl --silent --output "$body" --write-out '%{http_code}' \
+              --max-time 9 "$PREVIEW_URL/autosetup/v1/crypto-selftest" || true)"
+            if [[ "$code" == 200 ]] && jq -e '
+              .crypto_ready == true and .stage == "READY"
+            ' "$body" >/dev/null 2>&1; then
+              crypto_ok=true
+              break
+            fi
+            stage="$(jq -r '.stage // "UNAVAILABLE"' "$body" 2>/dev/null || echo UNAVAILABLE)"
+            # Only fixed static stage enumerations are surfaced.
+            case "$stage" in
+              SODIUM_READY|KEYPAIR|ENCRYPT|DECRYPT|RANDOM_UUID|UNAVAILABLE) ;;
+              *) stage="UNAVAILABLE" ;;
+            esac
+            echo "LAB06 crypto self-test failed: HTTP $code, stage=$stage" >&2
+            sleep 2
+          done
+          test "$crypto_ok" = true
+
           # Synthetic, unauthenticated negative tests: never send a real PAT.
           denied="$(curl --silent --output /dev/null --write-out '%{http_code}' \
             --max-time 12 -X OPTIONS -H 'Origin: https://blocked.invalid' \
@@ -215,7 +238,7 @@ jobs:
             echo '- Worker: existing motorlab-state-bridge (no parallel Worker).'
             echo '- Active production version unchanged after Preview.'
             echo '- Preview uses no production D1/KV binding; Pollicino DO isolated.'
-            echo '- Health, protected panel, cross-origin denial and write-off gate: PASS.'
+            echo '- Health, protected panel, local crypto sealed-box, cross-origin denial and write-off gate: PASS.'
             echo '- No PAT, secret value or request body was logged.'
           } >> "$GITHUB_STEP_SUMMARY"
 
