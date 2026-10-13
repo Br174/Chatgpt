@@ -14,6 +14,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.Spinner;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -64,7 +67,28 @@ public final class AutoSetupActivity extends Activity {
         final String signature;
         final String label;
         final EditText editor;
-        FormField(int i,String s,String label,EditText e){index=i;signature=s;this.label=label;editor=e;}
+        final Spinner picker;
+        final CheckBox toggle;
+        final JSONArray options;
+        boolean toggleModified;
+        FormField(int i,String s,String label,EditText e,Spinner p,CheckBox t,JSONArray o){
+            index=i;signature=s;this.label=label;editor=e;
+            picker=p;toggle=t;options=o;
+        }
+        /** null means no user change; empty is valid only as a site-defined menu option. */
+        String pendingValue(){
+            if(toggle!=null)return toggleModified?(toggle.isChecked()?"true":"false"):null;
+            if(picker!=null){
+                int selected=picker.getSelectedItemPosition();
+                if(selected<=0||options==null||selected>options.length())return null;
+                JSONObject opt=options.optJSONObject(selected-1);
+                return opt==null?null:opt.optString("value","");
+            }
+            if(editor==null)return null;
+            String value=editor.getText().toString();
+            return value.isEmpty()?null:value;
+        }
+        String kind(){return toggle==null?"value":"checkbox";}
     }
 
     private TextView text(String value,int size,boolean bold) {
@@ -780,9 +804,14 @@ public final class AutoSetupActivity extends Activity {
           "var sig=[el.tagName,typ,el.name||'',el.id||''].join('|');"+
           "var sensitive=/password|passwort|token|secret|api.?key|auth|credential|otp|2fa|codice.*accesso/i.test("+
           "label+' '+(el.name||'')+' '+(el.id||''));"+
-          "if(['password','hidden','file','checkbox','radio','submit','button','reset'].indexOf(typ)>=0||sensitive)return null;"+
+          "if(['password','hidden','file','radio','submit','button','reset'].indexOf(typ)>=0||sensitive)return null;"+
           "if(['input','textarea','select'].indexOf(tag)<0||el.disabled)return null;"+
-          "return {i:i,s:sig,label:String(label).slice(0,90)};"+
+          "if(tag==='select'&&(el.multiple||el.options.length>25))return null;"+
+          "var options=tag==='select'?Array.from(el.options).filter(function(o){return !o.disabled;})."+
+          "map(function(o){return {value:String(o.value).slice(0,150),title:String(o.textContent||o.label||o.value).trim().slice(0,90)};}):[];"+
+          "if(tag==='select'&&!options.length)return null;"+
+          "return {i:i,s:sig,label:String(label).slice(0,90),kind:typ==='checkbox'?'checkbox':tag,"+
+          "checked:typ==='checkbox'?!!el.checked:false,options:options};"+
           "}).filter(Boolean).slice(0,30));})()";
         String origin=activeOrigin;
         status("Rilevazione campi in corso…");
@@ -797,8 +826,38 @@ public final class AutoSetupActivity extends Activity {
                 for(int i=0;i<found.length();i++){
                     JSONObject f=found.getJSONObject(i);
                     String title=f.optString("label","Campo");
-                    EditText input=editor(fields,title);
-                    controls.add(new FormField(f.getInt("i"),f.getString("s"),title,input));
+                    String kind=f.optString("kind","input");
+                    int fieldIndex=f.getInt("i");
+                    String signature=f.getString("s");
+                    if("checkbox".equals(kind)){
+                        CheckBox toggle=new CheckBox(this);
+                        toggle.setText(title);
+                        toggle.setChecked(f.optBoolean("checked",false));
+                        fields.addView(toggle,new LinearLayout.LayoutParams(-1,-2));
+                        FormField control=new FormField(fieldIndex,signature,title,null,null,toggle,null);
+                        toggle.setOnCheckedChangeListener((view,checked)->control.toggleModified=true);
+                        controls.add(control);
+                    }else if("select".equals(kind)){
+                        JSONArray options=f.optJSONArray("options");
+                        if(options==null||options.length()==0)continue;
+                        fields.addView(text(title,13,true));
+                        Spinner picker=new Spinner(this);
+                        ArrayList<String> names=new ArrayList<>();
+                        names.add("— Non modificare —");
+                        for(int k=0;k<options.length();k++){
+                            JSONObject opt=options.optJSONObject(k);
+                            names.add(opt==null?"Opzione":opt.optString("title","Opzione"));
+                        }
+                        ArrayAdapter<String> adapter=new ArrayAdapter<>(this,
+                            android.R.layout.simple_spinner_item,names);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        picker.setAdapter(adapter);
+                        fields.addView(picker,new LinearLayout.LayoutParams(-1,dp(48)));
+                        controls.add(new FormField(fieldIndex,signature,title,null,picker,null,options));
+                    }else{
+                        EditText input=editor(fields,title);
+                        controls.add(new FormField(fieldIndex,signature,title,input,null,null,null));
+                    }
                 }
                 if(controls.isEmpty()){
                     status("Nessun campo ordinario riconosciuto. Il sito potrebbe usare moduli speciali.");
@@ -901,7 +960,7 @@ public final class AutoSetupActivity extends Activity {
                                     String value=suggestion.optString("value","").trim();
                                     if(value.isEmpty()||value.length()>1000)continue;
                                     for(FormField f:controls){
-                                        if(f.index==index&&f.editor.getText().length()==0){
+                                        if(f.index==index&&f.editor!=null&&f.editor.getText().length()==0){
                                             f.editor.setText(value);
                                             accepted++;break;
                                         }
@@ -951,7 +1010,7 @@ public final class AutoSetupActivity extends Activity {
             int count=0;
             StringBuilder names=new StringBuilder();
             for(FormField f:controls){
-                if(f.editor.getText().length()==0)continue;
+                if(f.pendingValue()==null)continue;
                 count++;
                 if(count<=8)names.append("• ").append(limit(
                     f.label.replace('\n',' ').replace('\r',' '),80)).append("\n");
@@ -960,7 +1019,7 @@ public final class AutoSetupActivity extends Activity {
             final int countAtReview=count;
             new AlertDialog.Builder(this).setTitle("Confermare la compilazione?")
                 .setMessage("Sito: "+activeOrigin+"\n"+count+
-                    " campi ordinari da compilare:\n"+names+
+                    " controlli ordinari da applicare:\n"+names+
                     (count>8?"…e altri "+(count-8)+" campi.\n":"")+
                     "\nI valori non vengono mostrati qui. Attenzione: alcuni siti "+
                     "SALVANO AUTOMATICAMENTE dopo input/change, anche senza premere Invia.")
@@ -987,9 +1046,9 @@ public final class AutoSetupActivity extends Activity {
         JSONArray updates=new JSONArray();
         try{
             for(FormField f:controls){
-                String val=f.editor.getText().toString();
-                if(!val.isEmpty())updates.put(new JSONObject().put("i",f.index)
-                    .put("s",f.signature).put("v",val));
+                String val=f.pendingValue();
+                if(val!=null)updates.put(new JSONObject().put("i",f.index)
+                    .put("s",f.signature).put("v",val).put("k",f.kind()));
             }
             if(updates.length()==0){alert("Compila almeno un campo nella chat.");return;}
             currentTaskPlan().prepared(updates.length());
@@ -1000,19 +1059,23 @@ public final class AutoSetupActivity extends Activity {
                 "if(!t||[t.tagName,(t.getAttribute('type')||'text').toLowerCase(),"+
                 "t.name||'',t.id||''].join('|')!==x.s||t.disabled)return 'PAGE_CHANGED';"+
                 "var ty=(t.getAttribute('type')||'text').toLowerCase();"+
-                "if(['password','hidden','file','checkbox','radio','submit','button','reset'].indexOf(ty)>=0)"+
+                "if(['password','hidden','file','radio','submit','button','reset'].indexOf(ty)>=0)"+
                 "return 'PAGE_CHANGED';"+
+                "if(ty==='checkbox'){if(x.k!=='checkbox'||(x.v!=='true'&&x.v!=='false'))return 'PAGE_CHANGED';}"+
+                "else if(x.k!=='value')return 'PAGE_CHANGED';"+
                 "if(t.tagName==='SELECT'&&!Array.from(t.options).some(function(o){return o.value===x.v;}))"+
                 "return 'PAGE_CHANGED';}"+
                 "var filled=0;for(var j=0;j<values.length;j++){var v=values[j];var el=all[v.i];"+
                 "if(!el||[el.tagName,(el.getAttribute('type')||'text').toLowerCase(),el.name||'',el.id||''].join('|')!==v.s)continue;"+
                 "var typ=(el.getAttribute('type')||'text').toLowerCase();"+
-                "if(['password','hidden','file','checkbox','radio','submit','button','reset'].indexOf(typ)>=0||el.disabled)continue;"+
-                "if(el.tagName==='SELECT'){el.value=v.v;}else{"+
+                "if(['password','hidden','file','radio','submit','button','reset'].indexOf(typ)>=0||el.disabled)continue;"+
+                "if(typ==='checkbox'){el.checked=v.v==='true';}"+
+                "else if(el.tagName==='SELECT'){el.value=v.v;}else{"+
                 "var p=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;"+
                 "var d=Object.getOwnPropertyDescriptor(p,'value');if(d&&d.set)d.set.call(el,v.v);else el.value=v.v;}"+
                 "el.dispatchEvent(new Event('input',{bubbles:true}));"+
-                "el.dispatchEvent(new Event('change',{bubbles:true}));if(el.value===v.v)filled++;}"+
+                "el.dispatchEvent(new Event('change',{bubbles:true}));"+
+                "if(typ==='checkbox'?(el.checked===(v.v==='true')):el.value===v.v)filled++;}"+
                 "return String(filled);})()";
             browser.evaluateJavascript(js,result->{
                 try{
@@ -1052,7 +1115,8 @@ public final class AutoSetupActivity extends Activity {
                 "var matches=0;for(var j=0;j<values.length;j++){var v=values[j];var el=all[v.i];"+
                 "if(!el||[el.tagName,(el.getAttribute('type')||'text').toLowerCase(),"+
                 "el.name||'',el.id||''].join('|')!==v.s)return 'PAGE_CHANGED';"+
-                "if(el.value===v.v)matches++;}return String(matches);})()";
+                "if(v.k==='checkbox'? (el.type==='checkbox'&&el.checked===(v.v==='true')):"+
+                "(el.type!=='checkbox'&&el.value===v.v))matches++;}return String(matches);})()";
             browser.evaluateJavascript(js,result->{
                 try{
                     if(!expectedPage.equals(browser.getUrl())||!origin.equals(currentOrigin())){
