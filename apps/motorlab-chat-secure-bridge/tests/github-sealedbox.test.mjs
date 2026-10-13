@@ -88,3 +88,155 @@ test("probe never overwrites a pre-existing reserved GitHub secret",async()=>{
    error=>error.code==="PROBE_SECRET_ALREADY_EXISTS");
  assert.equal(calls,1);
 });
+
+
+test("precheck transient transport error is retried and diagnosed without any write", async()=>{
+ let gets=0, writes=0;
+ const fetchImpl=async(url,opts)=>{
+   if(opts.method !== "GET"){writes++;throw Error("unexpected write");}
+   gets++;
+   const error=new Error("FAKE_PAT_VALUE_MUST_NEVER_LEAK");
+   error.name="TypeError";
+   throw error;
+ };
+ await assert.rejects(
+   probeRepositorySecrets({token,approval:true,liveEnabled:true,fetchImpl}),
+   e=>e instanceof PublicSafeError &&
+      e.code==="GITHUB_PROBE_PRECHECK_TRANSPORT" &&
+      !JSON.stringify(e).includes(token) &&
+      !JSON.stringify(e).includes("FAKE_PAT_VALUE_MUST_NEVER_LEAK")
+ );
+ assert.equal(gets,2);
+ assert.equal(writes,0);
+});
+
+test("a read-only public-key timeout is retried and classified without secrets", async()=>{
+ let calls=0;
+ const fetchImpl=async(_url,opts)=>{
+   assert.equal(opts.method,"GET");
+   calls++;
+   const e=new Error("private request must not be copied");
+   e.name="TimeoutError";
+   throw e;
+ };
+ const { getPublicKey }=await import("../src/github-gateway.mjs");
+ await assert.rejects(getPublicKey({token,fetchImpl}),
+   e=>e.code==="GITHUB_KEY_FETCH_TIMEOUT" &&
+      !JSON.stringify(e).includes("private request"));
+ assert.equal(calls,2);
+});
+
+test("an ambiguous probe PUT is never retried, and the temporary secret is removed",async()=>{
+ await sodium.ready;
+ const keys=sodium.crypto_box_keypair();
+ const key=sodium.to_base64(keys.publicKey,sodium.base64_variants.ORIGINAL);
+ const probeUrl="https://api.github.com/repos/Br174/Chatgpt/actions/secrets/MOTORLAB_AUTOSETUP_LAB06_PROBE";
+ let created=false,putCount=0,deleteCount=0,getCount=0;
+ const fetchImpl=async(url,opts)=>{
+   if(url.endsWith("/public-key"))return reply({key_id:"unit",key});
+   if(url===probeUrl&&opts.method==="GET"){
+     getCount++;return reply({},created?200:404);
+   }
+   if(url===probeUrl&&opts.method==="PUT"){
+     putCount++;created=true;
+     throw new TypeError("DO_NOT_LEAK_PAT_IN_ERROR");
+   }
+   if(url===probeUrl&&opts.method==="DELETE"){
+     deleteCount++;created=false;return new Response(null,{status:204});
+   }
+   throw Error("unexpected operation");
+ };
+ await assert.rejects(probeRepositorySecrets({token,approval:true,liveEnabled:true,fetchImpl}),
+   e=>e.code==="GITHUB_PROBE_CREATE_TRANSPORT"&&!JSON.stringify(e).includes(token)&&
+      !JSON.stringify(e).includes("DO_NOT_LEAK"));
+ assert.equal(putCount,1);
+ assert.equal(deleteCount,1);
+ assert.equal(created,false);
+ assert.equal(getCount,2);
+});
+
+test("probe readback transport failures still cause synthetic secret deletion",async()=>{
+ await sodium.ready;
+ const keys=sodium.crypto_box_keypair();
+ const key=sodium.to_base64(keys.publicKey,sodium.base64_variants.ORIGINAL);
+ const probeUrl="https://api.github.com/repos/Br174/Chatgpt/actions/secrets/MOTORLAB_AUTOSETUP_LAB06_PROBE";
+ let created=false,reads=0,deleted=0;
+ const fetchImpl=async(url,opts)=>{
+   if(url.endsWith("/public-key"))return reply({key_id:"unit",key});
+   if(url===probeUrl&&opts.method==="PUT"){
+     created=true;return new Response(null,{status:201});
+   }
+   if(url===probeUrl&&opts.method==="DELETE"){
+     created=false;deleted++;return new Response(null,{status:204});
+   }
+   if(url===probeUrl&&opts.method==="GET"){
+     reads++;
+     if(reads===1)return reply({},404);
+     if(created)throw new TypeError("READBACK_FAKE_SECRET_VALUE");
+     return reply({},404);
+   }
+   throw Error("unexpected operation");
+ };
+ await assert.rejects(probeRepositorySecrets({token,approval:true,liveEnabled:true,fetchImpl}),
+   e=>e.code==="GITHUB_PROBE_READBACK_TRANSPORT");
+ assert.equal(created,false);assert.equal(deleted,1);
+ assert.equal(reads,4);
+});
+
+test("probe deletion with a lost HTTP response may be verified from GitHub GET 404",async()=>{
+ await sodium.ready;
+ const keys=sodium.crypto_box_keypair();
+ const key=sodium.to_base64(keys.publicKey,sodium.base64_variants.ORIGINAL);
+ const probeUrl="https://api.github.com/repos/Br174/Chatgpt/actions/secrets/MOTORLAB_AUTOSETUP_LAB06_PROBE";
+ let created=false,seen=0;
+ const fetchImpl=async(url,opts)=>{
+   if(url.endsWith("/public-key"))return reply({key_id:"unit",key});
+   if(opts.method==="PUT"){created=true;return new Response(null,{status:201});}
+   if(opts.method==="DELETE"){created=false;throw new TypeError("NO_LEAK");}
+   if(url===probeUrl&&opts.method==="GET"){
+     seen++; if(created)return reply({name:"MOTORLAB_AUTOSETUP_LAB06_PROBE",updated_at:"2026-10-13T18:00:00Z"});
+     return reply({},404);
+   }
+   throw Error("unexpected call");
+ };
+ const result=await probeRepositorySecrets({token,approval:true,liveEnabled:true,fetchImpl});
+ assert.equal(result.status,"GITHUB_PROBE_VERIFIED_AND_REMOVED");
+ assert.equal(created,false);
+ assert.equal(seen,3);
+});
+
+test("probe never declares cleanup success when GitHub refuses deletion",async()=>{
+ await sodium.ready;
+ const keys=sodium.crypto_box_keypair();
+ const key=sodium.to_base64(keys.publicKey,sodium.base64_variants.ORIGINAL);
+ const probeUrl="https://api.github.com/repos/Br174/Chatgpt/actions/secrets/MOTORLAB_AUTOSETUP_LAB06_PROBE";
+ let created=false;
+ const fetchImpl=async(url,opts)=>{
+   if(url.endsWith("/public-key"))return reply({key_id:"unit",key});
+   if(opts.method==="PUT"){created=true;return new Response(null,{status:201});}
+   if(opts.method==="DELETE")return reply({error:"DENIED"},500);
+   if(url===probeUrl&&opts.method==="GET")
+     return created?reply({name:"MOTORLAB_AUTOSETUP_LAB06_PROBE",updated_at:"2026-10-13T18:00:00Z"}):reply({},404);
+   throw Error("unexpected request");
+ };
+ await assert.rejects(probeRepositorySecrets({token,approval:true,liveEnabled:true,fetchImpl}),
+   e=>e.code==="PROBE_CLEANUP_UNVERIFIED");
+ assert.equal(created,true);
+});
+
+test("GitHub access-denied response stays a permission error, not a cleanup error",async()=>{
+ await sodium.ready;
+ const keys=sodium.crypto_box_keypair();
+ const key=sodium.to_base64(keys.publicKey,sodium.base64_variants.ORIGINAL);
+ let deletes=0;
+ const fetchImpl=async(url,opts)=>{
+   if(url.endsWith("/public-key"))return reply({key_id:"unit",key});
+   if(opts.method==="GET")return reply({},404);
+   if(opts.method==="PUT")return reply({},403);
+   if(opts.method==="DELETE"){deletes++;return reply({},204);}
+   throw Error("unexpected");
+ };
+ await assert.rejects(probeRepositorySecrets({token,approval:true,liveEnabled:true,fetchImpl}),
+   e=>e.code==="GITHUB_PERMISSION_MISSING");
+ assert.equal(deletes,0);
+});
