@@ -49,6 +49,7 @@ public final class AutoSetupActivity extends Activity {
     private boolean demoMode=false;
     private boolean autosetupActive=false;
     private boolean demoSettingsPage=false;
+    private boolean demoChoicesPage=false;
     private boolean suggestionRunning=false;
     private boolean guidedAnalysisPending=false;
     private boolean scanAfterNavigation=false;
@@ -179,6 +180,7 @@ public final class AutoSetupActivity extends Activity {
         button(top,"Avvia AutoSetup ibrido",this::startHybrid);
         button(top,"Apri sito dentro MotorLab",this::openSite);
         button(top,"Prova modulo generico offline",this::openDemo);
+        button(top,"Prova scelte e interruttori offline",this::openDemoChoices);
         button(top,"Riconosci i campi del modulo",this::inspectForm);
         button(top,"Trova collegamenti del sito",this::discoverLinks);
         button(top,"Inserisci token protetto per questo sito",this::saveToken);
@@ -284,14 +286,14 @@ public final class AutoSetupActivity extends Activity {
             "(function(){return document.querySelectorAll('input,textarea,select').length;})()",
             result->{
                 if(!demoMode) return;
-                if((demoSettingsPage?"2":"3").equals(result)){
+                if((demoSettingsPage||demoChoicesPage?"2":"3").equals(result)){
                     pageReady=true;
                     activeOrigin=DEMO_ORIGIN;
                     if(hybridFlow.stage()==AutoSetupHybridFlow.Stage.AUTO){
                         try{hybridFlow.visited(activeOrigin,DEMO_ORIGIN+(demoSettingsPage?"/impostazioni":"/"));}
                         catch(Exception stopped){hybridFlow.blocked("La demo ha cambiato pagina inattesa.");}
                     }
-                    status("Demo offline pronta: "+(demoSettingsPage?"2":"3")+" campi HTML. Premere Riconosci i campi.");
+                    status("Demo offline pronta: "+(demoSettingsPage||demoChoicesPage?"2":"3")+" campi HTML. Premere Riconosci i campi.");
                     finishGuidedNavigation();
                 } else if(retry<12) {
                     browser.postDelayed(()->checkDemoReady(retry+1),300);
@@ -306,6 +308,7 @@ public final class AutoSetupActivity extends Activity {
         hybridFlow.reset();hybridHops=0;
         demoMode=true;
         demoSettingsPage=false;
+        demoChoicesPage=false;
         scanAfterNavigation=false;
         nextStepUrl="";nextStepSource="";nextStepOrigin="";
         activeOrigin=DEMO_ORIGIN;
@@ -327,10 +330,35 @@ public final class AutoSetupActivity extends Activity {
         status("Caricamento modulo dimostrativo offline…");
     }
 
+    /** Typed-controls proof: no passwords, server requests or third-party domains. */
+    private void openDemoChoices() {
+        hybridFlow.reset();hybridHops=0;
+        demoMode=true;demoSettingsPage=false;demoChoicesPage=true;
+        scanAfterNavigation=false;
+        nextStepUrl="";nextStepSource="";nextStepOrigin="";
+        activeOrigin=DEMO_ORIGIN;
+        url.setText(DEMO_ORIGIN+"/scelte");
+        goal.setText("Configurare le scelte e gli interruttori dimostrativi");
+        pageReady=false;inspectedUrl="";taskPlan=null;
+        controls.clear();fields.removeAllViews();navigation.removeAllViews();
+        activateAutoSetup();
+        say("AutoSetup: verifica scelte e interruttori offline, senza credenziali reali.");
+        String html="<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head>"+
+            "<body><h2>Controlli dimostrativi</h2><form>"+
+            "<label for='tema'>Tema visivo</label><select id='tema' name='tema'>"+
+            "<option value='chiaro'>Chiaro</option><option value='scuro'>Scuro</option></select>"+
+            "<label for='avvisi'>Abilita avvisi demo</label><input id='avvisi' name='avvisi' type='checkbox'>"+
+            "</form></body></html>";
+        browser.loadDataWithBaseURL(DEMO_ORIGIN+"/scelte",html,"text/html","UTF-8",null);
+        browser.postDelayed(()->checkDemoReady(0),350);
+        status("Caricamento scelte dimostrative offline…");
+    }
+
     /** Second in-memory test page; no request to a remote website. */
     private void openDemoSettingsPage() {
         if(!demoMode || !DEMO_ORIGIN.equals(activeOrigin)) return;
         demoSettingsPage=true;
+        demoChoicesPage=false;
         // Second in-memory page must NEVER inherit the first page's 100% progress.
         pageReady=false;inspectedUrl="";taskPlan=null;controls.clear();fields.removeAllViews();
         navigation.removeAllViews();
@@ -351,6 +379,7 @@ public final class AutoSetupActivity extends Activity {
         try{
             demoMode=false;
             demoSettingsPage=false;
+            demoChoicesPage=false;
             scanAfterNavigation=false;
             nextStepUrl="";nextStepSource="";nextStepOrigin="";
             activeOrigin=SecureServiceToken.checkedOrigin(address);
@@ -1008,18 +1037,22 @@ public final class AutoSetupActivity extends Activity {
                 alert("La pagina è cambiata: analizza nuovamente i campi.");return;
             }
             int count=0;
+            boolean typed=false;
             StringBuilder names=new StringBuilder();
             for(FormField f:controls){
                 if(f.pendingValue()==null)continue;
+                if(f.toggle!=null||f.picker!=null)typed=true;
                 count++;
                 if(count<=8)names.append("• ").append(limit(
                     f.label.replace('\n',' ').replace('\r',' '),80)).append("\n");
             }
             if(count==0){alert("Compila almeno un campo nella chat.");return;}
             final int countAtReview=count;
+            final boolean hasTypedControls=typed;
             new AlertDialog.Builder(this).setTitle("Confermare la compilazione?")
                 .setMessage("Sito: "+activeOrigin+"\n"+count+
-                    " controlli ordinari da applicare:\n"+names+
+                    (hasTypedControls?" controlli da applicare:\n":
+                        " campi ordinari da compilare:\n")+names+
                     (count>8?"…e altri "+(count-8)+" campi.\n":"")+
                     "\nI valori non vengono mostrati qui. Attenzione: alcuni siti "+
                     "SALVANO AUTOMATICAMENTE dopo input/change, anche senza premere Invia.")
