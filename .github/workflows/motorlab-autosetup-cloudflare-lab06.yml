@@ -11,7 +11,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: motorlab-autosetup-cloudflare-{{ github.ref }}
+  group: motorlab-autosetup-cloudflare-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   verify:
