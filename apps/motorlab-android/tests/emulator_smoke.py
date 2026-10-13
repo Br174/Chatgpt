@@ -204,6 +204,14 @@ def autosetup_smoke():
     scroll_until_visible("Collegamenti interni · 1")
     scroll_until_visible("Apri: Impostazioni demo")
     print("MOTORLAB_AUTOSETUP_GENERIC_LINK_DISCOVERY=PASSED_SAME_ORIGIN_DEMO",flush=True)
+    scroll_to_click("Apri: Impostazioni demo")
+    wait("Navigare sul sito?",seconds=12)
+    click("Apri pagina",exact=True)
+    wait("Impostazioni demo",seconds=16)
+    scroll_top()
+    scroll_to_click("Riconosci i campi del modulo")
+    scroll_until_visible("Campi rilevati nel sito · 2")
+    print("MOTORLAB_AUTOSETUP_MULTIPAGE_CONSENT_AND_SCAN=PASSED_OFFLINE",flush=True)
     no_crash()
 
 def main():
