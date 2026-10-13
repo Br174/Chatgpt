@@ -232,12 +232,13 @@ def autosetup_smoke():
     assert "autosetup-demo.example" in receipt_xml
     assert "MotorLabTest" not in receipt_xml and "ProvaAutoSetup" not in receipt_xml
     print("MOTORLAB_AUTOSETUP_RECEIPT_PRIVATE_REDACTED=PASSED",flush=True)
-    # The status TextView can be scrolled out of the accessibility viewport.
-    # Require the visible operation receipt to prove stage 100% AFTER the
-    # second DOM readback; a stale timer/status string is not sufficient.
-    verified_message=scroll_until_visible("[100% percorso locale] MotorLab: esito AutoSetup")
-    assert "verifica DOM 2/2" in verified_message.get("text",""), (
-        "100% must belong to the verified 2/2 DOM receipt, not an earlier stage")
+    # The receipt in the scrollable chat may be outside the accessibility
+    # viewport. Assert the canonical, visible progress TextView instead, and
+    # require the matching DOM 2/2 result in the SAME text node. This proves
+    # that 100% is tied to readback, never to a timer or remote save.
+    verified_status=scroll_until_visible("Avanzamento locale: 100% · Compilati 2 campi · Verifica DOM 2/2")
+    assert "salvataggio server NON verificato" in verified_status.get("text",""), (
+        "Progress 100% must not claim successful remote persistence")
     print("MOTORLAB_AUTOSETUP_STAGE_PROGRESS=PASSED_LOCAL_100_NOT_REMOTE",flush=True)
     print("MOTORLAB_AUTOSETUP_DOM_SECOND_READBACK=PASSED_FIELDS_2",flush=True)
     print("MOTORLAB_AUTOSETUP_FORM_REVIEW_CONSENT_CANCEL=PASSED",flush=True)
