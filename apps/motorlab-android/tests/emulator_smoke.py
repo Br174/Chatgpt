@@ -172,7 +172,16 @@ def autosetup_smoke():
     wait("MotorLab AutoSetup")
     wait("Prova modulo generico offline",clickable=True)
     print("MOTORLAB_AUTOSETUP_CHAT_ENTRY=PASSED",flush=True)
+    # No AutoSetup avatar is inserted into the idle introductory message.
+    assert not any(n.get("class")=="android.widget.ImageView" and
+                   n.get("content-desc")=="AutoSetup attivo" for n in ui())
     click("Prova modulo generico offline",exact=True)
+    scroll_top()
+    wait("AutoSetup attivo",seconds=12)
+    icons=[n for n in ui() if n.get("class")=="android.widget.ImageView" and
+           n.get("content-desc")=="AutoSetup attivo"]
+    assert icons, "Original AutoSetup avatar missing from active chat"
+    print("MOTORLAB_AUTOSETUP_ORIGINAL_AVATAR=PASSED_ACTIVE_ONLY",flush=True)
     print("MOTORLAB_AUTOSETUP_OFFLINE_DEMO_LAUNCH=PASSED",flush=True)
     time.sleep(2)
     scroll_to_click("Riconosci i campi del modulo")

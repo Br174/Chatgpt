@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import json
+import hashlib
+import struct
 p=Path(__file__).resolve().parents[1]
 source=(p/"app/src/main/java/it/motorlab/app/MainActivity.java").read_text()
 manifest=(p/"app/src/main/AndroidManifest.xml").read_text()
@@ -141,3 +143,16 @@ assert "Condividi checkpoint" in autosetup and "Intent.ACTION_SEND" in autosetup
 assert "Condividere checkpoint AutoSetup?" in autosetup and "NON contiene obiettivo" in autosetup
 assert "MOTORLAB_AUTOSETUP_REDACTED_CHECKPOINT_SHARE_CONSENT=PASSED" in emulator
 print("AutoSetup shared redacted contract and explicit Android share: PASS")
+
+# Original user-supplied two-gear icon is resampled only for Android avatar density.
+icon=p/"app/src/main/res/drawable-nodpi/autosetup_avatar.png"
+raw=icon.read_bytes()
+assert raw[:8]==b"\x89PNG\r\n\x1a\n"
+assert struct.unpack(">II",raw[16:24])==(96,96)
+assert hashlib.sha256(raw).hexdigest()=="a087c868ff129847326a3a4fcb5e4823b3e50c46cf18e888e4f75edc4f361227"
+assert 'setImageResource(R.drawable.autosetup_avatar)' in autosetup
+assert 'setContentDescription("AutoSetup attivo")' in autosetup
+assert 'private void activateAutoSetup()' in autosetup
+assert 'activateAutoSetup();' in autosetup
+assert 'MOTORLAB_AUTOSETUP_ORIGINAL_AVATAR=PASSED_ACTIVE_ONLY' in emulator
+print("AutoSetup user-original inline avatar resource and active state: PASS")

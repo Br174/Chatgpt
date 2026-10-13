@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
@@ -15,6 +16,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -40,6 +42,7 @@ public final class AutoSetupActivity extends Activity {
     private String inspectedUrl="";
     private boolean pageReady=false;
     private boolean demoMode=false;
+    private boolean autosetupActive=false;
     private boolean demoSettingsPage=false;
     private boolean suggestionRunning=false;
     private boolean guidedAnalysisPending=false;
@@ -76,7 +79,37 @@ public final class AutoSetupActivity extends Activity {
         parent.addView(e,new LinearLayout.LayoutParams(-1,-2));return e;
     }
     private void say(String msg) {
-        conversation.addView(text(msg,13,false));
+        // Keep the existing introduction untouched. Once AutoSetup is active,
+        // show the user's original gear/check artwork where a chat avatar sits.
+        if(!autosetupActive){
+            conversation.addView(text(msg,13,false));
+            return;
+        }
+        LinearLayout message=new LinearLayout(this);
+        message.setOrientation(LinearLayout.HORIZONTAL);
+        ImageView avatar=new ImageView(this);
+        avatar.setImageResource(R.drawable.autosetup_avatar);
+        avatar.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        avatar.setContentDescription("AutoSetup attivo");
+        GradientDrawable circle=new GradientDrawable();
+        circle.setShape(GradientDrawable.OVAL);
+        circle.setColor(0xff252b33);
+        avatar.setBackground(circle);
+        avatar.setPadding(dp(3),dp(3),dp(3),dp(3));
+        LinearLayout.LayoutParams emblem=new LinearLayout.LayoutParams(dp(38),dp(38));
+        emblem.setMargins(0,dp(3),dp(8),0);
+        message.addView(avatar,emblem);
+        message.addView(text(msg,13,false),
+            new LinearLayout.LayoutParams(0,-2,1));
+        LinearLayout.LayoutParams placement=new LinearLayout.LayoutParams(-1,-2);
+        placement.setMargins(0,0,0,dp(4));
+        conversation.addView(message,placement);
+    }
+
+    private void activateAutoSetup() {
+        if(autosetupActive)return;
+        autosetupActive=true;
+        say("AutoSetup attivo");
     }
     private void status(String msg) {state.setText(msg);}
     private void alert(String msg){new AlertDialog.Builder(this).setMessage(msg).setPositiveButton("OK",null).show();}
@@ -217,6 +250,7 @@ public final class AutoSetupActivity extends Activity {
         goal.setText("Apri le impostazioni demo senza utilizzare servizi esterni");
         pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
         navigation.removeAllViews();
+        activateAutoSetup();
         say("MotorLab: prova offline. Nessuna connessione a servizi esterni o login.");
         String html="<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head>"+
             "<body><h2>Modulo dimostrativo MotorLab</h2><form>"+
@@ -256,6 +290,7 @@ public final class AutoSetupActivity extends Activity {
             nextStepUrl="";nextStepSource="";nextStepOrigin="";
             activeOrigin=SecureServiceToken.checkedOrigin(address);
             controls.clear();fields.removeAllViews();navigation.removeAllViews();pageReady=false;inspectedUrl="";
+            activateAutoSetup();
             say("Richiesta: "+limit(goal.getText().toString(),180)+
                 " · Sito: "+activeOrigin+" · Apertura autorizzata.");
             browser.loadUrl(address);
@@ -286,6 +321,7 @@ public final class AutoSetupActivity extends Activity {
         final String origin;
         try {origin=currentOrigin();}
         catch(Exception e){alert("Apri prima un sito HTTPS compatibile.");return;}
+        activateAutoSetup();
         navigation.removeAllViews();
         nextStepUrl="";nextStepSource="";nextStepOrigin="";
         final String expectedPage=browser.getUrl();
@@ -456,6 +492,7 @@ public final class AutoSetupActivity extends Activity {
     private void analyzeAndPlan() {
         try {currentOrigin();}
         catch(Exception e){alert("Apri prima una pagina HTTPS compatibile.");return;}
+        activateAutoSetup();
         guidedAnalysisPending=true;
         status("Analisi guidata: riconoscimento campi, poi collegamenti interni.");
         inspectForm();
@@ -464,6 +501,7 @@ public final class AutoSetupActivity extends Activity {
     private void inspectForm() {
         try{currentOrigin();}
         catch(Exception e){guidedAnalysisPending=false;alert("Apri prima un sito compatibile.");return;}
+        activateAutoSetup();
         // No input values, passwords, tokens, cookies, or page content are collected.
         String js="(function(){var all=Array.from(document.querySelectorAll('input,textarea,select'));"+
           "return JSON.stringify(all.map(function(el,i){"+

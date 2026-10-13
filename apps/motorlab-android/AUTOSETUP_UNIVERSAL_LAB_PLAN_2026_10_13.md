@@ -206,3 +206,10 @@ PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
 - Questa chat può utilizzare subito i plugin/connettori reali disponibili e leggere il checkpoint condiviso dall'utente. Le approvazioni per eseguire azioni devono essere raccolte nuovamente.
 - Schema, fixture e test aggiornati nella stessa LAB, mantenendo firma release e REALTEST fuori perimetro.
 - Futuro bridge bidirezionale autenticato NON implementato e NON simulato.
+
+## Icona AutoSetup approvata — avatar chat (13/10/2026)
+- Grafica approvata dall'utente: icona originale con ingranaggio grigio dietro e ingranaggio giallo con spunta, posta a SINISTRA dei messaggi di AutoSetup nella chat, nella posizione dell'avatar M, non come banner aggiuntivo.
+- Una risorsa PNG `app/src/main/res/drawable-nodpi/autosetup_avatar.png` contiene soltanto l'originale dell'utente ridimensionato a 96×96 per renderlo piccolo e nitido. Nessuna generazione di una nuova icona; nessuna modifica alla grafica di altri progetti.
+- `AutoSetupActivity.say()` mostra l'icona come avatar circolare 38dp ai messaggi dell'operazione DOPO attivazione. Il messaggio introduttivo in stato inattivo resta invariato. All'apertura di una demo o sito (e sulle azioni attive consentite) `activateAutoSetup()` pubblica il messaggio di stato con l'avatar.
+- Test Android: prima dell'attivazione non appare l'avatar specifico; dopo l'avvio della demo compare `ImageView` con contentDescription `AutoSetup attivo`. La UI è modificata solo nel punto esplicitamente approvato.
+- In questa chat ChatGPT è possibile *mostrare* l'icona accanto al testo di stato, ma non cambiare l'avatar di sistema dell'interfaccia ChatGPT dall'interno della conversazione. Non affermare che la sostituzione nel client ChatGPT sia implementata.
