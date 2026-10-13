@@ -228,6 +228,15 @@ public final class AutoSetupActivity extends Activity {
         root.addView(browser,new LinearLayout.LayoutParams(-1,0,2));
         button(root,"← Torna alla Team Chat",this::finish);
         setContentView(root);
+        // Sharesheet launches from another Android application are never tasks.
+        // Review only after UI is initialized; do not navigate automatically.
+        Intent launch=getIntent();
+        if(launch!=null && "it.motorlab.app.ACTION_REVIEW_ONLY".equals(launch.getAction())){
+            final String imported=launch.getStringExtra(
+                AutoSetupShareReceiverActivity.EXTRA_REVIEW_CHECKPOINT);
+            launch.removeExtra(AutoSetupShareReceiverActivity.EXTRA_REVIEW_CHECKPOINT);
+            if(imported!=null)browser.post(()->reviewImportedCheckpoint(imported));
+        }
     }
 
     private void checkDemoReady(int retry) {
@@ -535,14 +544,24 @@ public final class AutoSetupActivity extends Activity {
                 }
             }
             String json=new String(bytes.toByteArray(),StandardCharsets.UTF_8);
+            reviewImportedCheckpoint(json);
+        }catch(Exception e){
+            // Never echo raw input, URLs from rejected files or JSON containing secrets.
+            alert("Importazione respinta: JSON incompatibile o non sicuro. Nessun dato applicato.");
+        }
+    }
+
+
+    /** Reviews an untrusted file/share. Never restores approvals or credentials. */
+    private void reviewImportedCheckpoint(String json) {
+        try {
             final AutoSetupCheckpointBridge.Preview preview=AutoSetupCheckpointBridge.inspect(json);
             new AlertDialog.Builder(this)
                 .setTitle("Checkpoint AutoSetup dalla chat")
                 .setMessage(preview.review())
                 .setNegativeButton("Annulla",null)
                 .setPositiveButton("Prepara sito",(d,w)->{
-                    // A transfer is an UNTRUSTED observation, never consent to
-                    // resume a session, inherit passwords or execute remote writes.
+                    // No automatic website navigation even after review consent.
                     browser.stopLoading();
                     demoMode=false;demoSettingsPage=false;scanAfterNavigation=false;
                     guidedAnalysisPending=false;nextStepUrl="";nextStepSource="";nextStepOrigin="";
@@ -550,14 +569,13 @@ public final class AutoSetupActivity extends Activity {
                     controls.clear();fields.removeAllViews();navigation.removeAllViews();
                     goal.setText("");
                     url.setText(preview.origin);
-                    browser.loadUrl("about:blank"); // local reset, NO network access
+                    browser.loadUrl("about:blank");
                     activateAutoSetup();
                     say("Checkpoint dalla chat letto come dato non verificato: "+preview.origin+
                         ". Nessuna sessione, autorizzazione o credenziale importata.");
                     status("Sito preparato, NON aperto. Premi Apri sito per nuova verifica.");
                 }).show();
-        }catch(Exception e){
-            // Never echo raw input, URLs from rejected files or JSON containing secrets.
+        } catch(Exception rejected) {
             alert("Importazione respinta: JSON incompatibile o non sicuro. Nessun dato applicato.");
         }
     }
