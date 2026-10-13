@@ -73,6 +73,20 @@ assert 'bool(privacy,"contains_credentials",false)' in bridge
 assert "SecureServiceToken.checkedOrigin(origin)" in bridge
 assert 'choice(verification,"remote_outcome","not_verified","verified_separately")' in bridge
 assert "Intent.ACTION_OPEN_DOCUMENT" in activity
+receiver=(root/"app/src/main/java/it/motorlab/app/AutoSetupShareReceiverActivity.java").read_text()
+manifest=(root/"app/src/main/AndroidManifest.xml").read_text()
+assert 'android:name=".AutoSetupActivity" android:exported="false"' in manifest
+assert 'android:name=".AutoSetupShareReceiverActivity"' in manifest
+assert 'android:exported="true"' in manifest
+assert 'android.intent.action.SEND' in manifest
+assert "AutoSetupCheckpointBridge.inspect(json)" in receiver
+assert "Intent.ACTION_SEND.equals(incoming.getAction())" in receiver
+assert "MAX_BYTES" in receiver
+assert "EXTRA_REVIEW_CHECKPOINT" in receiver
+assert "startActivity(review)" in receiver
+assert "reviewImportedCheckpoint(imported)" in activity
+assert 'launch.removeExtra(AutoSetupShareReceiverActivity.EXTRA_REVIEW_CHECKPOINT)' in activity
+assert 'browser.loadUrl("about:blank")' in activity
 assert 'button(top,"Importa checkpoint dalla chat",this::pickCheckpoint)' in activity
 assert "AutoSetupCheckpointBridge.inspect(json)" in activity
 assert "ByteArrayOutputStream" in activity and "input.read(buffer)" in activity
