@@ -2,12 +2,12 @@
   "schema": 1,
   "operation_id": "MOTORLAB-AUTOSETUP-LAB06-CLOUDFLARE-CHAT-FIRST",
   "worker": "motorlab-state-bridge",
-  "source_head": "845e5b90c63f40a4c01b94a11efed615c3f7adef",
+  "source_head": "f3cc11754a4f22f9c55459ba8a201afdc886903e",
   "approved": true,
   "deploy_production": true,
   "probe_only": true,
   "writes_enabled": false,
-  "expires_at": "2026-10-13T21:22:46Z",
+  "expires_at": "2026-10-13T21:45:14Z",
   "scope": "synthetic-test-only-PAT-entered-exclusively-in-browser",
-  "approval_basis": "explicit user approval to enable temporary probe and cause-fixed retry after verified automatic rollback"
+  "approval_basis": "User approved GitHub connection-stage and cleanup correction, guarded redeploy/retest in this conversation"
 }
