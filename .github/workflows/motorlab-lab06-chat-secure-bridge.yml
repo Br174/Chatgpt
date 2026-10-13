@@ -1,0 +1,39 @@
+name: MotorLab LAB06 ChatGPT Secure Bridge Safety Gates
+on:
+  push:
+    branches: ['motorlab/lab06-chat-first-secure-bridge-*']
+    paths:
+      - 'apps/motorlab-chat-secure-bridge/**'
+      - '.github/workflows/motorlab-lab06-chat-secure-bridge.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: motorlab-chat-secure-bridge-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test_gateway:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source syntax
+        run: |
+          node --check apps/motorlab-chat-secure-bridge/src/github-gateway.mjs
+          node --check apps/motorlab-chat-secure-bridge/src/server.mjs
+          node --check apps/motorlab-chat-secure-bridge/tests/gateway.test.mjs
+      - name: Install only dedicated bridge dependencies
+        working-directory: apps/motorlab-chat-secure-bridge
+        run: npm install --no-audit --no-fund --ignore-scripts
+      - name: Test synthetic secrets, sealed-box, CORS, readback and fail-closed mode
+        working-directory: apps/motorlab-chat-secure-bridge
+        env:
+          MOTORLAB_LIVE_GITHUB_WRITE: 'false'
+        run: npm test
+      - name: No user secrets or GitHub writes performed
+        run: |
+          echo "LAB06 ChatGPT secure bridge: local fake-token tests only." >> "$GITHUB_STEP_SUMMARY"
+          echo "No GitHub Actions Secrets created; no host deployed; no plugin connected." >> "$GITHUB_STEP_SUMMARY"
