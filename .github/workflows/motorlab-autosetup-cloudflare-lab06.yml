@@ -119,6 +119,36 @@ jobs:
             printf '%s\n' "$active_version"
           }
 
+          # Read-only verification. A token may be user-owned or account-owned.
+          # Read only HTTP status and numeric Cloudflare error codes, never token IDs or raw responses.
+          verify_token() {
+            local url code body_file error_codes
+            body_file="$(mktemp)"
+            for url in \
+              "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/tokens/verify"; do
+              code="$(curl --silent --show-error --max-time 15 \
+                --output "$body_file" --write-out '%{http_code}' \
+                -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$url")" || {
+                  echo 'Cloudflare token verification transport error.' >&2
+                  continue
+                }
+              if [[ "$code" == 200 ]] && jq -e '
+                .success == true and .result.status == "active"
+              ' "$body_file" >/dev/null 2>&1; then
+                rm -f "$body_file"
+                echo 'Cloudflare token: ACTIVE (identity and value not logged).' >&2
+                return 0
+              fi
+              error_codes="$(jq -r '[.errors[]?.code | tostring] | join(",")' "$body_file" 2>/dev/null || true)"
+              printf 'Cloudflare token verification: HTTP %s, error codes: %s\n' "$code" "${error_codes:-none}" >&2
+            done
+            rm -f "$body_file"
+            echo 'BLOCKED: Cloudflare API token was not verified as active.' >&2
+            return 1
+          }
+
+          verify_token
           LAST_GOOD_VERSION="$(get_active_version)"
           test -n "$LAST_GOOD_VERSION"
 
