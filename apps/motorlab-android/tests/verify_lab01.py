@@ -86,6 +86,15 @@ assert "Nessun campo sarà compilato sul sito" in autosetup
 assert "new SecureGeminiKey(this).load()" in autosetup
 assert "appSettings.reserveDailyTrialCall()" in autosetup
 assert "f.editor.getText().length()==0" in autosetup
+plan=(p/"app/src/main/java/it/motorlab/app/AutoSetupTaskPlan.java").read_text()
+assert 'class AutoSetupTaskPlan' in plan
+assert "Invio definitivo non automatico" in plan
+assert "credenziali non sono incluse" in plan
+assert "Mostra piano operazioni" in autosetup and "currentTaskPlan()" in autosetup
+assert "taskPlan=null" in autosetup and ".scanned(found.length())" in autosetup
+assert ".links(shown)" in autosetup and ".prepared(updates.length())" in autosetup
+assert ".applied(Integer.parseInt(count))" in autosetup
+assert "MOTORLAB_AUTOSETUP_STAGED_PLAN=PASSED_NO_AUTO_SUBMIT" in (p/"tests/emulator_smoke.py").read_text()
 assert "private void openDemoSettingsPage()" in autosetup
 assert "private void discoverLinks()" in autosetup
 assert 'new AlertDialog.Builder(this).setTitle("Navigare sul sito?")' in autosetup

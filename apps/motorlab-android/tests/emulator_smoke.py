@@ -212,6 +212,12 @@ def autosetup_smoke():
     scroll_to_click("Riconosci i campi del modulo")
     scroll_until_visible("Campi rilevati nel sito · 2")
     print("MOTORLAB_AUTOSETUP_MULTIPAGE_CONSENT_AND_SCAN=PASSED_OFFLINE",flush=True)
+    scroll_top()
+    scroll_to_click("Mostra piano operazioni")
+    wait("Piano AutoSetup",seconds=12)
+    wait("Campi riconosciuti: 2",seconds=12)
+    click("OK",exact=True)
+    print("MOTORLAB_AUTOSETUP_STAGED_PLAN=PASSED_NO_AUTO_SUBMIT",flush=True)
     no_crash()
 
 def main():

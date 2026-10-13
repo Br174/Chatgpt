@@ -42,6 +42,7 @@ public final class AutoSetupActivity extends Activity {
     private boolean demoMode=false;
     private boolean demoSettingsPage=false;
     private boolean suggestionRunning=false;
+    private AutoSetupTaskPlan taskPlan;
     private static final String DEMO_ORIGIN="https://autosetup-demo.example";
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
 
@@ -98,6 +99,7 @@ public final class AutoSetupActivity extends Activity {
 
         url=editor(top,"Sito HTTPS, per esempio https://example.com");
         goal=editor(top,"Cosa vuoi fare su questo sito?");
+        button(top,"Mostra piano operazioni",this::showTaskPlan);
         button(top,"Apri sito dentro MotorLab",this::openSite);
         button(top,"Prova modulo generico offline",this::openDemo);
         button(top,"Riconosci i campi del modulo",this::inspectForm);
@@ -130,7 +132,7 @@ public final class AutoSetupActivity extends Activity {
             @Override public void onPageStarted(WebView w,String page,android.graphics.Bitmap favicon){
                 if(demoMode && page!=null && !"about:blank".equals(page)
                         && !page.startsWith(DEMO_ORIGIN+"/")) demoMode=false;
-                pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
+                pageReady=false;inspectedUrl="";taskPlan=null;controls.clear();fields.removeAllViews();
                 navigation.removeAllViews();
             }
             @Override public void onPageFinished(WebView w,String page) {
@@ -310,6 +312,7 @@ public final class AutoSetupActivity extends Activity {
                         }catch(Exception e){alert("La pagina è cambiata.");}
                     });
                 }
+                currentTaskPlan().links(shown);
                 status("Collegamenti interni verificati: "+shown+
                     ". Scegli una pagina dalla chat; nessuna navigazione automatica.");
             }catch(Exception e){
@@ -317,6 +320,22 @@ public final class AutoSetupActivity extends Activity {
                 status("Collegamenti non disponibili su questa pagina.");
             }
         });
+    }
+
+    /** Show the generic step checklist without executing any site operation. */
+    private AutoSetupTaskPlan currentTaskPlan() {
+        String origin=currentOrigin();
+        if(taskPlan==null)taskPlan=new AutoSetupTaskPlan(origin,goal.getText().toString());
+        taskPlan.ready();
+        return taskPlan;
+    }
+
+    private void showTaskPlan() {
+        try {
+            new AlertDialog.Builder(this).setTitle("Piano AutoSetup")
+                .setMessage(currentTaskPlan().summary())
+                .setPositiveButton("OK",null).show();
+        }catch(Exception e){alert("Apri prima una pagina HTTPS compatibile.");}
     }
 
     private void inspectForm() {
@@ -344,6 +363,7 @@ public final class AutoSetupActivity extends Activity {
                 Object decoded=new JSONTokener(value).nextValue();
                 JSONArray found=new JSONArray((String)decoded);
                 controls.clear();fields.removeAllViews();inspectedUrl=browser.getUrl();
+                currentTaskPlan().scanned(found.length());
                 fields.addView(text("Campi rilevati nel sito · "+found.length(),14,true));
                 for(int i=0;i<found.length();i++){
                     JSONObject f=found.getJSONObject(i);
@@ -451,6 +471,7 @@ public final class AutoSetupActivity extends Activity {
                                         }
                                     }
                                 }
+                                currentTaskPlan().prepared(accepted);
                                 status("AI: "+accepted+" valori proposti nella chat, NON inviati al sito.");
                                 say("MotorLab: rivedi tutte le proposte. Solo premendo "+
                                     "«Compila i campi» potranno essere trasferite alla pagina.");
@@ -481,6 +502,7 @@ public final class AutoSetupActivity extends Activity {
                 filled++;
             }
         }
+        currentTaskPlan().prepared(filled);
         status("Preparati "+filled+" valori nella chat; nessun campo web compilato.");
     }
 
@@ -499,6 +521,7 @@ public final class AutoSetupActivity extends Activity {
                     .put("s",f.signature).put("v",val));
             }
             if(updates.length()==0){alert("Compila almeno un campo nella chat.");return;}
+            currentTaskPlan().prepared(updates.length());
             String origin=activeOrigin;
             final String js="(function(){var values="+updates.toString()+";"+
                 "var all=Array.from(document.querySelectorAll('input,textarea,select'));"+
@@ -516,6 +539,7 @@ public final class AutoSetupActivity extends Activity {
                 try{
                     if(!origin.equals(currentOrigin()))return;
                     String count=String.valueOf(new JSONTokener(result).nextValue());
+                    currentTaskPlan().applied(Integer.parseInt(count));
                     status("Compilati "+count+" campi; nessun clic su Invia. Alcuni siti salvano automaticamente.");
                     say("MotorLab: compilazione effettuata su "+origin+
                         ". Non ho premuto Invia; controlla eventuali modifiche salvate automaticamente dal sito.");
