@@ -1,0 +1,25 @@
+MotorLab LAB06 AutoSetup ChatBridge — APK DI PROVA
+Data: 13 ottobre 2026. Firma Android debug TEMPORANEA. Non e' una release produttiva.
+
+Download:
+- MotorLab-LAB06-ChatBridge-TEST.apk
+- MotorLab-LAB06-ChatBridge-TEST.zip (include APK, JSON dimostrativo, istruzioni, checksum).
+
+Verifiche:
+- Android 11 emulatore: tutte le verifiche funzionali passate nel run GitHub 38355061731; quel workflow aveva esito complessivo failure SOLO per quota artefatti.
+- Compilazione e recupero binari: run 38356448314 success, stessa identica sorgente applicativa. Rispetto alla precedente prova l'unico nuovo file sorgente era un workflow di consegna.
+- NON verificata sul telefono fisico.
+- NON e' sincronizzazione automatica con le chat ChatGPT, ma trasferimento di checkpoint redatti via file o menu Condividi.
+
+Installazione:
+- Firma diversa dalle vecchie LAB01 e LAB06 PROVA. Prima scaricare APK e ZIP.
+- Per installarla, disinstallare SOLO la vecchia MotorLab: i dati locali dell'app disinstallata saranno cancellati.
+- Non cancellare MusicLab, StudyBook AI, MotorAI o altre app.
+- Non servono chiavi API o configurazioni.
+- Una futura versione con firma permanente richiedera' un'ulteriore installazione pulita.
+
+Provenienza:
+- Build commit: a17d729ab460ded7a3ce538ef86a93514dcaddb5
+- Functional test workflow: https://github.com/Br174/Chatgpt/actions/runs/38355061731
+- Byte attestation workflow: https://github.com/Br174/Chatgpt/actions/runs/38356448314
+- Stato sviluppo / PR: https://github.com/Br174/Chatgpt/pull/46

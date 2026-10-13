@@ -1,0 +1,2 @@
+38bf66787b93a82da627ddf77e112a9e74b9ddbaf405b7587188304ba31357a8  MotorLab-LAB06-ChatBridge-TEST.apk
+8859cdf81a20ba9c3f40db8438aa9d7d69e429e8c4882e939fb3c3b2444fe6ed  MotorLab-LAB06-ChatBridge-TEST.zip
