@@ -240,3 +240,47 @@ test("GitHub access-denied response stays a permission error, not a cleanup erro
    e=>e.code==="GITHUB_PERMISSION_MISSING");
  assert.equal(deletes,0);
 });
+
+test("Cloudflare-safe redirect handling uses manual and blocks precheck 3xx without writing",async()=>{
+ let calls=0;
+ const fetchImpl=async(_url,opts)=>{
+   calls++;
+   assert.equal(opts.method,"GET");
+   assert.equal(opts.redirect,"manual");
+   return new Response(null,{status:302,headers:{Location:"https://untrusted.invalid/"}});
+ };
+ await assert.rejects(
+   probeRepositorySecrets({token,approval:true,liveEnabled:true,fetchImpl}),
+   err=>err.code==="GITHUB_PROBE_PRECHECK_REDIRECT"&&
+     !JSON.stringify(err).includes(token)
+ );
+ assert.equal(calls,1);
+});
+
+test("all synthetic probe HTTP stages refuse redirects with PAT, including DELETE",async()=>{
+ await sodium.ready;
+ const keys=sodium.crypto_box_keypair();
+ const key=sodium.to_base64(keys.publicKey,sodium.base64_variants.ORIGINAL);
+ const probeUrl="https://api.github.com/repos/Br174/Chatgpt/actions/secrets/MOTORLAB_AUTOSETUP_LAB06_PROBE";
+ const seen=[];
+ let before=true,created=false;
+ const fetchImpl=async(url,opts)=>{
+   assert.equal(opts.redirect,"manual");
+   seen.push(opts.method+" "+url.slice(url.lastIndexOf("/")+1));
+   if(url.endsWith("/public-key"))return reply({key_id:"unit",key});
+   if(url===probeUrl&&opts.method==="GET"){
+     if(before){before=false;return reply({},404);}
+     return reply(created?{name:"MOTORLAB_AUTOSETUP_LAB06_PROBE",updated_at:"2026-10-13T18:00:00Z"}:{},created?200:404);
+   }
+   if(url===probeUrl&&opts.method==="PUT"){created=true;return new Response(null,{status:201});}
+   if(url===probeUrl&&opts.method==="DELETE"){
+     created=false;
+     return new Response(null,{status:302,headers:{Location:"https://untrusted.invalid/"}});
+   }
+   throw new Error("Unexpected request");
+ };
+ const outcome=await probeRepositorySecrets({token,approval:true,liveEnabled:true,fetchImpl});
+ assert.equal(outcome.status,"GITHUB_PROBE_VERIFIED_AND_REMOVED");
+ assert.equal(created,false);
+ assert.ok(seen.some(v=>v.startsWith("DELETE ")));
+});
