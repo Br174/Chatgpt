@@ -14,7 +14,9 @@ RECEIVER=PACKAGE+"/.AutoSetupShareReceiverActivity"
 
 
 def send(json_text):
-    cmd=("am start -W -a android.intent.action.SEND -t text/plain -n "+
+    # Avoid Android ActivityManager -W waiting forever for deliberately rejected
+    # shares that close the receiver before a resumed activity is reported.
+    cmd=("am start -a android.intent.action.SEND -t text/plain -n "+
          RECEIVER+" --es android.intent.extra.TEXT "+shlex.quote(json_text))
     result=adb("shell",cmd,timeout=40)
     assert "Error:" not in result and "Exception" not in result, result[-250:]
