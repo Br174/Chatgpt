@@ -1,0 +1,16 @@
+{
+  "name": "motorlab-autosetup-cloudflare-adapter",
+  "private": true,
+  "version": "0.1.0-lab06",
+  "type": "module",
+  "description": "MotorLab LAB06 secured MCP adapter for the existing Cloudflare state Worker",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.0",
+    "@modelcontextprotocol/ext-apps": "^1.1.2",
+    "libsodium-wrappers": "0.8.4",
+    "zod": "^3.25.0"
+  }
+}
