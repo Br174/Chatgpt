@@ -194,6 +194,11 @@ public final class AutoSetupActivity extends Activity {
                 navigation.removeAllViews();
             }
             @Override public void onPageFinished(WebView w,String page) {
+                if("about:blank".equals(page)&&activeOrigin.isEmpty()) {
+                    pageReady=false;
+                    status("Checkpoint preparato localmente: apri il sito per verificarlo.");
+                    return;
+                }
                 if(demoMode) {
                     // loadDataWithBaseURL can report about:blank on some Android WebViews.
                     // Confirm actual in-memory DOM content rather than trusting its callback URL.
