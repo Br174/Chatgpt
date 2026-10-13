@@ -82,10 +82,7 @@ jobs:
           disable-animations: true
           emulator-boot-timeout: 420
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: |
-            python3 apps/motorlab-android/tests/update_family_smoke.py \
-              "$RUNNER_TEMP/motorlab-test-v6.apk" \
-              "$RUNNER_TEMP/motorlab-test-v7.apk"
+          script: python3 apps/motorlab-android/tests/update_family_smoke.py "$RUNNER_TEMP/motorlab-test-v6.apk" "$RUNNER_TEMP/motorlab-test-v7.apk"
       - name: Seal successful test-family gate
         run: |
           echo "MOTORLAB_LAB06_SIGNED_UPDATE_FAMILY_EMULATOR=PASSED_TEST_CERT_ONLY"
