@@ -6,7 +6,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { registerAppTool, registerAppResource, RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { panelHtml } from "../src/generated-panel.mjs";
-import { setRepositorySecret, probeRepositorySecrets, PublicSafeError } from "../src/github-gateway.mjs";
+import { setRepositorySecret, probeRepositorySecrets, checkGatewayCrypto, PublicSafeError } from "../src/github-gateway.mjs";
 
 const PREFIX = "/autosetup/v1";
 const URI = "ui://motorlab-autosetup/secure-secrets-v1.html";
@@ -234,6 +234,18 @@ export async function handleAutoSetupCloudflare(request, env, {gateway = setRepo
       github_write_verified: false,
       chat_connected_verified: false
     }), { headers: { ...HEADERS, "Content-Type": "application/json" } });
+  }
+  if (url.pathname === PREFIX + "/crypto-selftest") {
+    // Read-only diagnostic runs only on isolated Cloudflare previews.
+    // Never expose the diagnostic in the production Worker.
+    if (env.MOTORLAB_AUTOSETUP_CRYPTO_DIAGNOSTIC !== "preview-only")
+      return errorResponse("NOT_FOUND", 404);
+    if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
+    const health = await checkGatewayCrypto();
+    return new Response(JSON.stringify(health), {
+      status: health.crypto_ready ? 200 : 503,
+      headers: { ...HEADERS, "Content-Type": "application/json" }
+    });
   }
   if (url.pathname === PREFIX + "/panel") {
     if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
