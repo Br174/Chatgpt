@@ -153,3 +153,48 @@ Verifiche sull'ultima HEAD ancora da chiudere prima di promuovere la LAB.
 - Blocco della navigazione main-frame verso origini differenti, inclusi redirect: per cambiare sito occorre apertura esplicita.
 - Test E2E offline esteso a percorso automatico di sola lettura dopo approvazione su pagina 2, con protezioni anti-cambio pagina. Non equivale al Browser Agent autonomo multi-sito né a una prova su siti reali.
 - Versione LAB soltanto: non promuovere alla MADRE, non firmare update release senza verifica delle chiavi.
+
+
+## REQUISITO TRASVERSALE — AutoSetup nella chat ChatGPT E nella APK MotorLab
+Decisione esplicita dell'utente (13 ottobre 2026): AutoSetup deve essere utilizzabile
+**subito anche dalla chat ChatGPT del progetto**, non solo dalla Team Chat dell'app
+Android; quando l'app sarà completata, deve essere disponibile ANCHE nella stessa
+APK MotorLab principale, non in un'app alternativa. Questo requisito integra, non
+sostituisce, la roadmap AutoSetup e non abilita lo sviluppo RealTest.
+
+### Due interfacce, capacità condivise, esecutori distinti
+1. **Chat ChatGPT già ora**: offrire e realizzare direttamente dalla conversazione
+   tutte le operazioni web effettivamente consentite dagli strumenti/connettori
+   attualmente disponibili e autorizzati. Es.: lavori GitHub mediante il connettore
+   GitHub; eventuale browser web interattivo tramite strumenti collegati che lo
+   supportino, previa verifica di costi, permessi, disponibilità e conferme. Non
+   presentare un'esecuzione simulata come effettuata, né dichiarare supporto
+   universale quando un sito o un'integrazione non è disponibile.
+2. **APK MotorLab**: continuare a realizzare AutoSetup nell'app canonica Android
+   con motore e interfaccia nativi; non rendere ChatGPT, account ChatGPT, plugin
+   di questa chat, servizi di AI remota o API a pagamento prerequisiti obbligatori
+   per l'uso locale e i test offline.
+3. **Contratto condiviso**: stesso schema delle azioni (goal, site origin,
+   discover, suggest, confirm, navigate, inspect, preview, apply, verify,
+   checkpoint), stessi guard rail, policy di conferma e log di verifica.
+   L'interfaccia/chat non equivale a un esecutore unico: un bridge o una
+   sincronizzazione autentica dovrà essere implementato e verificato prima
+   di affermare che l'APK eredita sessioni, plugin, contesto o task ChatGPT.
+4. **Tracciabilità**: ogni azione effettuata dalla chat su strumenti esterni
+   deve avere risultato, fonte/ID verificabile e stato; gli stessi concetti
+   devono essere rappresentati nella UI AutoSetup Android. Se si prevede
+   sincronizzazione tra chat e APK, progettare formato di checkpoint e
+   autorizzazione separata; non trasmettere password, cookie, token o dati
+   personali nei log e nei checkpoint condivisi.
+5. **Costi e permessi**: preferire connettori già attivi e strumenti gratuiti;
+   alcuni servizi di browser remoto prevedono costi a consumo. Nessun costo
+   o modifica di account senza consenso esplicito; usare l'eventuale modalità
+   ChatGPT Work solo se davvero disponibile all'utente, senza spacciare
+   la normale chat per una sessione Work.
+6. **Priorità invariata**: continuare il completamento dell'attuale LAB AutoSetup,
+   MADRE/CORE r36 intatti, RealTest nel backlog e non in implementazione.
+
+STATO_CHAT=CAPACITA_PARZIALI_REALI_GIA_UTILIZZABILI_CON_TOOL_CONNESSI
+STATO_APK=LAB_AUTOSETUP_VERIFICATO_SU_EMULATORE_MA_NON_RELEASE
+STATO_SINCRONIZZAZIONE_CHAT_APK=REQUISITO_NON_IMPLEMENTATO
+PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
