@@ -1,0 +1,107 @@
+name: MotorLab AutoSetup Chat-APK Checkpoint Bridge LAB06
+on:
+  push:
+    branches: ['motorlab/app-lab06-autosetup-checkpoint-*']
+    paths:
+      - 'apps/motorlab-android/**'
+      - '.github/workflows/motorlab-app-autosetup-checkpoint-bridge.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: motorlab-chat-apk-checkpoint-bridge
+  cancel-in-progress: false
+jobs:
+  android:
+    name: Checkpoint schema, Android 11 picker and full regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Verify existing MotorLab unified app static contracts
+        run: python3 apps/motorlab-android/tests/verify_lab01.py
+      - name: Validate ChatGPT and Android checkpoint schemas and invalid envelopes
+        run: python3 apps/motorlab-android/tests/verify_checkpoint_bridge.py
+      - name: Prepare Android SDK
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -r | head -1)"
+          test -n "$sdkmanager"
+          "$sdkmanager" "platforms;android-35" "build-tools;35.0.0"
+      - name: Build temporary APK without accounts or API keys
+        run: |
+          set -euo pipefail
+          gradle --no-daemon --build-cache -p apps/motorlab-android :app:assembleDebug
+          apk=apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep -m1 "package: name='it.motorlab.app' versionCode='6'"
+          echo "MOTORLAB_AUTOSETUP_CHAT_APK_BRIDGE_BUILD=PASSED_TEMP_DEBUG"
+      - name: Confirm emulator KVM acceleration
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chmod 0666 /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
+      - name: Android11 native document picker and entire AutoSetup smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          profile: pixel_5
+          cores: 2
+          ram-size: 3072M
+          disable-linux-hw-accel: false
+          heap-size: 256M
+          disable-animations: true
+          emulator-boot-timeout: 420
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: adb install -r apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk && python3 apps/motorlab-android/tests/checkpoint_picker_smoke.py && python3 apps/motorlab-android/tests/emulator_smoke.py
+      - name: Publish TEMPORARY test APK and ZIP if all gates pass
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        run: |
+          set -euo pipefail
+          TAG="motorlab-lab06-chatbridge-$(git rev-parse --short=7 HEAD)"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "MOTORLAB_AUTOSETUP_CHAT_BRIDGE_RELEASE=EXISTS"
+            exit 0
+          fi
+          out="$RUNNER_TEMP/motorlab-chat-bridge-test"
+          mkdir -p "$out"
+          cp apps/motorlab-android/app/build/outputs/apk/debug/app-debug.apk "$out/MotorLab-LAB06-ChatBridge-TEST.apk"
+          cp apps/motorlab-android/tests/fixtures/autosetup_checkpoint_chatgpt.json "$out/Checkpoint-ChatGPT-Esempio.json"
+          cat > "$out/LEGGIMI-ChatBridge.txt" <<'TXT'
+          MotorLab LAB06 - AutoSetup ponte ChatGPT <-> APK (PROVA)
+          Esporta dall'app con 'Condividi checkpoint'. Importa nella app
+          un JSON della chat attraverso 'Importa checkpoint dalla chat'.
+          Il file contiene solo URL origine e conteggi non sensibili.
+          L'importazione richiede selezione manuale e conferma. Non apre
+          siti, esegue login, importa autorizzazioni o sincronizza account.
+          NON e' sincronizzazione automatica ChatGPT <-> Android.
+          Firma debug TEMPORANEA, diversa dalle vecchie APK LAB01/LAB06.
+          Per installare questa TEST occorre disinstallare la vecchia MotorLab
+          (la disinstallazione cancella i dati interni). Prima scaricare APK/ZIP.
+          La firma definitiva futura richiedera' una nuova installazione pulita.
+          NON sono necessarie chiavi di configurazione, Gemini o ChatGPT.
+          Test Android 11 solo emulatore, non telefono fisico.
+          TXT
+          ( cd "$out"
+            sha256sum MotorLab-LAB06-ChatBridge-TEST.apk > SHA256-ChatBridge.txt
+            zip -q -9 MotorLab-LAB06-ChatBridge-TEST.zip MotorLab-LAB06-ChatBridge-TEST.apk Checkpoint-ChatGPT-Esempio.json LEGGIMI-ChatBridge.txt SHA256-ChatBridge.txt
+          )
+          gh release create "$TAG" "$out/MotorLab-LAB06-ChatBridge-TEST.apk" "$out/MotorLab-LAB06-ChatBridge-TEST.zip" "$out/Checkpoint-ChatGPT-Esempio.json" "$out/LEGGIMI-ChatBridge.txt" "$out/SHA256-ChatBridge.txt" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "MotorLab LAB06 PROVA - ponte AutoSetup ChatGPT APK" \
+            --notes "Trasferimento manuale checkpoint JSON, senza chiavi o sincronizzazione automatica. Firma debug temporanea: installazione pulita; dati vecchi non conservati. Android 11 testato solo in emulatore."
+          echo "MOTORLAB_AUTOSETUP_CHAT_BRIDGE_TEST_APK_ZIP=PUBLISHED"
