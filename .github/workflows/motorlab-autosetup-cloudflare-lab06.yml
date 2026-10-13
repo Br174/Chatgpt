@@ -325,9 +325,9 @@ jobs:
           }
 
           health_ok() {
-            local code body attempt
+            local code body attempt probe_state write_state
             body="$(mktemp)"
-            for attempt in 1 2 3 4 5; do
+            for attempt in {1..12}; do
               code="$(curl --silent --output "$body" --write-out '%{http_code}' --max-time 12 "$HEALTH_URL" || true)"
               if [[ "$code" == '200' ]] && jq -e '
                 .service == "motorlab-autosetup-cloudflare" and
@@ -339,6 +339,10 @@ jobs:
                 rm -f "$body"
                 return 0
               fi
+              # Metadata booleans only: never print request bodies, credentials or PATs.
+              probe_state="$(jq -r 'if .probe_enabled == true then "true" elif .probe_enabled == false then "false" else "missing" end' "$body" 2>/dev/null || echo invalid)"
+              write_state="$(jq -r 'if .write_enabled == true then "true" elif .write_enabled == false then "false" else "missing" end' "$body" 2>/dev/null || echo invalid)"
+              printf 'LAB06 health gate not ready: HTTP %s, probe=%s, signing_writes=%s, attempt=%s/12\n' "$code" "$probe_state" "$write_state" "$attempt" >&2
               sleep 3
             done
             rm -f "$body"
