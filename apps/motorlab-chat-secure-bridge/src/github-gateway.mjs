@@ -181,16 +181,22 @@ export async function probeRepositorySecrets({
   const encrypted = await encryptForGitHub(syntheticValue, pub.key);
 
   let receipt, failure;
+  let cleanupRequired = false;
   try {
     // A failed PUT may still have reached GitHub: do not retry the PUT.
+    cleanupRequired = true;
     const put = await request(fetchImpl, url, {
       method: "PUT",
       headers: { ...headers(token), "Content-Type": "application/json" },
       body: JSON.stringify({ encrypted_value: encrypted, key_id: pub.key_id })
     }, "PROBE_CREATE");
+    if (put.status === 401 || put.status === 403) {
+      // A definitive access denial could not have created the synthetic secret.
+      cleanupRequired = false;
+      throw new PublicSafeError("GITHUB_PERMISSION_MISSING");
+    }
     if (![201, 204].includes(put.status))
-      throw new PublicSafeError(put.status === 401 || put.status === 403
-        ? "GITHUB_PERMISSION_MISSING" : "GITHUB_REJECTED_WRITE");
+      throw new PublicSafeError("GITHUB_REJECTED_WRITE");
 
     const get = await request(fetchImpl, url,
       { method: "GET", headers: headers(token) }, "PROBE_READBACK");
@@ -211,8 +217,9 @@ export async function probeRepositorySecrets({
     failure = error instanceof PublicSafeError ? error : new PublicSafeError("BRIDGE_UNAVAILABLE");
   }
 
-  // This cleanup runs even if the PUT timed out or its network state is unknown.
-  try {
+  // Cleanup after acknowledged or ambiguous creation. Do not turn a clear
+  // GitHub 401/403 response into an unrelated cleanup error.
+  if (cleanupRequired) try {
     let del;
     try {
       del = await request(fetchImpl, url,
