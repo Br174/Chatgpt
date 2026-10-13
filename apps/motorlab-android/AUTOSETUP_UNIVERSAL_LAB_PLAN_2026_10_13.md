@@ -254,3 +254,8 @@ PROVA_EMULATORE_RIF=https://github.com/Br174/Chatgpt/actions/runs/38332778397
 - Progresso deterministico di una *singola compilazione locale* basato su milestone: 0% non pronto, 20% pagina pronta, 40% scansione completata, 60% valori preparati, 80% compilazione applicata, 100% rilettura DOM corrispondente. I link interni sono facoltativi; non fanno salire artificialmente la percentuale. Una pagina cambiata riparte da 0%; un modulo rianalizzato resetta i progressi downstream.
 - Non è un timer, previsione di minuti o % di completamento del progetto intero. **100% indica soltanto il flusso locale**, mai salvataggio remoto. Non scrivere segreti nel progresso o nei checkpoint; contratto condiviso v1 invariato.
 - Test emulator Android esteso per la stringa `Avanzamento locale: 100%` dopo la seconda lettura dei due campi della demo. E2E e sicurezza esistenti invariati.
+
+## AS8B — precisione delle percentuali e reset seconda pagina
+- I test emulator mostrano 20% solo dopo pagina pronta, 40% dopo riconoscimento, 60% dopo preparazione; Annulla mantiene 60% e non scrive. 100% resta possibile soltanto dopo la seconda verifica DOM positiva.
+- All'apertura della seconda pagina demo, `taskPlan=null` impedisce di trasferire il progresso dalla pagina precedente anche se la callback WebView di navigazione è differita/non emessa. Smoke controlla che sulla nuova pagina non appaia il vecchio `Avanzamento locale: 100%`.
+- Non è la percentuale dell'intero progetto o del server remoto. Aspetto grafico originale e altre sezioni invariati.

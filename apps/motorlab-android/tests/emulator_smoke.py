@@ -184,6 +184,8 @@ def autosetup_smoke():
     print("MOTORLAB_AUTOSETUP_ORIGINAL_AVATAR=PASSED_ACTIVE_ONLY",flush=True)
     print("MOTORLAB_AUTOSETUP_OFFLINE_DEMO_LAUNCH=PASSED",flush=True)
     time.sleep(2)
+    scroll_until_visible("Avanzamento locale: 20%")
+    print("MOTORLAB_AUTOSETUP_PROGRESS_20_PAGE_READY=PASSED",flush=True)
     scroll_to_click("Riconosci i campi del modulo")
     # Form controls are below the chat header inside the bounded ScrollView.
     for _ in range(3):
@@ -201,14 +203,20 @@ def autosetup_smoke():
         time.sleep(.8)
     wait("Campi rilevati nel sito · 2",seconds=10)
     print("MOTORLAB_AUTOSETUP_GENERIC_FORM_SCAN=PASSED_FIELDS_2_PASSWORD_EXCLUDED",flush=True)
+    scroll_until_visible("Avanzamento locale: 40%")
+    print("MOTORLAB_AUTOSETUP_PROGRESS_40_SCAN=PASSED",flush=True)
     scroll_to_click("Prepara valori dimostrativi")
     scroll_top()
     scroll_until_visible("Preparati 2 valori nella chat")
+    wait("Avanzamento locale: 60%",seconds=12)
+    print("MOTORLAB_AUTOSETUP_PROGRESS_60_PREPARED=PASSED",flush=True)
     scroll_to_click("Compila i campi sulla pagina")
     wait("Confermare la compilazione?",seconds=12)
     wait("2 campi ordinari da compilare",seconds=12)
     click("ANNULLA",exact=True)
     assert not matches("Compilati 2 campi"), "Cancellation unexpectedly applied form values"
+    scroll_until_visible("Avanzamento locale: 60%")
+    print("MOTORLAB_AUTOSETUP_PROGRESS_CANCEL_RETAINS_60=PASSED",flush=True)
     scroll_to_click("Compila i campi sulla pagina")
     wait("Confermare la compilazione?",seconds=12)
     click("CONFERMA COMPILAZIONE",exact=True)
@@ -242,7 +250,10 @@ def autosetup_smoke():
     wait("Navigare sul sito?",seconds=12)
     click("APRI PAGINA",exact=True)
     wait("Impostazioni demo",seconds=16)
-    scroll_top()
+    scroll_until_visible("Avanzamento locale: 20%")
+    # The second page starts at the ready milestone, not the previous 100%.
+    assert not matches("Avanzamento locale: 100%"), "Progress carried across page navigation"
+    print("MOTORLAB_AUTOSETUP_PROGRESS_NEW_PAGE_RESET=PASSED",flush=True)
     scroll_to_click("Analizza pagina e pianifica")
     scroll_top()
     scroll_until_visible("Campi rilevati nel sito · 2")

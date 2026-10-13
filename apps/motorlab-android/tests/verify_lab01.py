@@ -217,3 +217,12 @@ assert "[\"+localProgressPercent()+\"% percorso locale]" in autosetup
 assert 'taskPlan.domVerified(requested,observed)' in autosetup
 assert "MOTORLAB_AUTOSETUP_STAGE_PROGRESS=PASSED_LOCAL_100_NOT_REMOTE" in emulator
 print("AutoSetup percentage progress is stage-derived, local-only and tested: PASS")
+
+# AS8B regression: verified milestone percents and no progress leakage across pages.
+assert 'pageReady=false;inspectedUrl="";taskPlan=null;controls.clear();fields.removeAllViews();' in autosetup
+assert "MOTORLAB_AUTOSETUP_PROGRESS_20_PAGE_READY=PASSED" in emulator
+assert "MOTORLAB_AUTOSETUP_PROGRESS_40_SCAN=PASSED" in emulator
+assert "MOTORLAB_AUTOSETUP_PROGRESS_60_PREPARED=PASSED" in emulator
+assert "MOTORLAB_AUTOSETUP_PROGRESS_CANCEL_RETAINS_60=PASSED" in emulator
+assert "MOTORLAB_AUTOSETUP_PROGRESS_NEW_PAGE_RESET=PASSED" in emulator
+print("AutoSetup AS8B percentage milestones and page reset regressions: PASS")

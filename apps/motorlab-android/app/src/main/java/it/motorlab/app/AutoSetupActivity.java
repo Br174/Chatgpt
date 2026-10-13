@@ -274,7 +274,8 @@ public final class AutoSetupActivity extends Activity {
     private void openDemoSettingsPage() {
         if(!demoMode || !DEMO_ORIGIN.equals(activeOrigin)) return;
         demoSettingsPage=true;
-        pageReady=false;inspectedUrl="";controls.clear();fields.removeAllViews();
+        // Second in-memory page must NEVER inherit the first page's 100% progress.
+        pageReady=false;inspectedUrl="";taskPlan=null;controls.clear();fields.removeAllViews();
         navigation.removeAllViews();
         say("MotorLab: seconda pagina demo aperta dopo conferma. Nessun servizio contattato.");
         String html="<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head>"+
