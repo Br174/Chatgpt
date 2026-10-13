@@ -5,7 +5,7 @@ from pathlib import Path
 
 module=(Path(__file__).parent.parent/'src'/'memory-catalog.mjs').read_text()
 # The SQL constant is a JS string array: extract only the SQL statements.
-lines=re.findall(r'^"(CREATE (?:TABLE|INDEX|UNIQUE INDEX) IF NOT EXISTS .+?)",?
+lines=re.findall(r'^"(CREATE (?:TABLE|INDEX|UNIQUE INDEX) IF NOT EXISTS .+?)",?$',module,re.M)
 assert len(lines)==5, 'unexpected schema count: '+str(len(lines))
 schema='\n'.join(s+';' if not s.endswith(';') else s for s in lines)
 with sqlite3.connect(':memory:') as db:
