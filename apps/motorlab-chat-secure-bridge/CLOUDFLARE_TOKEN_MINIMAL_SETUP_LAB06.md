@@ -15,3 +15,9 @@ Status: design/implementation gate only. No live authorization, token creation, 
 
 ## Acceptance
 User can complete Cloudflare authorization with minimum manual action; secure transfer and GitHub update verified; read-only identity test passes; no secret disclosure; no production modifications other than explicit GitHub Actions secret replacement. Until then status is BLOCKED, not complete.
+
+## Checkpoint 2026-10-14 — Cloudflare authorization (no credential values)
+- User confirmed GitHub Actions `CLOUDFLARE_API_TOKEN` repository secret was updated; Cloudflare Worker edit permission is shown for the intended account. Secret contents remain inaccessible and must never be logged.
+- Production/staging D1 read-only identities independently verified (4 GET, zero writes) in run 38564888755; this does not prove Worker deployment authorization.
+- OIDC r37 manifest compatibility corrected on LAB branch; seven CI gates succeeded at commit 522212c6dcf5a8d5a376e177a1ef9ebafe23da16.
+- Next automatic push triggers isolated LAB06 preview; preview must verify token, panel CSP, crypto and unchanged production version, or fail closed. Production deploy remains blocked by its distinct approval commit gate. No APK, main, MADRE, production D1/KV or Worker deployment authorized here.
