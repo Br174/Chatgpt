@@ -68,3 +68,14 @@ REMOTE_READ_ONLY_API=NOT_EXECUTED
 REMOTE_D1_WRITE=FORBIDDEN
 PRODUCTION_MUTATIONS=FORBIDDEN
 NEXT=Set staging and production read-only tokens exclusively in protected GitHub Actions secrets, using distinct names and no chat/log disclosure; then run existing fail-closed read-only preflight. Workflow currently intentionally excludes credentials and cannot attest provider identity until safe wiring is separately reviewed.
+
+
+LIVE_STAGING_READ_ATTESTATION_20261014
+WORKFLOW_RUN=https://github.com/Br174/Chatgpt/actions/runs/38554942476
+LIVE_STAGING_RESULT=STAGING_READ_ONLY_VERIFIED
+CLOUDFLARE_GET_COUNT=2
+CLOUDFLARE_WRITE_COUNT=0
+STAGING_ACCOUNT_AND_D1_IDENTITY=VERIFIED
+PRODUCTION_ACCOUNT_AND_D1_CROSS_ATTESTATION=NOT_VERIFIED
+REMOTE_D1_WRITE_ALLOWED=FALSE
+SECRET_VALUE=NOT_LOGGED_NOT_STORED_IN_REPO
