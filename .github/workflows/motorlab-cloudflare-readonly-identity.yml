@@ -24,6 +24,20 @@ jobs:
           const stagingDatabase='fd3ff45b-694a-45ec-8d5c-5653fdba092e';
           const productionToken=process.env.PRODUCTION_TOKEN;
           const stagingToken=process.env.STAGING_TOKEN;
+          function tokenFormatStatus(token,label) {
+            if (!token) return;
+            const hasBearer=/^Bearer\\s+/i.test(token);
+            const hasWhitespace=token!==token.trim() || /\\s/.test(token);
+            const isLikelyCloudflareToken=/^[A-Za-z0-9_-]{30,200}$/.test(token);
+            const looksStructured=/^[{\\[\\"']/.test(token);
+            if(hasBearer || hasWhitespace || looksStructured || !isLikelyCloudflareToken) {
+              console.error(label+': TOKEN_FORMAT_WARNING (bearer_prefix='+hasBearer+', whitespace='+hasWhitespace+', structured_value='+looksStructured+', expected_shape='+isLikelyCloudflareToken+')');
+            } else {
+              console.log(label+': TOKEN_FORMAT_PLAUSIBLE (shape only, not authentication)');
+            }
+          }
+          tokenFormatStatus(productionToken,'PRODUCTION');
+          tokenFormatStatus(stagingToken,'STAGING');
           if (!productionToken || !stagingToken) {
             console.error('BLOCKED: a required GitHub secret is missing');
             process.exit(1);
