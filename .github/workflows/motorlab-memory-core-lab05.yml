@@ -1,0 +1,58 @@
+name: MotorLab Memory CORE LAB05 Staging Gate and Concurrency
+on:
+  push:
+    branches:
+      - motorlab/memory-core-lab05-20261014
+    paths:
+      - 'tools/memory-core-lab05/**'
+      - 'cloudflare/motorlab-state-bridge/test/memory-lab05.test.mjs'
+      - 'docs/memory-core-lab05/**'
+      - '.github/workflows/motorlab-memory-core-lab05.yml'
+  pull_request:
+    paths:
+      - 'tools/memory-core-lab05/**'
+      - 'cloudflare/motorlab-state-bridge/test/memory-lab05.test.mjs'
+      - 'docs/memory-core-lab05/**'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  staging-safety-and-local-concurrency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: LAB01 immutable catalog regression
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-catalog.test.mjs
+      - name: LAB02 verified GitHub source regression
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-github-lab02.test.mjs
+      - name: LAB03 persistent local SQLite and crash regression
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-lab03.test.mjs
+      - name: LAB04 Wrangler local D1 isolation regression
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-lab04.test.mjs
+      - name: LAB05 Cloudflare staging independent identity and cost fail-closed tests
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-lab05.test.mjs
+      - name: LAB05 on-disk multi-writer, crash, rollback and backup restore
+        run: python3 tools/memory-core-lab05/concurrency-backup-canary.py
+      - name: LAB05 staging remote preflight (must NOT contact remote without verified config)
+        run: node tools/memory-core-lab05/optional-staging-check.mjs
+      - name: LAB04 real Wrangler --local D1 and verified GitHub sources re-test
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/memory-core-lab04/d1-local-check.mjs
+      - name: Protect production routes/DB/KV and prevent remote command execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -F 'memory-core-lab05' cloudflare/motorlab-state-bridge/src/entry.js; then
+            echo 'FORBIDDEN: LAB05 imported into production Worker'; exit 1
+          fi
+          if grep -E -- 'wrangler[[:space:]]+(deploy|d1[[:space:]]+create)|--remote' tools/memory-core-lab05/*.mjs; then
+            echo 'FORBIDDEN: LAB05 contains remote mutation code'; exit 1
+          fi
+          echo 'LAB05: protected production; remote D1 write 0; only local canaries.'
