@@ -1,0 +1,49 @@
+name: MotorLab Memory CORE LAB04 Wrangler Local D1
+on:
+  push:
+    branches:
+      - motorlab/memory-core-lab04-20261014
+    paths:
+      - 'tools/memory-core-lab04/**'
+      - 'cloudflare/motorlab-state-bridge/test/memory-lab04.test.mjs'
+      - 'docs/memory-core-lab04/**'
+      - '.github/workflows/motorlab-memory-core-lab04.yml'
+  pull_request:
+    paths:
+      - 'tools/memory-core-lab04/**'
+      - 'cloudflare/motorlab-state-bridge/test/memory-lab04.test.mjs'
+      - 'docs/memory-core-lab04/**'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  isolated-d1-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: LAB01 verified catalog regressions
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-catalog.test.mjs
+      - name: LAB02 verified source/recall regressions
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-github-lab02.test.mjs
+      - name: LAB03 persistence/crash regressions
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-lab03.test.mjs
+      - name: LAB04 production isolation and mandatory --local tests
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-lab04.test.mjs
+      - name: LAB04 real Wrangler D1 local integration test
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/memory-core-lab04/d1-local-check.mjs
+      - name: Confirm production routes and settings were not imported
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -F 'memory-core-lab04' cloudflare/motorlab-state-bridge/src/entry.js; then
+            echo 'ERROR: LAB04 imported by production Worker'; exit 1
+          fi
+          echo 'PASS: Local Wrangler only. No real D1/KV/Worker resources, no deploy and no Cloudflare secrets.'

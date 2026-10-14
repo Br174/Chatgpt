@@ -1,0 +1,11 @@
+{
+  "name": "motorlab-memory-core-lab04-local-only",
+  "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    {
+      "binding": "MEMORY_LAB_DB",
+      "database_name": "motorlab-memory-core-lab04-local-only",
+      "database_id": "00000000-0000-4000-8000-000000000044"
+    }
+  ]
+}
