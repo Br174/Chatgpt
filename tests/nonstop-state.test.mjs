@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {reconcileTurnEnd, recoverOperation} from './nonstop-state.mjs';
+const base = {id:'op-1',status:'OPEN',verifiedProgress:40,nextSafeStep:'test'};
+test('turn end does not complete operation',()=>{const x=reconcileTurnEnd(base,{});assert.equal(x.status,'OPEN');assert.equal(x.nextSafeStep,'test')});
+test('microtask 100 percent cannot complete without acceptance',()=>assert.equal(reconcileTurnEnd({...base,verifiedProgress:100},{},{acceptanceVerified:false}).status,'OPEN'));
+test('verified whole project completes',()=>assert.equal(reconcileTurnEnd({...base,verifiedProgress:100},{},{acceptanceVerified:true,allRequiredChecksPassed:true}).status,'COMPLETED'));
+test('user stop respected',()=>assert.equal(reconcileTurnEnd(base,{userStop:true}).status,'PAUSED_BY_USER'));
+test('no fake durable handoff',()=>assert.equal(reconcileTurnEnd(base,{},{durableExecutorAccepted:true}).status,'OPEN'));
+test('verified durable handoff',()=>assert.equal(reconcileTurnEnd(base,{},{durableExecutorAccepted:true,executorJobId:'job-1',executorPersisted:true}).status,'RUNNING_EXTERNAL'));
+test('monotonic progress',()=>assert.equal(recoverOperation(base,{verifiedProgress:55}).verifiedProgress,55));
+test('stale checkpoint cannot lower floor',()=>assert.equal(recoverOperation(base,{verifiedProgress:10}).verifiedProgress,40));
+test('identity mismatch rejected',()=>assert.throws(()=>recoverOperation(base,{id:'other'})));
+test('blocked external preserved',()=>assert.equal(reconcileTurnEnd({...base,status:'BLOCKED_EXTERNAL'},{}).status,'BLOCKED_EXTERNAL'));
