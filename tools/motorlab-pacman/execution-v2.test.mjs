@@ -113,3 +113,18 @@ test("pre-existing target never overwritten",async()=>{
   }),{code:"TARGET_NOT_EMPTY_OR_UNVERIFIED"});
   assert.equal(writes,0);
 });
+
+test("refuses to mutate code or config files within allowed directory",async()=>{
+  const s=setup();
+  let writes=0;
+  s.adapter.create=async()=>{writes++;};
+  for(const unsafe of ["tools/motorlab-pacman/execution-v2.mjs",
+    "tools/motorlab-pacman/d1-ledger.sql",
+    "tools/motorlab-pacman/PACMAN_LIVE_GITHUB_EVIDENCE.md"]) {
+    await assert.rejects(runGithubLabFileCycle({
+      operationId:"pacman-path-reject-001",branch,path:unsafe,content,
+      adapter:s.adapter,ledger:s.ledger,onCheckpoint:s.onCheckpoint,approval:true
+    }),{code:"LAB_PATH_REQUIRED"});
+  }
+  assert.equal(writes,0);
+});
