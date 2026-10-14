@@ -66,6 +66,7 @@ D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
 5. Non-build work: remove non-applicable phases and proportionally recalculate progress across the real work plan.
 6. Failure behavior: keep the last verified percentage, identify the failing phase, and never show 100% until the requested outcome is verified.
 7. Interactive reporting frequency:
+   - FIELD-FAILURE PRECEDENCE: reporting cadence is advisory and strictly subordinate to continuing authorized work. Do not convert a status explanation, percentage, fireworks, checkpoint or report into a voluntary final answer while ready project work remains; batch/defer the explanation and dispatch the next safe step first.
    - report at task start, meaningful subtask start/completion, phase changes, important file/change application, check transitions, build/test transitions, artifact/checkpoint changes, watchdog interventions, recovery outcomes, handoff/promotion transitions and final delivery;
    - as a practical default, offer progress after roughly 1-3 meaningful tool/operation interactions ONLY when a supported non-terminal update is possible; this is not a turn-length limit, checkpoint cadence, mandatory pause, or reason to return control to the user;
    - completion of a single task, build, test, commit, checkpoint or phase is not project completion; immediately continue the next approved safe dependency within the same available turn;
