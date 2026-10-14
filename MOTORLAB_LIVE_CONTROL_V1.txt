@@ -95,6 +95,7 @@ NON-STOP SAFE-POINT INTERPRETATION
 Safe-point reconciliation means an in-turn observation while execution control remains, not an instruction to terminate the turn or request user confirmation. FORCE_PROGRESS_DISPLAY and PROGRESS_PRESENCE HIGH may increase status detail but cannot create a pit stop, 15-second stop timer, or new approval for an already approved scope. If the host cannot emit non-terminal updates, continue safe work and defer the status until the next available control point. Independent regression checks run without blocking unrelated runners.
 
 7. PROGRESS INTEGRATION
+STATUS PREEMPTION PROHIBITED: FORCE_PROGRESS_DISPLAY and PROGRESS_PRESENCE=HIGH control what a supported status contains, not whether execution must stop. When no nonterminal update channel exists, keep working and batch status. Do not produce a final answer solely to satisfy a display directive.
 FORCE_PROGRESS_DISPLAY=ON requires numeric MotorLab progress in every user-visible active-work status when a control point exists.
 PROGRESS_PRESENCE=HIGH requires micro-progress for small operations:
 - one-step change: opening + verified closing percentage;
