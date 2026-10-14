@@ -7,7 +7,7 @@ BASE_LAB06_PR=https://github.com/Br174/Chatgpt/pull/55
 LAB06_LOCAL_CI=https://github.com/Br174/Chatgpt/actions/runs/38510548012
 BRANCH=motorlab/memory-core-lab06-remote-gate-20261014
 PROTECTED=main,MADRE,APK,production_Worker_D1_KV,OIDC,signing_secrets,native_engines,LAST_GOOD
-CHANGED_SCOPE=only new isolated staging read-only verifier/CLI/test/docs/checkpoint/workflow files
+CHANGED_SCOPE=LAB06 isolated staging read-only verifier/CLI/test/docs/checkpoint/workflow plus minimal LAB05 canonical account-ID validation bugfix and its synthetic regression tests; only isolated branch, no production
 EXISTING_AUTHORITY=LAB05 validateStagingTarget and inspectStagingReadOnly re-used; LAB01-LAB06 canonical schema and local importer unchanged
 STAGING_IDENTITY=NOT_VERIFIED_WITH_REAL_CLOUDFLARE
 CLOUDFLARE_STAGING_READ=OPTIONAL_PROTECTED_RUNTIME_ONLY
@@ -36,3 +36,14 @@ DEPLOYS=0
 FINAL_CHECKPOINT_NOTE=checkpoint commit metadata only, re-run exact latest HEAD CI before any closure
 PR_URL=https://github.com/Br174/Chatgpt/pull/56
 
+
+USER_DASHBOARD_ID_PROOF=2026-10-14: MotorLab-Staging account, Workers Free UI, 1/10 D1, database motorlab-memory-core-staging-r36 empty; account ID 32 hex from user URL and D1 database UUID present; real Cloudflare API not independently checked
+PROD_ACCOUNT_BROWSER_ID=NOT_YET_SUPPLIED
+ACCOUNT_ID_VALIDATOR_FIX=real Cloudflare account ids are 32 hex; LAB05/LAB06 code previously (incorrectly) expected 36-char UUID; fixed on this isolated child branch with fake-ID tests
+ACTUAL_STAGING_DB=CREATED_BY_USER_AND_VISIBLE_IN_DASHBOARD
+AUTHENTICATED_CLOUDFLARE_GET=NOT_ATTEMPTED_NO_PROTECTED_TOKENS
+LIVE_STAGING_READ_ACCESS=NOT_VERIFIED
+LIVE_STAGING_WRITE_AUTHORIZATION=BLOCKED
+LATEST_HEAD_CI=PENDING_AFTER_COMPATIBILITY_FIX
+NO_PRODUCTION_WRITES=TRUE
+NEXT_USER_STEP=obtain production account dashboard URL (account ID only) and protected read-only access via a secure non-chat channel; never paste tokens
