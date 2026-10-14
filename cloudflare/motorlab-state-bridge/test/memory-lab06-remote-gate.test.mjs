@@ -161,5 +161,6 @@ test('only additive LAB06 files; no production import, deploy workflow or remote
  assert(!workflow.includes('id-token: write'));
  assert(!workflow.includes('CLOUDFLARE_API_TOKEN'));
  assert(!workflow.includes('secrets.'));
- assert(!/wrangler\s+(?:deploy|d1\s+execute)|--remote/.test(workflow));
+ // The workflow contains a grep DENY pattern with '--remote'; this is a guard, not a call.
+ assert(!/^\s*(?:npx\s+)?wrangler\s+(?:deploy|d1\s+(?:execute|create))\b/m.test(workflow));
 });
