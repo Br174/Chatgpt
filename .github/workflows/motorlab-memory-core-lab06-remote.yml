@@ -1,0 +1,117 @@
+name: MotorLab Memory CORE LAB06 Remote Identity Gate (NO CLOUD WRITE)
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - motorlab/memory-core-lab06-remote-gate-20261014
+    paths:
+      - 'tools/memory-core-lab06/remote-staging-preflight.mjs'
+      - 'tools/memory-core-lab06/optional-remote-staging-read.mjs'
+      - 'cloudflare/motorlab-state-bridge/test/memory-lab06-remote-gate.test.mjs'
+      - 'docs/memory-core-lab06/REMOTE_STAGING_GATE.md'
+      - 'checkpoints/MOTORLAB_MEMORY_CORE_LAB06_REMOTE_GATE_20261014.txt'
+      - '.github/workflows/motorlab-memory-core-lab06-remote.yml'
+  pull_request:
+    paths:
+      - 'tools/memory-core-lab06/remote-staging-preflight.mjs'
+      - 'tools/memory-core-lab06/optional-remote-staging-read.mjs'
+      - 'cloudflare/motorlab-state-bridge/test/memory-lab06-remote-gate.test.mjs'
+      - 'docs/memory-core-lab06/REMOTE_STAGING_GATE.md'
+      - 'checkpoints/MOTORLAB_MEMORY_CORE_LAB06_REMOTE_GATE_20261014.txt'
+      - '.github/workflows/motorlab-memory-core-lab06-remote.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  isolated-staging-read-only-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Strict remote gate - 11 tests, Cloudflare mocked GET only
+        run: node --test cloudflare/motorlab-state-bridge/test/memory-lab06-remote-gate.test.mjs
+      - name: Inherited original Memory LAB01-LAB05 - 49 tests
+        run: |
+          node --test cloudflare/motorlab-state-bridge/test/memory-catalog.test.mjs cloudflare/motorlab-state-bridge/test/memory-github-lab02.test.mjs cloudflare/motorlab-state-bridge/test/memory-lab03.test.mjs cloudflare/motorlab-state-bridge/test/memory-lab04.test.mjs cloudflare/motorlab-state-bridge/test/memory-lab05.test.mjs
+      - name: Inherited LAB05 concurrent backup and hard-crash canary
+        run: python3 tools/memory-core-lab05/concurrency-backup-canary.py
+      - name: Inherited LAB06 9 persistent local SQLite and recovery tests
+        run: python3 tools/memory-core-lab06/test-persistent-store.py
+      - name: Real Wrangler D1 LOCAL only with authenticated read-only GitHub sources
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/memory-core-lab04/d1-local-check.mjs
+      - name: Cloudflare credentials intentionally absent - remote check BLOCKED
+        run: |
+          set -euo pipefail
+          unset CLOUDFLARE_PRODUCTION_ACCOUNT_ID CLOUDFLARE_PRODUCTION_READ_TOKEN
+          unset CLOUDFLARE_STAGING_ACCOUNT_ID CLOUDFLARE_STAGING_DATABASE_ID
+          unset CLOUDFLARE_STAGING_DATABASE_NAME CLOUDFLARE_STAGING_READ_TOKEN
+          node tools/memory-core-lab06/optional-remote-staging-read.mjs > "$RUNNER_TEMP/remote-hold.json"
+          node --input-type=module -e "import fs from 'node:fs'; const x=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if(x.result!=='REMOTE_STAGING_NOT_TESTED'||x.remote_cloudflare_requests!==0||x.remote_cloudflare_writes!==0||x.remote_d1_write_permitted!==false)process.exit(1); console.log('PENDING_STAGING_ACCESS: zero Cloudflare requests/writes');" "$RUNNER_TEMP/remote-hold.json"
+      - name: Staging D1 live identity read - two GET only
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/motorlab/memory-core-lab06-remote-gate-20261014'
+        env:
+          CLOUDFLARE_STAGING_READ_TOKEN: ${{ secrets.CLOUDFLARE_STAGING_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_STAGING_READ_TOKEN:-}" ]; then
+            echo 'STAGING_READ_ONLY_NOT_TESTED: protected secret unavailable'
+            exit 0
+          fi
+          node --input-type=module <<'NODE'
+          import {inspectStagingReadOnly} from './tools/memory-core-lab05/staging-preflight.mjs';
+          try {
+            const proof = await inspectStagingReadOnly({
+              target: {
+                account_id:'b86f445c2b57e604c02f79c8da64bb9c',
+                database_id:'fd3ff45b-694a-45ec-8d5c-5653fdba092e',
+                database_name:'motorlab-memory-core-staging-r36'
+              },
+              token:process.env.CLOUDFLARE_STAGING_READ_TOKEN
+            });
+            if(proof.result!=='STAGING_IDENTITY_READ_VERIFIED'||proof.remote_d1_write_permitted!==false) process.exit(1);
+            console.log('STAGING_READ_ONLY_VERIFIED: two Cloudflare GET requests; zero writes; production separation not yet proven');
+          } catch {
+            console.error('STAGING_READ_ONLY_BLOCKED: provider identity or permissions not verified; zero writes');
+            process.exitCode=1;
+          }
+          NODE
+      - name: Independent production and staging identity proof - four GET only
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/motorlab/memory-core-lab06-remote-gate-20261014'
+        env:
+          CLOUDFLARE_PRODUCTION_ACCOUNT_ID: '5781b597517f6f7fe25751170a99b9ab'
+          CLOUDFLARE_PRODUCTION_READ_TOKEN: ${{ secrets.CLOUDFLARE_PRODUCTION_READ_TOKEN }}
+          CLOUDFLARE_STAGING_ACCOUNT_ID: 'b86f445c2b57e604c02f79c8da64bb9c'
+          CLOUDFLARE_STAGING_DATABASE_ID: 'fd3ff45b-694a-45ec-8d5c-5653fdba092e'
+          CLOUDFLARE_STAGING_DATABASE_NAME: 'motorlab-memory-core-staging-r36'
+          CLOUDFLARE_STAGING_READ_TOKEN: ${{ secrets.CLOUDFLARE_STAGING_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_PRODUCTION_READ_TOKEN:-}" ] || [ -z "${CLOUDFLARE_STAGING_READ_TOKEN:-}" ]; then
+            echo 'PRODUCTION_READ_ONLY_NOT_TESTED: protected token missing'
+            exit 1
+          fi
+          node tools/memory-core-lab06/optional-remote-staging-read.mjs > "$RUNNER_TEMP/identity-proof.json"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/identity-proof.json','utf8'));
+          if(p.result!=='LAB06_REMOTE_IDENTITIES_READ_VERIFIED'||p.read_only_requests!==4||p.production_cloudflare_writes!==0||p.staging_cloudflare_writes!==0||p.remote_d1_write_permitted!==false)process.exit(1);
+          console.log('PRODUCTION_AND_STAGING_READ_ONLY_VERIFIED: four GET, zero writes, two independent accounts');
+          NODE
+      - name: Static protected surfaces and no remote mutation routes
+        run: |
+          set -euo pipefail
+          test -f cloudflare/motorlab-state-bridge/wrangler.jsonc
+          if grep -F 'memory-core-lab06/remote-staging' cloudflare/motorlab-state-bridge/src/entry.js; then
+            echo 'FORBIDDEN: remote LAB imported into production Worker'; exit 1
+          fi
+          if grep -E 'wrangler (deploy|d1 execute|d1 create)|--remote' tools/memory-core-lab06/optional-remote-staging-read.mjs tools/memory-core-lab06/remote-staging-preflight.mjs; then
+            echo 'FORBIDDEN: remote mutation code in identity gate'; exit 1
+          fi
+          echo 'No production Worker import, no Cloudflare deploy/execute/create, no billable fallback.'

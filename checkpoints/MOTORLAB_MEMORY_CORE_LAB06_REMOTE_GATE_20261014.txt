@@ -1,0 +1,94 @@
+MOTORLAB_OPERATION_ID=memory-core-lab06-remote-gate-20261014
+PROJECT=Br174/Chatgpt
+PINNED_CORE=2026.10.12-r36
+APPROVAL=2026-10-14 user expressly approved isolated Memory CORE LAB06 remote extension: independent staging/cost verification, tests, draft PR, checkpoint; forbid all remote write before proof
+BASE_LAB06_SHA=51ab24a7334de21c4a48f074b42ada997b2c6378
+BASE_LAB06_PR=https://github.com/Br174/Chatgpt/pull/55
+LAB06_LOCAL_CI=https://github.com/Br174/Chatgpt/actions/runs/38510548012
+BRANCH=motorlab/memory-core-lab06-remote-gate-20261014
+PROTECTED=main,MADRE,APK,production_Worker_D1_KV,OIDC,signing_secrets,native_engines,LAST_GOOD
+CHANGED_SCOPE=LAB06 isolated staging read-only verifier/CLI/test/docs/checkpoint/workflow plus minimal LAB05 canonical account-ID validation bugfix and its synthetic regression tests; only isolated branch, no production
+EXISTING_AUTHORITY=LAB05 validateStagingTarget and inspectStagingReadOnly re-used; LAB01-LAB06 canonical schema and local importer unchanged
+STAGING_IDENTITY=NOT_VERIFIED_WITH_REAL_CLOUDFLARE
+CLOUDFLARE_STAGING_READ=OPTIONAL_PROTECTED_RUNTIME_ONLY
+PRODUCTION_ACCOUNT_ID=NOT_VERIFIED_VIA_LIVE_CLOUDFLARE
+CLOUDFLARE_REMOTE_CALLS_ACTUAL=0
+CLOUDFLARE_REMOTE_D1_WRITES=0
+CLOUDFLARE_REMOTE_DEPLOYS=0
+COST_ZERO_VERIFIED=false
+WRITE_SCOPE_VERIFIED=false
+REMOTE_D1_WRITE_PERMITTED=false
+REMOTE_D1_EXECUTE_IMPLEMENTED=false
+APPROVAL_FOR_PRODUCTION=false
+NEXT=check exact-head CI for isolated remote-gate branch, fix isolated tests only, leave PR draft against LAB06; if still no secure Cloudflare read access, remain PENDING_STAGING_ACCESS
+PROGRESS_REMOTE_STAGING_REAL=0%
+PROGRESS_OFFLINE_EXTENSION=100%_CODE_TESTS_VERIFIED_AT_cbac8b817c3a341cc2218070a440ec42dff377c5
+TESTED_CHANGESET_SHA=cbac8b817c3a341cc2218070a440ec42dff377c5
+TESTED_REMOTE_GATE_RUN=38518514426
+TESTED_REMOTE_GATE_RESULT=SUCCESS
+TESTED_INHERITED_LAB06_RUN=38518514749
+TESTED_INHERITED_LAB06_RESULT=SUCCESS
+TEST_REPORT=11/11 remote gate mocks; 49/49 inherited JavaScript; 9/9 LAB06 persistent SQLite; LAB05 concurrency/rollback backup PASS; LAB04 real Wrangler D1 --local PASS; inherited LAB06 real verified GitHub local ingest and backup PASS
+ACTUAL_REMOTE_STAGING=REMOTE_STAGING_NOT_TESTED
+CLOUD_REAL_GETS=0
+D1_REMOTE_WRITES=0
+DEPLOYS=0
+FINAL_CHECKPOINT_NOTE=checkpoint commit metadata only, re-run exact latest HEAD CI before any closure
+PR_URL=https://github.com/Br174/Chatgpt/pull/56
+
+
+USER_DASHBOARD_ID_PROOF=2026-10-14: MotorLab-Staging account, Workers Free UI, 1/10 D1, database motorlab-memory-core-staging-r36 empty; account ID 32 hex from user URL and D1 database UUID present; real Cloudflare API not independently checked
+PROD_ACCOUNT_BROWSER_ID=NOT_YET_SUPPLIED
+ACCOUNT_ID_VALIDATOR_FIX=real Cloudflare account ids are 32 hex; LAB05/LAB06 code previously (incorrectly) expected 36-char UUID; fixed on this isolated child branch with fake-ID tests
+ACTUAL_STAGING_DB=CREATED_BY_USER_AND_VISIBLE_IN_DASHBOARD
+AUTHENTICATED_CLOUDFLARE_GET=NOT_ATTEMPTED_NO_PROTECTED_TOKENS
+LIVE_STAGING_READ_ACCESS=NOT_VERIFIED
+LIVE_STAGING_WRITE_AUTHORIZATION=BLOCKED
+ACCOUNT_ID_FIX_VERIFIED_CODE_SHA=dc25584bce65ba4f798a4818fa292d8d334ecbe9
+ACCOUNT_ID_FIX_CI_LAB05=https://github.com/Br174/Chatgpt/actions/runs/38524862802;SUCCESS
+ACCOUNT_ID_FIX_CI_LAB06_REMOTE=https://github.com/Br174/Chatgpt/actions/runs/38524862813;SUCCESS
+ACCOUNT_ID_FIX_CI_LAB06_OFFLINE=https://github.com/Br174/Chatgpt/actions/runs/38524862860;SUCCESS
+LATEST_HEAD_CI=run_final_checks_after_checkpoint_metadata_commit
+NO_EXTERNAL_CLOUDFLARE_VERIFICATION=TRUE
+NO_PRODUCTION_WRITES=TRUE
+NEXT_USER_STEP=obtain production account dashboard URL (account ID only) and protected read-only access via a secure non-chat channel; never paste tokens
+
+
+STAGING_RESOURCE_DISCOVERY_20261014_VERIFIED_BY_USER_DASHBOARD
+STAGING_ACCOUNT_NAME=MotorLab-Staging
+STAGING_ACCOUNT_ID=b86f445c2b57e604c02f79c8da64bb9c
+STAGING_D1_NAME=motorlab-memory-core-staging-r36
+STAGING_D1_ID=fd3ff45b-694a-45ec-8d5c-5653fdba092e
+PRODUCTION_ACCOUNT_ID=NOT_YET_VERIFIED_FROM_PRODUCTION_DASHBOARD
+PRODUCTION_D1_ID=9d94db34-2d3d-45be-8335-eae1b75d60b4
+EVIDENCE=user-provided Cloudflare dashboard URLs and screenshots; NOT authenticated API attestation
+STAGING_READ_TOKEN=user reports created; value NOT shared; not confirmed installed in protected executor
+PRODUCTION_READ_TOKEN=existing production agent read token observed in account UI; availability in protected executor NOT verified
+REMOTE_READ_ONLY_API=NOT_EXECUTED
+REMOTE_D1_WRITE=FORBIDDEN
+PRODUCTION_MUTATIONS=FORBIDDEN
+NEXT=Set staging and production read-only tokens exclusively in protected GitHub Actions secrets, using distinct names and no chat/log disclosure; then run existing fail-closed read-only preflight. Workflow currently intentionally excludes credentials and cannot attest provider identity until safe wiring is separately reviewed.
+
+
+LIVE_STAGING_READ_ATTESTATION_20261014
+WORKFLOW_RUN=https://github.com/Br174/Chatgpt/actions/runs/38554942476
+LIVE_STAGING_RESULT=STAGING_READ_ONLY_VERIFIED
+CLOUDFLARE_GET_COUNT=2
+CLOUDFLARE_WRITE_COUNT=0
+STAGING_ACCOUNT_AND_D1_IDENTITY=VERIFIED
+PRODUCTION_ACCOUNT_AND_D1_CROSS_ATTESTATION=NOT_VERIFIED
+REMOTE_D1_WRITE_ALLOWED=FALSE
+SECRET_VALUE=NOT_LOGGED_NOT_STORED_IN_REPO
+
+
+PRODUCTION_DASHBOARD_IDENTITY_20261014
+PRODUCTION_DASHBOARD_URL=https://dash.cloudflare.com/5781b597517f6f7fe25751170a99b9ab/workers/d1/databases/9d94db34-2d3d-45be-8335-eae1b75d60b4/metrics
+PRODUCTION_ACCOUNT_ID=5781b597517f6f7fe25751170a99b9ab
+PRODUCTION_D1_ID=9d94db34-2d3d-45be-8335-eae1b75d60b4
+PRODUCTION_D1_NAME=motorlab-operational-state-db
+EVIDENCE=user-supplied production dashboard URL and existing Wrangler production binding; not authenticated Cloudflare API
+STAGING_ACCOUNT_DISTINCT_FROM_PRODUCTION=YES_BY_DASHBOARD_IDENTIFIERS
+STAGING_API_GET_VERIFIED=YES_RUN_38554942476
+PRODUCTION_API_GET_VERIFIED=NO_READ_ONLY_TOKEN_NOT_YET_AVAILABLE_TO_EXECUTOR
+REMOTE_WRITES=FORBIDDEN
+NEXT_GATE=distinct protected production read-only token plus safe trusted execution; never use production write-capable build token

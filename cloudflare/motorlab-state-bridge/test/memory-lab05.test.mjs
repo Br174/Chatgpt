@@ -6,7 +6,7 @@ import {resolve} from 'node:path';
 import {validateStagingTarget,inspectStagingReadOnly} from '../../../tools/memory-core-lab05/staging-preflight.mjs';
 const root=resolve(fileURLToPath(new URL('../../..',import.meta.url)));
 const target=()=>({
- account_id:'81818181-8181-4818-8818-818181818181',
+ account_id:'81818181818181818181818181818181',
  database_id:'51525252-5555-4555-8555-555555555555',
  database_name:'motorlab-memory-core-staging-test'
 });
@@ -27,7 +27,7 @@ function fetchStub({accountId=null,dbId=null,dbName=null,badSuccess=false}={}){
  };
  return {fetchImpl,log};
 }
-test('staging target name and UUIDs distinct from bound production and LAB04 local',()=>{
+test('real-format Cloudflare 32-hex account ID and D1 UUID remain distinct from production',()=>{
  assert.deepEqual(validateStagingTarget(target()),target());
 });
 test('refuse production D1 ID, name and LAB04 synthetic database identity',()=>{
@@ -41,6 +41,8 @@ test('refuse staging scope escalation, extra binding, invalid name, missing proo
  assert.throws(()=>validateStagingTarget({...t,binding:'DB'}),/unknown_target_fields/);
  assert.throws(()=>validateStagingTarget({...t,database_name:'untrusted-db'}),/not_staging_named/);
  assert.throws(()=>validateStagingTarget({...t,account_id:'password: supersecret'}),/unexpected_credential_value/);
+ assert.throws(()=>validateStagingTarget({...t,account_id:'81818181-8181-4818-8818-818181818181'}),/invalid_account_id/);
+ assert.throws(()=>validateStagingTarget({...t,account_id:'8181818181818181818181818181818G'}),/invalid_account_id/);
  assert.throws(()=>validateStagingTarget({...t,database_id:'<TO_BE_PROVISIONED>'}),/invalid_uuid/);
 });
 test('read-only Cloudflare account and D1 visibility still fail CLOSED on cost/write scope',async()=>{
@@ -59,7 +61,7 @@ test('read-only Cloudflare account and D1 visibility still fail CLOSED on cost/w
  assert(!JSON.stringify(out).includes(valid().token),'token_leaked_in_result');
 });
 test('account identity mismatch is a hard stop, never try D1 after mismatch',async()=>{
- const mock=fetchStub({accountId:'99999999-9999-4999-8999-999999999999'});
+ const mock=fetchStub({accountId:'99999999999999999999999999999999'});
  await assert.rejects(inspectStagingReadOnly({...valid(),fetchImpl:mock.fetchImpl}),/account_identity_mismatch/);
  assert.equal(mock.log.length,1);
 });
