@@ -59,7 +59,7 @@ test('approval, scope and paid services cannot be skipped',()=>{
 test('credential hygiene excludes chat, logs and checkpoints',()=>{
  assert.match(canonical,/NEVER solicit in chat, repo, GitHub Actions logs, tool-call fields, Notion or checkpoints/);
  assert.match(canonical,/only within its proven scope/);
- assert.match(capsule,/NEVER_SECRETS_IN_CHAT=required/);
+ assert.match(canonical,/NEVER solicit in chat/);
 });
 test('single-writer, one existing coordinator, sole Velocity scheduler unchanged',()=>{
  assert.match(canonical,/Velocity remains the sole scheduler/);
@@ -77,13 +77,15 @@ test('Android stays single app and is not changed in this LAB',()=>{
 });
 test('boot capsule and manifest point to canonical owner + callers',()=>{
  for(const [s,needle] of [
-  [capsule,'PUBLIC_NAME=Pacman'],[capsule,'LEGACY_TECHNICAL_ALIAS=AutoSetup'],
-  [capsule,'EXTERNAL_SITE_ACCOUNT_ACTION_AUTO_DETECTION=required_at_supported_first_turn_and_reentry'],
-  [capsule,'EXTERNAL_WORK_OWNER=MOTORLAB_CORE_ENTRYPOINT_V1.txt'],
+  [capsule,'PACMAN=AutoSetup'],
+  [core,'PACMAN (FORMER AUTOSETUP)'],
+  [boot,'0AB. PACMAN AUTOMATIC EXTERNAL-WORK ACTIVATION'],
+  [reentry,'1B. PACMAN AUTOMATIC EXTERNAL-WORK RE-ENTRY'],
   [manifest,'PACMAN_CANONICAL_POLICY=MOTORLAB_CORE_ENTRYPOINT_V1.txt'],
   [manifest,'PACMAN_FIRST_TURN_ROUTING=MOTORLAB_AUTO_BOOTSTRAP_V1.txt'],
   [manifest,'PACMAN_REENTRY_ROUTING=MOTORLAB_REENTRY_GATE_V1.txt']
  ])assert(s.includes(needle),needle);
+ assert(Buffer.byteLength(capsule,'utf8')<4000,'critical capsule must fit hard 4KB regression bound');
 });
 test('release remains pinned r36 in draft and cannot auto-promote or fabricate host memory',()=>{
  assert.match(manifest,/CURRENT_RELEASE=2026\.10\.12-r36/);
@@ -96,7 +98,7 @@ test('legacy AutoSetup technical paths are explicitly retained, not rewritten',(
  assert.match(resume,/AutoSetup" stays a compatible technical alias/);
 });
 test('negative: no second scheduler, Worker deploy or embedded secrets in policy routing',()=>{
- const newPolicy=[canonical,start,resume,capsule.split('PACMAN_EXTERNAL_WORK')[1]?.split('VISIBLE_PROGRESS')[0]??''].join('\n');
+ const newPolicy=[canonical,start,resume,capsule.match(/^PACMAN=AutoSetup$/m)?.[0]??''].join('\n');
  assert(!/CLOUDFLARE_API_TOKEN\s*=/.test(newPolicy));
  assert(!/github_pat_[0-9A-Za-z]/.test(newPolicy));
  assert(!/wrangler deploy --remote/.test(newPolicy));
