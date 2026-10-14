@@ -5,6 +5,7 @@ on:
       - motorlab/pacman-execution-v2-lab-20261014
     paths:
       - 'tools/motorlab-pacman/**'
+      - 'cloudflare/motorlab-state-bridge/wrangler.jsonc'
       - '.github/workflows/pacman-v2-complete-tests.yml'
   pull_request:
     branches:
@@ -25,4 +26,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run Pacman V2 complete suite
-        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/d1-ledger.test.mjs tools/motorlab-pacman/d1-runner-integration.test.mjs tools/motorlab-pacman/staging-readiness.test.mjs tools/motorlab-pacman/d1-isolation-audit.test.mjs
+        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/d1-ledger.test.mjs tools/motorlab-pacman/d1-runner-integration.test.mjs tools/motorlab-pacman/staging-readiness.test.mjs tools/motorlab-pacman/d1-isolation-audit.test.mjs tools/motorlab-pacman/d1-repository-config.test.mjs
