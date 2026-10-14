@@ -29,3 +29,11 @@ User can complete Cloudflare authorization with minimum manual action; secure tr
 - No production deploy, new token, D1/KV write, or Worker mutation performed during this checkpoint.
 - Next safe work: check current CI/preview evidence and production identity, then prepare a NEW short-lived probe window only after verifying its independent production approval gate and fresh source-head binding. A new one-shot approval commit must contain only `.github/autosetup/LAB06_PROBE_APPROVAL.json` and must match the workflow's exact authorized subject; never reuse the expired approval.
 - Do not silently enable GitHub signing writes, broaden token scope, or deploy from ordinary push/PR. If required provider capability is unavailable, report the exact blocker without claiming live end-to-end functionality.
+
+## LAB06 verified isolated-preview checkpoint — 2026-10-14
+- The old approval was explicitly revoked in commit `366c55640455b1ec378c883fd836a4025c0a1750`: `approved=false`, `deploy_production=false`, and the expired timestamp remains historical only.
+- The Wrangler LAB configuration is fail-closed: `MOTORLAB_AUTOSETUP_PROBE_ONLY=false`, `MOTORLAB_AUTOSETUP_PROBE_UNTIL=""`, `MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE=false`.
+- GitHub Actions run `38597655652` on the revocation commit completed successfully: `verify=success`, isolated `preview=success`, `deploy=skipped`. This is the final verified outcome of the user-authorized preview-only operation.
+- User explicitly authorized ONLY isolated preview and explicitly did NOT authorize production changes. Do not create a new production approval, change the production Worker, activate signing writes, or bypass the deploy gate as a continuation of this checkpoint.
+- Next permitted work: improve isolated preview tests or documentation in LAB06; rerun preview CI after LAB changes and confirm `deploy=skipped`. Production deployment requires a new, separate explicit user authorization.
+- Preview success does not prove that the live production AutoSetup service is deployed or functional.
