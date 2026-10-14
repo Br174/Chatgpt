@@ -225,6 +225,45 @@ export async function handleAutoSetupCloudflare(request, env, {gateway = setRepo
     return null; // Let the existing MotorLab Worker handle every legacy route unchanged.
   const publicOrigin = originOnly(url.origin);
   if (!publicOrigin) return errorResponse("HTTPS_REQUIRED", 403);
+  // Read-only capability diagnosis. Never expose credentials, account IDs or secret values.
+  // A successful Worker preview does NOT prove that the ChatGPT host connected the MCP app.
+  if (url.pathname === PREFIX + "/capabilities") {
+    if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
+    const writes = liveEnabled(env);
+    const probe = probeEnabled(env);
+    const blockers = [];
+    if (!writes) blockers.push({
+      code: "GITHUB_WRITES_DISABLED",
+      component: "github-secrets",
+      next_action: "Explicit owner authorization and protected gateway enablement required"
+    });
+    if (!probe) blockers.push({
+      code: "PROBE_WINDOW_CLOSED",
+      component: "github-probe",
+      next_action: "Do not reuse expired authorization; isolated preview remains available"
+    });
+    blockers.push({
+      code: "CHAT_CONNECTION_UNVERIFIED",
+      component: "chatgpt-mcp",
+      next_action: "Connect the MCP app in a supported host and verify a real tool invocation"
+    });
+    blockers.push({
+      code: "GENERAL_PROVIDER_ROUTING_NOT_IMPLEMENTED",
+      component: "autosetup-router",
+      next_action: "Implement provider discovery and provider-specific capability checks before claiming universal setup"
+    });
+    return new Response(JSON.stringify({
+      schema: 1,
+      service: "motorlab-autosetup-cloudflare",
+      mode: "diagnostic-read-only",
+      supported_provider_operations: ["github-actions-signing-secrets"],
+      github_writes_enabled: writes,
+      github_probe_enabled: probe,
+      chat_connection_verified: false,
+      general_provider_routing_implemented: false,
+      blockers
+    }), { headers: { ...HEADERS, "Content-Type": "application/json; charset=utf-8" } });
+  }
   if (url.pathname === PREFIX + "/health") {
     if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
     return new Response(JSON.stringify({
