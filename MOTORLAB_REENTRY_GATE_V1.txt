@@ -91,3 +91,7 @@ VERSION
 MOTORLAB-REENTRY-GATE-V1.1
 Established: 2026-10-08
 Revision 1.0: r31 adds mandatory every-turn/resume MotorLab re-entry and safe latest-verified-release refresh.
+
+
+R37 FULL-SUITE READY RULE (2026-10-14; USER APPROVED)
+On EVERY recognized MotorLab project turn and safe re-entry, restore and make available the complete existing MotorLab suite (Fantastici 20 as all current/future capabilities), including Pollicino, Velocity, Watchdog, Resume Recovery and Pacman, without a user trigger word. Apply each function automatically when its preconditions and real host tools are satisfied; 'ready' is not proof an unavailable external runtime is executing. Keep ONE coordinator, no duplicated workers or needless simultaneous actions, preserve existing approval/security/native-engine rules. Apply global diagnostic-first/human-last, continue-until-terminal and dual-progress rules through their existing canonical owners, not via Pacman-specific behavior.
