@@ -55,3 +55,26 @@ F. Promote only after measured improvement, safety/regression gates, and separat
 
 ## Status
 LAB01 baseline inventory and plan recorded. No implementation, database migration, live D1 inspection or end-to-end tests claimed. Next: inspect actual D1 schema and current bridge routes; implement minimal catalog adapter in isolated LAB.
+
+## Execution roadmap — 2026-10-14
+Estimates are technical active-work estimates, not wall-clock commitments. Overall percent = sum of VERIFIED completed weighted work; no percent granted for untested assumptions. Each step reports STEP_TOTAL, STEP_PARTIAL and PROJECT_TOTAL, plus estimated/actual active time and evidence. Preserve all existing owners, approved scope, Pollicino, Watchdog, bidirectional sync, continuity, safeguards, and NON-STOP execution. Do not create new engine or service.
+
+| Step | Work | Estimated active time | Overall weight | Gate |
+|---|---|---|---|---|
+| 1 | Inventory live/schema/source and current recall baseline | 1–2 h | 10% | source + schema inventory and unknowns |
+| 2 | Duplicate/conflict/ownership map | 1–2 h | 10% | OLD/NEW owner map and regression risks |
+| 3 | Hierarchical catalog adapter in isolated LAB | 2–4 h | 20% | deterministic taxonomy/idempotency tests |
+| 4 | Memory relations/graph | 2–3 h | 15% | provenance and relation tests |
+| 5 | Frequency/relevance/importance/recency ranking | 1–2 h | 10% | safety authority unaffected, ranking tests |
+| 6 | Bidirectional ingest and Re-entry retrieval integration | 2–4 h | 20% | cross-chat/operation recall integration |
+| 7 | Comparative recall, correctness, latency, anti-conflict and regression | 2–3 h | 10% | measurable improvement vs baseline |
+| 8 | Final consolidation, rollback/checkpoints, candidate proposal | 1–2 h | 5% | review and approval for promotion |
+Total estimated technical active work: 12–22 h. Do not assert autonomous background execution without a real durable job.
+
+### Step 1 subactivities and evidence
+1A Existing CORE contracts and owners — 25% of step (verified from repository files).
+1B Existing Worker route and operational event sink inspection — 25% of step (partial; source confirms operation_events INSERT OR IGNORE).
+1C Actual D1 deployed schema, bindings and resources — 25% of step (not verified; read-only access required).
+1D Baseline recall fixtures and measured results — 25% of step (not run).
+Step 1 verified partial: 25%; step 1 total: 25%; project verified total: 2.5% (10% x 25%). Worker observation remains partial, not counted until route/schema assessment complete.
+No changes to production, main, MADRE, APK or live D1/KV.
