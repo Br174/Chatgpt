@@ -78,3 +78,8 @@ Total estimated technical active work: 12–22 h. Do not assert autonomous backg
 1D Baseline recall fixtures and measured results — 25% of step (not run).
 Step 1 verified partial: 25%; step 1 total: 25%; project verified total: 2.5% (10% x 25%). Worker observation remains partial, not counted until route/schema assessment complete.
 No changes to production, main, MADRE, APK or live D1/KV.
+
+## Step 1 follow-up: source-schema audit
+Verified from cloudflare/motorlab-state-bridge/src/schema.js on LAB branch: 14 CREATE TABLE IF NOT EXISTS declarations (relay_snapshots, projects, operations, approvals, checkpoints, locks, artifacts, root_causes, operation_events, live_directives, pollicino_sessions, pollicino_session_events, pollicino_resume_packets, velocity_lessons) and 10 CREATE INDEX IF NOT EXISTS declarations. No FTS5 in that schema. src/index.js calls ensureSchema(env.DB) and writes operation_events with INSERT OR IGNORE. src/entry.js provides continuity context/resume-ready routes. These are SOURCE findings only; deployed remote D1, actual bindings, data, connectivity and behavior remain UNVERIFIED.
+Step 1A verified 100%; 1B source audit verified 100%; 1C remote actual D1 unverified; 1D baseline recall untested. Step 1 total 50%; project verified total 5.0% (step weight 10%). Time spent not reliably metered; original active-time estimates remain provisional. No production changes.
+Next: inspect live D1 with authorized read-only path if available; construct reproducible offline baseline fixture before implementation.
