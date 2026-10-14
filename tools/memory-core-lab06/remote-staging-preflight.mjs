@@ -10,6 +10,7 @@ const root=resolve(fileURLToPath(new URL('../..',import.meta.url)));
 const prodConfig=JSON.parse(readFileSync(resolve(root,'cloudflare/motorlab-state-bridge/wrangler.jsonc'),'utf8'));
 const production=prodConfig.d1_databases?.find(x=>x.binding==='DB');
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
+const accountId=/^[a-f0-9]{32}$/i;
 const fail=(reason)=>{throw new Error('LAB06_REMOTE_GATE_BLOCKED:'+reason)};
 const must=(cond,reason)=>{if(!cond)fail(reason)};
 const endpoint=(accountId,databaseId)=>'https://api.cloudflare.com/client/v4/accounts/'+accountId+(databaseId?'/d1/database/'+databaseId:'');
@@ -40,7 +41,7 @@ export async function inspectIndependentStagingReadOnly({
  const stage=validateStagingTarget(target); // canonical LAB05 guard, not a second resolver
  must(production&&uuid.test(production.database_id)
     &&production.database_name==='motorlab-operational-state-db','production_reference_missing');
- must(typeof productionAccountId==='string'&&uuid.test(productionAccountId),'production_account_id_unverified');
+ must(typeof productionAccountId==='string'&&accountId.test(productionAccountId),'production_account_id_unverified');
  must(productionAccountId!==stage.account_id,'staging_same_as_production_account');
  must(typeof fetchImpl==='function','missing_provider_fetch');
  safeToken(productionReadToken);
