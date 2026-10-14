@@ -12,3 +12,7 @@ test('monotonic progress',()=>assert.equal(recoverOperation(base,{verifiedProgre
 test('stale checkpoint cannot lower floor',()=>assert.equal(recoverOperation(base,{verifiedProgress:10}).verifiedProgress,40));
 test('identity mismatch rejected',()=>assert.throws(()=>recoverOperation(base,{id:'other'})));
 test('blocked external preserved',()=>assert.equal(reconcileTurnEnd({...base,status:'BLOCKED_EXTERNAL'},{}).status,'BLOCKED_EXTERNAL'));
+
+test('user pause survives re-entry',()=>assert.equal(recoverOperation({...base,status:'PAUSED_BY_USER'},{}).status,'PAUSED_BY_USER'));
+test('running external job is not duplicated on re-entry',()=>assert.equal(recoverOperation({...base,status:'RUNNING_EXTERNAL'},{}).status,'RUNNING_EXTERNAL'));
+test('external blocker remains blocked on re-entry',()=>assert.equal(recoverOperation({...base,status:'BLOCKED_EXTERNAL'},{}).status,'BLOCKED_EXTERNAL'));
