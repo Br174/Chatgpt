@@ -161,10 +161,13 @@ test('only additive LAB06 files; no production import, deploy workflow or remote
  }
  assert(!workflow.includes('id-token: write'));
  assert(!workflow.includes('CLOUDFLARE_API_TOKEN'));
- assert(!workflow.replaceAll('secrets.CLOUDFLARE_STAGING_READ_TOKEN','').includes('secrets.'));
- assert(workflow.includes("if: github.event_name == 'push'"));
+ assert(!workflow.replaceAll('secrets.CLOUDFLARE_STAGING_READ_TOKEN','').replaceAll('secrets.CLOUDFLARE_PRODUCTION_READ_TOKEN','').includes('secrets.'));
+ assert(workflow.includes('workflow_dispatch:'));
+ assert.equal((workflow.match(/if: github.event_name == 'workflow_dispatch' && github.ref == 'refs\\/heads\\/motorlab\\/memory-core-lab06-remote-gate-20261014'/g)||[]).length,2);
+ assert(!workflow.includes("if: github.event_name == 'push' ||"));
  assert(workflow.includes('STAGING_READ_ONLY_VERIFIED'));
- assert(!workflow.includes('secrets.CLOUDFLARE_PRODUCTION_READ_TOKEN'));
+ assert(workflow.includes('secrets.CLOUDFLARE_PRODUCTION_READ_TOKEN'));
+ assert(workflow.includes('Independent production and staging identity proof - four GET only'));
  // The workflow contains a grep DENY pattern with '--remote'; this is a guard, not a call.
  assert(!/^\s*(?:npx\s+)?wrangler\s+(?:deploy|d1\s+(?:execute|create))\b/m.test(workflow));
 });
