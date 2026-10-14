@@ -6,7 +6,7 @@ const path = "tools/motorlab-pacman/probe.txt";
 const content = "synthetic probe";
 function setup() {
   const store = new Map();
-  const ledger = {get: async id => store.get(id), put: async (id, value) => {store.set(id, value);}};
+  const ledger = {durable:true,atomic:true, get: async id => store.get(id), put: async (id, value) => {store.set(id, value);}, claim: async (id, value) => {if(store.has(id))return false;store.set(id,value);return true;}};
   const checkpoints = [];
   let current = null;
   const adapter = {
@@ -53,4 +53,16 @@ test("rejects unsafe branch and path", async () => {
   await assert.rejects(runGithubLabFileCycle({operationId:"pacman-probe-006",branch,
     path:"tools/motorlab-pacman/../other",content,adapter:s.adapter,ledger:s.ledger,
     onCheckpoint:s.onCheckpoint,approval:true}), {code:"LAB_PATH_REQUIRED"});
+});
+
+test("20 concurrent LAB operations admit one writer", async () => {
+  const s=setup();
+  let writes=0;
+  const original=s.adapter.create;
+  s.adapter.create=async args=>{writes++;await original(args);};
+  const args={operationId:"pacman-concurrent-020",branch,path,content,adapter:s.adapter,
+    ledger:s.ledger,onCheckpoint:s.onCheckpoint,approval:true};
+  const results=await Promise.allSettled(Array.from({length:20},()=>runGithubLabFileCycle(args)));
+  assert.equal(results.filter(r=>r.status==="fulfilled").length,1);
+  assert.equal(writes,1);
 });
