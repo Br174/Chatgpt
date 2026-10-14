@@ -1,0 +1,26 @@
+MOTORLAB NONSTOP PROJECT LIFECYCLE — LAB CANDIDATE 2026-10-14
+
+Scope: isolated LAB only. No changes to ChatGPT host turn lifecycle, production, main, MADRE, APK, Worker, D1 or KV.
+
+Problem: an assistant turn may finish while the project operation is still open. Existing Project Continuity termination flush and Pollicino terminal seals must not equate turn completion with operation completion.
+
+Rules:
+1. Separate TURN_STATE from OPERATION_STATE. TURN_ENDED is never equivalent to OPERATION_COMPLETED. The latter requires verified acceptance criteria, artifact and tests where applicable.
+2. At each safe material boundary, persist ACTIVE_OPERATION_ID, last verified progress, current phase, last completed step, next safe step, blockers, source ref/head and evidence using existing Project Continuity. Coalesce writes; no high-frequency GitHub heartbeat.
+3. Before an ordinary assistant turn ends with an unfinished operation, perform a continuation preflight: if safe executable work remains and the host permits further tool calls, execute it rather than prematurely reporting completion. Do not insert artificial 'OK procedi' approval loops within existing approved scope.
+4. If the host forces the turn to end, checkpoint as OPERATION_OPEN / TURN_ENDED, never COMPLETED. On the next supported prompt, existing Re-entry Gate and Resume Recovery continue the same operation ID and progress floor.
+5. If an actual authorized persistent executor remains active after chat detachment, record CHAT_DETACHED / EXECUTOR_ALIVE and let it continue independently. Without such executor, do not claim background execution or auto-resumption without a new host trigger.
+6. For externally blocked tasks, mark BLOCKED_EXTERNAL and continue independent safe steps. Never bypass permissions, paid-service restrictions, single-writer locks, approvals or test gates.
+7. Pollicino records session evidence; Watchdog alone decides stall; Resume Recovery alone chooses next step; Project Continuity owns the ledger. No second scheduler, watchdog or memory store.
+8. UI streaming, maximum turn duration and autonomous ChatGPT turn continuation are host capabilities, not repository-controlled features.
+
+Regression acceptance:
+- Turn ends while operation open => operation remains OPEN and next safe step survives.
+- New chat resumes same operation ID and monotonic verified progress.
+- Completed operation requires verified completion evidence.
+- External job running => no duplicate writer/restart.
+- User stop => honor stop; no auto-continue.
+- Host without persistent executor => no false background status.
+- Existing modules retain authority; no changes to native project engines.
+
+Implementation status: policy candidate only. Requires integration, automated tests, and approval before release fanout.
