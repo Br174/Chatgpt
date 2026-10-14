@@ -1,0 +1,24 @@
+name: Pacman ephemeral GitHub LAB probe
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: pacman-ephemeral-lab-probe
+  cancel-in-progress: false
+jobs:
+  reversible-probe:
+    if: github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' && github.repository == 'Br174/Chatgpt'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Real reversible GitHub file cycle with ephemeral token
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/motorlab-pacman/github-ephemeral-probe.mjs
