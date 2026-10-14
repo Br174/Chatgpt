@@ -53,6 +53,34 @@ jobs:
           unset CLOUDFLARE_STAGING_DATABASE_NAME CLOUDFLARE_STAGING_READ_TOKEN
           node tools/memory-core-lab06/optional-remote-staging-read.mjs > "$RUNNER_TEMP/remote-hold.json"
           node --input-type=module -e "import fs from 'node:fs'; const x=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if(x.result!=='REMOTE_STAGING_NOT_TESTED'||x.remote_cloudflare_requests!==0||x.remote_cloudflare_writes!==0||x.remote_d1_write_permitted!==false)process.exit(1); console.log('PENDING_STAGING_ACCESS: zero Cloudflare requests/writes');" "$RUNNER_TEMP/remote-hold.json"
+      - name: Staging D1 live identity read - two GET only
+        if: github.event_name == 'push'
+        env:
+          CLOUDFLARE_STAGING_READ_TOKEN: ${{ secrets.CLOUDFLARE_STAGING_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_STAGING_READ_TOKEN:-}" ]; then
+            echo 'STAGING_READ_ONLY_NOT_TESTED: protected secret unavailable'
+            exit 0
+          fi
+          node --input-type=module <<'NODE'
+          import {inspectStagingReadOnly} from './tools/memory-core-lab05/staging-preflight.mjs';
+          try {
+            const proof = await inspectStagingReadOnly({
+              target: {
+                account_id:'b86f445c2b57e604c02f79c8da64bb9c',
+                database_id:'fd3ff45b-694a-45ec-8d5c-5653fdba092e',
+                database_name:'motorlab-memory-core-staging-r36'
+              },
+              token:process.env.CLOUDFLARE_STAGING_READ_TOKEN
+            });
+            if(proof.result!=='STAGING_IDENTITY_READ_VERIFIED'||proof.remote_d1_write_permitted!==false) process.exit(1);
+            console.log('STAGING_READ_ONLY_VERIFIED: two Cloudflare GET requests; zero writes; production separation not yet proven');
+          } catch {
+            console.error('STAGING_READ_ONLY_BLOCKED: provider identity or permissions not verified; zero writes');
+            process.exitCode=1;
+          }
+          NODE
       - name: Static protected surfaces and no remote mutation routes
         run: |
           set -euo pipefail
