@@ -1,3 +1,4 @@
+import {claimOperation} from "./atomic-claim.mjs";
 // Pacman Execution V2 — fail-closed capability registry and verified operation runner.
 // LAB-only module. The host supplies authenticated adapters; this module never handles credentials.
 export const CAPABILITIES = Object.freeze({
@@ -45,13 +46,17 @@ export async function runGithubLabFileCycle({operationId, branch, path, content,
   check(approval === true, "OWNER_APPROVAL_REQUIRED");
   check(adapter && ["read","create","remove"].every(key => typeof adapter[key] === "function"),
     "ADAPTER_MISSING");
-  check(ledger && typeof ledger.get === "function" && typeof ledger.put === "function",
-    "DURABLE_LEDGER_REQUIRED");
+  check(ledger && typeof ledger.put === "function", "DURABLE_LEDGER_REQUIRED");
   check(typeof onCheckpoint === "function", "CHECKPOINT_WRITER_REQUIRED");
-  const previous = await ledger.get(operationId);
-  check(!previous, "OPERATION_ALREADY_RECORDED");
-  const initial = await adapter.read({branch, path});
-  check(initial?.exists === false, "TARGET_NOT_EMPTY_OR_UNVERIFIED");
+  await claimOperation(ledger, operationId, safeReceipt(operationId, "CLAIMED", {branch, path}));
+  let initial;
+  try { initial = await adapter.read({branch, path}); }
+  catch { await ledger.put(operationId, safeReceipt(operationId, "PREFLIGHT_FAILED", {branch, path}));
+    throw new PacmanDenied("PREFLIGHT_FAILED"); }
+  if (initial?.exists !== false) {
+    await ledger.put(operationId, safeReceipt(operationId, "PREFLIGHT_FAILED", {branch, path}));
+    throw new PacmanDenied("TARGET_NOT_EMPTY_OR_UNVERIFIED");
+  }
   await ledger.put(operationId, safeReceipt(operationId, "PREPARED", {branch, path}));
   await onCheckpoint(safeReceipt(operationId, "PREPARED", {branch, path}));
   let mutationAttempted = false;
