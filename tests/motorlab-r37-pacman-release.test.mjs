@@ -27,13 +27,18 @@ test('r37 policy is same existing AutoSetup and follows boot/reentry without a s
  assert.match(bundle,/^PACMAN_MCP_LIVE_STATUS=NOT_VERIFIED$/m);
  assert.match(sync,/R37 PACMAN AUTOSETUP ALIAS SYNC/);
 });
-test('release cannot be announced globally complete before six main satellites are proven',()=>{
- assert.match(manifest,/^FANOUT_STATE=IN_PROGRESS$/m);
- assert.match(manifest,/^RELEASE_FANOUT_STATE=IN_PROGRESS$/m);
- assert.match(manifest,/^FANOUT_MAIN_VERIFIED=0\/6$/m);
- assert.match(ledger,/R37_STATE=IN_PROGRESS/);
- assert.match(ledger,/R37_MAIN_STATUS=0\/6_UNTIL_INDEPENDENT_GITHUB_READBACK_AFTER_SAFE_ADOPTION/);
- assert.match(manifest,/PACMAN_RELEASE_ACTIVATION=R37_PREPARED_AWAITING_VERIFIED_FANOUT/);
+test('r37 release may be COMPLETE only after all six main satellite SHA receipts and four pending LAB refs',()=>{
+ assert.match(manifest,/^FANOUT_STATE=COMPLETE$/m);
+ assert.match(manifest,/^RELEASE_FANOUT_STATE=COMPLETE$/m);
+ assert.match(manifest,/^FANOUT_MAIN_VERIFIED=6\/6$/m);
+ assert.match(ledger,/R37_GLOBAL_STATE=COMPLETE/);
+ assert.match(ledger,/R37_CURRENT_MAIN_VERIFIED=6\/6/);
+ assert.match(ledger,/R37_VERIFICATION=central_content_git_blob_exact_match/);
+ const checks=ledger.match(/^R37_MAIN_VERIFIED Br174\/.* ref=main sha=[0-9a-f]{40} release=r37 last_good=r36$/gm)||[];
+ assert.equal(checks.length,6,'all 6 r37 main GitHub receipt refs required');
+ assert.match(ledger,/R37_PENDING_SAFE_BOUNDARY_COUNT=4/);
+ assert.match(registry,/STATUS=R37_COMPLETE_WITH_FOUR_EXPLICIT_LAB_PENDING_SAFE_BOUNDARIES/);
+ assert.match(manifest,/PACMAN_RELEASE_ACTIVATION=VERIFIED_CORE_AND_SIX_ACTIVE_MAINS/);
 });
 test('retrospective r35/r36 closure is preserved and four active LABs explicitly stay pinned',()=>{
  assert.match(ledger,/R35_GLOBAL_STATE=COMPLETE/);
