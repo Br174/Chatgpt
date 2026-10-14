@@ -1,0 +1,24 @@
+MOTORLAB_OPERATION_ID=memory-core-lab06-20261014
+PROJECT=Br174/Chatgpt
+CENTRAL_RELEASE=2026.10.12-r36
+APPROVAL=Bruno explicitly approved LAB06 implementation 2026-10-14 after pre-change report
+LAB05_BASE_SHA=de6fc9d9553467797d0a161721936295197be682
+LAB05_DRAFT_PR=https://github.com/Br174/Chatgpt/pull/54
+TARGET_BRANCH=motorlab/memory-core-lab06-20261014
+PROTECTED=main,MADRE,APK,production_Worker_D1_KV,signing_secrets,native_project_engines,LAST_GOOD
+IMPLEMENTED_SCOPE=local durable SQLite gateway (LAB03 canonical DB/importer), LAB02 independently verified Github acquisition, LAB01 derived hot capsule/master book, atomic offline backups and missing-target-only restore, process lock, regression and canary CI
+LOCAL_PROGRESS=implementation and 9 independent-process local tests passed at code SHA 6a074c10b013ec3c53ea902212f00999cffc682f
+LAST_SUCCESSFUL_CODE_CI_RUN=38510410991
+LAST_SUCCESSFUL_CODE_CI_URL=https://github.com/Br174/Chatgpt/actions/runs/38510410991
+LAST_SUCCESSFUL_CI_RESULT=SUCCESS:49 JS regressions, LAB05 concurrent/crash backup, LAB06 9 Python tests, Wrangler D1 local genuine GitHub sources, LAB06 independent verified GitHub import/reimport/recall, fail-closed cloud gate
+SECURITY_HARDENING_AFTER_CI=7e4b83a9398c666ecfb1fa7f0840751c2bd8aeb4: remove sourceAcquirer override, force canonical LAB02 source proof
+FINAL_HEAD_CI=must verify live GitHub Actions status after this checkpoint commit (do not infer success from previous SHA)
+
+D1_REMOTE_STAGING=PENDING_STAGING_ACCESS
+D1_REMOTE_WRITES=0
+NO_EXTRA_CLOUD_COSTS=Not asserted; no remote use authorized until independently proven
+CHATGPT_AUTO_HISTORY=NOT_IMPLEMENTED
+CORE_INTEGRATION_LIVE=NOT_IMPLEMENTED
+RELEASE_PROMOTION=FORBIDDEN_NO_SEPARATE_APPROVAL
+LAST_GOOD=LAB05 head as recorded above
+NEXT=inspect LAB06 exact-head CI, repair only LAB06 isolated files if needed, verify remote staging remains blocked, leave DRAFT PR against LAB05, report percentages
