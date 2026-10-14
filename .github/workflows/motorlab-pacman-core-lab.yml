@@ -46,7 +46,7 @@ jobs:
           const fs=require('node:fs');
           const m=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
           if(!m.includes('CURRENT_RELEASE=2026.10.14-r37'))throw Error('unapproved release bump');
-          if(!m.includes('PACMAN_RELEASE_ACTIVATION=R37_PREPARED_AWAITING_VERIFIED_FANOUT'))throw Error('fanout bypass');
+          if(!m.includes('PACMAN_RELEASE_ACTIVATION=VERIFIED_CORE_AND_SIX_ACTIVE_MAINS'))throw Error('fanout bypass');
           const wf=fs.readFileSync('.github/workflows/motorlab-pacman-core-lab.yml','utf8');
           if(wf.split('\n').some(line=>/^\s*(?:npx\s+)?wrangler\s+(?:deploy|d1\s+execute)/.test(line)))throw Error('production-capable workflow');
           console.log('r37 release preparation only. No provider authentication, deployment, D1/KV, APK, MADRE or main promotion.');
