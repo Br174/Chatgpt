@@ -25,4 +25,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run Pacman V2 complete suite
-        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/d1-ledger.test.mjs tools/motorlab-pacman/d1-runner-integration.test.mjs tools/motorlab-pacman/staging-readiness.test.mjs
+        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/d1-ledger.test.mjs tools/motorlab-pacman/d1-runner-integration.test.mjs tools/motorlab-pacman/staging-readiness.test.mjs tools/motorlab-pacman/d1-isolation-audit.test.mjs
