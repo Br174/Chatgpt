@@ -62,7 +62,7 @@ export async function executeLocalMemory(argv,{sourceAcquirer=acquireVerifiedGit
   const found=recallVerifiedMemory(memory,{query:flags['--query'],projectId:'MotorLab'});
   return {result:'LAB06_RECOVERED_FROM_DISK',found:found.found,results:found.results,
    conflicts:view.conflicts,hot_capsule_entries:hotCapsule(view,{limit:12}).length,
-   master_book_pages:masterBookChapters(view).length,records:snapshot.counts.memory_records,
+   master_book_pages:masterBookChapters(view).reduce((sum,chapter)=>sum+chapter.pages.length,0),records:snapshot.counts.memory_records,
    sha256:snapshot.sha256,cloudflare_remote_writes:0};
  }
  return {...pyRun(action,flags,action==='restore'?['--backup-file',flags['--backup-file']]:[]),
