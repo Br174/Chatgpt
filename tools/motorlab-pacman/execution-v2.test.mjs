@@ -66,3 +66,15 @@ test("20 concurrent LAB operations admit one writer", async () => {
   assert.equal(results.filter(r=>r.status==="fulfilled").length,1);
   assert.equal(writes,1);
 });
+
+test("completed cleanup stays verified if final notification fails",async()=>{
+  const s=setup();
+  const receipt=await runGithubLabFileCycle({
+    operationId:"pacman-final-notify-001",branch,path,content,adapter:s.adapter,
+    ledger:s.ledger,approval:true,
+    onCheckpoint:async value=>{if(value.state==="VERIFIED_AND_REMOVED")throw Error("notification offline");}
+  });
+  assert.equal(receipt.state,"VERIFIED_AND_REMOVED");
+  assert.equal((await s.ledger.get("pacman-final-notify-001")).state,"VERIFIED_AND_REMOVED");
+  assert.equal((await s.adapter.read()).exists,false);
+});
