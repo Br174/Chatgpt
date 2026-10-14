@@ -11,6 +11,16 @@
 - Isolated test workflow uses synthetic Cloudflare API mocks and inherited LAB01–LAB06 tests including actual **Wrangler D1 --local**. It does NOT use GitHub Actions secrets, Cloudflare real credentials, deploys, changes of live services, or staging remote writes.
 - No remote D1 query path, migration, or deploy implementation exists in this LAB. Read-only staging verification may run only on an authorized trusted executor with protected per-account read tokens; no real remote connection has been asserted.
 
+## Real dashboard evidence and compatibility correction — 2026-10-14
+
+The user opened the newly created **MotorLab-Staging** account's D1 page and supplied the browser URL for `motorlab-memory-core-staging-r36`. From the URL the staging **Account ID is 32 hexadecimal characters without hyphens**, whereas its D1 database identifier is a **36-character UUID with hyphens**. This browser evidence matches an empty staging D1 and dashboard **Workers Free** plus observed 1/10 DB capacity, but it **does not constitute independently authenticated Cloudflare API proof**; current usage screenshot is point-in-time, not a full billing/overage attestation.
+
+**Root cause:** LAB05 previously applied the D1 UUID validator to the Cloudflare account identifier, and LAB06 also applied the same validator to the production account identifier. Both would reject a legitimate Cloudflare account even with valid tokens. In this isolated child branch, change the **existing LAB05 canonical staging validator**, never copy it into another duplicate, to strictly require 32 hex chars for `account_id` and RFC4122-style UUID for `database_id`; change LAB06 production account checker to the same account ID format. Use synthetic account IDs in fixtures and negative tests; **do not embed the user's account ID, full staging URL, tokens, secrets, or provider billing data into GitHub**.
+
+OLD → NEW: `LAB05.validateStagingTarget.account_id` invalid UUID32-form → Cloudflare 32-hex account ID; `LAB05.validateStagingTarget.database_id` same strict UUID invariant; `LAB06.inspectIndependentStagingReadOnly.productionAccountId` UUID → 32 hex, preserving strict separation; same LAB05 protected GET path, no second client/writer. Inherited LAB01–LAB06 tests must pass alongside negative malformed-ID tests. This correction is part of the already approved read-only verification extension; existing production files, scripts, D1, KV, Worker and APK remain untouched.
+
+**Until two separately authenticated accounts are actually checked by Cloudflare read-only API:** status `PENDING_STAGING_ACCESS`, `remote_d1_write_permitted:false`, zero real remote API requests. The user's Chrome login is not transmitted to GitHub Actions or this assistant, and a dashboard URL is **not** a credential.
+
 ## Protected runtime requirements (not to paste into chat or commit)
 Fields are `CLOUDFLARE_PRODUCTION_ACCOUNT_ID`, `CLOUDFLARE_PRODUCTION_READ_TOKEN`, `CLOUDFLARE_STAGING_ACCOUNT_ID`, `CLOUDFLARE_STAGING_DATABASE_ID`, `CLOUDFLARE_STAGING_DATABASE_NAME`, `CLOUDFLARE_STAGING_READ_TOKEN`. Identity requirements were derived from actual repository Worker binding with database name `motorlab-operational-state-db` and the LAB05 staging-name prefix. The two read tokens must be different and have minimal read-only scopes.
 
