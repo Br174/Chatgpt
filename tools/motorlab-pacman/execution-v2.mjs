@@ -59,7 +59,8 @@ export async function runGithubLabFileCycle({operationId, branch, path, content,
     throw new PacmanDenied("TARGET_NOT_EMPTY_OR_UNVERIFIED");
   }
   await ledger.put(operationId, safeReceipt(operationId, "PREPARED", {branch, path}));
-  await onCheckpoint(safeReceipt(operationId, "PREPARED", {branch, path}));
+  try { await onCheckpoint(safeReceipt(operationId, "PREPARED", {branch, path})); }
+  catch { throw new PacmanDenied("CHECKPOINT_PREPARE_FAILED"); }
   let mutationAttempted = false;
   let cleanupVerified = false;
   try {
