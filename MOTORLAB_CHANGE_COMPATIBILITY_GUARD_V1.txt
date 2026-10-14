@@ -27,6 +27,8 @@ This section SUPERSEDES overlapping earlier guidance inside this very Guard: it 
 - COMPLEMENTARY: where the rules address independent or genuinely compatible behavior, retain both with unambiguous ownership; do not delete unrelated functions.
 No blind recency rule applies to unapproved edits, broader changes, safety protections, package/signing identity, data integrity, native-engine contracts or LAST_GOOD. Git history remains available for recovery, never as an alternate ACTIVE authority.
 
+NON-STOP PRECEDENCE: the approved whole-project continuation rule supersedes older interpretations that a successful microtask, phase, checkpoint, session seal or turn flush completes the project. Project Continuity owns the operation ledger, Pollicino owns session evidence, Resume Recovery selects the next step, Velocity dispatches, Watchdog classifies stalls, and this Guard resolves conflicts. Keep compatible functionality; disable contradictory interpretations. Require negative regression tests.
+
 MANDATORY REPLACEMENT PROOF
 1. Locate the former governing rule and every active enforcement route: source logic, callbacks, workers, UI, provider adapters, error/empty fallbacks, cache or persisted decisions, player/preview metadata, navigation/re-entry and release defaults.
 2. Record an OLD -> NEW map (affected responsibility, precise path, prior owner, new owner, IDENTICAL_MERGED / CONFLICT_REPLACED / RETIRED / INDEPENDENT disposition, protected areas). For IDENTICAL retire duplicate authority, for CONFLICT replace the previous behavior, for COMPLEMENTARY keep separately owned behavior.
