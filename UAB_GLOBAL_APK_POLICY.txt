@@ -118,6 +118,7 @@ Broad full-task ladder:
 100% requested state verified and delivered
 
 Progress reporting rules:
+FIELD-FAILURE PRECEDENCE: visible progress is nonblocking telemetry, never an instruction to end the assistant turn. If a status-only response would interrupt ready approved build/test/delivery work, perform that work first and include progress at a supported nonterminal point or at the genuine stopping boundary.
 1. Report percentage throughout substantial work, not only at broad milestones.
 2. Report at meaningful subtask starts/completions, phase changes, relevant code/config changes, check transitions, build/test transitions, artifact/checkpoint changes, watchdog interventions, recovery outcomes and delivery/promotion transitions.
 PROJECT-LEVEL TERMINATION: a completed APK subtask, checkpoint, build, test, phase or delivered intermediate artifact does not finish the entire approved project. Continue the next safe authorized dependency within the same available turn, while delivering testable artifacts promptly; respect genuine blockers, approval gates and host limits.
