@@ -67,7 +67,8 @@ D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
 6. Failure behavior: keep the last verified percentage, identify the failing phase, and never show 100% until the requested outcome is verified.
 7. Interactive reporting frequency:
    - report at task start, meaningful subtask start/completion, phase changes, important file/change application, check transitions, build/test transitions, artifact/checkpoint changes, watchdog interventions, recovery outcomes, handoff/promotion transitions and final delivery;
-   - as a practical default, avoid more than roughly 1-3 meaningful tool/operation interactions without a progress update when the interface permits;
+   - as a practical default, offer progress after roughly 1-3 meaningful tool/operation interactions ONLY when a supported non-terminal update is possible; this is not a turn-length limit, checkpoint cadence, mandatory pause, or reason to return control to the user;
+   - never stop an approved work sequence to emit a status, percent, heartbeat or Pollicino breadcrumb; continue the next safe action in the same turn until a valid terminal state;
    - for a long single operation, report status as provider/job evidence changes;
    - do not spam clock-based identical messages with no new information.
 8. Same-percentage updates are explicitly allowed and encouraged when new operational information exists but no new completion has been verified.
