@@ -1,0 +1,22 @@
+name: Pacman V2 Complete LAB Suite
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - 'tools/motorlab-pacman/**'
+      - '.github/workflows/pacman-v2-complete-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complete-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run Pacman V2 complete suite
+        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/d1-ledger.test.mjs
