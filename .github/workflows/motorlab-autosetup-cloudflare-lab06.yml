@@ -16,6 +16,7 @@ on:
       - '.github/workflows/motorlab-autosetup-cloudflare-lab06.yml'
       - '.github/autosetup/LAB06_PRODUCTION_APPROVAL.json'
       - '.github/autosetup/LAB06_PROBE_APPROVAL.json'
+      - 'apps/motorlab-chat-secure-bridge/CLOUDFLARE_TOKEN_MINIMAL_SETUP_LAB06.md'
   workflow_dispatch:
     inputs:
       deploy_production:
