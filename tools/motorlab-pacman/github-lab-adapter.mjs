@@ -13,7 +13,7 @@ function utf8ToBase64(s) {
   return btoa(binary);
 }
 function base64ToUtf8(s) {
-  const binary=atob(s.replace(/\\s/g,""));
+  const binary=atob(s.replace(/\s/g,""));
   return new TextDecoder().decode(Uint8Array.from(binary, c=>c.charCodeAt(0)));
 }
 export function makeGithubLabAdapter({token,fetchImpl=fetch}={}) {
