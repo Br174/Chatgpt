@@ -18,3 +18,14 @@ test("without independently verified staging evidence remote writes remain block
   assert.equal(readiness.mutationAllowed,false);
   assert.ok(readiness.missing.includes("isolatedDatabase"));
 });
+
+test("dedicated Pacman staging D1 differs from operational and Memory CORE",async()=>{
+  const pacman=JSON.parse(await readFile(new URL("./wrangler.pacman-staging.jsonc",import.meta.url),"utf8"));
+  const operational=JSON.parse(await readFile(new URL("../../cloudflare/motorlab-state-bridge/wrangler.jsonc",import.meta.url),"utf8"));
+  const pacmanId=pacman.d1_databases?.[0]?.database_id;
+  assert.equal(pacman.d1_databases?.[0]?.database_name,"motorlab-pacman-staging");
+  assert.equal(pacmanId,"eb834fc1-5589-4f75-bcb9-d311d0d72261");
+  assert.notEqual(pacmanId,"fd3ff45b-694a-45ec-8d5c-5653fdba092e");
+  assert.equal(compareD1Isolation(operational,pacman).safe,true);
+  assert.equal(compareD1Isolation(operational,pacman).mutationAllowed,false);
+});
