@@ -19,6 +19,7 @@ For the manual `⚡` path, Resume Recovery also owns the RAPID SALVAGE CHECKPOIN
 After every tool/provider/build/GitHub/API response, immediately evaluate whether the user task is complete.
 If NOT complete and execution control remains, continue the same turn with the next safe action.
 A tool result is intermediate unless it satisfies the request or establishes a genuine blocker.
+Checkpoint and progress notifications are intermediate state observations, never a reason to end an unfinished authorized task.
 
 2. VALID TURN TERMINATION STATES
 A controlled turn may finish only in:
