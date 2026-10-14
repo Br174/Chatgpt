@@ -105,6 +105,11 @@ function createMcp(publicOrigin, env) {
     { name: "motorlab-autosetup-cloudflare", version: "0.1.0-lab06" },
     { instructions: "Only open the secure embedded panel. NEVER receive or request secrets, PATs, keystore, passwords or OTP in chat messages or MCP tool calls. No write is permitted until the real owner separately enables the protected gateway." }
   );
+  mcp.tool("diagnose_provider", "Read-only diagnosis for MotorLab provider setup; never accepts credentials.", {
+    provider: z.string().min(1).max(64)
+  }, async ({ provider }) => ({
+    content: [{ type: "text", text: JSON.stringify(diagnoseProvider(provider, env)) }]
+  }));
   registerAppTool(mcp, "open_secure_secrets_panel", {
     title: "AutoSetup · pannello protetto",
     description: "Apri il pannello per gli Actions Secrets di firma MotorLab. Nessun valore segreto e' trasmesso al modello.",
@@ -303,6 +308,13 @@ export async function handleAutoSetupCloudflare(request, env, {gateway = setRepo
     if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
     const provider = url.searchParams.get("provider");
     if (!provider || provider.length > 80) return errorResponse("PROVIDER_REQUIRED", 400);
+    return new Response(JSON.stringify(diagnoseProvider(provider, env)), {
+      headers: { ...HEADERS, "Content-Type": "application/json; charset=utf-8" }
+    });
+  }
+  if (url.pathname === PREFIX + "/provider-diagnosis") {
+    if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
+    const provider = url.searchParams.get("provider") || "";
     return new Response(JSON.stringify(diagnoseProvider(provider, env)), {
       headers: { ...HEADERS, "Content-Type": "application/json; charset=utf-8" }
     });
