@@ -20,6 +20,7 @@ export class PacmanDenied extends Error {
 }
 const allowedId = /^[a-zA-Z0-9][a-zA-Z0-9._-]{7,119}$/;
 const EXECUTION_LAB_BRANCH = "motorlab/pacman-execution-v2-lab-20261014";
+const EXECUTION_PROBE_PATH = "tools/motorlab-pacman/probe.txt";
 export function capabilityStatus(name, context = {}) {
   const capability = CAPABILITIES[name];
   if (!capability) return {name, available: false, blocker: "UNKNOWN_CAPABILITY"};
@@ -39,8 +40,8 @@ export async function runGithubLabFileCycle({operationId, branch, path, content,
   approval = false, ledger, onCheckpoint} = {}) {
   check(typeof operationId === "string" && allowedId.test(operationId), "INVALID_OPERATION_ID");
   check(branch === EXECUTION_LAB_BRANCH, "LAB_BRANCH_REQUIRED");
-  check(typeof path === "string" && path.startsWith("tools/motorlab-pacman/") &&
-    !path.includes("..") && !path.includes("//"), "LAB_PATH_REQUIRED");
+  check(path === EXECUTION_PROBE_PATH || path === "tools/motorlab-pacman/probe-integration.txt",
+    "LAB_PATH_REQUIRED");
   check(typeof content === "string" && content.length > 0 && content.length <= 4096,
     "INVALID_PROBE_CONTENT");
   check(approval === true, "OWNER_APPROVAL_REQUIRED");
