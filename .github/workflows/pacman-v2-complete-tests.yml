@@ -6,6 +6,12 @@ on:
     paths:
       - 'tools/motorlab-pacman/**'
       - '.github/workflows/pacman-v2-complete-tests.yml'
+  pull_request:
+    branches:
+      - motorlab/pacman-steel-guard-lab-20261014
+    paths:
+      - 'tools/motorlab-pacman/**'
+      - '.github/workflows/pacman-v2-complete-tests.yml'
   workflow_dispatch:
 permissions:
   contents: read
