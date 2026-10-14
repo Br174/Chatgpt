@@ -71,6 +71,25 @@ function diagnoseProvider(provider, env) {
       : "Obtain separate owner authorization before enabling any GitHub secret writes"
   };
 }
+// Pure, bounded, deterministic Pacman planning. No provider mutations.
+function planSetup(provider, goal, env) {
+  const diagnosis = diagnoseProvider(provider, env);
+  const request = typeof goal === "string" ? goal.trim().slice(0, 240) : "";
+  const steps = [
+    { id: "diagnose", status: "DONE", action: "Identify provider capabilities without credentials" },
+    { id: "authorize", status: "BLOCKED", action: "Verify separate owner approval and scoped provider access" },
+    { id: "execute", status: "BLOCKED", action: "Perform only reviewed provider-specific operation" },
+    { id: "readback", status: "BLOCKED", action: "Verify provider result without exposing secrets" }
+  ];
+  return {
+    schema: 1, mode: "READ_ONLY_PLAN", provider: diagnosis.provider,
+    goal: request, operation_allowed: false, diagnosis, steps,
+    completed_steps: 1, total_steps: steps.length,
+    phase_percent: 25,
+    blocker: diagnosis.blocker || "OWNER_AUTHORIZATION_NOT_VERIFIED",
+    next_action: diagnosis.next_action || "Obtain owner approval"
+  };
+}
 function securePanel(apiBase, { embedded = false } = {}) {
   const bytes = new Uint8Array(18);
   crypto.getRandomValues(bytes);
@@ -120,6 +139,13 @@ function createMcp(publicOrigin, env) {
     { provider: z.string().min(1).max(80) },
     async ({ provider }) => ({
       content: [{ type: "text", text: JSON.stringify(diagnoseProvider(provider, env)) }]
+    })
+  );
+  mcp.tool("plan_setup",
+    "Create a read-only Pacman setup plan with explicit blockers and progress; no changes or credentials.",
+    { provider: z.string().min(1).max(80), goal: z.string().max(240).optional() },
+    async ({ provider, goal }) => ({
+      content: [{ type: "text", text: JSON.stringify(planSetup(provider, goal, env)) }]
     })
   );
   // Read-only tool callable by a connected ChatGPT MCP host. It reports the
@@ -328,6 +354,16 @@ export async function handleAutoSetupCloudflare(request, env, {gateway = setRepo
     const provider = url.searchParams.get("provider");
     if (!provider || provider.length > 80) return errorResponse("PROVIDER_REQUIRED", 400);
     return new Response(JSON.stringify(diagnoseProvider(provider, env)), {
+      headers: { ...HEADERS, "Content-Type": "application/json; charset=utf-8" }
+    });
+  }
+  if (url.pathname === PREFIX + "/plan") {
+    if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
+    const provider = url.searchParams.get("provider") || "";
+    const goal = url.searchParams.get("goal") || "";
+    if (!provider || provider.length > 80 || goal.length > 240)
+      return errorResponse("INVALID_PLAN_INPUT", 400);
+    return new Response(JSON.stringify(planSetup(provider, goal, env)), {
       headers: { ...HEADERS, "Content-Type": "application/json; charset=utf-8" }
     });
   }
