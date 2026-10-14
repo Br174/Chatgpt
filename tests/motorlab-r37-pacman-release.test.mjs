@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
-const root=resolve(fileURLToPath(new URL('../',import.meta.url)).pathname);
+const root=resolve(fileURLToPath(new URL('../',import.meta.url)));
 const read=name=>readFileSync(resolve(root,name),'utf8');
 const manifest=read('MOTORLAB_RELEASE_MANIFEST_V1.txt');
 const capsule=read('MOTORLAB_BOOT_CAPSULE_V1.txt');
