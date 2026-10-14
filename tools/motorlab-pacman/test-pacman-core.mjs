@@ -87,9 +87,9 @@ test('boot capsule and manifest point to canonical owner + callers',()=>{
  ])assert(s.includes(needle),needle);
  assert(Buffer.byteLength(capsule,'utf8')<4000,'critical capsule must fit hard 4KB regression bound');
 });
-test('release remains pinned r36 in draft and cannot auto-promote or fabricate host memory',()=>{
- assert.match(manifest,/CURRENT_RELEASE=2026\.10\.12-r36/);
- assert.match(manifest,/PACMAN_RELEASE_ACTIVATION=ONLY_AFTER_APPROVED_MERGE_AND_SAFE_FANOUT/);
+test('r37 release remains awaiting verified fanout and cannot fabricate host memory',()=>{
+ assert.match(manifest,/CURRENT_RELEASE=2026\.10\.14-r37/);
+ assert.match(manifest,/PACMAN_RELEASE_ACTIVATION=R37_PREPARED_AWAITING_VERIFIED_FANOUT/);
  assert.match(canonical,/not a claim to have modified ChatGPT's personal Memory/);
  assert.match(canonical,/an isolated LAB policy candidate/);
 });
