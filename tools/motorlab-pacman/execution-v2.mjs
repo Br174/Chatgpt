@@ -19,6 +19,7 @@ export class PacmanDenied extends Error {
   constructor(code) { super(code); this.name = "PacmanDenied"; this.code = code; }
 }
 const allowedId = /^[a-zA-Z0-9][a-zA-Z0-9._-]{7,119}$/;
+const EXECUTION_LAB_BRANCH = "motorlab/pacman-execution-v2-lab-20261014";
 export function capabilityStatus(name, context = {}) {
   const capability = CAPABILITIES[name];
   if (!capability) return {name, available: false, blocker: "UNKNOWN_CAPABILITY"};
@@ -37,8 +38,7 @@ function safeReceipt(operationId, state, extra = {}) {
 export async function runGithubLabFileCycle({operationId, branch, path, content, adapter,
   approval = false, ledger, onCheckpoint} = {}) {
   check(typeof operationId === "string" && allowedId.test(operationId), "INVALID_OPERATION_ID");
-  check(typeof branch === "string" && branch.startsWith("motorlab/") &&
-    !branch.includes("..") && !branch.includes("//"), "LAB_BRANCH_REQUIRED");
+  check(branch === EXECUTION_LAB_BRANCH, "LAB_BRANCH_REQUIRED");
   check(typeof path === "string" && path.startsWith("tools/motorlab-pacman/") &&
     !path.includes("..") && !path.includes("//"), "LAB_PATH_REQUIRED");
   check(typeof content === "string" && content.length > 0 && content.length <= 4096,
