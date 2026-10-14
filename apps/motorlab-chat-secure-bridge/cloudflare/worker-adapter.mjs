@@ -45,6 +45,32 @@ function probeEnabled(env, now = Date.now()) {
   const until = Date.parse(untilText);
   return Number.isFinite(until) && until > now && until - now <= 45 * 60 * 1000;
 }
+// Provider routing is deliberately read-only until an authenticated host and
+// per-provider permission checks are independently verified.
+function diagnoseProvider(provider, env) {
+  const name = typeof provider === "string" ? provider.trim().toLowerCase() : "";
+  const supported = ["github", "cloudflare"];
+  if (!supported.includes(name)) return {
+    schema: 1, provider: name || "unspecified", status: "UNSUPPORTED_PROVIDER",
+    action_allowed: false,
+    blocker: "PROVIDER_ADAPTER_MISSING",
+    next_action: "Add a reviewed provider adapter; never request credentials in chat"
+  };
+  if (name === "cloudflare") return {
+    schema: 1, provider: name, status: "READ_ONLY_PREVIEW_VERIFIED",
+    action_allowed: false,
+    blocker: "CLOUDFLARE_CONFIGURATION_ADAPTER_MISSING",
+    next_action: "Implement an authorized Cloudflare configuration adapter in LAB; production changes remain forbidden"
+  };
+  return {
+    schema: 1, provider: name, status: "GATEWAY_AVAILABLE",
+    action_allowed: liveEnabled(env),
+    blocker: liveEnabled(env) ? null : "GITHUB_WRITES_DISABLED",
+    next_action: liveEnabled(env)
+      ? "Use the existing protected secrets gateway with independent owner approval"
+      : "Obtain separate owner authorization before enabling any GitHub secret writes"
+  };
+}
 function securePanel(apiBase, { embedded = false } = {}) {
   const bytes = new Uint8Array(18);
   crypto.getRandomValues(bytes);
@@ -87,6 +113,14 @@ function createMcp(publicOrigin, env) {
     _meta: { ui: { resourceUri: URI } }
   }, async () => ({
     content: [{ type: "text", text: "Pannello AutoSetup protetto richiesto. Non inserire segreti nella chat; una scrittura non e' confermata senza verifica GitHub." }]
+  }));
+  registerAppTool(mcp, "diagnose_setup", {
+    title: "Pacman · individua ostacolo configurazione",
+    description: "Diagnosi senza credenziali per GitHub o Cloudflare; per altri provider indica adattatore mancante. Non modifica account o Worker.",
+    inputSchema: z.object({ provider: z.string().min(1).max(80) }),
+    annotations: { readOnlyHint: true, openWorldHint: false }
+  }, async ({ provider }) => ({
+    content: [{ type: "text", text: JSON.stringify(diagnoseProvider(provider, env)) }]
   }));
   registerAppResource(mcp, "MotorLab AutoSetup protected panel", URI, {}, async () => {
     const metadata = {
@@ -261,8 +295,17 @@ export async function handleAutoSetupCloudflare(request, env, {gateway = setRepo
       github_probe_enabled: probe,
       chat_connection_verified: false,
       general_provider_routing_implemented: false,
-      blockers
+      blockers,
+      providers: ["github", "cloudflare"].map(provider => diagnoseProvider(provider, env))
     }), { headers: { ...HEADERS, "Content-Type": "application/json; charset=utf-8" } });
+  }
+  if (url.pathname === PREFIX + "/diagnose") {
+    if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
+    const provider = url.searchParams.get("provider");
+    if (!provider || provider.length > 80) return errorResponse("PROVIDER_REQUIRED", 400);
+    return new Response(JSON.stringify(diagnoseProvider(provider, env)), {
+      headers: { ...HEADERS, "Content-Type": "application/json; charset=utf-8" }
+    });
   }
   if (url.pathname === PREFIX + "/health") {
     if (request.method !== "GET") return errorResponse("METHOD_NOT_ALLOWED", 405);
