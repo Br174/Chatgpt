@@ -66,8 +66,11 @@ D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
 5. Non-build work: remove non-applicable phases and proportionally recalculate progress across the real work plan.
 6. Failure behavior: keep the last verified percentage, identify the failing phase, and never show 100% until the requested outcome is verified.
 7. Interactive reporting frequency:
+   - FIELD-FAILURE PRECEDENCE: reporting cadence is advisory and strictly subordinate to continuing authorized work. Do not convert a status explanation, percentage, fireworks, checkpoint or report into a voluntary final answer while ready project work remains; batch/defer the explanation and dispatch the next safe step first.
    - report at task start, meaningful subtask start/completion, phase changes, important file/change application, check transitions, build/test transitions, artifact/checkpoint changes, watchdog interventions, recovery outcomes, handoff/promotion transitions and final delivery;
-   - as a practical default, avoid more than roughly 1-3 meaningful tool/operation interactions without a progress update when the interface permits;
+   - as a practical default, offer progress after roughly 1-3 meaningful tool/operation interactions ONLY when a supported non-terminal update is possible; this is not a turn-length limit, checkpoint cadence, mandatory pause, or reason to return control to the user;
+   - completion of a single task, build, test, commit, checkpoint or phase is not project completion; immediately continue the next approved safe dependency within the same available turn;
+   - never stop an approved work sequence to emit a status, percent, heartbeat or Pollicino breadcrumb; continue the next safe action in the same turn until a valid terminal state;
    - for a long single operation, report status as provider/job evidence changes;
    - do not spam clock-based identical messages with no new information.
 8. Same-percentage updates are explicitly allowed and encouraged when new operational information exists but no new completion has been verified.
@@ -78,6 +81,7 @@ D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
 13. Detailed semantics are mandatory in MOTORLAB_PROGRESS_REPORTING_V1.txt.
 
 E. REGRESSION GATES - MANDATORY
+NON-BLOCKING EXECUTION: regression checks are safety evidence, not chat pit stops. Run independent read-only checks concurrently where supported, continue unrelated approved safe branches while checks run, and gate only the dependent risky write/promotion. Do not ask for a new OK merely because a check completed or is pending. Never disable mandatory checks to improve conversational flow.
 1. Each project adapter must define critical unrelated functions that must remain healthy before a CANDIDATA can become MADRE.
 2. A feature-specific success is insufficient if it breaks another core function.
 3. Serious regression means the experimental lineage is rejected and the current MADRE remains authoritative.

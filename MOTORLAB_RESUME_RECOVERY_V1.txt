@@ -16,9 +16,10 @@ Resume Recovery must not independently start a competing second recovery path fo
 For the manual `⚡` path, Resume Recovery also owns the RAPID SALVAGE CHECKPOINT pre-step described below; this is a pre-recovery state capture, not an independent health/recovery coordinator.
 
 1. POST-TOOL CONTINUATION GUARD - MANDATORY
-After every tool/provider/build/GitHub/API response, immediately evaluate whether the user task is complete.
-If NOT complete and execution control remains, continue the same turn with the next safe action.
+After every tool/provider/build/GitHub/API response, evaluate completion against the ENTIRE user-approved project outcome and its pending-action/dependency ledger, not merely the just-finished tool call, micro-task, test, phase, checkpoint, document, commit or status report.
+If the approved project outcome is NOT fully verified and execution control remains, immediately execute the next authorized safe ready action in the SAME turn. A completed subtask must unlock its dependent work; it must never close the turn merely because that subtask succeeded.
 A tool result is intermediate unless it satisfies the request or establishes a genuine blocker.
+Checkpoint and progress notifications are intermediate state observations, never a reason to end an unfinished authorized task.
 
 2. VALID TURN TERMINATION STATES
 A controlled turn may finish only in:
@@ -28,6 +29,7 @@ A controlled turn may finish only in:
 - SAFE_STOP;
 - HANDOFF_COMPLETE.
 It is not valid to end merely because a tool returned, a repository read finished, an intermediate percentage was shown or the assistant forgot the next step.
+PROJECT-SCOPE TERMINATION PRECEDENCE: COMPLETED means the entire approved project outcome (not a single task/phase) is verified complete. HANDOFF_COMPLETE means an actual durable approved executor accepted the remaining operation, with verified job ID, persisted state and next ownership; it is not satisfied by writing a checkpoint or promising later work. BLOCKED_EXTERNAL/BLOCKED_USER/SAFE_STOP require a specific evidenced blocker or safety boundary; a completed subtask, elapsed time, tool count, routine progress report, or optional verification is not a blocker. Respect genuine host execution limits; never claim control after the host has ended a turn.
 
 3. PENDING-ACTION LEDGER
 For substantial tasks maintain when possible:

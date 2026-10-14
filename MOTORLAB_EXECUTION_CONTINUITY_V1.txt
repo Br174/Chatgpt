@@ -30,6 +30,7 @@ A runner/tool/job completion should unlock its dependents immediately without wa
 If the host is serial-only, continue without pausing but record SERIAL_HOST_LIMITED so the limitation is visible and learnable.
 
 2. COMPLETION TARGET
+PROJECT-LEVEL ACCEPTANCE RULE (2026-10-14): one completed micro-task, tool call, test, phase, PR edit, checkpoint or intermediate deliverable does NOT complete the project and MUST NOT terminate the current available turn. After each completed node, reconcile the full approved outcome and dependency graph, then dispatch the next ready safe node(s) immediately. Only verified whole-project completion, a real evidenced blocker/protected boundary, or a verified durable executor handoff can justify a controlled stop. Do not promise continuation after the host forcibly ends the model execution cycle.
 Continue until:
 A. the entire agreed modification/project outcome reaches verified 100% completion; or
 B. a genuine external blocker makes further progress impossible without information/action that MotorLab cannot supply itself.

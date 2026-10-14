@@ -345,6 +345,7 @@ Each task should identify, when relevant:
 - required verification;
 - integration contract;
 - whether it blocks TTTA.
+PROJECT-COMPLETION SCHEDULING: after a ready node finishes, select newly unblocked nodes of the SAME approved project; do not equate node completion with project termination or wait for an intermediate user OK. Respect single-writer, approval, risk and host limits.
 Prioritize the CRITICAL PATH: tasks whose completion directly determines artifact readiness receive first access to scarce executor/build resources.
 Independent tasks should run as soon as their own prerequisites are satisfied instead of waiting at unnecessary whole-operation barriers.
 

@@ -92,8 +92,9 @@ First response is observation, not cancellation. Verify provider/process state b
 9. SINGLE-WRITER
 Only one writer may mutate the same project/repo/ref/resource scope. Read-only diagnostics may run independently.
 
+PROJECT-LEVEL WATCHDOG: completion of one tool/subtask/checkpoint is healthy progress, not a terminal seal or stall. A controlled stop requires full project verification, evidenced blocker/safety boundary, or real verified durable handoff; never escalate solely due to a routine completed node.
 10. CHECKPOINT CONTRACT
-Checkpoint after meaningful safe milestones when persistence exists. Record enough to continue deterministically: operation/ref, completed milestone, exact next step, changed resources, job ids, artifacts/checksums, verified percent, visible verified percent, recovery floor/source and recovery state.
+Checkpoint after meaningful safe milestones when persistence exists. Checkpoint creation is not a pause, response-finalization trigger, approval request, or reason to cancel healthy parallel runners. Record enough to continue deterministically: operation/ref, completed milestone, exact next step, changed resources, job ids, artifacts/checksums, verified percent, visible verified percent, recovery floor/source and recovery state.
 Recovery uses freshest coherent verified state, never blindly an older checkpoint.
 
 11. RETRIES

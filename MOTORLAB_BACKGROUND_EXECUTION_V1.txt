@@ -117,6 +117,7 @@ While Bruno is away MotorLab should, where the execution environment supports it
 - continue subsequent pre-approved autonomous substeps;
 - stop only when completed, failed safely, externally blocked or Bruno's decision is required.
 
+PROJECT-LEVEL COMPLETION: durable job success for a subtask does not mean the approved whole project is complete. Reconcile the remaining dependency ledger; continue eligible authorized work or report a real blocker. HANDOFF_COMPLETE requires actual executor/job evidence, not a saved checkpoint.
 8. CHECKPOINT IS SAFETY, NOT THE DEFAULT STOP
 Checkpointing does NOT mean the work should pause whenever Bruno leaves.
 The normal behavior is:

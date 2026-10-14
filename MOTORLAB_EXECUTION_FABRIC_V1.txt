@@ -211,6 +211,7 @@ The graph may grow during execution.
 A completed runner may emit DISCOVERY_BRANCH / TASK_SPAWNED nodes when it discovers independent or newly-required work.
 Dynamic children inherit the parent dependency by default unless explicitly detached by an allowed adapter contract.
 New nodes enter the same READY queue and scheduler; do not restart the operation or rebuild already-valid branches from zero.
+WHOLE-PROJECT NON-STOP: TASKS_COMPLETED and individual runner success are nonterminal project events. Immediately dispatch newly ready approved dependent nodes under Velocity in the same available turn; only full approved project acceptance, an evidenced blocker/protected boundary, or verified real durable handoff permits a controlled stop. Do not infer whole-project completion from an empty transient READY queue while tasks are RUNNING/WAITING or pending verification.
 
 22. PROGRESSIVE BRANCHING
 Branching is adaptive:

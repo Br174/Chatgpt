@@ -93,6 +93,7 @@ SATELLITE LOCAL FILES
 Each project must contain `.motorlab/MOTORLAB_BOOT_CAPSULE.txt` plus hook + local core + LAST_GOOD + sync state. The capsule is the mandatory first-context critical contract; long-form modules remain authoritative detail loaded on demand.
 
 SAFE UPDATE
+NON-STOP PROJECT-SCOPE CANONICAL RULE (LAB pending promotion): MOTORLAB_EXECUTION_CONTINUITY_V1.txt and MOTORLAB_RESUME_RECOVERY_V1.txt define termination against the entire approved project, not an individual subtask. Progress/checkpoints are nonterminal. This LAB manifest note is not a verified promoted release; follow release fanout before activation outside LAB.
 Every central release must execute MOTORLAB_RELEASE_FANOUT_V1.txt. Preserve current VERIFIED local bundle as LAST_GOOD. Open sessions pin their complete MotorLab snapshot and never switch release mid-session/write/build/test/promotion; newer releases become active on a new session or a verified safe re-entry boundary; every supported later project turn still re-enters MotorLab even when the pin does not change.
 
 VISIBLE STARTUP

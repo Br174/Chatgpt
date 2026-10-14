@@ -1,0 +1,39 @@
+name: MotorLab NON-STOP LAB Contract Gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'MOTORLAB_RESUME_RECOVERY_V1.txt'
+      - 'MOTORLAB_PROGRESS_REPORTING_V1.txt'
+      - 'MOTORLAB_WATCHDOG_V1.txt'
+      - 'MOTORLAB_LIVE_CONTROL_V1.txt'
+      - 'UAB_ENGINE_CONTRACT.txt'
+      - 'UAB_GLOBAL_APK_POLICY.txt'
+      - 'MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt'
+      - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
+      - 'tests/motorlab_nonstop_contract_check.cjs'
+      - 'tests/nonstop-state.mjs'
+      - 'tests/nonstop-state.test.mjs'
+      - 'MOTORLAB_PROJECT_CONTINUITY_V1.txt'
+      - 'MOTORLAB_POLLICINO_CONTINUITY_V1.txt'
+      - 'MOTORLAB_EXECUTION_CONTINUITY_V1.txt'
+      - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
+      - '.github/workflows/motorlab-nonstop-lab-gate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contract-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: NON-STOP contract assertions (not E2E)
+        run: node tests/motorlab_nonstop_contract_check.cjs
+      - name: NON-STOP operation lifecycle tests
+        run: node --test tests/nonstop-state.test.mjs

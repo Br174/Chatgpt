@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {retrieveMemory} from '../cloudflare/motorlab-state-bridge/lab/memory-retrieval.mjs';
+const now='2026-10-14T12:00:00.000Z';
+const mk=(id,extra={})=>({id,project_id:'MotorLab',status:'ACTIVE',summary:'regola memoria',canonical_path:'rules/memory',evidence_ref:'git:123',source_authority:'GitHub',updated_at:now,...extra});
+const get=(items,opts={})=>retrieveMemory({items,projectId:'MotorLab',now,query:'regola memoria',...opts});
+test('active valid item returned',()=>assert.equal(get([mk('a')]).length,1));
+test('superseded item excluded',()=>assert.deepEqual(get([mk('old'),mk('new')],{relations:[{from_id:'new',to_id:'old',relation_type:'SUPERSEDES',evidence_ref:'git:456'}]}).map(x=>x.id),['new']));
+test('unverified supersession ignored',()=>assert.equal(get([mk('old'),mk('new')],{relations:[{from_id:'new',to_id:'old',relation_type:'SUPERSEDES'}]}).length,2));
+test('expired excluded',()=>assert.equal(get([mk('old',{valid_to:'2026-01-01'})]).length,0));
+test('future excluded',()=>assert.equal(get([mk('future',{valid_from:'2027-01-01'})]).length,0));
+test('unverified source excluded',()=>assert.equal(get([mk('a',{evidence_ref:''})]).length,0));
+test('project isolation',()=>assert.equal(get([mk('a',{project_id:'MusicLab'})]).length,0));
+test('inactive excluded',()=>assert.equal(get([mk('a',{status:'PROPOSED'})]).length,0));
+test('deterministic tie',()=>assert.deepEqual(get([mk('b'),mk('a')]).map(x=>x.id),['a','b']));
+test('limit',()=>assert.equal(get([mk('a'),mk('b')],{limit:1}).length,1));
+test('category alias search',()=>assert.equal(get([mk('a',{summary:'x',canonical_path:'x'})],{query:'ricordo',categories:[{id:'c',label:'memory',aliases:['ricordo']}],itemCategories:[{item_id:'a',category_id:'c'}]})[0].match,1));
+test('no cross-project supersession',()=>assert.equal(get([mk('old'),mk('new',{project_id:'Other'})],{relations:[{from_id:'new',to_id:'old',relation_type:'SUPERSEDES',evidence_ref:'git:456'}]}).length,1));
