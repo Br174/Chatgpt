@@ -28,7 +28,7 @@ jobs:
             console.error('BLOCKED: a required GitHub secret is missing');
             process.exit(1);
           }
-          async function get(path, token) {
+          async function get(path, token, label) {
             const url='https://api.cloudflare.com/client/v4'+path;
             const response=await fetch(url,{
               method:'GET',
@@ -36,16 +36,20 @@ jobs:
               signal:AbortSignal.timeout(12000),
               redirect:'error'
             });
-            if(!response.ok)throw Error('Cloudflare GET returned HTTP '+response.status);
+            if(!response.ok){
+              let code='unknown';
+              try { const body=await response.json(); const n=body?.errors?.[0]?.code; if(Number.isInteger(n))code=String(n); }catch{}
+              throw Error(label+': HTTP '+response.status+'; Cloudflare error code '+code);
+            }
             const data=await response.json();
             if(data.success!==true || !data.result || typeof data.result!=='object')
               throw Error('Cloudflare GET response was not successful');
             return data.result;
           }
           async function verify(label,account,database,token,expectedName) {
-            const a=await get('/accounts/'+account,token);
+            const a=await get('/accounts/'+account,token,label+' account GET');
             if(a.id!==account)throw Error(label+': account mismatch');
-            const d=await get('/accounts/'+account+'/d1/database/'+database,token);
+            const d=await get('/accounts/'+account+'/d1/database/'+database,token,label+' D1 GET');
             if(d.uuid!==database || d.name!==expectedName)
               throw Error(label+': D1 identity mismatch');
             console.log(label+': READ_ONLY_IDENTITY_VERIFIED (2 GET, 0 writes)');
