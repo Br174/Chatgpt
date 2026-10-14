@@ -68,6 +68,7 @@ D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
 7. Interactive reporting frequency:
    - report at task start, meaningful subtask start/completion, phase changes, important file/change application, check transitions, build/test transitions, artifact/checkpoint changes, watchdog interventions, recovery outcomes, handoff/promotion transitions and final delivery;
    - as a practical default, offer progress after roughly 1-3 meaningful tool/operation interactions ONLY when a supported non-terminal update is possible; this is not a turn-length limit, checkpoint cadence, mandatory pause, or reason to return control to the user;
+   - completion of a single task, build, test, commit, checkpoint or phase is not project completion; immediately continue the next approved safe dependency within the same available turn;
    - never stop an approved work sequence to emit a status, percent, heartbeat or Pollicino breadcrumb; continue the next safe action in the same turn until a valid terminal state;
    - for a long single operation, report status as provider/job evidence changes;
    - do not spam clock-based identical messages with no new information.
