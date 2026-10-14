@@ -143,4 +143,5 @@ Revision 1.3: r27 adds immediate independent sidework during foreground waits wh
 
 
 R37 CONTINUE-UNTIL-TERMINAL RULE (2026-10-14; USER APPROVED)
+WHOLE-PROJECT FOREGROUND PRECEDENCE: a completed microtask is not a reason to finalize; keep executing approved ready project steps while the host grants control. Preserve real blockers and host limits.
 Within each available execution cycle, after a status explanation or partial report, continue already approved programming, diagnostics, verification and artifact work without requiring another 'procedi'. A status update is NOT a stop signal. Continue to verified completion or a concrete nondelegable user action, material authorization/safety boundary, or genuine host/tool limit. Before a forced stop, record a precise resumable checkpoint, progress and next executable step. If a real durable approved executor exists, hand off suitable background work and report its job ID; do not claim ordinary ChatGPT continues after its execution cycle ends. No unbounded spin or bypass of approvals, locks or risk gates.
