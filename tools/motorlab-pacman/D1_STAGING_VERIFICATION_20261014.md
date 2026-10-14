@@ -15,3 +15,11 @@
 
 ## Current decision
 **NO-GO for remote D1 writes**. Keep PR #64 isolated; no production, MADRE, APK, Worker or D1/KV mutation. Local/CI mock tests passed; live staging unverified.
+
+
+## Cloudflare dashboard evidence — 2026-10-14
+The user verified in the distinct Cloudflare account `MotorLab-Staging` an existing D1 named `motorlab-memory-core-staging-r36`, binding `DB`, ID `fd3ff45b-694a-45ec-8d5c-5653fdba092e`. The UI showed one of ten D1 slots used and no application tables visible. This D1 is **reserved for MotorLab Memory CORE**, not Pacman.
+
+The operational State Bridge D1 configured in the repository has ID `9d94db34-2d3d-45be-8335-eae1b75d60b4`. These IDs differ; this demonstrates resource identity difference, **not** permission to use Memory CORE staging for Pacman.
+
+Pacman dedicated staging D1: **not yet provisioned or authorized**. Do not mutate either existing database. No Cloudflare API credentials or live remote tests were used.
