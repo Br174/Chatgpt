@@ -30,3 +30,14 @@ test("remove requires verified sha",async()=>{
  await assert.rejects(a.remove({branch,path,sha:"not-a-sha"}),/INVALID_READBACK_SHA/);
  assert.equal(calls,0);
 });
+
+test("GitHub base64 readback handles line breaks and Unicode",async()=>{
+ const source=Buffer.from("Pacman è pronto 🚀").toString("base64");
+ const wrapped=source.slice(0,8)+"\\n"+source.slice(8);
+ const a=makeGithubLabAdapter({token:"fake-test-token-123",fetchImpl:async()=>({
+   ok:true,status:200,json:async()=>({type:"file",sha:"a".repeat(40),encoding:"base64",content:wrapped})
+ })});
+ assert.deepEqual(await a.read({branch,path}),{
+   exists:true,sha:"a".repeat(40),content:"Pacman è pronto 🚀"
+ });
+});
