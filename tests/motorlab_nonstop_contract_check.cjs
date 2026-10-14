@@ -18,6 +18,14 @@ const tests = [
  ['T11', 'MOTORLAB_RELEASE_MANIFEST_V1.txt', /pin their complete MotorLab snapshot/i],
  ['T12', 'MOTORLAB_RESUME_RECOVERY_V1.txt', /VALID TURN TERMINATION STATES/i]
 ];
+// Whole-project regression assertions: prevent microtask-level terminal interpretation.
+tests.push(
+ ['P01', 'MOTORLAB_RESUME_RECOVERY_V1.txt', /ENTIRE user-approved project outcome/i],
+ ['P02', 'MOTORLAB_RESUME_RECOVERY_V1.txt', /HANDOFF_COMPLETE means an actual durable approved executor/i],
+ ['P03', 'MOTORLAB_EXECUTION_CONTINUITY_V1.txt', /one completed micro-task.*does NOT complete the project/i],
+ ['P04', 'MOTORLAB_PROGRESS_REPORTING_V1.txt', /WHOLE-PROJECT COMPLETION PRECEDENCE/i],
+ ['P05', 'checkpoints/MOTORLAB_NONSTOP_PROJECT_SCOPE_RULE_20261014.md', /Subtask success -> final response.*FAIL/i]
+);
 let failed=0;
 for (const [id, file, pattern] of tests) {
   try {
