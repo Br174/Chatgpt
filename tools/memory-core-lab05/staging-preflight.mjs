@@ -9,6 +9,8 @@ const root=resolve(fileURLToPath(new URL('../..',import.meta.url)));
 const prod=JSON.parse(readFileSync(resolve(root,'cloudflare/motorlab-state-bridge/wrangler.jsonc'),'utf8'));
 const local=JSON.parse(readFileSync(resolve(root,'tools/memory-core-lab04/wrangler.local.jsonc'),'utf8'));
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
+// Cloudflare Account IDs are 32 hex chars; D1 database IDs are hyphenated UUIDs.
+const accountId=/^[a-f0-9]{32}$/i;
 const dbname=/^[a-z][a-z0-9_-]{3,95}$/;
 const refuse=(cause)=>{throw new Error('LAB05_STAGING_BLOCKED:'+cause)};
 const must=(condition,cause)=>{if(!condition)refuse(cause)};
@@ -20,7 +22,8 @@ export function validateStagingTarget(target){
  for(const [k,v] of Object.entries(target)){
   must(typeof v==='string','invalid_'+k);forbidCredentials(v);
  }
- must(uuid.test(account_id)&&uuid.test(database_id),'invalid_uuid');
+ must(accountId.test(account_id),'invalid_account_id');
+ must(uuid.test(database_id),'invalid_uuid');
  must(dbname.test(database_name),'invalid_database_name');
  must(database_name.startsWith('motorlab-memory-core-staging-'),'not_staging_named');
  must(!/^0{8}-0{4}-4(?:0{3}|[0-9a-f]{3})-8[0-9a-f]{3}-0{12}$/i.test(database_id),'synthetic_uuid');
