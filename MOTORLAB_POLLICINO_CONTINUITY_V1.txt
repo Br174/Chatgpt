@@ -92,6 +92,7 @@ SESSION_SUPERSEDED
 Do not log every internal token, low-value thought or poll. High-frequency heartbeats update the current session row; they do not create unbounded event spam.
 
 5. TERMINAL SEAL
+SESSION/PROJECT DISTINCTION: a session seal reports session status only. It does not prove whole-project acceptance. If the project is unfinished, retain the open operation and its next step in Project Continuity. Never infer project completion solely from a session ending. Pollicino owns session evidence; Resume Recovery owns next-step selection.
 Before a controlled MotorLab execution surface ends normally, persist a terminal seal whenever technically possible:
 COMPLETED
 BLOCKED_EXTERNAL
