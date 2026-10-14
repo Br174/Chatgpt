@@ -227,6 +227,22 @@ test("LAB06 45-minute probe cannot enable any of the five real signing writes",a
  assert.equal(receipt.github_write_verified,false);
 });
 
+test("Pacman read-only planner reports blocked steps without invoking gateways",async()=>{
+  const response=await handleAutoSetupCloudflare(new Request(base+"/autosetup/v1/plan?provider=cloudflare&goal=configure"),env);
+  assert.equal(response.status,200);
+  const plan=await response.json();
+  assert.equal(plan.mode,"READ_ONLY_PLAN");
+  assert.equal(plan.operation_allowed,false);
+  assert.equal(plan.phase_percent,25);
+  assert.equal(plan.steps.length,4);
+  assert.equal(plan.steps[0].status,"DONE");
+  assert.ok(plan.steps.slice(1).every(step=>step.status==="BLOCKED"));
+  const unknown=await handleAutoSetupCloudflare(new Request(base+"/autosetup/v1/plan?provider=digitab"),env);
+  assert.equal((await unknown.json()).blocker,"PROVIDER_ADAPTER_MISSING");
+  const invalid=await handleAutoSetupCloudflare(new Request(base+"/autosetup/v1/plan?provider="),env);
+  assert.equal(invalid.status,400);
+});
+
 test("PAT-free crypto self-test is inaccessible in Worker production", async () => {
   const url=base+"/autosetup/v1/crypto-selftest";
   const response=await handleAutoSetupCloudflare(new Request(url),env);
