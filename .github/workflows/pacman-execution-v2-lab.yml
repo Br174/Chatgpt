@@ -1,0 +1,25 @@
+name: Pacman Execution V2 LAB tests
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - 'tools/motorlab-pacman/execution-v2.mjs'
+      - 'tools/motorlab-pacman/execution-v2.test.mjs'
+      - 'tools/motorlab-pacman/atomic-claim.mjs'
+      - 'tools/motorlab-pacman/atomic-claim.test.mjs'
+      - '.github/workflows/pacman-execution-v2-lab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test fail-closed and concurrency behavior
+        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs
