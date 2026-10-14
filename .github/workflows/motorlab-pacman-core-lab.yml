@@ -10,6 +10,8 @@ on:
       - 'MOTORLAB_BOOT_CAPSULE_V1.txt'
       - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
       - 'tools/motorlab-pacman/**'
+      - 'tests/motorlab-r37-pacman-release.test.mjs'
+      - 'tests/motorlab-r37-pacman-release.test.mjs'
       - '.github/workflows/motorlab-pacman-core-lab.yml'
       - 'checkpoints/MOTORLAB_PACMAN_CORE_LAB_20261014.txt'
   pull_request:
@@ -36,7 +38,7 @@ jobs:
         with:
           node-version: '22'
       - name: 15 offline Pacman canonical/negative/continuity tests
-        run: node --test tools/motorlab-pacman/test-pacman-core.mjs
+        run: node --test tools/motorlab-pacman/test-pacman-core.mjs tests/motorlab-r37-pacman-release.test.mjs
       - name: Protect main release, production & Android
         run: |
           set -euo pipefail
