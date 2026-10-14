@@ -47,6 +47,7 @@ These are execution facts, not percentage inflation.
 A serial status is acceptable when dependencies or host limits require it; state the reason rather than inventing concurrency.
 
 5. MICRO-PROGRESS / MICRO-MILESTONES
+STATUS-OUTPUT PRIORITY (FIELD-FAILURE FIX): status and percentage are read-only observations. They NEVER consume or replace the next ready authorized work item. If a progress explanation would be the final assistant message while executable project steps remain, defer/batch it and execute those steps first. An opening, intermediate or closing status requirement is not an independent reason to yield control to the user. Report verified progress at supported nonterminal control points or alongside genuine terminal delivery.
 Small one-step change minimum: opening percentage + verified closing percentage.
 Small change with any tool/test/write boundary minimum: opening percentage + at least one intermediate material boundary + verified closing percentage.
 Longer work continues the existing high-presence verified model.
