@@ -120,7 +120,7 @@ Broad full-task ladder:
 Progress reporting rules:
 1. Report percentage throughout substantial work, not only at broad milestones.
 2. Report at meaningful subtask starts/completions, phase changes, relevant code/config changes, check transitions, build/test transitions, artifact/checkpoint changes, watchdog interventions, recovery outcomes and delivery/promotion transitions.
-3. As a practical default, avoid more than roughly 1-3 meaningful operations/tool interactions without a progress update when the chat surface permits.
+3. Progress updates after roughly 1-3 meaningful operations are optional NON-TERMINAL observations when the interface permits; this is never a pit stop, mandatory response end, checkpoint timer or request for another OK. Continue all already authorized safe steps in the same available execution turn. When non-terminal updates are unavailable, batch observations until the next available control point.
 4. Large broad phases may use real deterministic micro-milestones to produce justified intermediate percentages.
 5. The same verified percentage may be repeated with a new explanation when status changes but no new completion is verified.
 6. Long operations should surface job/provider phase changes when available rather than remain silent.
