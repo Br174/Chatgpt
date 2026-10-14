@@ -122,6 +122,30 @@ function createMcp(publicOrigin, env) {
       content: [{ type: "text", text: JSON.stringify(diagnoseProvider(provider, env)) }]
     })
   );
+  // Read-only tool callable by a connected ChatGPT MCP host. It reports the
+  // actual capability gates, never treats a successful preview as host pairing.
+  mcp.tool("get_autosetup_status",
+    "Inspect Pacman AutoSetup readiness, permissions and missing integrations without changing anything.",
+    {},
+    async () => ({
+      content: [{ type: "text", text: JSON.stringify({
+        schema: 1,
+        mode: "diagnostic-read-only",
+        chat_connection_verified: false,
+        general_provider_routing_implemented: false,
+        github_writes_enabled: liveEnabled(env),
+        github_probe_enabled: probeEnabled(env),
+        supported_provider_operations: ["github-actions-signing-secrets"],
+        blockers: [
+          ...(!liveEnabled(env) ? ["GITHUB_WRITES_DISABLED"] : []),
+          ...(!probeEnabled(env) ? ["PROBE_WINDOW_CLOSED"] : []),
+          "CHAT_CONNECTION_UNVERIFIED",
+          "GENERAL_PROVIDER_ROUTING_NOT_IMPLEMENTED"
+        ],
+        providers: ["github", "cloudflare"].map(provider => diagnoseProvider(provider, env))
+      }) }]
+    })
+  );
   registerAppResource(mcp, "MotorLab AutoSetup protected panel", URI, {}, async () => {
     const metadata = {
       prefersBorder: true,
