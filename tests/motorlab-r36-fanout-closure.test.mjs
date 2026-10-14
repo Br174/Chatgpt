@@ -4,7 +4,10 @@ import {readFile} from 'node:fs/promises';
 const read=(p)=>readFile(new URL('../'+p,import.meta.url),'utf8');
 test('r36 closes central transaction only with six verified main satellite refs and four explicit pending LABs',async()=>{
  const [m,l,reg]=await Promise.all([read('MOTORLAB_RELEASE_MANIFEST_V1.txt'),read('MOTORLAB_RELEASE_FANOUT_STATE_V1.txt'),read('MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt')]);
- for(const s of ['CURRENT_RELEASE=2026.10.12-r36','FANOUT_STATE=COMPLETE','FANOUT_MAIN_VERIFIED=6/6','FANOUT_PENDING_SAFE_BOUNDARY=4'])assert.ok(m.includes(s),s);
+ // Verify immutable r36 closure history without asserting it is still the current release.
+ assert.match(m,/R36 FINAL RELEASE FANOUT ACCOUNTING/);
+ assert.match(m,/All six ACTIVE main repos adopted r36/);
+ assert.match(m,/FANOUT_PENDING_SAFE_BOUNDARY=4/);
  assert.match(l,/R36_GLOBAL_STATE=COMPLETE/);
  assert.match(l,/R36_FANOUT_CLOSURE_NOT_TOTAL_LAB_ADOPTION=TRUE/);
  assert.match(l,/R36_PENDING_SAFE_BOUNDARY_COUNT=4/);

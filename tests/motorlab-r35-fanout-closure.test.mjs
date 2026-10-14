@@ -7,7 +7,10 @@ test('r35 closure counts all six main repos and four exact pending active LAB re
  read('MOTORLAB_RELEASE_MANIFEST_V1.txt'),read('MOTORLAB_RELEASE_FANOUT_STATE_V1.txt'),
  read('MOTORLAB_PROJECT_INTEGRATION_REGISTRY_V1.txt'),read('MOTORLAB_RELEASE_FANOUT_V1.txt')
  ]);
- for(const v of ['CURRENT_RELEASE=2026.10.12-r35','FANOUT_STATE=COMPLETE','FANOUT_MAIN_VERIFIED=6/6','FANOUT_PENDING_SAFE_BOUNDARY=4'])assert.ok(m.includes(v),v);
+ // Historical r35 provenance must remain true even after r37 is prepared.
+ assert.match(m,/R35 FINAL FANOUT ACCOUNTING/);
+ assert.match(m,/r35 main fanout 6\/6/);
+ assert.match(m,/FANOUT_PENDING_SAFE_BOUNDARY=4/);
  assert.match(l,/R35_GLOBAL_STATE=COMPLETE/);
  assert.match(l,/R35_CLOSURE_NOT_FULL_ADOPTION=TRUE/);
  assert.match(l,/R35_PENDING_SAFE_BOUNDARY_COUNT=4/);

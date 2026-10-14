@@ -178,3 +178,20 @@ R36_EXCLUDED_DORMANT=Br174/Cover-Lab-AI
 R36_VERIFICATION_SCOPE=release_markers_and_control_plane_only_not_universal_ChatGPT_app_UI_runtime
 R36_FANOUT_CLOSURE_NOT_TOTAL_LAB_ADOPTION=TRUE
 R36_NEXT_PHASE=bidirectional_sync_executor_and_real_E2E_proof_before_claiming_automatic_multi_project_feedback
+
+
+R37 PACMAN RELEASE TRANSACTION — PREPARE 2026-10-14
+R37_RELEASE=2026.10.14-r37
+R37_STATE=IN_PROGRESS
+R37_APPROVAL=Bruno 2026-10-14 approved promotion and satellite synchronization after Pacman LAB PR57 verified
+R37_PREVIOUS_VERIFIED=r36
+R37_CORE_POLICY=existing AutoSetup feature public name Pacman; automatic outside-chat provider-work routing via existing Auto Bootstrap/Re-entry; no new executor/agent/secret store
+R37_ACTIVE_MAIN_TARGETS=Br174/MusicLab;Br174/GeoVision-Test;Br174/StudyBook-AI;Br174/Visionflix;Br174/streamflix-BV;Br174/MotorAI
+R37_MAIN_STATUS=0/6_UNTIL_INDEPENDENT_GITHUB_READBACK_AFTER_SAFE_ADOPTION
+R37_PENDING_SAFE_BOUNDARY Br174/MusicLab ref=uab-build/musiclab-lab64-aggiornamento-family-01 reason=existing_unverified_device_pin
+R37_PENDING_SAFE_BOUNDARY Br174/MusicLab ref=uab-build/musiclab-turbo-lab10-artwork-autovideo-family-02 reason=existing_unverified_turbo_test_pin
+R37_PENDING_SAFE_BOUNDARY Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-23 reason=existing_unverified_device_acceptance_pin
+R37_PENDING_SAFE_BOUNDARY Br174/MotorAI ref=lab/seed021r3r14-contrastive-two-stage reason=existing_unverified_training_session_pin
+R37_EXCLUDED_DORMANT=Br174/Cover-Lab-AI
+R37_FANOUT_GUARD=never_touch_native_code_APK_MADRE_production_Worker_D1_KV_or_secrets;only_control_plane_files;preserve_r36_as_last_good;recheck_each_ref_safe_boundary;skip_busy;no_implicit_host_or_MCP_activation_claim
+R37_ACTIVATION_COMPLETE=FALSE_UNTIL_6_MAINS_VERIFIED_AND_4_LABS_PRESERVED_PENDING
