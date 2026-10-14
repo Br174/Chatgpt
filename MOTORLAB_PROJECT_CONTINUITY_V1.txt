@@ -95,6 +95,7 @@ Control-plane-only commits/workflows may be recorded as operational evidence but
 If a control-plane-only change unexpectedly triggers application builds/tests/releases, treat that as a root-cause problem in the triggering workflow/configuration and correct trigger hygiene when safe.
 
 3. TERMINATION FLUSH - MANDATORY
+TURN/OPERATION SEPARATION: the end of a chat/model turn is not proof that the approved project operation completed. Before a voluntary turn end, if approved safe executable steps remain and host control permits, continue them instead of flushing a terminal project state. When host control is exhausted, persist OPERATION_OPEN + TURN_ENDED with operation ID, progress floor, pending dependencies and exact next safe step. Do not translate an ordinary turn end into COMPLETED, SAFE_STOP or HANDOFF_COMPLETE without evidence. Preserve PAUSED_BY_USER when user explicitly stops. Project Continuity remains sole ledger owner; Resume Recovery remains sole next-step selector.
 Before a substantial MotorLab turn ends in COMPLETED, BLOCKED_EXTERNAL, BLOCKED_USER, SAFE_STOP or HANDOFF_COMPLETE, persist the freshest coherent continuation state when technically possible.
 If central persistence is unavailable, preserve the best available local/checkpoint state and mark continuity sync pending for the next safe cycle.
 
