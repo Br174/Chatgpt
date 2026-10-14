@@ -1,0 +1,50 @@
+name: Pacman staging D1 health deploy (manual only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pacman-staging-worker-deploy
+  cancel-in-progress: false
+jobs:
+  deploy-staging:
+    if: github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-staging
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify exact staging target and read-only source
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const base='tools/motorlab-pacman/';
+          const config=JSON.parse(fs.readFileSync(base+'wrangler.pacman-staging.jsonc','utf8'));
+          if(config.name!=='motorlab-pacman-staging-lab' ||
+             config.main!=='./worker-health-staging.mjs' ||
+             config.d1_databases?.length!==1 ||
+             config.d1_databases[0].binding!=='DB' ||
+             config.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
+            throw Error('STAGING_TARGET_MISMATCH');
+          const source=fs.readFileSync(base+'worker-health-staging.mjs','utf8');
+          if(!source.includes('SELECT COUNT(*)') || !source.includes('"/health"'))
+            throw Error('UNEXPECTED_WORKER_SOURCE');
+          console.log('Staging target and read-only entrypoint verified');
+          NODE
+      - name: Verify Cloudflare credentials configured
+        env:
+          CF_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "::error::Missing staging-only Cloudflare secrets; no deployment attempted."
+            exit 1
+          fi
+      - name: Deploy only Pacman staging Worker
+        working-directory: tools/motorlab-pacman
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: npx --yes wrangler@4 deploy --config wrangler.pacman-staging.jsonc
