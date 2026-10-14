@@ -114,14 +114,14 @@ function createMcp(publicOrigin, env) {
   }, async () => ({
     content: [{ type: "text", text: "Pannello AutoSetup protetto richiesto. Non inserire segreti nella chat; una scrittura non e' confermata senza verifica GitHub." }]
   }));
-  registerAppTool(mcp, "diagnose_setup", {
-    title: "Pacman · individua ostacolo configurazione",
-    description: "Diagnosi senza credenziali per GitHub o Cloudflare; per altri provider indica adattatore mancante. Non modifica account o Worker.",
-    inputSchema: z.object({ provider: z.string().min(1).max(80) }),
-    annotations: { readOnlyHint: true, openWorldHint: false }
-  }, async ({ provider }) => ({
-    content: [{ type: "text", text: JSON.stringify(diagnoseProvider(provider, env)) }]
-  }));
+  // This tool has no UI resource: use the standard MCP tool API, not registerAppTool.
+  mcp.tool("diagnose_setup",
+    "Read-only Pacman provider diagnosis; no credentials and no account changes.",
+    { provider: z.string().min(1).max(80) },
+    async ({ provider }) => ({
+      content: [{ type: "text", text: JSON.stringify(diagnoseProvider(provider, env)) }]
+    })
+  );
   registerAppResource(mcp, "MotorLab AutoSetup protected panel", URI, {}, async () => {
     const metadata = {
       prefersBorder: true,
