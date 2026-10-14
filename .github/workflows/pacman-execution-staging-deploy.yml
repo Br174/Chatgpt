@@ -37,6 +37,14 @@ jobs:
             echo "::error::Dedicated staging deployment credentials missing; abort."
             exit 1
           }
+      - name: Require explicit execution activation acknowledgement
+        env:
+          ACTIVATION_APPROVED: \${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}
+        run: |
+          if [ "$ACTIVATION_APPROVED" != 'YES_STAGING_EXECUTION_ONLY' ]; then
+            echo "::error::Execution activation not approved in protected staging environment; abort."
+            exit 1
+          fi
       - name: Deploy dedicated Worker only
         working-directory: tools/motorlab-pacman
         env:
