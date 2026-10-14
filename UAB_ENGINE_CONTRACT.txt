@@ -79,6 +79,7 @@ D. VISIBLE PROGRESS PERCENTAGE - MANDATORY
 13. Detailed semantics are mandatory in MOTORLAB_PROGRESS_REPORTING_V1.txt.
 
 E. REGRESSION GATES - MANDATORY
+NON-BLOCKING EXECUTION: regression checks are safety evidence, not chat pit stops. Run independent read-only checks concurrently where supported, continue unrelated approved safe branches while checks run, and gate only the dependent risky write/promotion. Do not ask for a new OK merely because a check completed or is pending. Never disable mandatory checks to improve conversational flow.
 1. Each project adapter must define critical unrelated functions that must remain healthy before a CANDIDATA can become MADRE.
 2. A feature-specific success is insufficient if it breaks another core function.
 3. Serious regression means the experimental lineage is rejected and the current MADRE remains authoritative.
