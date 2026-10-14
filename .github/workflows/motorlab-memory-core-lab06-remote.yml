@@ -54,7 +54,7 @@ jobs:
           node tools/memory-core-lab06/optional-remote-staging-read.mjs > "$RUNNER_TEMP/remote-hold.json"
           node --input-type=module -e "import fs from 'node:fs'; const x=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if(x.result!=='REMOTE_STAGING_NOT_TESTED'||x.remote_cloudflare_requests!==0||x.remote_cloudflare_writes!==0||x.remote_d1_write_permitted!==false)process.exit(1); console.log('PENDING_STAGING_ACCESS: zero Cloudflare requests/writes');" "$RUNNER_TEMP/remote-hold.json"
       - name: Staging D1 live identity read - two GET only
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
         env:
           CLOUDFLARE_STAGING_READ_TOKEN: ${{ secrets.CLOUDFLARE_STAGING_READ_TOKEN }}
         run: |
