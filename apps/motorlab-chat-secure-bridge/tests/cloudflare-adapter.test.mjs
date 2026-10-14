@@ -70,6 +70,22 @@ test("read-only MCP exposes reused secure UI and never accepts secret contents",
   assert.ok(!html.includes("__MOTORLAB_PUBLIC_ORIGIN__"));
   assert.match(html,/motorlab-state-bridge.brunoverlezza.workers.dev/);
 });
+test("Pacman capabilities diagnose real missing integrations without claiming ChatGPT connectivity", async () => {
+  const response = await handleAutoSetupCloudflare(new Request(base + "/autosetup/v1/capabilities"),env);
+  assert.equal(response.status,200);
+  const report = await response.json();
+  assert.equal(report.mode,"diagnostic-read-only");
+  assert.equal(report.chat_connection_verified,false);
+  assert.equal(report.general_provider_routing_implemented,false);
+  assert.equal(report.github_writes_enabled,false);
+  assert.ok(report.blockers.some(b=>b.code==="CHAT_CONNECTION_UNVERIFIED"));
+  assert.ok(report.blockers.some(b=>b.code==="GENERAL_PROVIDER_ROUTING_NOT_IMPLEMENTED"));
+  const unknown = await handleAutoSetupCloudflare(new Request(base + "/autosetup/v1/diagnose?provider=digitab"),env);
+  assert.equal(unknown.status,200);
+  const diagnosis = await unknown.json();
+  assert.equal(diagnosis.action_allowed,false);
+  assert.equal(diagnosis.blocker,"PROVIDER_ADAPTER_MISSING");
+});
 test("approved synthetic write may call ONE injected gateway with verified origin only", async () => {
   let calls = 0;
   const payload = {secret_name:"MOTORLAB_MAIN_KEY_ALIAS",value:"synthetic_alias",approval:true};
