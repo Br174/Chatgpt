@@ -401,3 +401,6 @@ R37 VERIFIED PACMAN RELEASE FANOUT — 2026-10-14
 - Br174/Cover-Lab-AI remains DORMANT_RESERVED and excluded; project-native engines, main app runtime, APK, MADRE, production Worker/D1/KV and signing assets were not touched by this control-plane release.
 - AutoSetup PR #49 Worker/MCP remains draft/not proven live; do not mistake the Pacman routing policy for connected autonomous ChatGPT browser execution. Existing sessions retain their pinned r36 until a verified safe re-entry.
 - No new paid services or secret transfers permitted. Fanout transaction COMPLETE means 6/6 active mains verified or pending LABs explicitly preserved at safe boundary; does not mean four LAB branches were updated.
+
+R37 FINAL CI VERIFICATION CANDIDATE — 2026-10-14
+Purpose: trigger existing GitHub pull-request policy and historical gates against EXACT COMPLETED r37 fanout manifest/capsule/bundle/ledger. This paragraph has no runtime or provider effect. R37 has six verified main satellites and four explicit LAB pending refs. Workflow checks must pass before final seal; do not deploy Worker or claim live MCP.
