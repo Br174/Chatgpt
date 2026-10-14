@@ -1,5 +1,6 @@
 name: MotorLab Memory CORE LAB06 Remote Identity Gate (NO CLOUD WRITE)
 on:
+  workflow_dispatch:
   push:
     branches:
       - motorlab/memory-core-lab06-remote-gate-20261014
@@ -80,6 +81,28 @@ jobs:
             console.error('STAGING_READ_ONLY_BLOCKED: provider identity or permissions not verified; zero writes');
             process.exitCode=1;
           }
+          NODE
+      - name: Independent production and staging identity proof - four GET only
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/motorlab/memory-core-lab06-remote-gate-20261014'
+        env:
+          CLOUDFLARE_PRODUCTION_ACCOUNT_ID: '5781b597517f6f7fe25751170a99b9ab'
+          CLOUDFLARE_PRODUCTION_READ_TOKEN: ${{ secrets.CLOUDFLARE_PRODUCTION_READ_TOKEN }}
+          CLOUDFLARE_STAGING_ACCOUNT_ID: 'b86f445c2b57e604c02f79c8da64bb9c'
+          CLOUDFLARE_STAGING_DATABASE_ID: 'fd3ff45b-694a-45ec-8d5c-5653fdba092e'
+          CLOUDFLARE_STAGING_DATABASE_NAME: 'motorlab-memory-core-staging-r36'
+          CLOUDFLARE_STAGING_READ_TOKEN: ${{ secrets.CLOUDFLARE_STAGING_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_PRODUCTION_READ_TOKEN:-}" ] || [ -z "${CLOUDFLARE_STAGING_READ_TOKEN:-}" ]; then
+            echo 'PRODUCTION_READ_ONLY_NOT_TESTED: protected token missing'
+            exit 1
+          fi
+          node tools/memory-core-lab06/optional-remote-staging-read.mjs > "$RUNNER_TEMP/identity-proof.json"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/identity-proof.json','utf8'));
+          if(p.result!=='LAB06_REMOTE_IDENTITIES_READ_VERIFIED'||p.read_only_requests!==4||p.production_cloudflare_writes!==0||p.staging_cloudflare_writes!==0||p.remote_d1_write_permitted!==false)process.exit(1);
+          console.log('PRODUCTION_AND_STAGING_READ_ONLY_VERIFIED: four GET, zero writes, two independent accounts');
           NODE
       - name: Static protected surfaces and no remote mutation routes
         run: |
