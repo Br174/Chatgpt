@@ -9,8 +9,8 @@ import {inspectIndependentStagingReadOnly,remoteWriteGate}
 const root=resolve(fileURLToPath(new URL('../../..',import.meta.url)));
 const prodId='9d94db34-2d3d-45be-8335-eae1b75d60b4';
 const prodName='motorlab-operational-state-db';
-const prodAcct='31313131-3131-4313-8313-313131313131';
-const stageAcct='45454545-4545-4454-8454-454545454545';
+const prodAcct='31313131313131313131313131313131';
+const stageAcct='45454545454545454545454545454545';
 const stageId='65656565-6565-4656-8656-656565656565';
 const stageName='motorlab-memory-core-staging-proof';
 const prodToken='fixture_production_read_token_01';
@@ -83,6 +83,7 @@ test('reject known production D1 as staging even with different account IDs',asy
 test('reject a missing, malformed or reused protected token before Cloudflare GET',async()=>{
  for(const change of [
   {productionAccountId:'invalid'},
+  {productionAccountId:'31313131-3131-4313-8313-313131313131'},
   {productionReadToken:''},
   {stagingReadToken:''},
   {stagingReadToken:prodToken}
