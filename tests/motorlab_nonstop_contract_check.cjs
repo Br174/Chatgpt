@@ -5,7 +5,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const tests = [
- ['T01', 'MOTORLAB_RESUME_RECOVERY_V1.txt', /If NOT complete and execution control remains, continue the same turn/i],
+ ['T01', 'MOTORLAB_RESUME_RECOVERY_V1.txt', /If the approved project outcome is NOT fully verified and execution control remains, immediately execute the next authorized safe ready action in the SAME turn/i],
  ['T02', 'MOTORLAB_PROGRESS_REPORTING_V1.txt', /Never end a turn merely to show a percentage/i],
  ['T03', 'MOTORLAB_WATCHDOG_V1.txt', /Checkpoint creation is not a pause/i],
  ['T04', 'MOTORLAB_RESUME_RECOVERY_V1.txt', /latest verified checkpoint/i],
