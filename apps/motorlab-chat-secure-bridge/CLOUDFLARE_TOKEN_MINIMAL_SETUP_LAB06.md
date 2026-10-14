@@ -21,3 +21,11 @@ User can complete Cloudflare authorization with minimum manual action; secure tr
 - Production/staging D1 read-only identities independently verified (4 GET, zero writes) in run 38564888755; this does not prove Worker deployment authorization.
 - OIDC r37 manifest compatibility corrected on LAB branch; seven CI gates succeeded at commit 522212c6dcf5a8d5a376e177a1ef9ebafe23da16.
 - Next automatic push triggers isolated LAB06 preview; preview must verify token, panel CSP, crypto and unchanged production version, or fail closed. Production deploy remains blocked by its distinct approval commit gate. No APK, main, MADRE, production D1/KV or Worker deployment authorized here.
+
+
+## LAB06 recovery checkpoint — 2026-10-14, expired probe authorization
+- Verified in LAB06: `.github/autosetup/LAB06_PROBE_APPROVAL.json` has `expires_at=2026-10-13T22:18:55Z`, and `cloudflare/motorlab-state-bridge/wrangler.jsonc` has the same expired `MOTORLAB_AUTOSETUP_PROBE_UNTIL`.
+- GitHub signing writes remain explicitly disabled (`MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE=false`). The expired marker MUST NOT be treated as a fresh production authorization.
+- No production deploy, new token, D1/KV write, or Worker mutation performed during this checkpoint.
+- Next safe work: check current CI/preview evidence and production identity, then prepare a NEW short-lived probe window only after verifying its independent production approval gate and fresh source-head binding. A new one-shot approval commit must contain only `.github/autosetup/LAB06_PROBE_APPROVAL.json` and must match the workflow's exact authorized subject; never reuse the expired approval.
+- Do not silently enable GitHub signing writes, broaden token scope, or deploy from ordinary push/PR. If required provider capability is unavailable, report the exact blocker without claiming live end-to-end functionality.
