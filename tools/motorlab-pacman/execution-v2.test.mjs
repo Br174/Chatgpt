@@ -78,3 +78,14 @@ test("completed cleanup stays verified if final notification fails",async()=>{
   assert.equal((await s.ledger.get("pacman-final-notify-001")).state,"VERIFIED_AND_REMOVED");
   assert.equal((await s.adapter.read()).exists,false);
 });
+
+test("rejects another motorlab branch despite matching prefix",async()=>{
+  const s=setup();
+  let writes=0;
+  s.adapter.create=async()=>{writes++;};
+  await assert.rejects(runGithubLabFileCycle({
+    operationId:"pacman-other-branch-001",branch:"motorlab/autosetup-cloudflare-lab06-20261013",
+    path,content,adapter:s.adapter,ledger:s.ledger,onCheckpoint:s.onCheckpoint,approval:true
+  }),{code:"LAB_BRANCH_REQUIRED"});
+  assert.equal(writes,0);
+});
