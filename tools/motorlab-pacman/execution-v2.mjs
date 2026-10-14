@@ -75,7 +75,8 @@ export async function runGithubLabFileCycle({operationId, branch, path, content,
     cleanupVerified = true;
     const receipt = safeReceipt(operationId, "VERIFIED_AND_REMOVED", {branch, path});
     await ledger.put(operationId, receipt);
-    await onCheckpoint(receipt);
+    // A failed notification must never downgrade a verified cleanup to recovery.
+    try { await onCheckpoint(receipt); } catch { /* durable receipt is authoritative */ }
     return receipt;
   } catch (error) {
     // Never retry ambiguous writes. Record recovery-needed state, not a false success.
