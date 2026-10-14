@@ -59,6 +59,8 @@ test("read-only MCP exposes reused secure UI and never accepts secret contents",
   assert.equal(readiness.mode,"diagnostic-read-only");
   assert.equal(readiness.chat_connection_verified,false);
   assert.equal(readiness.github_writes_enabled,false);
+  assert.equal(readiness.providers.find(p=>p.provider==="github").action_allowed,false);
+  assert.equal(readiness.providers.find(p=>p.provider==="cloudflare").status,"READ_ONLY_DIAGNOSTIC");
   assert.ok(readiness.blockers.includes("GENERAL_PROVIDER_ROUTING_NOT_IMPLEMENTED"));
   const diagnosis = await invoke(4,"tools/call",{
     name:"diagnose_setup",arguments:{provider:"cloudflare"}
