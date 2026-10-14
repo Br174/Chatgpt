@@ -1,0 +1,63 @@
+name: MotorLab Memory CORE LAB06 Persistent Offline Gate
+on:
+  push:
+    branches:
+      - motorlab/memory-core-lab06-20261014
+    paths:
+      - 'tools/memory-core-lab06/**'
+      - 'docs/memory-core-lab06/**'
+      - 'checkpoints/MOTORLAB_MEMORY_CORE_LAB06_*'
+      - '.github/workflows/motorlab-memory-core-lab06.yml'
+  pull_request:
+    paths:
+      - 'tools/memory-core-lab06/**'
+      - 'docs/memory-core-lab06/**'
+      - 'checkpoints/MOTORLAB_MEMORY_CORE_LAB06_*'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  lab06-no-cloud-no-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inherited LAB01 through LAB05 Node regressions - 49 tests expected
+        run: |
+          node --test cloudflare/motorlab-state-bridge/test/memory-catalog.test.mjs cloudflare/motorlab-state-bridge/test/memory-github-lab02.test.mjs cloudflare/motorlab-state-bridge/test/memory-lab03.test.mjs cloudflare/motorlab-state-bridge/test/memory-lab04.test.mjs cloudflare/motorlab-state-bridge/test/memory-lab05.test.mjs
+      - name: Inherited LAB05 local concurrency and backup regression
+        run: python3 tools/memory-core-lab05/concurrency-backup-canary.py
+      - name: LAB06 persistent file, cold-process search, concurrent writers, immutable backup and rollback
+        run: python3 tools/memory-core-lab06/test-persistent-store.py
+      - name: Inherited LAB04 Wrangler D1 local GitHub verified canary
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/memory-core-lab04/d1-local-check.mjs
+      - name: LAB06 genuine verified GitHub import persisted between separate processes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          export LAB06_LOCAL_DIR="$RUNNER_TEMP/motorlab-memory-core-lab06-local"
+          node tools/memory-core-lab06/local-memory.mjs init --data-dir "$LAB06_LOCAL_DIR"
+          node tools/memory-core-lab06/local-memory.mjs ingest-github --data-dir "$LAB06_LOCAL_DIR"
+          node tools/memory-core-lab06/local-memory.mjs ingest-github --data-dir "$LAB06_LOCAL_DIR"
+          node tools/memory-core-lab06/local-memory.mjs recall --data-dir "$LAB06_LOCAL_DIR" --query GitHub
+          node tools/memory-core-lab06/local-memory.mjs status --data-dir "$LAB06_LOCAL_DIR"
+          node tools/memory-core-lab06/local-memory.mjs backup --data-dir "$LAB06_LOCAL_DIR"
+      - name: Cloudflare staging MUST fail closed if unverified - never remote D1 execute
+        run: |
+          node tools/memory-core-lab05/optional-staging-check.mjs
+          test ! -f "tools/memory-core-lab06/wrangler.production.jsonc"
+          if grep -E -- 'wrangler[[:space:]]+(deploy|d1[[:space:]]+create)|--remote' tools/memory-core-lab06/*.mjs tools/memory-core-lab06/*.py; then
+            echo "LAB06_FORBIDDEN_REMOTE_PATH"; exit 1
+          fi
+          if grep -F 'memory-core-lab06' cloudflare/motorlab-state-bridge/src/entry.js; then
+            echo "LAB06_FORBIDDEN_PROD_WORKER_IMPORT"; exit 1
+          fi
+          echo "LAB06: 0 Cloudflare remote commands, 0 deployments, no production entry changes."
