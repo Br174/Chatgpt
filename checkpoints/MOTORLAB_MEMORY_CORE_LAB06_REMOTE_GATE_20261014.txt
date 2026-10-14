@@ -52,3 +52,19 @@ LATEST_HEAD_CI=run_final_checks_after_checkpoint_metadata_commit
 NO_EXTERNAL_CLOUDFLARE_VERIFICATION=TRUE
 NO_PRODUCTION_WRITES=TRUE
 NEXT_USER_STEP=obtain production account dashboard URL (account ID only) and protected read-only access via a secure non-chat channel; never paste tokens
+
+
+STAGING_RESOURCE_DISCOVERY_20261014_VERIFIED_BY_USER_DASHBOARD
+STAGING_ACCOUNT_NAME=MotorLab-Staging
+STAGING_ACCOUNT_ID=b86f445c2b57e604c02f79c8da64bb9c
+STAGING_D1_NAME=motorlab-memory-core-staging-r36
+STAGING_D1_ID=fd3ff45b-694a-45ec-8d5c-5653fdba092e
+PRODUCTION_ACCOUNT_ID=5781b597517f6f7fe25751170a99b9ab
+PRODUCTION_D1_ID=9d94db34-2d3d-45be-8335-eae1b75d60b4
+EVIDENCE=user-provided Cloudflare dashboard URLs and screenshots; NOT authenticated API attestation
+STAGING_READ_TOKEN=user reports created; value NOT shared; not confirmed installed in protected executor
+PRODUCTION_READ_TOKEN=existing production agent read token observed in account UI; availability in protected executor NOT verified
+REMOTE_READ_ONLY_API=NOT_EXECUTED
+REMOTE_D1_WRITE=FORBIDDEN
+PRODUCTION_MUTATIONS=FORBIDDEN
+NEXT=Set staging and production read-only tokens exclusively in protected GitHub Actions secrets, using distinct names and no chat/log disclosure; then run existing fail-closed read-only preflight. Workflow currently intentionally excludes credentials and cannot attest provider identity until safe wiring is separately reviewed.
