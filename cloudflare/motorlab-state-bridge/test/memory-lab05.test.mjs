@@ -93,3 +93,19 @@ test('LAB05 cannot reach remote D1 write and cannot reuse production OIDC',()=>{
  const entry=readFileSync(resolve(root,'cloudflare/motorlab-state-bridge/src/entry.js'),'utf8');
  assert(!entry.includes('memory-core-lab05'));
 });
+
+test('staging Wrangler template is deliberately undeployable and contains no production resource IDs or secrets',()=>{
+ const text=readFileSync(resolve(root,'tools/memory-core-lab05/wrangler.staging.template.jsonc'),'utf8');
+ const staging=JSON.parse(text);
+ const production=JSON.parse(readFileSync(resolve(root,'cloudflare/motorlab-state-bridge/wrangler.jsonc'),'utf8'));
+ assert.equal(staging.d1_databases.length,1);
+ assert.deepEqual(Object.keys(staging).sort(),['compatibility_date','d1_databases','name']);
+ assert(staging.name.includes('NOT-DEPLOYABLE'));
+ assert.equal(staging.d1_databases[0].binding,'MEMORY_STAGING_DB');
+ assert(staging.d1_databases[0].database_id.includes('NOT_A_REAL_DATABASE_ID'));
+ assert(staging.d1_databases[0].database_name.startsWith('motorlab-memory-core-staging-'));
+ assert(!production.d1_databases.some(d=>d.database_id===staging.d1_databases[0].database_id));
+ assert(!production.d1_databases.some(d=>d.database_name===staging.d1_databases[0].database_name));
+ assert(!('kv_namespaces' in staging)&&!('routes' in staging)&&!('vars' in staging)&&!('account_id' in staging));
+ assert(!/9d94db34-2d3d-45be-8335-eae1b75d60b4|987774db498241aba75e6e30880dbb10/.test(text));
+});
