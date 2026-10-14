@@ -1,0 +1,45 @@
+name: Pacman execution staging deploy (manual, gated)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pacman-execution-staging-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify dedicated Worker target and D1 scope
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const root='tools/motorlab-pacman/';
+          const config=JSON.parse(fs.readFileSync(root+'wrangler.pacman-execution-staging.jsonc','utf8'));
+          if(config.name!=='motorlab-pacman-execution-staging-lab' ||
+             config.main!=='./worker-execution-staging.mjs' ||
+             config.d1_databases?.length!==1 ||
+             config.d1_databases[0].binding!=='DB' ||
+             config.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
+             throw Error('STAGING_SCOPE_MISMATCH');
+          console.log('Dedicated execution Worker and isolated D1 verified');
+          NODE
+      - name: Require staging-only Cloudflare deployment credentials
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          test -n "$CF_TOKEN" && test -n "$CF_ACCOUNT" || {
+            echo "::error::Dedicated staging deployment credentials missing; abort."
+            exit 1
+          }
+      - name: Deploy dedicated Worker only
+        working-directory: tools/motorlab-pacman
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: npx --yes wrangler@4 deploy --config wrangler.pacman-execution-staging.jsonc
