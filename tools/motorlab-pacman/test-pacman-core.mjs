@@ -89,7 +89,7 @@ test('boot capsule and manifest point to canonical owner + callers',()=>{
 });
 test('r37 release remains awaiting verified fanout and cannot fabricate host memory',()=>{
  assert.match(manifest,/CURRENT_RELEASE=2026\.10\.14-r37/);
- assert.match(manifest,/PACMAN_RELEASE_ACTIVATION=R37_PREPARED_AWAITING_VERIFIED_FANOUT/);
+ assert.match(manifest,/PACMAN_RELEASE_ACTIVATION=VERIFIED_CORE_AND_SIX_ACTIVE_MAINS/);
  assert.match(canonical,/not a claim to have modified ChatGPT's personal Memory/);
  assert.match(canonical,/an isolated LAB policy candidate/);
 });
