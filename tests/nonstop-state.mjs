@@ -13,5 +13,5 @@ export function recoverOperation(previous, observed = {}) {
   if (observed.id && observed.id !== previous.id) throw new Error('operation_identity_conflict');
   const floor = Math.max(previous.verifiedProgress ?? 0, observed.verifiedProgress ?? 0);
   if (floor > 100 || floor < 0) throw new Error('invalid_progress');
-  return { ...previous, verifiedProgress: floor, status: previous.status === 'COMPLETED' ? 'COMPLETED' : 'OPEN', nextSafeStep: observed.nextSafeStep ?? previous.nextSafeStep };
+  return { ...previous, verifiedProgress: floor, status: previous.status === 'COMPLETED' ? 'COMPLETED' : previous.status === 'PAUSED_BY_USER' ? 'PAUSED_BY_USER' : previous.status === 'BLOCKED_EXTERNAL' ? 'BLOCKED_EXTERNAL' : previous.status === 'RUNNING_EXTERNAL' ? 'RUNNING_EXTERNAL' : 'OPEN', nextSafeStep: observed.nextSafeStep ?? previous.nextSafeStep };
 }
