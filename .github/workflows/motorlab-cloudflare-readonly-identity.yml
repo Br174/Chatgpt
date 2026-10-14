@@ -1,0 +1,62 @@
+name: MotorLab Cloudflare Identity Read-Only Verification
+run-name: Cloudflare read-only identity check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-cloudflare-read-only:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify production and staging Cloudflare identities (GET only)
+        shell: bash
+        env:
+          PRODUCTION_TOKEN: ${{ secrets.CLOUDFLARE_PRODUCTION_READ_TOKEN }}
+          STAGING_TOKEN: ${{ secrets.CLOUDFLARE_STAGING_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const productionAccount='5781b597517f6f7fe25751170a99b9ab';
+          const productionDatabase='9d94db34-2d3d-45be-8335-eae1b75d60b4';
+          const stagingAccount='b86f445c2b57e604c02f79c8da64bb9c';
+          const stagingDatabase='fd3ff45b-694a-45ec-8d5c-5653fdba092e';
+          const productionToken=process.env.PRODUCTION_TOKEN;
+          const stagingToken=process.env.STAGING_TOKEN;
+          if (!productionToken || !stagingToken) {
+            console.error('BLOCKED: a required GitHub secret is missing');
+            process.exit(1);
+          }
+          async function get(path, token) {
+            const url='https://api.cloudflare.com/client/v4'+path;
+            const response=await fetch(url,{
+              method:'GET',
+              headers:{Authorization:'Bearer '+token,Accept:'application/json'},
+              signal:AbortSignal.timeout(12000),
+              redirect:'error'
+            });
+            if(!response.ok)throw Error('Cloudflare GET returned HTTP '+response.status);
+            const data=await response.json();
+            if(data.success!==true || !data.result || typeof data.result!=='object')
+              throw Error('Cloudflare GET response was not successful');
+            return data.result;
+          }
+          async function verify(label,account,database,token,expectedName) {
+            const a=await get('/accounts/'+account,token);
+            if(a.id!==account)throw Error(label+': account mismatch');
+            const d=await get('/accounts/'+account+'/d1/database/'+database,token);
+            if(d.uuid!==database || d.name!==expectedName)
+              throw Error(label+': D1 identity mismatch');
+            console.log(label+': READ_ONLY_IDENTITY_VERIFIED (2 GET, 0 writes)');
+          }
+          try {
+            await verify('PRODUCTION',productionAccount,productionDatabase,productionToken,'motorlab-operational-state-db');
+            await verify('STAGING',stagingAccount,stagingDatabase,stagingToken,'motorlab-memory-core-staging-r36');
+            if(productionAccount===stagingAccount)throw Error('Account separation mismatch');
+            console.log('MOTORLAB_CLOUDFLARE_IDENTITIES_VERIFIED: 4 GET, 0 writes, independent accounts');
+          }catch(e){
+            console.error('READ_ONLY_IDENTITY_BLOCKED: '+e.message);
+            process.exitCode=1;
+          }
+          NODE
