@@ -13,10 +13,10 @@ PACMAN_FIRST_TURN_ROUTING=MOTORLAB_AUTO_BOOTSTRAP_V1.txt
 PACMAN_REENTRY_ROUTING=MOTORLAB_REENTRY_GATE_V1.txt
 PACMAN_CRITICAL_BOOT_POINTER=MOTORLAB_BOOT_CAPSULE_V1.txt
 PACMAN_LIVE_WORKER_MCP_CONNECTION=NOT_VERIFIED_PR49_DRAFT
-PACMAN_RELEASE_ACTIVATION=R37_PREPARED_AWAITING_VERIFIED_FANOUT
-FANOUT_STATE=IN_PROGRESS
+PACMAN_RELEASE_ACTIVATION=VERIFIED_CORE_AND_SIX_ACTIVE_MAINS
+FANOUT_STATE=COMPLETE
 SATELLITE_SCHEMA=1
-FANOUT_MAIN_VERIFIED=0/6
+FANOUT_MAIN_VERIFIED=6/6
 FANOUT_PENDING_SAFE_BOUNDARY=4
 FANOUT_COMPLETE_MEANS=all_active_mains_verified_or_pending_safe_boundary_explicit;not_all_LABs_current
 CHAT_CONTEXT_GUARD_OWNER=UAB_PROJECT_ROUTING.txt
@@ -28,7 +28,7 @@ SATELLITE_SYNC_MODULE=MOTORLAB_SATELLITE_SYNC_V1.txt
 SATELLITE_BUNDLE_MODULE=MOTORLAB_SATELLITE_BUNDLE_V1.txt
 RELEASE_FANOUT_MODULE=MOTORLAB_RELEASE_FANOUT_V1.txt
 RELEASE_FANOUT_STATE_MODULE=MOTORLAB_RELEASE_FANOUT_STATE_V1.txt
-RELEASE_FANOUT_STATE=IN_PROGRESS
+RELEASE_FANOUT_STATE=COMPLETE
 PROJECT_CONTINUITY_MODULE=MOTORLAB_PROJECT_CONTINUITY_V1.txt
 ROOT_CAUSE_CLOSURE_MODULE=MOTORLAB_ROOT_CAUSE_CLOSURE_V1.txt
 ARTIFACT_FIRST_ROOT_CAUSE_MODULE=MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt
@@ -393,3 +393,11 @@ R36 NEXT RELEASE — CHAT CONTEXT GUARD (2026-10-12)
 
 R36 FINAL RELEASE FANOUT ACCOUNTING — 2026-10-12
 All six ACTIVE main repos adopted r36 CHAT_CONTEXT_GUARD=required with core and critical capsule release=r36 and last-good verified r35. Four current LAB/work refs remain on prior verified r34 pending SAFE_BOUNDARY and are documented with full repository/ref/reason in the central fanout ledger. Cover-Lab-AI is DORMANT_RESERVED and excluded. This is release transaction COMPLETE, not proof that ALL LABs or all chat host UI paths have been upgraded; prompt/chat-identity-dependent warning behavior is host-limited. MotorLab central CORE does not replace native app/domain engines. No project app source files changed.
+
+
+R37 VERIFIED PACMAN RELEASE FANOUT — 2026-10-14
+- GitHub PR #57 merged to the canonical CORE after exact-head nine CI success. Pacman is the public alias of existing AutoSetup; existing Auto Bootstrap and Re-entry Gate automatically route real external-account/site tasks through available tools when permitted, without a second agent/engine.
+- Every six active main repo satellite verified exact canonical r37 boot capsule + r37 bundle content by Git blob SHA, with immediately previous verified r36 bundle preserved as LAST_GOOD and r37 sync state. Immutable per-repo commit SHAs and four protected pending LAB refs are recorded in MOTORLAB_RELEASE_FANOUT_STATE_V1.txt.
+- Br174/Cover-Lab-AI remains DORMANT_RESERVED and excluded; project-native engines, main app runtime, APK, MADRE, production Worker/D1/KV and signing assets were not touched by this control-plane release.
+- AutoSetup PR #49 Worker/MCP remains draft/not proven live; do not mistake the Pacman routing policy for connected autonomous ChatGPT browser execution. Existing sessions retain their pinned r36 until a verified safe re-entry.
+- No new paid services or secret transfers permitted. Fanout transaction COMPLETE means 6/6 active mains verified or pending LABs explicitly preserved at safe boundary; does not mean four LAB branches were updated.
