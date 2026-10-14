@@ -50,7 +50,7 @@ jobs:
           for(const required of ['REMOTE_PREVIEW=NOT_EXECUTED','STAGING_API_IDENTITY=NOT_VERIFIED','STAGING_PERMISSIONS=NOT_VERIFIED','ZERO_ADDITIONAL_COST=NOT_VERIFIED','NO_PRODUCTION_DEPLOY=TRUE']) {
             if(!stage.includes(required))throw Error('UNSAFE_REMOTE_STAGING_STATUS');
           }
-          if(/secrets\.|workflow_dispatch:|^\s*(?:preview|deploy):\s*$/m.test(wf))throw Error('REMOTE_DEPLOY_ROUTE_FORBIDDEN');
+          if(/secrets\.|^\s*(?:preview|deploy):\s*$/m.test(wf) || wf.includes('workflow_'+'dispatch:'))throw Error('REMOTE_DEPLOY_ROUTE_FORBIDDEN');
           if(!wf.includes('wrangler@4.136.3 deploy --dry-run'))throw Error('DRY_RUN_MISSING');
           console.log('Pacman LAB07: provider requests 0, D1/KV/production writes 0, preview blocked.');
           NODE
