@@ -98,3 +98,7 @@ VERSION
 MOTORLAB-ROOT-CAUSE-CLOSURE-V1.1
 Established: 2026-09-30
 Revision 1.1: r15 integrates Artifact-First ordering, deferred causal queue and dual artifact/overall progress while preserving mandatory causal closure.
+
+
+R37 GLOBAL DIAGNOSTIC-FIRST / HUMAN-LAST RULE (2026-10-14; USER APPROVED)
+For EVERY MotorLab-managed project and MotorLab CORE self-work, MotorLab must autonomously exhaust reasonably available authorized read-only evidence (repo, source, CI, logs, endpoints, checkpoints, connected tools) before asking the user to navigate dashboards or gather screenshots. Diagnose the precise cause and location to the extent technically provable, distinguish hypotheses from confirmed defects, and perform authorized safe repair itself. Delegate ONLY the irreducible human-only step (e.g. login, 2FA, nondelegable consent, missing provider capability), with exact location, minimum grouped instructions, and no exploratory user debugging. If root cause cannot be proven from accessible evidence, disclose the exact missing evidence and access limitation; never invent certainty or request repetitive manual browsing. Applies independently of Pacman. Existing safety/approval/one-writer gates remain intact.
