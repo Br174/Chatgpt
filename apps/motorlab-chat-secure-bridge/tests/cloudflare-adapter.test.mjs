@@ -53,7 +53,13 @@ test("read-only MCP exposes reused secure UI and never accepts secret contents",
   });
   assert.equal(init.result.serverInfo.name,"motorlab-autosetup-cloudflare");
   const tools = await invoke(2,"tools/list");
-  assert.deepEqual(tools.result.tools.map(t=>t.name),["open_secure_secrets_panel","diagnose_setup"]);
+  assert.deepEqual(tools.result.tools.map(t=>t.name),["open_secure_secrets_panel","diagnose_setup","get_autosetup_status"]);
+  const status = await invoke(5,"tools/call",{name:"get_autosetup_status",arguments:{}});
+  const readiness = JSON.parse(status.result.content[0].text);
+  assert.equal(readiness.mode,"diagnostic-read-only");
+  assert.equal(readiness.chat_connection_verified,false);
+  assert.equal(readiness.github_writes_enabled,false);
+  assert.ok(readiness.blockers.includes("GENERAL_PROVIDER_ROUTING_NOT_IMPLEMENTED"));
   const diagnosis = await invoke(4,"tools/call",{
     name:"diagnose_setup",arguments:{provider:"cloudflare"}
   });
