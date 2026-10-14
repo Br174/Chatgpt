@@ -1,6 +1,8 @@
 {
   "name": "motorlab-pacman-staging-lab",
+  "main": "./worker-health-staging.mjs",
   "compatibility_date": "2026-10-15",
+  "workers_dev": true,
   "d1_databases": [
     {
       "binding": "DB",
