@@ -128,3 +128,16 @@ test("refuses to mutate code or config files within allowed directory",async()=>
   }
   assert.equal(writes,0);
 });
+
+test("failed PREPARED checkpoint blocks mutation and preserves receipt",async()=>{
+  const s=setup();
+  let writes=0;
+  s.adapter.create=async()=>{writes++;};
+  await assert.rejects(runGithubLabFileCycle({
+    operationId:"pacman-checkpoint-prepare-001",branch,path,content,
+    adapter:s.adapter,ledger:s.ledger,approval:true,
+    onCheckpoint:async()=>{throw Error("checkpoint unavailable");}
+  }),{code:"CHECKPOINT_PREPARE_FAILED"});
+  assert.equal(writes,0);
+  assert.equal((await s.ledger.get("pacman-checkpoint-prepare-001")).state,"PREPARED");
+});
