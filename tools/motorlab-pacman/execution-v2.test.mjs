@@ -89,3 +89,27 @@ test("rejects another motorlab branch despite matching prefix",async()=>{
   }),{code:"LAB_BRANCH_REQUIRED"});
   assert.equal(writes,0);
 });
+
+test("preflight read failure never mutates target",async()=>{
+  const s=setup();
+  let writes=0;
+  s.adapter.read=async()=>{throw Error("provider offline");};
+  s.adapter.create=async()=>{writes++;};
+  await assert.rejects(runGithubLabFileCycle({
+    operationId:"pacman-preflight-offline-001",branch,path,content,
+    adapter:s.adapter,ledger:s.ledger,onCheckpoint:s.onCheckpoint,approval:true
+  }),{code:"PREFLIGHT_FAILED"});
+  assert.equal(writes,0);
+  assert.equal((await s.ledger.get("pacman-preflight-offline-001")).state,"PREFLIGHT_FAILED");
+});
+test("pre-existing target never overwritten",async()=>{
+  const s=setup();
+  let writes=0;
+  s.adapter.read=async()=>({exists:true,content:"original",sha:"existing"});
+  s.adapter.create=async()=>{writes++;};
+  await assert.rejects(runGithubLabFileCycle({
+    operationId:"pacman-existing-target-001",branch,path,content,
+    adapter:s.adapter,ledger:s.ledger,onCheckpoint:s.onCheckpoint,approval:true
+  }),{code:"TARGET_NOT_EMPTY_OR_UNVERIFIED"});
+  assert.equal(writes,0);
+});
