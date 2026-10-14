@@ -13,6 +13,12 @@ on:
       - 'MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt'
       - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
       - 'tests/motorlab_nonstop_contract_check.cjs'
+      - 'tests/nonstop-state.mjs'
+      - 'tests/nonstop-state.test.mjs'
+      - 'MOTORLAB_PROJECT_CONTINUITY_V1.txt'
+      - 'MOTORLAB_POLLICINO_CONTINUITY_V1.txt'
+      - 'MOTORLAB_EXECUTION_CONTINUITY_V1.txt'
+      - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
       - '.github/workflows/motorlab-nonstop-lab-gate.yml'
 
 permissions:
