@@ -9,6 +9,7 @@ Let Bruno follow ALL MotorLab-controlled modifications — from micro-changes to
 
 CORE PRINCIPLE
 Progress represents verified completion, not elapsed time or ETA. Same-scale verified progress is monotonic unless material evidence invalidates prior work.
+WHOLE-PROJECT COMPLETION PRECEDENCE: all percentages, phase milestones, reports, test passes and artifact deliveries are nonterminal unless the ENTIRE approved project outcome is verified complete. On each subtask completion, select the next ready approved dependency immediately, without ending the current turn for a status-only message. No new OK between in-scope subtasks. Respect evidenced blockers, approval gates and genuine host limits.
 NON-STOP PRECEDENCE: visible progress is observational, not a completion or pause signal. Status may be shown after every meaningful operation when a non-terminal update channel exists; otherwise accumulate observations and keep executing, then report at the next available control point. No new user OK is needed between already approved steps. Emit intermediate progress only when it can be followed by continued execution in the same available turn. Never end a turn merely to show a percentage, checkpoint, heartbeat, status or Pollicino breadcrumb. Resume Recovery valid terminal states govern stopping. No 15-second or 1-3-tool stop timer exists.
 
 ROLE / PRECEDENCE
