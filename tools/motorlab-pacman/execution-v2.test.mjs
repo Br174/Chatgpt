@@ -26,7 +26,7 @@ test("denies without approval and without ledger", async () => {
   await assert.rejects(runGithubLabFileCycle({operationId:"pacman-probe-001",branch,path,content,
     adapter:s.adapter,ledger:s.ledger,onCheckpoint:s.onCheckpoint}), {code:"OWNER_APPROVAL_REQUIRED"});
   await assert.rejects(runGithubLabFileCycle({operationId:"pacman-probe-002",branch,path,content,
-    adapter:s.adapter,approval:true,onCheckpoint:s.onCheckpoint}), {code:"DURABLE_LEDGER_REQUIRED"});
+    adapter:s.adapter,approval:true,onCheckpoint:s.onCheckpoint}), {code:"ATOMIC_DURABLE_LEDGER_REQUIRED"});
 });
 test("isolated create/read/delete verifies cleanup and rejects replay", async () => {
   const s=setup();
@@ -35,7 +35,7 @@ test("isolated create/read/delete verifies cleanup and rejects replay", async ()
   const receipt=await runGithubLabFileCycle(args);
   assert.equal(receipt.state,"VERIFIED_AND_REMOVED");
   assert.equal((await s.adapter.read()).exists,false);
-  await assert.rejects(runGithubLabFileCycle(args), {code:"OPERATION_ALREADY_RECORDED"});
+  await assert.rejects(runGithubLabFileCycle(args), {code:"DUPLICATE_OR_UNVERIFIED_CLAIM"});
 });
 test("readback mismatch enters recovery, never reports success", async () => {
   const s=setup();
