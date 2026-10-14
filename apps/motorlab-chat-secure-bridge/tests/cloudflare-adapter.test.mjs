@@ -53,7 +53,15 @@ test("read-only MCP exposes reused secure UI and never accepts secret contents",
   });
   assert.equal(init.result.serverInfo.name,"motorlab-autosetup-cloudflare");
   const tools = await invoke(2,"tools/list");
-  assert.deepEqual(tools.result.tools.map(t=>t.name),["open_secure_secrets_panel"]);
+  assert.deepEqual(tools.result.tools.map(t=>t.name),["open_secure_secrets_panel","diagnose_setup"]);
+  const diagnosis = await invoke(4,"tools/call",{
+    name:"diagnose_setup",arguments:{provider:"cloudflare"}
+  });
+  const diagnosisResult = JSON.parse(diagnosis.result.content[0].text);
+  assert.equal(diagnosisResult.provider,"cloudflare");
+  assert.equal(diagnosisResult.action_allowed,false);
+  assert.equal(diagnosisResult.blocker,"CLOUDFLARE_CONFIGURATION_ADAPTER_MISSING");
+
   const resource = await invoke(3,"resources/read",{uri:"ui://motorlab-autosetup/secure-secrets-v1.html"});
   const html = resource.result.contents[0].text;
   assert.match(html,/autosetup\/v1\/api\/repository-secret/);
