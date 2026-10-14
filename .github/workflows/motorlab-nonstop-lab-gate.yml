@@ -29,3 +29,5 @@ jobs:
           node-version: '22'
       - name: NON-STOP contract assertions (not E2E)
         run: node tests/motorlab_nonstop_contract_check.cjs
+      - name: NON-STOP operation lifecycle tests
+        run: node --test tests/nonstop-state.test.mjs
