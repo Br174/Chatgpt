@@ -140,3 +140,7 @@ Revision 1.1: emerging-loop prevention, Watchdog preventive handoff, two-strike 
 Revision 1.2: r20 enrolls supported persistent executors in Pollicino and explicitly forbids fake hidden-heartbeat claims for opaque normal chat turns.
 
 Revision 1.3: r27 adds immediate independent sidework during foreground waits while preserving separate same-task recovery.
+
+
+R37 CONTINUE-UNTIL-TERMINAL RULE (2026-10-14; USER APPROVED)
+Within each available execution cycle, after a status explanation or partial report, continue already approved programming, diagnostics, verification and artifact work without requiring another 'procedi'. A status update is NOT a stop signal. Continue to verified completion or a concrete nondelegable user action, material authorization/safety boundary, or genuine host/tool limit. Before a forced stop, record a precise resumable checkpoint, progress and next executable step. If a real durable approved executor exists, hand off suitable background work and report its job ID; do not claim ordinary ChatGPT continues after its execution cycle ends. No unbounded spin or bypass of approvals, locks or risk gates.
