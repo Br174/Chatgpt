@@ -90,6 +90,7 @@ A supported agent records the directive_id values it has already surfaced for it
 Dedup state is local/reconstructible and must not mutate application files.
 D1 writes are transition-based, not busy polling/event spam.
 
+PROJECT-LEVEL LIVE CONTROL: nonterminal status observations must never conclude a turn merely because a task or phase ended while approved safe project work remains. Apply the next ready node within the same available cycle.
 NON-STOP SAFE-POINT INTERPRETATION
 Safe-point reconciliation means an in-turn observation while execution control remains, not an instruction to terminate the turn or request user confirmation. FORCE_PROGRESS_DISPLAY and PROGRESS_PRESENCE HIGH may increase status detail but cannot create a pit stop, 15-second stop timer, or new approval for an already approved scope. If the host cannot emit non-terminal updates, continue safe work and defer the status until the next available control point. Independent regression checks run without blocking unrelated runners.
 
