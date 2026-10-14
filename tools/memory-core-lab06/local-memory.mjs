@@ -33,13 +33,13 @@ function pyRun(action,flags,extra=[]){
   env:Object.fromEntries(Object.entries(process.env).filter(([k])=>!/^CLOUDFLARE_|^CF_/.test(k)))});
  return JSON.parse(stdout);
 }
-export async function executeLocalMemory(argv,{sourceAcquirer=acquireVerifiedGithubMemory}={}){
+export async function executeLocalMemory(argv){
  const {action,flags}=parseArgs(argv);
  if(action==='ingest-github'){
   const token=process.env.GITHUB_TOKEN;
   if(!token)throw Error('LAB06_GITHUB_READ_TOKEN_REQUIRED');
   // LAB02 independently verifies pinned blobs, commits, immutable SHA and Actions receipt.
-  const evidence=await sourceAcquirer({token});
+  const evidence=await acquireVerifiedGithubMemory({token});
   if(evidence.records?.length!==9||evidence.receipts?.length!==4||evidence.links?.length!==4)
    throw Error('LAB06_UNVERIFIED_SOURCE_SHAPE');
   const folder=mkdtempSync(join(tmpdir(),'motorlab-lab06-evidence-'));
