@@ -1,0 +1,11 @@
+{
+  "name": "motorlab-memory-core-staging-NOT-DEPLOYABLE",
+  "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    {
+      "binding": "MEMORY_STAGING_DB",
+      "database_name": "motorlab-memory-core-staging-VERIFY-IDENTITY",
+      "database_id": "NOT_A_REAL_DATABASE_ID_REQUIRES_SEPARATE_CLOUDFLARE_READ_PROOF"
+    }
+  ]
+}
