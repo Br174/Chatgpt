@@ -224,6 +224,29 @@ jobs:
           done
           test "$crypto_ok" = true
 
+          # Real HTTPS MCP JSON-RPC handshake against the isolated preview.
+          # No token, secret, owner authorization, or production write is involved.
+          mcp_headers=('Accept: application/json, text/event-stream' 'Content-Type: application/json')
+          mcp_url="$PREVIEW_URL/autosetup/v1/mcp"
+          mcp_code="$(curl --silent --output "$body" --write-out '%{http_code}' \
+            --max-time 15 -X POST -H "${mcp_headers[0]}" -H "${mcp_headers[1]}" \
+            --data '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"lab06-preview-smoke","version":"1"}}}' \
+            "$mcp_url" || true)"
+          test "$mcp_code" = 200
+          jq -e '.result.serverInfo.name == "motorlab-autosetup-cloudflare"' "$body" >/dev/null
+          mcp_code="$(curl --silent --output "$body" --write-out '%{http_code}' \
+            --max-time 15 -X POST -H "${mcp_headers[0]}" -H "${mcp_headers[1]}" \
+            --data '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
+            "$mcp_url" || true)"
+          test "$mcp_code" = 200
+          jq -e '[.result.tools[].name] | (index("diagnose_setup") != null) and (index("get_autosetup_status") != null)' "$body" >/dev/null
+          mcp_code="$(curl --silent --output "$body" --write-out '%{http_code}' \
+            --max-time 15 -X POST -H "${mcp_headers[0]}" -H "${mcp_headers[1]}" \
+            --data '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"get_autosetup_status","arguments":{}}}' \
+            "$mcp_url" || true)"
+          test "$mcp_code" = 200
+          jq -e '.result.content[0].text | fromjson | .chat_connection_verified == false and .github_writes_enabled == false' "$body" >/dev/null
+
           # Synthetic, unauthenticated negative tests: never send a real PAT.
           denied="$(curl --silent --output /dev/null --write-out '%{http_code}' \
             --max-time 12 -X OPTIONS -H 'Origin: https://blocked.invalid' \
