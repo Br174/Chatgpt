@@ -9,6 +9,7 @@ Let Bruno follow ALL MotorLab-controlled modifications — from micro-changes to
 
 CORE PRINCIPLE
 Progress represents verified completion, not elapsed time or ETA. Same-scale verified progress is monotonic unless material evidence invalidates prior work.
+NON-STOP PRECEDENCE: visible progress is observational, not a completion or pause signal. Emit intermediate progress only when it can be followed by continued execution in the same available turn. Never end a turn merely to show a percentage, checkpoint, heartbeat, status or Pollicino breadcrumb. Resume Recovery valid terminal states govern stopping. No 15-second or 1-3-tool stop timer exists.
 
 ROLE / PRECEDENCE
 Progress Reporting owns user-visible percentages. Visual Status owns emoji labels. Watchdog owns health/stall. Resume Recovery owns continuation. Root Cause Closure owns definitive problem closure. MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt owns artifact-vs-causal phase ordering.
