@@ -3,11 +3,11 @@
   "operation_id": "MOTORLAB-AUTOSETUP-LAB06-CLOUDFLARE-CHAT-FIRST",
   "worker": "motorlab-state-bridge",
   "source_head": "9cb33fb7edb5154fe8f60ebdce5e8147190130a2",
-  "approved": true,
-  "deploy_production": true,
+  "approved": false,
+  "deploy_production": false,
   "probe_only": true,
   "writes_enabled": false,
   "expires_at": "2026-10-13T22:18:55Z",
   "scope": "synthetic-test-only-PAT-entered-exclusively-in-browser",
-  "approval_basis": "Owner explicitly approved pure-JS sealed-box replacement and tests in LAB06 in this conversation"
+  "approval_basis": "Expired 2026-10-13 authorization revoked; new production approval requires a fresh independently authorized one-shot commit."
 }
