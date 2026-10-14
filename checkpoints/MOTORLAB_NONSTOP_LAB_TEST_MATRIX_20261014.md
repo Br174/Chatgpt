@@ -28,3 +28,13 @@ All T01-T12 are NOT RUN as end-to-end tests. Document inspection is NOT equivale
 
 ## Next
 Implement and run isolated deterministic contract checks, then real multi-operation provider test; record evidence per case. Keep PR draft. Memory Consolidation stays suspended at previously reported 5%.
+
+## Acceptance criterion — user-observed NON-STOP (2026-10-14)
+The user's acceptance criterion supersedes treating contract assertions, checkpoint writes or isolated GitHub operations as sufficient completion. PASS requires an observable real working session in which:
+1. After the user's initial approval, MotorLab executes successive approved substantive operations without requiring another "OK procedi" between them.
+2. Intermediate visible progress/checkpoints do not end the available execution turn.
+3. The work reaches a verifiable requested outcome, or reports a genuine external blocker (not an invented pit stop).
+4. A controlled interruption/re-entry resumes from the verified checkpoint without duplicating writes.
+5. Any claim of execution after an ordinary ChatGPT turn ends is backed by a real enrolled durable executor/job and observed evidence. Contract prose alone cannot provide it.
+
+Current result: ACCEPTANCE NOT MET / NOT YET DEMONSTRATED. The earlier 12 contract checks are static checks, not proof of user-observed nonstop execution. Do not mark project 100% until this criterion is demonstrated. Keep PR draft, preserve main/MADRE.
