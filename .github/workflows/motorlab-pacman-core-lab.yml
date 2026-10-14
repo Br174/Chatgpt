@@ -1,0 +1,51 @@
+name: MotorLab Pacman CORE Alias and Auto-Routing (isolated policy LAB)
+on:
+  push:
+    branches:
+      - motorlab/pacman-autosetup-core-lab-20261014
+    paths:
+      - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
+      - 'MOTORLAB_AUTO_BOOTSTRAP_V1.txt'
+      - 'MOTORLAB_REENTRY_GATE_V1.txt'
+      - 'MOTORLAB_BOOT_CAPSULE_V1.txt'
+      - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
+      - 'tools/motorlab-pacman/**'
+      - '.github/workflows/motorlab-pacman-core-lab.yml'
+      - 'checkpoints/MOTORLAB_PACMAN_CORE_LAB_20261014.txt'
+  pull_request:
+    paths:
+      - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
+      - 'MOTORLAB_AUTO_BOOTSTRAP_V1.txt'
+      - 'MOTORLAB_REENTRY_GATE_V1.txt'
+      - 'MOTORLAB_BOOT_CAPSULE_V1.txt'
+      - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
+      - 'tools/motorlab-pacman/**'
+      - '.github/workflows/motorlab-pacman-core-lab.yml'
+      - 'checkpoints/MOTORLAB_PACMAN_CORE_LAB_20261014.txt'
+permissions:
+  contents: read
+jobs:
+  pacman-core-policy-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 15 offline Pacman canonical/negative/continuity tests
+        run: node --test tools/motorlab-pacman/test-pacman-core.mjs
+      - name: Protect main release, production & Android
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const m=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
+          if(!m.includes('CURRENT_RELEASE=2026.10.12-r36'))throw Error('unapproved release bump');
+          if(!m.includes('PACMAN_RELEASE_ACTIVATION=ONLY_AFTER_APPROVED_MERGE_AND_SAFE_FANOUT'))throw Error('fanout bypass');
+          const wf=fs.readFileSync('.github/workflows/motorlab-pacman-core-lab.yml','utf8');
+          if(/secrets\.|id-token: write|wrangler deploy|d1 execute/.test(wf))throw Error('production-capable workflow');
+          console.log('Policy only. No provider authentication, deployment, D1/KV, APK, MADRE or main promotion.');
+          NODE
