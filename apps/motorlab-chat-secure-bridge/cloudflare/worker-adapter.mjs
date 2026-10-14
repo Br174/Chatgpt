@@ -57,15 +57,15 @@ function diagnoseProvider(provider, env) {
     next_action: "Add a reviewed provider adapter; never request credentials in chat"
   };
   if (name === "cloudflare") return {
-    schema: 1, provider: name, status: "READ_ONLY_PREVIEW_VERIFIED",
+    schema: 1, provider: name, status: "READ_ONLY_DIAGNOSTIC",
     action_allowed: false,
     blocker: "CLOUDFLARE_CONFIGURATION_ADAPTER_MISSING",
     next_action: "Implement an authorized Cloudflare configuration adapter in LAB; production changes remain forbidden"
   };
   return {
     schema: 1, provider: name, status: "GATEWAY_AVAILABLE",
-    action_allowed: liveEnabled(env),
-    blocker: liveEnabled(env) ? null : "GITHUB_WRITES_DISABLED",
+    action_allowed: false,
+    blocker: liveEnabled(env) ? "OWNER_AUTHORIZATION_NOT_VERIFIED" : "GITHUB_WRITES_DISABLED",
     next_action: liveEnabled(env)
       ? "Use the existing protected secrets gateway with independent owner approval"
       : "Obtain separate owner authorization before enabling any GitHub secret writes"
@@ -103,7 +103,7 @@ function panelResponse(publicOrigin) {
 function createMcp(publicOrigin, env) {
   const mcp = new McpServer(
     { name: "motorlab-autosetup-cloudflare", version: "0.1.0-lab06" },
-    { instructions: "Only open the secure embedded panel. NEVER receive or request secrets, PATs, keystore, passwords or OTP in chat messages or MCP tool calls. No write is permitted until the real owner separately enables the protected gateway." }
+    { instructions: "Use diagnose_setup and get_autosetup_status for read-only checks. Open the secure embedded panel only for its supported signing-secrets operation. NEVER receive or request secrets, PATs, keystore, passwords or OTP in chat messages or MCP tool calls. No write is permitted until the real owner separately enables the protected gateway." }
   );
   registerAppTool(mcp, "open_secure_secrets_panel", {
     title: "AutoSetup · pannello protetto",
