@@ -38,3 +38,11 @@ The user's acceptance criterion supersedes treating contract assertions, checkpo
 5. Any claim of execution after an ordinary ChatGPT turn ends is backed by a real enrolled durable executor/job and observed evidence. Contract prose alone cannot provide it.
 
 Current result: ACCEPTANCE NOT MET / NOT YET DEMONSTRATED. The earlier 12 contract checks are static checks, not proof of user-observed nonstop execution. Do not mark project 100% until this criterion is demonstrated. Keep PR draft, preserve main/MADRE.
+
+## Evidence update — 2026-10-14: multi-tool continuation and static contract validation
+- Nine repository files fetched successfully from the isolated LAB branch: six modified CORE contracts, Change Compatibility Guard, release manifest, and the Node contract-check script.
+- Twelve deterministic regex contract assertions evaluated against the fetched GitHub contents by the current orchestration session: 12 PASS / 0 FAIL. This is static contract verification, not an execution of the checked-in Node script and not an end-to-end test.
+- Multiple successive GitHub reads and a durable GitHub checkpoint write occurred in the same user-approved turn, demonstrating bounded same-turn continuation.
+- A local shell attempt to reach the private repository over HTTPS failed with DNS resolution (no direct GitHub clone from the isolated local container). The GitHub connector works. Do not describe the checked-in Node script as locally executed.
+- Acceptance status remains NOT MET until a user-observable uninterrupted work session reaches its authorized terminal result without intermediate prompts, and any claimed beyond-turn background execution is backed by an actual enrolled durable executor.
+- No main/MADRE/production writes authorized or performed. PR remains draft.
