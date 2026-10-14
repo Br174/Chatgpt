@@ -1,0 +1,17 @@
+# Pacman AutoSetup — Cloudflare production read-only token (LAB06)
+
+Status: design/implementation gate only. No live authorization, token creation, secret update or production deploy is implied.
+
+## Minimum user interaction
+1. Show a chat-hosted status/configuration card. Never ask for a token in ordinary chat, chat inputs, model-visible app bindings, logs, URL, or GitHub source.
+2. Cloudflare account is production `5781b597517f6f7fe25751170a99b9ab`. Preselect only Account/D1/Read and Account/Account Settings/Read. No optional IP restriction, expiration, write permission, other accounts, or other services.
+3. Creation must be delegated to an authenticated Cloudflare flow or an already-authorized scoped broker; the chat card cannot grant Cloudflare permissions or create tokens itself. If browser authorization is required, explain it and keep it to one action. Do not claim in-chat Cloudflare authorization exists until proven.
+4. Only after a trusted HTTPS secret-entry surface is actually deployed and verified, allow user to paste the raw token there. No raw token is passed to the model, chat UI state, client-side model bindings or repo. Broker may update only existing GitHub Actions secret `CLOUDFLARE_PRODUCTION_READ_TOKEN`, with strict origin/session/CSRF checks, scoped GitHub authorization, encrypted transit, no secret logging, and fail-closed errors.
+5. Verify token shape locally without exposing the value; verify via Cloudflare read-only endpoints and confirm GitHub secret metadata update, then run the existing main-only read-only identity workflow once. Do not run tests against production until secret and authorization gates pass.
+6. No main/MADRE/APK/Worker/D1/KV production changes, deploy, writes, or additional cost. Keep work on LAB06 PR #49; explicit approval required for production deployment.
+
+## Existing implementation gap
+`src/generated-panel.mjs` currently exposes Android signing secrets and a GitHub PAT, not Cloudflare token creation. Do not present that panel as if it creates Cloudflare tokens. Implement a dedicated, verified, protected Cloudflare flow before requesting any real token. Never embed raw secret fields in a DIL/AppBlock because they may become model-visible.
+
+## Acceptance
+User can complete Cloudflare authorization with minimum manual action; secure transfer and GitHub update verified; read-only identity test passes; no secret disclosure; no production modifications other than explicit GitHub Actions secret replacement. Until then status is BLOCKED, not complete.
