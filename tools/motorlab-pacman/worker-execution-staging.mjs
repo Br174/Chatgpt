@@ -30,6 +30,8 @@ export default {
   } catch {return response({error:"INVALID_JSON"},400);}
   if(!input || typeof input!=="object" || !input.intent || !input.approval || typeof input.content!=="string")
    return response({error:"INVALID_REQUEST"},400);
-  // Request data cannot attest that a chat button was pressed.\n  // No authenticated approval issuer is available to this Worker yet.\n  return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);
+  // Request data cannot attest that a chat button was pressed.
+  // No authenticated approval issuer is available to this Worker yet.
+  return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);
  }
 };
