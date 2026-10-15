@@ -38,7 +38,7 @@ export default {
    if(new TextEncoder().encode(raw).length>MAX_BYTES) return response({error:"PAYLOAD_TOO_LARGE"},413);
    input=JSON.parse(raw);
   } catch {return response({error:"INVALID_JSON"},400);}
-  if(!input || typeof input!=="object" || !input.intent || !input.approval || typeof input.content!=="string")
+  if(!input || typeof input!=="object" || Array.isArray(input) || !input.intent || typeof input.intent!=="object" || Array.isArray(input.intent) || !input.approval || typeof input.approval!=="object" || Array.isArray(input.approval) || typeof input.content!=="string")
    return response({error:"INVALID_REQUEST"},400);
   // A chat message or JSON approval is never sufficient to assert trusted-host identity.
   // Fail closed BEFORE consuming a one-time attestation until a separate trusted issuer
