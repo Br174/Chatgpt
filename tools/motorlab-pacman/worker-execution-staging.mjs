@@ -1,5 +1,7 @@
 // Separate staging-only execution Worker. NOT deployed; read-only health Worker remains untouched.
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
+import {verifyApprovalAttestation} from "./approval-attestation.mjs";
+import {validateChatApproval} from "./chat-approval.mjs";
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
@@ -30,8 +32,17 @@ export default {
   } catch {return response({error:"INVALID_JSON"},400);}
   if(!input || typeof input!=="object" || !input.intent || !input.approval || typeof input.content!=="string")
    return response({error:"INVALID_REQUEST"},400);
-  // Request data cannot attest that a chat button was pressed.
-  // No authenticated approval issuer is available to this Worker yet.
-  return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);
+  // No host-side trusted chat issuer has been connected yet. Never accept JSON approval alone.
+  if(typeof env?.PACMAN_APPROVAL_SIGNING_SECRET!=="string" || env.PACMAN_APPROVAL_SIGNING_SECRET.length<32)
+   return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);
+  try {
+   validateChatApproval(input.intent,input.approval);
+   await verifyApprovalAttestation({intent:input.intent,attestation:input.attestation,secret:env.PACMAN_APPROVAL_SIGNING_SECRET});
+  } catch {
+   return response({error:"TRUSTED_APPROVAL_REJECTED"},403);
+  }
+  // Cryptographic verification alone does not guarantee the issuer was authenticated.
+  // Keep execution disabled until the trusted host integration and replay protection are implemented.
+  return response({error:"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING"},503);
  }
 };
