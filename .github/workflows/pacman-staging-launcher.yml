@@ -26,7 +26,7 @@ jobs:
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const c=JSON.parse(fs.readFileSync('tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc','utf8'));
-          if(c.name!=='motorlab-pacman-execution-staging-lab'||c.main!=='./worker-execution-staging.mjs'||c.d1_databases?.length!==1||c.d1_databases[0].database_name!=='motorlab-pacman-staging'||c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261') throw Error('STAGING_SCOPE_MISMATCH');
+          if(c.workers_dev!==true||c.d1_databases[0].binding!=='DB'||c.name!=='motorlab-pacman-execution-staging-lab'||c.main!=='./worker-execution-staging.mjs'||c.d1_databases?.length!==1||c.d1_databases[0].database_name!=='motorlab-pacman-staging'||c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261') throw Error('STAGING_SCOPE_MISMATCH');
           NODE
           node --test tools/motorlab-pacman/*.test.mjs
   deploy:
@@ -48,6 +48,7 @@ jobs:
         run: |
           test "$APPROVED" = YES_STAGING_EXECUTION_ONLY || exit 1
           test -n "$TOKEN" && test -n "$ACCOUNT" || exit 1
+          test "$ACCOUNT" = b86f445c2b57e604c02f79c8da64bb9c || { echo "::error::Cloudflare account is not the isolated staging account"; exit 1; }
       - name: Deploy dedicated staging Worker
         working-directory: tools/motorlab-pacman
         env:
