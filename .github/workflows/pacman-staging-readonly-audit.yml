@@ -1,0 +1,51 @@
+name: Pac-Man staging read-only audit
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/workflows/pacman-staging-readonly-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 5
+    steps:
+      - name: Read-only Cloudflare staging audit (names only)
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          const expected='b86f445c2b57e604c02f79c8da64bb9c';
+          const worker='motorlab-pacman-execution-staging-lab';
+          if(process.env.CF_ACCOUNT!==expected || !process.env.CF_TOKEN) {
+            console.log('STAGING_DEPLOY_CREDENTIALS: MISSING_OR_WRONG_ACCOUNT');
+            process.exitCode=1;
+          } else {
+            const url='https://api.cloudflare.com/client/v4/accounts/'+expected+'/workers/scripts/'+worker+'/settings';
+            try {
+              const r=await fetch(url,{headers:{Authorization:'Bearer '+process.env.CF_TOKEN},signal:AbortSignal.timeout(12000),redirect:'error'});
+              if(!r.ok){console.log('WORKER_SETTINGS_READ: UNAVAILABLE_HTTP_'+r.status+' (permission or endpoint; no conclusions about secrets)');}
+              else {
+                const j=await r.json();
+                if(j.success!==true){console.log('WORKER_SETTINGS_READ: API_UNAVAILABLE');}
+                else {
+                  const bindings=Array.isArray(j.result?.bindings)?j.result.bindings:[];
+                  const expectedNames=['PACMAN_EXECUTION_KEY','PACMAN_GITHUB_TOKEN','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_TRUSTED_ISSUER_CONNECTED','PACMAN_GITHUB_LAB_WRITE_ENABLED','PACMAN_APPROVAL_READINESS_ENABLED'];
+                  for(const name of expectedNames) console.log(name+': '+(bindings.some(b=>b.name===name)?'PRESENT_NAME_ONLY':'NOT_LISTED'));
+                  const db=bindings.find(b=>b.name==='DB' && b.type==='d1');
+                  console.log('D1_BINDING: '+(db?.id==='eb834fc1-5589-4f75-bcb9-d311d0d72261'?'MATCH':'UNVERIFIED'));
+                  console.log('SECRET_VALUES: NEVER_READ_OR_PRINTED');
+                }
+              }
+            } catch {console.log('WORKER_SETTINGS_READ: NETWORK_OR_API_ERROR');}
+          }
+          NODE
