@@ -1,7 +1,6 @@
 // Separate staging-only execution Worker. NOT deployed; read-only health Worker remains untouched.
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
-import {verifyApprovalAttestation} from "./approval-attestation.mjs";
-import {validateChatApproval} from "./chat-approval.mjs";
+import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
@@ -32,17 +31,21 @@ export default {
   } catch {return response({error:"INVALID_JSON"},400);}
   if(!input || typeof input!=="object" || !input.intent || !input.approval || typeof input.content!=="string")
    return response({error:"INVALID_REQUEST"},400);
-  // No host-side trusted chat issuer has been connected yet. Never accept JSON approval alone.
+  // A chat message or JSON approval is never sufficient to assert trusted-host identity.
+  // Fail closed BEFORE consuming a one-time attestation until a separate trusted issuer
+  // and an audited staging-only executor are both connected and enabled.
+  if(env?.PACMAN_TRUSTED_ISSUER_CONNECTED!=="YES_VERIFIED_TRUSTED_HOST" ||
+     env?.PACMAN_STAGING_EXECUTOR_READY!=="YES_AUDITED_STAGING_ONLY")
+   return response({error:"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING"},503);
   if(typeof env?.PACMAN_APPROVAL_SIGNING_SECRET!=="string" || env.PACMAN_APPROVAL_SIGNING_SECRET.length<32)
    return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);
-  try {
-   validateChatApproval(input.intent,input.approval);
-   await verifyApprovalAttestation({intent:input.intent,attestation:input.attestation,secret:env.PACMAN_APPROVAL_SIGNING_SECRET});
-  } catch {
-   return response({error:"TRUSTED_APPROVAL_REJECTED"},403);
-  }
-  // No trusted host issuer exists yet: never claim a token or execute a side effect.
-  // Atomic approval claiming belongs to the trusted execution path, not this disabled endpoint.
-  return response({error:"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING"},503);
+  // Atomic D1 claim must occur immediately before the first audited side effect.
+  // Until the audited executor exists, this Worker intentionally cannot run operations.
+  return response({error:"STAGING_EXECUTOR_NOT_IMPLEMENTED"},503);
+  // Future execution path (not reachable or enabled in this version):
+  // await verifyAndConsumeTrustedApproval({intent:input.intent,approval:input.approval,
+  //   attestation:input.attestation,secret:env.PACMAN_APPROVAL_SIGNING_SECRET,db:env.DB});
+  // Only then invoke the separately audited LAB-only executor.
+
  }
 };
