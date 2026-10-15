@@ -95,7 +95,7 @@ test("signed readiness claim is single-use, without GitHub token (mock D1)",asyn
  let writes=0;
  const DB={prepare(sql){
   assert.match(sql,/INSERT OR IGNORE INTO pacman_approval_claims/);
-  return {bind(id){return {async run(){writes++;const changes=claimed.has(id)?0:1;claimed.add(id);return {success:true,meta:{changes}};}}};}
+  return {bind(id){return {async run(){writes++;const changes=claimed.has(id)?0:1;claimed.add(id);return {success:true,meta:{changes}};}};}};
  }};
  const env={PACMAN_EXECUTION_KEY:key,DB,PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_APPROVAL_READINESS_ENABLED:"YES_STAGING_D1_ONLY"};
  const payload=JSON.stringify({mode:"approval-readiness",intent,approval,attestation,content:"probe"});
