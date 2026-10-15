@@ -1,3 +1,4 @@
+import {LAB_BRANCH,LAB_PROBE} from "./chat-approval.mjs";
 // Verify a short-lived, one-operation approval issued by a trusted host.
 // Chat text or a user-controlled JSON "approval" field is not a signature.
 const encoder=new TextEncoder();
@@ -29,6 +30,7 @@ export async function verifyApprovalAttestation({intent,attestation,secret,conte
 export async function signApprovalInTrustedHost({intent,expiresAt,secret,content}={}){
  if(typeof secret!=="string"||secret.length<32)throw Error("TRUSTED_ISSUER_NOT_CONFIGURED");
  const now=Date.now();
+ if(intent?.capability!=="github.lab-file-cycle"||intent?.branch!==LAB_BRANCH||intent?.path!==LAB_PROBE)throw Error("ISSUER_SCOPE_DENIED");
  if(!intent||!id.test(intent.operationId||"")||typeof intent.capability!=="string"||!intent.capability||typeof intent.branch!=="string"||!intent.branch||typeof intent.path!=="string"||!intent.path||!Number.isSafeInteger(expiresAt)||expiresAt<=now||expiresAt>now+120000)throw Error("INVALID_ISSUANCE_REQUEST");
  const a={operationId:intent.operationId,capability:intent.capability,branch:intent.branch,path:intent.path,decision:"authorize",expiresAt};
  if(content!==undefined){if(typeof content!=="string")throw Error("INVALID_APPROVAL_CONTENT");a.contentSha256=await digest(content);}
