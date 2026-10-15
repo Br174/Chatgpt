@@ -17,3 +17,11 @@ The authenticated ChatGPT GitHub connector can perform explicitly user-authorize
 - Verified GitHub LAB create/read/delete/404 cycle, commit `38496542e5d8b4aff289f42c1f1a5af24aba801a`.
 - GitHub Actions `38659508768`: 98 tests passed, 0 failed.
 - Draft PR #64 remains isolated; no merge or production deployment.
+
+
+## Current operational route — 2026-10-15
+- For user-authorized GitHub LAB work during an active ChatGPT conversation, Pac-Man uses the already-connected first-party GitHub tools directly. The verified reversible probe above is the real write/read/delete/404 evidence for this route.
+- This route does not require a Cloudflare token or a separate GitHub website action for each repository operation. It runs only while ChatGPT actively invokes the connected tool; it is not unattended/background execution.
+- The separate Cloudflare staging Worker is deployed and its read-only `/health` check reports D1 `CONNECTED`. Its `/execute` route remains fail-closed until a genuine authenticated trusted issuer exists. Do not use the deployment token, bearer key, self-signed payload, or a chat boolean as a substitute issuer.
+- ChatGPT custom MCP write connections are currently available on Business and Enterprise/Edu. Plus can connect custom MCP servers only with read/fetch permissions, and custom MCP connection setup is web-only. Therefore this Worker cannot provide a write-capable custom MCP route to this Plus/mobile session. See the current OpenAI help page: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt
+- Operational rule: route current-chat GitHub LAB changes through the connected GitHub tools with explicit user authorization, read-before-write, scoped branch/path, readback and cleanup as needed. Keep the Worker fail-closed; do not emulate background execution or claim it is active.
