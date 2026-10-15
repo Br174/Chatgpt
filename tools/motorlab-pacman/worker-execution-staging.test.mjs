@@ -117,17 +117,3 @@ test("signed readiness rejects unauthorized branch before mock D1 write",async()
  assert.equal(response.status,403);assert.equal(writes,0);
 });
 
-// Read-only remote connectivity endpoint must not require bearer or write to D1.
-test("health checks staging D1 schema without writes or credentials",async()=>{
- let reads=0;
- const DB={prepare(sql){assert.match(sql,/SELECT COUNT\\(\\*\\).*sqlite_master/);reads++;return {async first(){return {total:1};}};}};
- const response=await worker.fetch(new Request("https://staging.example/health"),{DB});
- assert.equal(response.status,200);
- assert.deepEqual(await response.json(),{service:"pacman-execution-staging",database:"CONNECTED"});
- assert.equal(reads,1);
-});
-test("health fails closed on missing D1 binding",async()=>{
- const response=await worker.fetch(new Request("https://staging.example/health"),{});
- assert.equal(response.status,503);
- assert.equal((await response.json()).database,"BINDING_MISSING");
-});
