@@ -34,3 +34,18 @@ test("authenticated request requires explicit boolean approval",async()=>{
  const r=await worker.fetch(req("POST",JSON.stringify({approval:"true",operationId:"pacman-test-001",content:"probe"}),key),env);
  assert.equal(r.status,400);assert.equal(calls,0);
 });
+
+test("authenticated chat intent for main is refused before D1",async()=>{
+ let calls=0;
+ const env={PACMAN_EXECUTION_KEY:key,PACMAN_GITHUB_TOKEN:"test-token-123",DB:{prepare(){calls++;throw Error("DB touched");}}};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const r=await worker.fetch(req("POST",JSON.stringify({intent,approval:{...intent,decision:"authorize"},content:"probe"}),key),env);
+ assert.equal(r.status,409);assert.equal((await r.json()).error,"INTENT_SCOPE_DENIED");assert.equal(calls,0);
+});
+test("authenticated mismatched chat approval is refused before D1",async()=>{
+ let calls=0;
+ const env={PACMAN_EXECUTION_KEY:key,PACMAN_GITHUB_TOKEN:"test-token-123",DB:{prepare(){calls++;throw Error("DB touched");}}};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const r=await worker.fetch(req("POST",JSON.stringify({intent,approval:{...intent,operationId:"pacman-test-002",decision:"authorize"},content:"probe"}),key),env);
+ assert.equal(r.status,409);assert.equal((await r.json()).error,"CHAT_APPROVAL_MISMATCH");assert.equal(calls,0);
+});
