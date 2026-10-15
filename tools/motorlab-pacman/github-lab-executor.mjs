@@ -2,8 +2,8 @@
 // Only the exact isolated probe path is eligible. No network call is made when disabled.
 import {LAB_BRANCH,LAB_PROBE} from "./chat-approval.mjs";
 const OWNER="Br174", REPO="Chatgpt";
-export async function executeGithubLabProbe({intent,content,token,enabled=false,fetchImpl=fetch}={}){
- if(enabled!==true) throw Error("GITHUB_EXECUTOR_DISABLED");
+export async function executeGithubLabProbe({intent,content,token,fetchImpl=fetch}={}){
+ // Fixed read-only mode: never trust caller-controlled enable flags.\n
  if(intent?.capability!=="github.lab-file-cycle"||intent.branch!==LAB_BRANCH||intent.path!==LAB_PROBE) throw Error("GITHUB_SCOPE_DENIED");
  if(typeof content!=="string"||new TextEncoder().encode(content).length>8192) throw Error("INVALID_PROBE_CONTENT");
  if(typeof token!=="string"||token.length<20) throw Error("GITHUB_TOKEN_MISSING");
