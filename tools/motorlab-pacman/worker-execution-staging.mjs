@@ -45,9 +45,20 @@ export default {
   }
   let input;
   try {
-   const raw=await request.text();
-   if(new TextEncoder().encode(raw).length>MAX_BYTES) return response({error:"PAYLOAD_TOO_LARGE"},413);
-   input=JSON.parse(raw);
+   // Bound memory usage even when Content-Length is omitted or dishonest.
+   const reader=request.body?.getReader();
+   if(!reader) return response({error:"INVALID_JSON"},400);
+   const chunks=[];let total=0;
+   while(true){
+    const {done,value}=await reader.read();
+    if(done)break;
+    total+=value.byteLength;
+    if(total>MAX_BYTES){await reader.cancel().catch(()=>{});return response({error:"PAYLOAD_TOO_LARGE"},413);}
+    chunks.push(value);
+   }
+   const bytes=new Uint8Array(total);let offset=0;
+   for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
+   input=JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(bytes));
   } catch {return response({error:"INVALID_JSON"},400);}
   if(!input || typeof input!=="object" || Array.isArray(input) || !input.intent || typeof input.intent!=="object" || Array.isArray(input.intent) || !input.approval || typeof input.approval!=="object" || Array.isArray(input.approval) || typeof input.content!=="string")
    return response({error:"INVALID_REQUEST"},400);
