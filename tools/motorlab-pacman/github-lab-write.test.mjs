@@ -50,3 +50,16 @@ test("failed GitHub read never proceeds to write or refunds approval",async()=>{
  await assert.rejects(writeApprovedLabProbe({...args,db,fetchImpl}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
  assert.deepEqual(methods,["GET"]);
 });
+
+test("failed GitHub PUT consumes approval and cannot be replayed",async()=>{
+ const args=await setup("approved");let claims=0;const methods=[];
+ const db={prepare(){return {bind(){return {async run(){claims++;return {success:true,meta:{changes:claims===1?1:0}};}};}};}};
+ const fetchImpl=async(_url,opts)=>{
+  methods.push(opts.method);
+  if(opts.method==="GET")return {ok:true,async json(){return {type:"file",sha:"a".repeat(40)};}};
+  return {ok:false,status:409};
+ };
+ await assert.rejects(writeApprovedLabProbe({...args,db,fetchImpl}),/GITHUB_PROBE_WRITE_FAILED_409/);
+ await assert.rejects(writeApprovedLabProbe({...args,db,fetchImpl}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
+ assert.deepEqual(methods,["GET","PUT"]);assert.equal(claims,2);
+});
