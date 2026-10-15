@@ -20,6 +20,14 @@ export default {
   const url=new URL(request.url);
   if(url.pathname!=="/execute" || request.method!=="POST") return response({error:"NOT_FOUND"},404);
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);
+  // Public, read-only connectivity check: no secrets, approvals, or D1 writes.
+  if(url.pathname==="/health" && request.method==="GET"){
+   if(!env?.DB?.prepare) return response({service:"pacman-execution-staging",database:"BINDING_MISSING"},503);
+   try {
+    const found=await env.DB.prepare("SELECT COUNT(*) AS total FROM sqlite_master WHERE type = 'table' AND name = 'pacman_operations'").first();
+    return response({service:"pacman-execution-staging",database:found?.total===1?"CONNECTED":"SCHEMA_MISSING"},found?.total===1?200:503);
+   } catch {return response({service:"pacman-execution-staging",database:"ERROR"},503);}
+  }
   if(!env?.DB?.prepare)
    return response({error:"STAGING_CONFIGURATION_MISSING"},503);
   const size=Number(request.headers.get("content-length"));
