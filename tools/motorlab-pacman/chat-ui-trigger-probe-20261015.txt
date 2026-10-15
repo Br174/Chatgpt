@@ -1,0 +1,7 @@
+PACMAN_UI_TRIGGER_PROBE_V2
+source=interactive-chat-command
+action=test
+scope=lab
+services=github
+tests=false
+secrets=none
