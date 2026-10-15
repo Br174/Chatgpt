@@ -27,3 +27,17 @@ test("wrong signing secret rejected",async()=>{
 test("missing trusted issuer rejected",async()=>{
  await assert.rejects(verifyApprovalAttestation({intent,attestation:{},secret:""}),/TRUSTED_ISSUER_NOT_CONFIGURED/);
 });
+
+test("content-bound attestation accepts only the exact approved bytes",async()=>{
+ const content="approved LAB probe contents";
+ const attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:now+60000,content});
+ assert.match(attestation.contentSha256,/^[a-f0-9]{64}$/);
+ assert.equal(await verifyApprovalAttestation({intent,attestation,secret,content,now}),true);
+ await assert.rejects(verifyApprovalAttestation({intent,attestation,secret,content:content+" tampered",now}),/INVALID_APPROVAL_ATTESTATION/);
+ await assert.rejects(verifyApprovalAttestation({intent,attestation,secret,now}),/INVALID_APPROVAL_ATTESTATION/);
+});
+test("unsigned content digest cannot be substituted",async()=>{
+ const content="approved LAB probe contents";
+ const attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:now+60000,content});
+ await assert.rejects(verifyApprovalAttestation({intent,attestation:{...attestation,contentSha256:"0".repeat(64)},secret,content:"other",now}),/INVALID_APPROVAL_ATTESTATION/);
+});
