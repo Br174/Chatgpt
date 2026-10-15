@@ -2,6 +2,7 @@
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
 import {verifyApprovalAttestation} from "./approval-attestation.mjs";
 import {validateChatApproval} from "./chat-approval.mjs";
+import {claimSingleUseApproval} from "./approval-single-use.mjs";
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
@@ -41,8 +42,9 @@ export default {
   } catch {
    return response({error:"TRUSTED_APPROVAL_REJECTED"},403);
   }
-  // Cryptographic verification alone does not guarantee the issuer was authenticated.
-  // Keep execution disabled until the trusted host integration and replay protection are implemented.
+  // No trusted host issuer exists yet: never claim a token or execute a side effect.
+  // The atomic claim is intentionally reserved for the trusted execution path.
+  void claimSingleUseApproval;
   return response({error:"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING"},503);
  }
 };
