@@ -26,3 +26,15 @@ test("claim fails closed on D1 error",async()=>{
 test("schema has unique operation ID",()=>{
  assert.match(APPROVAL_CLAIMS_SCHEMA,/operation_id TEXT PRIMARY KEY/);
 });
+
+test("concurrent claims on one operation produce exactly one winner",async()=>{
+ const db=fakeDb();
+ const results=await Promise.allSettled(Array.from({length:12},()=>claimSingleUseApproval(db,a)));
+ assert.equal(results.filter(x=>x.status==="fulfilled").length,1);
+ assert.equal(results.filter(x=>x.status==="rejected"&&/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/.test(x.reason?.message)).length,11);
+});
+test("different signatures cannot reuse an already claimed operation ID",async()=>{
+ const db=fakeDb();
+ await claimSingleUseApproval(db,a);
+ await assert.rejects(claimSingleUseApproval(db,{...a,signature:"b".repeat(64)}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
+});
