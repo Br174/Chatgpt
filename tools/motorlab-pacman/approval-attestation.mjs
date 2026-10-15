@@ -28,6 +28,8 @@ export async function verifyApprovalAttestation({intent,attestation,secret,conte
 // Do not expose an HTTP endpoint that signs caller-supplied approval JSON.
 export async function signApprovalInTrustedHost({intent,expiresAt,secret,content}={}){
  if(typeof secret!=="string"||secret.length<32)throw Error("TRUSTED_ISSUER_NOT_CONFIGURED");
+ const now=Date.now();
+ if(!intent||!id.test(intent.operationId||"")||typeof intent.capability!=="string"||!intent.capability||typeof intent.branch!=="string"||!intent.branch||typeof intent.path!=="string"||!intent.path||!Number.isSafeInteger(expiresAt)||expiresAt<=now||expiresAt>now+120000)throw Error("INVALID_ISSUANCE_REQUEST");
  const a={operationId:intent.operationId,capability:intent.capability,branch:intent.branch,path:intent.path,decision:"authorize",expiresAt};
  if(content!==undefined){if(typeof content!=="string")throw Error("INVALID_APPROVAL_CONTENT");a.contentSha256=await digest(content);}
  const payload=JSON.stringify([a.operationId,a.capability,a.branch,a.path,a.decision,a.expiresAt,...(a.contentSha256===undefined?[]:[a.contentSha256])]);
