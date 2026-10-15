@@ -1,6 +1,7 @@
 // Separate staging-only execution Worker. NOT deployed; read-only health Worker remains untouched.
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
-// The trusted-approval-gate is intentionally NOT called until an audited executor exists.
+import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
+// Staging-only authorization gate; no GitHub side effects are enabled.
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
@@ -39,13 +40,23 @@ export default {
    return response({error:"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING"},503);
   if(typeof env?.PACMAN_APPROVAL_SIGNING_SECRET!=="string" || env.PACMAN_APPROVAL_SIGNING_SECRET.length<32)
    return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);
-  // Atomic D1 claim must occur immediately before the first audited side effect.
-  // Until the audited executor exists, this Worker intentionally cannot run operations.
-  return response({error:"STAGING_EXECUTOR_NOT_IMPLEMENTED"},503);
-  // Future execution path (not reachable or enabled in this version):
-  // await verifyAndConsumeTrustedApproval({intent:input.intent,approval:input.approval,
-  //   attestation:input.attestation,secret:env.PACMAN_APPROVAL_SIGNING_SECRET,db:env.DB});
-  // Only then invoke the separately audited LAB-only executor.
+  // Do not consume one-time approvals until an audited executor is implemented:
+  // otherwise an authorized operation would be irreversibly claimed without execution.
+  // The gate is wired and callable only for an explicit, side-effect-free readiness probe.
+  if(input.mode!=="approval-readiness")
+   return response({error:"STAGING_EXECUTOR_NOT_IMPLEMENTED"},503);
+  // Readiness verifies signature + atomically claims a one-time approval in staging D1.
+  // This mode MUST NOT call GitHub and is intentionally irreversible for the test operationId.
+  if(env?.PACMAN_APPROVAL_READINESS_ENABLED!=="YES_STAGING_D1_ONLY")
+   return response({error:"APPROVAL_READINESS_DISABLED"},503);
+  try {
+   const claim=await verifyAndConsumeTrustedApproval({intent:input.intent,
+    approval:input.approval,attestation:input.attestation,
+    secret:env.PACMAN_APPROVAL_SIGNING_SECRET,db:env.DB});
+   return response({status:"APPROVAL_CLAIMED_NO_EXECUTION",operationId:claim.operationId});
+  } catch {
+   return response({error:"APPROVAL_INVALID_OR_ALREADY_CLAIMED"},403);
+  }
 
  }
 };
