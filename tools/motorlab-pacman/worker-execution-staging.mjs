@@ -1,6 +1,7 @@
 // Separate staging-only execution Worker. NOT deployed; read-only health Worker remains untouched.
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
+import {writeApprovedLabProbe} from "./github-lab-write.mjs";
 // Staging-only authorization gate; no GitHub side effects are enabled.
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
@@ -47,6 +48,18 @@ export default {
    return response({error:"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING"},503);
   if(typeof env?.PACMAN_APPROVAL_SIGNING_SECRET!=="string" || env.PACMAN_APPROVAL_SIGNING_SECRET.length<32)
    return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);
+  // Separate, explicit staging-only switch. No live writes without verified issuer and token.
+  if(input.mode==="github-lab-write"){
+   if(env?.PACMAN_GITHUB_LAB_WRITE_ENABLED!=="YES_STAGING_LAB_ONLY" ||
+      typeof env?.PACMAN_GITHUB_TOKEN!=="string" || env.PACMAN_GITHUB_TOKEN.length<20)
+    return response({error:"GITHUB_LAB_WRITE_DISABLED"},503);
+   try {
+    const result=await writeApprovedLabProbe({intent:input.intent,approval:input.approval,
+     attestation:input.attestation,secret:env.PACMAN_APPROVAL_SIGNING_SECRET,
+     db:env.DB,content:input.content,token:env.PACMAN_GITHUB_TOKEN,fetchImpl:fetch});
+    return response(result);
+   } catch {return response({error:"GITHUB_LAB_WRITE_REJECTED"},403);}
+  }
   // Do not consume one-time approvals for an executor until audited implementation exists:
   // otherwise an authorized operation would be irreversibly claimed without execution.
   // The gate is wired and callable only for an explicit, side-effect-free readiness probe.
