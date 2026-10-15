@@ -15,5 +15,11 @@ export async function routeApprovedGithubLabProbe({intent,approval,content,conne
  if(!/^[a-f0-9]{40}$/.test(write?.commit_sha||""))throw Error("GITHUB_WRITE_NOT_CONFIRMED");
  const after=await connector.readFile({repository_full_name:REPO,path:LAB_PROBE,ref:LAB_BRANCH});
  if(after?.content!==content)throw Error("GITHUB_READBACK_MISMATCH");
- return {status:"LAB_CONNECTOR_WRITE_VERIFIED",operationId:scope.operationId,commitSha:write.commit_sha};
+ if(typeof after?.sha!=="string"||!/^[a-f0-9]{40}$/.test(after.sha))throw Error("GITHUB_READBACK_SHA_INVALID");
+ // This receipt is a connector-returned observation, not a signed trusted-host attestation.
+ // Never mark it as production execution or Worker authorization.
+ return Object.freeze({status:"LAB_CONNECTOR_WRITE_VERIFIED",operationId:scope.operationId,
+  repository:REPO,branch:LAB_BRANCH,path:LAB_PROBE,commitSha:write.commit_sha,
+  contentBlobSha:after.sha,readbackVerified:true,executionMode:"HOST_CONNECTOR_LAB",
+  attestationStatus:"NOT_HOST_SIGNED"});
 }
