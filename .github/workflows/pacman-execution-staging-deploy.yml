@@ -39,7 +39,7 @@ jobs:
           }
       - name: Require explicit execution activation acknowledgement
         env:
-          ACTIVATION_APPROVED: \${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}
+          ACTIVATION_APPROVED: ${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}
         run: |
           if [ "$ACTIVATION_APPROVED" != 'YES_STAGING_EXECUTION_ONLY' ]; then
             echo "::error::Execution activation not approved in protected staging environment; abort."
