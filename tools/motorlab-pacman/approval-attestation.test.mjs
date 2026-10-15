@@ -17,8 +17,7 @@ test("tampered expiry invalidates signature",async()=>{
  await assert.rejects(verifyApprovalAttestation({intent,attestation:{...attestation,expiresAt:now+90000},secret,now}),/INVALID_APPROVAL_SIGNATURE/);
 });
 test("expired approval rejected",async()=>{
- const attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:now-1});
- await assert.rejects(verifyApprovalAttestation({intent,attestation,secret,now}),/INVALID_APPROVAL_ATTESTATION/);
+ await assert.rejects(signApprovalInTrustedHost({intent,secret,expiresAt:now-1}),/INVALID_ISSUANCE_REQUEST/);
 });
 test("wrong signing secret rejected",async()=>{
  const attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:now+60000});
@@ -44,13 +43,11 @@ test("unsigned content digest cannot be substituted",async()=>{
 
 test("content-bound signature rejects expiry beyond two-minute window",async()=>{
  const content="probe";
- const attestation=await signApprovalInTrustedHost({intent,secret,content,expiresAt:now+120001});
- await assert.rejects(verifyApprovalAttestation({intent,attestation,secret,content,now}),/INVALID_APPROVAL_ATTESTATION/);
+ await assert.rejects(signApprovalInTrustedHost({intent,secret,content,expiresAt:Date.now()+120001}),/INVALID_ISSUANCE_REQUEST/);
 });
 test("content-bound signature rejects expired approval",async()=>{
  const content="probe";
- const attestation=await signApprovalInTrustedHost({intent,secret,content,expiresAt:now-1});
- await assert.rejects(verifyApprovalAttestation({intent,attestation,secret,content,now}),/INVALID_APPROVAL_ATTESTATION/);
+ await assert.rejects(signApprovalInTrustedHost({intent,secret,content,expiresAt:now-1}),/INVALID_ISSUANCE_REQUEST/);
 });
 test("content-bound signature rejects different operation ID",async()=>{
  const content="probe";
