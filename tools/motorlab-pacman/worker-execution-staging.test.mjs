@@ -252,3 +252,22 @@ test("malformed JSON is rejected without trusted issuer",async()=>{
  assert.equal(result.status,400);
  assert.equal((await result.json()).error,"INVALID_JSON");
 });
+
+test("chunked request without Content-Length stops at 8192 bytes",async()=>{
+ let cancelled=false;
+ const stream=new ReadableStream({
+  start(controller){controller.enqueue(new Uint8Array(4096));controller.enqueue(new Uint8Array(4097));},
+  cancel(){cancelled=true;}
+ });
+ const request=new Request(url,{method:"POST",headers:{authorization:"Bearer "+key,"content-type":"application/json"},body:stream,duplex:"half"});
+ const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,DB:{prepare(){throw Error("D1 must not be touched");}}});
+ assert.equal(result.status,413);
+ assert.equal((await result.json()).error,"PAYLOAD_TOO_LARGE");
+ assert.equal(cancelled,true);
+});
+test("invalid UTF-8 is rejected before issuer or D1",async()=>{
+ const request=new Request(url,{method:"POST",headers:{authorization:"Bearer "+key,"content-type":"application/json"},body:new Uint8Array([0xc3,0x28])});
+ const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,DB:{prepare(){throw Error("D1 must not be touched");}}});
+ assert.equal(result.status,400);
+ assert.equal((await result.json()).error,"INVALID_JSON");
+});
