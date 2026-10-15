@@ -16,7 +16,7 @@ export async function writeApprovedLabProbe({intent,approval,attestation,secret,
  const file=await read.json();
  if(file?.type!=="file"||!/^[a-f0-9]{40}$/.test(file.sha||""))throw Error("GITHUB_PROBE_INVALID");
  // Optimistic concurrency: GitHub rejects changes if SHA has moved.
- const body={message:"chore(pacman): approved LAB probe "+claim.operationId,content:Uint8Array.from(new TextEncoder().encode(content)).reduce((s,b)=>s+String.fromCharCode(b),"") ,sha:file.sha,branch:LAB_BRANCH};
+ const body={message:"chore(pacman): approved LAB probe "+claim.operationId,sha:file.sha,branch:LAB_BRANCH};
  // Base64 is required by GitHub's contents API; encode bytes without relying on Node globals.
  const bytes=new TextEncoder().encode(content);
  const abc="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
