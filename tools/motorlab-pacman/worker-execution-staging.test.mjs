@@ -232,3 +232,23 @@ test("readiness stays disabled with issuer configured but readiness switch absen
  const r=await worker.fetch(req("POST",payload,key),env);
  assert.equal(r.status,503);assert.equal((await r.json()).error,"APPROVAL_READINESS_DISABLED");assert.equal(dbCalls,0);
 });
+
+test("browser Origin is rejected before reading request body",async()=>{
+ const request=req("POST","{}",key);
+ request.headers.set("origin","https://untrusted.invalid");
+ const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,DB:{prepare(){throw Error("DB touched");}}});
+ assert.equal(result.status,403);
+ assert.equal((await result.json()).error,"BROWSER_ORIGIN_NOT_ALLOWED");
+});
+test("non-JSON content type is rejected",async()=>{
+ const request=req("POST","{}",key);
+ request.headers.set("content-type","text/plain");
+ const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,DB:{prepare(){throw Error("DB touched");}}});
+ assert.equal(result.status,415);
+ assert.equal((await result.json()).error,"UNSUPPORTED_MEDIA_TYPE");
+});
+test("malformed JSON is rejected without trusted issuer",async()=>{
+ const result=await worker.fetch(req("POST","{",key),{PACMAN_EXECUTION_KEY:key,DB:{prepare(){throw Error("DB touched");}}});
+ assert.equal(result.status,400);
+ assert.equal((await result.json()).error,"INVALID_JSON");
+});
