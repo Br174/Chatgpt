@@ -1,6 +1,6 @@
 // Separate staging-only execution Worker. NOT deployed; read-only health Worker remains untouched.
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
-import {createAuthorizedPacmanRunner} from "./authorized-runner.mjs";
+import {createChatAuthorizedCoordinator} from "./chat-coordinator.mjs";
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
@@ -29,19 +29,19 @@ export default {
    if(new TextEncoder().encode(raw).length>MAX_BYTES) return response({error:"PAYLOAD_TOO_LARGE"},413);
    input=JSON.parse(raw);
   } catch {return response({error:"INVALID_JSON"},400);}
-  if(!input || typeof input!=="object" || input.approval!==true ||
-     typeof input.operationId!=="string" || typeof input.content!=="string")
+  if(!input || typeof input!=="object" || !input.intent || !input.approval || typeof input.content!=="string")
    return response({error:"INVALID_REQUEST"},400);
   try {
-   const runner=createAuthorizedPacmanRunner({
+   const runner=createChatAuthorizedCoordinator({
     env,githubToken:env.PACMAN_GITHUB_TOKEN,
     onCheckpoint:async()=>{} // D1 receipts are authoritative and durable.
    });
-   const receipt=await runner.execute({operationId:input.operationId,content:input.content,approval:true});
+   const receipt=await runner.execute({intent:input.intent,approval:input.approval,content:input.content});
    return response({operationId:receipt.operationId,state:receipt.state});
   }catch(error){
    // No stacks, provider responses, tokens or payload echoed to callers.
-   const code=typeof error?.code==="string"?error.code:"EXECUTION_FAILED";
+   const code=typeof error?.code==="string"?error.code:
+    ["INTENT_SCOPE_DENIED","CHAT_APPROVAL_MISMATCH","INVALID_PROBE_CONTENT"].includes(error?.message)?error.message:"EXECUTION_FAILED";
    return response({error:code},409);
   }
  }
