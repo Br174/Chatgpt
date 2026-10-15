@@ -56,7 +56,7 @@ export default {
     if(total>MAX_BYTES){await reader.cancel().catch(()=>{});return response({error:"PAYLOAD_TOO_LARGE"},413);}
     chunks.push(value);
    }
-   const bytes=new Uint8Array(total);let offset=0;
+   // An inaccurate declared length is rejected rather than silently accepted.\n   if(lengthHeader!==null && total!==Number(lengthHeader)) return response({error:"CONTENT_LENGTH_MISMATCH"},400);\n   const bytes=new Uint8Array(total);let offset=0;
    for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
    input=JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(bytes));
   } catch {return response({error:"INVALID_JSON"},400);}
