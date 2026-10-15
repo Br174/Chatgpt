@@ -2,7 +2,7 @@
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
 import {writeApprovedLabProbe} from "./github-lab-write.mjs";
-// Staging-only authorization gate; no GitHub side effects are enabled.
+// Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
