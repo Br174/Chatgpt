@@ -19,7 +19,7 @@ export default {
   const url=new URL(request.url);
   if(url.pathname!=="/execute" || request.method!=="POST") return response({error:"NOT_FOUND"},404);
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);
-  if(!env?.DB?.prepare || typeof env.PACMAN_GITHUB_TOKEN!=="string" || env.PACMAN_GITHUB_TOKEN.length<10)
+  // Until a trusted approval issuer is connected, remote execution is disabled by default.\n  // A request body and bearer token alone do not prove that the owner clicked a chat button.\n  if(env?.PACMAN_TRUSTED_APPROVAL_ISSUER_READY!== "enabled")\n   return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);\n  if(!env?.DB?.prepare || typeof env.PACMAN_GITHUB_TOKEN!=="string" || env.PACMAN_GITHUB_TOKEN.length<10)
    return response({error:"STAGING_CONFIGURATION_MISSING"},503);
   const size=Number(request.headers.get("content-length"));
   if(Number.isFinite(size)&&size>MAX_BYTES) return response({error:"PAYLOAD_TOO_LARGE"},413);
