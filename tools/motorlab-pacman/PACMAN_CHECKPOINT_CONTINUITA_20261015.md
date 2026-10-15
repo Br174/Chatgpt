@@ -25,6 +25,13 @@
 11. **Tentativo di creare un preflight read-only aggiuntivo:** bloccato dal controllo di sicurezza, non creato. Non contarlo come eseguito.
 12. **`POST /execute` non operativo:** resta bloccato dal collegamento con un issuer di approvazioni realmente autenticato. Non abilitare un flag simulato o un'approvazione autocertificata.
 
+## Chiarimento del 15 ottobre — evitare regressione nella lettura del progresso
+- L'utente ha confermato nuovamente di avere già creato e conservato le credenziali. **Non chiedere di ricrearle.**
+- Lo screenshot dell'ambiente GitHub conferma precisamente **2 environment secrets + 1 environment variable**; i due segreti di distribuzione sono già stati utilizzati con successo. Non chiamare questi elementi «tre segreti runtime» né contrassegnarli tutti come mancanti.
+- Il vero blocco è **il collegamento runtime al Worker di esecuzione** e, separatamente, **l'issuer autenticato delle approvazioni per `/execute`**. Gli audit dei Worker non hanno trovato i binding runtime richiesti.
+- Il controllo dei nomi delle credenziali runtime resta **non verificato**, non «0%» o «inesistenti». La lettura diretta dell'elenco environment secrets tramite connettore GitHub non è supportata. Evitare di riproporre schermate già esaminate come se fossero una nuova scoperta.
+- Workflow di provisioning già preparato ma non avviato: necessita revisione tecnica e autorizzazione esplicita prima di qualsiasi scrittura Cloudflare.
+
 ## Distinzione fondamentale sulle credenziali
 - Utente riferisce di aver creato e conservato token, inclusi due più recenti e un token temporaneo Cloudflare.
 - **Confermato:** almeno le credenziali di deploy GitHub→Cloudflare sono effettivamente utilizzabili; screenshot environment mostra due segreti in totale.
