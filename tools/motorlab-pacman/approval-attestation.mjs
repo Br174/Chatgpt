@@ -3,7 +3,8 @@
 const encoder=new TextEncoder();
 const hex=b=>Array.from(new Uint8Array(b),v=>v.toString(16).padStart(2,"0")).join("");
 const id=/^[a-zA-Z0-9][a-zA-Z0-9._-]{7,119}$/;
-export async function verifyApprovalAttestation({intent,attestation,secret,now=Date.now()}={}){
+const digest=async content=>hex(await crypto.subtle.digest('SHA-256',encoder.encode(content)));
+export async function verifyApprovalAttestation({intent,attestation,secret,content,now=Date.now()}={}){
  if(typeof secret!=="string"||secret.length<32)throw Error("TRUSTED_ISSUER_NOT_CONFIGURED");
  if(!intent||!id.test(intent.operationId||"")||!attestation||
    attestation.operationId!==intent.operationId||
@@ -11,11 +12,13 @@ export async function verifyApprovalAttestation({intent,attestation,secret,now=D
    attestation.branch!==intent.branch||
    attestation.path!==intent.path||
    attestation.decision!=="authorize"||
+   (typeof content==="string" && (typeof attestation.contentSha256!=="string" || attestation.contentSha256!==await digest(content)))||
+   (typeof content!=="string" && attestation.contentSha256!==undefined)||
    !Number.isSafeInteger(attestation.expiresAt)||
    attestation.expiresAt<now||attestation.expiresAt>now+120000||
    typeof attestation.signature!=="string"||!/^[a-f0-9]{64}$/.test(attestation.signature))
    throw Error("INVALID_APPROVAL_ATTESTATION");
- const payload=JSON.stringify([attestation.operationId,attestation.capability,attestation.branch,attestation.path,attestation.decision,attestation.expiresAt]);
+ const payload=JSON.stringify([attestation.operationId,attestation.capability,attestation.branch,attestation.path,attestation.decision,attestation.expiresAt,...(attestation.contentSha256===undefined?[]:[attestation.contentSha256])]);
  const key=await crypto.subtle.importKey("raw",encoder.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["verify"]);
  const bytes=Uint8Array.from(attestation.signature.match(/../g),h=>parseInt(h,16));
  if(!await crypto.subtle.verify("HMAC",key,bytes,encoder.encode(payload)))throw Error("INVALID_APPROVAL_SIGNATURE");
@@ -23,10 +26,11 @@ export async function verifyApprovalAttestation({intent,attestation,secret,now=D
 }
 // Issuance must occur only inside a trusted, authenticated owner-approval host.
 // Do not expose an HTTP endpoint that signs caller-supplied approval JSON.
-export async function signApprovalInTrustedHost({intent,expiresAt,secret}={}){
+export async function signApprovalInTrustedHost({intent,expiresAt,secret,content}={}){
  if(typeof secret!=="string"||secret.length<32)throw Error("TRUSTED_ISSUER_NOT_CONFIGURED");
  const a={operationId:intent.operationId,capability:intent.capability,branch:intent.branch,path:intent.path,decision:"authorize",expiresAt};
- const payload=JSON.stringify([a.operationId,a.capability,a.branch,a.path,a.decision,a.expiresAt]);
+ if(content!==undefined){if(typeof content!=="string")throw Error("INVALID_APPROVAL_CONTENT");a.contentSha256=await digest(content);}
+ const payload=JSON.stringify([a.operationId,a.capability,a.branch,a.path,a.decision,a.expiresAt,...(a.contentSha256===undefined?[]:[a.contentSha256])]);
  const key=await crypto.subtle.importKey("raw",encoder.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
  return {...a,signature:hex(await crypto.subtle.sign("HMAC",key,encoder.encode(payload)))};
 }
