@@ -1,5 +1,0 @@
-PACMAN_CHAT_EXECUTION_V2
-scope=LAB
-operation=authorized-chat-probe
-secrets=none
-production_modified=false
