@@ -1,6 +1,6 @@
 // Separate staging-only execution Worker. NOT deployed; read-only health Worker remains untouched.
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
-import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
+// The trusted-approval-gate is intentionally NOT called until an audited executor exists.
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
