@@ -2,3 +2,4 @@ PACMAN LAB PROBE
 Scope: motorlab/pacman-execution-v2-lab-20261014
 Purpose: isolated GitHub connector preflight and scoped authorization testing only.
 No secrets. No production operations.
+Connector write/readback proof: authorized LAB-only GitHub tool cycle 2026-10-15.
