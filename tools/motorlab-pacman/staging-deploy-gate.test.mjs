@@ -22,3 +22,17 @@ test("deployment workflow is manual-only, branch-locked and secret-gated",()=>{
   assert.match(text,/environment: pacman-staging/);
   assert.match(text,/wrangler\.pacman-staging\.jsonc/);
 });
+
+test("execution staging workflow has a protected approval expression and isolated D1",()=>{
+ const workflow=fs.readFileSync(new URL("../../.github/workflows/pacman-execution-staging-deploy.yml",base),"utf8");
+ const config=JSON.parse(fs.readFileSync(new URL("wrangler.pacman-execution-staging.jsonc",base),"utf8"));
+ assert.match(workflow,/workflow_dispatch:/);
+ assert.doesNotMatch(workflow,/^  push:|^  pull_request:/m);
+ assert.match(workflow,/environment: pacman-execution-staging/);
+ assert.ok(workflow.includes("ACTIVATION_APPROVED: ${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}"));
+ assert.ok(!workflow.includes("ACTIVATION_APPROVED: \\${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}"));
+ assert.match(workflow,/YES_STAGING_EXECUTION_ONLY/);
+ assert.equal(config.name,"motorlab-pacman-execution-staging-lab");
+ assert.equal(config.d1_databases.length,1);
+ assert.equal(config.d1_databases[0].database_id,"eb834fc1-5589-4f75-bcb9-d311d0d72261");
+});
