@@ -25,27 +25,30 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           const expected='b86f445c2b57e604c02f79c8da64bb9c';
-          const worker='motorlab-pacman-execution-staging-lab';
+          const workers=['motorlab-pacman-execution-staging-lab','motorlab-pacman-staging-lab'];
           if(process.env.CF_ACCOUNT!==expected || !process.env.CF_TOKEN) {
             console.log('STAGING_DEPLOY_CREDENTIALS: MISSING_OR_WRONG_ACCOUNT');
             process.exitCode=1;
           } else {
-            const url='https://api.cloudflare.com/client/v4/accounts/'+expected+'/workers/scripts/'+worker+'/settings';
-            try {
-              const r=await fetch(url,{headers:{Authorization:'Bearer '+process.env.CF_TOKEN},signal:AbortSignal.timeout(12000),redirect:'error'});
-              if(!r.ok){console.log('WORKER_SETTINGS_READ: UNAVAILABLE_HTTP_'+r.status+' (permission or endpoint; no conclusions about secrets)');}
-              else {
+            const expectedNames=['PACMAN_EXECUTION_KEY','PACMAN_GITHUB_TOKEN','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_TRUSTED_ISSUER_CONNECTED','PACMAN_GITHUB_LAB_WRITE_ENABLED','PACMAN_APPROVAL_READINESS_ENABLED'];
+            for(const worker of workers){
+              const url='https://api.cloudflare.com/client/v4/accounts/'+expected+'/workers/scripts/'+worker+'/settings';
+              try {
+                const r=await fetch(url,{headers:{Authorization:'Bearer '+process.env.CF_TOKEN},signal:AbortSignal.timeout(12000),redirect:'error'});
+                if(!r.ok){console.log(worker+' SETTINGS: HTTP_'+r.status);continue;}
                 const j=await r.json();
-                if(j.success!==true){console.log('WORKER_SETTINGS_READ: API_UNAVAILABLE');}
-                else {
-                  const bindings=Array.isArray(j.result?.bindings)?j.result.bindings:[];
-                  const expectedNames=['PACMAN_EXECUTION_KEY','PACMAN_GITHUB_TOKEN','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_TRUSTED_ISSUER_CONNECTED','PACMAN_GITHUB_LAB_WRITE_ENABLED','PACMAN_APPROVAL_READINESS_ENABLED'];
-                  for(const name of expectedNames) console.log(name+': '+(bindings.some(b=>b.name===name)?'PRESENT_NAME_ONLY':'NOT_LISTED'));
-                  const db=bindings.find(b=>b.name==='DB' && b.type==='d1');
-                  console.log('D1_BINDING: '+(db?.id==='eb834fc1-5589-4f75-bcb9-d311d0d72261'?'MATCH':'UNVERIFIED'));
-                  console.log('SECRET_VALUES: NEVER_READ_OR_PRINTED');
+                if(j.success!==true){console.log(worker+' SETTINGS: API_UNAVAILABLE');continue;}
+                const bindings=Array.isArray(j.result?.bindings)?j.result.bindings:null;
+                if(!bindings){console.log(worker+' SETTINGS: NO_BINDINGS_ARRAY (cannot infer missing secrets)');continue;}
+                console.log(worker+' BINDINGS_COUNT: '+bindings.length);
+                for(const name of expectedNames){
+                  const b=bindings.find(b=>b.name===name);
+                  console.log(worker+' '+name+': '+(b?'PRESENT_TYPE_'+String(b.type||'unknown').replace(/[^a-z0-9_-]/gi,''):'NOT_LISTED'));
                 }
-              }
-            } catch {console.log('WORKER_SETTINGS_READ: NETWORK_OR_API_ERROR');}
+                const db=bindings.find(b=>b.name==='DB' && b.type==='d1');
+                console.log(worker+' D1_BINDING: '+(db?.id==='eb834fc1-5589-4f75-bcb9-d311d0d72261'?'MATCH':'OTHER_OR_MISSING'));
+              } catch {console.log(worker+' SETTINGS: NETWORK_OR_API_ERROR');}
+            }
+            console.log('SECRET_VALUES: NEVER_READ_OR_PRINTED');
           }
           NODE
