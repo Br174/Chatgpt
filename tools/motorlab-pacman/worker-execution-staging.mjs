@@ -59,7 +59,7 @@ export default {
   try {
    const claim=await verifyAndConsumeTrustedApproval({intent:input.intent,
     approval:input.approval,attestation:input.attestation,
-    secret:env.PACMAN_APPROVAL_SIGNING_SECRET,db:env.DB});
+    secret:env.PACMAN_APPROVAL_SIGNING_SECRET,db:env.DB,content:input.content});
    return response({status:"APPROVAL_CLAIMED_NO_EXECUTION",operationId:claim.operationId});
   } catch {
    return response({error:"APPROVAL_INVALID_OR_ALREADY_CLAIMED"},403);
