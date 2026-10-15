@@ -18,9 +18,9 @@ test("execution Worker rejects wrong methods and paths",async()=>{
  assert.equal((await worker.fetch(req("GET"),{})).status,404);
  assert.equal((await worker.fetch(new Request("https://staging.example/health"),{})).status,404);
 });
-test("authenticated requests without GitHub secret fail closed",async()=>{
+test("authenticated malformed requests without GitHub secret fail closed",async()=>{
  const r=await worker.fetch(req("POST",'{"approval":true}',key),{PACMAN_EXECUTION_KEY:key,DB:{prepare(){}}});
- assert.equal(r.status,503);
+ assert.equal(r.status,400);
 });
 test("authenticated oversized payload is denied before DB access",async()=>{
  let calls=0;
@@ -74,5 +74,13 @@ test("approval readiness fails closed without trusted issuer and does not touch 
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-003",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
  const env={PACMAN_EXECUTION_KEY:key,PACMAN_GITHUB_TOKEN:"test-token-123",PACMAN_APPROVAL_SIGNING_SECRET:"local-test-only-signing-secret-0000000000000",PACMAN_APPROVAL_READINESS_ENABLED:"YES_STAGING_D1_ONLY",DB:{prepare(){calls++;throw Error("DB touched");}}};
  const r=await worker.fetch(req("POST",JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},attestation:{},content:"probe"}),key),env);
+ assert.equal(r.status,503);assert.equal((await r.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");assert.equal(calls,0);
+});
+
+test("readiness without GitHub token remains gated by trusted issuer",async()=>{
+ let calls=0;
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-004",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){calls++;throw Error("unexpected DB access");}}};
+ const r=await worker.fetch(req("POST",JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},content:"probe"}),key),env);
  assert.equal(r.status,503);assert.equal((await r.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");assert.equal(calls,0);
 });
