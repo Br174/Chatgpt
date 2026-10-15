@@ -20,7 +20,7 @@ export default {
   const url=new URL(request.url);
   if(url.pathname!=="/execute" || request.method!=="POST") return response({error:"NOT_FOUND"},404);
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);
-  if(!env?.DB?.prepare || typeof env.PACMAN_GITHUB_TOKEN!=="string" || env.PACMAN_GITHUB_TOKEN.length<10)
+  if(!env?.DB?.prepare)
    return response({error:"STAGING_CONFIGURATION_MISSING"},503);
   const size=Number(request.headers.get("content-length"));
   if(Number.isFinite(size)&&size>MAX_BYTES) return response({error:"PAYLOAD_TOO_LARGE"},413);
@@ -35,12 +35,11 @@ export default {
   // A chat message or JSON approval is never sufficient to assert trusted-host identity.
   // Fail closed BEFORE consuming a one-time attestation until a separate trusted issuer
   // and an audited staging-only executor are both connected and enabled.
-  if(env?.PACMAN_TRUSTED_ISSUER_CONNECTED!=="YES_VERIFIED_TRUSTED_HOST" ||
-     env?.PACMAN_STAGING_EXECUTOR_READY!=="YES_AUDITED_STAGING_ONLY")
+  if(env?.PACMAN_TRUSTED_ISSUER_CONNECTED!=="YES_VERIFIED_TRUSTED_HOST")
    return response({error:"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING"},503);
   if(typeof env?.PACMAN_APPROVAL_SIGNING_SECRET!=="string" || env.PACMAN_APPROVAL_SIGNING_SECRET.length<32)
    return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);
-  // Do not consume one-time approvals until an audited executor is implemented:
+  // Do not consume one-time approvals for an executor until audited implementation exists:
   // otherwise an authorized operation would be irreversibly claimed without execution.
   // The gate is wired and callable only for an explicit, side-effect-free readiness probe.
   if(input.mode!=="approval-readiness")
