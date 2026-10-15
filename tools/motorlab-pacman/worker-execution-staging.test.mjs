@@ -17,7 +17,7 @@ test("execution Worker rejects unconfigured secrets fail-closed",async()=>{
 });
 test("execution Worker rejects wrong methods and paths",async()=>{
  assert.equal((await worker.fetch(req("GET"),{})).status,404);
- assert.equal((await worker.fetch(new Request("https://staging.example/health"),{})).status,404);
+ assert.equal((await worker.fetch(new Request("https://staging.example/health"),{})).status,503);
 });
 test("authenticated malformed requests without GitHub secret fail closed",async()=>{
  const r=await worker.fetch(req("POST",'{"approval":true}',key),{PACMAN_EXECUTION_KEY:key,DB:{prepare(){}}});
@@ -117,3 +117,24 @@ test("signed readiness rejects unauthorized branch before mock D1 write",async()
  assert.equal(response.status,403);assert.equal(writes,0);
 });
 
+
+test("health is reachable without bearer and reports connected staging D1 read-only",async()=>{
+ let queries=0;
+ const env={DB:{prepare(sql){
+  queries++;assert.match(sql,/SELECT COUNT\(\*\)/);
+  return {async first(){return {total:1};}};
+ }}};
+ const r=await worker.fetch(new Request("https://staging.example/health"),env);
+ assert.equal(r.status,200);
+ assert.equal((await r.json()).database,"CONNECTED");
+ assert.equal(queries,1);
+});
+test("health reports missing D1 schema without writing",async()=>{
+ const env={DB:{prepare(sql){
+  assert.match(sql,/SELECT COUNT\(\*\)/);
+  return {async first(){return {total:0};}};
+ }}};
+ const r=await worker.fetch(new Request("https://staging.example/health"),env);
+ assert.equal(r.status,503);
+ assert.equal((await r.json()).database,"SCHEMA_MISSING");
+});
