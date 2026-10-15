@@ -26,6 +26,13 @@ test("host connector route performs scoped read/write/readback with SHA",async()
  };
  const result=await routeApprovedGithubLabProbe({intent,approval,content:"probe",connector});
  assert.equal(result.status,"LAB_CONNECTOR_WRITE_VERIFIED");
+ assert.equal(result.executionMode,"HOST_CONNECTOR_LAB");
+ assert.equal(result.attestationStatus,"NOT_HOST_SIGNED");
+ assert.equal(result.readbackVerified,true);
+ assert.equal(result.contentBlobSha,sha);
+ assert.equal(result.branch,LAB_BRANCH);
+ assert.equal(result.path,LAB_PROBE);
+ assert.equal(result.repository,"Br174/Chatgpt");
  assert.deepEqual(calls.map(x=>x[0]),["read","write","read"]);
  assert.equal(calls[1][1].branch,LAB_BRANCH);assert.equal(calls[1][1].sha,sha);
  assert.equal(calls[1][1].path,LAB_PROBE);
@@ -34,4 +41,13 @@ test("host connector route fails closed on unconfirmed write or mismatched readb
  const base={readFile:async()=>({sha:"a".repeat(40),content:"old"})};
  await assert.rejects(routeApprovedGithubLabProbe({intent,approval,content:"probe",connector:{...base,updateFile:async()=>({})}}),/GITHUB_WRITE_NOT_CONFIRMED/);
  await assert.rejects(routeApprovedGithubLabProbe({intent,approval,content:"probe",connector:{...base,updateFile:async()=>({commit_sha:"b".repeat(40)})}}),/GITHUB_READBACK_MISMATCH/);
+});
+
+test("host connector route rejects readback without verified blob SHA",async()=>{
+ let reads=0;
+ const connector={
+  async readFile(){reads++;return reads===1?{sha:"a".repeat(40),content:"old"}:{content:"probe"};},
+  async updateFile(){return {commit_sha:"b".repeat(40)};}
+ };
+ await assert.rejects(routeApprovedGithubLabProbe({intent,approval,content:"probe",connector}),/GITHUB_READBACK_SHA_INVALID/);
 });
