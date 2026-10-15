@@ -26,8 +26,9 @@ test("deployment workflow is manual-only, branch-locked and secret-gated",()=>{
 test("execution staging workflow has a protected approval expression and isolated D1",()=>{
  const workflow=fs.readFileSync(new URL("../../.github/workflows/pacman-execution-staging-deploy.yml",base),"utf8");
  const config=JSON.parse(fs.readFileSync(new URL("wrangler.pacman-execution-staging.jsonc",base),"utf8"));
- assert.match(workflow,/workflow_dispatch:/);
- assert.doesNotMatch(workflow,/^  push:|^  pull_request:/m);
+ assert.match(workflow,/^  push:/m);
+ assert.doesNotMatch(workflow,/^  pull_request:/m);
+ assert.match(workflow,/motorlab\\/pacman-execution-v2-lab-20261014/);
  assert.match(workflow,/environment: pacman-execution-staging/);
  assert.ok(workflow.includes("ACTIVATION_APPROVED: ${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}"));
  assert.ok(!workflow.includes("ACTIVATION_APPROVED: \\${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}"));
