@@ -51,3 +51,14 @@
 - Niente TinyFish per questo flusso.
 - Mostrare percentuali solo su fasi effettivamente misurabili; distinguere eseguito/verificato/in attesa.
 - Recupero da nuova chat: chiedere **"Cerca il progresso di Pac-Man fino a questo momento"** e aprire questo file sul ramo LAB.
+
+
+## Avanzamento del 15 ottobre — workflow_dispatch non raggiungibile in Actions
+- Screenshot utente: il link `/actions/workflows/pacman-staging-runtime-secret-provision.yml` mostra **This workflow does not exist**.
+- Verifica via GitHub API: il file `.github/workflows/pacman-staging-runtime-secret-provision.yml` esiste sul ramo LAB e **non esiste su main**. Il collegamento diretto al file LAB funziona, ma è solo visualizzazione, non avvio.
+- **Non riproporre il link Actions come pulsante da premere**, né chiedere all'utente di premere `View runs` sul file come soluzione.
+- GitHub richiede che un workflow `workflow_dispatch` sia registrato sul ramo predefinito per l'avvio manuale. Non effettuare merge o scritture su main senza autorizzazione distinta.
+- Il workflow di provisioning contiene una fase di upload di tre segreti runtime al Worker staging; **non è un controllo read-only** e non è stato avviato. La verifica dei segreti sorgente non è stata ancora dimostrata.
+- Prima di un'esecuzione futura: review di sicurezza del workflow e della conservazione D1, conferma delle sorgenti segrete, autorizzazione esplicita dell'utente e gate protetto. Non aggirare il gate con push-trigger o bypass del controllo di sicurezza.
+- **UI preferita dall'utente:** mostrare un solo pulsante primario **nero** per l'azione consigliata; le alternative devono essere chiaramente secondarie. Se non esiste un'azione manuale utile, non mostrare pulsanti inutili.
+- **Lavoro residuo effettivo:** percorso di attivazione autorizzato, collegamento dei segreti runtime se verificati, issuer attendibile per approvazioni, test reale di `/execute` in LAB.
