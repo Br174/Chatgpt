@@ -31,8 +31,14 @@ export default {
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);
   if(!env?.DB?.prepare)
    return response({error:"STAGING_CONFIGURATION_MISSING"},503);
-  const size=Number(request.headers.get("content-length"));
-  if(Number.isFinite(size)&&size>MAX_BYTES) return response({error:"PAYLOAD_TOO_LARGE"},413);
+  // Reject oversized declared bodies before buffering; streamed bodies are checked below.
+  const lengthHeader=request.headers.get("content-length");
+  if(lengthHeader!==null){
+   if(!/^\d+$/.test(lengthHeader)) return response({error:"INVALID_CONTENT_LENGTH"},400);
+   const declared=Number(lengthHeader);
+   if(!Number.isSafeInteger(declared)) return response({error:"INVALID_CONTENT_LENGTH"},400);
+   if(declared>MAX_BYTES) return response({error:"PAYLOAD_TOO_LARGE"},413);
+  }
   let input;
   try {
    const raw=await request.text();
