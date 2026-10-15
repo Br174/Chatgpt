@@ -90,7 +90,7 @@ test("signed readiness claim is single-use, without GitHub token (mock D1)",asyn
  const secret="test-only-signing-secret-not-for-deployment-12345";
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-readiness-replay-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
  const approval={...intent,decision:"authorize"};
- const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret});
+ const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
  const claimed=new Set();
  let writes=0;
  const DB={prepare(sql){
@@ -110,7 +110,7 @@ test("signed readiness claim is single-use, without GitHub token (mock D1)",asyn
 test("signed readiness rejects unauthorized branch before mock D1 write",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-readiness-main-001",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"};
- const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret});
+ const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
  let writes=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){writes++;throw Error("unexpected write");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_APPROVAL_READINESS_ENABLED:"YES_STAGING_D1_ONLY"};
  const response=await worker.fetch(req("POST",JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},attestation,content:"probe"}),key),env);
@@ -153,4 +153,14 @@ test("malformed intent and approval types are rejected before trusted issuer and
   assert.equal((await r.json()).error,"INVALID_REQUEST");
  }
  assert.equal(queries,0);
+});
+
+test("content tampering cannot claim a signed readiness approval",async()=>{
+ const secret="test-only-signing-secret-not-for-deployment-12345";
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-content-tamper-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"approved"});
+ let writes=0;
+ const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){writes++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_APPROVAL_READINESS_ENABLED:"YES_STAGING_D1_ONLY"};
+ const r=await worker.fetch(req("POST",JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},attestation,content:"tampered"}),key),env);
+ assert.equal(r.status,403);assert.equal(writes,0);
 });
