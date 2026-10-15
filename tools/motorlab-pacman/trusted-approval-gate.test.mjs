@@ -39,3 +39,13 @@ test("content-bound signed approval cannot authorize changed content",async()=>{
  await assert.rejects(verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,db:ledger,now,content:"modified"}),/INVALID_APPROVAL_ATTESTATION/);
  assert.equal(ledger.calls,0);
 });
+
+test("missing durable staging ledger fails closed",async()=>{
+ const attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:Date.now()+60000,content:"LAB-only"});
+ await assert.rejects(verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,content:"LAB-only",now:Date.now()}),/APPROVAL_LEDGER_UNAVAILABLE/);
+});
+test("attempt to authorize main fails before touching ledger",async()=>{
+ const ledger=db(),other={...intent,branch:"main"};
+ await assert.rejects(verifyAndConsumeTrustedApproval({intent:other,approval:{...approval,branch:"main"},db:ledger,secret,now:Date.now()}),/INTENT_SCOPE_DENIED/);
+ assert.equal(ledger.calls,0);
+});
