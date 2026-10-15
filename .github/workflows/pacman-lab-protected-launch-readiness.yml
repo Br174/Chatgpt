@@ -1,0 +1,50 @@
+name: Pac-Man LAB protected launch readiness (read-only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_lab_only:
+        description: 'Type CHECK_LAB_ONLY to inspect the isolated Pac-Man LAB branch; no deployment'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-lab-protected-readiness
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/main' && inputs.confirm_lab_only == 'CHECK_LAB_ONLY'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 5
+    steps:
+      - name: Check fixed LAB branch and expected workflow without running it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          const repo=process.env.REPO;
+          const branch='motorlab/pacman-execution-v2-lab-20261014';
+          const path='.github/workflows/pacman-staging-runtime-secret-provision.yml';
+          const base='https://api.github.com/repos/'+repo;
+          const headers={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
+          const get=async url=>{
+            const r=await fetch(url,{headers,redirect:'error',signal:AbortSignal.timeout(15000)});
+            if(!r.ok)throw Error('LAB_READINESS_HTTP_'+r.status);
+            return r.json();
+          };
+          const ref=await get(base+'/git/ref/heads/'+encodeURIComponent(branch));
+          if(ref?.ref!=='refs/heads/'+branch||!ref?.object?.sha)throw Error('LAB_REF_INVALID');
+          const file=await get(base+'/contents/'+path+'?ref='+encodeURIComponent(branch));
+          if(file?.type!=='file'||!file?.sha)throw Error('LAB_WORKFLOW_MISSING');
+          console.log('LAB_BRANCH: VERIFIED');
+          console.log('LAB_WORKFLOW_FILE: VERIFIED');
+          console.log('LAB_COMMIT: '+ref.object.sha);
+          console.log('READ_ONLY_NO_SECRETS_NO_CLOUDFLARE_NO_EXECUTION');
+          NODE
