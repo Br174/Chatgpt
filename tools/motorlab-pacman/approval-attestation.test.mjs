@@ -56,12 +56,18 @@ test("content-bound signature rejects different operation ID",async()=>{
 });
 
 test("issuer rejects missing intent before accessing its fields",async()=>{
- await assert.rejects(signApprovalInTrustedHost({secret,expiresAt:Date.now()+60000}),/INVALID_ISSUANCE_REQUEST/);
+ await assert.rejects(signApprovalInTrustedHost({secret,expiresAt:Date.now()+60000}),/ISSUER_SCOPE_DENIED/);
 });
 test("issuer rejects malformed operation ID and missing scope",async()=>{
  await assert.rejects(signApprovalInTrustedHost({intent:{...intent,operationId:"bad"},secret,expiresAt:Date.now()+60000}),/INVALID_ISSUANCE_REQUEST/);
- await assert.rejects(signApprovalInTrustedHost({intent:{...intent,path:""},secret,expiresAt:Date.now()+60000}),/INVALID_ISSUANCE_REQUEST/);
+ await assert.rejects(signApprovalInTrustedHost({intent:{...intent,path:""},secret,expiresAt:Date.now()+60000}),/ISSUER_SCOPE_DENIED/);
 });
 test("issuer rejects noninteger expiry",async()=>{
  await assert.rejects(signApprovalInTrustedHost({intent,secret,expiresAt:Date.now()+60000.5}),/INVALID_ISSUANCE_REQUEST/);
+});
+
+test("trusted issuer refuses to sign main, another file or capability",async()=>{
+ for(const change of [{branch:"main"},{path:"README.md"},{capability:"github.any-write"}]){
+  await assert.rejects(signApprovalInTrustedHost({intent:{...intent,...change},secret,expiresAt:Date.now()+60000}),/ISSUER_SCOPE_DENIED/);
+ }
 });
