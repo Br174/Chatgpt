@@ -2,7 +2,6 @@
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
 import {verifyApprovalAttestation} from "./approval-attestation.mjs";
 import {validateChatApproval} from "./chat-approval.mjs";
-import {claimSingleUseApproval} from "./approval-single-use.mjs";
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
@@ -43,8 +42,7 @@ export default {
    return response({error:"TRUSTED_APPROVAL_REJECTED"},403);
   }
   // No trusted host issuer exists yet: never claim a token or execute a side effect.
-  // The atomic claim is intentionally reserved for the trusted execution path.
-  void claimSingleUseApproval;
+  // Atomic approval claiming belongs to the trusted execution path, not this disabled endpoint.
   return response({error:"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING"},503);
  }
 };
