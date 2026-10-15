@@ -41,3 +41,19 @@ test("unsigned content digest cannot be substituted",async()=>{
  const attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:now+60000,content});
  await assert.rejects(verifyApprovalAttestation({intent,attestation:{...attestation,contentSha256:"0".repeat(64)},secret,content:"other",now}),/INVALID_APPROVAL_ATTESTATION/);
 });
+
+test("content-bound signature rejects expiry beyond two-minute window",async()=>{
+ const content="probe";
+ const attestation=await signApprovalInTrustedHost({intent,secret,content,expiresAt:now+120001});
+ await assert.rejects(verifyApprovalAttestation({intent,attestation,secret,content,now}),/INVALID_APPROVAL_ATTESTATION/);
+});
+test("content-bound signature rejects expired approval",async()=>{
+ const content="probe";
+ const attestation=await signApprovalInTrustedHost({intent,secret,content,expiresAt:now-1});
+ await assert.rejects(verifyApprovalAttestation({intent,attestation,secret,content,now}),/INVALID_APPROVAL_ATTESTATION/);
+});
+test("content-bound signature rejects different operation ID",async()=>{
+ const content="probe";
+ const attestation=await signApprovalInTrustedHost({intent,secret,content,expiresAt:now+60000});
+ await assert.rejects(verifyApprovalAttestation({intent:{...intent,operationId:"pacman-chat-002"},attestation,secret,content,now}),/INVALID_APPROVAL_ATTESTATION/);
+});
