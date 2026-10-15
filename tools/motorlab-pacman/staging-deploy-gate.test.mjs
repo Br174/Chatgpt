@@ -28,7 +28,7 @@ test("execution staging workflow has a protected approval expression and isolate
  const config=JSON.parse(fs.readFileSync(new URL("wrangler.pacman-execution-staging.jsonc",base),"utf8"));
  assert.match(workflow,/^  push:/m);
  assert.doesNotMatch(workflow,/^  pull_request:/m);
- assert.match(workflow,/motorlab\\/pacman-execution-v2-lab-20261014/);
+ assert.ok(workflow.includes("motorlab/pacman-execution-v2-lab-20261014"));
  assert.match(workflow,/environment: pacman-execution-staging/);
  assert.ok(workflow.includes("ACTIVATION_APPROVED: ${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}"));
  assert.ok(!workflow.includes("ACTIVATION_APPROVED: \\${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}"));
