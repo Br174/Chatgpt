@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 6b23444a1d6789bcbffff52eeb33326e53431c95
+          ref: d8a19a1e03d8f2a748ad7fa983623016c843eddf
           persist-credentials: false
       - name: Verify staging target
         run: |
@@ -29,7 +29,7 @@ jobs:
           if(c.workers_dev!==true||c.d1_databases?.length!==1||c.d1_databases[0].binding!=='DB'||c.name!=='motorlab-pacman-execution-staging-lab'||c.main!=='./worker-execution-staging.mjs'||c.d1_databases[0].database_name!=='motorlab-pacman-staging'||c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261') throw Error('STAGING_SCOPE_MISMATCH');
           NODE
           node --test tools/motorlab-pacman/*.test.mjs
-          test "$(git rev-parse HEAD)" = 6b23444a1d6789bcbffff52eeb33326e53431c95
+          test "$(git rev-parse HEAD)" = d8a19a1e03d8f2a748ad7fa983623016c843eddf
   deploy:
     needs: preflight
     if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.deploy_staging == true }}
@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 6b23444a1d6789bcbffff52eeb33326e53431c95
+          ref: d8a19a1e03d8f2a748ad7fa983623016c843eddf
           persist-credentials: false
       - name: Recheck exact staging target before deployment
         run: |
@@ -48,7 +48,7 @@ jobs:
           const c=JSON.parse(fs.readFileSync('tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc','utf8'));
           if(c.name!=='motorlab-pacman-execution-staging-lab'||c.main!=='./worker-execution-staging.mjs'||c.workers_dev!==true||c.d1_databases?.length!==1||c.d1_databases[0].binding!=='DB'||c.d1_databases[0].database_name!=='motorlab-pacman-staging'||c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261') throw Error('STAGING_SCOPE_MISMATCH');
           NODE
-          test "$(git rev-parse HEAD)" = 6b23444a1d6789bcbffff52eeb33326e53431c95
+          test "$(git rev-parse HEAD)" = d8a19a1e03d8f2a748ad7fa983623016c843eddf
       - name: Check protected staging credentials
         env:
           APPROVED: ${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}
