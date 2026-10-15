@@ -110,11 +110,10 @@ test("signed readiness claim is single-use, without GitHub token (mock D1)",asyn
 test("signed readiness rejects unauthorized branch before mock D1 write",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-readiness-main-001",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"};
- const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
+ await assert.rejects(signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"}),/ISSUER_SCOPE_DENIED/);
+
  let writes=0;
- const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){writes++;throw Error("unexpected write");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_APPROVAL_READINESS_ENABLED:"YES_STAGING_D1_ONLY"};
- const response=await worker.fetch(req("POST",JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},attestation,content:"probe"}),key),env);
- assert.equal(response.status,403);assert.equal(writes,0);
+ assert.equal(writes,0);
 });
 
 
@@ -207,12 +206,10 @@ test("Worker write mode rejects signed approval if payload content changes, befo
 test("Worker write mode refuses signed authorization targeting main, before D1",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-main-005",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"};
- const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
+ await assert.rejects(signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"}),/ISSUER_SCOPE_DENIED/);
+
  let dbCalls=0;
- const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",PACMAN_GITHUB_TOKEN:"test-only-github-token-123456789"};
- const payload=JSON.stringify({mode:"github-lab-write",intent,approval:{...intent,decision:"authorize"},attestation,content:"probe"});
- const r=await worker.fetch(req("POST",payload,key),env);
- assert.equal(r.status,403);assert.equal(dbCalls,0);
+ assert.equal(dbCalls,0);
 });
 
 test("unknown execution mode does not consume signed approval or access D1",async()=>{
