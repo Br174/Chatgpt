@@ -26,3 +26,16 @@ test("wrong approval never touches D1",async()=>{
  await assert.rejects(verifyAndConsumeTrustedApproval({intent,approval:{...approval,branch:"main"},attestation,secret,db:ledger,now}));
  assert.equal(ledger.calls,0);
 });
+
+test("content-bound signed approval is consumed once, replay fails",async()=>{
+ const ledger=db(),content="LAB-only signed content";
+ const attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:now+60000,content});
+ await verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,db:ledger,now,content});
+ await assert.rejects(verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,db:ledger,now,content}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
+ assert.equal(ledger.calls,2);
+});
+test("content-bound signed approval cannot authorize changed content",async()=>{
+ const ledger=db(),attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:now+60000,content:"approved"});
+ await assert.rejects(verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,db:ledger,now,content:"modified"}),/INVALID_APPROVAL_ATTESTATION/);
+ assert.equal(ledger.calls,0);
+});
