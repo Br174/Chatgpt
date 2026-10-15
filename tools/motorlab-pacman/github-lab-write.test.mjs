@@ -63,3 +63,16 @@ test("failed GitHub PUT consumes approval and cannot be replayed",async()=>{
  await assert.rejects(writeApprovedLabProbe({...args,db,fetchImpl}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
  assert.deepEqual(methods,["GET","PUT"]);assert.equal(claims,2);
 });
+
+test("successful HTTP PUT without valid commit SHA is not reported as success",async()=>{
+ const args=await setup("approved");let claims=0;const methods=[];
+ const db={prepare(){return {bind(){return {async run(){claims++;return {success:true,meta:{changes:claims===1?1:0}};}};}};}};
+ const fetchImpl=async(_url,opts)=>{
+  methods.push(opts.method);
+  if(opts.method==="GET")return {ok:true,async json(){return {type:"file",sha:"a".repeat(40)};}};
+  return {ok:true,async json(){return {commit:{sha:"invalid"}};}};
+ };
+ await assert.rejects(writeApprovedLabProbe({...args,db,fetchImpl}),/GITHUB_WRITE_RESPONSE_INVALID/);
+ await assert.rejects(writeApprovedLabProbe({...args,db,fetchImpl}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
+ assert.deepEqual(methods,["GET","PUT"]);
+});
