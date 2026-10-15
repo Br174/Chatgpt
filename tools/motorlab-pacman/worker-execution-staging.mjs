@@ -19,7 +19,7 @@ export default {
   const url=new URL(request.url);
   if(url.pathname!=="/execute" || request.method!=="POST") return response({error:"NOT_FOUND"},404);
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);
-  // Until a trusted approval issuer is connected, remote execution is disabled by default.\n  // A request body and bearer token alone do not prove that the owner clicked a chat button.\n  if(true) // Fail closed: remove only when cryptographic chat-approval verification is implemented.\n   return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);\n  if(!env?.DB?.prepare || typeof env.PACMAN_GITHUB_TOKEN!=="string" || env.PACMAN_GITHUB_TOKEN.length<10)
+  if(!env?.DB?.prepare || typeof env.PACMAN_GITHUB_TOKEN!=="string" || env.PACMAN_GITHUB_TOKEN.length<10)
    return response({error:"STAGING_CONFIGURATION_MISSING"},503);
   const size=Number(request.headers.get("content-length"));
   if(Number.isFinite(size)&&size>MAX_BYTES) return response({error:"PAYLOAD_TOO_LARGE"},413);
@@ -32,12 +32,12 @@ export default {
   if(!input || typeof input!=="object" || !input.intent || !input.approval || typeof input.content!=="string")
    return response({error:"INVALID_REQUEST"},400);
   try {
-   const runner=createChatAuthorizedCoordinator({
+   // Fail closed until a trusted chat approval attestation verifier is integrated.\n   return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);\n   /* const runner=createChatAuthorizedCoordinator({
     env,githubToken:env.PACMAN_GITHUB_TOKEN,
     onCheckpoint:async()=>{} // D1 receipts are authoritative and durable.
    });
    const receipt=await runner.execute({intent:input.intent,approval:input.approval,content:input.content});
-   return response({operationId:receipt.operationId,state:receipt.state});
+   return response({operationId:receipt.operationId,state:receipt.state}); */
   }catch(error){
    // No stacks, provider responses, tokens or payload echoed to callers.
    const code=typeof error?.code==="string"?error.code:
