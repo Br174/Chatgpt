@@ -138,3 +138,19 @@ test("health reports missing D1 schema without writing",async()=>{
  assert.equal(r.status,503);
  assert.equal((await r.json()).database,"SCHEMA_MISSING");
 });
+
+test("malformed intent and approval types are rejected before trusted issuer and D1",async()=>{
+ let queries=0;
+ const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){queries++;throw Error("unexpected D1");}}};
+ for(const input of [
+  {intent:[],approval:{decision:"authorize"},content:"probe"},
+  {intent:{capability:"github.lab-file-cycle"},approval:[],content:"probe"},
+  {intent:"main",approval:{decision:"authorize"},content:"probe"},
+  {intent:{capability:"github.lab-file-cycle"},approval:"authorize",content:"probe"}
+ ]){
+  const r=await worker.fetch(req("POST",JSON.stringify(input),key),env);
+  assert.equal(r.status,400);
+  assert.equal((await r.json()).error,"INVALID_REQUEST");
+ }
+ assert.equal(queries,0);
+});
