@@ -31,6 +31,10 @@ export default {
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);
   if(!env?.DB?.prepare)
    return response({error:"STAGING_CONFIGURATION_MISSING"},503);
+  // Never accept browser-originated write requests; trusted issuer integration is server-to-server only.
+  if(request.headers.has("origin")) return response({error:"BROWSER_ORIGIN_NOT_ALLOWED"},403);
+  const contentType=request.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase();
+  if(contentType!=="application/json") return response({error:"UNSUPPORTED_MEDIA_TYPE"},415);
   // Reject oversized declared bodies before buffering; streamed bodies are checked below.
   const lengthHeader=request.headers.get("content-length");
   if(lengthHeader!==null){
