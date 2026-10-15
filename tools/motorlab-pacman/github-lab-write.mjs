@@ -1,4 +1,4 @@
-// Explicitly scoped LAB-only write. Caller must supply a trusted, already claimed approval.
+// Explicitly scoped LAB-only write. The signed approval is verified and atomically claimed here.
 // This module is not exposed as a Worker endpoint and never accepts raw chat approval.
 import {LAB_BRANCH,LAB_PROBE} from "./chat-approval.mjs";
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
