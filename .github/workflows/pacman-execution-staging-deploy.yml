@@ -1,53 +1,89 @@
-name: Pacman execution staging deploy (manual, gated)
+name: Pacman execution staging deploy (LAB branch, protected)
+
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/workflows/pacman-execution-staging-deploy.yml'
+      - 'tools/motorlab-pacman/*.mjs'
+      - 'tools/motorlab-pacman/*.jsonc'
+
 permissions:
   contents: read
+
 concurrency:
   group: pacman-execution-staging-deploy
   cancel-in-progress: false
+
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
     runs-on: ubuntu-latest
     environment: pacman-execution-staging
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Verify dedicated Worker target and D1 scope
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact isolated staging target
+        working-directory: tools/motorlab-pacman
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
-          const root='tools/motorlab-pacman/';
-          const config=JSON.parse(fs.readFileSync(root+'wrangler.pacman-execution-staging.jsonc','utf8'));
-          if(config.name!=='motorlab-pacman-execution-staging-lab' ||
-             config.main!=='./worker-execution-staging.mjs' ||
-             config.d1_databases?.length!==1 ||
-             config.d1_databases[0].binding!=='DB' ||
-             config.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
-             throw Error('STAGING_SCOPE_MISMATCH');
-          console.log('Dedicated execution Worker and isolated D1 verified');
-          NODE
-      - name: Require staging-only Cloudflare deployment credentials
-        env:
-          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
-          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
-        run: |
-          test -n "$CF_TOKEN" && test -n "$CF_ACCOUNT" || {
-            echo "::error::Dedicated staging deployment credentials missing; abort."
-            exit 1
+          const c=JSON.parse(fs.readFileSync('wrangler.pacman-execution-staging.jsonc','utf8'));
+          if(c.workers_dev!==true ||
+             c.name!=='motorlab-pacman-execution-staging-lab' ||
+             c.main!=='./worker-execution-staging.mjs' ||
+             c.d1_databases?.length!==1 ||
+             c.d1_databases[0].binding!=='DB' ||
+             c.d1_databases[0].database_name!=='motorlab-pacman-staging' ||
+             c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261') {
+            throw Error('STAGING_SCOPE_MISMATCH');
           }
-      - name: Require explicit execution activation acknowledgement
+          console.log('DEDICATED_STAGING_WORKER_AND_D1_VERIFIED');
+          NODE
+      - name: Run Pacman LAB tests
+        run: node --test tools/motorlab-pacman/*.test.mjs
+      - name: Require protected staging credentials and activation flag
         env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
           ACTIVATION_APPROVED: ${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}
         run: |
-          if [ "$ACTIVATION_APPROVED" != 'YES_STAGING_EXECUTION_ONLY' ]; then
-            echo "::error::Execution activation not approved in protected staging environment; abort."
-            exit 1
-          fi
-      - name: Deploy dedicated Worker only
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::PACMAN_CF_API_TOKEN is missing from the protected staging environment"; exit 1; }
+          test "$CLOUDFLARE_ACCOUNT_ID" = b86f445c2b57e604c02f79c8da64bb9c || { echo "::error::Cloudflare account is not MotorLab-Staging"; exit 1; }
+          test "$ACTIVATION_APPROVED" = YES_STAGING_EXECUTION_ONLY || { echo "::error::Staging activation flag is not approved"; exit 1; }
+      - name: Deploy dedicated staging Worker
+        id: deploy
         working-directory: tools/motorlab-pacman
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
-        run: npx --yes wrangler@4 deploy --config wrangler.pacman-execution-staging.jsonc
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 deploy --config wrangler.pacman-execution-staging.jsonc 2>&1 | tee "$RUNNER_TEMP/pacman-wrangler-deploy.log"
+          worker_url="$(grep -Eo 'https://[[:alnum:].-]+\.workers\.dev' "$RUNNER_TEMP/pacman-wrangler-deploy.log" | head -n 1 || true)"
+          if [[ -z "$worker_url" ]]; then
+            echo "::error::Deployment completed but Wrangler did not report a workers.dev URL; health readback is unverified."
+            exit 1
+          fi
+          echo "worker_url=$worker_url" >> "$GITHUB_OUTPUT"
+      - name: Verify deployed Worker and isolated D1 binding
+        env:
+          WORKER_URL: ${{ steps.deploy.outputs.worker_url }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base=process.env.WORKER_URL;
+          if(!base || !/^https:\/\/[a-zA-Z0-9.-]+\.workers\.dev$/.test(base)) throw Error('INVALID_STAGING_WORKER_URL');
+          const r=await fetch(base+'/health',{redirect:'error',signal:AbortSignal.timeout(15000)});
+          const body=await r.json();
+          if(!r.ok || body.service!=='pacman-execution-staging' || body.database!=='CONNECTED')
+            throw Error('STAGING_HEALTH_READBACK_FAILED');
+          console.log('PACMAN_STAGING_WORKER_HEALTH_AND_D1_BINDING_VERIFIED');
+          NODE
