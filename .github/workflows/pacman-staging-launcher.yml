@@ -1,0 +1,56 @@
+name: Pac-Man staging launcher (manual, protected)
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_staging:
+        description: Deploy isolated Pac-Man Worker (protected staging approval required)
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: pacman-staging-launcher
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 8d4c777ad95673d0566416406b8c53bb15329a31
+          persist-credentials: false
+      - name: Verify staging target
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc','utf8'));
+          if(c.name!=='motorlab-pacman-execution-staging-lab'||c.main!=='./worker-execution-staging.mjs'||c.d1_databases?.length!==1||c.d1_databases[0].database_name!=='motorlab-pacman-staging'||c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261') throw Error('STAGING_SCOPE_MISMATCH');
+          NODE
+          node --test tools/motorlab-pacman/*.test.mjs
+  deploy:
+    needs: preflight
+    if: ${{ inputs.deploy_staging == true }}
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 8d4c777ad95673d0566416406b8c53bb15329a31
+          persist-credentials: false
+      - name: Check protected staging credentials
+        env:
+          APPROVED: ${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}
+          TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          test "$APPROVED" = YES_STAGING_EXECUTION_ONLY || exit 1
+          test -n "$TOKEN" && test -n "$ACCOUNT" || exit 1
+      - name: Deploy dedicated staging Worker
+        working-directory: tools/motorlab-pacman
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: npx --yes wrangler@4 deploy --config wrangler.pacman-execution-staging.jsonc
