@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import worker from "./worker-execution-staging.mjs";
+import {signApprovalInTrustedHost} from "./approval-attestation.mjs";
 const key="test-only-authorization-key-000000000000000000";
 const url="https://staging.example/execute";
 const req=(method,body,auth)=>new Request(url,{method,headers:{...(auth?{authorization:"Bearer "+auth}:{}),...(body?{"content-type":"application/json"}:{})},...(body?{body}: {})});
@@ -83,4 +84,35 @@ test("readiness without GitHub token remains gated by trusted issuer",async()=>{
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){calls++;throw Error("unexpected DB access");}}};
  const r=await worker.fetch(req("POST",JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},content:"probe"}),key),env);
  assert.equal(r.status,503);assert.equal((await r.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");assert.equal(calls,0);
+});
+
+test("signed readiness claim is single-use, without GitHub token (mock D1)",async()=>{
+ const secret="test-only-signing-secret-not-for-deployment-12345";
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-readiness-replay-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const approval={...intent,decision:"authorize"};
+ const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret});
+ const claimed=new Set();
+ let writes=0;
+ const DB={prepare(sql){
+  assert.match(sql,/INSERT OR IGNORE INTO pacman_approval_claims/);
+  return {bind(id){return {async run(){writes++;const changes=claimed.has(id)?0:1;claimed.add(id);return {success:true,meta:{changes}};}}};}
+ }};
+ const env={PACMAN_EXECUTION_KEY:key,DB,PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_APPROVAL_READINESS_ENABLED:"YES_STAGING_D1_ONLY"};
+ const payload=JSON.stringify({mode:"approval-readiness",intent,approval,attestation,content:"probe"});
+ const first=await worker.fetch(req("POST",payload,key),env);
+ assert.equal(first.status,200);
+ assert.equal((await first.json()).status,"APPROVAL_CLAIMED_NO_EXECUTION");
+ const second=await worker.fetch(req("POST",payload,key),env);
+ assert.equal(second.status,403);
+ assert.equal((await second.json()).error,"APPROVAL_INVALID_OR_ALREADY_CLAIMED");
+ assert.equal(writes,2);
+});
+test("signed readiness rejects unauthorized branch before mock D1 write",async()=>{
+ const secret="test-only-signing-secret-not-for-deployment-12345";
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-readiness-main-001",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret});
+ let writes=0;
+ const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){writes++;throw Error("unexpected write");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_APPROVAL_READINESS_ENABLED:"YES_STAGING_D1_ONLY"};
+ const response=await worker.fetch(req("POST",JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},attestation,content:"probe"}),key),env);
+ assert.equal(response.status,403);assert.equal(writes,0);
 });
