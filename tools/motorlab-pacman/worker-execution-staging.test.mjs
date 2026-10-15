@@ -271,3 +271,18 @@ test("invalid UTF-8 is rejected before issuer or D1",async()=>{
  assert.equal(result.status,400);
  assert.equal((await result.json()).error,"INVALID_JSON");
 });
+
+test("declared Content-Length smaller than actual body is rejected",async()=>{
+ const body=JSON.stringify({intent:{},approval:{},content:"probe"});
+ const request=new Request(url,{method:"POST",headers:{authorization:"Bearer "+key,"content-type":"application/json","content-length":String(new TextEncoder().encode(body).length-1)},body});
+ const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,DB:{prepare(){throw Error("D1 must not be touched");}}});
+ assert.equal(result.status,400);
+ assert.equal((await result.json()).error,"CONTENT_LENGTH_MISMATCH");
+});
+test("declared Content-Length larger than actual body is rejected",async()=>{
+ const body=JSON.stringify({intent:{},approval:{},content:"probe"});
+ const request=new Request(url,{method:"POST",headers:{authorization:"Bearer "+key,"content-type":"application/json","content-length":String(new TextEncoder().encode(body).length+1)},body});
+ const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,DB:{prepare(){throw Error("D1 must not be touched");}}});
+ assert.equal(result.status,400);
+ assert.equal((await result.json()).error,"CONTENT_LENGTH_MISMATCH");
+});
