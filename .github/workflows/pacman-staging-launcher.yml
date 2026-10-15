@@ -32,7 +32,7 @@ jobs:
           test "$(git rev-parse HEAD)" = 8d4c777ad95673d0566416406b8c53bb15329a31
   deploy:
     needs: preflight
-    if: ${{ inputs.deploy_staging == true }}
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.deploy_staging == true }}
     runs-on: ubuntu-latest
     environment: pacman-execution-staging
     timeout-minutes: 10
