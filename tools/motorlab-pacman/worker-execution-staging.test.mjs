@@ -214,3 +214,24 @@ test("Worker write mode refuses signed authorization targeting main, before D1",
  const r=await worker.fetch(req("POST",payload,key),env);
  assert.equal(r.status,403);assert.equal(dbCalls,0);
 });
+
+test("unknown execution mode does not consume signed approval or access D1",async()=>{
+ const secret="test-only-signing-secret-not-for-deployment-12345";
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-unknown-mode-006",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
+ let dbCalls=0;
+ const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret};
+ const payload=JSON.stringify({mode:"github-production-write",intent,approval:{...intent,decision:"authorize"},attestation,content:"probe"});
+ const r=await worker.fetch(req("POST",payload,key),env);
+ assert.equal(r.status,503);assert.equal((await r.json()).error,"STAGING_EXECUTOR_NOT_IMPLEMENTED");assert.equal(dbCalls,0);
+});
+test("readiness stays disabled with issuer configured but readiness switch absent",async()=>{
+ const secret="test-only-signing-secret-not-for-deployment-12345";
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-readiness-off-007",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
+ let dbCalls=0;
+ const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret};
+ const payload=JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},attestation,content:"probe"});
+ const r=await worker.fetch(req("POST",payload,key),env);
+ assert.equal(r.status,503);assert.equal((await r.json()).error,"APPROVAL_READINESS_DISABLED");assert.equal(dbCalls,0);
+});
