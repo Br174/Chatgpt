@@ -11,6 +11,13 @@ const now=Date.now();
 const b64=b=>Buffer.from(b).toString("base64url");
 const text=s=>[...enc.encode(s)];
 const str=s=>[0x60+text(s).length,...text(s)];
+async function challengeProof(){
+ const data={purpose:"pacman.webauthn.enrollment.challenge.v1",challenge,origin,rpId,issuedAt:now-1000,expiresAt:now+60000};
+ const payload=b64(enc.encode(JSON.stringify(data)));
+ const key=await webcrypto.subtle.importKey("raw",enc.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+ const signature=b64(await webcrypto.subtle.sign("HMAC",key,enc.encode(payload)));
+ return {challengePayload:payload,challengeSignature:signature};
+}
 
 function cose(jwk){
  const x=Buffer.from(jwk.x,"base64url"),y=Buffer.from(jwk.y,"base64url");
@@ -55,7 +62,7 @@ test("valid WebAuthn registration plus exact GitHub owner proof stores first pas
  const f=await fixture();
  const out=await enrollOwnerPasskeyFromGithubLab({
   db:f.db,commentId:12345,githubToken:token,signingSecret:secret,
-  registrationResponse:f.registrationResponse,challenge,origin,rpId,
+  registrationResponse:f.registrationResponse,challenge,...await challengeProof(),origin,rpId,
   fetchImpl:f.fetchImpl,cryptoImpl:webcrypto,nowMs:now
  });
  assert.equal(out.status,"OWNER_PASSKEY_ENROLLED");
@@ -68,7 +75,7 @@ test("wrong GitHub owner prevents credential storage",async()=>{
  const f=await fixture(),badFetch=async()=>({ok:true,status:200,json:async()=>({...f.comment,user:{login:"attacker",id:1,type:"User"}})});
  await assert.rejects(enrollOwnerPasskeyFromGithubLab({
   db:f.db,commentId:12345,githubToken:token,signingSecret:secret,
-  registrationResponse:f.registrationResponse,challenge,origin,rpId,
+  registrationResponse:f.registrationResponse,challenge,...await challengeProof(),origin,rpId,
   fetchImpl:badFetch,cryptoImpl:webcrypto,nowMs:now
  }),/GITHUB_BOOTSTRAP_DENIED/);
  assert.equal(f.db.rows.size,0);
@@ -79,7 +86,7 @@ test("tampered registration prevents GitHub trust from being consumed into stora
  const bad={...f.registrationResponse,rawId:b64([1,2,3,4,5,6,7,8])};
  await assert.rejects(enrollOwnerPasskeyFromGithubLab({
   db:f.db,commentId:12345,githubToken:token,signingSecret:secret,
-  registrationResponse:bad,challenge,origin,rpId,
+  registrationResponse:bad,challenge,...await challengeProof(),origin,rpId,
   fetchImpl:f.fetchImpl,cryptoImpl:webcrypto,nowMs:now
  }));
  assert.equal(f.db.rows.size,0);
@@ -87,7 +94,7 @@ test("tampered registration prevents GitHub trust from being consumed into stora
 
 test("same GitHub bootstrap cannot enroll a second credential",async()=>{
  const f=await fixture();
- const args={db:f.db,commentId:12345,githubToken:token,signingSecret:secret,registrationResponse:f.registrationResponse,challenge,origin,rpId,fetchImpl:f.fetchImpl,cryptoImpl:webcrypto,nowMs:now};
+ const args={db:f.db,commentId:12345,githubToken:token,signingSecret:secret,registrationResponse:f.registrationResponse,challenge,...await challengeProof(),origin,rpId,fetchImpl:f.fetchImpl,cryptoImpl:webcrypto,nowMs:now};
  await enrollOwnerPasskeyFromGithubLab(args);
  await assert.rejects(enrollOwnerPasskeyFromGithubLab(args),/WEBAUTHN_CREDENTIAL_ALREADY_ENROLLED/);
  assert.equal(f.db.rows.size,1);
