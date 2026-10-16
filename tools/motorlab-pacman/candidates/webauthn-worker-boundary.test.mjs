@@ -18,6 +18,8 @@ function db(){
  return {
   challenges,
   prepare(sql){
+   if(sql.startsWith("SELECT credential_id,public_key_jwk,sign_count,owner_subject,disabled_at FROM pacman_webauthn_credentials WHERE owner_subject="))
+    return {bind:()=>({first:async()=>null})};
    if(sql.startsWith("INSERT OR IGNORE INTO pacman_webauthn_challenges"))return {bind:(...a)=>({run:async()=>{
     const challenge=a[0];if(challenges.has(challenge))return {success:true,meta:{changes:0}};
     challenges.set(challenge,a);return {success:true,meta:{changes:1}};
