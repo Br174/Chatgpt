@@ -13,6 +13,7 @@ import {
 import {storeWebAuthnChallengeD1} from "../candidates/webauthn-d1-lab.mjs";
 import {issuePacmanApprovalFromWebAuthnLab} from "../candidates/webauthn-trusted-issuer-lab.mjs";
 import {handleWebAuthnOwnerLab} from "../candidates/webauthn-owner-handler-lab.mjs";
+import {renderWebAuthnOwnerPage} from "./page.mjs";
 
 const MAX_BODY=32768;
 const reply=(body,status=200)=>Response.json(body,{status,headers:{
@@ -20,6 +21,12 @@ const reply=(body,status=200)=>Response.json(body,{status,headers:{
  "content-security-policy":"default-src 'none'; frame-ancestors 'none'",
  "x-content-type-options":"nosniff",
  "referrer-policy":"no-referrer"
+}});
+const pageReply=body=>new Response(body,{status:200,headers:{
+ "content-type":"text/html; charset=utf-8","cache-control":"no-store","pragma":"no-cache",
+ "x-content-type-options":"nosniff","referrer-policy":"no-referrer",
+ "permissions-policy":"publickey-credentials-create=(self), publickey-credentials-get=(self)",
+ "content-security-policy":"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
 }});
 const fail=(code,status=400)=>Object.assign(Error(code),{status});
 const enc=new TextEncoder();
@@ -63,6 +70,10 @@ export async function handleWebAuthnRequest(request,env,{
 }={}){
  try{
   const url=new URL(request.url),cfg=config(env);
+  if((url.pathname==="/webauthn"||url.pathname==="/webauthn/")&&request.method==="GET"){
+   if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
+   return pageReply(renderWebAuthnOwnerPage());
+  }
   if(url.pathname.startsWith("/webauthn/"))
    return handleWebAuthnOwnerLab(request,env,{fetchImpl,cryptoImpl,nowMs});
   if(url.pathname==="/health"&&request.method==="GET")
