@@ -5,7 +5,6 @@ on:
     branches:
       - motorlab/pacman-execution-v2-lab-20261014
     paths:
-      - '.github/workflows/pacman-webauthn-staging-bootstrap.yml'
       - '.github/pacman-webauthn-bootstrap-trigger'
   workflow_dispatch:
     inputs:
@@ -69,7 +68,7 @@ jobs:
     if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' && (github.event_name == 'push' || inputs.confirm_staging_only == 'BOOTSTRAP_WEBAUTHN_STAGING_ONLY')
     runs-on: ubuntu-latest
     environment: pacman-execution-staging
-    timeout-minutes: 15
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
