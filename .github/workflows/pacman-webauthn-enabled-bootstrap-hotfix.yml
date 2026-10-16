@@ -1,0 +1,121 @@
+name: Pac-Man WebAuthn public bootstrap hotfix (enabled LAB)
+on:
+  push:
+    branches: [motorlab/pacman-execution-v2-lab-20261014]
+    paths: ['.github/workflows/pacman-webauthn-enabled-bootstrap-hotfix.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pacman-webauthn-enabled-bootstrap-hotfix
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Complete WebAuthn and Pac-Man LAB security tests
+        run: |
+          node --test tools/motorlab-pacman/*.test.mjs
+          node --test tools/motorlab-pacman/candidates/*.test.mjs
+  deploy:
+    needs: validate
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify latest LAB branch, enabled Worker, staging D1, existing secrets
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          GH_TOKEN: ${{ github.token }}
+          RUN_SHA: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const account='b86f445c2b57e604c02f79c8da64bb9c',name='motorlab-pacman-webauthn-staging-lab';
+          const conf=JSON.parse(fs.readFileSync('tools/motorlab-pacman/webauthn/wrangler.pacman-webauthn-staging.jsonc','utf8'));
+          if(conf.name!==name||conf.main!=='./worker.mjs'||conf.workers_dev!==true||
+             conf.d1_databases?.length!==1||conf.d1_databases[0].binding!=='DB'||
+             conf.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
+            throw Error('HOTFIX_SCOPE_MISMATCH');
+          if(process.env.ACCOUNT!==account||!process.env.CF_TOKEN||!process.env.GH_TOKEN)
+            throw Error('HOTFIX_AUTH_SCOPE_MISMATCH');
+          const gh=await fetch('https://api.github.com/repos/Br174/Chatgpt/git/ref/heads/motorlab/pacman-execution-v2-lab-20261014',{
+            headers:{authorization:'Bearer '+process.env.GH_TOKEN,accept:'application/vnd.github+json'},redirect:'error',signal:AbortSignal.timeout(12000)
+          });
+          const head=await gh.json();
+          if(!gh.ok||head.object?.sha!==process.env.RUN_SHA)throw Error('HOTFIX_STALE_BRANCH_ABORT');
+          const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/scripts/'+name+'/settings',{
+            headers:{authorization:'Bearer '+process.env.CF_TOKEN},redirect:'error',signal:AbortSignal.timeout(12000)
+          });
+          if(!r.ok)throw Error('HOTFIX_WORKER_HTTP_'+r.status);
+          const j=await r.json(),bindings=j.result?.bindings;
+          if(j.success!==true||!Array.isArray(bindings))throw Error('HOTFIX_INVALID_BINDINGS');
+          const expected=['PACMAN_WEBAUTHN_ENABLED','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN',
+            'PACMAN_EXECUTION_KEY','PACMAN_EXECUTION_URL','PACMAN_WEBAUTHN_ORIGIN','PACMAN_WEBAUTHN_RP_ID'];
+          if(expected.some(n=>!bindings.some(b=>b.name===n&&b.type==='secret_text')))
+            throw Error('HOTFIX_MISSING_EXISTING_SECRET');
+          if(!bindings.some(b=>b.name==='DB'&&b.type==='d1'&&b.id==='eb834fc1-5589-4f75-bcb9-d311d0d72261'))
+            throw Error('HOTFIX_D1_MISMATCH');
+          const health=await fetch('https://'+name+'.motorlab-staging.workers.dev/health',{redirect:'error',signal:AbortSignal.timeout(12000)});
+          const h=await health.json();
+          if(health.status!==200||h.configured!==true||h.path!=='WEBAUTHN_ZERO_COST')
+            throw Error('HOTFIX_ENABLED_WORKER_NOT_READY');
+          console.log('HOTFIX_PRECHECK_PASSED_STAGING_ONLY');
+          NODE
+      - name: Deploy WebAuthn source only preserving existing secret bindings
+        working-directory: tools/motorlab-pacman/webauthn
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: npx --yes wrangler@4 deploy --config wrangler.pacman-webauthn-staging.jsonc --keep-vars
+      - name: Verify current staging secret names, D1 binding, health and owner pages
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          const account='b86f445c2b57e604c02f79c8da64bb9c',name='motorlab-pacman-webauthn-staging-lab';
+          const origin='https://'+name+'.motorlab-staging.workers.dev';
+          const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/scripts/'+name+'/settings',{
+            headers:{authorization:'Bearer '+process.env.CF_TOKEN},redirect:'error',signal:AbortSignal.timeout(15000)
+          });
+          if(!r.ok)throw Error('HOTFIX_READBACK_HTTP_'+r.status);
+          const j=await r.json(),b=j.result?.bindings;
+          if(j.success!==true||!Array.isArray(b))throw Error('HOTFIX_READBACK_INVALID');
+          const secrets=['PACMAN_WEBAUTHN_ENABLED','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN',
+            'PACMAN_EXECUTION_KEY','PACMAN_EXECUTION_URL','PACMAN_WEBAUTHN_ORIGIN','PACMAN_WEBAUTHN_RP_ID'];
+          if(secrets.some(n=>!b.some(x=>x.name===n&&x.type==='secret_text'))||
+             !b.some(x=>x.name==='DB'&&x.type==='d1'&&x.id==='eb834fc1-5589-4f75-bcb9-d311d0d72261'))
+           throw Error('HOTFIX_BINDING_REGRESSION');
+          let ok=false;
+          for(const delay of [0,2000,3000,5000,8000]){
+            if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
+            try{
+             const health=await fetch(origin+'/health',{redirect:'error',signal:AbortSignal.timeout(12000)});
+             const h=await health.json();
+             const status=await fetch(origin+'/webauthn/status',{redirect:'error',signal:AbortSignal.timeout(12000)});
+             const s=await status.json();
+             const page=await fetch(origin+'/webauthn',{redirect:'error',signal:AbortSignal.timeout(12000)});
+             const html=await page.text();
+             if(health.status===200&&h.configured===true&&h.path==='WEBAUTHN_ZERO_COST'&&
+                status.status===200&&s.configured===true&&page.status===200&&html.includes('Pac-Man · Passkey proprietario')){
+                ok=true;break;
+             }
+            }catch{}
+          }
+          if(!ok)throw Error('HOTFIX_PUBLIC_STAGING_NOT_READY');
+          console.log('HOTFIX_WEBAUTHN_STAGING_READY_WITH_PROTECTED_D1');
+          NODE
