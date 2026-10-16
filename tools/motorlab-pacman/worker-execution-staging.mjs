@@ -64,7 +64,10 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
   } catch {return response({error:"INVALID_JSON"},400);}
   if(!input || typeof input!=="object" || Array.isArray(input) || !input.intent || typeof input.intent!=="object" || Array.isArray(input.intent) || !input.approval || typeof input.approval!=="object" || Array.isArray(input.approval) || typeof input.content!=="string")
    return response({error:"INVALID_REQUEST"},400);
-  // V2 route is wired into the real staging Worker but remains disabled unless the exact LAB-only route flag is set.\n  const candidateResult=await candidateCycleDispatch({input,env,fetchImpl});\n  if(candidateResult!==null)return candidateResult;\n  // A chat message or JSON approval is never sufficient to assert trusted-host identity.
+  // V2 route is wired into the real staging Worker but remains disabled unless the exact LAB-only route flag is set.
+  const candidateResult=await candidateCycleDispatch({input,env,fetchImpl});
+  if(candidateResult!==null)return candidateResult;
+  // A chat message or JSON approval is never sufficient to assert trusted-host identity.
   // Fail closed BEFORE consuming a one-time attestation until a separate trusted issuer
   // and an audited staging-only executor are both connected and enabled.
   if(env?.PACMAN_TRUSTED_ISSUER_CONNECTED!=="YES_VERIFIED_TRUSTED_HOST")
