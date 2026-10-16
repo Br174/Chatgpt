@@ -71,7 +71,11 @@ export async function handleWebAuthnRequest(request,env,{
 }={}){
  try{
   const url=new URL(request.url),cfg=config(env);
-  if(url.pathname==="/webauthn/approve"&&request.method==="GET"){\n   if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);\n   return pageReply(renderWebAuthnApprovalPage());\n  }\n  if((url.pathname==="/webauthn"||url.pathname==="/webauthn/")&&request.method==="GET"){
+  if(url.pathname==="/webauthn/approve"&&request.method==="GET"){
+   if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
+   return pageReply(renderWebAuthnApprovalPage());
+  }
+  if((url.pathname==="/webauthn"||url.pathname==="/webauthn/")&&request.method==="GET"){
    if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
    return pageReply(renderWebAuthnOwnerPage());
   }
