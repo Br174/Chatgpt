@@ -47,6 +47,8 @@ try{
  evidence.reason=result.reason;
  evidence.completedPhaseCount=result.completed.length;
  await persist();
+ const persisted=JSON.parse(await readFile(output,"utf8"));
+ if(persisted.operationId!==operationId||persisted.checkpointId!=="audit-verified"||persisted.completed.length!==phases.length||persisted.completed.some((step,i)=>step.completed!==i+1||step.checkpointId!==phases[i].checkpointId)||persisted.status!=="AUDIT_PHASES_VERIFIED_PROJECT_NOT_COMPLETE")throw Error("DURABLE_CHECKPOINT_VERIFICATION_FAILED");
  if(result.decision!=="CONTINUE"||result.completed.length!==phases.length)throw Error("INCOMPLETE_AUDIT");
  console.log(JSON.stringify({operationId,runId:evidence.runId,status:evidence.status,checkpointId:evidence.checkpointId}));
 }catch(error){
