@@ -1,0 +1,36 @@
+name: MotorLab R38 Durable Continuity Audit LAB
+on:
+  push:
+    branches:
+      - motorlab/continuity-pillar-v3-lab-20261016
+    paths:
+      - 'templates/execution/motorlab-r38-*-lab.mjs'
+      - 'templates/execution/motorlab-r38-*-lab.test.mjs'
+      - 'MOTORLAB_EXECUTION_CONTINUITY_V1.txt'
+      - 'MOTORLAB_PROGRESS_REPORTING_V1.txt'
+      - '.github/workflows/motorlab-r38-continuity-durable-audit-lab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: motorlab-r38-durable-audit-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  continuity-durable-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run authorized read-only multi-phase audit with durable checkpoints
+        run: node templates/execution/motorlab-r38-durable-audit-lab.mjs
+      - name: Preserve checkpoint and evidence even after test failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motorlab-r38-durable-audit-${{ github.run_id }}
+          path: .motorlab-r38-audit/
+          if-no-files-found: warn
+          retention-days: 14
