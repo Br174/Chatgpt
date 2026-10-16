@@ -41,3 +41,23 @@ test("GitHub base64 readback handles line breaks and Unicode",async()=>{
    exists:true,sha:"a".repeat(40),content:"Pacman è pronto 🚀"
  });
 });
+
+test("all GitHub adapter HTTP requests refuse redirects",async()=>{
+ const methods=[];
+ const a=makeGithubLabAdapter({token:"fake-test-token-123",fetchImpl:async(_url,opts)=>{
+  methods.push(opts.method);
+  assert.equal(opts.redirect,"error");
+  if(opts.method==="GET")return {status:404,ok:false};
+  return {ok:true,json:async()=>({})};
+ }});
+ await a.read({branch,path});
+ await a.create({branch,path,content:"safe"});
+ await a.remove({branch,path,sha:"a".repeat(40)});
+ assert.deepEqual(methods,["GET","PUT","DELETE"]);
+});
+test("probe content byte limit rejects multibyte payload before network",async()=>{
+ let calls=0;
+ const a=makeGithubLabAdapter({token:"fake-test-token-123",fetchImpl:async()=>{calls++;throw Error("unexpected network");}});
+ await assert.rejects(a.create({branch,path,content:"🚀".repeat(1025)}),/INVALID_PROBE_CONTENT/);
+ assert.equal(calls,0);
+});
