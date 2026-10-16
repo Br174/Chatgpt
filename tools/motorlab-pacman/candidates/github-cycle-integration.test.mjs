@@ -69,3 +69,18 @@ test("GitHub readback mismatch never deletes unverified content",async()=>{
  await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async()=>{}}),/LAB_CYCLE_RECOVERY_REQUIRED/);
  assert.deepEqual(methods,["GET","PUT","GET"]);assert.equal(present,true);
 });
+
+test("failed final receipt cannot report success after verified cleanup",async()=>{
+ let present=false;const methods=[],states=[];
+ const fetchImpl=async(url,init)=>{methods.push(init.method);
+  if(init.method==="GET")return present?response(200,{type:"file",sha,encoding:"base64",content:"cHJvYmU="}):response(404,{});
+  if(init.method==="PUT"){present=true;return response(201,{content:{sha},commit:{sha:commit}});}
+  if(init.method==="DELETE"){present=false;return response(200,{commit:{sha:commit}});}
+  throw Error("unexpected request");
+ };
+ const adapter=makeGitHubContentsLabAdapter({token:"x".repeat(20),fetchImpl});
+ await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async x=>{states.push(x.state);if(x.state==="VERIFIED_AND_REMOVED")throw Error("storage unavailable");}}),/LAB_CYCLE_RECOVERY_REQUIRED/);
+ assert.deepEqual(methods,["GET","PUT","GET","DELETE","GET"]);
+ assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","VERIFIED_AND_REMOVED","RECOVERY_REQUIRED"]);
+ assert.equal(present,false);
+});
