@@ -25,3 +25,19 @@ test("forged signature fails before any D1 claim",async()=>{
 test("issuer refuses main branch",async()=>{
  await assert.rejects(signApprovalInTrustedHost({intent:{...intent,branch:"main"},secret,expiresAt:Date.now()+60000,content:"test"}),/ISSUER_SCOPE_DENIED/);
 });
+
+test("expired attestation fails before any D1 claim",async()=>{
+ const attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:Date.now()+60000,content:"test"});
+ let dbCalls=0;
+ await assert.rejects(verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,content:"test",now:attestation.expiresAt+1,db:{prepare(){dbCalls++;throw Error("D1 should not be called");}}}),/INVALID_APPROVAL_ATTESTATION/);
+ assert.equal(dbCalls,0);
+});
+test("valid attestation is single-use in simulated staging D1",async()=>{
+ const attestation=await signApprovalInTrustedHost({intent,secret,expiresAt:Date.now()+60000,content:"test"});
+ const seen=new Set();
+ const db={prepare(sql){assert.match(sql,/INSERT OR IGNORE INTO pacman_approval_claims/);return {bind(operationId){return {async run(){const duplicate=seen.has(operationId);seen.add(operationId);return {success:true,meta:{changes:duplicate?0:1}};}};}};}};
+ const first=await verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,content:"test",db});
+ assert.equal(first.claimed,true);
+ await assert.rejects(verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,content:"test",db}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
+ assert.equal(seen.size,1);
+});
