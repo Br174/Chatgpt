@@ -100,7 +100,7 @@ SAFE_STOP
 HANDOFF_COMPLETE
 CANCELLED_BY_USER
 
-A valid terminal seal means the session did not disappear unexpectedly.
+A valid terminal seal means the session did not disappear unexpectedly. HANDOFF_COMPLETE seals only the enrolled session/polling lane after a verified durable job handoff; it does not assert operation/project completion. Before sealing, the R38 Execution Continuity owner must verify that no other safe approved READY work can run in the current cycle.
 Absence of a seal is evidence only when the surface was actually enrolled in Pollicino liveness monitoring.
 
 6. ALIVE-BUT-NO-PROGRESS / LOOP SIGNAL
