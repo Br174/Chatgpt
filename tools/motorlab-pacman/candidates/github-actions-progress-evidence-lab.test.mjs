@@ -1,0 +1,18 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {createGithubActionsEvidenceValidatorLab as factory} from "./github-actions-progress-evidence-lab.mjs";
+import {calculateEvidenceBackedProgressLab} from "./evidence-backed-progress-lab.mjs";
+const sha="a".repeat(40),branch="motorlab/pacman-execution-v2-lab-20261014",name="Pacman V2 Complete LAB Suite";
+const node={id:"ci-slice",kind:"ci",commitSha:sha,workflowName:name,weight:1};
+const run={id:123,name,status:"completed",conclusion:"success",head_sha:sha,head_branch:branch,repository:{full_name:"Br174/Chatgpt"},event:"push"};
+const validator=(runs)=>factory({runs,expectedRepository:"Br174/Chatgpt",expectedBranch:branch,allowedWorkflows:[name]});
+const check=(runs)=>calculateEvidenceBackedProgressLab({tree:{children:[node]},evidence:[{id:"ci-slice",completion:100}],validateEvidence:validator(runs)});
+test("trusted CI run credits CI slice only",async()=>assert.equal((await check([run])).percent,100));
+test("failed CI run grants zero",async()=>assert.equal((await check([{...run,conclusion:"failure"}])).percent,0));
+test("wrong commit grants zero",async()=>assert.equal((await check([{...run,head_sha:"b".repeat(40)}])).percent,0));
+test("wrong branch grants zero",async()=>assert.equal((await check([{...run,head_branch:"main"}])).percent,0));
+test("wrong repository grants zero",async()=>assert.equal((await check([{...run,repository:{full_name:"other/repo"}}])).percent,0));
+test("wrong workflow grants zero",async()=>assert.equal((await check([{...run,name:"Unknown"}])).percent,0));
+test("uncompleted run grants zero",async()=>assert.equal((await check([{...run,status:"queued"}])).percent,0));
+test("non-push event grants zero",async()=>assert.equal((await check([{...run,event:"workflow_dispatch"}])).percent,0));
+test("arbitrary feature task cannot claim CI evidence",async()=>{const v=validator([run]);assert.equal(await v({id:"ci-slice",completion:100},{...node,kind:"feature"}),false);});
