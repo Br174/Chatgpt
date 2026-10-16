@@ -24,6 +24,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify resume planner rejects forged or stale checkpoints
+        run: node --test templates/execution/motorlab-r38-resume-plan-lab.test.mjs
       - name: Run authorized read-only multi-phase audit with durable checkpoints
         run: node templates/execution/motorlab-r38-durable-audit-lab.mjs
       - name: Preserve checkpoint and evidence even after test failure
