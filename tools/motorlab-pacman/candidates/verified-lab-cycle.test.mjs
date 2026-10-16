@@ -81,3 +81,10 @@ test("checkpoint PREPARED failure prevents every GitHub mutation",async()=>{
  await assert.rejects(verifiedLabCycle({adapter:m.adapter,branch,path,content:"probe",onCheckpoint:async x=>{states.push(x.state);throw Error("durable ledger unavailable");}}),/durable ledger unavailable/);
  assert.deepEqual(m.calls,["read"]);assert.deepEqual(states,["PREPARED"]);
 });
+
+test("checkpoint WRITE_ATTEMPTED failure requests recovery and never deletes",async()=>{
+ const m=mock(),states=[];
+ await assert.rejects(verifiedLabCycle({adapter:m.adapter,branch,path,content:"probe",onCheckpoint:async x=>{states.push(x.state);if(x.state==="WRITE_ATTEMPTED")throw Error("checkpoint unavailable");}}),/LAB_CYCLE_RECOVERY_REQUIRED/);
+ assert.deepEqual(m.calls,["read","create"]);
+ assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","RECOVERY_REQUIRED"]);
+});
