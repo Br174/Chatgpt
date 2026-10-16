@@ -97,7 +97,8 @@ export async function handleWebAuthnRequest(request,env,{
    const out=await enrollOwnerPasskeyFromGithubLab({
     db:cfg.db,commentId:input?.commentId,githubToken:cfg.githubToken,
     signingSecret:cfg.signingSecret,registrationResponse:input?.registrationResponse,
-    challenge:input?.challenge,origin:cfg.origin,rpId:cfg.rpId,
+    challenge:input?.challenge,challengePayload:input?.payload,challengeSignature:input?.signature,
+    origin:cfg.origin,rpId:cfg.rpId,
     fetchImpl,cryptoImpl,nowMs
    });
    return reply(out);
