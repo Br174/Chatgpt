@@ -1,4 +1,4 @@
-import {mkdir,readFile,writeFile} from "node:fs/promises";
+import {mkdir,readFile,writeFile,rename} from "node:fs/promises";
 import {createHash} from "node:crypto";
 import {runMotorLabOperationR38} from "./motorlab-r38-operation-entrypoint-lab.mjs";
 import {planR38ResumeLab} from "./motorlab-r38-resume-plan-lab.mjs";
@@ -29,7 +29,7 @@ if(plan)checkpointId=plan.checkpointId;
 const alreadyCompleted=plan?.completedCount||0;
 const remainingPhases=plan?.remainingPhases||phases;
 const evidence={operationId,checkpointId,approvedScope:"READ_ONLY_CONTINUITY_AUDIT",status:"RUNNING",completed:prior?[...prior.completed]:[],runId:process.env.GITHUB_RUN_ID||null,sourceCommit};
-const persist=async()=>writeFile(output,JSON.stringify(evidence,null,2)+"\n");
+const persist=async()=>{const temp=output+".tmp";await writeFile(temp,JSON.stringify(evidence,null,2)+"\n");await rename(temp,output);};
 await persist();
 try{
  const result=await runMotorLabOperationR38({
