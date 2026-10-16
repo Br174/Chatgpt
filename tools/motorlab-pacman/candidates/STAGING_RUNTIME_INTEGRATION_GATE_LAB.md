@@ -53,3 +53,11 @@ SELECT state, COUNT(*) AS total FROM pacman_cycle_checkpoints GROUP BY state;
 Required approval ledger columns: `operation_id` (primary key), `approval_signature`, `claimed_at`, `expires_at`. Required checkpoint columns: `operation_id` (primary key), `state`, `branch`, `path`, `sha`, `updated_at`. Any `RECOVERY_REQUIRED` or incomplete state requires manual reconciliation before enabling writes. Do **not** print signing secrets, tokens, approval signatures, or raw operation content. If a table is missing, stop; schema migration requires separate review and is not authorized by a green CI run.
 
 Current status: **not executed** against Cloudflare; live D1 readiness remains **UNVERIFIED / NO-GO**.
+
+## Live Cloudflare observation and prepared migration — 2026-10-16
+
+Authenticated browser inspection located Cloudflare account **MotorLab-Staging** and D1 database **motorlab-pacman-staging**, ID `eb834fc1-5589-4f75-bcb9-d311d0d72261`. The Cloudflare overview reported **0 tables** and **0 queries**; SQL console query results were **not captured**. Therefore table absence is strongly suggested by UI metrics but **not conclusively established by SQL**. Do not claim a successful D1 schema inspection or migration.
+
+The candidate-only, non-executing file `staging-d1-schema-migration.sql` contains two `CREATE TABLE IF NOT EXISTS` statements matching the canonical approval ledger and checkpoint schema. Its three consistency tests passed as part of **65/65 isolated candidate tests**, GitHub Actions run **38837054809**. These tests do not prove live database readiness.
+
+**Installation gate (pending):** obtain definitive read-only schema results; confirm exact staging account/database ID and existing data; review migration against current schema; obtain explicit authorization for the staging-only D1 schema write; apply once with rollback/recovery plan; independently verify both tables/primary keys after execution. Keep all GitHub write and trusted-issuer flags disabled throughout. Never apply to production or other D1 databases.
