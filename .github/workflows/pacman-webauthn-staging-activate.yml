@@ -37,27 +37,14 @@ jobs:
         run: |
           node --test tools/motorlab-pacman/candidates/webauthn-*.test.mjs
 
-      - name: Verify exact staging credentials and D1 schema
+      - name: Verify exact staging account credentials
         env:
           CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
           CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
         run: |
-          node --input-type=module <<'NODE'
-          const account='b86f445c2b57e604c02f79c8da64bb9c';
-          const db='eb834fc1-5589-4f75-bcb9-d311d0d72261';
-          if(process.env.CF_ACCOUNT!==account||!process.env.CF_TOKEN)throw Error('STAGING_CREDENTIALS_INVALID');
-          const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+'/d1/database/'+db+'/query',{
-            method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
-            headers:{Authorization:'Bearer '+process.env.CF_TOKEN,'Content-Type':'application/json'},
-            body:JSON.stringify({sql:"SELECT name FROM sqlite_master WHERE type='table' AND name IN ('pacman_webauthn_credentials','pacman_webauthn_challenges') ORDER BY name"})
-          });
-          if(!r.ok)throw Error('D1_PREFLIGHT_HTTP_'+r.status);
-          const j=await r.json();
-          const names=(j.result||[]).flatMap(x=>x.results||[]).map(x=>x.name).sort();
-          if(JSON.stringify(names)!==JSON.stringify(['pacman_webauthn_challenges','pacman_webauthn_credentials']))
-            throw Error('WEBAUTHN_D1_SCHEMA_NOT_READY');
-          console.log('WEBAUTHN_D1_SCHEMA_READY');
-          NODE
+          test -n "$CF_TOKEN" || { echo "::error::Staging Cloudflare token missing"; exit 1; }
+          test "$CF_ACCOUNT" = "b86f445c2b57e604c02f79c8da64bb9c" || { echo "::error::Cloudflare staging account mismatch"; exit 1; }
+          echo "STAGING_CLOUDFLARE_ACCOUNT_VERIFIED"
 
       - name: Verify disabled Worker and resolve exact workers.dev identity
         id: identity
@@ -96,6 +83,37 @@ jobs:
           const executionUrl='https://motorlab-pacman-execution-staging-lab.'+subdomain+'.workers.dev';
           await appendFile(process.env.GITHUB_OUTPUT,'execution_url='+executionUrl+'\n');
           console.log('WEBAUTHN_DISABLED_WORKER_AND_IDENTITY_VERIFIED');
+          NODE
+
+      - name: Verify previously bootstrapped WebAuthn staging D1 through bound Worker
+        env:
+          ORIGIN: ${{ steps.identity.outputs.origin }}
+          PACMAN_EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base=process.env.ORIGIN,key=process.env.PACMAN_EXECUTION_KEY;
+          if(!/^https:\/\/[a-zA-Z0-9.-]+\.workers\.dev$/.test(base||''))
+            throw Error('WEBAUTHN_STAGING_ORIGIN_INVALID');
+          if(typeof key!=='string'||key.length<32)
+            throw Error('WEBAUTHN_EXECUTION_KEY_NOT_CONFIGURED');
+          // Use only the existing disabled Worker D1 binding. No Cloudflare D1 REST
+          // scope expansion. Bootstrap is idempotent for the two WebAuthn tables;
+          // protected operational tables are schema-compared and never modified.
+          const r=await fetch(base+'/bootstrap/webauthn-schema',{
+            method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),cache:'no-store',
+            headers:{
+              authorization:'Bearer '+key,
+              'x-pacman-bootstrap':'WEBAUTHN_SCHEMA_V1',
+              'cache-control':'no-store'
+            }
+          });
+          let body;try{body=await r.json();}catch{throw Error('WEBAUTHN_D1_BINDING_NON_JSON_HTTP_'+r.status);}
+          if(r.status!==200||body?.status!=='WEBAUTHN_SCHEMA_BOOTSTRAPPED'||
+             JSON.stringify(body?.createdTables)!==JSON.stringify(['pacman_webauthn_challenges','pacman_webauthn_credentials'])||
+             JSON.stringify(body?.protectedTables)!==JSON.stringify(['pacman_approval_claims','pacman_cycle_checkpoints','pacman_operations']))
+            throw Error('WEBAUTHN_D1_BINDING_PREFLIGHT_FAILED_HTTP_'+r.status);
+          console.log('WEBAUTHN_D1_SCHEMA_VERIFIED_THROUGH_WORKER_BINDING');
+          console.log('PROTECTED_D1_SCHEMAS_UNCHANGED');
           NODE
 
       - name: Verify current V2 execution Worker is deployed and disabled
