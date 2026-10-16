@@ -26,3 +26,14 @@ test("handler rejects failed D1 schema introspection without GitHub calls",async
 
 test("handler refuses missing approval ledger column without consuming authorization",async()=>{const request=await input("handler-011");let calls=0;const store={prepare(sql){if(sql.startsWith("PRAGMA table_info("))return {all:async()=>({results:[{name:"operation_id",pk:1},{name:"claimed_at"},{name:"expires_at"}]})};throw Error("ledger must not be accessed");}};const r=await stagingCycleHandler({input:request,env:{...flags,DB:store,PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:token},fetchImpl:async()=>{calls++;}});assert.equal(r.status,503);assert.equal(calls,0);});
 test("handler denies invalid mode before inspecting D1 or contacting GitHub",async()=>{let calls=0;const r=await stagingCycleHandler({input:{mode:"github-lab-write"},env:{...flags,DB:{prepare(){calls++;throw Error("D1 must not be read");}},PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:token},fetchImpl:async()=>{calls++;}});assert.equal(r.status,404);assert.equal(calls,0);});
+
+test("handler refuses wrong D1 column type before consuming approval",async()=>{
+ const request=await input("handler-012");let calls=0;
+ const store={prepare(sql){if(sql.startsWith("PRAGMA table_info(")){
+  const approval=sql.includes("pacman_approval_claims");
+  const cols=approval?["operation_id","approval_signature","claimed_at","expires_at"]:["operation_id","state","branch","path","sha","updated_at"];
+  return {all:async()=>({results:cols.map(name=>({name,pk:name==="operation_id"?1:0,type:name==="claimed_at"?"TEXT":name==="expires_at"?"INTEGER":"TEXT"}))})};
+ }throw Error("approval must not be claimed");}};
+ const response=await stagingCycleHandler({input:request,env:{...flags,DB:store,PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:token},fetchImpl:async()=>{calls++;}});
+ assert.equal(response.status,503);assert.equal((await response.json()).error,"STAGING_D1_SCHEMA_UNVERIFIED");assert.equal(calls,0);
+});
