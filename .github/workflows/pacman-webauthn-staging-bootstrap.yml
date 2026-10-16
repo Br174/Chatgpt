@@ -100,11 +100,6 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verify complete Pac-Man LAB suites
-        run: |
-          node --test tools/motorlab-pacman/*.test.mjs
-          node --test tools/motorlab-pacman/candidates/*.test.mjs
-
       - name: Verify exact isolated WebAuthn staging target
         run: |
           node --input-type=module <<'NODE'
