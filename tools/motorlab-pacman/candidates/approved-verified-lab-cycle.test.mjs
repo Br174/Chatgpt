@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {approvedVerifiedLabCycle} from "./approved-verified-lab-cycle.mjs";
+import {approvedVerifiedLabCycle,approvedVerifiedLabCycleWithD1} from "./approved-verified-lab-cycle.mjs";
 import {signApprovalInTrustedHost} from "../approval-attestation.mjs";
 const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-integration.txt";
 const sha="a".repeat(40),commit="b".repeat(40),secret="s".repeat(48),token="t".repeat(24),content="probe";
@@ -56,4 +56,18 @@ test("oversized content is rejected before consuming single-use approval",async(
  assert.equal(calls,0);
  await assert.rejects(approvedVerifiedLabCycle({...f,secret,db,content,token,fetchImpl:async()=>{calls++;return response(403,{});},onCheckpoint:async()=>{}}),/GITHUB_READ_FAILED_403/);
  assert.equal(calls,1);
+});
+
+test("D1 checkpoint integration persists full verified cycle before returning success",async()=>{
+ const f=await fixture("signed-d1-001");let file=false;const checkpoints=[];
+ const db={prepare(sql){if(sql.includes("pacman_cycle_checkpoints"))return {bind(...args){return {async run(){checkpoints.push({sql,args});return {success:true,meta:{changes:1}};}};}};return ledger().prepare(sql);}};
+ const fetchImpl=async(url,init)=>{if(init.method==="GET")return file?response(200,{type:"file",sha,encoding:"base64",content:"cHJvYmU="}):response(404,{});if(init.method==="PUT"){file=true;return response(201,{content:{sha},commit:{sha:commit}});}if(init.method==="DELETE"){file=false;return response(200,{commit:{sha:commit}});}throw Error("unexpected");};
+ const result=await approvedVerifiedLabCycleWithD1({...f,secret,db,content,token,fetchImpl});
+ assert.equal(result.state,"VERIFIED_AND_REMOVED");assert.equal(file,false);
+ assert.deepEqual(checkpoints.map((x,i)=>i===0?x.args[1]:x.args[0]),["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","VERIFIED_AND_REMOVED"]);
+});
+test("D1 checkpoint override is denied before approval claim or GitHub call",async()=>{
+ const f=await fixture("signed-d1-002");let calls=0;
+ await assert.rejects(approvedVerifiedLabCycleWithD1({...f,secret,db:ledger(),content,token,fetchImpl:async()=>{calls++;},onCheckpoint:async()=>{}}),/CHECKPOINT_OVERRIDE_DENIED/);
+ assert.equal(calls,0);
 });
