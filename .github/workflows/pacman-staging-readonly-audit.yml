@@ -30,7 +30,7 @@ jobs:
             console.log('STAGING_DEPLOY_CREDENTIALS: MISSING_OR_WRONG_ACCOUNT');
             process.exitCode=1;
           } else {
-            const expectedNames=['PACMAN_EXECUTION_KEY','PACMAN_GITHUB_TOKEN','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_TRUSTED_ISSUER_CONNECTED','PACMAN_GITHUB_LAB_WRITE_ENABLED','PACMAN_APPROVAL_READINESS_ENABLED'];
+            const expectedNames=['PACMAN_EXECUTION_KEY','PACMAN_GITHUB_TOKEN','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_TRUSTED_ISSUER_CONNECTED','PACMAN_GITHUB_LAB_WRITE_ENABLED','PACMAN_APPROVAL_READINESS_ENABLED','PACMAN_CYCLE_ROUTE_ENABLED','PACMAN_D1_CHECKPOINTS_VERIFIED'];
             for(const worker of workers){
               const url='https://api.cloudflare.com/client/v4/accounts/'+expected+'/workers/scripts/'+worker+'/settings';
               try {
