@@ -11,7 +11,24 @@ export async function loadPinnedAccessJwksLab({teamDomain,fetchImpl,timeoutMs=30
  const len=Number(response.headers?.get?.("content-length"));
  if(Number.isFinite(len)&&len>65536)fail();
  let data;
- try{data=await response.json();}catch{fail();}
+ try{
+  if(!response.body?.getReader)fail();
+  const reader=response.body.getReader();
+  const chunks=[];let size=0;
+  try{
+   while(true){
+    const {done,value}=await reader.read();
+    if(done)break;
+    if(!(value instanceof Uint8Array))fail();
+    size+=value.byteLength;
+    if(size>65536)fail();
+    chunks.push(value);
+   }
+  }finally{reader.releaseLock();}
+  const bytes=new Uint8Array(size);let offset=0;
+  for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
+  data=JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(bytes));
+ }catch{fail();}
  if(!data||!Array.isArray(data.keys)||data.keys.length<1||data.keys.length>12)fail();
  for(const k of data.keys){
   if(!k||k.kty!=="RSA"||k.alg!=="RS256"||k.use!=="sig"||
@@ -22,5 +39,5 @@ export async function loadPinnedAccessJwksLab({teamDomain,fetchImpl,timeoutMs=30
  if(new Set(data.keys.map(k=>k.kid)).size!==data.keys.length)fail();
  return {keys:data.keys.map(({kid,kty,alg,use,n,e})=>({kid,kty,alg,use,n,e}))};
 }
-// Production hardening still required: bound response bytes while streaming, independent
+// Production hardening still required: independent
 // trust configuration, controlled cache/rotation, retry and failure policy.
