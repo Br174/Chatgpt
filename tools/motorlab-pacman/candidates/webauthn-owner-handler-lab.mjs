@@ -203,7 +203,7 @@ export async function handleWebAuthnOwnerLab(request,env,{
       typeof challenge!=="string"||!assertion||typeof assertion!=="object")
     throw fail("INVALID_APPROVAL_REQUEST",400);
    if(assertion.id!==credential.id)throw fail("WEBAUTHN_CREDENTIAL_MISMATCH",403);
-   const result=await executePacmanWithWebAuthnLab({
+   if(typeof executeImpl!=="function")throw fail("WEBAUTHN_EXECUTOR_NOT_CONFIGURED",503);\n   const result=await executeImpl({
     db:cfg.db,intent,content,challenge,credentialId:credential.id,assertion,
     signingSecret:cfg.signingSecret,
     executionUrl:cfg.executionUrl,executionKey:cfg.executionKey,
