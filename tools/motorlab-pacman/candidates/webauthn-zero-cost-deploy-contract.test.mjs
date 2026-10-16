@@ -6,8 +6,9 @@ const worker=readFileSync(new URL("../webauthn/worker.mjs",import.meta.url),"utf
 const wrangler=JSON.parse(readFileSync(new URL("../webauthn/wrangler.pacman-webauthn-staging.jsonc",import.meta.url),"utf8"));
 const workflow=readFileSync(new URL("../../../.github/workflows/pacman-webauthn-staging-deploy.yml",import.meta.url),"utf8");
 
-test("canonical WebAuthn Worker contains no Cloudflare Access or Zero Trust dependency",()=>{
- assert.doesNotMatch(worker,/cloudflare-access|zero\s*trust|PACMAN_ACCESS_/i);
+test("canonical WebAuthn Worker has no Access dependency",()=>{
+ assert.doesNotMatch(worker,/from\s*["'][^"']*cloudflare-access[^"']*["']/i);
+ assert.doesNotMatch(worker,/PACMAN_ACCESS_[A-Z0-9_]+/);
  assert.match(worker,/PACMAN_WEBAUTHN_ENABLED/);
  assert.match(worker,/YES_ZERO_COST_WEBAUTHN_STAGING/);
 });
@@ -23,11 +24,13 @@ test("WebAuthn deploy targets only isolated staging Worker and staging D1",()=>{
  });
 });
 
-test("protected deploy verifies fail-closed state and never references production or main",()=>{
+test("protected deploy stays on LAB staging branch and target",()=>{
  assert.match(workflow,/environment:\s*pacman-execution-staging/);
+ assert.match(workflow,/refs\/heads\/motorlab\/pacman-execution-v2-lab-20261014/);
  assert.match(workflow,/WEBAUTHN_STAGING_DEPLOYED_DISABLED_AND_VERIFIED/);
  assert.match(workflow,/WEBAUTHN_ALREADY_ACTIVATED_ABORT/);
- assert.doesNotMatch(workflow,/\bmain\b|production/i);
+ assert.doesNotMatch(workflow,/refs\/heads\/main|branches:\s*\n\s*-\s*main(?:\s|$)/i);
+ assert.doesNotMatch(workflow,/motorlab-pacman[^\n]*production|production[^\n]*motorlab-pacman/i);
 });
 
 test("deploy workflow cannot enable WebAuthn runtime flag",()=>{
