@@ -76,3 +76,21 @@ test("integrated LAB Worker with valid D1 schema rejects main before approval cl
  assert.equal((await result.json()).error,"STAGING_CYCLE_REJECTED_OR_RECOVERY_REQUIRED");
  assert.deepEqual(calls,["PRAGMA table_info(pacman_approval_claims)","PRAGMA table_info(pacman_cycle_checkpoints)"]);
 });
+
+test("integrated LAB Worker preserves legacy github-lab-write gate with V2 routing disabled",async()=>{
+ let calls=0;
+ const request=new Request("https://staging.invalid/execute",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+key},body:JSON.stringify({mode:"github-lab-write",intent:{operationId:"legacy-gate"},approval:{},content:"probe"})});
+ const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,DB:{prepare(){calls++;throw Error("unexpected");}}});
+ assert.equal(result.status,503);
+ assert.equal((await result.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");
+ assert.equal(calls,0);
+});
+
+test("integrated LAB Worker rejects unknown mode with V2 route disabled and issuer disconnected",async()=>{
+ let calls=0;
+ const request=new Request("https://staging.invalid/execute",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+key},body:JSON.stringify({mode:"unexpected-mode",intent:{operationId:"unknown"},approval:{},content:"probe"})});
+ const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,DB:{prepare(){calls++;throw Error("unexpected");}}});
+ assert.equal(result.status,503);
+ assert.equal((await result.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");
+ assert.equal(calls,0);
+});
