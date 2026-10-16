@@ -70,7 +70,7 @@ test("tampered signed bootstrap proof is rejected",async()=>{
  const f=await fixture();
  const verified=await verifyGithubOwnerBootstrapCommentLab({commentId:12345,nonce,registrationSha256:f.registrationSha256,githubToken:token,fetchImpl:f.fetchImpl,nowMs:now});
  const proof=await signVerifiedGithubBootstrapLab({verified,signingSecret:secret,nowMs:now,cryptoImpl:webcrypto});
- await assert.rejects(verifyGithubBootstrapProofV2Lab({payload:proof.payload,signature:"A"+proof.signature.slice(1),signingSecret:secret,expectedRegistrationSha256:f.registrationSha256,nowMs:now+1,cryptoImpl:webcrypto}),/BOOTSTRAP_PROOF_INVALID/);
+ await assert.rejects(verifyGithubBootstrapProofV2Lab({payload:proof.payload,signature:(proof.signature[0]==="A"?"B":"A")+proof.signature.slice(1),signingSecret:secret,expectedRegistrationSha256:f.registrationSha256,nowMs:now+1,cryptoImpl:webcrypto}),/BOOTSTRAP_PROOF_INVALID/);
 });
 
 test("proof is bound to exact registration digest",async()=>{

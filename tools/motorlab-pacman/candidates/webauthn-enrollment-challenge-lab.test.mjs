@@ -28,8 +28,8 @@ test("server-signed enrollment challenge verifies exact origin and RP ID",async(
 
 test("tampered signature is rejected",async()=>{
  const c=await make();
- const last=c.signature.at(-1);
- const bad=c.signature.slice(0,-1)+(last==="A"?"B":"A");
+ // Changing the first Base64URL symbol always changes signature bytes.
+ const bad=(c.signature[0]==="A"?"B":"A")+c.signature.slice(1);
  await assert.rejects(verifyEnrollmentChallengeLab({
   ...c,signature:bad,origin,rpId,signingSecret:secret,nowMs:now+1,cryptoImpl:webcrypto
  }),/WEBAUTHN_ENROLLMENT_CHALLENGE_INVALID/);
