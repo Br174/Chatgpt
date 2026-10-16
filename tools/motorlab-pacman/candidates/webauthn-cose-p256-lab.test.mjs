@@ -1,0 +1,15 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {webcrypto} from "node:crypto";
+import {decodeCoseP256PublicKeyLab as decode} from "./webauthn-cose-p256-lab.mjs";
+const key=()=>{const x=new Uint8Array(32).fill(1),y=new Uint8Array(32).fill(2);return Uint8Array.from([0xa5,0x01,0x02,0x03,0x26,0x20,0x01,0x21,0x58,0x20,...x,0x22,0x58,0x20,...y]);};
+test("decodes canonical COSE EC2 ES256 P-256 map",()=>{const r=decode(key());assert.equal(r.kty,"EC");assert.equal(r.crv,"P-256");assert.equal(Buffer.from(r.x,"base64url").length,32);});
+test("rejects unsupported algorithm",()=>{const b=key();b[4]=0x27;assert.throws(()=>decode(b));});
+test("rejects unsupported curve",()=>{const b=key();b[6]=0x02;assert.throws(()=>decode(b));});
+test("rejects duplicate COSE map key",()=>{const b=key();b[5]=0x03;assert.throws(()=>decode(b));});
+test("rejects truncated public key",()=>assert.throws(()=>decode(key().slice(0,-1))));
+test("rejects trailing bytes",()=>assert.throws(()=>decode(Uint8Array.from([...key(),0]))));
+test("rejects indefinite CBOR map",()=>{const b=key();b[0]=0xbf;assert.throws(()=>decode(b));});
+test("rejects wrong coordinate length",()=>{const b=key();b[9]=0x1f;assert.throws(()=>decode(b));});
+test("rejects noncanonical integer",()=>{const b=key();b[1]=0x18;assert.throws(()=>decode(b));});
+test("rejects empty key",()=>assert.throws(()=>decode(new Uint8Array())));
