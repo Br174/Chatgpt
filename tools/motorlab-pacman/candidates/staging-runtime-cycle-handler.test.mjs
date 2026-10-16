@@ -37,3 +37,14 @@ test("handler refuses wrong D1 column type before consuming approval",async()=>{
  const response=await stagingCycleHandler({input:request,env:{...flags,DB:store,PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:token},fetchImpl:async()=>{calls++;}});
  assert.equal(response.status,503);assert.equal((await response.json()).error,"STAGING_D1_SCHEMA_UNVERIFIED");assert.equal(calls,0);
 });
+
+test("handler rejects nullable required D1 column before approval claim",async()=>{
+ const request=await input("handler-013");let calls=0;
+ const store={prepare(sql){if(sql.startsWith("PRAGMA table_info(")){
+  const approval=sql.includes("pacman_approval_claims");
+  const cols=approval?["operation_id","approval_signature","claimed_at","expires_at"]:["operation_id","state","branch","path","sha","updated_at"];
+  return {all:async()=>({results:cols.map(name=>({name,pk:name==="operation_id"?1:0,type:["claimed_at","expires_at"].includes(name)?"INTEGER":"TEXT",notnull:name==="approval_signature"?0:["operation_id","sha"].includes(name)&&!approval?0:1}))})};
+ }throw Error("approval must not be claimed");}};
+ const result=await stagingCycleHandler({input:request,env:{...flags,DB:store,PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:token},fetchImpl:async()=>{calls++;}});
+ assert.equal(result.status,503);assert.equal((await result.json()).error,"STAGING_D1_SCHEMA_UNVERIFIED");assert.equal(calls,0);
+});
