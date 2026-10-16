@@ -46,3 +46,10 @@ Only candidate source, tests, and review documentation are eligible for LAB-only
 - Do **not** copy/paste candidate code into the dashboard editor. Produce and review a controlled integration diff, a reproducible build and a rollback plan first.
 - Do **not** set any of the four cycle feature flags until trusted issuer authentication and secret custody are independently validated.
 - The last 3% remains a planning estimate, **not** proof of deployment readiness or successful real-world execution.
+
+## Latest LAB integration anti-regression evidence — 2026-10-16
+- Commit `a36a769030a50af87122fe3258548ad7cdf60ac2` added legacy/unknown-mode fail-closed tests.
+- Isolated candidate suite: **95/95 passed**, 0 failed, 0 skipped (Actions run `38845216522`).
+- Complete LAB suite: **150/150 passed**, 0 failed, 0 skipped (Actions run `38845216535`).
+- CORE alias workflow: success (Actions run `38845216576`).
+- All are simulated CI evidence; deployed Cloudflare Worker still lacks inspected `github-lab-cycle` routing and is not authorized for activation.
