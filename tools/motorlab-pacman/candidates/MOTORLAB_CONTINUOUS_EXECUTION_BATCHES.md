@@ -1,19 +1,19 @@
-# MotorLab — Continuous Execution Batches (LAB candidate)
+# MotorLab — Continuous Execution Until Completion V3 (LAB candidate)
 
-## Default execution policy
-After the user's initial approval of a defined scope, execute up to six meaningful, authorized development interventions consecutively without seeking redundant approval between progress updates. A progress update is informational, not a pause or permission gate.
+## Priority and supersession
+This policy replaces the earlier six-intervention batching policy and supersedes conflicting MotorLab organizational rules that require arbitrary pauses, per-step approval, or a user prompt to continue after reporting progress. The default stopping point is completion of the entire project, not the end of a step, phase, checkpoint, or batch.
 
-## Intervention definition
-One intervention is an independently meaningful change, fix, verification, or test with recorded evidence and outcome. Do not pad batches with trivial actions. Group work by dependency order, stopping earlier if a blocker makes further work unsafe or unproductive.
+## Autonomous continuation
+After the user has authorized a project and its applicable actions, execute every feasible dependent activity consecutively until completion or a genuine blocking condition. A checkpoint or progress report must never itself stop execution. Fix recoverable defects, run tests, inspect evidence, retry safely, and continue to the next task without seeking redundant confirmation. Avoid artificially dividing a feasible project into sessions.
 
-## Progress and reporting
-At each checkpoint, display exactly three progress percentages (overall project, current phase, current activity), each with a signed delta in percentage points from a comparable previous checkpoint. Green for verified increases, red for verified regressions, neutral for unchanged, and unavailable when no comparable baseline exists. Distinguish estimated and verified values. Record every meaningful intermediate checkpoint, even if a user-visible summary is deferred until batch end.
+## Only legitimate stops
+Pause when the user must perform an indispensable manual action, give an authorization not already granted, provide an essential missing decision, or when the execution environment imposes an actual blocking limitation. Clearly identify the exact blocker and the minimum action required. An approval limited to LAB cannot authorize changes to main/MADRE, production, live D1, secrets, spending, or unrelated repositories; request explicit approval before those actions. Never bypass access controls or approval mechanisms.
 
-## Authorization and hard stops
-An initial approval never grants authority beyond its exact scope. Stop and request approval before changing repository/branch/path authorization, MADRE/main, production, deployment, real D1 or Cloudflare runtime, secrets, external access, spending, or other sensitive actions not explicitly covered. Preserve single-writer and anti-regression checks. Do not perform unapproved live write probes.
+## Progress reports
+Display exactly three percentages: overall project, current phase, current activity, each with a signed change in percentage points against a comparable previous checkpoint (green increase, red regression, neutral unchanged, unavailable if incomparable). Mark estimates distinctly from verified data; report genuine progress promptly without turning reports into approval gates. Keep checkpoint evidence, single-writer protections, and regression checks.
 
-## Execution environment
-Continue within the active response while tools and time permit. Do not claim asynchronous or background execution, or that work continues after a response without a scheduled task. At the end of a batch (default six interventions), give a compact status and next dependencies. If an error is recoverable within scope, fix and retest without stopping to ask permission.
+## Execution constraints
+Continue for as long as the active response and available tools permit. Do not imply that code continues running after a chat response ends unless an actual persistent runner or scheduled automation has been configured and verified. If the environment stops execution, preserve an accurate resumable checkpoint and state the limitation without calling it completed.
 
-## Scope of adoption
-This is a shared MotorLab policy candidate for Pac-Man, MusicLab, StudyBook AI, MotorAI and other orchestrated projects. Committing this file to the Pac-Man LAB candidate does not deploy or modify the real shared CORE or other projects.
+## Adoption
+This file is a MotorLab shared-policy LAB candidate applicable in design to Pac-Man, MusicLab, StudyBook AI, MotorAI and other projects. Its GitHub commit does not automatically install or activate the rule in their deployed runtimes or modify the real CORE. No change outside the previously authorized Pac-Man LAB branch/path is implied.
