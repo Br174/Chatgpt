@@ -4,11 +4,11 @@ on:
     branches:
       - motorlab/continuity-pillar-v3-lab-20261016
     paths:
-      - 'templates/execution/motorlab-continuity-*.mjs'
+      - 'templates/execution/motorlab-*-lab.mjs'
       - '.github/workflows/motorlab-r38-continuity-lab.yml'
   pull_request:
     paths:
-      - 'templates/execution/motorlab-continuity-*.mjs'
+      - 'templates/execution/motorlab-*-lab.mjs'
       - '.github/workflows/motorlab-r38-continuity-lab.yml'
   workflow_dispatch:
 permissions:
@@ -23,4 +23,4 @@ jobs:
         with:
           node-version: '22'
       - name: Test continuity decisions and checkpoint handoff
-        run: node --test templates/execution/motorlab-continuity-*.test.mjs
+        run: node --test templates/execution/motorlab-continuity-*.test.mjs templates/execution/motorlab-r38-execution-bridge-lab.test.mjs
