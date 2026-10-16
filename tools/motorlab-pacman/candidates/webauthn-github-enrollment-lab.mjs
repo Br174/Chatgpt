@@ -7,19 +7,26 @@ import {
  signVerifiedGithubBootstrapLab,verifyGithubBootstrapProofV2Lab
 } from "./webauthn-github-bootstrap-lab.mjs";
 import {storeWebAuthnCredentialD1} from "./webauthn-d1-lab.mjs";
+import {verifyEnrollmentChallengeLab} from "./webauthn-enrollment-challenge-lab.mjs";
 
 const OWNER_SUBJECT="202558590";
 const fail=code=>{throw Error(code);};
 
 export async function enrollOwnerPasskeyFromGithubLab({
  db,commentId,githubToken,signingSecret,registrationResponse,
- challenge,origin,rpId,fetchImpl=fetch,cryptoImpl=globalThis.crypto,nowMs=Date.now()
+ challenge,challengePayload,challengeSignature,origin,rpId,fetchImpl=fetch,cryptoImpl=globalThis.crypto,nowMs=Date.now()
 }={}){
  if(!db?.prepare||!registrationResponse||typeof registrationResponse!=="object"||
+    typeof challengePayload!=="string"||!challengePayload||typeof challengeSignature!=="string"||!challengeSignature||
     typeof signingSecret!=="string"||signingSecret.length<32||
     typeof githubToken!=="string"||githubToken.length<20||
     !Number.isSafeInteger(commentId)||commentId<1||!Number.isSafeInteger(nowMs))
   fail("WEBAUTHN_ENROLLMENT_NOT_CONFIGURED");
+
+ await verifyEnrollmentChallengeLab({
+  challenge,payload:challengePayload,signature:challengeSignature,
+  origin,rpId,signingSecret,nowMs,cryptoImpl
+ });
 
  const registrationSha256=await digestRegistrationCandidateLab({
   registrationResponse,challenge,origin,rpId,cryptoImpl
