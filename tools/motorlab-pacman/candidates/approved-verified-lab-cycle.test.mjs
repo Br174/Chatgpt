@@ -49,3 +49,11 @@ test("invalid GitHub adapter configuration does not consume signed approval",asy
  await assert.rejects(approvedVerifiedLabCycle({...args,token,fetchImpl:async()=>{calls++;}}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
  assert.equal(calls,1);
 });
+
+test("oversized content is rejected before consuming single-use approval",async()=>{
+ const f=await fixture("signed-cycle-006"),db=ledger();let calls=0;
+ await assert.rejects(approvedVerifiedLabCycle({...f,secret,db,content:"x".repeat(4097),token,fetchImpl:async()=>{calls++;},onCheckpoint:async()=>{}}),/INVALID_CONTENT/);
+ assert.equal(calls,0);
+ await assert.rejects(approvedVerifiedLabCycle({...f,secret,db,content,token,fetchImpl:async()=>{calls++;return response(403,{});},onCheckpoint:async()=>{}}),/GITHUB_READ_FAILED_403/);
+ assert.equal(calls,1);
+});
