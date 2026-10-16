@@ -31,7 +31,7 @@ const sha256Hex=async(value,cryptoImpl)=>{
 };
 
 function config(env){
- if(env?.PACMAN_WEBAUTHN_ENABLED!=="YES_STAGING_WEBAUTHN_ONLY")return null;
+ if(env?.PACMAN_WEBAUTHN_ENABLED!=="YES_ZERO_COST_WEBAUTHN_STAGING")return null;
  if(!env?.DB?.prepare||
     typeof env.PACMAN_WEBAUTHN_ORIGIN!=="string"||
     typeof env.PACMAN_WEBAUTHN_RP_ID!=="string"||
