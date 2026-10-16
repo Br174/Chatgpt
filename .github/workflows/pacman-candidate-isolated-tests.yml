@@ -1,0 +1,25 @@
+name: Pacman isolated candidate tests (LAB only)
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - 'tools/motorlab-pacman/candidates/**'
+      - 'tools/motorlab-pacman/tests/**'
+      - '.github/workflows/pacman-candidate-isolated-tests.yml'
+permissions:
+  contents: read
+jobs:
+  candidate-tests:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run isolated LAB candidate and issuer regression tests
+        run: node --test tools/motorlab-pacman/candidates/*.test.mjs tools/motorlab-pacman/tests/*.test.mjs
