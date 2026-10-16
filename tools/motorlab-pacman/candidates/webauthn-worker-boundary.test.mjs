@@ -132,3 +132,24 @@ test("canonical Worker delegates owner enrollment start and never falls through 
  assert.ok(body.enrollmentChallenge.payload);
  assert.ok(body.enrollmentChallenge.signature);
 });
+
+
+test("canonical Worker serves the Android passkey page only when configured",async()=>{
+ const env={...baseEnv,DB:db()};
+ const r=await handleWebAuthnRequest(new Request(endpoint+"/webauthn"),env,{cryptoImpl:webcrypto});
+ assert.equal(r.status,200);
+ assert.match(r.headers.get("content-type")||"",/text\/html/);
+ assert.match(r.headers.get("permissions-policy")||"",/publickey-credentials-create/);
+ const body=await r.text();
+ assert.match(body,/navigator\.credentials\.create/);
+ assert.match(body,/\/webauthn\/enroll\/start/);
+ assert.match(body,/\/webauthn\/enroll\/finish/);
+ assert.match(body,/github\.com\/Br174\/Chatgpt\/pull\/64/);
+ assert.doesNotMatch(body,/PACMAN_GITHUB_TOKEN|PACMAN_APPROVAL_SIGNING_SECRET/);
+});
+
+test("Android passkey page remains unavailable while zero-cost runtime is disabled",async()=>{
+ const r=await handleWebAuthnRequest(new Request(endpoint+"/webauthn"),{});
+ assert.equal(r.status,503);
+ assert.equal((await r.json()).error,"WEBAUTHN_DISABLED_OR_UNCONFIGURED");
+});
