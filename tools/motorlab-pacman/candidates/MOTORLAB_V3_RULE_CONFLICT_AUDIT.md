@@ -40,3 +40,9 @@ MOTORLAB_EXECUTION_CONTINUITY_V1.txt remains the canonical owner of approved-ope
 ## Verified audit status
 Read-only inspected: PRE_CHANGE_APPROVAL_GATE, EXECUTION_CONTINUITY, LIVE_CONTROL, GOVERNANCE, BACKGROUND_EXECUTION, PROGRESS_REPORTING, REENTRY_GATE, WATCHDOG, FAST_ITERATION_NO_SPIN, EXTERNAL_SERVICE_GUARD, EXECUTION_FABRIC, ROOT_CAUSE_CLOSURE, CHANGE_COMPATIBILITY_GUARD (default branch).
 LAB candidate supersession documentation: present. Full active-route inventory: PENDING. CORE integration: NOT DONE. Runtime adoption across other projects: NOT DONE.
+
+## Root cause of non-application (evidence-based)
+The default-branch EXECUTION_CONTINUITY contract already promises continuation to verified 100%. PRE_CHANGE_APPROVAL_GATE explicitly says do not re-ask inside the approved scope. The LAB V3 policy was only a candidate file and not an active runtime hook. Thus documentation alone cannot enforce behavior at chat-turn boundaries. The prior assistant ended individual responses after a correction or status, which is an observed conversational failure, not proof that a particular code callback fired. The old six-intervention policy was an additional contradictory LAB document and is now superseded. Full runtime code-path attribution remains unverified until enforcement routes are inventoried and tested.
+
+## Verified related CI evidence
+The Pac-Man WebAuthn registration test-fixture correction commit ac4e9ce5c66f0139069e7ddcca4e9538e8af3d3a has three completed successful workflows (Pacman CORE Alias, Pacman V2 Complete LAB Suite, Pacman isolated candidate tests). This is evidence for that test correction, not evidence of CORE-wide V3 deployment.
