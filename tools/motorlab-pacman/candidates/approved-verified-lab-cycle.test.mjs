@@ -88,3 +88,16 @@ test("D1 WRITE_ATTEMPTED persistence failure leaves probe for manual recovery, n
  assert.equal(file,true);assert.deepEqual(methods,["GET","PUT"]);
  assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","RECOVERY_REQUIRED"]);
 });
+
+test("production main branch rejected by scope guard before D1 approval or GitHub calls",async()=>{
+ const f=await fixture("scope-main-001");let dbCalls=0,githubCalls=0;
+ const db={prepare(){dbCalls++;throw Error("approval ledger must not be touched");}};
+ await assert.rejects(approvedVerifiedLabCycle({...f,intent:{...f.intent,branch:"main"},approval:{...f.approval,branch:"main"},secret,db,content,token,fetchImpl:async()=>{githubCalls++;throw Error("GitHub must not be contacted");},onCheckpoint:async()=>{}}),/LAB_SCOPE_REQUIRED/);
+ assert.equal(dbCalls,0);assert.equal(githubCalls,0);
+});
+test("non-probe path rejected by scope guard before D1 approval or GitHub calls",async()=>{
+ const f=await fixture("scope-path-001");let dbCalls=0,githubCalls=0;
+ const db={prepare(){dbCalls++;throw Error("approval ledger must not be touched");}};
+ await assert.rejects(approvedVerifiedLabCycle({...f,intent:{...f.intent,path:".github/workflows/deploy.yml"},secret,db,content,token,fetchImpl:async()=>{githubCalls++;throw Error("GitHub must not be contacted");},onCheckpoint:async()=>{}}),/LAB_SCOPE_REQUIRED/);
+ assert.equal(dbCalls,0);assert.equal(githubCalls,0);
+});
