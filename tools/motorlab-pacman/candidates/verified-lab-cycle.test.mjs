@@ -45,3 +45,26 @@ test("candidate checkpoints deletion before calling remove",async()=>{
  assert.ok(states.indexOf("CLEANUP_ATTEMPTED")>states.indexOf("WRITE_ATTEMPTED"));
  assert.ok(states.indexOf("CLEANUP_ATTEMPTED")<states.indexOf("VERIFIED_AND_REMOVED"));
 });
+
+test("cleanup timeout is marked for recovery and never retried automatically",async()=>{
+ const calls=[],states=[];let file=null;
+ const adapter={
+  async read(){calls.push("read");return file===null?{exists:false}:{exists:true,content:file,sha};},
+  async create({content}){calls.push("create");file=content;},
+  async remove(){calls.push("remove");throw Error("ambiguous delete timeout");}
+ };
+ await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async x=>states.push(x.state)}),/LAB_CYCLE_RECOVERY_REQUIRED/);
+ assert.deepEqual(calls,["read","create","read","remove"]);
+ assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","RECOVERY_REQUIRED"]);
+});
+test("cleanup verification failure does not claim completion",async()=>{
+ const calls=[],states=[];let readCount=0;
+ const adapter={
+  async read(){calls.push("read");readCount++;return readCount===1?{exists:false}:{exists:true,content:"probe",sha};},
+  async create(){calls.push("create");},
+  async remove(){calls.push("remove");}
+ };
+ await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async x=>states.push(x.state)}),/LAB_CYCLE_RECOVERY_REQUIRED/);
+ assert.deepEqual(calls,["read","create","read","remove","read"]);
+ assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","RECOVERY_REQUIRED"]);
+});
