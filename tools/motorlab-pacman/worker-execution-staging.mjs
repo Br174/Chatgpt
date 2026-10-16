@@ -2,6 +2,7 @@
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
 import {writeApprovedLabProbe} from "./github-lab-write.mjs";
+import {candidateCycleDispatch} from "./candidates/staging-cycle-dispatch.mjs";
 // Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
@@ -16,8 +17,7 @@ async function authorized(request,secret){
  for(let i=0;i<aa.length;i++)diff|=aa[i]^bb[i];
  return diff===0 && supplied.length===secret.length;
 }
-export default {
- async fetch(request,env){
+export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
   const url=new URL(request.url);
   // Public, read-only connectivity check: no secrets, approvals, or D1 writes.
   if(url.pathname==="/health" && request.method==="GET"){
@@ -64,7 +64,7 @@ export default {
   } catch {return response({error:"INVALID_JSON"},400);}
   if(!input || typeof input!=="object" || Array.isArray(input) || !input.intent || typeof input.intent!=="object" || Array.isArray(input.intent) || !input.approval || typeof input.approval!=="object" || Array.isArray(input.approval) || typeof input.content!=="string")
    return response({error:"INVALID_REQUEST"},400);
-  // A chat message or JSON approval is never sufficient to assert trusted-host identity.
+  // V2 route is wired into the real staging Worker but remains disabled unless the exact LAB-only route flag is set.\n  const candidateResult=await candidateCycleDispatch({input,env,fetchImpl});\n  if(candidateResult!==null)return candidateResult;\n  // A chat message or JSON approval is never sufficient to assert trusted-host identity.
   // Fail closed BEFORE consuming a one-time attestation until a separate trusted issuer
   // and an audited staging-only executor are both connected and enabled.
   if(env?.PACMAN_TRUSTED_ISSUER_CONNECTED!=="YES_VERIFIED_TRUSTED_HOST")
@@ -79,7 +79,7 @@ export default {
    try {
     const result=await writeApprovedLabProbe({intent:input.intent,approval:input.approval,
      attestation:input.attestation,secret:env.PACMAN_APPROVAL_SIGNING_SECRET,
-     db:env.DB,content:input.content,token:env.PACMAN_GITHUB_TOKEN,fetchImpl:fetch});
+     db:env.DB,content:input.content,token:env.PACMAN_GITHUB_TOKEN,fetchImpl});
     return response(result);
    } catch {return response({error:"GITHUB_LAB_WRITE_REJECTED"},403);}
   }
@@ -101,5 +101,6 @@ export default {
    return response({error:"APPROVAL_INVALID_OR_ALREADY_CLAIMED"},403);
   }
 
- }
-};
+}
+
+export default {fetch(request,env){return handleExecutionRequest(request,env);}};
