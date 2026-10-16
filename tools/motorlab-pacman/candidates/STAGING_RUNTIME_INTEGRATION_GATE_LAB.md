@@ -18,3 +18,15 @@ Current `tools/motorlab-pacman/worker-execution-staging.mjs` still routes `mode=
 ## Decision
 
 **NO-GO** for live Worker GitHub mutation. Keep `PACMAN_TRUSTED_ISSUER_CONNECTED`, `PACMAN_GITHUB_LAB_WRITE_ENABLED`, and `PACMAN_APPROVAL_READINESS_ENABLED` disabled. No main/MADRE/production changes. Candidate-only source and tests are permitted in the LAB branch.
+
+## Verified progress — 2026-10-16 (post-58-test run)
+
+- Isolated candidate suite: **58/58 pass**, GitHub Actions run **38834944764**; full LAB and CORE workflows also succeeded.
+- Candidate `staging-runtime-cycle-handler.mjs` checks three independent flags, signing secret, GitHub token, D1 approval ledger columns/primary key and checkpoint columns/primary key before attempting an approved cycle.
+- Tests invoke the *actual* `worker-execution-staging.mjs` and confirm that the new candidate mode remains **unrouted and disabled**. This is evidence of isolation, **not** a live integration test.
+- The real Worker still offers legacy `github-lab-write` under separate flags. That path is not the reversible create/verify/delete cycle and must not be mistaken for the new candidate.
+- **No actual staging D1 migration, trusted-host issuer authentication, real token scope check, or deployment has been verified.** Live mutation remains **NO-GO**.
+
+### Precise next integration checkpoint
+
+Before modifying or deploying the Worker entry point, confirm that the dedicated staging deployment is isolated, inventory its D1 binding and actual table schemas, inspect the Worker deploy workflow trigger paths, and establish an authenticated issuer design. Then integrate the candidate cycle with disabled-by-default routing and test the real Worker entry point using mocked D1/GitHub. Do not set enablement flags from test evidence alone.
