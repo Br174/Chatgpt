@@ -26,3 +26,10 @@ Status: DESIGN REVIEW ONLY. Not an authenticated issuer, not an authorization to
 
 ## Deployment boundary
 Keep all cycle flags OFF. No main/MADRE/production edits, no Worker deployment, no real GitHub probe, and no D1 writes are authorized by this document.
+
+## Latest signature anti-forgery CI evidence — 2026-10-16
+- Commit `9bda3a417d29bcd58c8852e3be48d9783f7cba9c` adds two tests: forged caller JSON is rejected, and matching scope/content with a fake HMAC signature is rejected.
+- Complete LAB suite: **152/152 passed**, 0 failed, 0 skipped; run `38845430740`. Logs include both new cases.
+- Isolated candidate suite: **95/95 passed**, 0 failed, 0 skipped; run `38845430733`.
+- CORE alias workflow succeeded; run `38845430714`.
+- These are simulated tests, **not** proof of an authenticated external issuer or deployed Worker integration.
