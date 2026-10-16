@@ -29,7 +29,7 @@ async function fixture(){
   return body+"."+Buffer.from(sig).toString("base64url");
  }
 
- let claimed=false,exists=false;
+ let claimed=false,exists=false,fileContent=null;
  const states=[],githubMethods=[],executorCalls=[];
  const DB={prepare(sql){
   const match=/^PRAGMA table_info\((\w+)\)$/.exec(sql);
@@ -40,9 +40,9 @@ async function fixture(){
  }};
  const githubFetch=async(_url,init)=>{
   githubMethods.push(init.method);
-  if(init.method==="GET")return {status:exists?200:404,ok:exists,json:async()=>exists?{type:"file",sha,encoding:"base64",content:"cHJvYmU="}:{}};
-  if(init.method==="PUT"){assert.equal(exists,false);exists=true;return {status:201,ok:true,json:async()=>({content:{sha},commit:{sha:commit}})};}
-  if(init.method==="DELETE"){assert.equal(exists,true);exists=false;return {status:200,ok:true,json:async()=>({commit:{sha:commit}})};}
+  if(init.method==="GET")return {status:exists?200:404,ok:exists,json:async()=>exists?{type:"file",sha,encoding:"base64",content:Buffer.from(fileContent).toString("base64")}:{}};
+  if(init.method==="PUT"){assert.equal(exists,false);const body=JSON.parse(init.body);fileContent=Buffer.from(body.content,"base64").toString("utf8");exists=true;return {status:201,ok:true,json:async()=>({content:{sha},commit:{sha:commit}})};}
+  if(init.method==="DELETE"){assert.equal(exists,true);exists=false;fileContent=null;return {status:200,ok:true,json:async()=>({commit:{sha:commit}})};}
   throw Error("UNEXPECTED_GITHUB_METHOD");
  };
  const executorEnv={
