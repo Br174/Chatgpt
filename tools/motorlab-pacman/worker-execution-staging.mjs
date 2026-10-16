@@ -1,7 +1,6 @@
 // Separate staging-only execution Worker. NOT deployed; read-only health Worker remains untouched.
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
-import {writeApprovedLabProbe} from "./github-lab-write.mjs";
 import {candidateCycleDispatch} from "./candidates/staging-cycle-dispatch.mjs";
 // Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
 const MAX_BYTES=8192;
@@ -67,25 +66,13 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
   // V2 route is wired into the real staging Worker but remains disabled unless the exact LAB-only route flag is set.
   const candidateResult=await candidateCycleDispatch({input,env,fetchImpl});
   if(candidateResult!==null)return candidateResult;
-  // A chat message or JSON approval is never sufficient to assert trusted-host identity.
+  // V1 existing-file write contract is retired. V2 reversible cycle is the only canonical GitHub mutation route.\n  if(input.mode==="github-lab-write") return response({error:"LEGACY_GITHUB_LAB_WRITE_RETIRED"},410);\n  // A chat message or JSON approval is never sufficient to assert trusted-host identity.
   // Fail closed BEFORE consuming a one-time attestation until a separate trusted issuer
   // and an audited staging-only executor are both connected and enabled.
   if(env?.PACMAN_TRUSTED_ISSUER_CONNECTED!=="YES_VERIFIED_TRUSTED_HOST")
    return response({error:"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING"},503);
   if(typeof env?.PACMAN_APPROVAL_SIGNING_SECRET!=="string" || env.PACMAN_APPROVAL_SIGNING_SECRET.length<32)
    return response({error:"TRUSTED_CHAT_APPROVAL_NOT_CONNECTED"},503);
-  // Separate, explicit staging-only switch. No live writes without verified issuer and token.
-  if(input.mode==="github-lab-write"){
-   if(env?.PACMAN_GITHUB_LAB_WRITE_ENABLED!=="YES_STAGING_LAB_ONLY" ||
-      typeof env?.PACMAN_GITHUB_TOKEN!=="string" || env.PACMAN_GITHUB_TOKEN.length<20)
-    return response({error:"GITHUB_LAB_WRITE_DISABLED"},503);
-   try {
-    const result=await writeApprovedLabProbe({intent:input.intent,approval:input.approval,
-     attestation:input.attestation,secret:env.PACMAN_APPROVAL_SIGNING_SECRET,
-     db:env.DB,content:input.content,token:env.PACMAN_GITHUB_TOKEN,fetchImpl});
-    return response(result);
-   } catch {return response({error:"GITHUB_LAB_WRITE_REJECTED"},403);}
-  }
   // Do not consume one-time approvals for an executor until audited implementation exists:
   // otherwise an authorized operation would be irreversibly claimed without execution.
   // The gate is wired and callable only for an explicit, side-effect-free readiness probe.
