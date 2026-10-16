@@ -30,3 +30,20 @@ test("integrated LAB Worker rejects invalid D1 schema before approval claim or G
  assert.equal(result.status,503);assert.equal((await result.json()).error,"STAGING_D1_SCHEMA_UNVERIFIED");
  assert.deepEqual(statements,["PRAGMA table_info(pacman_approval_claims)"]);
 });
+
+test("integrated LAB Worker rejects malformed JSON before D1 or GitHub access",async()=>{
+ let calls=0;
+ const request=new Request("https://staging.invalid/execute",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+key},body:'{"mode":'});
+ const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",DB:{prepare(){calls++;throw Error("unexpected");}}});
+ assert.equal(result.status,400);assert.equal((await result.json()).error,"INVALID_JSON");assert.equal(calls,0);
+});
+test("integrated LAB Worker ignores unrecognized routing flag even with independent flags present",async()=>{
+ let calls=0;
+ const result=await worker.fetch(req({authorization:"Bearer "+key}),{
+  PACMAN_EXECUTION_KEY:key,PACMAN_CYCLE_ROUTE_ENABLED:"true",PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",
+  PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",
+  PACMAN_APPROVAL_SIGNING_SECRET:"s".repeat(48),PACMAN_GITHUB_TOKEN:"t".repeat(24),
+  DB:{prepare(){calls++;throw Error("unexpected");}}
+ });
+ assert.equal(result.status,503);assert.equal((await result.json()).error,"STAGING_CYCLE_ROUTE_DISABLED");assert.equal(calls,0);
+});
