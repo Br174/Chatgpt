@@ -170,7 +170,7 @@ test("protected GitHub egress diagnostic denies unauthenticated and disabled cal
 
 test("guarded Github egress diagnostic reports only numeric statuses, not secrets or comment contents",async()=>{
  const key="k".repeat(40),calls=[];
- const fetchImpl=async(url,opt)=>{calls.push({url,auth:opt.headers?.authorization,method:opt.method});return {status:calls.length===1?403:200};};
+ const fetchImpl=async(url,opt)=>{calls.push({url,auth:opt.headers?.authorization,method:opt.method,redirect:opt.redirect});return {status:calls.length===1?403:200};};
  const r=await handleWebAuthnRequest(new Request(endpoint+"/__motorlab_lab/diagnostics/github-bootstrap",{headers:{authorization:"Bearer "+key}}),{...baseEnv,DB:db(),PACMAN_EXECUTION_KEY:key},{fetchImpl});
  assert.equal(r.status,200);
  const body=await r.json();
