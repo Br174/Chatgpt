@@ -12,6 +12,13 @@ export async function stagingCycleHandler({input,env,fetchImpl=fetch,now}={}){
  if(!env?.DB?.prepare || typeof env?.PACMAN_APPROVAL_SIGNING_SECRET!=="string" ||
     env.PACMAN_APPROVAL_SIGNING_SECRET.length<32 || typeof env?.PACMAN_GITHUB_TOKEN!=="string" ||
     env.PACMAN_GITHUB_TOKEN.length<20)return reply({error:"STAGING_CONFIGURATION_MISSING"},503);
+ // Verify both staging tables before consuming a one-time approval or calling GitHub.
+ try {
+  const tables=await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('pacman_operations','pacman_cycle_checkpoints')").all();
+  const found=new Set(tables?.results?.map(x=>x.name));
+  if(!found?.has("pacman_operations") || !found.has("pacman_cycle_checkpoints"))
+   return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);
+ } catch {return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);}
  try {
   const result=await approvedVerifiedLabCycleWithD1({intent:input.intent,approval:input.approval,
    attestation:input.attestation,secret:env.PACMAN_APPROVAL_SIGNING_SECRET,
