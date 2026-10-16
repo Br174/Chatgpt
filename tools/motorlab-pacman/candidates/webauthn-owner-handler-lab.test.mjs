@@ -10,7 +10,7 @@ const token="t".repeat(40);
 const ownerRow={credential_id:"cred_owner_0001",public_key_jwk:JSON.stringify({kty:"EC",crv:"P-256",x:"x".repeat(43),y:"y".repeat(43)}),sign_count:0,owner_subject:"202558590",disabled_at:null};
 
 function env(db,extra={}){return {
- DB:db,PACMAN_WEBAUTHN_ENABLED:"YES_STAGING_WEBAUTHN_ONLY",
+ DB:db,PACMAN_WEBAUTHN_ENABLED:"YES_ZERO_COST_WEBAUTHN_STAGING",
  PACMAN_WEBAUTHN_ORIGIN:origin,PACMAN_WEBAUTHN_RP_ID:rpId,
  PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:token,...extra
 };}
