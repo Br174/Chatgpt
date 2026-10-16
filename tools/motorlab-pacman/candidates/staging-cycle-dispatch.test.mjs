@@ -51,3 +51,24 @@ test("routing rejects unverified issuer even with configured token, secret and D
  assert.equal((await result.json()).error,"STAGING_CYCLE_DISABLED");
  assert.equal(calls,0);
 });
+
+test("routing switch stays fail-closed even when all downstream gates and credentials are configured",async()=>{
+ let calls=0;
+ const env={
+  PACMAN_CYCLE_ROUTE_ENABLED:"DISABLED",
+  PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",
+  PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",
+  PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",
+  PACMAN_APPROVAL_SIGNING_SECRET:"s".repeat(48),
+  PACMAN_GITHUB_TOKEN:"t".repeat(24),
+  DB:{prepare(){calls++;throw Error("D1 must not be touched");}}
+ };
+ const result=await candidateCycleDispatch({
+  input:{mode:"github-lab-cycle"},
+  env,
+  fetchImpl:async()=>{calls++;throw Error("GitHub must not be touched");}
+ });
+ assert.equal(result.status,503);
+ assert.equal((await result.json()).error,"STAGING_CYCLE_ROUTE_DISABLED");
+ assert.equal(calls,0);
+});
