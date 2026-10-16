@@ -40,7 +40,7 @@ function derEcdsaToRaw(sig,size=32){
  if(b.length<8||b[0]!==0x30)fail("WEBAUTHN_SIGNATURE_INVALID");
  let i=1;
  let seqLen=b[i++];
- if(seqLen&0x80){const n=seqLen&0x7f;if(n<1||n>2||i+n>b.length)fail("WEBAUTHN_SIGNATURE_INVALID");seqLen=0;while(n--){seqLen=(seqLen<<8)|b[i++];}}
+ if(seqLen&0x80){let n=seqLen&0x7f;if(n<1||n>2||i+n>b.length)fail("WEBAUTHN_SIGNATURE_INVALID");seqLen=0;while(n--){seqLen=(seqLen<<8)|b[i++];}}
  if(i+seqLen!==b.length||b[i++]!==0x02)fail("WEBAUTHN_SIGNATURE_INVALID");
  let rLen=b[i++];if(rLen&0x80){const n=rLen&0x7f;if(n!==1||i>=b.length)fail("WEBAUTHN_SIGNATURE_INVALID");rLen=b[i++];}
  let r=b.slice(i,i+rLen);i+=rLen;
