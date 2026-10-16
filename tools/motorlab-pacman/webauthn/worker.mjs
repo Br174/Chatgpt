@@ -12,6 +12,7 @@ import {
 } from "../candidates/webauthn-approval-lab.mjs";
 import {storeWebAuthnChallengeD1} from "../candidates/webauthn-d1-lab.mjs";
 import {issuePacmanApprovalFromWebAuthnLab} from "../candidates/webauthn-trusted-issuer-lab.mjs";
+import {handleWebAuthnOwnerLab} from "../candidates/webauthn-owner-handler-lab.mjs";
 
 const MAX_BODY=32768;
 const reply=(body,status=200)=>Response.json(body,{status,headers:{
@@ -62,6 +63,8 @@ export async function handleWebAuthnRequest(request,env,{
 }={}){
  try{
   const url=new URL(request.url),cfg=config(env);
+  if(url.pathname.startsWith("/webauthn/"))
+   return handleWebAuthnOwnerLab(request,env,{fetchImpl,cryptoImpl,nowMs});
   if(url.pathname==="/health"&&request.method==="GET")
    return reply({service:"motorlab-pacman-webauthn-staging-lab",configured:cfg!==null,path:"WEBAUTHN_ZERO_COST"},cfg?200:503);
   if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
