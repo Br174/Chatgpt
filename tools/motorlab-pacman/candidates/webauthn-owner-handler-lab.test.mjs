@@ -142,11 +142,11 @@ test("approval execute delegates exact owner-bound LAB operation to server-side 
  assert.equal(r.status,200);
  assert.deepEqual(await r.json(),{status:"PACMAN_OPERATION_VERIFIED",operationId:intent.operationId,branch:intent.branch,path:intent.path});
  assert.equal(seen.db,d);
- assert.equal(seen.intent,intent);
+ assert.deepEqual(seen.intent,intent);
  assert.equal(seen.content,"probe");
  assert.equal(seen.challenge,"d".repeat(43));
  assert.equal(seen.credentialId,ownerRow.credential_id);
- assert.equal(seen.assertion,assertion);
+ assert.deepEqual(seen.assertion,assertion);
  assert.equal(seen.executionUrl,e.PACMAN_EXECUTION_URL);
  assert.equal(seen.executionKey,e.PACMAN_EXECUTION_KEY);
  assert.equal(seen.signingSecret,secret);
