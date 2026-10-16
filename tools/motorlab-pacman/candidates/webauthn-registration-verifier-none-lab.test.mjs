@@ -16,7 +16,7 @@ async function fixture(){
  const jwk=await webcrypto.subtle.exportKey("jwk",keys.publicKey);
  const id=new Uint8Array([7,8,9,10]),hash=new Uint8Array(await webcrypto.subtle.digest("SHA-256",enc.encode(rpId)));
  const auth=new Uint8Array([...hash,0x45,0,0,0,0,...new Uint8Array(16),0,4,...id,...cose(jwk)]);
- const att=new Uint8Array([0xa3,...str("fmt"),...str("none"),...str("authData"),0x59,(auth.length>>8)&255,auth.length&255,...auth,...str("attStmt"),0xa0]);
+ const att=new Uint8Array([0xa3,...str("fmt"),...str("none"),...str("authData"),...(auth.length<=255?[0x58,auth.length]:[0x59,(auth.length>>8)&255,auth.length&255]),...auth,...str("attStmt"),0xa0]);
  return {rpId,origin,challenge,rawId:b64(id),clientDataJSON:b64(enc.encode(JSON.stringify({type:"webauthn.create",challenge,origin}))),attestationObject:b64(att),cryptoImpl:webcrypto};
 }
 test("accepts a structurally valid none registration",async()=>{
