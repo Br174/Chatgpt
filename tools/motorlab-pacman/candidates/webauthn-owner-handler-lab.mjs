@@ -6,7 +6,8 @@ import {verifyNoneRegistrationLab} from "./webauthn-registration-verifier-none-l
 import {digestRegistrationCandidateLab,githubBootstrapCommentBodyLab} from "./webauthn-github-bootstrap-lab.mjs";
 import {enrollOwnerPasskeyFromGithubLab} from "./webauthn-github-enrollment-lab.mjs";
 import {createPacmanWebAuthnChallenge} from "./webauthn-approval-lab.mjs";
-import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.mjs";\nimport {executePacmanWithWebAuthnLab} from "./webauthn-execution-relay-lab.mjs";
+import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.mjs";
+import {executePacmanWithWebAuthnLab} from "./webauthn-execution-relay-lab.mjs";
 import {storeWebAuthnChallengeD1,loadOwnerWebAuthnCredentialD1} from "./webauthn-d1-lab.mjs";
 
 const OWNER_SUBJECT="202558590";
