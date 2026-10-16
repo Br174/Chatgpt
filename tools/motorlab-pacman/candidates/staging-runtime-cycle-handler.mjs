@@ -25,6 +25,10 @@ export async function stagingCycleHandler({input,env,fetchImpl=fetch,now}={}){
     return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);
    const pk=info.results.find(row=>row.name==="operation_id");
    if(pk?.pk!==1)return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);
+   // The live D1 schema must match the canonical column types, not just names.
+   const types=table==="pacman_approval_claims"?["TEXT","TEXT","INTEGER","INTEGER"]:["TEXT","TEXT","TEXT","TEXT","TEXT","TEXT"];
+   if(!columns.every((name,i)=>info.results.find(row=>row.name===name)?.type?.toUpperCase()===types[i]))
+    return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);
   }
  } catch {return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);}
  try {
