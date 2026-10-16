@@ -52,14 +52,14 @@ test("stale authenticated session is rejected",async()=>{
 
 test("confirmation bound to different content is rejected",async()=>{
  const f=await setup();
- await assert.rejects(issuePacmanApprovalFromCloudflareAccessLab({...f,confirmation:{...f.confirmation,contentSha256:"0".repeat(64)},accessConfig:f.config,signingSecret:secret,cryptoImpl:webcrypto}),/ISSUER_AUTHORIZATION_DENIED/);
+ await assert.rejects(issuePacmanApprovalFromCloudflareAccessLab({...f,accessToken:f.token,confirmation:{...f.confirmation,contentSha256:"0".repeat(64)},accessConfig:f.config,signingSecret:secret,cryptoImpl:webcrypto}),/ISSUER_AUTHORIZATION_DENIED/);
 });
 
 test("production branch is rejected even for verified owner",async()=>{
  const f=await setup();
  const intent={...f.intent,branch:"main"};
  const confirmation={...f.confirmation,branch:"main"};
- await assert.rejects(issuePacmanApprovalFromCloudflareAccessLab({...f,intent,confirmation,accessConfig:f.config,signingSecret:secret,cryptoImpl:webcrypto}),/ISSUER_AUTHORIZATION_DENIED/);
+ await assert.rejects(issuePacmanApprovalFromCloudflareAccessLab({...f,accessToken:f.token,intent,confirmation,accessConfig:f.config,signingSecret:secret,cryptoImpl:webcrypto}),/ISSUER_AUTHORIZATION_DENIED/);
 });
 
 test("forged Access JWT signature is rejected",async()=>{
