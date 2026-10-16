@@ -22,7 +22,50 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  preflight:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' && (github.event_name == 'push' || inputs.confirm_staging_only == 'BOOTSTRAP_WEBAUTHN_STAGING_ONLY')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify complete Pac-Man LAB suites before approval gate
+        run: |
+          node --test tools/motorlab-pacman/*.test.mjs
+          node --test tools/motorlab-pacman/candidates/*.test.mjs
+
+      - name: Verify exact WebAuthn staging target before approval gate
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('tools/motorlab-pacman/webauthn/wrangler.pacman-webauthn-staging.jsonc','utf8'));
+          if(c.workers_dev!==true ||
+             c.name!=='motorlab-pacman-webauthn-staging-lab' ||
+             c.main!=='./worker.mjs' ||
+             c.d1_databases?.length!==1 ||
+             c.d1_databases[0].binding!=='DB' ||
+             c.d1_databases[0].database_name!=='motorlab-pacman-staging' ||
+             c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
+            throw Error('WEBAUTHN_STAGING_SCOPE_MISMATCH');
+          console.log('WEBAUTHN_STAGING_SCOPE_VERIFIED');
+          NODE
+
+      - name: Bundle WebAuthn Worker dry-run before approval gate
+        working-directory: tools/motorlab-pacman/webauthn
+        run: |
+          npx --yes wrangler@4 deploy --dry-run --config wrangler.pacman-webauthn-staging.jsonc --outdir "$RUNNER_TEMP/webauthn-dry-run"
+          test -f "$RUNNER_TEMP/webauthn-dry-run/worker.js" || test -n "$(find "$RUNNER_TEMP/webauthn-dry-run" -type f -maxdepth 2 -print -quit)"
+          echo "WEBAUTHN_BUNDLE_PREFLIGHT_VERIFIED"
+
   bootstrap:
+    needs: preflight
     if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' && (github.event_name == 'push' || inputs.confirm_staging_only == 'BOOTSTRAP_WEBAUTHN_STAGING_ONLY')
     runs-on: ubuntu-latest
     environment: pacman-execution-staging
