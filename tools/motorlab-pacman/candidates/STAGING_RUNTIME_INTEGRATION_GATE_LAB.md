@@ -30,3 +30,11 @@ Current `tools/motorlab-pacman/worker-execution-staging.mjs` still routes `mode=
 ### Precise next integration checkpoint
 
 Before modifying or deploying the Worker entry point, confirm that the dedicated staging deployment is isolated, inventory its D1 binding and actual table schemas, inspect the Worker deploy workflow trigger paths, and establish an authenticated issuer design. Then integrate the candidate cycle with disabled-by-default routing and test the real Worker entry point using mocked D1/GitHub. Do not set enablement flags from test evidence alone.
+
+## Deployment boundary audit — 2026-10-16
+
+Source inspection of `.github/workflows/pacman-execution-staging-deploy.yml` confirms that deployment is triggered by changes to top-level `tools/motorlab-pacman/*.mjs`, `*.jsonc`, or the deploy workflow itself, **not** by `candidates/**` changes. The deploy job also requires protected Cloudflare credentials, an explicit activation variable, and checks the exact dedicated staging Worker name and D1 database ID before deploying. These are source-level safeguards, not evidence that a deployment succeeded.
+
+**Critical distinction:** the deploy workflow's current tests run `node --test tools/motorlab-pacman/*.test.mjs`, which excludes the candidate test directory. The separate isolated candidate CI provides that coverage. Any future integration into the top-level Worker must update the deployment test gate to include the relevant candidate tests and must avoid accidentally triggering a live deployment before review.
+
+The Worker `/health` currently checks only `pacman_operations`, so a healthy response does **not** prove the approval ledger or cycle checkpoint schema exists. Do not interpret a green health check as readiness to enable GitHub writes.
