@@ -1,2 +1,2 @@
-bootstrap_revision=dce75cb2ec
-purpose=zero-cost-webauthn-staging-only
+retry=2026-10-16T16:01Z
+reason=worker-d1-binding-bootstrap-after-green-head
