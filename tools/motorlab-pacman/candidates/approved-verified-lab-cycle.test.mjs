@@ -79,3 +79,12 @@ test("D1 PREPARED persistence failure prevents GitHub PUT and DELETE",async()=>{
  await assert.rejects(approvedVerifiedLabCycleWithD1({...f,secret,db,content,token,fetchImpl}),/CHECKPOINT_PERSISTENCE_UNVERIFIED/);
  assert.deepEqual(methods,["GET"]);
 });
+
+test("D1 WRITE_ATTEMPTED persistence failure leaves probe for manual recovery, never deletes",async()=>{
+ const f=await fixture("signed-d1-004");const methods=[],states=[];let file=false;
+ const db={prepare(sql){if(sql.includes("pacman_cycle_checkpoints"))return {bind(...args){return {async run(){const state=sql.startsWith("INSERT")?args[1]:args[0];states.push(state);return {success:true,meta:{changes:state==="WRITE_ATTEMPTED"?0:1}};}};}};return ledger().prepare(sql);}};
+ const fetchImpl=async(url,init)=>{methods.push(init.method);if(init.method==="GET")return file?response(200,{type:"file",sha,encoding:"base64",content:"cHJvYmU="}):response(404,{});if(init.method==="PUT"){file=true;return response(201,{content:{sha},commit:{sha:commit}});}throw Error("DELETE must never occur");};
+ await assert.rejects(approvedVerifiedLabCycleWithD1({...f,secret,db,content,token,fetchImpl}),/LAB_CYCLE_RECOVERY_REQUIRED/);
+ assert.equal(file,true);assert.deepEqual(methods,["GET","PUT"]);
+ assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","RECOVERY_REQUIRED"]);
+});
