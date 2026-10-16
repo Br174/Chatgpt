@@ -47,7 +47,7 @@ try{
   },
   onCheckpoint:async state=>{
    evidence.checkpointId=state.checkpointId;
-   evidence.completed.push({checkpointId:state.checkpointId,completed:alreadyCompleted+state.completed,remaining:state.remaining});
+   evidence.completed.push({checkpointId:state.checkpointId,completed:alreadyCompleted+state.completed,remaining:phases.length-alreadyCompleted-state.completed});
    await persist();
   }
  });
