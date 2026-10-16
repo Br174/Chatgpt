@@ -11,15 +11,15 @@ test("actual staging Worker denies candidate cycle mode before trusted issuer",a
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){calls++;throw Error("unexpected D1 access");}}};
  const response=await worker.fetch(request({mode:"github-lab-cycle",intent:{},approval:{},content:"probe"}),env);
  assert.equal(response.status,503);
- assert.equal((await response.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");
+ assert.equal((await response.json()).error,"STAGING_CYCLE_ROUTE_DISABLED");
  assert.equal(calls,0);
 });
 
-test("actual staging Worker does not route candidate cycle even with issuer flag",async()=>{
+test("actual staging Worker keeps candidate cycle disabled without explicit routing flag",async()=>{
  const env={PACMAN_EXECUTION_KEY:key,PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:"s".repeat(48),DB:{prepare(){throw Error("should not access D1");}}};
  const response=await worker.fetch(request({mode:"github-lab-cycle",intent:{},approval:{},content:"probe"}),env);
  assert.equal(response.status,503);
- assert.equal((await response.json()).error,"STAGING_EXECUTOR_NOT_IMPLEMENTED");
+ assert.equal((await response.json()).error,"STAGING_CYCLE_ROUTE_DISABLED");
 });
 
 test("actual staging Worker rejects browser-originated requests before issuer handling",async()=>{
