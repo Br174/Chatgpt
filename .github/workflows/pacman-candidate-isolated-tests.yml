@@ -1,5 +1,8 @@
 name: Pacman isolated candidate tests (LAB only)
 on:
+  pull_request:
+    branches:
+      - motorlab/pacman-steel-guard-lab-20261014
   push:
     branches:
       - motorlab/pacman-execution-v2-lab-20261014
@@ -11,7 +14,7 @@ permissions:
   contents: read
 jobs:
   candidate-tests:
-    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    if: github.repository == 'Br174/Chatgpt' && (github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' || github.event.pull_request.head.ref == 'motorlab/pacman-execution-v2-lab-20261014')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
