@@ -154,7 +154,7 @@ export async function handleWebAuthnOwnerLab(request,env,{
    if(await ownerCredentialOrNull(cfg.db))throw fail("OWNER_PASSKEY_ALREADY_ENROLLED",409);
    const registrationResponse=registrationResponseFrom(input);
    const e=enrollmentEnvelopeFrom(input);
-   if(!Number.isSafeInteger(input?.commentId)||input.commentId<1)throw fail("INVALID_GITHUB_COMMENT_ID",400);
+   if(input?.commentId!==undefined&&(!Number.isSafeInteger(input.commentId)||input.commentId<1))throw fail("INVALID_GITHUB_COMMENT_ID",400);
    await verifyEnrollmentChallengeLab({
     challenge:e.challenge,payload:e.payload,signature:e.signature,
     origin:cfg.origin,rpId:cfg.rpId,signingSecret:cfg.signingSecret,nowMs,cryptoImpl
