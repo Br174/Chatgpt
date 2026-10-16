@@ -120,3 +120,21 @@ test("public fallback refuses upstream error; authenticated success remains sing
  await findGithubOwnerBootstrapCommentLab({nonce,registrationSha256:f.registrationSha256,githubToken:token,nowMs:now,fetchImpl:success});
  assert.equal(calls,1);
 });
+
+test("a rejected credentialed fetch can fall back only to exact anonymous public read",async()=>{
+ const f=await fixture();let tries=0;
+ const fetchImpl=async(url,init)=>{
+  tries++;assert.match(url,/\/issues\/72\/comments\?per_page=100$/);
+  if(tries===1){assert.equal(init.headers.authorization,"Bearer "+token);throw Error("NETWORK_BLOCKED");}
+  assert.equal(init.headers.authorization,undefined);
+  return {ok:true,status:200,json:async()=>[{id:12345,...f.json}]};
+ };
+ const v=await findGithubOwnerBootstrapCommentLab({nonce,registrationSha256:f.registrationSha256,githubToken:token,fetchImpl,nowMs:now});
+ assert.equal(v.commentId,12345);assert.equal(tries,2);
+});
+
+test("both fetch modes rejecting fails closed without owner credential issuance",async()=>{
+ const f=await fixture();let count=0;
+ await assert.rejects(findGithubOwnerBootstrapCommentLab({nonce,registrationSha256:f.registrationSha256,githubToken:token,fetchImpl:async()=>{count++;throw Error("NO_EGRESS");},nowMs:now}),/GITHUB_BOOTSTRAP_UNAVAILABLE/);
+ assert.equal(count,2);
+});

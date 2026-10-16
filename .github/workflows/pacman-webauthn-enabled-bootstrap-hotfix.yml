@@ -119,3 +119,23 @@ jobs:
           if(!ok)throw Error('HOTFIX_PUBLIC_STAGING_NOT_READY');
           console.log('HOTFIX_WEBAUTHN_STAGING_READY_WITH_PROTECTED_D1');
           NODE
+      - name: Independently verify guarded GitHub API egress from the deployed Worker
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          if(!process.env.EXECUTION_KEY||process.env.EXECUTION_KEY.length<32)throw Error('GITHUB_EGRESS_PROBE_SECRET_NOT_AVAILABLE');
+          const url='https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/__motorlab_lab/diagnostics/github-bootstrap';
+          let report;
+          for(const wait of [0,1000,2000,3000,5000]){
+           if(wait)await new Promise(resolve=>setTimeout(resolve,wait));
+           try{
+            const r=await fetch(url,{headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},redirect:'error',signal:AbortSignal.timeout(15000)});
+            if(!r.ok)continue;
+            report=await r.json();break;
+           }catch{}
+          }
+          if(report?.component!=='webAuthnBootstrapGitHubReadOnly')throw Error('GITHUB_EGRESS_DIAGNOSTIC_UNAVAILABLE');
+          console.log('PACMAN_GITHUB_WORKER_EGRESS_AUTH_HTTP_'+report.authenticatedHttp+'_PUBLIC_HTTP_'+report.anonymousHttp);
+          if(report.authenticatedHttp!==200&&report.anonymousHttp!==200)throw Error('GITHUB_BOOTSTRAP_OUTBOUND_UNAVAILABLE');
+          NODE

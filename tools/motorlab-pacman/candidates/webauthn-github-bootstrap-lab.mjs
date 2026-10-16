@@ -21,7 +21,7 @@ async function readGithubBootstrapJsonLab(url,githubToken,fetchImpl){
  const headers={accept:"application/vnd.github+json","x-github-api-version":"2022-11-28","user-agent":"motorlab-pacman-bootstrap"};
  const get=h=>fetchImpl(url,{method:"GET",redirect:"error",headers:h});
  let r;try{r=await get({...headers,authorization:"Bearer "+githubToken});}
- catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
+ catch{r={status:403,ok:false};} // A network rejection is not a successful owner check.
  if([401,403,404].includes(r?.status)){
   try{r=await get(headers);}catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
  }

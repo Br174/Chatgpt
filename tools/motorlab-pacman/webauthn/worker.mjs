@@ -79,6 +79,22 @@ export async function handleWebAuthnRequest(request,env,{
 }={}){
  try{
   const url=new URL(request.url),cfg=config(env);
+  // Guarded diagnostic: fixed public issue and HTTP status codes only, no data or credentials returned.
+  if(url.pathname==="/__motorlab_lab/diagnostics/github-bootstrap"){
+   if(request.method!=="GET")return reply({error:"NOT_FOUND"},404);
+   if(!exactBearer(request,env?.PACMAN_EXECUTION_KEY))return reply({error:"UNAUTHORIZED"},401);
+   if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
+   const githubUrl="https://api.github.com/repos/Br174/Chatgpt/issues/72/comments?per_page=1";
+   const common={accept:"application/vnd.github+json","x-github-api-version":"2022-11-28","user-agent":"motorlab-pacman-bootstrap"};
+   const check=async(headers)=>{
+    try{const r=await fetchImpl(githubUrl,{method:"GET",redirect:"error",headers,signal:AbortSignal.timeout(12000)});
+     return Number.isInteger(r.status)?r.status:0;
+    }catch{return 0;}
+   };
+   const authenticated=await check({...common,authorization:"Bearer "+env.PACMAN_GITHUB_TOKEN});
+   const anonymous=await check(common);
+   return reply({component:"webAuthnBootstrapGitHubReadOnly",authenticatedHttp:authenticated,anonymousHttp:anonymous});
+  }
   if(url.pathname==="/bootstrap/webauthn-schema"){
    if(request.method!=="POST")return reply({error:"NOT_FOUND"},404);
    if(env?.PACMAN_WEBAUTHN_ENABLED!==undefined)

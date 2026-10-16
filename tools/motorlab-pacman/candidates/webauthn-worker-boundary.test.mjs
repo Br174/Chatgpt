@@ -157,3 +157,25 @@ test("Android passkey page remains unavailable while zero-cost runtime is disabl
  assert.equal(r.status,503);
  assert.equal((await r.json()).error,"WEBAUTHN_DISABLED_OR_UNCONFIGURED");
 });
+
+test("protected GitHub egress diagnostic denies unauthenticated and disabled callers",async()=>{
+ const req=new Request(endpoint+"/__motorlab_lab/diagnostics/github-bootstrap");
+ let fetched=0;
+ const stub=async()=>{fetched++;throw Error("SHOULD_NOT_FETCH")};
+ let r=await handleWebAuthnRequest(req,{...baseEnv,DB:db()},{fetchImpl:stub});
+ assert.equal(r.status,401);
+ r=await handleWebAuthnRequest(new Request(req.url,{headers:{authorization:"Bearer "+"K".repeat(40)}}),{...baseEnv,DB:db(),PACMAN_EXECUTION_KEY:"K".repeat(40),PACMAN_WEBAUTHN_ENABLED:undefined},{fetchImpl:stub});
+ assert.equal(r.status,503);assert.equal(fetched,0);
+});
+
+test("guarded Github egress diagnostic reports only numeric statuses, not secrets or comment contents",async()=>{
+ const key="k".repeat(40),calls=[];
+ const fetchImpl=async(url,opt)=>{calls.push({url,auth:opt.headers.authorization,method:opt.method});return {status:calls.length===1?403:200};};
+ const r=await handleWebAuthnRequest(new Request(endpoint+"/__motorlab_lab/diagnostics/github-bootstrap",{headers:{authorization:"Bearer "+key}}),{...baseEnv,DB:db(),PACMAN_EXECUTION_KEY:key},{fetchImpl});
+ assert.equal(r.status,200);
+ const body=await r.json();
+ assert.deepEqual(body,{component:"webAuthnBootstrapGitHubReadOnly",authenticatedHttp:403,anonymousHttp:200});
+ assert.equal(calls.length,2);assert.equal(calls[1].auth,undefined);
+ assert.equal(calls[0].url,calls[1].url);assert.equal(calls[0].method,"GET");
+ assert.ok(!JSON.stringify(body).includes(key));assert.ok(!JSON.stringify(body).includes(baseEnv.PACMAN_GITHUB_TOKEN));
+});
