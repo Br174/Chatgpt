@@ -20,11 +20,10 @@ input{width:100%;box-sizing:border-box;border:1px solid #394357;border-radius:12
 <p class="muted">Percorso LAB a costo €0. La chiave privata resta nel telefono. GitHub serve soltanto una volta per confermare il proprietario.</p>
 <button id="create">1. Crea passkey</button>
 <section id="confirm" hidden>
-<p class="muted">2. Copia esattamente questo testo e pubblicalo come nuovo commento nella PR Pac-Man.</p>
+<p class="muted">2. Copia esattamente questo testo e pubblicalo come nuovo commento nell’issue di conferma Pac-Man.</p>
 <pre id="comment"></pre>
-<a class="btn secondary" target="_blank" rel="noreferrer" href="https://github.com/Br174/Chatgpt/pull/64">Apri PR Pac-Man</a>
-<p class="muted">3. Copia l'URL del commento appena pubblicato e incollalo qui.</p>
-<input id="url" inputmode="url" autocomplete="off" placeholder="https://github.com/Br174/Chatgpt/pull/64#issuecomment-...">
+<a class="btn secondary" target="_blank" rel="noreferrer" href="https://github.com/Br174/Chatgpt/issues/72">Apri conferma GitHub</a>
+<p class="muted">3. Dopo aver pubblicato il commento, torna qui e premi il pulsante sotto. Pac-Man troverà automaticamente il commento corretto.</p>
 <button id="finish">Verifica e registra</button>
 </section>
 <p id="status" class="muted"></p>
@@ -65,9 +64,8 @@ q("create").onclick=async()=>{
 q("finish").onclick=async()=>{
  try{
   if(!state)throw Error("CREA_PRIMA_LA_PASSKEY");
-  const m=q("url").value.match(/issuecomment-(\\d+)/);if(!m)throw Error("URL_COMMENTO_NON_VALIDO");
-  q("finish").disabled=true;status.className="muted";status.textContent="Verifica proprietario e salvataggio…";
-  await post("/webauthn/enroll/finish",{enrollmentChallenge:state.enrollmentChallenge,registrationResponse:state.registrationResponse,commentId:Number(m[1])});
+  q("finish").disabled=true;status.className="muted";status.textContent="Ricerca conferma GitHub e salvataggio…";
+  await post("/webauthn/enroll/finish",{enrollmentChallenge:state.enrollmentChallenge,registrationResponse:state.registrationResponse});
   q("confirm").hidden=true;status.className="ok";status.textContent="Passkey registrata. Pac-Man è pronto per l'autorizzazione biometrica.";
  }catch(e){
   q("finish").disabled=false;status.className="err";status.textContent=e.message;
