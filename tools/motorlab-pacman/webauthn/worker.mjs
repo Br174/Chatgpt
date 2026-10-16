@@ -15,6 +15,7 @@ import {issuePacmanApprovalFromWebAuthnLab} from "../candidates/webauthn-trusted
 import {handleWebAuthnOwnerLab} from "../candidates/webauthn-owner-handler-lab.mjs";
 import {renderWebAuthnOwnerPage} from "./page.mjs";
 import {renderWebAuthnApprovalPage} from "./approval-page.mjs";
+import {bootstrapWebAuthnSchemaLab} from "../candidates/webauthn-schema-bootstrap-lab.mjs";
 
 const MAX_BODY=32768;
 const reply=(body,status=200)=>Response.json(body,{status,headers:{
@@ -32,6 +33,13 @@ const pageReply=body=>new Response(body,{status:200,headers:{
 const fail=(code,status=400)=>Object.assign(Error(code),{status});
 const enc=new TextEncoder();
 const hex=b=>Array.from(new Uint8Array(b),v=>v.toString(16).padStart(2,"0")).join("");
+function exactBearer(request,secret){
+ const h=request.headers.get("authorization");
+ if(typeof secret!=="string"||secret.length<32||typeof h!=="string"||!h.startsWith("Bearer "))return false;
+ const token=h.slice(7);if(token.length!==secret.length)return false;
+ let diff=0;for(let i=0;i<token.length;i++)diff|=token.charCodeAt(i)^secret.charCodeAt(i);
+ return diff===0;
+}
 
 function config(env){
  if(env?.PACMAN_WEBAUTHN_ENABLED!=="YES_ZERO_COST_WEBAUTHN_STAGING")return null;
@@ -71,6 +79,17 @@ export async function handleWebAuthnRequest(request,env,{
 }={}){
  try{
   const url=new URL(request.url),cfg=config(env);
+  if(url.pathname==="/bootstrap/webauthn-schema"){
+   if(request.method!=="POST")return reply({error:"NOT_FOUND"},404);
+   if(env?.PACMAN_WEBAUTHN_ENABLED!==undefined)
+    return reply({error:"WEBAUTHN_BOOTSTRAP_REQUIRES_DISABLED_RUNTIME"},409);
+   if(request.headers.get("x-pacman-bootstrap")!=="WEBAUTHN_SCHEMA_V1"||
+      !exactBearer(request,env?.PACMAN_EXECUTION_KEY))
+    return reply({error:"WEBAUTHN_BOOTSTRAP_UNAUTHORIZED"},401);
+   if(!env?.DB?.prepare)return reply({error:"WEBAUTHN_BOOTSTRAP_D1_UNAVAILABLE"},503);
+   const out=await bootstrapWebAuthnSchemaLab(env.DB);
+   return reply(out,200);
+  }
   if(url.pathname==="/webauthn/approve"&&request.method==="GET"){
    if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
    return pageReply(renderWebAuthnApprovalPage());
