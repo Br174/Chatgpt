@@ -7,7 +7,7 @@ import {decodeCoseP256PublicKeyLab} from "./webauthn-cose-p256-lab.mjs";
 const deny=()=>{throw Error("WEBAUTHN_REGISTRATION_VERIFICATION_DENIED");};
 function decode(s){
  if(typeof s!=="string"||!s||s.length>4096||s.length%4===1||!/^[A-Za-z0-9_-]+$/.test(s))deny();
- let bytes;try{bytes=Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/)+"=".repeat((4-s.length%4)%4)),c=>c.charCodeAt(0));}catch{deny();}
+ let bytes;try{bytes=Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-s.length%4)%4)),c=>c.charCodeAt(0));}catch{deny();}
  let raw="";for(const n of bytes)raw+=String.fromCharCode(n);
  if(btoa(raw).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")!==s)deny();
  return bytes;
