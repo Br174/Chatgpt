@@ -102,3 +102,45 @@ export async function advanceWebAuthnSignCountD1(db,credentialId,{previous,next}
  if(result?.success!==true||result?.meta?.changes!==1)fail("WEBAUTHN_COUNTER_CONFLICT");
  return true;
 }
+
+
+export const WEBAUTHN_BOOTSTRAP_CLAIMS_SCHEMA=`CREATE TABLE IF NOT EXISTS pacman_webauthn_bootstrap_claims (
+ nonce TEXT PRIMARY KEY NOT NULL,
+ owner_id TEXT NOT NULL,
+ claimed_at INTEGER NOT NULL,
+ expires_at INTEGER NOT NULL
+)`;
+
+export async function claimWebAuthnBootstrapD1(db,{ownerId,nonce,expiresAt}={}, {nowMs=Date.now()}={}){
+ if(!db?.prepare||typeof ownerId!=="string"||!ownerId||
+    typeof nonce!=="string"||!/^[A-Za-z0-9_-]{32,128}$/.test(nonce)||
+    !Number.isSafeInteger(expiresAt)||!Number.isSafeInteger(nowMs)||expiresAt<nowMs)
+  fail("WEBAUTHN_BOOTSTRAP_INVALID");
+ const result=await db.prepare(
+  "INSERT OR IGNORE INTO pacman_webauthn_bootstrap_claims (nonce,owner_id,claimed_at,expires_at) VALUES (?,?,?,?)"
+ ).bind(nonce,ownerId,nowMs,expiresAt).run();
+ if(result?.success!==true||result?.meta?.changes!==1)fail("WEBAUTHN_BOOTSTRAP_REPLAY");
+ return true;
+}
+
+export async function storeFirstWebAuthnCredentialD1(db,{
+ id,publicKeyJwk,signCount=0,ownerSubject
+}={}, {nowMs=Date.now()}={}){
+ if(!db?.prepare||typeof id!=="string"||!id||
+    typeof ownerSubject!=="string"||!ownerSubject||
+    !Number.isSafeInteger(signCount)||signCount<0||!Number.isSafeInteger(nowMs)||
+    !publicKeyJwk||publicKeyJwk.kty!=="EC"||publicKeyJwk.crv!=="P-256"||
+    publicKeyJwk.alg!=="ES256"||typeof publicKeyJwk.x!=="string"||
+    typeof publicKeyJwk.y!=="string"||"d" in publicKeyJwk)
+  fail("WEBAUTHN_CREDENTIAL_INVALID");
+ const jwk=JSON.stringify({
+  kty:"EC",crv:"P-256",alg:"ES256",x:publicKeyJwk.x,y:publicKeyJwk.y,
+  ext:true,key_ops:["verify"]
+ });
+ const result=await db.prepare(
+  "INSERT INTO pacman_webauthn_credentials (credential_id,public_key_jwk,sign_count,owner_subject,created_at,disabled_at) "+
+  "SELECT ?,?,?,?,?,NULL WHERE NOT EXISTS (SELECT 1 FROM pacman_webauthn_credentials WHERE disabled_at IS NULL)"
+ ).bind(id,jwk,signCount,ownerSubject,nowMs).run();
+ if(result?.success!==true||result?.meta?.changes!==1)fail("WEBAUTHN_ACTIVE_CREDENTIAL_ALREADY_EXISTS");
+ return true;
+}
