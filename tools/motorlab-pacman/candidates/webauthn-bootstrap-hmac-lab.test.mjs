@@ -1,0 +1,18 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {webcrypto} from "node:crypto";
+import {verifyBootstrapProofLab} from "./webauthn-bootstrap-hmac-lab.mjs";
+const now=1780000000000,owner="owner-lab-001";
+const b64=b=>Buffer.from(b).toString("base64url");
+const payloadData={purpose:"pacman.webauthn.enroll.v1",ownerId:owner,nonce:"n".repeat(32),issuedAt:now-1000,expiresAt:now+60000};
+const secret=webcrypto.getRandomValues(new Uint8Array(32));
+const sign=async data=>{const payload=b64(new TextEncoder().encode(JSON.stringify(data)));const key=await webcrypto.subtle.importKey("raw",secret,{name:"HMAC",hash:"SHA-256"},false,["sign"]);const signature=b64(new Uint8Array(await webcrypto.subtle.sign("HMAC",key,new TextEncoder().encode(payload))));return {payload,signature};};
+const verify=async(data=payloadData,overrides={})=>verifyBootstrapProofLab({...await sign(data),secret,expectedOwner:owner,now,...overrides});
+test("valid operator signed proof is accepted (not proof of owner identity)",async()=>assert.equal((await verify()).ownerId,owner));
+test("tampered payload is rejected",async()=>{const signed=await sign(payloadData);await assert.rejects(()=>verifyBootstrapProofLab({...signed,payload:b64(new TextEncoder().encode(JSON.stringify({...payloadData,ownerId:"attacker"}))),secret,expectedOwner:owner,now}),/INVALID/);});
+test("wrong owner rejected",async()=>assert.rejects(()=>verify({...payloadData,ownerId:"other"}),/INVALID/));
+test("expired proof rejected",async()=>assert.rejects(()=>verify({...payloadData,expiresAt:now}),/INVALID/));
+test("future issue time rejected",async()=>assert.rejects(()=>verify({...payloadData,issuedAt:now+1}),/INVALID/));
+test("wrong purpose rejected",async()=>assert.rejects(()=>verify({...payloadData,purpose:"other"}),/INVALID/));
+test("weak nonce rejected",async()=>assert.rejects(()=>verify({...payloadData,nonce:"short"}),/INVALID/));
+test("invalid signature rejected",async()=>assert.rejects(()=>verify(payloadData,{signature:"AAAA"}),/INVALID/));
