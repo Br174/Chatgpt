@@ -18,10 +18,16 @@ test("LAB candidate writes, verifies, removes, verifies cleanup",async()=>{
 test("candidate denies main without touching provider",async()=>{
  const m=mock();await assert.rejects(verifiedLabCycle({adapter:m.adapter,branch:"main",path,content:"probe",onCheckpoint:async()=>{}}),/LAB_SCOPE_REQUIRED/);assert.equal(m.calls.length,0);
 });
-test("candidate records recovery if readback differs and does not silently succeed",async()=>{
- const states=[];const m=mock();m.adapter.read=async()=>({exists:true,content:"tampered",sha});
- await assert.rejects(verifiedLabCycle({adapter:m.adapter,branch,path,content:"probe",onCheckpoint:async x=>states.push(x.state)}));
- assert.equal(states.length,0); // Preflight rejected before mutation
+test("candidate records recovery if readback differs after write",async()=>{
+ const states=[],calls=[];let readCount=0;
+ const adapter={
+  async read(){calls.push("read");readCount++;return readCount===1?{exists:false}:{exists:true,content:"tampered",sha};},
+  async create(){calls.push("create");},
+  async remove(){calls.push("remove");}
+ };
+ await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async x=>states.push(x.state)}),/RECOVERY_REQUIRED/);
+ assert.deepEqual(calls,["read","create","read"]);
+ assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","RECOVERY_REQUIRED"]);
 });
 test("candidate marks ambiguous create as recovery, never retries",async()=>{
  const states=[],calls=[];const adapter={
