@@ -164,7 +164,7 @@ test("content tampering cannot claim a signed readiness approval",async()=>{
  assert.equal(r.status,403);assert.equal(writes,0);
 });
 
-test("GitHub LAB write mode is disabled unless explicitly switched on",async()=>{
+test("legacy GitHub LAB write mode is permanently retired",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
  const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
@@ -172,28 +172,28 @@ test("GitHub LAB write mode is disabled unless explicitly switched on",async()=>
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:"test-only-github-token-123456789"};
  const payload=JSON.stringify({mode:"github-lab-write",intent,approval:{...intent,decision:"authorize"},attestation,content:"probe"});
  const r=await worker.fetch(req("POST",payload,key),env);
- assert.equal(r.status,503);assert.equal((await r.json()).error,"GITHUB_LAB_WRITE_DISABLED");assert.equal(dbCalls,0);
+ assert.equal(r.status,410);assert.equal((await r.json()).error,"LEGACY_GITHUB_LAB_WRITE_RETIRED");assert.equal(dbCalls,0);
 });
-test("GitHub LAB write switch without token fails before consuming approval",async()=>{
+test("legacy GitHub LAB write stays retired even when old switch is present",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-002",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
  let dbCalls=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY"};
  const payload=JSON.stringify({mode:"github-lab-write",intent,approval:{...intent,decision:"authorize"},content:"probe"});
  const r=await worker.fetch(req("POST",payload,key),env);
- assert.equal(r.status,503);assert.equal((await r.json()).error,"GITHUB_LAB_WRITE_DISABLED");assert.equal(dbCalls,0);
+ assert.equal(r.status,410);assert.equal((await r.json()).error,"LEGACY_GITHUB_LAB_WRITE_RETIRED");assert.equal(dbCalls,0);
 });
-test("GitHub LAB write rejects unsigned approval without D1 writes",async()=>{
+test("legacy GitHub LAB write rejects unsigned payload before D1",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-003",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
  let dbCalls=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",PACMAN_GITHUB_TOKEN:"test-only-github-token-123456789"};
  const payload=JSON.stringify({mode:"github-lab-write",intent,approval:{...intent,decision:"authorize"},content:"probe"});
  const r=await worker.fetch(req("POST",payload,key),env);
- assert.equal(r.status,403);assert.equal((await r.json()).error,"GITHUB_LAB_WRITE_REJECTED");assert.equal(dbCalls,0);
+ assert.equal(r.status,410);assert.equal((await r.json()).error,"LEGACY_GITHUB_LAB_WRITE_RETIRED");assert.equal(dbCalls,0);
 });
 
-test("Worker write mode rejects signed approval if payload content changes, before D1",async()=>{
+test("legacy Worker write mode is retired even for tampered signed payload",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-tamper-004",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
  const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"original"});
@@ -201,7 +201,7 @@ test("Worker write mode rejects signed approval if payload content changes, befo
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",PACMAN_GITHUB_TOKEN:"test-only-github-token-123456789"};
  const payload=JSON.stringify({mode:"github-lab-write",intent,approval:{...intent,decision:"authorize"},attestation,content:"changed"});
  const r=await worker.fetch(req("POST",payload,key),env);
- assert.equal(r.status,403);assert.equal((await r.json()).error,"GITHUB_LAB_WRITE_REJECTED");assert.equal(dbCalls,0);
+ assert.equal(r.status,410);assert.equal((await r.json()).error,"LEGACY_GITHUB_LAB_WRITE_RETIRED");assert.equal(dbCalls,0);
 });
 test("Worker write mode refuses signed authorization targeting main, before D1",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
