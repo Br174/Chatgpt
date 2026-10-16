@@ -31,3 +31,18 @@ This document is a review checklist, not a runtime configuration or authorizatio
 ## Boundaries
 No MADRE/main/production edits. No staging Worker deploy. No real GitHub probe write.
 Only candidate source, tests, and review documentation are eligible for LAB-only commits.
+
+## Evidence from owner-reviewed Cloudflare dashboard — 2026-10-16
+- Account selected: `MotorLab-Staging`; Worker: `motorlab-pacman-execution-staging-lab`.
+- Active deployed version: `0b796387-3150-4c73-bb62-6504f4a9ba63` (100% traffic).
+- D1 binding `DB` displays `motorlab-pacman-staging`; the dashboard view did not expose a D1 ID, so matching the canonical ID remains a separate check.
+- Runtime secrets shown as encrypted: `PACMAN_EXECUTION_KEY`, `PACMAN_GITHUB_TOKEN`, and one truncated `PACMAN_APPROVAL_SI...` name. Secret values and whether the GitHub secret corresponds to the reviewed fine-grained token are **not verified**.
+- GitHub fine-grained token `PacMan-GitHub-LAB`: repository `Br174/Chatgpt`, metadata read, contents read/write, no user permissions; token is **not branch/file scoped**. Owner created a classic protection rule for `main` requiring pull requests and disallowing bypass; enforcement was not exercised.
+- Deployed Worker editor search: `github-lab-write` = **2 matches**, `github-lab-cycle` = **0 matches**. This is evidence that the candidate V2 route is absent from the inspected deployed bundle, not evidence that deployment or GitHub mutation is authorized.
+- Release history lists Wrangler as deployment origin, mostly manual; no source-commit provenance established for the active version.
+
+## LAB integration review conclusion
+- The candidate snapshot `worker-execution-staging-integrated-lab.mjs` imports `candidateCycleDispatch`; the deployed `worker-execution-staging.js` does not show the `github-lab-cycle` route.
+- Do **not** copy/paste candidate code into the dashboard editor. Produce and review a controlled integration diff, a reproducible build and a rollback plan first.
+- Do **not** set any of the four cycle feature flags until trusted issuer authentication and secret custody are independently validated.
+- The last 3% remains a planning estimate, **not** proof of deployment readiness or successful real-world execution.
