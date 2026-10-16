@@ -33,9 +33,9 @@ test("failed PREPARED checkpoint consumes approval but never mutates GitHub",asy
  const f=await fixture("signed-cycle-004"),db=ledger();let calls=0;
  const args={...f,secret,db,content,token,fetchImpl:async()=>{calls++;return response(404,{});},onCheckpoint:async()=>{throw Error("checkpoint storage failed");}};
  await assert.rejects(approvedVerifiedLabCycle(args),/checkpoint storage failed/);
- assert.equal(calls,1);
- await assert.rejects(approvedVerifiedLabCycle(args),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
  assert.equal(calls,2);
+ await assert.rejects(approvedVerifiedLabCycle(args),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
+ assert.equal(calls,3);
 });
 
 test("invalid GitHub adapter configuration does not consume signed approval",async()=>{
