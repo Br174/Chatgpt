@@ -1,0 +1,16 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {authorizeWebAuthnEnrollmentLab} from "./webauthn-enrollment-policy-lab.mjs";
+const now=1780000000000;
+const expectedOwner="owner-001";
+const bootstrap={verifiedByTrustedServer:true,proofVerified:true,ownerId:expectedOwner,nonce:"n".repeat(32),consumed:false,issuedAt:now-1000,expiresAt:now+60000};
+const credential={id:"credential-identifier-001",algorithm:"ES256",publicKeyJwk:{kty:"EC",crv:"P-256",x:"x",y:"y"}};
+const run=(b=bootstrap,c=credential)=>authorizeWebAuthnEnrollmentLab({bootstrap:b,credential:c,expectedOwner,now});
+test("accepts server-verified enrollment policy inputs (not proof verification)",()=>assert.equal(run().ownerId,expectedOwner));
+test("denies unverified bootstrap",()=>assert.throws(()=>run({...bootstrap,proofVerified:false}),/DENIED/));
+test("denies consumed bootstrap",()=>assert.throws(()=>run({...bootstrap,consumed:true}),/DENIED/));
+test("denies expired bootstrap",()=>assert.throws(()=>run({...bootstrap,expiresAt:now}),/DENIED/));
+test("denies wrong owner",()=>assert.throws(()=>run({...bootstrap,ownerId:"other"}),/DENIED/));
+test("denies weak nonce",()=>assert.throws(()=>run({...bootstrap,nonce:"abc"}),/DENIED/));
+test("denies invalid credential algorithm",()=>assert.throws(()=>run(bootstrap,{...credential,algorithm:"RS256"}),/DENIED/));
+test("denies overly long bootstrap lifetime",()=>assert.throws(()=>run({...bootstrap,expiresAt:now+600000}),/DENIED/));
