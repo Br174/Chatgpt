@@ -63,7 +63,7 @@ export async function enrollOwnerPasskeyFromGithubLab({
   signCount:credential.signCount,
   ownerSubject:OWNER_SUBJECT,
   bootstrapNonce:challenge,
-  bootstrapCommentId:commentId,
+  bootstrapCommentId:resolvedCommentId,
   registrationSha256,
   createdAt:nowMs
  });
