@@ -15,7 +15,7 @@ export async function runMotorLabOperationR38({operationId,checkpointId,approved
   if(i>=maxPhases)throw Error("R38_PHASE_LIMIT_REACHED");
   const phase=queue[i];
   if(!Array.isArray(phase.tasks)||!phase.tasks.length)throw Error("INVALID_PHASE_GRAPH");
-  const nextTaskId=queue[i+1]?.tasks?.[0]?.id||null;
+  const nextTaskId=queue[i+1]?.tasks?.[0]?.id||(typeof getNextApprovedPhases==="function"?"r38-next-approved-phase":null);
   const outcome=await executeApprovedContinuityGraphLab({operationId,checkpointId:checkpoint,approved,scopeChange,protectedBoundary,tasks:phase.tasks,worker,nextTaskId,executionOptions});
   if(!outcome.executed)return {decision:outcome.pre.decision,reason:outcome.pre.reason,completed,checkpointId:checkpoint};
   completed.push({phaseId:phase.id||String(i+1),proof:outcome.result.proof});
