@@ -80,8 +80,9 @@ async function fixture(){
 test("full LAB chain verifies owner, issues approval, executes D1-checkpointed reversible GitHub cycle",async()=>{
  const f=await fixture();
  const response=await relayApprovedPacmanOperationLab(f.request(),f.relayOptions);
- assert.equal(response.status,200);
- assert.deepEqual(await response.json(),{status:"PACMAN_OPERATION_VERIFIED",branch,path});
+ const responseBody=await response.json();
+ assert.equal(response.status,200,JSON.stringify(responseBody));
+ assert.deepEqual(responseBody,{status:"PACMAN_OPERATION_VERIFIED",branch,path});
  assert.equal(f.claimed(),true);assert.equal(f.exists(),false);
  assert.deepEqual(f.executorCalls,["POST"]);
  assert.deepEqual(f.githubMethods,["GET","GET","PUT","GET","DELETE","GET"]);
@@ -91,7 +92,8 @@ test("full LAB chain verifies owner, issues approval, executes D1-checkpointed r
 test("full LAB chain rejects replay at executor single-use claim",async()=>{
  const f=await fixture();
  const first=await relayApprovedPacmanOperationLab(f.request(),f.relayOptions);
- assert.equal(first.status,200);
+ const firstBody=await first.clone().json();
+ assert.equal(first.status,200,JSON.stringify(firstBody));
  const replay=await relayApprovedPacmanOperationLab(f.request(),f.relayOptions);
  assert.equal(replay.status,502);
  assert.equal((await replay.json()).error,"EXECUTOR_REJECTED");
