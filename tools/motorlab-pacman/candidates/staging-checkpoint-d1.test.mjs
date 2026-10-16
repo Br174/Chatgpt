@@ -3,7 +3,25 @@ import assert from "node:assert/strict";
 import {makeD1Checkpoint,CHECKPOINT_SCHEMA} from "./staging-checkpoint-d1.mjs";
 const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-integration.txt",sha="a".repeat(40);
 const step=(state,extra={})=>({state,branch,path,...extra});
-function mockDb(){const calls=[];let current=null;return {calls,prepare(sql){return {bind(...args){return {async run(){calls.push({sql,args});if(sql.startsWith("INSERT")){if(current!==null)return {success:true,meta:{changes:0}};current=args[1];return {success:true,meta:{changes:1}};}if(args[3]!==current)return {success:true,meta:{changes:0}};current=args[0];return {success:true,meta:{changes:1}};}}};}}};}
+function mockDb(){
+ const calls=[];let current=null;
+ return {
+  calls,
+  prepare(sql){return {
+   bind(...args){return {
+    async run(){
+     calls.push({sql,args});
+     if(sql.startsWith("INSERT")){
+      if(current!==null)return {success:true,meta:{changes:0}};
+      current=args[1];return {success:true,meta:{changes:1}};
+     }
+     if(args[3]!==current)return {success:true,meta:{changes:0}};
+     current=args[0];return {success:true,meta:{changes:1}};
+    }
+   };}
+  };}
+ };
+}
 test("checkpoint schema declares operation primary key",()=>assert.match(CHECKPOINT_SCHEMA,/operation_id TEXT PRIMARY KEY/));
 test("durable D1 state transitions preserve order and SHA",async()=>{const db=mockDb(),save=makeD1Checkpoint({db,operationId:"cycle-001"});for(const s of [step("PREPARED"),step("WRITE_ATTEMPTED"),step("CLEANUP_ATTEMPTED",{sha}),step("VERIFIED_AND_REMOVED")])await save(s);assert.equal(db.calls.length,4);assert.equal(db.calls[2].args[1],sha);assert.equal(db.calls[3].args[3],"CLEANUP_ATTEMPTED");});
 test("invalid transitions are denied before database write",async()=>{const db=mockDb(),save=makeD1Checkpoint({db,operationId:"cycle-002"});await assert.rejects(save(step("WRITE_ATTEMPTED")),/CHECKPOINT_SEQUENCE_INVALID/);await save(step("PREPARED"));await assert.rejects(save(step("VERIFIED_AND_REMOVED")),/CHECKPOINT_SEQUENCE_INVALID/);await assert.rejects(save(step("PREPARED")),/CHECKPOINT_SEQUENCE_INVALID/);assert.equal(db.calls.length,1);});
