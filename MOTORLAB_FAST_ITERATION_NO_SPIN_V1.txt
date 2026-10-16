@@ -11,7 +11,7 @@ ROLE / NON-DUPLICATION
 Velocity Layer owns FAST LAB/risk scaling. Foreground Stall Guard owns foreground-risk/checkpointing. Background Execution owns durable jobs. Watchdog owns health/no-progress. Resume Recovery owns continuation. Root Cause Closure owns definitive causal closure. MOTORLAB_ARTIFACT_FIRST_ROOT_CAUSE_V1.txt owns artifact-before-cause ordering where safe.
 
 1. NO-SPIN HANDOFF
-For a verified durable job with persisted operation/ref/job/checkpoint/lock state, do not poll indefinitely. Default max two unchanged provider probes, then HANDOFF_COMPLETE; next available cycle reconciles the same job id.
+For a verified durable job with persisted operation/ref/job/checkpoint/lock state, do not poll indefinitely. Default max two unchanged provider probes, then HANDOFF_COMPLETE for that verified durable-job polling lane ONLY; next available cycle reconciles the same job id. HANDOFF_COMPLETE is not an operation or project terminal state. Before ending the current turn, apply canonical MOTORLAB_EXECUTION_CONTINUITY_V1.txt R38 and dispatch other READY approved safe work. Only when no other work is READY may the turn end as DURABLE_JOB_RUNNING with verified job id, checkpoint and concrete resume trigger. Never apply HANDOFF_COMPLETE without a verified durable job.
 
 2. NO FALSE BACKGROUND PROMISE
 Without a real persistent executor, do not claim work continues while the host is suspended. Use bounded foreground segments/checkpoints.
