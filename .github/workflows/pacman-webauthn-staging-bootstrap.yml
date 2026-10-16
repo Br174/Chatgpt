@@ -6,6 +6,7 @@ on:
       - motorlab/pacman-execution-v2-lab-20261014
     paths:
       - '.github/pacman-webauthn-bootstrap-trigger'
+      - '.github/workflows/pacman-webauthn-staging-bootstrap.yml'
   workflow_dispatch:
     inputs:
       confirm_staging_only:
@@ -170,6 +171,28 @@ jobs:
           printf '%s' "$PACMAN_EXECUTION_KEY" | npx --yes wrangler@4 secret put PACMAN_EXECUTION_KEY --config wrangler.pacman-webauthn-staging.jsonc
           echo "WEBAUTHN_SERVER_EXECUTION_KEY_BOUND"
 
+      - name: Verify staging binding names after secret upload (never read secret values)
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const worker='motorlab-pacman-webauthn-staging-lab';
+          const url='https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/scripts/'+worker+'/settings';
+          const r=await fetch(url,{headers:{Authorization:'Bearer '+process.env.CF_TOKEN},redirect:'error',signal:AbortSignal.timeout(15000)});
+          if(!r.ok)throw Error('WEBAUTHN_POST_SECRET_SETTINGS_HTTP_'+r.status);
+          const j=await r.json();
+          if(j.success!==true||!Array.isArray(j.result?.bindings))throw Error('WEBAUTHN_POST_SECRET_SETTINGS_INVALID');
+          const bindings=j.result.bindings;
+          if(!bindings.some(b=>b.name==='PACMAN_EXECUTION_KEY'&&b.type==='secret_text'))
+            throw Error('WEBAUTHN_EXECUTION_KEY_BINDING_MISSING');
+          if(!bindings.some(b=>b.name==='DB'&&b.type==='d1'))
+            throw Error('WEBAUTHN_D1_BINDING_MISSING');
+          if(bindings.some(b=>b.name==='PACMAN_WEBAUTHN_ENABLED'))
+            throw Error('WEBAUTHN_ALREADY_ACTIVATED_ABORT');
+          console.log('WEBAUTHN_BINDINGS_VERIFIED_NO_SECRET_VALUES_READ');
+          NODE
+
       - name: Bootstrap exact WebAuthn schema through Worker D1 binding
         env:
           WORKER_URL: ${{ steps.deploy.outputs.worker_url }}
@@ -178,20 +201,34 @@ jobs:
           node --input-type=module <<'NODE'
           const base=process.env.WORKER_URL;
           if(!/^https:\/\/[a-zA-Z0-9.-]+\.workers\.dev$/.test(base||''))throw Error('INVALID_WEBAUTHN_WORKER_URL');
-          const r=await fetch(base+'/bootstrap/webauthn-schema',{
-            method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
-            headers:{
-              authorization:'Bearer '+process.env.PACMAN_EXECUTION_KEY,
-              'x-pacman-bootstrap':'WEBAUTHN_SCHEMA_V1'
+          // Secret publication can briefly precede its serving deployment: retry only
+          // the exact fail-closed 401 from this Worker, never SQL/5xx/mismatched replies.
+          for(let attempt=1;attempt<=12;attempt++){
+            const r=await fetch(base+'/bootstrap/webauthn-schema',{
+              method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),cache:'no-store',
+              headers:{
+                authorization:'Bearer '+process.env.PACMAN_EXECUTION_KEY,
+                'x-pacman-bootstrap':'WEBAUTHN_SCHEMA_V1',
+                'cache-control':'no-store'
+              }
+            });
+            let body;try{body=await r.json();}catch{throw Error('WEBAUTHN_BOOTSTRAP_NON_JSON_HTTP_'+r.status);}
+            const code=typeof body?.error==='string'&&/^WEBAUTHN_[A-Z0-9_]+$/.test(body.error)
+              ? body.error : 'UNEXPECTED_RESPONSE';
+            if(r.status===401&&code==='WEBAUTHN_BOOTSTRAP_UNAUTHORIZED'){
+              if(attempt===12)throw Error('WEBAUTHN_AUTH_UNRESOLVED_AFTER_12_ATTEMPTS');
+              console.log('WEBAUTHN_AUTH_NOT_YET_READY_RETRY_'+attempt);
+              await new Promise(resolve=>setTimeout(resolve,2000));
+              continue;
             }
-          });
-          let body;try{body=await r.json();}catch{throw Error('WEBAUTHN_BOOTSTRAP_RESPONSE_INVALID');}
-          if(r.status!==200||body?.status!=='WEBAUTHN_SCHEMA_BOOTSTRAPPED'||
-             JSON.stringify(body?.createdTables)!==JSON.stringify(['pacman_webauthn_challenges','pacman_webauthn_credentials'])||
-             JSON.stringify(body?.protectedTables)!==JSON.stringify(['pacman_approval_claims','pacman_cycle_checkpoints','pacman_operations']))
-            throw Error('WEBAUTHN_SCHEMA_BOOTSTRAP_FAILED_'+r.status);
-          console.log('WEBAUTHN_D1_SCHEMA_BOOTSTRAPPED_THROUGH_BINDING');
-          console.log('PROTECTED_D1_SCHEMAS_VERIFIED_UNCHANGED');
+            if(r.status!==200||body?.status!=='WEBAUTHN_SCHEMA_BOOTSTRAPPED'||
+               JSON.stringify(body?.createdTables)!==JSON.stringify(['pacman_webauthn_challenges','pacman_webauthn_credentials'])||
+               JSON.stringify(body?.protectedTables)!==JSON.stringify(['pacman_approval_claims','pacman_cycle_checkpoints','pacman_operations']))
+              throw Error('WEBAUTHN_SCHEMA_BOOTSTRAP_FAILED_HTTP_'+r.status+'_'+code);
+            console.log('WEBAUTHN_D1_SCHEMA_BOOTSTRAPPED_THROUGH_BINDING');
+            console.log('PROTECTED_D1_SCHEMAS_VERIFIED_UNCHANGED');
+            break;
+          }
           NODE
 
       - name: Verify deployed Worker remains fail-closed
