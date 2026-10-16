@@ -24,6 +24,7 @@ export function makeGithubLabAdapter({token,fetchImpl=fetch}={}) {
       method,
       headers:{authorization:"Bearer "+token,accept:"application/vnd.github+json",
         "x-github-api-version":"2022-11-28","content-type":"application/json"},
+      redirect:"error",
       ...(body===undefined?{}:{body:JSON.stringify(body)})
     });
     if(method==="GET" && response.status===404) return {exists:false};
@@ -42,7 +43,7 @@ export function makeGithubLabAdapter({token,fetchImpl=fetch}={}) {
     },
     async create({branch,path,content}) {
       check(branch,path);
-      if(typeof content!=="string" || !content.length || content.length>4096)
+      if(typeof content!=="string" || !content.length || new TextEncoder().encode(content).length>4096)
         throw Error("INVALID_PROBE_CONTENT");
       await request(path,"PUT",{
         message:"test(pacman): isolated reversible LAB probe",
