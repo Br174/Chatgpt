@@ -162,7 +162,8 @@ export async function handleWebAuthnOwnerLab(request,env,{
    const result=await enrollOwnerPasskeyFromGithubLab({
     db:cfg.db,commentId:input.commentId,githubToken:cfg.githubToken,
     signingSecret:cfg.signingSecret,registrationResponse,
-    challenge:e.challenge,origin:cfg.origin,rpId:cfg.rpId,
+    challenge:e.challenge,challengePayload:e.payload,challengeSignature:e.signature,
+    origin:cfg.origin,rpId:cfg.rpId,
     fetchImpl,cryptoImpl,nowMs
    });
    return reply(result,201);
