@@ -13,12 +13,12 @@ test("real Worker denies candidate cycle without execution key before D1 access"
  assert.equal((await result.json()).error,"UNAUTHORIZED");
  assert.equal(queries,0);
 });
-test("real Worker does not route candidate cycle with valid execution key and missing trusted issuer",async()=>{
+test("real Worker keeps candidate cycle disabled with valid key but no routing flag",async()=>{
  let queries=0;
  const key="k".repeat(48);
  const result=await worker.fetch(request("github-lab-cycle",{authorization:"Bearer "+key}),{PACMAN_EXECUTION_KEY:key,DB:{prepare(){queries++;throw Error("unexpected D1 access");}}});
  assert.equal(result.status,503);
- assert.equal((await result.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");
+ assert.equal((await result.json()).error,"STAGING_CYCLE_ROUTE_DISABLED");
  assert.equal(queries,0);
 });
 test("real Worker rejects browser-originated cycle before issuer and GitHub activity",async()=>{
@@ -41,6 +41,6 @@ test("real Worker refuses unrouted cycle even when issuer and signing secret are
   DB:{prepare(){queries++;throw Error("unexpected D1 access");}}
  });
  assert.equal(result.status,503);
- assert.equal((await result.json()).error,"STAGING_EXECUTOR_NOT_IMPLEMENTED");
+ assert.equal((await result.json()).error,"STAGING_CYCLE_ROUTE_DISABLED");
  assert.equal(queries,0);
 });
