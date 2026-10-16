@@ -37,7 +37,9 @@ export async function signBootstrapProofLab({
  let raw="";for(const n of nonceBytes)raw+=String.fromCharCode(n);
  const nonce=btoa(raw).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
  const data={purpose:"pacman.webauthn.enroll.v1",ownerId,nonce,issuedAt:now,expiresAt:now+ttlMs};
- const payload=btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+ const payloadBytes=encoder.encode(JSON.stringify(data));
+ let payloadRaw="";for(const n of payloadBytes)payloadRaw+=String.fromCharCode(n);
+ const payload=btoa(payloadRaw).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
  const key=await cryptoImpl.subtle.importKey("raw",bytes,{name:"HMAC",hash:"SHA-256"},false,["sign"]);
  const signatureBytes=new Uint8Array(await cryptoImpl.subtle.sign("HMAC",key,encoder.encode(payload)));
  let sig="";for(const n of signatureBytes)sig+=String.fromCharCode(n);
