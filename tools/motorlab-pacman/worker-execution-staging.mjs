@@ -3,6 +3,7 @@
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
 import {candidateCycleDispatch} from "./candidates/staging-cycle-dispatch.mjs";
 // Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
+export const PACMAN_EXECUTION_RUNTIME_REVISION="pacman-v2-webauthn-relay-20261016";
 const MAX_BYTES=8192;
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
@@ -20,11 +21,11 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
   const url=new URL(request.url);
   // Public, read-only connectivity check: no secrets, approvals, or D1 writes.
   if(url.pathname==="/health" && request.method==="GET"){
-   if(!env?.DB?.prepare) return response({service:"pacman-execution-staging",database:"BINDING_MISSING"},503);
+   if(!env?.DB?.prepare) return response({service:"pacman-execution-staging",revision:PACMAN_EXECUTION_RUNTIME_REVISION,database:"BINDING_MISSING"},503);
    try {
     const found=await env.DB.prepare("SELECT COUNT(*) AS total FROM sqlite_master WHERE type = 'table' AND name = 'pacman_operations'").first();
-    return response({service:"pacman-execution-staging",database:found?.total===1?"CONNECTED":"SCHEMA_MISSING"},found?.total===1?200:503);
-   } catch {return response({service:"pacman-execution-staging",database:"ERROR"},503);}
+    return response({service:"pacman-execution-staging",revision:PACMAN_EXECUTION_RUNTIME_REVISION,database:found?.total===1?"CONNECTED":"SCHEMA_MISSING"},found?.total===1?200:503);
+   } catch {return response({service:"pacman-execution-staging",revision:PACMAN_EXECUTION_RUNTIME_REVISION,database:"ERROR"},503);}
   }
   if(url.pathname!=="/execute" || request.method!=="POST") return response({error:"NOT_FOUND"},404);
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);
