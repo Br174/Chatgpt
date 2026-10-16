@@ -34,8 +34,7 @@ test("a finished batch is not falsely reported as a finished project",async()=>{
 test("completion flag alone cannot terminate an operation without matching evidence",async()=>{
  const base={operationId:"evidence-op",checkpointId:"cp0",approved:true,projectCompleteVerified:true,phases:[{id:"phase",checkpointId:"cp1",tasks:[{id:"read",kind:"read"}]}],worker:async()=>({ok:true})};
  for(const evidence of [null,{operationId:"wrong",checkpointId:"cp1",verified:true},{operationId:"evidence-op",checkpointId:"wrong",verified:true},{operationId:"evidence-op",checkpointId:"cp1",verified:false}]){
-  const result=await runMotorLabOperationR38({...base,completionEvidence:evidence});
-  assert.equal(result.decision,"CONTINUE");
+  await assert.rejects(runMotorLabOperationR38({...base,completionEvidence:evidence}),/UNVERIFIED_PROJECT_COMPLETION/);
  }
  const verified=await runMotorLabOperationR38({...base,completionEvidence:{operationId:"evidence-op",checkpointId:"cp1",verified:true}});
  assert.equal(verified.decision,"COMPLETE");
