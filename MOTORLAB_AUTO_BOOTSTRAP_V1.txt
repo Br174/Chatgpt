@@ -269,3 +269,7 @@ R30 CAPSULE-FIRST BOOT ORDER
 
 
 Revision 1.13: r31 adds mandatory MotorLab Re-entry Gate on every supported project UserPromptSubmit and resume/compact/clear, with safe newer-local-release pin refresh and no second scheduler.
+
+
+R38 BOOTSTRAP EXECUTION HANDOFF — CORE LAB (2026-10-16)
+On supported authorized runtime invocations, hand the approved operation graph to templates/execution/motorlab-r38-operation-entrypoint-lab.mjs through the existing Execution Fabric adapter; R38 is the only stop/continue decision authority, not a second scheduler. This is a contract and integration route, NOT proof that a ChatGPT host hook invokes this module automatically. Preserve first-write approval, protected boundaries, checkpoint persistence and existing Pacman AutoSetup routing. If no executable host adapter is connected, report R38_HOST_ADAPTER_PENDING and do not claim global activation.
