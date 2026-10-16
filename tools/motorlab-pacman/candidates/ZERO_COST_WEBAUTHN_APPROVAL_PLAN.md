@@ -1,5 +1,5 @@
 # Pac-Man zero-cost approval alternative — LAB proposal
-Status: design only; no WebAuthn code, credentials, Worker deployment or D1 writes.
+Status: **CANONICAL LAB PATH**. Cloudflare Access / Zero Trust is explicitly rejected for Pac-Man owner approval because the project requirement is €0. WebAuthn/passkey is the active authentication path. No production changes or live D1/GitHub mutations are authorized by this status.
 ## Goal
 Avoid Cloudflare Zero Trust onboarding that requests billing authorization. Reuse existing staging Worker/D1 where supported by current free-plan quotas. No guarantee of zero cost without checking actual account usage and billing limits.
 ## Authentication
@@ -19,3 +19,11 @@ Avoid Cloudflare Zero Trust onboarding that requests billing authorization. Reus
 4. Integrate issuer with existing trusted-approval gate in disabled LAB-only mode.
 ## Explicit non-goals
 No assumption that ChatGPT's chat buttons convey a cryptographically authenticated user identity; no automatic access to Android biometrics or passkeys from this conversation.
+
+
+## Decision lock — 2026-10-16
+- Cloudflare Access / Zero Trust is **not** the Pac-Man approval path unless the owner explicitly reverses this decision later.
+- Do not spend more implementation or audit effort on Access for the active Pac-Man path.
+- Reuse the existing dedicated Worker + D1 and browser-native WebAuthn/passkey over HTTPS.
+- Keep all real mutation flags OFF until WebAuthn registration, assertion verification, one-time challenge consumption, and recovery are tested in LAB.
+- Any Access-related candidate files remain historical/isolated only and must not be treated as readiness evidence for the zero-cost path.
