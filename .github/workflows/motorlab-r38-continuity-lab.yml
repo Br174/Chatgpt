@@ -7,6 +7,8 @@ on:
       - 'templates/execution/motorlab-*-lab.mjs'
       - '.github/workflows/motorlab-r38-continuity-lab.yml'
       - 'tests/motorlab-r38-core-integration.test.mjs'
+      - 'templates/execution/motorlab-r38-operation-entrypoint-lab.mjs'
+      - 'templates/execution/motorlab-r38-operation-entrypoint-lab.test.mjs'
       - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
       - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
   pull_request:
@@ -14,6 +16,8 @@ on:
       - 'templates/execution/motorlab-*-lab.mjs'
       - '.github/workflows/motorlab-r38-continuity-lab.yml'
       - 'tests/motorlab-r38-core-integration.test.mjs'
+      - 'templates/execution/motorlab-r38-operation-entrypoint-lab.mjs'
+      - 'templates/execution/motorlab-r38-operation-entrypoint-lab.test.mjs'
       - 'MOTORLAB_RELEASE_MANIFEST_V1.txt'
       - 'MOTORLAB_CORE_ENTRYPOINT_V1.txt'
   workflow_dispatch:
@@ -29,4 +33,4 @@ jobs:
         with:
           node-version: '22'
       - name: Test continuity decisions and checkpoint handoff
-        run: node --test templates/execution/motorlab-continuity-*.test.mjs templates/execution/motorlab-r38-execution-bridge-lab.test.mjs tests/motorlab-r38-core-integration.test.mjs
+        run: node --test templates/execution/motorlab-continuity-*.test.mjs templates/execution/motorlab-r38-execution-bridge-lab.test.mjs tests/motorlab-r38-core-integration.test.mjs templates/execution/motorlab-r38-operation-entrypoint-lab.test.mjs
