@@ -26,3 +26,12 @@ test("JWKS response without streaming body rejected",async()=>{
  const fetchImpl=async()=>({ok:true,status:200,headers:{get:()=>null},json:async()=>({keys:[key]})});
  await assert.rejects(loadPinnedAccessJwksLab({...valid(),fetchImpl}),/ACCESS_JWKS_UNAVAILABLE/);
 });
+
+test("malformed declared content length fails closed",async()=>{
+ const fetchImpl=async()=>({ok:true,status:200,headers:{get:()=>"-5"},body:new ReadableStream({start(controller){controller.enqueue(new TextEncoder().encode(JSON.stringify({keys:[key]})));controller.close();}})});
+ await assert.rejects(loadPinnedAccessJwksLab({...valid(),fetchImpl}),/ACCESS_JWKS_UNAVAILABLE/);
+});
+test("declared oversized content length fails before reading",async()=>{
+ const fetchImpl=async()=>({ok:true,status:200,headers:{get:()=>"65537"},body:new ReadableStream({start(controller){controller.enqueue(new TextEncoder().encode(JSON.stringify({keys:[key]})));controller.close();}})});
+ await assert.rejects(loadPinnedAccessJwksLab({...valid(),fetchImpl}),/ACCESS_JWKS_UNAVAILABLE/);
+});
