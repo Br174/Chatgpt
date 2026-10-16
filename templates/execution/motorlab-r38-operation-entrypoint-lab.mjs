@@ -5,6 +5,7 @@ import {reconcileContinuityCheckpointLab} from "./motorlab-continuity-checkpoint
  * No background claims and no duplicate scheduler. */
 export async function runMotorLabOperationR38({operationId,checkpointId,approved=false,scopeChange=false,protectedBoundary=false,phases=[],worker,onCheckpoint,projectCompleteVerified=false,completionEvidence=null,executionOptions={}}={}){
  if(!Array.isArray(phases))throw Error("INVALID_PHASES");
+ if(projectCompleteVerified!==true&&completionEvidence!==null)throw Error("COMPLETION_EVIDENCE_WITHOUT_VERIFICATION");
  const completed=[];let checkpoint=checkpointId;
  const initial=reconcileContinuityCheckpointLab({operationId,checkpointId:checkpoint,approved,scopeChange,protectedBoundary,nextTaskId:phases[0]?.tasks?.[0]?.id||null});
  if(initial.decision!=="CONTINUE")return {decision:initial.decision,reason:initial.reason,completed,checkpointId:checkpoint};
@@ -21,5 +22,6 @@ export async function runMotorLabOperationR38({operationId,checkpointId,approved
   if(i<phases.length-1&&!outcome.post.dispatchAllowed)throw Error("R38_CONTINUATION_NOT_DISPATCHED");
  }
  const verified=projectCompleteVerified===true&&completionEvidence?.operationId===operationId&&completionEvidence?.checkpointId===checkpoint&&completionEvidence?.verified===true;
+ if(projectCompleteVerified===true&&!verified)throw Error("UNVERIFIED_PROJECT_COMPLETION");
  return {decision:verified?"COMPLETE":"CONTINUE",reason:verified?"PROJECT_VERIFIED_COMPLETE":"APPROVED_PHASES_COMPLETE_WORK_REMAINS",completed,checkpointId:checkpoint};
 }
