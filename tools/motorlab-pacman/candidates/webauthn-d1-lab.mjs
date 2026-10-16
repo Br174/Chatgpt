@@ -51,6 +51,19 @@ export async function storeWebAuthnChallengeD1(db,record){
  return true;
 }
 
+
+export async function loadWebAuthnChallengeD1(db,challenge){
+ if(!db?.prepare||!id.test(challenge||""))fail("WEBAUTHN_CHALLENGE_INVALID");
+ const row=await db.prepare("SELECT challenge,operation_id,capability,branch,path,content_sha256,rp_id,origin,issued_at,expires_at,consumed_at FROM pacman_webauthn_challenges WHERE challenge=? LIMIT 1").bind(challenge).first();
+ if(!row)fail("WEBAUTHN_CHALLENGE_NOT_FOUND");
+ return {
+  challenge:row.challenge,operationId:row.operation_id,capability:row.capability,
+  branch:row.branch,path:row.path,contentSha256:row.content_sha256,
+  rpId:row.rp_id,origin:row.origin,issuedAt:row.issued_at,expiresAt:row.expires_at,
+  consumedAt:row.consumed_at
+ };
+}
+
 export async function consumeWebAuthnChallengeD1(db,record,{nowMs=Date.now()}={}){
  if(!db?.prepare)fail("WEBAUTHN_D1_UNAVAILABLE");
  if(!record||!id.test(record.challenge||"")||!Number.isSafeInteger(nowMs))fail("WEBAUTHN_CHALLENGE_INVALID");
