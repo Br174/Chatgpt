@@ -4,7 +4,10 @@ export const WEBAUTHN_CREDENTIALS_SCHEMA=`CREATE TABLE IF NOT EXISTS pacman_weba
  credential_id TEXT PRIMARY KEY NOT NULL,
  public_key_jwk TEXT NOT NULL,
  sign_count INTEGER NOT NULL DEFAULT 0,
- owner_subject TEXT NOT NULL,
+ owner_subject TEXT NOT NULL UNIQUE,
+ bootstrap_nonce TEXT NOT NULL UNIQUE,
+ bootstrap_comment_id INTEGER NOT NULL UNIQUE,
+ registration_sha256 TEXT NOT NULL,
  created_at INTEGER NOT NULL,
  disabled_at INTEGER
 )`;
@@ -55,6 +58,30 @@ export async function consumeWebAuthnChallengeD1(db,record,{nowMs=Date.now()}={}
  const result=await db.prepare(sql).bind(nowMs,record.challenge,record.operationId,record.contentSha256,nowMs).run();
  if(result?.success!==true||result?.meta?.changes!==1)fail("WEBAUTHN_CHALLENGE_REPLAY_OR_EXPIRED");
  return true;
+}
+
+
+export async function storeWebAuthnCredentialD1(db,{
+ credentialId,publicKeyJwk,signCount=0,ownerSubject,
+ bootstrapNonce,bootstrapCommentId,registrationSha256,createdAt=Date.now()
+}={}){
+ if(!db?.prepare||typeof credentialId!=="string"||!/^[A-Za-z0-9_-]{4,1024}$/.test(credentialId)||
+    !publicKeyJwk||publicKeyJwk.kty!=="EC"||publicKeyJwk.crv!=="P-256"||
+    typeof publicKeyJwk.x!=="string"||!publicKeyJwk.x||typeof publicKeyJwk.y!=="string"||!publicKeyJwk.y||
+    !Number.isSafeInteger(signCount)||signCount<0||
+    typeof ownerSubject!=="string"||!ownerSubject||
+    !id.test(bootstrapNonce||"")||!Number.isSafeInteger(bootstrapCommentId)||bootstrapCommentId<1||
+    !digest.test(registrationSha256||"")||!Number.isSafeInteger(createdAt))
+  fail("WEBAUTHN_CREDENTIAL_INVALID");
+ const sql="INSERT INTO pacman_webauthn_credentials (credential_id,public_key_jwk,sign_count,owner_subject,bootstrap_nonce,bootstrap_comment_id,registration_sha256,created_at,disabled_at) VALUES (?,?,?,?,?,?,?,?,NULL)";
+ let result;try{
+  result=await db.prepare(sql).bind(
+   credentialId,JSON.stringify(publicKeyJwk),signCount,ownerSubject,
+   bootstrapNonce,bootstrapCommentId,registrationSha256,createdAt
+  ).run();
+ }catch{fail("WEBAUTHN_CREDENTIAL_ALREADY_ENROLLED");}
+ if(result?.success!==true||result?.meta?.changes!==1)fail("WEBAUTHN_CREDENTIAL_ALREADY_ENROLLED");
+ return Object.freeze({credentialId,ownerSubject,stored:true});
 }
 
 export async function loadWebAuthnCredentialD1(db,credentialId){
