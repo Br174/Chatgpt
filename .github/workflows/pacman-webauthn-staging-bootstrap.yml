@@ -1,6 +1,11 @@
 name: Pac-Man WebAuthn staging bootstrap (zero-cost, protected)
 
 on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/workflows/pacman-webauthn-staging-bootstrap.yml'
   workflow_dispatch:
     inputs:
       confirm_staging_only:
@@ -17,7 +22,7 @@ concurrency:
 
 jobs:
   bootstrap:
-    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' && inputs.confirm_staging_only == 'BOOTSTRAP_WEBAUTHN_STAGING_ONLY'
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' && (github.event_name == 'push' || inputs.confirm_staging_only == 'BOOTSTRAP_WEBAUTHN_STAGING_ONLY')
     runs-on: ubuntu-latest
     environment: pacman-execution-staging
     timeout-minutes: 15
