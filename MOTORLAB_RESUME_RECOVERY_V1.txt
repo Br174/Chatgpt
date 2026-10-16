@@ -26,7 +26,7 @@ A controlled turn may finish only in:
 - BLOCKED_EXTERNAL;
 - BLOCKED_USER;
 - SAFE_STOP;
-- HANDOFF_COMPLETE.
+- HANDOFF_COMPLETE (only a verified durable-job polling-lane handoff, not completion of the operation; use only when no other safe approved READY work remains, with persisted job identity/checkpoint and next resume trigger).
 It is not valid to end merely because a tool returned, a repository read finished, an intermediate percentage was shown or the assistant forgot the next step.
 
 3. PENDING-ACTION LEDGER
