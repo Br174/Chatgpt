@@ -1,0 +1,184 @@
+name: Pac-Man WebAuthn staging bootstrap (zero-cost, protected)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_staging_only:
+        description: 'Type BOOTSTRAP_WEBAUTHN_STAGING_ONLY'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-webauthn-staging-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' && inputs.confirm_staging_only == 'BOOTSTRAP_WEBAUTHN_STAGING_ONLY'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify complete Pac-Man LAB suites
+        run: |
+          node --test tools/motorlab-pacman/*.test.mjs
+          node --test tools/motorlab-pacman/candidates/*.test.mjs
+
+      - name: Verify exact staging scope and additive migration
+        run: |
+          node --test tools/motorlab-pacman/candidates/staging-d1-webauthn-migration.test.mjs
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('tools/motorlab-pacman/webauthn/wrangler.pacman-webauthn-staging.jsonc','utf8'));
+          if(c.workers_dev!==true ||
+             c.name!=='motorlab-pacman-webauthn-staging-lab' ||
+             c.main!=='./worker.mjs' ||
+             c.d1_databases?.length!==1 ||
+             c.d1_databases[0].binding!=='DB' ||
+             c.d1_databases[0].database_name!=='motorlab-pacman-staging' ||
+             c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
+            throw Error('WEBAUTHN_STAGING_SCOPE_MISMATCH');
+          console.log('WEBAUTHN_STAGING_SCOPE_VERIFIED');
+          NODE
+
+      - name: Require exact Cloudflare staging credentials
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          test -n "$CF_TOKEN" || { echo "::error::PACMAN_CF_API_TOKEN missing"; exit 1; }
+          test "$CF_ACCOUNT" = "b86f445c2b57e604c02f79c8da64bb9c" || { echo "::error::Wrong Cloudflare account"; exit 1; }
+
+      - name: Snapshot protected D1 schemas
+        id: before
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {writeFileSync} from 'node:fs';
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const db='eb834fc1-5589-4f75-bcb9-d311d0d72261';
+          const endpoint='https://api.cloudflare.com/client/v4/accounts/'+account+'/d1/database/'+db+'/query';
+          const query=async sql=>{
+            const r=await fetch(endpoint,{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
+              headers:{Authorization:'Bearer '+process.env.CF_TOKEN,'Content-Type':'application/json'},
+              body:JSON.stringify({sql})});
+            if(!r.ok)throw Error('D1_HTTP_'+r.status);
+            const j=await r.json();
+            if(j.success!==true||!Array.isArray(j.result)||j.result.some(x=>x.success!==true))throw Error('D1_QUERY_FAILED');
+            return j.result.flatMap(x=>x.results||[]);
+          };
+          const rows=await query("SELECT name,sql FROM sqlite_master WHERE type='table' AND name IN ('pacman_operations','pacman_approval_claims','pacman_cycle_checkpoints') ORDER BY name");
+          writeFileSync(process.env.RUNNER_TEMP+'/protected-before.json',JSON.stringify(rows));
+          console.log('PROTECTED_D1_SCHEMA_SNAPSHOT_SAVED');
+          NODE
+
+      - name: Apply only WebAuthn additive D1 schema
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFile} from 'node:fs/promises';
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const db='eb834fc1-5589-4f75-bcb9-d311d0d72261';
+          const endpoint='https://api.cloudflare.com/client/v4/accounts/'+account+'/d1/database/'+db+'/query';
+          const query=async sql=>{
+            const r=await fetch(endpoint,{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
+              headers:{Authorization:'Bearer '+process.env.CF_TOKEN,'Content-Type':'application/json'},
+              body:JSON.stringify({sql})});
+            if(!r.ok)throw Error('D1_HTTP_'+r.status);
+            const j=await r.json();
+            if(j.success!==true||!Array.isArray(j.result)||j.result.some(x=>x.success!==true))throw Error('D1_QUERY_FAILED');
+            return j.result.flatMap(x=>x.results||[]);
+          };
+          const sql=await readFile('tools/motorlab-pacman/candidates/staging-d1-webauthn-migration.sql','utf8');
+          const statements=sql.replace(/--.*$/gm,'').trim().split(';').map(x=>x.trim()).filter(Boolean);
+          if(statements.length!==2||statements.some(s=>!/^CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+pacman_webauthn_(?:credentials|challenges)\b/i.test(s)))
+            throw Error('MIGRATION_SCOPE_REJECTED');
+          for(const statement of statements)await query(statement);
+          const created=await query("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('pacman_webauthn_credentials','pacman_webauthn_challenges') ORDER BY name");
+          const names=created.map(x=>x.name);
+          if(JSON.stringify(names)!==JSON.stringify(['pacman_webauthn_challenges','pacman_webauthn_credentials']))
+            throw Error('WEBAUTHN_TABLES_NOT_VERIFIED');
+          console.log('WEBAUTHN_D1_TABLES_VERIFIED');
+          NODE
+
+      - name: Verify protected D1 schemas unchanged
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const db='eb834fc1-5589-4f75-bcb9-d311d0d72261';
+          const endpoint='https://api.cloudflare.com/client/v4/accounts/'+account+'/d1/database/'+db+'/query';
+          const r=await fetch(endpoint,{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
+            headers:{Authorization:'Bearer '+process.env.CF_TOKEN,'Content-Type':'application/json'},
+            body:JSON.stringify({sql:"SELECT name,sql FROM sqlite_master WHERE type='table' AND name IN ('pacman_operations','pacman_approval_claims','pacman_cycle_checkpoints') ORDER BY name"})});
+          if(!r.ok)throw Error('D1_HTTP_'+r.status);
+          const j=await r.json();
+          if(j.success!==true||!Array.isArray(j.result)||j.result.some(x=>x.success!==true))throw Error('D1_QUERY_FAILED');
+          const after=j.result.flatMap(x=>x.results||[]);
+          const before=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/protected-before.json','utf8'));
+          if(JSON.stringify(before)!==JSON.stringify(after))throw Error('PROTECTED_D1_SCHEMA_CHANGED');
+          console.log('PROTECTED_D1_SCHEMAS_UNCHANGED');
+          NODE
+
+      - name: Refuse pre-existing WebAuthn activation
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const worker='motorlab-pacman-webauthn-staging-lab';
+          const url='https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/scripts/'+worker+'/settings';
+          const r=await fetch(url,{headers:{Authorization:'Bearer '+process.env.CF_TOKEN},redirect:'error',signal:AbortSignal.timeout(15000)});
+          if(r.status===404){console.log('WEBAUTHN_WORKER_NEW_TARGET');process.exit(0);}
+          if(!r.ok)throw Error('WEBAUTHN_PREFLIGHT_HTTP_'+r.status);
+          const j=await r.json();
+          if(j.success!==true||!Array.isArray(j.result?.bindings))throw Error('WEBAUTHN_PREFLIGHT_INVALID');
+          if(j.result.bindings.some(x=>x.name==='PACMAN_WEBAUTHN_ENABLED'))
+            throw Error('WEBAUTHN_ALREADY_ACTIVATED_ABORT');
+          console.log('WEBAUTHN_TARGET_CONFIRMED_DISABLED');
+          NODE
+
+      - name: Deploy WebAuthn Worker still disabled
+        id: deploy
+        working-directory: tools/motorlab-pacman/webauthn
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 deploy --config wrangler.pacman-webauthn-staging.jsonc 2>&1 | tee "$RUNNER_TEMP/webauthn-deploy.log"
+          worker_url="$(grep -Eo 'https://[[:alnum:].-]+\.workers\.dev' "$RUNNER_TEMP/webauthn-deploy.log" | head -n 1 || true)"
+          test -n "$worker_url" || { echo "::error::Worker URL not reported"; exit 1; }
+          echo "worker_url=$worker_url" >> "$GITHUB_OUTPUT"
+
+      - name: Verify deployed Worker is fail-closed
+        env:
+          WORKER_URL: ${{ steps.deploy.outputs.worker_url }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base=process.env.WORKER_URL;
+          if(!/^https:\/\/[a-zA-Z0-9.-]+\.workers\.dev$/.test(base||''))throw Error('INVALID_WEBAUTHN_WORKER_URL');
+          const r=await fetch(base+'/health',{redirect:'error',signal:AbortSignal.timeout(15000)});
+          const body=await r.json();
+          if(r.status!==503||body.service!=='motorlab-pacman-webauthn-staging-lab'||body.configured!==false||body.path!=='WEBAUTHN_ZERO_COST')
+            throw Error('WEBAUTHN_WORKER_NOT_FAIL_CLOSED');
+          console.log('WEBAUTHN_BOOTSTRAP_COMPLETE_DISABLED_AND_VERIFIED');
+          console.log('NO_MAIN_NO_PRODUCTION_NO_RUNTIME_ENABLEMENT');
+          NODE
