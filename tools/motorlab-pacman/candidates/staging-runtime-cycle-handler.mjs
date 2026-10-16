@@ -12,12 +12,20 @@ export async function stagingCycleHandler({input,env,fetchImpl=fetch,now}={}){
  if(!env?.DB?.prepare || typeof env?.PACMAN_APPROVAL_SIGNING_SECRET!=="string" ||
     env.PACMAN_APPROVAL_SIGNING_SECRET.length<32 || typeof env?.PACMAN_GITHUB_TOKEN!=="string" ||
     env.PACMAN_GITHUB_TOKEN.length<20)return reply({error:"STAGING_CONFIGURATION_MISSING"},503);
- // Verify both staging tables before consuming a one-time approval or calling GitHub.
+ // Verify actual approval ledger and checkpoint columns before consuming approval.
  try {
-  const tables=await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('pacman_operations','pacman_cycle_checkpoints')").all();
-  const found=new Set(tables?.results?.map(x=>x.name));
-  if(!found?.has("pacman_operations") || !found.has("pacman_cycle_checkpoints"))
-   return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);
+  const required={
+   pacman_approval_claims:["operation_id","approval_signature","claimed_at","expires_at"],
+   pacman_cycle_checkpoints:["operation_id","state","branch","path","sha","updated_at"]
+  };
+  for(const [table,columns] of Object.entries(required)){
+   const info=await env.DB.prepare("PRAGMA table_info("+table+")").all();
+   const names=new Set(info?.results?.map(row=>row.name));
+   if(!columns.every(column=>names.has(column)))
+    return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);
+   const pk=info.results.find(row=>row.name==="operation_id");
+   if(pk?.pk!==1)return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);
+  }
  } catch {return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);}
  try {
   const result=await approvedVerifiedLabCycleWithD1({intent:input.intent,approval:input.approval,
