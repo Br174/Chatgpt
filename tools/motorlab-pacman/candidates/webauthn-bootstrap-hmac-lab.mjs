@@ -23,26 +23,3 @@ export async function verifyBootstrapProofLab({payload,signature,secret,expected
 // This verifies authenticity of an operator-issued proof, NOT that the holder
 // is the real owner. A separate trusted issuance process, one-time atomic nonce
 // consumption and credential registration verification remain mandatory.
-
-export async function signBootstrapProofLab({
- ownerId,secret,now=Date.now(),ttlMs=180000,cryptoImpl=globalThis.crypto
-}={}){
- if(!cryptoImpl?.subtle||!cryptoImpl?.getRandomValues||
-    typeof ownerId!=="string"||!ownerId||
-    !(secret instanceof Uint8Array||secret instanceof ArrayBuffer)||
-    !Number.isSafeInteger(now)||!Number.isSafeInteger(ttlMs)||ttlMs<30000||ttlMs>300000)fail();
- const bytes=secret instanceof Uint8Array?secret:new Uint8Array(secret);
- if(bytes.byteLength<32)fail();
- const nonceBytes=new Uint8Array(32);cryptoImpl.getRandomValues(nonceBytes);
- let raw="";for(const n of nonceBytes)raw+=String.fromCharCode(n);
- const nonce=btoa(raw).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
- const data={purpose:"pacman.webauthn.enroll.v1",ownerId,nonce,issuedAt:now,expiresAt:now+ttlMs};
- const payloadBytes=encoder.encode(JSON.stringify(data));
- let payloadRaw="";for(const n of payloadBytes)payloadRaw+=String.fromCharCode(n);
- const payload=btoa(payloadRaw).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
- const key=await cryptoImpl.subtle.importKey("raw",bytes,{name:"HMAC",hash:"SHA-256"},false,["sign"]);
- const signatureBytes=new Uint8Array(await cryptoImpl.subtle.sign("HMAC",key,encoder.encode(payload)));
- let sig="";for(const n of signatureBytes)sig+=String.fromCharCode(n);
- const signature=btoa(sig).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
- return Object.freeze({payload,signature,nonce,expiresAt:data.expiresAt});
-}
