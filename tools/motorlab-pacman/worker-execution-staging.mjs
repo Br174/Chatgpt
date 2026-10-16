@@ -66,7 +66,9 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
   // V2 route is wired into the real staging Worker but remains disabled unless the exact LAB-only route flag is set.
   const candidateResult=await candidateCycleDispatch({input,env,fetchImpl});
   if(candidateResult!==null)return candidateResult;
-  // V1 existing-file write contract is retired. V2 reversible cycle is the only canonical GitHub mutation route.\n  if(input.mode==="github-lab-write") return response({error:"LEGACY_GITHUB_LAB_WRITE_RETIRED"},410);\n  // A chat message or JSON approval is never sufficient to assert trusted-host identity.
+  // V1 existing-file write contract is retired. V2 reversible cycle is the only canonical GitHub mutation route.
+  if(input.mode==="github-lab-write") return response({error:"LEGACY_GITHUB_LAB_WRITE_RETIRED"},410);
+  // A chat message or JSON approval is never sufficient to assert trusted-host identity.
   // Fail closed BEFORE consuming a one-time attestation until a separate trusted issuer
   // and an audited staging-only executor are both connected and enabled.
   if(env?.PACMAN_TRUSTED_ISSUER_CONNECTED!=="YES_VERIFIED_TRUSTED_HOST")
