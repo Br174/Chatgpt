@@ -38,3 +38,18 @@ Source inspection of `.github/workflows/pacman-execution-staging-deploy.yml` con
 **Critical distinction:** the deploy workflow's current tests run `node --test tools/motorlab-pacman/*.test.mjs`, which excludes the candidate test directory. The separate isolated candidate CI provides that coverage. Any future integration into the top-level Worker must update the deployment test gate to include the relevant candidate tests and must avoid accidentally triggering a live deployment before review.
 
 The Worker `/health` currently checks only `pacman_operations`, so a healthy response does **not** prove the approval ledger or cycle checkpoint schema exists. Do not interpret a green health check as readiness to enable GitHub writes.
+
+## Read-only Cloudflare D1 verification procedure (pending execution)
+
+The GitHub connector validates repository code and CI, **not** live Cloudflare D1 table state. The source pins dedicated staging D1 database ID `eb834fc1-5589-4f75-bcb9-d311d0d72261` and binding `DB`. Before any Worker routing or write enablement, an authorized operator must run **read-only** queries against this exact staging database using Cloudflare's authenticated dashboard or CLI, never production:
+
+```sql
+SELECT name FROM sqlite_master WHERE type='table' AND name IN ('pacman_approval_claims','pacman_cycle_checkpoints');
+PRAGMA table_info(pacman_approval_claims);
+PRAGMA table_info(pacman_cycle_checkpoints);
+SELECT state, COUNT(*) AS total FROM pacman_cycle_checkpoints GROUP BY state;
+```
+
+Required approval ledger columns: `operation_id` (primary key), `approval_signature`, `claimed_at`, `expires_at`. Required checkpoint columns: `operation_id` (primary key), `state`, `branch`, `path`, `sha`, `updated_at`. Any `RECOVERY_REQUIRED` or incomplete state requires manual reconciliation before enabling writes. Do **not** print signing secrets, tokens, approval signatures, or raw operation content. If a table is missing, stop; schema migration requires separate review and is not authorized by a green CI run.
+
+Current status: **not executed** against Cloudflare; live D1 readiness remains **UNVERIFIED / NO-GO**.
