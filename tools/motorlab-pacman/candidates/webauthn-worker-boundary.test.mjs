@@ -168,31 +168,39 @@ test("protected GitHub egress diagnostic denies unauthenticated and disabled cal
  assert.equal(r.status,503);assert.equal(fetched,0);
 });
 
-test("guarded Github egress diagnostic reports only numeric statuses, not secrets or comment contents",async()=>{
+test("guarded Github egress diagnostic reports only metadata with no secrets",async()=>{
  const key="k".repeat(40),calls=[];
- const fetchImpl=async(url,opt)=>{calls.push({url,auth:opt.headers?.authorization,method:opt.method,redirect:opt.redirect});return {status:calls.length===1?403:200};};
+ const fetchImpl=async(url,opt)=>{
+  calls.push({url,auth:opt.headers?.authorization,method:opt.method,redirect:opt.redirect});
+  return {status:calls.length===1?403:200,ok:calls.length!==1,
+    url,headers:{get:()=>null},
+    json:async()=>({message:"API rate limit exceeded"})};
+ };
  const r=await handleWebAuthnRequest(new Request(endpoint+"/__motorlab_lab/diagnostics/github-bootstrap",{headers:{authorization:"Bearer "+key}}),{...baseEnv,DB:db(),PACMAN_EXECUTION_KEY:key},{fetchImpl});
  assert.equal(r.status,200);
  const body=await r.json();
- assert.deepEqual(body,{component:"webAuthnBootstrapGitHubReadOnly",
-  authenticatedHttp:403,anonymousHttp:200,
-  authenticatedReason:"http",anonymousReason:"http",
-  publicManualHttp:200,publicManualReason:"http",independentHttp:200,independentReason:"http"});
- assert.equal(calls.length,4);assert.equal(calls[1].auth,undefined);
- assert.equal(calls[0].url,calls[1].url);assert.equal(calls[0].method,"GET");
- assert.equal(calls[2].redirect,"manual");
+ assert.equal(body.authenticatedHttp,403);assert.equal(body.anonymousHttp,200);
+ assert.equal(body.authManualHttp,200);assert.equal(body.publicManualHttp,200);assert.equal(body.publicFollowHttp,200);
+ assert.equal(body.independentHttp,200);
+ assert.equal(calls.length,6);assert.equal(calls[0].auth,"Bearer "+baseEnv.PACMAN_GITHUB_TOKEN);
+ assert.equal(calls[1].auth,"Bearer "+baseEnv.PACMAN_GITHUB_TOKEN);
+ for(const i of [2,3,4,5])assert.equal(calls[i].auth,undefined);
+ assert.equal(calls[4].redirect,"follow");assert.match(calls[5].url,/registry\.npmjs\.org/);
  assert.ok(!JSON.stringify(body).includes(key));assert.ok(!JSON.stringify(body).includes(baseEnv.PACMAN_GITHUB_TOKEN));
 });
 
-test("protected diagnosis categorizes blocked redirect versus manual Github response and never exposes messages",async()=>{
- const key="k".repeat(40);let n=0;
- const fetchImpl=async(url,opt)=>{n++;if(n===1||n===2)throw Error("redirect caused network violation SECRET_SHOULD_NOT_LEAK");
-  if(n===3)return {status:301};
-  return {status:200};};
+test("diagnostic errors remain secret-free even if outbound requests fail",async()=>{
+ const key="k".repeat(40),calls=[];
+ const fetchImpl=async(url,opt)=>{
+  calls.push({url,auth:opt.headers?.authorization,redirect:opt.redirect});
+  if(calls.length===4)return {status:403,ok:false,headers:{get:()=>null},url,
+   json:async()=>({message:"API rate limit exceeded"})};
+  throw Error("redirect SECRET_SHOULD_NOT_LEAK");
+ };
  const r=await handleWebAuthnRequest(new Request(endpoint+"/__motorlab_lab/diagnostics/github-bootstrap",{headers:{authorization:"Bearer "+key}}),{...baseEnv,DB:db(),PACMAN_EXECUTION_KEY:key},{fetchImpl});
- assert.equal(r.status,200);
- const body=await r.json();
- assert.equal(body.authenticatedReason,"redirect");assert.equal(body.anonymousHttp,0);
- assert.equal(body.publicManualHttp,301);assert.equal(body.independentHttp,200);
- assert.equal(n,4);assert.ok(!JSON.stringify(body).includes("SECRET_SHOULD_NOT_LEAK"));
+ const body=await r.json();assert.equal(body.authenticatedReason,"redirect");
+ assert.equal(body.publicManualHttp,403);assert.equal(body.publicManualCategory,"rate_limit");
+ assert.equal(body.publicFollowHttp,0);assert.equal(calls.length,6);
+ assert.equal(calls[4].auth,undefined);assert.equal(calls[4].redirect,"follow");
+ assert.ok(!JSON.stringify(body).includes(key));assert.ok(!JSON.stringify(body).includes("SECRET_SHOULD_NOT_LEAK"));
 });

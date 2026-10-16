@@ -87,36 +87,52 @@ export async function handleWebAuthnRequest(request,env,{
    const githubUrl="https://api.github.com/repos/Br174/Chatgpt/issues/72/comments?per_page=1";
    const common={accept:"application/vnd.github+json","x-github-api-version":"2022-11-28","user-agent":"motorlab-pacman-bootstrap"};
    // Report only a bounded reason category, never exception text, headers, comment body or secret.
-   const check=async(headers,redirect="error")=>{
+   const check=async(headers,redirect="manual",url=githubUrl)=>{
     try{
-     const r=await fetchImpl(githubUrl,{method:"GET",redirect,headers,signal:AbortSignal.timeout(12000)});
-     return {http:Number.isInteger(r.status)?r.status:0,reason:"http"};
-    }catch(e){
-     const message=typeof e?.message==="string"?e.message:"";
-     const reason=/redirect/i.test(message)?"redirect":
-      /network|connect|tls|fetch failed|dns|host/i.test(message)?"network":
-      /abort|timeout/i.test(message)?"timeout":
-      /unsupported|invalid/i.test(message)?"invalid":"other";
-     return {http:0,reason};
-    }
-   };
-   const authenticated=await check({...common,authorization:"Bearer "+env.PACMAN_GITHUB_TOKEN});
-   const anonymous=await check(common);
-   const manual=await check(common,"manual");
-   const unrelated=await (async()=>{
-    try{
-     const r=await fetchImpl("https://registry.npmjs.org/-/ping",{method:"GET",redirect:"manual",signal:AbortSignal.timeout(12000)});
-     return {http:Number.isInteger(r.status)?r.status:0,reason:"http"};
+     const r=await fetchImpl(url,{method:"GET",redirect,headers,signal:AbortSignal.timeout(12000)});
+     let category="other";
+     if(r.status===403&&typeof r.json==="function"){
+      try{
+       const body=await r.json(),msg=typeof body?.message==="string"?body.message:"";
+       category=/rate limit/i.test(msg)?"rate_limit":
+         /resource not accessible|permission/i.test(msg)?"permission":
+         /abuse|secondary/i.test(msg)?"abuse":
+         /requires authentication|bad credentials/i.test(msg)?"credentials":"other";
+      }catch{}
+     }
+     const to=r.headers?.get?.("location")||"";
+     let redirectHost="none";try{if(to)redirectHost=new URL(to,url).hostname;}catch{redirectHost="invalid";}
+     const final=typeof r.url==="string"&&r.url?new URL(r.url).hostname:"unknown";
+     return {http:Number.isInteger(r.status)?r.status:0,reason:"http",category,
+      githubRequestId:Boolean(r.headers?.get?.("x-github-request-id")),
+      redirectHost,finalHost:final};
     }catch(e){
      const msg=typeof e?.message==="string"?e.message:"";
-     return {http:0,reason:/redirect/i.test(msg)?"redirect":/network|connect|tls|fetch failed|dns|host/i.test(msg)?"network":/abort|timeout/i.test(msg)?"timeout":"other"};
+     return {http:0,reason:/redirect/i.test(msg)?"redirect":
+      /network|connect|tls|fetch failed|dns|host/i.test(msg)?"network":
+      /abort|timeout/i.test(msg)?"timeout":"other",
+      category:"unknown",githubRequestId:false,redirectHost:"none",finalHost:"unknown"};
     }
-   })();
+   };
+   const authedError=await check({...common,authorization:"Bearer "+env.PACMAN_GITHUB_TOKEN},"error");
+   const authedManual=await check({...common,authorization:"Bearer "+env.PACMAN_GITHUB_TOKEN},"manual");
+   const publicError=await check(common,"error");
+   const publicManual=await check(common,"manual");
+   // A redirect-follow experiment MUST NEVER contain Authorization headers.
+   const publicFollow=await check(common,"follow");
+   const independent=await check({accept:"application/json"},"manual","https://registry.npmjs.org/-/ping");
    return reply({component:"webAuthnBootstrapGitHubReadOnly",
-    authenticatedHttp:authenticated.http,anonymousHttp:anonymous.http,
-    authenticatedReason:authenticated.reason,anonymousReason:anonymous.reason,
-    publicManualHttp:manual.http,publicManualReason:manual.reason,
-    independentHttp:unrelated.http,independentReason:unrelated.reason});
+    authenticatedHttp:authedError.http,anonymousHttp:publicError.http,
+    authenticatedReason:authedError.reason,anonymousReason:publicError.reason,
+    authManualHttp:authedManual.http,authManualCategory:authedManual.category,
+    authManualGitHubId:authedManual.githubRequestId,
+    authManualRedirectHost:authedManual.redirectHost,
+    publicManualHttp:publicManual.http,publicManualCategory:publicManual.category,
+    publicManualGitHubId:publicManual.githubRequestId,
+    publicManualRedirectHost:publicManual.redirectHost,
+    publicFollowHttp:publicFollow.http,publicFollowCategory:publicFollow.category,
+    publicFollowHost:publicFollow.finalHost,
+    independentHttp:independent.http,independentReason:independent.reason});
   }
   if(url.pathname==="/bootstrap/webauthn-schema"){
    if(request.method!=="POST")return reply({error:"NOT_FOUND"},404);

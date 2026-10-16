@@ -139,8 +139,14 @@ jobs:
           if(report?.component!=='webAuthnBootstrapGitHubReadOnly')throw Error('GITHUB_EGRESS_DIAGNOSTIC_UNAVAILABLE');
           console.log('PACMAN_GITHUB_WORKER_EGRESS_AUTH_HTTP_'+report.authenticatedHttp+'_PUBLIC_HTTP_'+report.anonymousHttp);
           console.log('PACMAN_GITHUB_WORKER_EGRESS_REASON_AUTH_'+report.authenticatedReason+'_PUBLIC_'+report.anonymousReason+
-            '_MANUAL_HTTP_'+report.publicManualHttp+'_MANUAL_REASON_'+report.publicManualReason+
-            '_INDEPENDENT_HTTP_'+report.independentHttp+'_INDEPENDENT_REASON_'+report.independentReason);
-          if(report.authenticatedHttp!==200&&report.anonymousHttp!==200&&report.publicManualHttp!==200)
+            '_AUTH_MANUAL_HTTP_'+report.authManualHttp+'_AUTH_CATEGORY_'+report.authManualCategory+
+            '_AUTH_GITHUB_ID_'+report.authManualGitHubId+'_AUTH_REDIRECT_HOST_'+report.authManualRedirectHost+
+            '_PUBLIC_MANUAL_HTTP_'+report.publicManualHttp+'_PUBLIC_CATEGORY_'+report.publicManualCategory+
+            '_PUBLIC_GITHUB_ID_'+report.publicManualGitHubId+'_PUBLIC_REDIRECT_HOST_'+report.publicManualRedirectHost+
+            '_PUBLIC_FOLLOW_HTTP_'+report.publicFollowHttp+'_PUBLIC_FOLLOW_HOST_'+report.publicFollowHost+
+            '_INDEPENDENT_HTTP_'+report.independentHttp);
+          // Diagnostics is fail-closed. Owner enrollment is NOT marked complete.
+          if(report.authManualHttp!==200&&report.publicManualHttp!==200&&
+             !(report.publicFollowHttp===200&&report.publicFollowHost==='api.github.com'))
             throw Error('GITHUB_BOOTSTRAP_OUTBOUND_UNAVAILABLE');
           NODE
