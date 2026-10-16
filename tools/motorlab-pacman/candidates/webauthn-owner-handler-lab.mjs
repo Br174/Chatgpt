@@ -103,6 +103,15 @@ export async function handleWebAuthnOwnerLab(request,env,{
  const cfg=config(env);
  if(url.pathname==="/webauthn/health"&&request.method==="GET")
   return reply({service:"pacman-webauthn-owner-staging-lab",configured:!!cfg},cfg?200:503);
+ if(url.pathname==="/webauthn/status"&&request.method==="GET"){
+  if(!cfg)return reply({service:"pacman-webauthn-owner-staging-lab",configured:false,enrolled:false},503);
+  try{
+   const credential=await ownerCredentialOrNull(cfg.db);
+   return reply({service:"pacman-webauthn-owner-staging-lab",configured:true,enrolled:credential!==null},200);
+  }catch{
+   return reply({service:"pacman-webauthn-owner-staging-lab",configured:true,enrolled:false,error:"STATUS_UNAVAILABLE"},503);
+  }
+ }
  if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
  if(request.method!=="POST")return reply({error:"NOT_FOUND"},404);
 
