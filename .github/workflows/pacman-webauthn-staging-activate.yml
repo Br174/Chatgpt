@@ -1,0 +1,153 @@
+name: Pac-Man WebAuthn staging activation (zero-cost protected)
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/workflows/pacman-webauthn-staging-activate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-webauthn-staging-activation
+  cancel-in-progress: false
+
+jobs:
+  activate:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify current zero-cost WebAuthn LAB tests
+        run: |
+          node --test tools/motorlab-pacman/candidates/webauthn-*.test.mjs
+
+      - name: Verify exact staging credentials and D1 schema
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const db='eb834fc1-5589-4f75-bcb9-d311d0d72261';
+          if(process.env.CF_ACCOUNT!==account||!process.env.CF_TOKEN)throw Error('STAGING_CREDENTIALS_INVALID');
+          const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+'/d1/database/'+db+'/query',{
+            method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
+            headers:{Authorization:'Bearer '+process.env.CF_TOKEN,'Content-Type':'application/json'},
+            body:JSON.stringify({sql:"SELECT name FROM sqlite_master WHERE type='table' AND name IN ('pacman_webauthn_credentials','pacman_webauthn_challenges') ORDER BY name"})
+          });
+          if(!r.ok)throw Error('D1_PREFLIGHT_HTTP_'+r.status);
+          const j=await r.json();
+          const names=(j.result||[]).flatMap(x=>x.results||[]).map(x=>x.name).sort();
+          if(JSON.stringify(names)!==JSON.stringify(['pacman_webauthn_challenges','pacman_webauthn_credentials']))
+            throw Error('WEBAUTHN_D1_SCHEMA_NOT_READY');
+          console.log('WEBAUTHN_D1_SCHEMA_READY');
+          NODE
+
+      - name: Verify disabled Worker and resolve exact workers.dev identity
+        id: identity
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {appendFile} from 'node:fs/promises';
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const worker='motorlab-pacman-webauthn-staging-lab';
+          const headers={Authorization:'Bearer '+process.env.CF_TOKEN};
+
+          const settings=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/scripts/'+worker+'/settings',{
+            headers,redirect:'error',signal:AbortSignal.timeout(15000)
+          });
+          if(!settings.ok)throw Error('WEBAUTHN_WORKER_NOT_DEPLOYED_'+settings.status);
+          const sj=await settings.json();
+          if(sj.success!==true||!Array.isArray(sj.result?.bindings))throw Error('WEBAUTHN_WORKER_SETTINGS_INVALID');
+          if(sj.result.bindings.some(x=>x.name==='PACMAN_WEBAUTHN_ENABLED'))
+            throw Error('WEBAUTHN_ALREADY_ACTIVATED_ABORT');
+          const db=sj.result.bindings.find(x=>x.name==='DB'&&x.type==='d1');
+          if(db?.id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')throw Error('WEBAUTHN_D1_BINDING_MISMATCH');
+
+          const sub=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/subdomain',{
+            headers,redirect:'error',signal:AbortSignal.timeout(15000)
+          });
+          if(!sub.ok)throw Error('WORKERS_SUBDOMAIN_HTTP_'+sub.status);
+          const subJson=await sub.json();
+          const subdomain=subJson?.result?.subdomain;
+          if(subJson?.success!==true||typeof subdomain!=='string'||!/^[a-zA-Z0-9-]+$/.test(subdomain))
+            throw Error('WORKERS_SUBDOMAIN_INVALID');
+          const host=worker+'.'+subdomain+'.workers.dev';
+          const origin='https://'+host;
+          await appendFile(process.env.GITHUB_OUTPUT,'origin='+origin+'\n');
+          await appendFile(process.env.GITHUB_OUTPUT,'rp_id='+host+'\n');
+          console.log('WEBAUTHN_DISABLED_WORKER_AND_IDENTITY_VERIFIED');
+          NODE
+
+      - name: Provision WebAuthn-only runtime bindings
+        working-directory: tools/motorlab-pacman/webauthn
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          APPROVAL_SECRET: ${{ secrets.PACMAN_APPROVAL_SIGNING_SECRET }}
+          GITHUB_RUNTIME_TOKEN: ${{ secrets.PACMAN_GITHUB_TOKEN }}
+          WEBAUTHN_ORIGIN: ${{ steps.identity.outputs.origin }}
+          WEBAUTHN_RP_ID: ${{ steps.identity.outputs.rp_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$CLOUDFLARE_ACCOUNT_ID" = "b86f445c2b57e604c02f79c8da64bb9c"
+          test -n "$APPROVAL_SECRET"
+          test -n "$GITHUB_RUNTIME_TOKEN"
+          printf '%s' "$APPROVAL_SECRET" | npx --yes wrangler@4 secret put PACMAN_APPROVAL_SIGNING_SECRET --name motorlab-pacman-webauthn-staging-lab >/dev/null
+          printf '%s' "$GITHUB_RUNTIME_TOKEN" | npx --yes wrangler@4 secret put PACMAN_GITHUB_TOKEN --name motorlab-pacman-webauthn-staging-lab >/dev/null
+          printf '%s' "$WEBAUTHN_ORIGIN" | npx --yes wrangler@4 secret put PACMAN_WEBAUTHN_ORIGIN --name motorlab-pacman-webauthn-staging-lab >/dev/null
+          printf '%s' "$WEBAUTHN_RP_ID" | npx --yes wrangler@4 secret put PACMAN_WEBAUTHN_RP_ID --name motorlab-pacman-webauthn-staging-lab >/dev/null
+          printf '%s' 'YES_ZERO_COST_WEBAUTHN_STAGING' | npx --yes wrangler@4 secret put PACMAN_WEBAUTHN_ENABLED --name motorlab-pacman-webauthn-staging-lab >/dev/null
+          echo 'WEBAUTHN_RUNTIME_BINDINGS_PROVISIONED_VALUES_NOT_LOGGED'
+
+      - name: Verify names only and WebAuthn health/page
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          ORIGIN: ${{ steps.identity.outputs.origin }}
+        run: |
+          node --input-type=module <<'NODE'
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const worker='motorlab-pacman-webauthn-staging-lab';
+          const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/scripts/'+worker+'/settings',{
+            headers:{Authorization:'Bearer '+process.env.CF_TOKEN},redirect:'error',signal:AbortSignal.timeout(15000)
+          });
+          if(!r.ok)throw Error('READBACK_HTTP_'+r.status);
+          const j=await r.json();
+          const bindings=j.result?.bindings;
+          if(j.success!==true||!Array.isArray(bindings))throw Error('READBACK_INVALID');
+          for(const name of ['PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN','PACMAN_WEBAUTHN_ORIGIN','PACMAN_WEBAUTHN_RP_ID','PACMAN_WEBAUTHN_ENABLED']){
+            if(!bindings.some(x=>x.name===name&&x.type==='secret_text'))throw Error('BINDING_NOT_CONFIRMED_'+name);
+          }
+          if(!bindings.some(x=>x.name==='DB'&&x.type==='d1'&&x.id==='eb834fc1-5589-4f75-bcb9-d311d0d72261'))
+            throw Error('D1_BINDING_MISMATCH');
+
+          const health=await fetch(process.env.ORIGIN+'/health',{redirect:'error',signal:AbortSignal.timeout(15000)});
+          const hb=await health.json();
+          if(health.status!==200||hb.configured!==true||hb.path!=='WEBAUTHN_ZERO_COST')
+            throw Error('WEBAUTHN_HEALTH_NOT_READY');
+
+          const page=await fetch(process.env.ORIGIN+'/webauthn',{redirect:'error',signal:AbortSignal.timeout(15000)});
+          const html=await page.text();
+          if(page.status!==200||!html.includes('Pac-Man · Passkey proprietario')||!html.includes('github.com/Br174/Chatgpt/issues/72'))
+            throw Error('WEBAUTHN_OWNER_PAGE_NOT_READY');
+
+          console.log('WEBAUTHN_ZERO_COST_STAGING_ACTIVATED_AND_VERIFIED');
+          console.log('OWNER_PAGE: '+process.env.ORIGIN+'/webauthn');
+          console.log('SECRET_VALUES: NEVER_READ_OR_PRINTED');
+          NODE
