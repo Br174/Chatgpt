@@ -13,7 +13,7 @@ test("LAB candidate writes, verifies, removes, verifies cleanup",async()=>{
  const result=await verifiedLabCycle({adapter:m.adapter,branch,path,content:"probe",onCheckpoint:async x=>states.push(x.state)});
  assert.equal(result.state,"VERIFIED_AND_REMOVED");
  assert.deepEqual(m.calls,["read","create","read","remove","read"]);
- assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","VERIFIED_AND_REMOVED"]);
+ assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","VERIFIED_AND_REMOVED"]);
 });
 test("candidate denies main without touching provider",async()=>{
  const m=mock();await assert.rejects(verifiedLabCycle({adapter:m.adapter,branch:"main",path,content:"probe",onCheckpoint:async()=>{}}),/LAB_SCOPE_REQUIRED/);assert.equal(m.calls.length,0);
@@ -37,4 +37,11 @@ test("candidate marks ambiguous create as recovery, never retries",async()=>{
  };
  await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async x=>states.push(x.state)}),/RECOVERY_REQUIRED/);
  assert.deepEqual(calls,["read","create"]);assert.deepEqual(states,["PREPARED","RECOVERY_REQUIRED"]);
+});
+
+test("candidate checkpoints deletion before calling remove",async()=>{
+ const m=mock(),states=[];
+ await verifiedLabCycle({adapter:m.adapter,branch,path,content:"probe",onCheckpoint:async x=>states.push(x.state)});
+ assert.ok(states.indexOf("CLEANUP_ATTEMPTED")>states.indexOf("WRITE_ATTEMPTED"));
+ assert.ok(states.indexOf("CLEANUP_ATTEMPTED")<states.indexOf("VERIFIED_AND_REMOVED"));
 });
