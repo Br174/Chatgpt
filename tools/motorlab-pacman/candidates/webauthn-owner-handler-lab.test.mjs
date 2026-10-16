@@ -151,3 +151,20 @@ test("approval execute delegates exact owner-bound LAB operation to server-side 
  assert.equal(seen.executionKey,e.PACMAN_EXECUTION_KEY);
  assert.equal(seen.signingSecret,secret);
 });
+
+
+test("status reports only whether the owner passkey is enrolled",async()=>{
+ const empty=await handleWebAuthnOwnerLab(new Request(origin+"/webauthn/status"),env(db()),{cryptoImpl:webcrypto});
+ assert.equal(empty.status,200);
+ assert.deepEqual(await empty.json(),{service:"pacman-webauthn-owner-staging-lab",configured:true,enrolled:false});
+
+ const enrolled=await handleWebAuthnOwnerLab(new Request(origin+"/webauthn/status"),env(db({owner:ownerRow})),{cryptoImpl:webcrypto});
+ assert.equal(enrolled.status,200);
+ assert.deepEqual(await enrolled.json(),{service:"pacman-webauthn-owner-staging-lab",configured:true,enrolled:true});
+});
+
+test("status remains fail-closed while WebAuthn runtime is disabled",async()=>{
+ const r=await handleWebAuthnOwnerLab(new Request(origin+"/webauthn/status"),{});
+ assert.equal(r.status,503);
+ assert.deepEqual(await r.json(),{service:"pacman-webauthn-owner-staging-lab",configured:false,enrolled:false});
+});
