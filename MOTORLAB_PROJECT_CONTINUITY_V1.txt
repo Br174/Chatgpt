@@ -95,7 +95,7 @@ Control-plane-only commits/workflows may be recorded as operational evidence but
 If a control-plane-only change unexpectedly triggers application builds/tests/releases, treat that as a root-cause problem in the triggering workflow/configuration and correct trigger hygiene when safe.
 
 3. TERMINATION FLUSH - MANDATORY
-Before a substantial MotorLab turn ends in COMPLETED, BLOCKED_EXTERNAL, BLOCKED_USER, SAFE_STOP or HANDOFF_COMPLETE, persist the freshest coherent continuation state when technically possible.
+Before a substantial MotorLab turn ends in COMPLETED, BLOCKED_EXTERNAL, BLOCKED_USER, SAFE_STOP or HANDOFF_COMPLETE, persist the freshest coherent continuation state when technically possible. HANDOFF_COMPLETE here refers only to a verified durable-job polling-lane handoff with no other READY approved work; it never seals the whole project or operation as complete. Execution Continuity R38 is canonical for whether more approved work must be dispatched before turn termination.
 If central persistence is unavailable, preserve the best available local/checkpoint state and mark continuity sync pending for the next safe cycle.
 
 4. NEW-CHAT BOOT RECONCILIATION - MANDATORY
