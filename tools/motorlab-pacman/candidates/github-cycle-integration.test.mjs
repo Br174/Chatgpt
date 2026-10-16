@@ -45,3 +45,15 @@ test("GitHub API read error prevents all mutations",async()=>{
  await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async()=>{}}),/GITHUB_READ_FAILED_403/);
  assert.deepEqual(methods,["GET"]);
 });
+
+test("GitHub delete conflict requires recovery without automatic retry",async()=>{
+ let present=false;const methods=[];
+ const fetchImpl=async(url,init)=>{methods.push(init.method);
+  if(init.method==="GET")return present?response(200,{type:"file",sha,encoding:"base64",content:"cHJvYmU="}):response(404,{});
+  if(init.method==="PUT"){present=true;return response(201,{content:{sha},commit:{sha:commit}});}
+  return response(409,{});
+ };
+ const adapter=makeGitHubContentsLabAdapter({token:"x".repeat(20),fetchImpl});
+ await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async()=>{}}),/LAB_CYCLE_RECOVERY_REQUIRED/);
+ assert.deepEqual(methods,["GET","PUT","GET","DELETE"]);assert.equal(present,true);
+});
