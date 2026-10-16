@@ -3,15 +3,17 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 const root=new URL("../",import.meta.url);
 const runtime=readFileSync(new URL("worker-execution-staging.mjs",root),"utf8");
-const legacy=readFileSync(new URL("github-lab-write.mjs",root),"utf8");
 const candidate=readFileSync(new URL("verified-lab-cycle.mjs",import.meta.url),"utf8");
-test("real staging Worker wires V2 candidate dispatch while preserving fail-closed legacy path",()=>{
+
+test("real staging Worker wires canonical V2 dispatch and permanently retires legacy write route",()=>{
  assert.match(runtime,/import\s*\{\s*candidateCycleDispatch\s*\}\s*from\s*["']\.\/candidates\/staging-cycle-dispatch\.mjs["']/);
  assert.match(runtime,/await candidateCycleDispatch\(\{input,env,fetchImpl\}\)/);
- assert.match(runtime,/import\s*\{\s*writeApprovedLabProbe\s*\}\s*from\s*["']\.\/github-lab-write\.mjs["']/);
- assert.match(runtime,/await writeApprovedLabProbe\(/);
- assert.match(legacy,/sha:file\.sha/);
+ assert.doesNotMatch(runtime,/import\s*\{\s*writeApprovedLabProbe\s*\}/);
+ assert.doesNotMatch(runtime,/await writeApprovedLabProbe\(/);
+ assert.match(runtime,/LEGACY_GITHUB_LAB_WRITE_RETIRED/);
+ assert.match(runtime,/input\.mode===["']github-lab-write["']/);
 });
+
 test("canonical V2 contract remains reversible create-read-delete-read",()=>{
  assert.match(candidate,/TARGET_NOT_EMPTY_OR_UNVERIFIED/);
  assert.match(candidate,/adapter\.create/);
