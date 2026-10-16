@@ -1,5 +1,5 @@
 export function renderWebAuthnOwnerPage(){
- return \`<!doctype html>
+ return `<!doctype html>
 <html lang="it">
 <head>
 <meta charset="utf-8">
@@ -74,5 +74,5 @@ q("finish").onclick=async()=>{
  }
 };
 </script>
-</body></html>\`;
+</body></html>`;
 }
