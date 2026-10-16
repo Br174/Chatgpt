@@ -71,3 +71,11 @@ test("D1 checkpoint override is denied before approval claim or GitHub call",asy
  await assert.rejects(approvedVerifiedLabCycleWithD1({...f,secret,db:ledger(),content,token,fetchImpl:async()=>{calls++;},onCheckpoint:async()=>{}}),/CHECKPOINT_OVERRIDE_DENIED/);
  assert.equal(calls,0);
 });
+
+test("D1 PREPARED persistence failure prevents GitHub PUT and DELETE",async()=>{
+ const f=await fixture("signed-d1-003");const methods=[];
+ const db={prepare(sql){if(sql.includes("pacman_cycle_checkpoints"))return {bind(){return {run:async()=>({success:true,meta:{changes:0}})};}};return ledger().prepare(sql);}};
+ const fetchImpl=async(url,init)=>{methods.push(init.method);if(init.method==="GET")return response(404,{});throw Error("mutation must not occur");};
+ await assert.rejects(approvedVerifiedLabCycleWithD1({...f,secret,db,content,token,fetchImpl}),/CHECKPOINT_PERSISTENCE_UNVERIFIED/);
+ assert.deepEqual(methods,["GET"]);
+});
