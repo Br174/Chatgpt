@@ -15,5 +15,7 @@ try{
  assert.deepEqual(saved.completed.map(x=>x.checkpointId),["audit-policy","audit-runtime","audit-verified"]);
  assert.deepEqual(saved.completed.map(x=>x.remaining),[2,1,0]);
  assert.equal(saved.status,"AUDIT_PHASES_VERIFIED_PROJECT_NOT_COMPLETE");
+ assert.equal(saved.sourceCommit,sourceCommit);
+ assert.equal(saved.operationId,operationId);
  console.log("R38 resume smoke verified: skipped completed phase and finished remaining phases");
 }finally{await rm(tmp,{recursive:true,force:true});}
