@@ -13,7 +13,9 @@ export async function relayApprovedPacmanOperationLab(request,{
     typeof executionKey!=="string"||executionKey.length<32||typeof fetchImpl!=="function")
   return reply({error:"RELAY_NOT_CONFIGURED"},503);
 
- const issued=await handleCloudflareAccessIssuerLab(request,{...issuerOptions,fetchImpl});
+ let issuerRequest,payloadRequest;
+ try{issuerRequest=request.clone();payloadRequest=request.clone();}catch{return reply({error:"INVALID_APPROVAL_REQUEST"},400);}
+ const issued=await handleCloudflareAccessIssuerLab(issuerRequest,{...issuerOptions,fetchImpl});
  if(!issued.ok)return issued;
 
  let body;
@@ -21,7 +23,7 @@ export async function relayApprovedPacmanOperationLab(request,{
  if(body?.status!=="APPROVAL_ISSUED"||!body.attestation)return reply({error:"ISSUER_RESPONSE_INVALID"},502);
 
  let original;
- try{original=await request.clone().json();}catch{return reply({error:"INVALID_APPROVAL_REQUEST"},400);}
+ try{original=await payloadRequest.json();}catch{return reply({error:"INVALID_APPROVAL_REQUEST"},400);}
  const payload={
   mode:"github-lab-cycle",
   intent:original.intent,
