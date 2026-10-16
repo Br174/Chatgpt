@@ -10,8 +10,11 @@ export async function approvedVerifiedLabCycle({intent,approval,attestation,secr
  // Validate all local scope/content constraints before claiming the single-use approval.
  if(intent?.branch!=="motorlab/pacman-execution-v2-lab-20261014" || intent?.path!=="tools/motorlab-pacman/probe-integration.txt" || intent?.capability!=="github.lab-file-cycle")throw Error("LAB_SCOPE_REQUIRED");
  if(typeof content!=="string" || content.length===0 || new TextEncoder().encode(content).length>4096)throw Error("INVALID_CONTENT");
- // Check adapter configuration before irreversibly consuming the approval.
+ // Do not consume a one-time approval if the fixed LAB probe already exists.
+ // Read failure is ambiguous and must fail closed; no GitHub mutation occurs.
  const adapter=makeGitHubContentsLabAdapter({token,fetchImpl});
+ const preflight=await adapter.read({branch:intent.branch,path:intent.path});
+ if(preflight?.exists!==false)throw Error("LAB_PROBE_PRECONDITION_NOT_MET");
  await verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,db,content,now});
  return verifiedLabCycle({adapter,branch:intent.branch,path:intent.path,content,onCheckpoint});
 }
