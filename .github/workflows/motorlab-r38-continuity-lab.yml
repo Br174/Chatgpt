@@ -1,0 +1,22 @@
+name: MotorLab R38 Continuity Pillar LAB
+on:
+  push:
+    branches:
+      - motorlab/continuity-pillar-v3-lab-20261016
+    paths:
+      - 'templates/execution/motorlab-continuity-*.mjs'
+      - '.github/workflows/motorlab-r38-continuity-lab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  continuity-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test continuity decisions and checkpoint handoff
+        run: node --test templates/execution/motorlab-continuity-*.test.mjs
