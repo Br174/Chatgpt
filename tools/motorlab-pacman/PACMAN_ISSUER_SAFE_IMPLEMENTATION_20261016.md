@@ -1,31 +1,44 @@
-# Pac-Man LAB — issuer activation gate (2026-10-16)
+# Pac-Man LAB — issuer and V2 activation gate (2026-10-16)
 
-Status: DESIGN / FAIL-CLOSED. Scope: Br174/Chatgpt, branch `motorlab/pacman-execution-v2-lab-20261014` only. No main/MADRE/production changes.
+Status: **CODE READY / LIVE ACTIVATION BLOCKED BY PROTECTED EXTERNAL CONFIGURATION**.
+Scope: `Br174/Chatgpt`, branch `motorlab/pacman-execution-v2-lab-20261014` only.
+No main/MADRE/production changes.
 
-## Verified code path
-- `worker-execution-staging.mjs` handles POST /execute and refuses execution unless `PACMAN_TRUSTED_ISSUER_CONNECTED=YES_VERIFIED_TRUSTED_HOST`.
-- `github-lab-write.mjs` is invoked only with a separate staging-only write switch and runtime token.
-- `trusted-approval-gate.mjs` verifies a signed content-bound attestation and claims its operation ID atomically in staging D1 before side effects.
-- `authorized-runner.mjs` accepts an internal boolean `approval:true` but is not the deployed HTTP endpoint; never expose it or substitute it for the trusted gate.
+## Verified canonical code path
+- `worker-execution-staging.mjs` routes only `mode=github-lab-cycle` to the V2 reversible executor.
+- Legacy `github-lab-write` is permanently retired by the real Worker with `410 LEGACY_GITHUB_LAB_WRITE_RETIRED`; the old helper is not imported by the Worker.
+- V2 requires the independent route, issuer, GitHub-write and D1-checkpoint gates before execution.
+- The exact LAB lifecycle is: preflight absent target -> verify signed content-bound approval -> atomic single-use D1 claim -> PREPARED -> create -> WRITE_ATTEMPTED -> readback exact content/SHA -> CLEANUP_ATTEMPTED -> delete by SHA -> verify absence -> VERIFIED_AND_REMOVED.
+- Ambiguous mutation or checkpoint failure becomes RECOVERY_REQUIRED and is never blindly retried.
+- `pacman_approval_claims` and `pacman_cycle_checkpoints` were manually created and structurally verified in the dedicated staging D1 database `eb834fc1-5589-4f75-bcb9-d311d0d72261`.
 
-## Deployment hazard and safe change order
-- `.github/workflows/pacman-execution-staging-deploy.yml` has a LAB-branch push trigger for `tools/motorlab-pacman/*.mjs` and `*.jsonc`. Editing these files may redeploy the staging Worker.
-- This document is Markdown only, so its creation does not match that deployment workflow's path filter.
-- Do not change runtime files or enable flags until the staging deployment effect, existing secrets/bindings and rollback have been independently verified.
+## Verified owner-authentication / issuer chain
+- Cloudflare Access JWT verification is implemented with RS256, pinned team-domain JWKS, expected issuer, audience and exact owner subject.
+- The owner-facing issuer endpoint candidate rejects wrong origin, missing/forged Access JWT, wrong owner, stale session, production branch and content digest tampering.
+- The relay candidate constructs server-side confirmation metadata, issues a <=120s HMAC attestation and forwards only the exact approved V2 operation to the dedicated execution Worker.
+- A separate Access relay Worker candidate exists and is disabled by default; its Wrangler config contains no runtime secrets.
+- Full simulated chain is covered: verified Access owner -> issuer -> relay -> real Worker entrypoint -> D1 single-use/checkpoints -> reversible GitHub adapter -> verified cleanup.
 
-## Required real issuer
-1. Identify a provider-supported, host-authenticated approval event. Plain chat text, button click, caller JSON and user-generated signature do not prove host identity.
-2. Keep signing key solely in the authenticated issuer and verifier secret stores; do not expose a public signing API.
-3. Bind signature to operationId, capability, exact LAB branch, exact probe path, authorize decision, expiry <=120 s and SHA-256 of content.
-4. Verify signature and scope before D1 atomic single-use claim. Fail closed for missing identity, bad signature, expired/replayed operations and unavailable D1.
-5. Allow GitHub mutation only after verified issuer integration and separate staging-only activation review. Verify read/write/readback/delete with exact SHA, durable receipt and recovery on ambiguity.
-6. Never infer runtime readiness from provisioning secrets or green unit tests alone.
+## Current CI evidence
+Latest verified commit: `28df5bc7128d4a153ef73fb0292cca30d2ac491f`.
+- Pacman V2 Complete LAB Suite: SUCCESS.
+- Pacman isolated candidate tests: SUCCESS.
+- MotorLab Pacman CORE Alias and Auto-Routing: SUCCESS.
+Earlier canonical-runtime commit `9dc3454b8fa831ee326a3314d7a893e07836ff73` also passed V2, candidate, CORE and runtime tests together.
 
-## Current release decision
-**NO-GO** for autonomous POST /execute. Keep `PACMAN_TRUSTED_ISSUER_CONNECTED`, `PACMAN_GITHUB_LAB_WRITE_ENABLED` and `PACMAN_APPROVAL_READINESS_ENABLED` unset until a trusted host integration is demonstrably available and audited.
+## Live staging boundary
+The execution deploy workflow remains protected by environment `pacman-execution-staging`; current deployment jobs do not proceed without protected approval.
+The live read-only settings audit is also waiting at that protected environment gate.
 
-## Evidence still required
-- Authenticated issuer provider capability and installation evidence.
-- Staging-only D1 approval table and runtime secret-name readback after any provisioning.
-- Test logs and run IDs for actual LAB gate; a simulated signer is not an end-to-end test.
-- A separately reviewed, reversible staging activation with a safe rollback.
+Do **not** enable live mutation yet. Before first real LAB cycle, verify:
+1. protected source secrets exist for `PACMAN_EXECUTION_KEY`, `PACMAN_GITHUB_TOKEN`, and `PACMAN_APPROVAL_SIGNING_SECRET` without disclosing values;
+2. those secret names are provisioned to exact Worker `motorlab-pacman-execution-staging-lab`;
+3. the Access relay has real server-side values for team domain, issuer, audience, exact owner subject, approval origin, executor URL and execution key;
+4. Cloudflare Access actually protects the relay `/issue` endpoint;
+5. exact staging flags are enabled only after read-only verification: `PACMAN_CYCLE_ROUTE_ENABLED`, `PACMAN_TRUSTED_ISSUER_CONNECTED`, `PACMAN_GITHUB_LAB_WRITE_ENABLED`, `PACMAN_D1_CHECKPOINTS_VERIFIED`;
+6. the fixed LAB probe path is absent immediately before the real test;
+7. first real operation is one reversible create/read/delete/read cycle only, followed by D1 checkpoint and GitHub absence verification.
+
+## Current blocker
+Code/CI is not the blocker. The remaining blocker is provider-side protected configuration and approval.
+Do not weaken or bypass the protected GitHub environment, Cloudflare Access, or secret stores merely to make the final test run.
