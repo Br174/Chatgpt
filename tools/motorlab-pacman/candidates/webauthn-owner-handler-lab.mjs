@@ -6,7 +6,7 @@ import {verifyNoneRegistrationLab} from "./webauthn-registration-verifier-none-l
 import {digestRegistrationCandidateLab,githubBootstrapCommentBodyLab} from "./webauthn-github-bootstrap-lab.mjs";
 import {enrollOwnerPasskeyFromGithubLab} from "./webauthn-github-enrollment-lab.mjs";
 import {createPacmanWebAuthnChallenge} from "./webauthn-approval-lab.mjs";
-import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.mjs";
+import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.mjs";\nimport {executePacmanWithWebAuthnLab} from "./webauthn-execution-relay-lab.mjs";
 import {storeWebAuthnChallengeD1,loadOwnerWebAuthnCredentialD1} from "./webauthn-d1-lab.mjs";
 
 const OWNER_SUBJECT="202558590";
@@ -189,6 +189,24 @@ export async function handleWebAuthnOwnerLab(request,env,{
     },
     expiresAt:challengeRecord.expiresAt
    });
+  }
+
+  if(url.pathname==="/webauthn/approval/execute"){
+   const credential=await loadOwnerWebAuthnCredentialD1(cfg.db,OWNER_SUBJECT);
+   const {intent,content,challenge,assertion}=input||{};
+   if(typeof cfg.executionUrl!=="string"||typeof cfg.executionKey!=="string")
+    throw fail("WEBAUTHN_EXECUTOR_NOT_CONFIGURED",503);
+   if(!intent||typeof intent!=="object"||Array.isArray(intent)||typeof content!=="string"||!content||
+      typeof challenge!=="string"||!assertion||typeof assertion!=="object")
+    throw fail("INVALID_APPROVAL_REQUEST",400);
+   if(assertion.id!==credential.id)throw fail("WEBAUTHN_CREDENTIAL_MISMATCH",403);
+   const result=await executePacmanWithWebAuthnLab({
+    db:cfg.db,intent,content,challenge,credentialId:credential.id,assertion,
+    signingSecret:cfg.signingSecret,
+    executionUrl:cfg.executionUrl,executionKey:cfg.executionKey,
+    fetchImpl,cryptoImpl,nowMs
+   });
+   return reply(result,200);
   }
 
   if(url.pathname==="/webauthn/approval/finish"){
