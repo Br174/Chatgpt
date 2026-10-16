@@ -117,3 +117,10 @@ test("auto-discovers the exact owner comment in dedicated bootstrap issue",async
  const stored=[...f.db.rows.values()][0];
  assert.equal(stored.bootstrap_comment_id,12345);
 });
+
+test("valid WebAuthn credential stores only after anonymous GitHub fallback confirms owner",async()=>{
+ const f=await fixture();let calls=0;
+ const fetchImpl=async(u,o)=>{calls++;assert.match(u,/\/issues\/72\/comments\?per_page=100$/);return calls===1?{status:403,ok:false}:{status:200,ok:true,json:async()=>[{id:12345,...f.comment}]};};
+ const out=await enrollOwnerPasskeyFromGithubLab({db:f.db,githubToken:token,signingSecret:secret,registrationResponse:f.registrationResponse,challenge,...await challengeProof(),origin,rpId,fetchImpl,cryptoImpl:webcrypto,nowMs:now});
+ assert.equal(out.status,"OWNER_PASSKEY_ENROLLED");assert.equal(f.db.rows.size,1);assert.equal(calls,2);
+});

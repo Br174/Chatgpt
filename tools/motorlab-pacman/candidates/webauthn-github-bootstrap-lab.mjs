@@ -16,6 +16,19 @@ const b64u=bytes=>{
  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 };
 
+// LAB-only, fixed public GitHub issue read. No public write fallback.
+async function readGithubBootstrapJsonLab(url,githubToken,fetchImpl){
+ const headers={accept:"application/vnd.github+json","x-github-api-version":"2022-11-28","user-agent":"motorlab-pacman-bootstrap"};
+ const get=h=>fetchImpl(url,{method:"GET",redirect:"error",headers:h});
+ let r;try{r=await get({...headers,authorization:"Bearer "+githubToken});}
+ catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
+ if([401,403,404].includes(r?.status)){
+  try{r=await get(headers);}catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
+ }
+ if(r?.status!==200||r?.ok!==true)fail("GITHUB_BOOTSTRAP_UNAVAILABLE");
+ try{return await r.json();}catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
+}
+
 export async function digestRegistrationCandidateLab({registrationResponse,challenge,origin,rpId,cryptoImpl=globalThis.crypto}={}){
  if(!cryptoImpl?.subtle||!registrationResponse||typeof registrationResponse!=="object"||
     typeof challenge!=="string"||!NONCE.test(challenge)||
@@ -42,14 +55,7 @@ export async function verifyGithubOwnerBootstrapCommentLab({
     !DIGEST.test(registrationSha256||"")||typeof githubToken!=="string"||githubToken.length<20||
     typeof fetchImpl!=="function"||!Number.isSafeInteger(nowMs))fail();
  const url=`https://api.github.com/repos/${REPO}/issues/comments/${commentId}`;
- let r;try{
-  r=await fetchImpl(url,{method:"GET",redirect:"error",headers:{
-   authorization:"Bearer "+githubToken,accept:"application/vnd.github+json",
-   "x-github-api-version":"2022-11-28","user-agent":"motorlab-pacman-bootstrap"
-  }});
- }catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
- if(!r?.ok||r.status!==200)fail("GITHUB_BOOTSTRAP_UNAVAILABLE");
- let j;try{j=await r.json();}catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
+ const j=await readGithubBootstrapJsonLab(url,githubToken,fetchImpl);
  const expected=githubBootstrapCommentBodyLab({nonce,registrationSha256});
  if(j?.user?.login!==OWNER_LOGIN||j?.user?.id!==OWNER_ID||j?.user?.type!=="User"||
     j?.author_association!=="OWNER"||j?.body!==expected||
@@ -116,14 +122,7 @@ export async function findGithubOwnerBootstrapCommentLab({
     typeof fetchImpl!=="function"||!Number.isSafeInteger(nowMs))fail();
  const expected=githubBootstrapCommentBodyLab({nonce,registrationSha256});
  const url=`https://api.github.com/repos/${REPO}/issues/${BOOTSTRAP_ISSUE_NUMBER}/comments?per_page=100`;
- let r;try{
-  r=await fetchImpl(url,{method:"GET",redirect:"error",headers:{
-   authorization:"Bearer "+githubToken,accept:"application/vnd.github+json",
-   "x-github-api-version":"2022-11-28","user-agent":"motorlab-pacman-bootstrap"
-  }});
- }catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
- if(!r?.ok||r.status!==200)fail("GITHUB_BOOTSTRAP_UNAVAILABLE");
- let rows;try{rows=await r.json();}catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
+ const rows=await readGithubBootstrapJsonLab(url,githubToken,fetchImpl);
  if(!Array.isArray(rows))fail("GITHUB_BOOTSTRAP_UNAVAILABLE");
  const matches=rows.filter(j=>{
   const created=Date.parse(j?.created_at);
