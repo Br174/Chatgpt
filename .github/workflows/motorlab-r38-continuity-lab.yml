@@ -6,6 +6,10 @@ on:
     paths:
       - 'templates/execution/motorlab-continuity-*.mjs'
       - '.github/workflows/motorlab-r38-continuity-lab.yml'
+  pull_request:
+    paths:
+      - 'templates/execution/motorlab-continuity-*.mjs'
+      - '.github/workflows/motorlab-r38-continuity-lab.yml'
   workflow_dispatch:
 permissions:
   contents: read
