@@ -68,3 +68,10 @@ test("cleanup verification failure does not claim completion",async()=>{
  assert.deepEqual(calls,["read","create","read","remove","read"]);
  assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","RECOVERY_REQUIRED"]);
 });
+
+test("final receipt checkpoint failure must not report successful cycle",async()=>{
+ const m=mock(),states=[];
+ await assert.rejects(verifiedLabCycle({adapter:m.adapter,branch,path,content:"probe",onCheckpoint:async x=>{states.push(x.state);if(x.state==="VERIFIED_AND_REMOVED")throw Error("receipt persistence unavailable");}}),/LAB_CYCLE_RECOVERY_REQUIRED/);
+ assert.deepEqual(m.calls,["read","create","read","remove","read"]);
+ assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","VERIFIED_AND_REMOVED","RECOVERY_REQUIRED"]);
+});
