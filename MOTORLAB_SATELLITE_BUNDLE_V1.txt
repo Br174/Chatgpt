@@ -429,3 +429,7 @@ R36 TARGET-AWARE CHAT CONTEXT GUARD — ONE EXISTING ROUTER
 - If the host cannot supply reliable current chat/project identity, do not manufacture an alert; apply policy at the next supported control point.
 - No mandatory external ChatGPT API or paid provider; native engines and release pins remain protected.
 Revision 2.31: r36 Chat Context Guard routes by the actual change target and preserves cross-chat voluntary continuation.
+
+
+R38 SATELLITE CONTINUITY — CORE LAB (2026-10-16)
+R38 canonical owner=MOTORLAB_EXECUTION_CONTINUITY_V1.txt; supported executable adapter=templates/execution/motorlab-r38-operation-entrypoint-lab.mjs; activation is conditional on host runtime loading the adapter and on safe satellite fanout. Do not label this bundle as live globally until runtime and fanout proof exists. Preserve Pacman as active AutoSetup feature.

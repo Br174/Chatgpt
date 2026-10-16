@@ -150,3 +150,7 @@ Revision 1.11: r31 preserves numeric progress and visual-status obligations acro
 
 R37 DUAL PERCENT ALWAYS RULE (2026-10-14; USER APPROVED)
 For every active MotorLab-controlled project operation at each available user-visible material control point, show BOTH 'Fase corrente: N%' and 'Progresso MotorLab complessivo: M%'. This extends existing mandatory overall reporting, does not create a second reporting coordinator, and applies even for small tasks and after explanations. Base each percentage on verified completed milestones, preserve the progress floor on re-entry, and repeat the same values when no milestone changed. If a phase cannot be meaningfully quantified, label it 'non quantificabile' with the evidence reason rather than fabricate a number. Overall 100% only at verified terminal completion.
+
+
+R38 NONBLOCKING THREE-LEVEL REPORT (2026-10-16; CORE LAB)
+At meaningful user-visible control points report overall project, current phase and current activity with comparable signed percentage-point deltas when evidence exists. This extends the R37 two-level minimum rather than disabling it; unknown values must be labeled non-quantifiable and never invented. Reporting is informational and MUST NOT pause an already-approved operation or request 'procedi'. Preserve verified progress floors and genuine regression corrections.
