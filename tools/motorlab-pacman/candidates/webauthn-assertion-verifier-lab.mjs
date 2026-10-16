@@ -1,3 +1,4 @@
+import {derEcdsaToP1363} from "./der-ecdsa-lab.mjs";
 // LAB-only WebAuthn assertion verifier. Credential key is trusted configuration;
 // no enrollment, DB state, remote requests or production activation.
 const enc=new TextEncoder(),dec=new TextDecoder();
@@ -28,11 +29,9 @@ export async function verifyWebAuthnAssertionLab({assertion,credential,challenge
  let ok=false;
  try{
   const key=await cryptoImpl.subtle.importKey("jwk",credential.publicKeyJwk,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]);
-  ok=await cryptoImpl.subtle.verify({name:"ECDSA",hash:"SHA-256"},key,sig,signed);
+  ok=await cryptoImpl.subtle.verify({name:"ECDSA",hash:"SHA-256"},key,derEcdsaToP1363(sig),signed);
  }catch{deny();}
  if(!ok)deny();
  return Object.freeze({credentialId:credential.id,counter,userVerified});
 }
-// NOTE: WebCrypto ECDSA expects raw P1363 signatures; browser authenticators
-// commonly return ASN.1 DER. A strict DER-to-P1363 conversion is required before
-// this verifier can be used with real WebAuthn assertions.
+// Strict DER-to-P1363 conversion is applied before WebCrypto verification.
