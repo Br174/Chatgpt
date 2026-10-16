@@ -49,6 +49,8 @@ jobs:
           NODE
       - name: Run Pacman LAB tests
         run: node --test tools/motorlab-pacman/*.test.mjs
+      - name: Run isolated candidate and Worker boundary tests
+        run: node --test tools/motorlab-pacman/candidates/*.test.mjs
       - name: Require protected staging credentials and activation flag
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
