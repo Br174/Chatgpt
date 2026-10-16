@@ -1,4 +1,6 @@
 name: Pac-Man WebAuthn staging activation (zero-cost protected)
+# MOTORLAB_ACTIVATION_REQUEST_20261016_R37: authorized staging-only workflow invocation.
+# This comment changes only the workflow path to invoke its existing guarded push trigger.
 
 on:
   push:
