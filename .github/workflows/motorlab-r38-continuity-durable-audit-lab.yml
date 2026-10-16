@@ -40,5 +40,6 @@ jobs:
           path: |
             .motorlab-r38-audit/
             .motorlab-r38-project-acceptance/
-          if-no-files-found: warn
+          include-hidden-files: true
+          if-no-files-found: error
           retention-days: 14
