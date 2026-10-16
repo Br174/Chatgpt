@@ -2,6 +2,8 @@
 // The trusted host must authenticate the owner and issue a signed, content-bound
 // approval independently. This function only verifies and consumes it.
 import {verifyAndConsumeTrustedApproval} from "../trusted-approval-gate.mjs";
+import {validateChatApproval} from "../chat-approval.mjs";
+import {verifyApprovalAttestation} from "../approval-attestation.mjs";
 import {makeGitHubContentsLabAdapter} from "./github-contents-lab-adapter.mjs";
 import {verifiedLabCycle} from "./verified-lab-cycle.mjs";
 import {makeD1Checkpoint} from "./staging-checkpoint-d1.mjs";
@@ -13,6 +15,9 @@ export async function approvedVerifiedLabCycle({intent,approval,attestation,secr
  // Do not consume a one-time approval if the fixed LAB probe already exists.
  // Read failure is ambiguous and must fail closed; no GitHub mutation occurs.
  const adapter=makeGitHubContentsLabAdapter({token,fetchImpl});
+ if(!db?.prepare)throw Error("APPROVAL_LEDGER_UNAVAILABLE");
+ validateChatApproval(intent,approval);
+ await verifyApprovalAttestation({intent,attestation,secret,now,content});
  const preflight=await adapter.read({branch:intent.branch,path:intent.path});
  if(preflight?.exists!==false)throw Error("LAB_PROBE_PRECONDITION_NOT_MET");
  await verifyAndConsumeTrustedApproval({intent,approval,attestation,secret,db,content,now});
