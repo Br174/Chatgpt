@@ -3,7 +3,7 @@
 // to the exact WebAuthn registration candidate, then the credential is stored once.
 import {verifyNoneRegistrationLab} from "./webauthn-registration-verifier-none-lab.mjs";
 import {
- digestRegistrationCandidateLab,verifyGithubOwnerBootstrapCommentLab,
+ digestRegistrationCandidateLab,verifyGithubOwnerBootstrapCommentLab,findGithubOwnerBootstrapCommentLab,
  signVerifiedGithubBootstrapLab,verifyGithubBootstrapProofV2Lab
 } from "./webauthn-github-bootstrap-lab.mjs";
 import {storeWebAuthnCredentialD1} from "./webauthn-d1-lab.mjs";
@@ -20,7 +20,7 @@ export async function enrollOwnerPasskeyFromGithubLab({
     typeof challengePayload!=="string"||!challengePayload||typeof challengeSignature!=="string"||!challengeSignature||
     typeof signingSecret!=="string"||signingSecret.length<32||
     typeof githubToken!=="string"||githubToken.length<20||
-    !Number.isSafeInteger(commentId)||commentId<1||!Number.isSafeInteger(nowMs))
+    (commentId!==undefined&&(!Number.isSafeInteger(commentId)||commentId<1))||!Number.isSafeInteger(nowMs))
   fail("WEBAUTHN_ENROLLMENT_NOT_CONFIGURED");
 
  await verifyEnrollmentChallengeLab({
@@ -41,10 +41,14 @@ export async function enrollOwnerPasskeyFromGithubLab({
  });
 
  // Verify a fresh, unedited GitHub OWNER comment bound to this exact candidate.
- const verifiedOwner=await verifyGithubOwnerBootstrapCommentLab({
-  commentId,nonce:challenge,registrationSha256,
-  githubToken,fetchImpl,nowMs
- });
+ const verifiedOwner=commentId===undefined
+  ?await findGithubOwnerBootstrapCommentLab({
+    nonce:challenge,registrationSha256,githubToken,fetchImpl,nowMs
+   })
+  :await verifyGithubOwnerBootstrapCommentLab({
+    commentId,nonce:challenge,registrationSha256,githubToken,fetchImpl,nowMs
+   });
+ const resolvedCommentId=verifiedOwner.commentId;
 
  // Server-held HMAC turns the external owner check into a short-lived bootstrap proof.
  const signed=await signVerifiedGithubBootstrapLab({
