@@ -77,7 +77,7 @@ test("integrated LAB Worker with valid D1 schema rejects main before approval cl
  assert.deepEqual(calls,["PRAGMA table_info(pacman_approval_claims)","PRAGMA table_info(pacman_cycle_checkpoints)"]);
 });
 
-test("integrated LAB Worker preserves legacy github-lab-write gate with V2 routing disabled",async()=>{
+test("integrated LAB Worker permanently retires legacy github-lab-write",async()=>{
  let calls=0;
  const request=new Request("https://staging.invalid/execute",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+key},body:JSON.stringify({mode:"github-lab-write",intent:{operationId:"legacy-gate"},approval:{},content:"probe"})});
  const result=await worker.fetch(request,{PACMAN_EXECUTION_KEY:key,DB:{prepare(){calls++;throw Error("unexpected");}}});
