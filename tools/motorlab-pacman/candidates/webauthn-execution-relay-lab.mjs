@@ -12,13 +12,13 @@ function exactHttpsOrigin(value){
 
 export async function executePacmanWithWebAuthnLab({
  db,intent,content,challenge,credentialId,assertion,signingSecret,
- executionUrl,executionKey,fetchImpl=fetch,cryptoImpl=globalThis.crypto,nowMs=Date.now()
+ executionUrl,executionKey,fetchImpl=fetch,cryptoImpl=globalThis.crypto,nowMs=Date.now(),\n issueApproval=issuePacmanApprovalFromWebAuthnLab
 }={}){
  const base=exactHttpsOrigin(executionUrl);
  if(!base||typeof executionKey!=="string"||executionKey.length<32||typeof fetchImpl!=="function")
   fail("WEBAUTHN_EXECUTOR_NOT_CONFIGURED");
 
- const issued=await issuePacmanApprovalFromWebAuthnLab({
+ if(intent?.capability!=="github.lab-file-cycle"||\n    intent?.branch!=="motorlab/pacman-execution-v2-lab-20261014"||\n    intent?.path!=="tools/motorlab-pacman/probe-integration.txt")\n  fail("WEBAUTHN_EXECUTION_SCOPE_DENIED");\n\n const issued=await issueApproval({
   db,intent,content,challenge,credentialId,assertion,signingSecret,nowMs,cryptoImpl
  });
  if(issued?.status!=="WEBAUTHN_APPROVAL_ISSUED"||!issued.attestation)
