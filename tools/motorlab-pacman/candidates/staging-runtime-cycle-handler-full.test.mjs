@@ -35,7 +35,7 @@ test("staging handler completes signed one-use D1 checkpointed GitHub create/rea
  const result=await stagingCycleHandler(args);
  assert.equal(result.status,200);assert.equal((await result.json()).status,"VERIFIED_AND_REMOVED");
  assert.equal(exists,false);assert.equal(claimed,true);
- assert.deepEqual(methods,["GET","PUT","GET","DELETE","GET"]);
+ assert.deepEqual(methods,["GET","GET","PUT","GET","DELETE","GET"]);
  assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","VERIFIED_AND_REMOVED"]);
  const replay=await stagingCycleHandler(args);
  assert.equal(replay.status,409);assert.equal((await replay.json()).error,"STAGING_CYCLE_REJECTED_OR_RECOVERY_REQUIRED");
@@ -67,7 +67,7 @@ test("staging handler preserves RECOVERY_REQUIRED when simulated GitHub delete f
  const result=await stagingCycleHandler(args);
  assert.equal(result.status,409);assert.equal((await result.json()).error,"STAGING_CYCLE_REJECTED_OR_RECOVERY_REQUIRED");
  assert.equal(exists,true);assert.equal(claimed,true);
- assert.deepEqual(methods,["GET","PUT","GET","DELETE"]);
+ assert.deepEqual(methods,["GET","GET","PUT","GET","DELETE"]);
  assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","RECOVERY_REQUIRED"]);
  const replay=await stagingCycleHandler(args);
  assert.equal(replay.status,409);assert.equal((await replay.json()).error,"STAGING_CYCLE_REJECTED_OR_RECOVERY_REQUIRED");
