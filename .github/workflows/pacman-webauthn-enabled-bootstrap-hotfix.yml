@@ -1,4 +1,5 @@
 name: Pac-Man WebAuthn public bootstrap hotfix (enabled LAB)
+# Targeted diagnostic regression: mock unauthenticated outbound request without headers.
 on:
   push:
     branches: [motorlab/pacman-execution-v2-lab-20261014]
