@@ -31,3 +31,17 @@ test("ambiguous GitHub create response requires recovery without automatic delet
  await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async x=>states.push(x.state)}),/LAB_CYCLE_RECOVERY_REQUIRED/);
  assert.equal(file,"probe");assert.deepEqual(methods,["GET","PUT"]);assert.deepEqual(states,["PREPARED","RECOVERY_REQUIRED"]);
 });
+
+test("existing GitHub probe is never overwritten or deleted",async()=>{
+ const methods=[],states=[];
+ const fetchImpl=async(url,init)=>{methods.push(init.method);return response(200,{type:"file",sha,encoding:"base64",content:"ZXhpc3Rpbmc="});};
+ const adapter=makeGitHubContentsLabAdapter({token:"x".repeat(20),fetchImpl});
+ await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async x=>states.push(x.state)}),/TARGET_NOT_EMPTY_OR_UNVERIFIED/);
+ assert.deepEqual(methods,["GET"]);assert.deepEqual(states,[]);
+});
+test("GitHub API read error prevents all mutations",async()=>{
+ const methods=[];const fetchImpl=async(url,init)=>{methods.push(init.method);return response(403,{});};
+ const adapter=makeGitHubContentsLabAdapter({token:"x".repeat(20),fetchImpl});
+ await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async()=>{}}),/GITHUB_READ_FAILED_403/);
+ assert.deepEqual(methods,["GET"]);
+});
