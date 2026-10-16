@@ -6,6 +6,7 @@ on:
       - motorlab/pacman-execution-v2-lab-20261014
     paths:
       - '.github/workflows/pacman-webauthn-staging-bootstrap.yml'
+      - '.github/pacman-webauthn-bootstrap-trigger'
   workflow_dispatch:
     inputs:
       confirm_staging_only:
