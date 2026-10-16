@@ -71,3 +71,15 @@ test("trusted issuer refuses to sign main, another file or capability",async()=>
   await assert.rejects(signApprovalInTrustedHost({intent:{...intent,...change},secret,expiresAt:Date.now()+60000}),/ISSUER_SCOPE_DENIED/);
  }
 });
+
+test("caller-supplied approval JSON cannot impersonate a trusted host signature",async()=>{
+ const content="approved LAB probe contents";
+ const forged={operationId:intent.operationId,capability:intent.capability,branch:intent.branch,path:intent.path,decision:"authorize",expiresAt:Date.now()+60000,contentSha256:"0".repeat(64),signature:"0".repeat(64)};
+ await assert.rejects(verifyApprovalAttestation({intent,attestation:forged,secret,content}),/INVALID_APPROVAL_ATTESTATION/);
+});
+
+test("valid content digest and scope without a real HMAC still fails verification",async()=>{
+ const content="probe";
+ const issued=await signApprovalInTrustedHost({intent,secret,expiresAt:Date.now()+60000,content});
+ await assert.rejects(verifyApprovalAttestation({intent,attestation:{...issued,signature:"0".repeat(64)},secret,content}),/INVALID_APPROVAL_SIGNATURE/);
+});
