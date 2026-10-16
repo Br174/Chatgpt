@@ -24,3 +24,12 @@ The continuity-pillar-lab.mjs evaluator is an isolated testable helper, not a ne
 - Runtime enforcement across all apps, adapters, workers and chat-turn orchestration has NOT been enumerated or disabled.
 - Do NOT claim legacy routes are retired in production until each real enforcement path is patched and verified with integration tests.
 - An ordinary ChatGPT turn cannot force itself to remain active after its response ends. A verified persistent executor is required for unattended continuation.
+
+## 2026-10-16 LAB implementation follow-up
+- Added checkpoint-to-next-task adapter: it emits dispatchAllowed=true for a ready next task after any of ten retired arbitrary stop reasons; no second scheduler or external action is created.
+- Added negative tests: unapproved or protected scope cannot be marked complete to bypass the gate; missing operation/checkpoint IDs fail closed; host unavailability is WAIT, not COMPLETE.
+- Corrected precedence defect in continuity evaluator: approval and protected-boundary checks run before projectComplete.
+- This is still a LAB decision model, not an actual live integration with the default-branch CORE, the host chat lifecycle, or a persistent job dispatcher. No global activation claim.
+
+## Activation gate
+Current approved write lane is only tools/motorlab-pacman/candidates/ on motorlab/pacman-execution-v2-lab-20261014. Global CORE modification requires a separately established authorized branch/path and protected lifecycle promotion approval. Do not silently edit default branch or production to satisfy an activation request. If the user explicitly authorizes the CORE write target, follow Change Compatibility Guard with concrete runtime route tests before marking ACTIVE_NEW=yes.
