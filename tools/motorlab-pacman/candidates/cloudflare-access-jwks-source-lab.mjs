@@ -8,8 +8,10 @@ export async function loadPinnedAccessJwksLab({teamDomain,fetchImpl,timeoutMs=30
  let response;
  try{response=await fetchImpl(url,{method:"GET",redirect:"error",signal:AbortSignal.timeout(timeoutMs),headers:{accept:"application/json"}});}catch{fail();}
  if(!response||response.ok!==true||response.status!==200)fail();
- const len=Number(response.headers?.get?.("content-length"));
- if(Number.isFinite(len)&&len>65536)fail();
+ const declaredLength=response.headers?.get?.("content-length");
+ if(declaredLength!==null&&declaredLength!==undefined){
+  if(!/^\\d+$/.test(declaredLength)||Number(declaredLength)>65536)fail();
+ }
  let data;
  try{
   if(!response.body?.getReader)fail();
