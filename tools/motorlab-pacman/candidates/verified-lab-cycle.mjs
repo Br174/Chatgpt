@@ -22,7 +22,7 @@ export async function verifiedLabCycle({adapter,branch,path,content,onCheckpoint
   const removed=await adapter.read({branch,path});
   if(removed?.exists!==false)throw Error("CLEANUP_UNVERIFIED");
   const receipt={state:"VERIFIED_AND_REMOVED",branch,path};
-  try {await onCheckpoint(receipt);}catch{/* cleanup independently verified; receipt delivery may be retried by caller */}
+  await onCheckpoint(receipt);
   return receipt;
  } catch {
   // An ambiguous mutation MUST NOT be retried automatically.
