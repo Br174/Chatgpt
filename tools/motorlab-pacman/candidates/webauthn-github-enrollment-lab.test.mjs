@@ -99,3 +99,21 @@ test("same GitHub bootstrap cannot enroll a second credential",async()=>{
  await assert.rejects(enrollOwnerPasskeyFromGithubLab(args),/WEBAUTHN_CREDENTIAL_ALREADY_ENROLLED/);
  assert.equal(f.db.rows.size,1);
 });
+
+
+test("auto-discovers the exact owner comment in dedicated bootstrap issue",async()=>{
+ const f=await fixture();
+ const fetchImpl=async url=>{
+  assert.match(url,/repos\/Br174\/Chatgpt\/issues\/72\/comments\?per_page=100$/);
+  return {ok:true,status:200,json:async()=>[{id:12345,...f.comment}]};
+ };
+ const out=await enrollOwnerPasskeyFromGithubLab({
+  db:f.db,githubToken:token,signingSecret:secret,
+  registrationResponse:f.registrationResponse,challenge,...await challengeProof(),origin,rpId,
+  fetchImpl,cryptoImpl:webcrypto,nowMs:now
+ });
+ assert.equal(out.status,"OWNER_PASSKEY_ENROLLED");
+ assert.equal(f.db.rows.size,1);
+ const stored=[...f.db.rows.values()][0];
+ assert.equal(stored.bootstrap_comment_id,12345);
+});
