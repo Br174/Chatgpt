@@ -106,3 +106,48 @@ test("body size is bounded before JSON parsing",async()=>{
  }),env(d),{cryptoImpl:webcrypto});
  assert.equal(r.status,413);
 });
+
+
+test("approval execute stays fail-closed without executor configuration",async()=>{
+ const d=db({owner:ownerRow});let calls=0;
+ const intent={operationId:"pacman-handler-execute-001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const assertion={id:ownerRow.credential_id,type:"public-key",response:{}};
+ const r=await handleWebAuthnOwnerLab(
+  req("/webauthn/approval/execute",{intent,content:"probe",challenge:"c".repeat(43),assertion}),
+  env(d),
+  {cryptoImpl:webcrypto,nowMs:1780000000000,executeImpl:async()=>{calls++;throw Error("must not execute");}}
+ );
+ assert.equal(r.status,503);
+ assert.equal((await r.json()).error,"WEBAUTHN_EXECUTOR_NOT_CONFIGURED");
+ assert.equal(calls,0);
+});
+
+test("approval execute delegates exact owner-bound LAB operation to server-side relay",async()=>{
+ const d=db({owner:ownerRow});
+ const intent={operationId:"pacman-handler-execute-002",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const assertion={id:ownerRow.credential_id,type:"public-key",response:{clientDataJSON:"a",authenticatorData:"b",signature:"c"}};
+ let seen;
+ const executeImpl=async args=>{
+  seen=args;
+  return {status:"PACMAN_OPERATION_VERIFIED",operationId:intent.operationId,branch:intent.branch,path:intent.path};
+ };
+ const e=env(d,{
+  PACMAN_EXECUTION_URL:"https://motorlab-pacman-execution-staging-lab.example.workers.dev",
+  PACMAN_EXECUTION_KEY:"k".repeat(48)
+ });
+ const r=await handleWebAuthnOwnerLab(
+  req("/webauthn/approval/execute",{intent,content:"probe",challenge:"d".repeat(43),assertion}),
+  e,{cryptoImpl:webcrypto,nowMs:1780000000000,executeImpl}
+ );
+ assert.equal(r.status,200);
+ assert.deepEqual(await r.json(),{status:"PACMAN_OPERATION_VERIFIED",operationId:intent.operationId,branch:intent.branch,path:intent.path});
+ assert.equal(seen.db,d);
+ assert.equal(seen.intent,intent);
+ assert.equal(seen.content,"probe");
+ assert.equal(seen.challenge,"d".repeat(43));
+ assert.equal(seen.credentialId,ownerRow.credential_id);
+ assert.equal(seen.assertion,assertion);
+ assert.equal(seen.executionUrl,e.PACMAN_EXECUTION_URL);
+ assert.equal(seen.executionKey,e.PACMAN_EXECUTION_KEY);
+ assert.equal(seen.signingSecret,secret);
+});
