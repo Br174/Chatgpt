@@ -19,3 +19,14 @@ test("integrated LAB Worker requires independent issuer gates even with routing 
  let calls=0;const r=await worker.fetch(req({authorization:"Bearer "+key}),{PACMAN_EXECUTION_KEY:key,PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",DB:{prepare(){calls++;throw Error("unexpected");}}});
  assert.equal(r.status,503);assert.equal((await r.json()).error,"STAGING_CYCLE_DISABLED");assert.equal(calls,0);
 });
+
+test("integrated LAB Worker rejects invalid D1 schema before approval claim or GitHub call",async()=>{
+ let statements=[];
+ const env={PACMAN_EXECUTION_KEY:key,PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",
+  PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",
+  PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",PACMAN_APPROVAL_SIGNING_SECRET:"s".repeat(48),
+  PACMAN_GITHUB_TOKEN:"t".repeat(24),DB:{prepare(sql){statements.push(sql);if(!sql.startsWith("PRAGMA table_info("))throw Error("approval claim forbidden");return {all:async()=>({results:[]})};}}};
+ const result=await worker.fetch(req({authorization:"Bearer "+key}),env);
+ assert.equal(result.status,503);assert.equal((await result.json()).error,"STAGING_D1_SCHEMA_UNVERIFIED");
+ assert.deepEqual(statements,["PRAGMA table_info(pacman_approval_claims)"]);
+});
