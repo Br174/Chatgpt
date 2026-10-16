@@ -86,14 +86,37 @@ export async function handleWebAuthnRequest(request,env,{
    if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
    const githubUrl="https://api.github.com/repos/Br174/Chatgpt/issues/72/comments?per_page=1";
    const common={accept:"application/vnd.github+json","x-github-api-version":"2022-11-28","user-agent":"motorlab-pacman-bootstrap"};
-   const check=async(headers)=>{
-    try{const r=await fetchImpl(githubUrl,{method:"GET",redirect:"error",headers,signal:AbortSignal.timeout(12000)});
-     return Number.isInteger(r.status)?r.status:0;
-    }catch{return 0;}
+   // Report only a bounded reason category, never exception text, headers, comment body or secret.
+   const check=async(headers,redirect="error")=>{
+    try{
+     const r=await fetchImpl(githubUrl,{method:"GET",redirect,headers,signal:AbortSignal.timeout(12000)});
+     return {http:Number.isInteger(r.status)?r.status:0,reason:"http"};
+    }catch(e){
+     const message=typeof e?.message==="string"?e.message:"";
+     const reason=/redirect/i.test(message)?"redirect":
+      /network|connect|tls|fetch failed|dns|host/i.test(message)?"network":
+      /abort|timeout/i.test(message)?"timeout":
+      /unsupported|invalid/i.test(message)?"invalid":"other";
+     return {http:0,reason};
+    }
    };
    const authenticated=await check({...common,authorization:"Bearer "+env.PACMAN_GITHUB_TOKEN});
    const anonymous=await check(common);
-   return reply({component:"webAuthnBootstrapGitHubReadOnly",authenticatedHttp:authenticated,anonymousHttp:anonymous});
+   const manual=await check(common,"manual");
+   const unrelated=await (async()=>{
+    try{
+     const r=await fetchImpl("https://registry.npmjs.org/-/ping",{method:"GET",redirect:"manual",signal:AbortSignal.timeout(12000)});
+     return {http:Number.isInteger(r.status)?r.status:0,reason:"http"};
+    }catch(e){
+     const msg=typeof e?.message==="string"?e.message:"";
+     return {http:0,reason:/redirect/i.test(msg)?"redirect":/network|connect|tls|fetch failed|dns|host/i.test(msg)?"network":/abort|timeout/i.test(msg)?"timeout":"other"};
+    }
+   })();
+   return reply({component:"webAuthnBootstrapGitHubReadOnly",
+    authenticatedHttp:authenticated.http,anonymousHttp:anonymous.http,
+    authenticatedReason:authenticated.reason,anonymousReason:anonymous.reason,
+    publicManualHttp:manual.http,publicManualReason:manual.reason,
+    independentHttp:unrelated.http,independentReason:unrelated.reason});
   }
   if(url.pathname==="/bootstrap/webauthn-schema"){
    if(request.method!=="POST")return reply({error:"NOT_FOUND"},404);

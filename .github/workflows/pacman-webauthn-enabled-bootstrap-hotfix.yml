@@ -137,5 +137,9 @@ jobs:
           }
           if(report?.component!=='webAuthnBootstrapGitHubReadOnly')throw Error('GITHUB_EGRESS_DIAGNOSTIC_UNAVAILABLE');
           console.log('PACMAN_GITHUB_WORKER_EGRESS_AUTH_HTTP_'+report.authenticatedHttp+'_PUBLIC_HTTP_'+report.anonymousHttp);
-          if(report.authenticatedHttp!==200&&report.anonymousHttp!==200)throw Error('GITHUB_BOOTSTRAP_OUTBOUND_UNAVAILABLE');
+          console.log('PACMAN_GITHUB_WORKER_EGRESS_REASON_AUTH_'+report.authenticatedReason+'_PUBLIC_'+report.anonymousReason+
+            '_MANUAL_HTTP_'+report.publicManualHttp+'_MANUAL_REASON_'+report.publicManualReason+
+            '_INDEPENDENT_HTTP_'+report.independentHttp+'_INDEPENDENT_REASON_'+report.independentReason);
+          if(report.authenticatedHttp!==200&&report.anonymousHttp!==200&&report.publicManualHttp!==200)
+            throw Error('GITHUB_BOOTSTRAP_OUTBOUND_UNAVAILABLE');
           NODE
