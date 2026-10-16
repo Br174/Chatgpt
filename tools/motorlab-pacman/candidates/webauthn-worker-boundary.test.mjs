@@ -111,3 +111,24 @@ test("non-JSON request is rejected",async()=>{
  }),env,{cryptoImpl:webcrypto});
  assert.equal(r.status,415);
 });
+
+
+test("canonical Worker delegates /webauthn health to zero-cost owner portal",async()=>{
+ const env={...baseEnv,DB:db()};
+ const r=await handleWebAuthnRequest(new Request(endpoint+"/webauthn/health"),env,{cryptoImpl:webcrypto});
+ assert.equal(r.status,200);
+ const body=await r.json();
+ assert.equal(body.service,"pacman-webauthn-owner-staging-lab");
+ assert.equal(body.configured,true);
+});
+
+test("canonical Worker delegates owner enrollment start and never falls through to legacy endpoints",async()=>{
+ const env={...baseEnv,DB:db()};
+ const r=await handleWebAuthnRequest(req("/webauthn/enroll/start"),env,{cryptoImpl:webcrypto,nowMs:1780000000000});
+ assert.equal(r.status,200);
+ const body=await r.json();
+ assert.equal(body.status,"ENROLLMENT_CHALLENGE_READY");
+ assert.equal(body.publicKey.rp.id,"pacman.example.workers.dev");
+ assert.ok(body.enrollmentChallenge.payload);
+ assert.ok(body.enrollmentChallenge.signature);
+});
