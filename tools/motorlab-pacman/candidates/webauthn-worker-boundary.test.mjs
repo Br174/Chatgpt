@@ -146,7 +146,9 @@ test("canonical Worker serves the Android passkey page only when configured",asy
  assert.match(body,/navigator\.credentials\.create/);
  assert.match(body,/\/webauthn\/enroll\/start/);
  assert.match(body,/\/webauthn\/enroll\/finish/);
- assert.match(body,/github\\.com\\/Br174\\/Chatgpt\\/issues\\/72/);\n assert.doesNotMatch(body,/id=["\']url["\']/);\n assert.doesNotMatch(body,/issuecomment-\\(\\\\d\\\+\\)/);
+ assert.match(body,/github\.com\/Br174\/Chatgpt\/issues\/72/);
+ assert.equal(body.includes('id="url"'),false);
+ assert.doesNotMatch(body,/issuecomment-\d+/);
  assert.doesNotMatch(body,/PACMAN_GITHUB_TOKEN|PACMAN_APPROVAL_SIGNING_SECRET/);
 });
 
