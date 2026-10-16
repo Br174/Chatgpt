@@ -94,7 +94,10 @@ function enrollmentEnvelopeFrom(input){
 }
 
 export async function handleWebAuthnOwnerLab(request,env,{
- fetchImpl=fetch,cryptoImpl=globalThis.crypto,nowMs=Date.now()
+ fetchImpl=fetch,
+ cryptoImpl=globalThis.crypto,
+ nowMs=Date.now(),
+ executeImpl=executePacmanWithWebAuthnLab
 }={}){
  const url=new URL(request.url);
  const cfg=config(env);
@@ -203,7 +206,8 @@ export async function handleWebAuthnOwnerLab(request,env,{
       typeof challenge!=="string"||!assertion||typeof assertion!=="object")
     throw fail("INVALID_APPROVAL_REQUEST",400);
    if(assertion.id!==credential.id)throw fail("WEBAUTHN_CREDENTIAL_MISMATCH",403);
-   if(typeof executeImpl!=="function")throw fail("WEBAUTHN_EXECUTOR_NOT_CONFIGURED",503);\n   const result=await executeImpl({
+   if(typeof executeImpl!=="function")throw fail("WEBAUTHN_EXECUTOR_NOT_CONFIGURED",503);
+   const result=await executeImpl({
     db:cfg.db,intent,content,challenge,credentialId:credential.id,assertion,
     signingSecret:cfg.signingSecret,
     executionUrl:cfg.executionUrl,executionKey:cfg.executionKey,
