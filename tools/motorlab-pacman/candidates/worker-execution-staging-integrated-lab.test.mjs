@@ -47,3 +47,16 @@ test("integrated LAB Worker ignores unrecognized routing flag even with independ
  });
  assert.equal(result.status,503);assert.equal((await result.json()).error,"STAGING_CYCLE_ROUTE_DISABLED");assert.equal(calls,0);
 });
+
+test("integrated LAB Worker rejects production branch before any GitHub network call",async()=>{
+ const input={mode:"github-lab-cycle",intent:{operationId:"production-denied",capability:"github.lab-file-cycle",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"},approval:{decision:"authorize"},content:"probe"};
+ const request=new Request("https://staging.invalid/execute",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+key},body:JSON.stringify(input)});
+ let statements=[];
+ const env={PACMAN_EXECUTION_KEY:key,PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",
+  PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",
+  PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",PACMAN_APPROVAL_SIGNING_SECRET:"s".repeat(48),
+  PACMAN_GITHUB_TOKEN:"t".repeat(24),DB:{prepare(sql){statements.push(sql);if(!sql.startsWith("PRAGMA table_info("))throw Error("approval claim forbidden");return {all:async()=>({results:[]})};}}};
+ const result=await worker.fetch(request,env);
+ assert.equal(result.status,503);assert.equal((await result.json()).error,"STAGING_D1_SCHEMA_UNVERIFIED");
+ assert.deepEqual(statements,["PRAGMA table_info(pacman_approval_claims)"]);
+});
