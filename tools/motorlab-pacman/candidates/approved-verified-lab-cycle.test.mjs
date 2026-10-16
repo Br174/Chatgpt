@@ -28,3 +28,12 @@ test("unavailable D1 ledger denies operation before GitHub calls",async()=>{
  await assert.rejects(approvedVerifiedLabCycle({...f,secret,db:null,content,token,fetchImpl:async()=>{calls++;},onCheckpoint:async()=>{}}),/APPROVAL_LEDGER_UNAVAILABLE/);
  assert.equal(calls,0);
 });
+
+test("failed PREPARED checkpoint consumes approval but never mutates GitHub",async()=>{
+ const f=await fixture("signed-cycle-004"),db=ledger();let calls=0;
+ const args={...f,secret,db,content,token,fetchImpl:async()=>{calls++;return response(404,{});},onCheckpoint:async()=>{throw Error("checkpoint storage failed");}};
+ await assert.rejects(approvedVerifiedLabCycle(args),/checkpoint storage failed/);
+ assert.equal(calls,1);
+ await assert.rejects(approvedVerifiedLabCycle(args),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
+ assert.equal(calls,1);
+});
