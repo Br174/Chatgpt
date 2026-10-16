@@ -43,7 +43,9 @@ function config(env){
  if(origin.hostname!==env.PACMAN_WEBAUTHN_RP_ID&&!origin.hostname.endsWith("."+env.PACMAN_WEBAUTHN_RP_ID))return null;
  return {
   db:env.DB,origin:env.PACMAN_WEBAUTHN_ORIGIN,rpId:env.PACMAN_WEBAUTHN_RP_ID,
-  signingSecret:env.PACMAN_APPROVAL_SIGNING_SECRET,githubToken:env.PACMAN_GITHUB_TOKEN
+  signingSecret:env.PACMAN_APPROVAL_SIGNING_SECRET,githubToken:env.PACMAN_GITHUB_TOKEN,
+  executionUrl:typeof env.PACMAN_EXECUTION_URL==="string"?env.PACMAN_EXECUTION_URL:null,
+  executionKey:typeof env.PACMAN_EXECUTION_KEY==="string"?env.PACMAN_EXECUTION_KEY:null
  };
 }
 
