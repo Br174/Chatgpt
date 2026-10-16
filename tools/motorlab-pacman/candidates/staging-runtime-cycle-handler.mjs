@@ -29,6 +29,9 @@ export async function stagingCycleHandler({input,env,fetchImpl=fetch,now}={}){
    const types=table==="pacman_approval_claims"?["TEXT","TEXT","INTEGER","INTEGER"]:["TEXT","TEXT","TEXT","TEXT","TEXT","TEXT"];
    if(!columns.every((name,i)=>info.results.find(row=>row.name===name)?.type?.toUpperCase()===types[i]))
     return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);
+   const nullable=table==="pacman_cycle_checkpoints"?new Set(["operation_id","sha"]):new Set();
+   if(!columns.every(name=>nullable.has(name) || info.results.find(row=>row.name===name)?.notnull===1))
+    return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);
   }
  } catch {return reply({error:"STAGING_D1_SCHEMA_UNVERIFIED"},503);}
  try {
