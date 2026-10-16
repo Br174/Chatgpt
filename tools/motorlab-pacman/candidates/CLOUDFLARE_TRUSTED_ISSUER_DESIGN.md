@@ -26,3 +26,11 @@ Status: **PROPOSAL ONLY**. Owner agreed to Cloudflare as the intended platform; 
 - Keep `PACMAN_CYCLE_ROUTE_ENABLED`, `PACMAN_TRUSTED_ISSUER_CONNECTED`, `PACMAN_GITHUB_LAB_WRITE_ENABLED`, `PACMAN_D1_CHECKPOINTS_VERIFIED` OFF.
 - No `main`/MADRE/production edits; no Cloudflare changes; no D1 writes; no live GitHub probe.
 - Build and test a LAB-only issuer prototype with fake identities and secrets before seeking separate permission for real staging deployment.
+
+## Pure LAB issuer policy and CI evidence — 2026-10-16
+- Prototype: `trusted-issuer-policy-lab.mjs` is a pure policy function with no external identity-provider integration or side effects. Its `identity` argument is a **fixture/claim**, not cryptographic authentication; only a separately verified trusted host may supply it.
+- Eight tests added in `trusted-issuer-policy-lab.test.mjs` covering matching fixture, unauthenticated/untrusted principal, mismatched subject, main branch, modified digest, stale confirmation, and nonfresh session.
+- Candidate workflow run `38845652106`: **103/103 passed**, 0 failed, 0 skipped; test names visible in logs.
+- Complete suite run `38845652268`: **152/152 passed**, 0 failed, 0 skipped.
+- CORE alias run `38845652211`: success.
+- No claim of Cloudflare Access connection or real owner authentication. All V2 flags remain OFF and no Worker deployment has occurred.
