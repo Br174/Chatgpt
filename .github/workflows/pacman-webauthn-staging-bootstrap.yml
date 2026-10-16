@@ -56,6 +56,27 @@ jobs:
           console.log('WEBAUTHN_STAGING_SCOPE_VERIFIED');
           NODE
 
+      - name: Verify exact execution V2 staging target before approval gate
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc','utf8'));
+          if(c.workers_dev!==true ||
+             c.name!=='motorlab-pacman-execution-staging-lab' ||
+             c.main!=='./worker-execution-staging.mjs' ||
+             c.d1_databases?.length!==1 ||
+             c.d1_databases[0].binding!=='DB' ||
+             c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
+            throw Error('EXECUTION_STAGING_SCOPE_MISMATCH');
+          NODE
+
+      - name: Bundle execution V2 Worker dry-run before approval gate
+        working-directory: tools/motorlab-pacman
+        run: |
+          npx --yes wrangler@4 deploy --dry-run --config wrangler.pacman-execution-staging.jsonc --outdir "$RUNNER_TEMP/execution-dry-run"
+          test -n "$(find "$RUNNER_TEMP/execution-dry-run" -type f -maxdepth 2 -print -quit)"
+          echo "EXECUTION_V2_BUNDLE_PREFLIGHT_VERIFIED"
+
       - name: Bundle WebAuthn Worker dry-run before approval gate
         working-directory: tools/motorlab-pacman/webauthn
         run: |
