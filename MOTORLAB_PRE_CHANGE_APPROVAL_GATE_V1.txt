@@ -104,3 +104,7 @@ The gate is active when:
 VERSION
 MOTORLAB-PRE-CHANGE-APPROVAL-GATE-V1.0
 Established: 2026-09-30
+
+
+R38 APPROVAL IS NOT A PIT STOP (2026-10-16; CORE LAB)
+This gate remains mandatory before first write of a genuinely new modification or material scope expansion. Once the reported plan is approved, all in-scope tasks, tests, retries, checkpoints, provider transitions and artifact work proceed without repeated approvals, even across multiple steps, phases and progress reports. A checkpoint, commit or report does not create a new modification request. The canonical Execution Continuity R38 owns the post-approval stop/continue decision; protected boundaries and new scope still require explicit authorization.
