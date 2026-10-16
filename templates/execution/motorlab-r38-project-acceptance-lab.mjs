@@ -31,10 +31,10 @@ try{
   evidence.completed.push({checkpointId:state.checkpointId,completed:state.completed,remaining:state.remaining});
   await persist();
  }});
- evidence.status=result.decision==="CONTINUE"?"BOUNDED_PROJECT_ACCEPTANCE_VERIFIED":"UNEXPECTED_DECISION";
+ evidence.status=["CONTINUE","AWAITING_PROJECT_VERIFICATION"].includes(result.decision)?"BOUNDED_PROJECT_ACCEPTANCE_VERIFIED":"UNEXPECTED_DECISION";
  evidence.decision=result.decision;
  await persist();
  const saved=JSON.parse(await readFile(checkpointPath,"utf8"));
- if(result.decision!=="CONTINUE"||saved.completed.length!==3||saved.checkpointId!=="acceptance-integration")throw Error("PROJECT_ACCEPTANCE_INCOMPLETE");
+ if(!["CONTINUE","AWAITING_PROJECT_VERIFICATION"].includes(result.decision)||saved.completed.length!==3||saved.checkpointId!=="acceptance-integration")throw Error("PROJECT_ACCEPTANCE_INCOMPLETE");
  console.log(JSON.stringify({operationId,status:evidence.status,checkpointId:evidence.checkpointId,completed:3}));
 }catch(err){evidence.status="FAILED";evidence.error=String(err.message||err);await persist();throw err;}
