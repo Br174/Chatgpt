@@ -26,6 +26,8 @@ jobs:
           node-version: '22'
       - name: Verify resume planner rejects forged or stale checkpoints
         run: node --test templates/execution/motorlab-r38-resume-plan-lab.test.mjs
+      - name: Verify whole-project completion does not stop at subtasks
+        run: node --test templates/execution/motorlab-r38-project-completion-lab.test.mjs
       - name: Run authorized read-only multi-phase audit with durable checkpoints
         run: node templates/execution/motorlab-r38-durable-audit-lab.mjs
       - name: Verify actual resume skips completed phase
