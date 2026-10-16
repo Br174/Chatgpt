@@ -51,14 +51,14 @@ try{
    await persist();
   }
  });
- evidence.status=result.decision==="CONTINUE"?"AUDIT_PHASES_VERIFIED_PROJECT_NOT_COMPLETE":result.decision;
+ evidence.status=["CONTINUE","AWAITING_PROJECT_VERIFICATION"].includes(result.decision)?"AUDIT_PHASES_VERIFIED_PROJECT_NOT_COMPLETE":result.decision;
  evidence.decision=result.decision;
  evidence.reason=result.reason;
  evidence.completedPhaseCount=alreadyCompleted+result.completed.length;
  await persist();
  const persisted=JSON.parse(await readFile(output,"utf8"));
  if(persisted.operationId!==operationId||persisted.checkpointId!=="audit-verified"||persisted.completed.length!==phases.length||persisted.completed.some((step,i)=>step.completed!==i+1||step.checkpointId!==phases[i].checkpointId)||persisted.status!=="AUDIT_PHASES_VERIFIED_PROJECT_NOT_COMPLETE")throw Error("DURABLE_CHECKPOINT_VERIFICATION_FAILED");
- if(result.decision!=="CONTINUE"||alreadyCompleted+result.completed.length!==phases.length)throw Error("INCOMPLETE_AUDIT");
+ if(!["CONTINUE","AWAITING_PROJECT_VERIFICATION"].includes(result.decision)||alreadyCompleted+result.completed.length!==phases.length)throw Error("INCOMPLETE_AUDIT");
  console.log(JSON.stringify({operationId,runId:evidence.runId,status:evidence.status,checkpointId:evidence.checkpointId}));
 }catch(error){
  evidence.status="FAILED";
