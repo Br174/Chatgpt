@@ -97,6 +97,16 @@ export async function storeWebAuthnCredentialD1(db,{
  return Object.freeze({credentialId,ownerSubject,stored:true});
 }
 
+
+export async function loadOwnerWebAuthnCredentialD1(db,ownerSubject){
+ if(!db?.prepare||typeof ownerSubject!=="string"||!ownerSubject)fail("WEBAUTHN_CREDENTIAL_INVALID");
+ const row=await db.prepare("SELECT credential_id,public_key_jwk,sign_count,owner_subject,disabled_at FROM pacman_webauthn_credentials WHERE owner_subject=? AND disabled_at IS NULL LIMIT 1").bind(ownerSubject).first();
+ if(!row)fail("WEBAUTHN_CREDENTIAL_NOT_AVAILABLE");
+ let publicKeyJwk;try{publicKeyJwk=JSON.parse(row.public_key_jwk);}catch{fail("WEBAUTHN_CREDENTIAL_INVALID");}
+ if(!Number.isSafeInteger(row.sign_count)||row.sign_count<0||row.owner_subject!==ownerSubject)fail("WEBAUTHN_CREDENTIAL_INVALID");
+ return {id:row.credential_id,publicKeyJwk,signCount:row.sign_count,ownerSubject:row.owner_subject};
+}
+
 export async function loadWebAuthnCredentialD1(db,credentialId){
  if(!db?.prepare||typeof credentialId!=="string"||!credentialId)fail("WEBAUTHN_CREDENTIAL_INVALID");
  const row=await db.prepare("SELECT credential_id,public_key_jwk,sign_count,owner_subject,disabled_at FROM pacman_webauthn_credentials WHERE credential_id=? LIMIT 1").bind(credentialId).first();
