@@ -37,3 +37,15 @@ test("failed PREPARED checkpoint consumes approval but never mutates GitHub",asy
  await assert.rejects(approvedVerifiedLabCycle(args),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
  assert.equal(calls,1);
 });
+
+test("invalid GitHub adapter configuration does not consume signed approval",async()=>{
+ const f=await fixture("signed-cycle-005"),db=ledger();let calls=0;
+ const args={...f,secret,db,content,token:"short",fetchImpl:async()=>{calls++;},onCheckpoint:async()=>{}};
+ await assert.rejects(approvedVerifiedLabCycle(args),/ADAPTER_NOT_CONFIGURED/);
+ assert.equal(calls,0);
+ // Correcting the configuration allows the same unconsumed approval to be claimed.
+ await assert.rejects(approvedVerifiedLabCycle({...args,token,fetchImpl:async()=>{calls++;return response(403,{});}}),/GITHUB_READ_FAILED_403/);
+ assert.equal(calls,1);
+ await assert.rejects(approvedVerifiedLabCycle({...args,token,fetchImpl:async()=>{calls++;}}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
+ assert.equal(calls,1);
+});
