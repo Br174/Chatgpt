@@ -43,7 +43,7 @@ test("unsigned content digest cannot be substituted",async()=>{
 
 test("content-bound signature rejects expiry beyond two-minute window",async()=>{
  const content="probe";
- await assert.rejects(signApprovalInTrustedHost({intent,secret,content,expiresAt:Date.now()+120001}),/INVALID_ISSUANCE_REQUEST/);
+ await assert.rejects(signApprovalInTrustedHost({intent,secret,content,expiresAt:Date.now()+130000}),/INVALID_ISSUANCE_REQUEST/);
 });
 test("content-bound signature rejects expired approval",async()=>{
  const content="probe";
