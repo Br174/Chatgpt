@@ -14,6 +14,7 @@ import {storeWebAuthnChallengeD1} from "../candidates/webauthn-d1-lab.mjs";
 import {issuePacmanApprovalFromWebAuthnLab} from "../candidates/webauthn-trusted-issuer-lab.mjs";
 import {handleWebAuthnOwnerLab} from "../candidates/webauthn-owner-handler-lab.mjs";
 import {renderWebAuthnOwnerPage} from "./page.mjs";
+import {renderWebAuthnApprovalPage} from "./approval-page.mjs";
 
 const MAX_BODY=32768;
 const reply=(body,status=200)=>Response.json(body,{status,headers:{
@@ -70,7 +71,7 @@ export async function handleWebAuthnRequest(request,env,{
 }={}){
  try{
   const url=new URL(request.url),cfg=config(env);
-  if((url.pathname==="/webauthn"||url.pathname==="/webauthn/")&&request.method==="GET"){
+  if(url.pathname==="/webauthn/approve"&&request.method==="GET"){\n   if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);\n   return pageReply(renderWebAuthnApprovalPage());\n  }\n  if((url.pathname==="/webauthn"||url.pathname==="/webauthn/")&&request.method==="GET"){
    if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
    return pageReply(renderWebAuthnOwnerPage());
   }
