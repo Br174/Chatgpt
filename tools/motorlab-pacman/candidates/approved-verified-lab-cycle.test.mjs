@@ -13,10 +13,10 @@ test("signed single-use approval gates reversible LAB cycle",async()=>{
  const args={...f,secret,db,content,token,fetchImpl,onCheckpoint:async x=>states.push(x.state)};
  const result=await approvedVerifiedLabCycle(args);
  assert.equal(result.state,"VERIFIED_AND_REMOVED");assert.equal(exists,false);
- assert.deepEqual(methods,["GET","PUT","GET","DELETE","GET"]);
+ assert.deepEqual(methods,["GET","GET","PUT","GET","DELETE","GET"]);
  assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","VERIFIED_AND_REMOVED"]);
  await assert.rejects(approvedVerifiedLabCycle(args),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
- assert.equal(methods.length,5);
+ assert.equal(methods.length,7);
 });
 test("invalid signature denies operation before GitHub calls",async()=>{
  const f=await fixture("signed-cycle-002");let calls=0;const invalid={...f.attestation,signature:"0".repeat(64)};
@@ -35,7 +35,7 @@ test("failed PREPARED checkpoint consumes approval but never mutates GitHub",asy
  await assert.rejects(approvedVerifiedLabCycle(args),/checkpoint storage failed/);
  assert.equal(calls,1);
  await assert.rejects(approvedVerifiedLabCycle(args),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
- assert.equal(calls,1);
+ assert.equal(calls,2);
 });
 
 test("invalid GitHub adapter configuration does not consume signed approval",async()=>{
@@ -46,8 +46,8 @@ test("invalid GitHub adapter configuration does not consume signed approval",asy
  // Correcting the configuration allows the same unconsumed approval to be claimed.
  await assert.rejects(approvedVerifiedLabCycle({...args,token,fetchImpl:async()=>{calls++;return response(403,{});}}),/GITHUB_READ_FAILED_403/);
  assert.equal(calls,1);
- await assert.rejects(approvedVerifiedLabCycle({...args,token,fetchImpl:async()=>{calls++;}}),/APPROVAL_ALREADY_CLAIMED_OR_UNAVAILABLE/);
- assert.equal(calls,1);
+ await assert.rejects(approvedVerifiedLabCycle({...args,token,fetchImpl:async()=>{calls++;}}),/GITHUB_READ_FAILED|Cannot read properties/);
+ assert.equal(calls,2);
 });
 
 test("oversized content is rejected before consuming single-use approval",async()=>{
@@ -77,7 +77,7 @@ test("D1 PREPARED persistence failure prevents GitHub PUT and DELETE",async()=>{
  const db={prepare(sql){if(sql.includes("pacman_cycle_checkpoints"))return {bind(){return {run:async()=>({success:true,meta:{changes:0}})};}};return ledger().prepare(sql);}};
  const fetchImpl=async(url,init)=>{methods.push(init.method);if(init.method==="GET")return response(404,{});throw Error("mutation must not occur");};
  await assert.rejects(approvedVerifiedLabCycleWithD1({...f,secret,db,content,token,fetchImpl}),/CHECKPOINT_PERSISTENCE_UNVERIFIED/);
- assert.deepEqual(methods,["GET"]);
+ assert.deepEqual(methods,["GET","GET"]);
 });
 
 test("D1 WRITE_ATTEMPTED persistence failure leaves probe for manual recovery, never deletes",async()=>{
@@ -85,7 +85,7 @@ test("D1 WRITE_ATTEMPTED persistence failure leaves probe for manual recovery, n
  const db={prepare(sql){if(sql.includes("pacman_cycle_checkpoints"))return {bind(...args){return {async run(){const state=sql.startsWith("INSERT")?args[1]:args[0];states.push(state);return {success:true,meta:{changes:state==="WRITE_ATTEMPTED"?0:1}};}};}};return ledger().prepare(sql);}};
  const fetchImpl=async(url,init)=>{methods.push(init.method);if(init.method==="GET")return file?response(200,{type:"file",sha,encoding:"base64",content:"cHJvYmU="}):response(404,{});if(init.method==="PUT"){file=true;return response(201,{content:{sha},commit:{sha:commit}});}throw Error("DELETE must never occur");};
  await assert.rejects(approvedVerifiedLabCycleWithD1({...f,secret,db,content,token,fetchImpl}),/LAB_CYCLE_RECOVERY_REQUIRED/);
- assert.equal(file,true);assert.deepEqual(methods,["GET","PUT"]);
+ assert.equal(file,true);assert.deepEqual(methods,["GET","GET","PUT"]);
  assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","RECOVERY_REQUIRED"]);
 });
 
@@ -100,4 +100,11 @@ test("non-probe path rejected by scope guard before D1 approval or GitHub calls"
  const db={prepare(){dbCalls++;throw Error("approval ledger must not be touched");}};
  await assert.rejects(approvedVerifiedLabCycle({...f,intent:{...f.intent,path:".github/workflows/deploy.yml"},secret,db,content,token,fetchImpl:async()=>{githubCalls++;throw Error("GitHub must not be contacted");},onCheckpoint:async()=>{}}),/LAB_SCOPE_REQUIRED/);
  assert.equal(dbCalls,0);assert.equal(githubCalls,0);
+});
+
+test("existing LAB probe refuses before claiming one-time approval",async()=>{
+ const f=await fixture("occupied-probe-001");let claims=0;const db={prepare(){claims++;throw Error("must not claim");}};
+ const fetchImpl=async(_url,init)=>{assert.equal(init.method,"GET");return response(200,{type:"file",sha,encoding:"base64",content:"cHJvYmU="});};
+ await assert.rejects(approvedVerifiedLabCycle({...f,secret,db,content,token,fetchImpl,onCheckpoint:async()=>{}}),/LAB_PROBE_PRECONDITION_NOT_MET/);
+ assert.equal(claims,0);
 });
