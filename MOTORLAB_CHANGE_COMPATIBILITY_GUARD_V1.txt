@@ -183,3 +183,7 @@ Revision 1.1: elevated to foundational MotorLab pillar for all current/future pr
 Revision 1.2 (2026-10-12): Regola Madre delle Regole — verified old-to-new supersession, legacy path retirement, negative anti-regression proof, no second engine.
 
 Revision 1.3 (2026-10-12): R35 consolidation integrates IDENTICAL / CONTRADICTORY / COMPLEMENTARY into the existing v1 Guard, expressly retires ambiguous former precedence and unconditional additive wording, requires old-path negative test proof. No second coordinator.
+
+
+R38 CONTINUITY PILLAR SELECTIVE SUPERSESSION (2026-10-16; CORE LAB)
+For the narrow responsibility of deciding whether an already-approved operation should continue, MOTORLAB_EXECUTION_CONTINUITY_V1.txt R38 is canonical and takes priority over all older contradictory pause, step/batch cap, status-as-stop and repeated approval behavior. Classify each old path as IDENTICAL_MERGED, CONFLICT_REPLACED or COMPLEMENTARY. Replace all conflicting active routes, including fallbacks, before declaring ACTIVE_NEW=yes; negative regression tests must show old arbitrary stops no longer fire. Preserve independent approval, safety, integrity, cost and single-writer constraints. This Guard remains the sole conflict resolver; no second authority or unconditional override of higher-priority access controls is created.
