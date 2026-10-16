@@ -75,3 +75,9 @@ test("final receipt checkpoint failure must not report successful cycle",async()
  assert.deepEqual(m.calls,["read","create","read","remove","read"]);
  assert.deepEqual(states,["PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","VERIFIED_AND_REMOVED","RECOVERY_REQUIRED"]);
 });
+
+test("checkpoint PREPARED failure prevents every GitHub mutation",async()=>{
+ const m=mock(),states=[];
+ await assert.rejects(verifiedLabCycle({adapter:m.adapter,branch,path,content:"probe",onCheckpoint:async x=>{states.push(x.state);throw Error("durable ledger unavailable");}}),/durable ledger unavailable/);
+ assert.deepEqual(m.calls,["read"]);assert.deepEqual(states,["PREPARED"]);
+});
