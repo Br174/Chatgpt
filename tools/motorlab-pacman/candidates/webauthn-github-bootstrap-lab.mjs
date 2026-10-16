@@ -4,6 +4,7 @@
 const OWNER_LOGIN="Br174";
 const OWNER_ID=202558590;
 const REPO="Br174/Chatgpt";
+export const BOOTSTRAP_ISSUE_NUMBER=72;
 const PREFIX="PACMAN-WEBAUTHN-ENROLL-V2";
 const DIGEST=/^[a-f0-9]{64}$/;
 const NONCE=/^[A-Za-z0-9_-]{32,128}$/;
@@ -104,4 +105,39 @@ export async function verifyGithubBootstrapProofV2Lab({
  const key=await cryptoImpl.subtle.importKey("raw",enc.encode(signingSecret),{name:"HMAC",hash:"SHA-256"},false,["verify"]);
  if(!await cryptoImpl.subtle.verify("HMAC",key,sig,enc.encode(payload)))fail("BOOTSTRAP_PROOF_INVALID");
  return Object.freeze(data);
+}
+
+
+export async function findGithubOwnerBootstrapCommentLab({
+ nonce,registrationSha256,githubToken,fetchImpl=fetch,nowMs=Date.now()
+}={}){
+ if(!NONCE.test(nonce||"")||!DIGEST.test(registrationSha256||"")||
+    typeof githubToken!=="string"||githubToken.length<20||
+    typeof fetchImpl!=="function"||!Number.isSafeInteger(nowMs))fail();
+ const expected=githubBootstrapCommentBodyLab({nonce,registrationSha256});
+ const url=`https://api.github.com/repos/${REPO}/issues/${BOOTSTRAP_ISSUE_NUMBER}/comments?per_page=100`;
+ let r;try{
+  r=await fetchImpl(url,{method:"GET",redirect:"error",headers:{
+   authorization:"Bearer "+githubToken,accept:"application/vnd.github+json",
+   "x-github-api-version":"2022-11-28","user-agent":"motorlab-pacman-bootstrap"
+  }});
+ }catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
+ if(!r?.ok||r.status!==200)fail("GITHUB_BOOTSTRAP_UNAVAILABLE");
+ let rows;try{rows=await r.json();}catch{fail("GITHUB_BOOTSTRAP_UNAVAILABLE");}
+ if(!Array.isArray(rows))fail("GITHUB_BOOTSTRAP_UNAVAILABLE");
+ const matches=rows.filter(j=>{
+  const created=Date.parse(j?.created_at);
+  return Number.isSafeInteger(j?.id)&&j.id>0&&
+   j?.user?.login===OWNER_LOGIN&&j?.user?.id===OWNER_ID&&j?.user?.type==="User"&&
+   j?.author_association==="OWNER"&&j?.body===expected&&
+   typeof j?.created_at==="string"&&j?.created_at===j?.updated_at&&
+   j?.performed_via_github_app==null&&Number.isFinite(created)&&
+   created<=nowMs+30000&&created>=nowMs-300000;
+ });
+ if(matches.length!==1)fail(matches.length>1?"GITHUB_BOOTSTRAP_AMBIGUOUS":"GITHUB_BOOTSTRAP_NOT_FOUND");
+ const j=matches[0];
+ return Object.freeze({
+  verified:true,ownerId:String(OWNER_ID),ownerLogin:OWNER_LOGIN,
+  nonce,registrationSha256,commentId:j.id,verifiedAt:nowMs
+ });
 }
