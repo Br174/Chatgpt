@@ -9,6 +9,10 @@ on:
       - 'tools/motorlab-pacman/atomic-claim.mjs'
       - 'tools/motorlab-pacman/atomic-claim.test.mjs'
       - '.github/workflows/pacman-execution-v2-lab.yml'
+      - 'tools/motorlab-pacman/trusted-issuer-deployment-guard.test.mjs'
+      - 'tools/motorlab-pacman/TRUSTED_ISSUER_INTEGRATION_LAB.md'
+      - 'tools/motorlab-pacman/worker-execution-staging.mjs'
+      - 'tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc'
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,4 +26,4 @@ jobs:
         with:
           node-version: '22'
       - name: Test fail-closed and concurrency behavior
-        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs
+        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/trusted-issuer-deployment-guard.test.mjs
