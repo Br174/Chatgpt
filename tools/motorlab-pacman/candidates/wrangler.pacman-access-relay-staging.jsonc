@@ -1,0 +1,7 @@
+{
+  "name": "motorlab-pacman-access-relay-staging-lab",
+  "main": "./worker-access-relay-staging-lab.mjs",
+  "compatibility_date": "2026-10-16",
+  "workers_dev": true,
+  "vars": {}
+}
