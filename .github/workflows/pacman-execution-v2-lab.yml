@@ -10,6 +10,11 @@ on:
       - 'tools/motorlab-pacman/atomic-claim.test.mjs'
       - '.github/workflows/pacman-execution-v2-lab.yml'
       - 'tools/motorlab-pacman/trusted-issuer-deployment-guard.test.mjs'
+      - 'tools/motorlab-pacman/approval-attestation.mjs'
+      - 'tools/motorlab-pacman/approval-attestation.test.mjs'
+      - 'tools/motorlab-pacman/trusted-approval-gate.mjs'
+      - 'tools/motorlab-pacman/trusted-approval-gate.test.mjs'
+      - 'tools/motorlab-pacman/worker-execution-staging.test.mjs'
       - 'tools/motorlab-pacman/TRUSTED_ISSUER_INTEGRATION_LAB.md'
       - 'tools/motorlab-pacman/worker-execution-staging.mjs'
       - 'tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc'
@@ -26,4 +31,4 @@ jobs:
         with:
           node-version: '22'
       - name: Test fail-closed and concurrency behavior
-        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/trusted-issuer-deployment-guard.test.mjs
+        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/trusted-issuer-deployment-guard.test.mjs tools/motorlab-pacman/approval-attestation.test.mjs tools/motorlab-pacman/trusted-approval-gate.test.mjs tools/motorlab-pacman/worker-execution-staging.test.mjs
