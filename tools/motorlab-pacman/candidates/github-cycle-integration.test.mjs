@@ -57,3 +57,15 @@ test("GitHub delete conflict requires recovery without automatic retry",async()=
  await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async()=>{}}),/LAB_CYCLE_RECOVERY_REQUIRED/);
  assert.deepEqual(methods,["GET","PUT","GET","DELETE"]);assert.equal(present,true);
 });
+
+test("GitHub readback mismatch never deletes unverified content",async()=>{
+ let present=false;const methods=[];
+ const fetchImpl=async(url,init)=>{methods.push(init.method);
+  if(init.method==="GET")return present?response(200,{type:"file",sha,encoding:"base64",content:"dGFtcGVyZWQ="}):response(404,{});
+  if(init.method==="PUT"){present=true;return response(201,{content:{sha},commit:{sha:commit}});}
+  throw Error("unexpected mutation");
+ };
+ const adapter=makeGitHubContentsLabAdapter({token:"x".repeat(20),fetchImpl});
+ await assert.rejects(verifiedLabCycle({adapter,branch,path,content:"probe",onCheckpoint:async()=>{}}),/LAB_CYCLE_RECOVERY_REQUIRED/);
+ assert.deepEqual(methods,["GET","PUT","GET"]);assert.equal(present,true);
+});
