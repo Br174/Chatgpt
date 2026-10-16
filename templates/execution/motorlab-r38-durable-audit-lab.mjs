@@ -19,7 +19,7 @@ const expected={
  "check-runtime":["templates/execution/motorlab-r38-operation-entrypoint-lab.mjs"],
  "check-tests":["templates/execution/motorlab-r38-operation-entrypoint-lab.test.mjs"]
 };
-const evidence={operationId,checkpointId,approvedScope:"READ_ONLY_CONTINUITY_AUDIT",status:"RUNNING",completed:[],runId:process.env.GITHUB_RUN_ID||null};
+const evidence={operationId,checkpointId,approvedScope:"READ_ONLY_CONTINUITY_AUDIT",status:"RUNNING",completed:[],runId:process.env.GITHUB_RUN_ID||null,sourceCommit:process.env.GITHUB_SHA||null};
 const persist=async()=>writeFile(output,JSON.stringify(evidence,null,2)+"\n");
 await persist();
 try{
