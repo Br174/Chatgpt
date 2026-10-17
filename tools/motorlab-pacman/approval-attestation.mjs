@@ -88,3 +88,34 @@ export async function verifyControlledApprovalAttestation({
    throw Error("CONTROLLED_SIGNATURE_INVALID");
  return Object.freeze({approved:true,...scoped,approvalNonce:attestation.nonce});
 }
+
+
+// Called ONLY by the verified WebAuthn owner issuer, after the existing
+// challenge was consumed atomically and the credential counter checked.
+// No public HTTP signer; no user-provided "approved" flag can enter here.
+export async function signControlledApprovalAfterWebAuthnLab({
+ intent,verifiedWebAuthn,ownerSubject,secret,issuedAt=Date.now(),
+ expiresAt,cryptoImpl=globalThis.crypto
+}={}){
+ const scoped=validateControlledChatIntent(intent);
+ if(typeof secret!=="string"||secret.length<32||
+    typeof ownerSubject!=="string"||!ownerSubject||
+    !verifiedWebAuthn||verifiedWebAuthn.verified!==true||
+    verifiedWebAuthn.operationId!==scoped.operationId||
+    typeof verifiedWebAuthn.credentialId!=="string"||
+    !verifiedWebAuthn.credentialId||
+    typeof verifiedWebAuthn.challenge!=="string"||
+    !/^[A-Za-z0-9][A-Za-z0-9_-]{31,63}$/.test(verifiedWebAuthn.challenge)||
+    !Number.isSafeInteger(issuedAt)||!Number.isSafeInteger(expiresAt)||
+    expiresAt<=issuedAt||expiresAt-issuedAt>120000||
+    !cryptoImpl?.subtle)
+   throw Error("CONTROLLED_ISSUER_SCOPE_DENIED");
+ const a={decision:"authorize",expiresAt,issuedAt,
+  nonce:verifiedWebAuthn.challenge,operationId:scoped.operationId,
+  subject:ownerSubject,signature:""};
+ const key=await cryptoImpl.subtle.importKey("raw",encoder.encode(secret),
+  {name:"HMAC",hash:"SHA-256"},false,["sign"]);
+ const payload=controlledApprovalPayload(scoped,a);
+ const signature=hex(await cryptoImpl.subtle.sign("HMAC",key,encoder.encode(payload)));
+ return Object.freeze({...a,signature});
+}
