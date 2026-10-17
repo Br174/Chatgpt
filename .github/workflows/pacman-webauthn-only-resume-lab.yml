@@ -64,7 +64,9 @@ jobs:
              !file.includes("'--keep-vars'")||
              !file.includes("wrangler.pacman-webauthn-staging.jsonc")||
              /wrangler\.pacman-execution-staging\.jsonc.{0,40}--keep-vars/.test(file)||
-             /(?:secret put|d1 execute|migration apply|wrangler delete)/i.test(file))
+             ['secret'+' '+'put','d1'+' '+'execute',
+               'migration'+' '+'apply','wrangler'+' '+'delete'].some(x=>
+                 file.toLowerCase().includes(x)))
             throw Error('PACMAN_WEB_ONLY_WORKFLOW_CONTRACT_BLOCKED');
           // All Cloudflare settings mutations MUST originate exclusively from
           // the single WebAuthn deploy step below.
@@ -130,7 +132,7 @@ jobs:
           });
           console.log('PACMAN_WEB_ONLY_PREDEPLOY_HMAC_OWNER_D1_AND_FLAGS_VERIFIED');
           // Exactly ONE provider-changing command in this workflow.
-          // No Execution deploy, D1 queries, schema changes, secret puts or flag edits.
+          // No Execution deploy, D1 queries, schema changes, credential changes or flag edits.
           let stdout;
           try{
             stdout=cp.execFileSync('npx',[
