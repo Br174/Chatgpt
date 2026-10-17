@@ -14,3 +14,22 @@ export function validateChatApproval(intent, approval) {
    throw Error("CHAT_APPROVAL_MISMATCH");
  return Object.freeze({operationId:intent.operationId,branch:LAB_BRANCH,path:LAB_PROBE,approval:true});
 }
+
+
+// V2 Real Operations LAB: pure, strict intent validator for the existing chat coordinator.
+// It does NOT authorize a write; a trusted host signature must be independently verified.
+import {CONTROLLED_LAB_BRANCH,controlledLabPath} from "./candidates/github-controlled-update-lab.mjs";
+const CONTROLLED_INTENT_KEYS=["branch","capability","contentSha256","expectedSha","operationId","path"];
+const SHA40=/^[a-f0-9]{40}$/,SHA256=/^[a-f0-9]{64}$/;
+export function validateControlledChatIntent(intent){
+ if(!intent||typeof intent!=="object"||Array.isArray(intent)||
+    Object.keys(intent).sort().join(",")!==CONTROLLED_INTENT_KEYS.join(","))
+  throw Error("CONTROLLED_INTENT_FIELDS_DENIED");
+ if(intent.capability!=="github.lab-file-update"||
+    intent.branch!==CONTROLLED_LAB_BRANCH||!controlledLabPath(intent.path)||
+    typeof intent.operationId!=="string"||
+    !/^[A-Za-z0-9][A-Za-z0-9._-]{7,119}$/.test(intent.operationId)||
+    !SHA40.test(intent.expectedSha||"")||!SHA256.test(intent.contentSha256||""))
+  throw Error("CONTROLLED_INTENT_SCOPE_DENIED");
+ return Object.freeze({...intent});
+}
