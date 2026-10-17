@@ -86,3 +86,71 @@ test("outages never retry or return exception text",async()=>{
  assert.equal(out.result[exec].health.http,"TRANSPORT_OR_JSON_FAILURE");
  assert.doesNotMatch(JSON.stringify(out),/SENSITIVE_TRANSPORT_ERROR/);
 });
+
+test("live signed parity and historical version comparison stay GET-only and secret-free",async()=>{
+ const calls=[],auth="synthetic-owner-private-execution-key-for-read-only-check";
+ const fake=fakeFetch({record:calls,alter:(url,kind,worker,data)=>{
+  if(kind!=="deployments")return;
+  return response(200,{...data,result:{deployments:[{versions:[{
+   version_id:worker===exec?
+   "8e5680ab-ce88-4785-9fc4-dbc84604f0ba":
+   "23428a1c-920d-4d63-9514-49eb92fc04bf"}]}]}});
+ }});
+ const wrapped=async(url,opts)=>{
+  if(url.endsWith("/__motorlab_lab/diagnostics/issuer-parity")){
+   calls.push({url,opts});
+   assert.equal(opts.method,"GET");assert.equal(opts.redirect,"manual");
+   assert.equal(opts.headers.authorization,"Bearer "+auth);
+   return response(200,{component:"pacmanSigningSecretParity",match:true,
+    transport:"SERVICE_BINDING_STAGING",proof:"NEVER_OUTPUT_THIS"});
+  }
+  return fake(url,opts);
+ };
+ const result=await auditControlledStagingReadOnly({
+  cloudflareToken:token,accountId:account,executionKey:auth,fetchImpl:wrapped});
+ assert.equal(calls.length,7);
+ assert.equal(result.liveIssuerParity,"LIVE_PRIVATE_BINDING_HMAC_MATCH");
+ assert.equal(result.result[exec].parityRun4Version,"LATEST_MATCHES_GITHUB_PARITY_RUN4_VERSION");
+ assert.equal(result.result[web].parityRun4Version,"LATEST_MATCHES_GITHUB_PARITY_RUN4_VERSION");
+ assert.equal(result.executionAllowed,false);
+ assert.ok(calls.every(c=>c.opts.method==="GET"));
+ assert.doesNotMatch(JSON.stringify(result),/NEVER_OUTPUT_THIS|synthetic-owner-private-execution-key|8e5680ab-ce88|23428a1c-920d/);
+});
+
+test("newest different Worker version never passes historical run4 provenance",async()=>{
+ const old="8e5680ab-ce88-4785-9fc4-dbc84604f0ba";
+ const wrapped=fakeFetch({alter:(url,kind,worker,data)=>{
+  if(kind==="deployments"&&worker===exec){
+   return response(200,{...data,result:{deployments:[
+    {versions:[{version_id:"44444444-4444-4444-4444-444444444444"}]},
+    {versions:[{version_id:old}]}]}});
+  }
+ }});
+ const out=await auditControlledStagingReadOnly({
+  cloudflareToken:token,accountId:account,fetchImpl:wrapped});
+ assert.equal(out.result[exec].parityRun4Version,"HISTORICAL_GITHUB_PARITY_RUN4_VERSION_NOT_LATEST");
+ assert.equal(out.liveIssuerParity,"PROTECTED_KEY_NOT_PROVIDED");
+ assert.equal(out.executionAllowed,false);
+});
+
+test("current signing mismatch and malformed proof cannot be reported as verified",async()=>{
+ const auth="synthetic-owner-private-execution-key-00001";
+ for(const [parityResponse,expected] of [
+  [response(409,{error:"PARITY_MISMATCH"}),"LIVE_SIGNING_KEYS_MISMATCH"],
+  [response(200,{component:"pacmanSigningSecretParity",match:false,transport:"SERVICE_BINDING_STAGING"}),"PARITY_PROOF_UNVERIFIED"],
+  [response(401,{}),"LIVE_PARITY_HTTP_401"]
+ ]){
+  let calls=0;
+  const fake=fakeFetch();
+  const wrapped=async(url,opts)=>{
+   if(url.endsWith("/__motorlab_lab/diagnostics/issuer-parity")){
+    calls++;assert.equal(opts.method,"GET");return parityResponse;
+   }
+   return fake(url,opts);
+  };
+  const r=await auditControlledStagingReadOnly({
+   cloudflareToken:token,accountId:account,executionKey:auth,fetchImpl:wrapped});
+  assert.equal(calls,1);assert.equal(r.liveIssuerParity,expected);
+  assert.equal(r.remoteWrites,0);assert.equal(r.executionAllowed,false);
+ }
+});
