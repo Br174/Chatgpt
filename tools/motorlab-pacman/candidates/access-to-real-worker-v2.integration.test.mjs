@@ -60,7 +60,7 @@ test("Cloudflare Access owner -> issuer -> real Worker -> D1 -> reversible GitHu
  };
  const approval={...intent,decision:"authorize"};
  const executeRequest=new Request("https://staging.invalid/execute",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+execKey},body:JSON.stringify({mode:"github-lab-cycle",intent,approval,attestation,content})});
- const env={PACMAN_EXECUTION_KEY:execKey,DB,PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",PACMAN_APPROVAL_SIGNING_SECRET:signingSecret,PACMAN_GITHUB_TOKEN:githubToken};
+ const env={PACMAN_EXECUTION_KEY:execKey,DB,PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",PACMAN_APPROVAL_SIGNING_SECRET:signingSecret,PACMAN_GITHUB_TOKEN:githubToken,PACMAN_ISSUER_PARITY_VERIFIED:"YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED"};
  const result=await handleExecutionRequest(executeRequest,env,{fetchImpl:githubFetch});
  assert.equal(result.status,200);
  assert.equal((await result.json()).status,"VERIFIED_AND_REMOVED");

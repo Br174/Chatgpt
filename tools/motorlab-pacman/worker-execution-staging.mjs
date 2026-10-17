@@ -7,6 +7,7 @@ import {makeGitHubContentsLabAdapter} from "./candidates/github-contents-lab-ada
 // Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
 export const PACMAN_EXECUTION_RUNTIME_REVISION="pacman-v2-webauthn-relay-20261016";
 const MAX_BYTES=8192;
+const LAB_CYCLE_MODE="github-lab-cycle";
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
  if(typeof secret!=="string" || secret.length<32) return false;
@@ -116,7 +117,8 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
   // Hard, independent staging-only gate. Pre-existing opaque Cloudflare flags do not prove
   // that WebAuthn signing and Execution verification share the same trusted key.
   // The parity flag must remain absent until independent, non-mutating parity proof.
-  if(input.mode==="github-lab-cycle" &&
+  if(input.mode===LAB_CYCLE_MODE &&
+     env?.PACMAN_CYCLE_ROUTE_ENABLED==="YES_REVIEWED_STAGING_CANDIDATE" &&
      env?.PACMAN_ISSUER_PARITY_VERIFIED!=="YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED")
    return response({error:"STAGING_ISSUER_PARITY_NOT_VERIFIED"},503);
   const candidateResult=await candidateCycleDispatch({input,env,fetchImpl});

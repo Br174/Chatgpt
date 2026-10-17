@@ -53,7 +53,8 @@ async function fixture(){
   PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",
   PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",
   PACMAN_APPROVAL_SIGNING_SECRET:issuerSecret,
-  PACMAN_GITHUB_TOKEN:githubToken
+  PACMAN_GITHUB_TOKEN:githubToken,
+  PACMAN_ISSUER_PARITY_VERIFIED:"YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED"
  };
  const executionUrl="https://motorlab-pacman-execution-staging-lab.example.workers.dev";
  const relayFetch=async(url,init={})=>{

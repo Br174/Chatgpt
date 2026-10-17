@@ -18,12 +18,13 @@ test("LAB config keeps write flags and issuer parity absent",()=>{
   assert.equal(Object.hasOwn(config.vars??{},name),false);
 });
 test("Worker refuses the real mutating mode until independent owner signature parity is attested",()=>{
- const guard=worker.indexOf('if(input.mode==="github-lab-cycle" &&');
+ const guard=worker.indexOf('if(input.mode===LAB_CYCLE_MODE &&');
  const route=worker.indexOf("const candidateResult=await candidateCycleDispatch");
  assert.ok(guard>0&&route>guard);
  assert.match(worker,/STAGING_ISSUER_PARITY_NOT_VERIFIED/);
  assert.match(worker,/env\?\.PACMAN_ISSUER_PARITY_VERIFIED/);
  assert.match(worker,/PACMAN_ISSUER_PARITY_VERIFIED!=="YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED"/);
+ assert.match(worker,/PACMAN_CYCLE_ROUTE_ENABLED===\"YES_REVIEWED_STAGING_CANDIDATE\"/);
 });
 test("read-only schema audit only exposes bounded metadata and Worker D1 introspection",()=>{
  assert.match(worker,/__motorlab_lab\/diagnostics\/execution-schema-audit/);
