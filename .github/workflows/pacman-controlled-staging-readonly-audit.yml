@@ -61,7 +61,8 @@ jobs:
           let snapshot;
           try{
             snapshot=await auditControlledStagingReadOnly({
-              cloudflareToken:process.env.CF_TOKEN,accountId:process.env.CF_ACCOUNT
+              cloudflareToken:process.env.CF_TOKEN,accountId:process.env.CF_ACCOUNT,
+              executionKey:process.env.EXECUTION_KEY
             });
           }catch{
             console.log('PACMAN_READONLY_CLOUDFLARE=BLOCKED_PROTECTED_ENV_OR_ACCOUNT');
@@ -75,6 +76,7 @@ jobs:
               console.log('PACMAN_'+label+'_SETTINGS='+x.settingsHttp);
               console.log('PACMAN_'+label+'_D1='+String(x.database||'UNVERIFIED'));
               console.log('PACMAN_'+label+'_DEPLOYMENT='+x.deployment);
+              console.log('PACMAN_'+label+'_GITHUB_PARITY_RUN4_VERSION='+x.parityRun4Version);
               console.log('PACMAN_'+label+'_HEALTH='+x.health.http);
               if(label==='EXECUTION'){
                 console.log('PACMAN_EXECUTION_SOURCE_REVISION='+x.health.revision);
@@ -82,6 +84,20 @@ jobs:
               }else console.log('PACMAN_WEBAUTHN_EXECUTION_SERVICE='+x.service);
               for(const [name,type] of Object.entries(x.keys||{}))
                 console.log('PACMAN_'+label+'_SECRET_'+name+'='+type);
+            }
+          }
+          if(snapshot){
+            console.log('PACMAN_LIVE_SIGNING_PARITY='+snapshot.liveIssuerParity);
+            const workers=['motorlab-pacman-execution-staging-lab','motorlab-pacman-webauthn-staging-lab'];
+            // Do not mark success solely because all HTTP calls returned status codes:
+            // require authenticated settings, exact staging D1 and tested private HMAC.
+            if(snapshot.liveIssuerParity!=='LIVE_PRIVATE_BINDING_HMAC_MATCH'||
+              workers.some(name=>snapshot.result[name]?.settingsHttp!=='HTTP_200_API_SUCCESS'||
+                snapshot.result[name]?.database!=='MATCH')||
+              snapshot.result[workers[1]]?.service!=='MATCH'||
+              snapshot.result[workers[0]]?.flags?.PACMAN_CONTROLLED_UPDATE_ENABLED!=='NOT_LISTED'){
+              console.log('PACMAN_CLOUDFLARE_READONLY_SECURITY_EVIDENCE_INCOMPLETE');
+              process.exitCode=1;
             }
           }
           if(typeof process.env.EXECUTION_KEY==='string'&&process.env.EXECUTION_KEY.length>=32){
