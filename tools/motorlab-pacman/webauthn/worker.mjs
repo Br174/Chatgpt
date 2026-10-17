@@ -289,6 +289,9 @@ export async function handleWebAuthnRequest(request,env,{
   }
 
   if(url.pathname==="/approve/challenge"){
+   if(input?.intent?.capability==="github.lab-file-update"&&
+      env?.PACMAN_CONTROLLED_UPDATE_ENABLED!=="YES_REVIEWED_STAGING_CONTROLLED_UPDATE")
+    throw fail("WEBAUTHN_CONTROLLED_UPDATE_DISABLED",503);
    if(!input?.intent||typeof input?.content!=="string"||!input.content.length)throw fail("INVALID_APPROVAL_REQUEST");
    const contentSha256=hex(await cryptoImpl.subtle.digest("SHA-256",enc.encode(input.content)));
    if(input.intent.capability==="github.lab-file-update"&&input.intent.contentSha256!==contentSha256)
@@ -302,6 +305,9 @@ export async function handleWebAuthnRequest(request,env,{
   }
 
   if(url.pathname==="/approve/finish"){
+   if(input?.intent?.capability==="github.lab-file-update"&&
+      env?.PACMAN_CONTROLLED_UPDATE_ENABLED!=="YES_REVIEWED_STAGING_CONTROLLED_UPDATE")
+    throw fail("WEBAUTHN_CONTROLLED_UPDATE_DISABLED",503);
    const out=await issuePacmanApprovalFromWebAuthnLab({
     db:cfg.db,intent:input?.intent,content:input?.content,
     challenge:input?.challenge,credentialId:input?.credentialId,assertion:input?.assertion,
