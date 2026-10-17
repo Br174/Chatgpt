@@ -142,6 +142,18 @@ Autorizzazione utente successiva al rapporto preventivo: solo nuova fase 2 in qu
 - Deploy/route changes, live owner passkey challenge, real D1 and GitHub mutation by new issuer remain separately permission-gated. Do not treat synthetic P-256 key or code-only HMAC issuance as verified owner passkey.
 - Preserve old operation `pacman-webauthn-lab-20261017-ff59959a-01`: completed historically, **never replay**.
 
+## Node 22 real-crypto approval regression, continuity check — 2026-10-17
+
+- Existing LAB branch exact preflight HEAD `37a6d9135899225c64a259f52a1f68702686d598`, `main` `8615e8321bf9896f28826a09aa0c9f61ce5ecbb7`, no provider changes.
+- Reconstructed `approval-attestation.mjs` into local Node 22 environment from its previously verified source and exact later controlled-signer/nonce changes. **Git blob SHA independently matched** `bf07a1e2ce8f1c2ebfa01e308d7b6203e5a756fb`. Existing `chat-approval.mjs` Git blob matched `63dd13102ebaadad32d24cc95aa5221249e528a8`.
+- Node.js **v22.16.0 REAL WebCrypto**: 22/22 previously checked regression tests plus six new real-HMAC signer tests = **28/28 PASS**. Synthetic credentials, no actual owner passkey.
+- Six additional checks: the post-WebAuthn controlled signer produces a valid HMAC; `-` and `_` in Base64URL nonce; wrong owner/changed target path or SHA; fake verified flag/mismatched operation/empty credential; `main` and historic LAB isolation; oversized TTL rejection.
+- `controlledLabPath` is the locally retained limited dependency fixture of the existing allowlist. This test does **not** exercise the complete GitHub Contents adapter or Worker runtime. The 12 newly committed `webauthn-controlled-update-lab.test.mjs` test cases remain **NOT CONFIRMED** by an accessible official CI run, and were not executed in this local regression.
+- Connector `get_commit_combined_status` produced no status checks and `fetch_commit_workflow_runs` only lists PR-triggered workflows. These empty results **do not** imply the new code passed or failed GitHub Actions. Previous run #23 green applies only to an earlier commit.
+- Progress held conservatively at GitHub A `4/4 = 100%` Δ0; chat B `2/4 = 50%` Δ0; Cloudflare C `0/4 = 0%` Δ0; recovery D `2/4 = 50%` Δ0; overall `8/16 = 50%` Δ0. Activity `post-WebAuthn HMAC regression` 100% (+100 from task start) but not a newly completed global gate.
+- No code changes in this continuation; this metadata checkpoint write records test evidence only. No D1/Cloudflare/MADRE/production/legacy LAB actions, secret usage, deployments or replay.
+- Exact next gate: request/verifiably observe a GREEN GitHub Actions run for the **current LAB code HEAD**, including Node 22 full tests and Miniflare workerd smoke, and inspect failures on the run if RED. Subsequent live passkey/Worker activation remains outside this authorization.
+
 ## Next authoritative gates
 1. Obtain the final GitHub Actions Node 22 full-suite + workerd run/result for the new branch; fix any failures solely on this LAB. Connector only returns commit statuses and PR-triggered workflow runs, so its empty result is not proof of failed or passed CI.
 2. Execute an independently verified approval flow with the new capability, using a genuine host-issued signed approval; do not treat mock verifier / chat text as cryptographic authorization.
