@@ -3,6 +3,25 @@
 Status: `VERIFIED_COMPLETE_AUTHORIZED_STAGING_LAB`. The owner completed a fresh Android passkey assertion and the actual GitHub create/read/delete/read LAB cycle. Independent GitHub inspection confirms both commits, exact approved content, probe removal, and restoration of the whole pre-cycle repository tree. A subsequent protected GET-only audit independently read the completed D1 checkpoint and consumed approval. Do not execute this operation again.
 Session release pin: `2026.10.14-r37`. R38 continuity rules remain applicable as recorded by the canonical CORE; this is not an r38 release promotion.
 
+## Subsequent authorized consolidation into MotorLab stable source
+
+Status: `VERIFIED_COMPLETE_MOTORLAB_FUNCTION_INTEGRATION`.
+
+- Bruno authorized promotion if ready at approximately 21:34 Europe/Rome and clarified that Pac-Man is a function of MotorLab, not a separate product or MADRE. The operation consolidated the verified function into MotorLab's existing stable source; no independent Pac-Man application/orchestrator was created.
+- Verified LAB source: `2818f80ec9c75ce376a83b50d91744f70c73c5f8`.
+- Previous stable MotorLab main/recovery point: `88d6940c71d519b00f444fa50970f6e35ba4bd8c`.
+- Frozen CANDIDATA 01: branch `motorlab/pacman-execution-v2-candidate-01-20261017`, commit `22e3ed9d584d7e4aa75b8863e1a0adaff8f51423`.
+- Integration PR: https://github.com/Br174/Chatgpt/pull/73 — merged normally after all 8 exact-head checks succeeded; expected-head protection used, no forced ref update or protection bypass.
+- Stable MotorLab main commit: `8615e8321bf9896f28826a09aa0c9f61ce5ecbb7`, merged at 19:44:51 UTC / 21:44:51 Europe/Rome.
+- Candidate and promoted main have the exact same tree: `75c60555bf36d10bbae7026b8d2f66df1d1ee633`. Main parents are the prior stable main and frozen candidate; no functional reconstruction occurred during promotion.
+- All 266 LAB additions were copied by exact Git blob identity. Existing main CORE/R38 and main Pac-Man policy tests were preserved. Only the existing service integration registry received a scoped status addition; new release evidence and main/PR test-only CI were added.
+- Candidate verification: 765/765 Pac-Man plus main policy tests, 40/40 applicable CORE/r37/r38 checks, real workerd runtime smoke, and independent code review without blocking findings.
+- Post-merge main verification: https://github.com/Br174/Chatgpt/actions/runs/39063781780 — SUCCESS, job `117487042988`; actual logs show 765 tests, 765 passed, 0 failed and `PACMAN_WORKERS_RUNTIME_POST_CYCLE_REDIRECT_AND_INERT_DIAGNOSTIC_VERIFIED`.
+- The old draft PR #64 toward another experimental branch was closed without merge as superseded by #73. The LAB and frozen candidate refs remain preserved.
+- A broad unchanged-main historical test scan had 4 pre-existing failures (three r35-only pin fixtures, one unrelated Project Feedback shape assertion), recorded in `PACMAN_EXECUTION_V2_RELEASE.md` and PR #73. No historical test or protection was removed/disabled. All current applicable PR gates and main Pac-Man integration checks passed.
+- Runtime remains the verified dedicated staging Workers and fixed LAB capability. Source consolidation did not deploy production, change schema/credentials/enrollment, replay a consumed operation, connect a generic ChatGPT MCP app, or activate an r38 release/fanout.
+- Progress: LAB operational acceptance remains `100%` (delta `0%`); consolidation of this verified function into MotorLab stable source is complete. This is not a claim that every possible GitHub/Cloudflare administrative capability is implemented.
+
 ## Identity and verified baseline
 
 - Repository: `Br174/Chatgpt`.
