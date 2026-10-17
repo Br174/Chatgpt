@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {inspectPostParityReadiness as inspect} from "./execution-postparity-readonly-lab.mjs";
+import * as diagnostics from "./execution-postparity-readonly-lab.mjs";
 const key="unit-test-execution-token-012345678901234567890";
 const schema=()=>({component:"pacmanExecutionReadOnlySchemaAudit",schema:"EXACT",
  issuerParityLocked:false,flags:{PACMAN_TRUSTED_ISSUER_CONNECTED:"MATCH",
@@ -62,4 +63,55 @@ test("no accidental HTTP mutation on network/JSON failures",async()=>{
  }});
  assert.equal(count,3);assert.equal(v.category,"SCHEMA_OR_SIGNATURE_PARITY_NOT_CONFIRMED");
  assert.equal(JSON.stringify(v).includes(key),false);
+});
+
+const completed=()=>({component:"pacmanLABApprovalRecoveryReadOnly",
+ operationId:"pacman-webauthn-lab-20261017-ff59959a-01",
+ checkpointState:"VERIFIED_AND_REMOVED",claimPresent:true,challengeCount:4,consumedCount:4});
+const inspectCompleted=options=>diagnostics.inspectCompletedLabCycle(options);
+test("completed owner cycle requires a fresh fixed-route GET of its durable D1 receipt",async()=>{
+ let calls=0;
+ const result=await inspectCompleted({key,fetchImpl:async(url,options)=>{
+  calls++;
+  assert.equal(url,"https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/__motorlab_lab/diagnostics/approval-recovery");
+  assert.equal(options.method,"GET");assert.equal(options.redirect,"manual");
+  assert.equal(options.headers.authorization,"Bearer "+key);
+  assert.equal(options.body,undefined);
+  return response(completed());
+ }});
+ assert.equal(calls,1);assert.equal(result.verified,true);assert.equal(result.readOnly,true);
+ assert.equal(result.checkpointState,"VERIFIED_AND_REMOVED");assert.equal(result.claimPresent,true);
+ assert.equal(result.challengeCount,4);assert.equal(result.consumedCount,4);
+});
+test("an incomplete checkpoint or missing approval claim cannot certify the completed cycle",async()=>{
+ for(const patch of [{checkpointState:"NONE"},{checkpointState:"PREPARED"},
+  {checkpointState:"WRITE_ATTEMPTED"},{checkpointState:"CLEANUP_ATTEMPTED"},
+  {checkpointState:"RECOVERY_REQUIRED"},{claimPresent:false},{claimPresent:"true"}]){
+  const result=await inspectCompleted({key,fetchImpl:async()=>response({...completed(),...patch})});
+  assert.equal(result.verified,false,JSON.stringify(patch));
+ }
+});
+test("receipt from another operation, component, or invalid consumption counts is rejected",async()=>{
+ for(const patch of [{operationId:"another-operation"},{component:"another-component"},
+  {challengeCount:-1},{consumedCount:5},{consumedCount:0},{challengeCount:4.5},
+  {challengeCount:"4"},{consumedCount:null}]){
+  const result=await inspectCompleted({key,fetchImpl:async()=>response({...completed(),...patch})});
+  assert.equal(result.verified,false,JSON.stringify(patch));
+ }
+});
+test("redirect, authentication failure, malformed JSON and network error never certify D1",async()=>{
+ for(const fetchImpl of [async()=>response(completed(),302),async()=>response(completed(),401),
+  async()=>new Response("invalid JSON"),async()=>{throw Error("PRIVATE_"+key)}]){
+  const result=await inspectCompleted({key,fetchImpl});
+  assert.equal(result.verified,false);assert.equal(JSON.stringify(result).includes(key),false);
+ }
+ const result=await inspectCompleted({key,fetchImpl:async()=>response({...completed(),
+  checkpointState:"PRIVATE_"+key,challengeCount:key,extra:key})});
+ assert.equal(result.verified,false);assert.equal(result.checkpointState,"UNKNOWN");
+ assert.equal(JSON.stringify(result).includes(key),false);
+});
+test("final D1 audit requires the protected key before making any request",async()=>{
+ let calls=0;
+ await assert.rejects(inspectCompleted({key:"bad",fetchImpl:async()=>{calls++}}),/EXECUTION_KEY_NOT_AVAILABLE/);
+ assert.equal(calls,0);
 });

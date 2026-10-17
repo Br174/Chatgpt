@@ -54,3 +54,23 @@ export async function inspectPostParityReadiness({key,fetchImpl=fetch}={}){
   allHttp:{schema:s.http,readiness:r.http,webauthn:w.http}
  });
 }
+
+// Independent post-cycle readback of the existing protected recovery endpoint.
+// Never starts a challenge, consumes an approval, or calls the execution route.
+export async function inspectCompletedLabCycle({key,fetchImpl=fetch}={}){
+ if(typeof key!=="string"||key.length<32)throw Error("EXECUTION_KEY_NOT_AVAILABLE");
+ const r=await get(origins.webauthn+"/__motorlab_lab/diagnostics/approval-recovery",key,fetchImpl);
+ const d=r.data;
+ const states=new Set(["NONE","PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED",
+  "VERIFIED_AND_REMOVED","RECOVERY_REQUIRED"]);
+ const checkpointState=states.has(d?.checkpointState)?d.checkpointState:"UNKNOWN";
+ const count=value=>Number.isSafeInteger(value)&&value>=0?value:null;
+ const challengeCount=count(d?.challengeCount),consumedCount=count(d?.consumedCount);
+ const claimPresent=d?.claimPresent===true;
+ const verified=r.http===200&&d?.component==="pacmanLABApprovalRecoveryReadOnly"&&
+  d?.operationId==="pacman-webauthn-lab-20261017-ff59959a-01"&&
+  checkpointState==="VERIFIED_AND_REMOVED"&&claimPresent&&
+  challengeCount!==null&&consumedCount!==null&&consumedCount>=1&&consumedCount<=challengeCount;
+ return Object.freeze({verified,readOnly:true,http:r.http,checkpointState,claimPresent,
+  challengeCount,consumedCount});
+}

@@ -1,6 +1,6 @@
 # Pac-Man LAB — GitHub egress recovery, 17 October 2026
 
-Status: `LIVE_PRIVATE_POST_AND_RECOVERY_VERIFIED_WAITING_FRESH_OWNER_ASSERTION`. The corrected private POST transport, D1 recovery, HMAC and GitHub GET readiness have all passed the protected staging rollout. The actual owner-approved GitHub file cycle remains pending.
+Status: `REAL_OWNER_BIOMETRIC_GITHUB_CYCLE_VERIFIED_WAITING_PROTECTED_FINAL_D1_READBACK`. The owner completed a fresh Android passkey assertion and the actual GitHub create/read/delete/read LAB cycle. Independent GitHub inspection confirms both commits, exact approved content, probe removal, and restoration of the whole pre-cycle repository tree. Do not execute this operation again.
 Session release pin: `2026.10.14-r37`. R38 continuity rules remain applicable as recorded by the canonical CORE; this is not an r38 release promotion.
 
 ## Identity and verified baseline
@@ -11,6 +11,20 @@ Session release pin: `2026.10.14-r37`. R38 continuity rules remain applicable as
 - Owner cycle operation ID: `pacman-webauthn-lab-20261017-ff59959a-01`.
 - Exact allowed probe: `tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt`.
 - No project hook or `.motorlab/` satellite was found in the complete, non-truncated LAB tree. No satellite was invented or created during this repair.
+
+## Actual owner-approved cycle — 17 October 2026, 21:23 Europe/Rome
+
+- Operation: `pacman-webauthn-lab-20261017-ff59959a-01`, unchanged throughout recovery.
+- Owner screenshot at 21:23 shows `Operazione verificata e completata.` for the exact authorized LAB branch, probe and content.
+- Pre-cycle HEAD: `3f6a40a790295469114b9af025b402c6be0fa508`.
+- Create commit at 19:23:26 UTC: https://github.com/Br174/Chatgpt/commit/ed5a4cc61063f73349ddd6f7935bc626d9160149
+- Cleanup commit at 19:23:27 UTC: https://github.com/Br174/Chatgpt/commit/bf2bea705188d2c01be462e514c8c385c8342a72
+- Each commit changes only `tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt`; creation content was independently checked byte-for-byte, including the final newline, against the approved JSON below.
+- Pre-cycle and cleanup trees are identical: `173894b405655186296d6a58c1c6e742bcf67d07`. GitHub comparison contains two commits and zero net changed files. The probe is absent after cleanup.
+- The deployed relay emits `PACMAN_OPERATION_VERIFIED` only for a matching `VERIFIED_AND_REMOVED` Execution receipt. Execution awaits successful D1 persistence (`success:true`, exactly one changed row) before returning that receipt. This is strong receipt-path evidence; a separate protected GET readback of the post-cycle D1 state remains pending.
+- The existing read-only audit workflow now additionally reads the already deployed fixed-operation recovery endpoint. It requires final checkpoint `VERIFIED_AND_REMOVED`, an existing single-use approval claim, valid consumed challenge counts, exact D1 schema, current GitHub readiness and probe absence. It never starts WebAuthn, executes a cycle, changes a schema, deploys a Worker, clears claims or emits credentials.
+- Final-audit regression verification: 12/12 targeted tests and 750/750 full local tests passed; YAML and GET-only protected boundaries passed. Independent code review reported no findings. This verification covers the audit code, not yet the live post-cycle D1 readback.
+- Current user-action boundary: GitHub environment review for this final read-only audit. The GitHub connector cannot approve protected deployments. No further biometric assertion is needed for this completed operation.
 
 ## New POST relay failure and verified local correction
 
@@ -25,7 +39,7 @@ Successful repair rollout: https://github.com/Br174/Chatgpt/actions/runs/3906135
 - The historical initial WebAuthn deployment workflow is now manual-only, preserving its already-activated abort guard. It no longer auto-competes on WebAuthn source changes. An older pending run is not a continuation target and must not be approved.
 
 - At approximately 21:00 Europe/Rome the owner's portal reported `PACMAN_EXECUTOR_UNREACHABLE` after the passkey step.
-- Current remote HEAD was `f94456c2db0aee0731c42209c4c311903414ed4d`; the latest commit history contained no probe create/delete. The live D1 state must still be read through the protected recovery gate before another attempt.
+- At the time of that failed attempt, remote HEAD was `f94456c2db0aee0731c42209c4c311903414ed4d` and contained no probe create/delete. The required pre-retry D1 recovery gate subsequently passed in run `39061359612`.
 - The exact source relay reproduced the same failure in workerd through Miniflare `4.20260730.0`: `redirect:"error"` throws during Request construction. Node's Request accepted it, so Node-only tests had missed this runtime incompatibility.
 - The actual runtime error requires `follow` or `manual`; the correction uses `manual`, rejects all 3xx explicitly, never retries an ambiguous call, and retains the private Service Binding without public fallback.
 - One request constructor is shared by real execution and the protected diagnostic. The diagnostic sends only empty JSON `{}` to the existing `/execute` gate, which must return HTTP400 `INVALID_REQUEST` before approval, D1 or GitHub mutation paths.
@@ -46,7 +60,7 @@ Successful protected rollout: https://github.com/Br174/Chatgpt/actions/runs/3905
 - `PACMAN_LAB_PROBE_WAS_NOT_CREATED_OR_DELETED` confirmed no probe mutation.
 - Independent public GET readback: `/webauthn/status` HTTP200, `configured:true`, `enrolled:true`; `/webauthn/approve` HTTP200 with the expected approval button.
 
-The complete approval link must contain the base64url UTF-8 JSON below in its `#` fragment. Opening the bare approval page has no operation and is not a valid continuation link. The payload is non-secret and has been round-trip validated against the canonical WebAuthn intent policy.
+Historical approved operation: the complete approval link contained the base64url UTF-8 JSON below in its `#` fragment. The payload is non-secret and was round-trip validated against the canonical WebAuthn intent policy. The actual operation is now completed; retain the payload for audit, never offer it as a fresh execution link.
 
 ```json
 {"intent":{"capability":"github.lab-file-cycle","operationId":"pacman-webauthn-lab-20261017-ff59959a-01","branch":"motorlab/pacman-execution-v2-lab-20261014","path":"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"},"content":"MotorLab Pac-Man: collaudo WebAuthn staging LAB del 17 ottobre 2026. File temporaneo da verificare e rimuovere.\n"}
@@ -91,20 +105,21 @@ Two new regression tests first failed with `GITHUB_READ_FAILED_403` and readines
 | First activation | Gate absent; deploy both Workers, prove HMAC, enable gate | Same initial sequence retained | Independent protected path |
 | Refresh after proven parity | Initial-only rollout, then Execution-only refresh | Deploy WebAuthn only when current inert POST proof is missing; preserve the parity marker and reverify private POST/HMAC/readiness after deploy | Same rollout owner, no second writer |
 | Historical Execution deployment/refresh workflows | Manual-only or disabled push triggers | Unchanged | Preserved, not reactivated |
+| Existing post-parity read-only audit | Diagnostic categories could produce a green run while readiness failed | Final acceptance requires healthy readiness plus a GET-only readback of the completed operation in the existing recovery endpoint | Narrow extension of the same protected audit owner; no runtime/deploy route added |
 
 Negative tests block wrong HMAC, public transport, duplicate/non-secret marker, relocked runtime, consumed approval, changed HEAD, and an existing probe. None of these cases emits permission to deploy.
 
 ## Resume sequence
 
 1. Recheck current LAB HEAD before any source ref update; reconcile concurrent changes.
-2. The canonical repair run `39061359612` has completed successfully. Do not rerun enrollment, deployment or environment review merely to resume this operation. The earlier successful run `39058170571` proved GET readiness only and is historical.
-3. Real D1 recovery with no existing claim or uncertain checkpoint, fresh private HMAC, preserved enrollment/secrets/parity, successful private POST diagnostic, exact D1 schema, and GitHub GET readiness are now verified. No schema changes occurred.
-4. Prepare the full approval link from the exact non-secret operation JSON above; preserve the same operation ID, branch, path and content.
-5. Request a separate fresh owner passkey assertion; the three consumed challenges from prior failed attempts must not be replayed. The owner button performs the existing create/read/delete/read LAB cycle after successful passkey verification. Do not invoke it on the owner's behalf.
-6. Preserve checkpoint/claim integrity; do not retry an uncertain mutation blindly.
+2. The canonical repair run `39061359612` and real owner-approved GitHub cycle have completed successfully. Do not repeat registration, bootstrap, deployment, passkey assertion or file cycle.
+3. Continue only the current `.github/workflows/pacman-execution-postparity-readonly.yml` final audit after its protected environment review. Do not approve historical pending deployment runs.
+4. Require GET-only final D1 readback: `VERIFIED_AND_REMOVED`, claim present, sane consumed challenge counts; also require current GitHub probe absence, exact schema and healthy readiness.
+5. Read the actual final-audit logs, record the run ID and verified values in this checkpoint, and close the authorized staging LAB milestone. A green source test alone does not close the audit.
+6. Preserve the consumed claim and completed checkpoint. Any broader capability, promotion, main/MADRE/production change or new operation needs its own authorized scope.
 
 ## Scope and progress
 
 No main, MADRE, production, D1 schema, Cloudflare Access, new token, paid service, or permission expansion is authorized. Existing protected staging deploys and necessary LAB repairs remain within the approved scope. Do not approve old run `39037125095`.
 
-Carry forward Pac-Man global `98%` and WebAuthn `99%`, both delta `0%`, pending the actual biometric GitHub cycle. Root Cause Closure for the missing-header defect is verified; overall end-to-end acceptance remains pending. Neither green source tests nor readiness alone are global completion.
+Progress since the previous checkpoint: WebAuthn/passkey `100%` (delta `+1%`); actual owner-approved GitHub LAB cycle `100%` (previously incomplete); Pac-Man global historical estimate `99%` (delta `+1%`), pending the independent protected final D1 readback. The last two points of the earlier 98% estimate are tracked as one point for the actual biometric GitHub cycle and one for final persisted-state verification. These are continuity estimates, not a newly reconstructed weighted inventory of every possible Pac-Man capability. Global 100% remains unavailable before the final audit, and completion will apply only to the authorized staging LAB milestone, never unrestricted provider administration or production promotion.

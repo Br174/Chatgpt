@@ -1,4 +1,4 @@
-name: Pac-Man post-parity execution readiness audit (read-only LAB)
+name: Pac-Man completed owner cycle audit (read-only LAB)
 
 on:
   push:
@@ -85,4 +85,21 @@ jobs:
           console.log('PACMAN_POSTPARITY_AUDIT_DONE_NO_DEPLOY_NO_GITHUB_MUTATION');
           if(report.category==='LAB_FILE_ALREADY_PRESENT_REQUIRES_RECOVERY')
            throw Error('POSTPARITY_PROBE_PRESENCE_ABORT_RECOVERY_REQUIRED');
+          if(report.ready!==true||report.schemaValid!==true)
+           throw Error('POSTPARITY_FINAL_READINESS_NOT_VERIFIED');
+          NODE
+      - name: Read back the completed owner operation and consumed approval from D1
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {inspectCompletedLabCycle} from './tools/motorlab-pacman/candidates/execution-postparity-readonly-lab.mjs';
+          const report=await inspectCompletedLabCycle({key:process.env.EXECUTION_KEY});
+          if(report.verified!==true||report.readOnly!==true)
+           throw Error('PACMAN_COMPLETED_OWNER_CYCLE_D1_NOT_VERIFIED');
+          console.log('PACMAN_OWNER_CYCLE_D1_STATE_VERIFIED_AND_REMOVED');
+          console.log('PACMAN_OWNER_CYCLE_APPROVAL_CLAIM_PRESENT');
+          console.log('PACMAN_OWNER_CYCLE_CHALLENGE_COUNT_'+report.challengeCount);
+          console.log('PACMAN_OWNER_CYCLE_CONSUMED_COUNT_'+report.consumedCount);
+          console.log('PACMAN_OWNER_CYCLE_FINAL_AUDIT_VERIFIED_GET_ONLY');
           NODE
