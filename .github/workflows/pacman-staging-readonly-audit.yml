@@ -53,75 +53,20 @@ jobs:
           }
           NODE
 
-      - name: Classify existing Execution flags and verify D1 schema, read-only
+      - name: Compare protected GitHub key with both Worker gates, read-only
         env:
-          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
-          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
         run: |
           node --input-type=module <<'NODE'
-          const account='b86f445c2b57e604c02f79c8da64bb9c';
-          const db='eb834fc1-5589-4f75-bcb9-d311d0d72261';
-          const worker='motorlab-pacman-execution-staging-lab';
-          if(process.env.CF_ACCOUNT!==account||!process.env.CF_TOKEN)
-           throw Error('READONLY_STAGING_ACCOUNT_OR_TOKEN_INVALID');
-          const url='https://api.cloudflare.com/client/v4/accounts/'+account;
-          const headers={authorization:'Bearer '+process.env.CF_TOKEN,accept:'application/json'};
-          const get=async(path)=>fetch(url+path,{headers,redirect:'manual',signal:AbortSignal.timeout(15000)});
-          const r=await get('/workers/scripts/'+worker+'/settings');
-          if(r.status!==200)throw Error('READONLY_EXECUTION_SETTINGS_UNAVAILABLE_HTTP_'+r.status);
-          const j=await r.json(),bindings=j?.result?.bindings;
-          if(j?.success!==true||!Array.isArray(bindings))
-           throw Error('READONLY_BINDINGS_INVALID');
-          const expected={
-           PACMAN_TRUSTED_ISSUER_CONNECTED:'YES_VERIFIED_TRUSTED_HOST',
-           PACMAN_GITHUB_LAB_WRITE_ENABLED:'YES_STAGING_LAB_ONLY',
-           PACMAN_CYCLE_ROUTE_ENABLED:'YES_REVIEWED_STAGING_CANDIDATE',
-           PACMAN_D1_CHECKPOINTS_VERIFIED:'YES_STAGING_D1_CHECKPOINTS_VERIFIED',
-           PACMAN_APPROVAL_READINESS_ENABLED:'YES_STAGING_D1_ONLY'
-          };
-          let active=0;
-          for(const [name,enableValue] of Object.entries(expected)){
-           const found=bindings.filter(b=>b?.name===name);
-           const b=found.length===1?found[0]:null;
-           const classification=found.length>1?'DUPLICATE_BINDING':
-            !b?'ABSENT':b.type!=='plain_text'?'OPAQUE_OR_NON_PLAIN_TEXT':
-            b.text===enableValue?'PRESENT_MATCHES_ENABLE_VALUE':'PRESENT_OTHER_VALUE';
-           if(classification==='PRESENT_MATCHES_ENABLE_VALUE')active++;
-           console.log('READONLY_RUNTIME_FLAG_CLASSIFICATION '+name+' '+classification);
-          }
-          const expectedD1=bindings.find(b=>b.name==='DB'&&b.type==='d1');
-          if(expectedD1?.id!==db)throw Error('READONLY_D1_BINDING_MISMATCH');
-          for(const name of ['PACMAN_EXECUTION_KEY','PACMAN_GITHUB_TOKEN','PACMAN_APPROVAL_SIGNING_SECRET']){
-           const present=bindings.some(b=>b.name===name&&b.type==='secret_text');
-           console.log('READONLY_EXECUTION_SECRET_'+name+'_'+(present?'PRESENT':'MISSING'));
-           if(!present)throw Error('READONLY_STAGING_RUNTIME_SECRET_MISSING');
-          }
-          for(const [table,names,types] of [
-           ['pacman_approval_claims',['operation_id','approval_signature','claimed_at','expires_at'],['TEXT','TEXT','INTEGER','INTEGER']],
-           ['pacman_cycle_checkpoints',['operation_id','state','branch','path','sha','updated_at'],['TEXT','TEXT','TEXT','TEXT','TEXT','TEXT']]
-          ]){
-           const response=await fetch(url+'/d1/database/'+db+'/query',{
-            method:'POST',headers:{...headers,'content-type':'application/json'},
-            body:JSON.stringify({sql:'PRAGMA table_info('+table+')'}),
-            redirect:'manual',signal:AbortSignal.timeout(15000)
-           });
-           if(response.status!==200){
-            console.log('READONLY_D1_SCHEMA_'+table+'_HTTP_'+response.status);
-            throw Error('READONLY_D1_SCHEMA_QUERY_UNAVAILABLE');
-           }
-           const data=await response.json(),entry=data?.result?.[0],rows=entry?.results;
-           if(data?.success!==true||entry?.success!==true||!Array.isArray(rows))
-            throw Error('READONLY_D1_SCHEMA_RESPONSE_INVALID');
-           const matches=names.every((name,i)=>{
-            const row=rows.find(x=>x?.name===name);
-            const nullable=table==='pacman_cycle_checkpoints'&&(name==='operation_id'||name==='sha');
-            return row&&String(row.type).toUpperCase()===types[i]&&
-             (i!==0||row.pk===1)&&(nullable||row.notnull===1);
-           });
-           console.log('READONLY_D1_SCHEMA_'+table+'_'+(matches?'EXACT':'MISMATCH'));
-           if(!matches)throw Error('READONLY_D1_SCHEMA_MISMATCH');
-          }
-          console.log('READONLY_ACTIVE_EXECUTION_FLAGS_COUNT_'+active);
-          console.log('READONLY_ISSUER_SIGNATURE_PARITY_NOT_YET_VERIFIED');
-          console.log('READONLY_STAGING_AUDIT_FINISHED_NO_DEPLOY_NO_GITHUB_MUTATION');
+          import {inspectStagingCredentialParityReadOnly} from "./tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.mjs";
+          const result=await inspectStagingCredentialParityReadOnly({executionKey:process.env.EXECUTION_KEY});
+          // Only fixed category labels, numeric HTTP statuses and allowlisted gate classifications.
+          console.log('PACMAN_READONLY_AUTH_DIAGNOSIS_'+result.category);
+          console.log('PACMAN_READONLY_WEBAUTHN_HTTP_'+result.webAuthnHttp);
+          console.log('PACMAN_READONLY_EXECUTION_HTTP_'+result.executionHttp);
+          console.log('PACMAN_READONLY_EXECUTION_SCHEMA_'+result.executionSchema);
+          console.log('PACMAN_READONLY_ISSUER_PARITY_LOCKED_'+String(result.issuerParityLocked));
+          for(const [name,value] of Object.entries(result.flags))
+           console.log('PACMAN_READONLY_'+name+'_'+value);
+          console.log('PACMAN_READONLY_AUDIT_DONE_NO_DEPLOY_NO_MUTATIONS');
           NODE
