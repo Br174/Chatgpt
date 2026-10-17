@@ -115,6 +115,33 @@ Autorizzazione utente successiva al rapporto preventivo: solo nuova fase 2 in qu
 - Prossimo gate A4: ottenere evidenza Node 22 + suite completa Pac-Man e workerd sul HEAD corrente. NON confondere `get_commit_combined_status: []` o una ricerca di sole PR-run con la conferma di esito della GitHub Action avviata da push.
 - Rispettare la precedente autorizzazione limitata al nuovo LAB, senza invocare mai promozione/deploy e senza riattivare il probe storico.
 
+## WebAuthn capability-extension LAB — 2026-10-17, authorized after pre-change report
+
+**Owner authorization scope:** code, tests, workflow/checkpoint in `motorlab/pacman-real-operations-lab-20261017` only. No main/MADRE/historical LAB/production, no actual WebAuthn activation, remote D1/schema modification, secret changes, deploy or GitHub file mutation by the new issuer. Cost €0.
+
+### Changes committed, LAB only
+
+1. `candidates/webauthn-approval-lab.mjs`: the existing WebAuthn validator accepts the new `github.lab-file-update` capability only when `validateControlledChatIntent` permits exact intent shape, lab branch, path, blob SHA and content SHA-256. `controlledWebAuthnRequestDigest` SHA-256 binds the canonical [domain, repository, capability, operationId, branch, path, expectedSha, contentSha256] to a passkey challenge. New async canonical factory `createControlledPacmanWebAuthnChallenge`. Assertion verification independently recomputes this binding before checking the P-256 signature. Legacy `github.lab-file-cycle` continues to use its original *body SHA-256* record value and challenge factory.
+2. `candidates/webauthn-d1-lab.mjs`: existing challenge insert allows the new capability only in the exact new LAB path allowlist. For it, the existing `content_sha256` SQL field is used as the **full intent binding digest**. All SQL and both existing schema definitions remain unchanged. Claim/consume remains atomic and single-use.
+3. `approval-attestation.mjs`: new `signControlledApprovalAfterWebAuthnLab` creates HMAC-SHA256 with existing controlled-update signature payload, only after an authenticated WebAuthn issuer supplies the verified assertion details and short expiry. Old signing function untouched. Separate fix: accept syntactically valid WebAuthn base64url nonces beginning with `_` or `-` in both controlled signer and verifier.
+4. `candidates/webauthn-trusted-issuer-lab.mjs`: reuse existing registered-owner WebAuthn verifier, D1 challenge consumption and sign counter. New capability independently checks body digest, full intent digest, expiry and owner, then after challenge consumption and counter verification signs a controlled attestation. Old probe issuer branch preserved; new route not mounted on any deployed Worker.
+
+### Evidence obtained this turn
+
+- Both `main` and historic LAB remain unmodified. `main` remained `8615e8321bf9896f28826a09aa0c9f61ce5ecbb7`.
+- Source syntax check: 5/5 GitHub-fetched changed-module/test sources parsed correctly in isolated V8.
+- Targeted synthetic integration check on **the exact newly fetched GitHub module sources** with fake P-256/HMAC and in-memory D1: **7/7 PASS**. Assertions covered request-bound challenge, persistence into old SQL layout, simulated issuer signature, consumption, sign counter, chat-verifier signature acceptance and replay denial. This is **not** real WebAuthn cryptography or a deployed Worker.
+- New `candidates/webauthn-controlled-update-lab.test.mjs`: **12 test cases committed** using Node 22 `webcrypto` with synthetic generated P-256 keys and D1 test double, including tampering, main/historic branch denial, old-schema and old-path regression, counter/challenge replay and base64url prefix cases. The 12 tests are **not claimed PASSED in an official GitHub Actions run yet**; the existing LAB-only workflow automatically includes `candidates/*.test.mjs`.
+- Historical Actions run #23 green was for commit `112009b9`, before these changes. **Do not use that result as CI certification of the new HEAD**. Obtain a green workflow run on the new exact HEAD and inspect failures as needed.
+- Security: no new issuer endpoint, no remote signing, no private auth challenge generated for the actual owner, no D1 operations beyond in-memory test doubles, no new GitHub update performed through the issuer.
+- **Hierarchical progress stays at** A 100% (Δ0), B 50% (Δ0), C 0% (Δ0), D 50% (Δ0), global **8/16 = 50% (Δ0)**. Activity `LAB code WebAuthn capability + synthetic integration` 100% (new focused task), but live registered-owner issuer and chat transport are not connected for the new capability.
+
+### Remaining gates
+
+- New exact-head GitHub Actions run with real Node 22 + full regression + Miniflare/workerd smoke must be verified. Old green #23 is not enough.
+- Deploy/route changes, live owner passkey challenge, real D1 and GitHub mutation by new issuer remain separately permission-gated. Do not treat synthetic P-256 key or code-only HMAC issuance as verified owner passkey.
+- Preserve old operation `pacman-webauthn-lab-20261017-ff59959a-01`: completed historically, **never replay**.
+
 ## Next authoritative gates
 1. Obtain the final GitHub Actions Node 22 full-suite + workerd run/result for the new branch; fix any failures solely on this LAB. Connector only returns commit statuses and PR-triggered workflow runs, so its empty result is not proof of failed or passed CI.
 2. Execute an independently verified approval flow with the new capability, using a genuine host-issued signed approval; do not treat mock verifier / chat text as cryptographic authorization.
@@ -122,4 +149,4 @@ Autorizzazione utente successiva al rapporto preventivo: solo nuova fase 2 in qu
 4. Later expand to PR lifecycle and Cloudflare staging deployment through separate narrowly authorized review.
 5. On recovery use this checkpoint and do not repeat the completed 2026-10-17 historical WebAuthn file-cycle.
 
-State: PHASE2_SIGNED_CHAT_CODE_COMMITTED; PHASE1_GITHUB_CONNECTOR_WRITE_AND_HTTP409_VERIFIED; PHASE1_SIMULATED_TESTS_25_OF_25; PHASE2_SIMULATED_TESTS_16_OF_16; TOTAL_SIMULATED_41_OF_41; NODE_22_REAL_WEBCRYPTO_LOCAL_22_OF_22; GITHUB_ACTIONS_WORKFLOW_23_GREEN_ON_EXACT_HEAD_USER_SCREENSHOT; CI_PER_JOB_LOGS_NOT_RETRIEVED; LIVE_CRYPTO_ISSUER_NOT_CONNECTED; NO_NEW_WORKER_DEPLOYMENT; OVERALL_8_OF_16_50_PERCENT.
+State: WEB_AUTHN_CONTROLLED_CAPABILITY_LAB_CODE_WRITTEN; WEB_AUTHN_SCOPE_SIMULATION_7_OF_7; NEW_NODE22_REAL_CRYPTO_TESTS_12_DEFINED_CI_PENDING; LEGACY_APPROVAL_RETAINED; DB_SCHEMA_UNCHANGED; PREVIOUS_WORKFLOW_23_GREEN_ON_OLD_HEAD_ONLY; NEW_HEAD_CI_UNVERIFIED; LIVE_OWNER_ISSUER_NOT_CONNECTED; CLOUD_DEPLOY_NOT_AUTHORIZED; NO_PRODUCTION_OR_MAIN_CHANGE; OVERALL_8_OF_16_50_PERCENT.
