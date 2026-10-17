@@ -187,7 +187,7 @@ test("owner approval/start stores full controlled update digest, without enablin
   branch:"motorlab/pacman-real-operations-lab-20261017",
   path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
   expectedSha:"a".repeat(40),contentSha256:hash};
- const r=await handleWebAuthnOwnerLab(req("/webauthn/approval/start",{intent,content}),env(d),
+ const r=await handleWebAuthnOwnerLab(req("/webauthn/approval/start",{intent,content}),env(d,{PACMAN_CONTROLLED_UPDATE_ENABLED:"YES_REVIEWED_STAGING_CONTROLLED_UPDATE"}),
   {cryptoImpl:webcrypto,nowMs:1780000000000});
  assert.equal(r.status,200);
  assert.equal((await r.json()).status,"APPROVAL_CHALLENGE_READY");
@@ -209,7 +209,7 @@ test("owner approval/start refuses changed content or protected branch without c
    [{...base,branch:"motorlab/pacman-execution-v2-lab-20261014"},content]]){
   const d=db({owner:ownerRow});
   const r=await handleWebAuthnOwnerLab(req("/webauthn/approval/start",{intent,content:body}),
-   env(d),{cryptoImpl:webcrypto,nowMs:1780000000000});
+   env(d,{PACMAN_CONTROLLED_UPDATE_ENABLED:"YES_REVIEWED_STAGING_CONTROLLED_UPDATE"}),{cryptoImpl:webcrypto,nowMs:1780000000000});
   assert.equal(r.status,403);
   assert.equal(d.challenges.size,0);
  }
@@ -240,9 +240,36 @@ test("controlled owner portal forwards only its server-side enable flag, false b
     branch:intent.branch,path:intent.path
    }}
   });
-  assert.equal(out.status,200);
-  assert.equal(called,1);
-  assert.equal(seen.controlledEnabled,enabled);
-  assert.deepEqual(seen.intent,intent);
+  if(!enabled){
+   assert.equal(out.status,503);
+   assert.equal((await out.json()).error,"WEBAUTHN_CONTROLLED_UPDATE_DISABLED");
+   assert.equal(called,0);
+  }else{
+   assert.equal(out.status,200);
+   assert.equal(called,1);
+   assert.equal(seen.controlledEnabled,true);
+   assert.deepEqual(seen.intent,intent);
+  }
  }
+});
+
+
+test("controlled owner start/execute/finish fail closed before D1 and relay when flag is absent",async()=>{
+ const content="# owner off\n";
+ const hash=Buffer.from(await webcrypto.subtle.digest("SHA-256",new TextEncoder().encode(content))).toString("hex");
+ const intent={capability:"github.lab-file-update",operationId:"controlled-owner-off-0001",
+  branch:"motorlab/pacman-real-operations-lab-20261017",
+  path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
+  expectedSha:"a".repeat(40),contentSha256:hash};
+ let reads=0,executes=0;
+ const e=env({prepare(){reads++;throw Error("NO_D1_ALLOWED");}},
+  {PACMAN_EXECUTION_KEY:"k".repeat(48),
+   PACMAN_EXECUTION_URL:"https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev"});
+ for(const route of ["/webauthn/approval/start","/webauthn/approval/execute","/webauthn/approval/finish"]){
+  const response=await handleWebAuthnOwnerLab(req(route,{intent,content}),e,{
+   cryptoImpl:webcrypto,executeImpl:async()=>{executes++;throw Error("NO_EXECUTE_ALLOWED");}});
+  assert.equal(response.status,503);
+  assert.equal((await response.json()).error,"WEBAUTHN_CONTROLLED_UPDATE_DISABLED");
+ }
+ assert.equal(reads,0);assert.equal(executes,0);
 });
