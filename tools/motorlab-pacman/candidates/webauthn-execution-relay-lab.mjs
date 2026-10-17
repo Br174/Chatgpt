@@ -21,7 +21,7 @@ export async function executePacmanWithWebAuthnLab({
 
  if(intent?.capability!=="github.lab-file-cycle"||
     intent?.branch!=="motorlab/pacman-execution-v2-lab-20261014"||
-    intent?.path!=="tools/motorlab-pacman/probe-integration.txt")
+    intent?.path!=="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt")
   fail("WEBAUTHN_EXECUTION_SCOPE_DENIED");
 
  const issued=await issueApproval({

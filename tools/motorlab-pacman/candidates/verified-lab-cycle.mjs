@@ -2,7 +2,7 @@
 // Caller MUST verify a real host-authenticated approval and atomically consume it before invoking this helper.
 export async function verifiedLabCycle({adapter,branch,path,content,onCheckpoint}={}) {
  const LAB="motorlab/pacman-execution-v2-lab-20261014";
- const PROBE="tools/motorlab-pacman/probe-integration.txt";
+ const PROBE="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
  if(branch!==LAB||path!==PROBE)throw Error("LAB_SCOPE_REQUIRED");
  if(typeof content!=="string"||content.length===0||new TextEncoder().encode(content).length>4096)throw Error("INVALID_CONTENT");
  if(!adapter||["read","create","remove"].some(k=>typeof adapter[k]!=="function"))throw Error("ADAPTER_REQUIRED");

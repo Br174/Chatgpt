@@ -1,7 +1,7 @@
 // Approval intent for chat-controlled Pacman LAB actions.
 // This is an authorization scope validator, not an OAuth or provider credential.
 export const LAB_BRANCH="motorlab/pacman-execution-v2-lab-20261014";
-export const LAB_PROBE="tools/motorlab-pacman/probe-integration.txt";
+export const LAB_PROBE="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 export function validateChatApproval(intent, approval) {
  if(!intent || intent.capability!=="github.lab-file-cycle" ||
     intent.branch!==LAB_BRANCH || intent.path!==LAB_PROBE ||

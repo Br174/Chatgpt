@@ -10,7 +10,7 @@ import {makeD1Checkpoint} from "./staging-checkpoint-d1.mjs";
 export async function approvedVerifiedLabCycle({intent,approval,attestation,secret,db,content,token,fetchImpl,onCheckpoint,now}={}){
  if(typeof onCheckpoint!=="function")throw Error("CHECKPOINT_REQUIRED");
  // Validate all local scope/content constraints before claiming the single-use approval.
- if(intent?.branch!=="motorlab/pacman-execution-v2-lab-20261014" || intent?.path!=="tools/motorlab-pacman/probe-integration.txt" || intent?.capability!=="github.lab-file-cycle")throw Error("LAB_SCOPE_REQUIRED");
+ if(intent?.branch!=="motorlab/pacman-execution-v2-lab-20261014" || intent?.path!=="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt" || intent?.capability!=="github.lab-file-cycle")throw Error("LAB_SCOPE_REQUIRED");
  if(typeof content!=="string" || content.length===0 || new TextEncoder().encode(content).length>4096)throw Error("INVALID_CONTENT");
  // Do not consume a one-time approval if the fixed LAB probe already exists.
  // Read failure is ambiguous and must fail closed; no GitHub mutation occurs.

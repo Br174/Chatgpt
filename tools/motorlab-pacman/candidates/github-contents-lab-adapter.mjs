@@ -1,7 +1,7 @@
 // Candidate-only GitHub Contents adapter. No network calls on import.
 // Use only after an independently verified and consumed trusted approval.
 const LAB="motorlab/pacman-execution-v2-lab-20261014";
-const PATH="tools/motorlab-pacman/probe-integration.txt";
+const PATH="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const URL="https://api.github.com/repos/Br174/Chatgpt/contents/"+PATH;
 const validSha=x=>typeof x==="string"&&/^[a-f0-9]{40}$/.test(x);
 const encode=s=>{const a=new TextEncoder().encode(s);let out="";const abc="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";for(let i=0;i<a.length;i+=3){const x=a[i],y=a[i+1],z=a[i+2];out+=abc[x>>2]+abc[((x&3)<<4)|((y??0)>>4)]+(i+1<a.length?abc[((y&15)<<2)|((z??0)>>6)]:"=")+(i+2<a.length?abc[z&63]:"=");}return out;};

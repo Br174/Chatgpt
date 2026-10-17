@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {approvedVerifiedLabCycle,approvedVerifiedLabCycleWithD1} from "./approved-verified-lab-cycle.mjs";
 import {signApprovalInTrustedHost} from "../approval-attestation.mjs";
-const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-integration.txt";
+const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const sha="a".repeat(40),commit="b".repeat(40),secret="s".repeat(48),token="t".repeat(24),content="probe";
 const response=(status,body)=>({status,ok:status>=200&&status<300,json:async()=>body});
 async function fixture(operationId){const intent={operationId,capability:"github.lab-file-cycle",branch,path};const approval={...intent,decision:"authorize"};const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content});return {intent,approval,attestation};}
@@ -107,4 +107,13 @@ test("existing LAB probe refuses before claiming one-time approval",async()=>{
  const fetchImpl=async(_url,init)=>{assert.equal(init.method,"GET");return response(200,{type:"file",sha,encoding:"base64",content:"cHJvYmU="});};
  await assert.rejects(approvedVerifiedLabCycle({...f,secret,db,content,token,fetchImpl,onCheckpoint:async()=>{}}),/LAB_PROBE_PRECONDITION_NOT_MET/);
  assert.equal(claims,0);
+});
+
+test("occupied old LAB probe cannot be approved for the new WebAuthn cycle",async()=>{
+ const f=await fixture("old-probe-refused-20261017");let calls=0;
+ await assert.rejects(approvedVerifiedLabCycle({...f,intent:{...f.intent,path:"tools/motorlab-pacman/probe-integration.txt"},
+  approval:{...f.approval,path:"tools/motorlab-pacman/probe-integration.txt"},secret,db:ledger(),content,token,
+  fetchImpl:async()=>{calls++;throw Error("old path must not be touched");},
+  onCheckpoint:async()=>{}}),/LAB_SCOPE_REQUIRED/);
+ assert.equal(calls,0);
 });

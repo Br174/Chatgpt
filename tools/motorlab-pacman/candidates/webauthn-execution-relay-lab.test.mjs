@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {executePacmanWithWebAuthnLab} from "./webauthn-execution-relay-lab.mjs";
 
 const branch="motorlab/pacman-execution-v2-lab-20261014";
-const path="tools/motorlab-pacman/probe-integration.txt";
+const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const intent={operationId:"pacman-webauthn-relay-001",capability:"github.lab-file-cycle",branch,path};
 const secret="s".repeat(48),executionKey="k".repeat(48);
 const executionUrl="https://motorlab-pacman-execution-staging-lab.example.workers.dev";
@@ -73,4 +73,13 @@ test("relay requires exact HTTPS origin and strong executor key",async()=>{
   await assert.rejects(executePacmanWithWebAuthnLab({intent,content:"probe",executionUrl:bad,executionKey,issueApproval}),/WEBAUTHN_EXECUTOR_NOT_CONFIGURED/);
  }
  await assert.rejects(executePacmanWithWebAuthnLab({intent,content:"probe",executionUrl,executionKey:"short",issueApproval}),/WEBAUTHN_EXECUTOR_NOT_CONFIGURED/);
+});
+
+test("previous occupied probe rejected before biometric issuance or executor call",async()=>{
+ let issued=0,called=0;
+ await assert.rejects(executePacmanWithWebAuthnLab({intent:{...intent,path:"tools/motorlab-pacman/probe-integration.txt"},
+  content:"probe",executionUrl,executionKey,
+  issueApproval:async()=>{issued++;},
+  fetchImpl:async()=>{called++;}}),/WEBAUTHN_EXECUTION_SCOPE_DENIED/);
+ assert.equal(issued,0);assert.equal(called,0);
 });
