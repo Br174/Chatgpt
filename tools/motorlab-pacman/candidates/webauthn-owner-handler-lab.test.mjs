@@ -214,3 +214,35 @@ test("owner approval/start refuses changed content or protected branch without c
   assert.equal(d.challenges.size,0);
  }
 });
+
+
+test("controlled owner portal forwards only its server-side enable flag, false by default",async()=>{
+ const content="# owner portal gated update\n";
+ const contentSha256=Buffer.from(await webcrypto.subtle.digest("SHA-256",
+  new TextEncoder().encode(content))).toString("hex");
+ const intent={capability:"github.lab-file-update",operationId:"controlled-owner-flag-0001",
+  branch:"motorlab/pacman-real-operations-lab-20261017",
+  path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
+  expectedSha:"a".repeat(40),contentSha256};
+ const assertion={id:ownerRow.credential_id,type:"public-key",response:{}};
+ const payload={intent,content,challenge:"n".repeat(43),assertion};
+ for(const enabled of [false,true]){
+  let called=0,seen;
+  const e=env(db({owner:ownerRow}),{
+   PACMAN_EXECUTION_URL:"https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev",
+   PACMAN_EXECUTION_KEY:"k".repeat(48),
+   ...(enabled?{PACMAN_CONTROLLED_UPDATE_ENABLED:"YES_REVIEWED_STAGING_CONTROLLED_UPDATE"}:{})
+  });
+  const out=await handleWebAuthnOwnerLab(req("/webauthn/approval/execute",payload),e,{
+   cryptoImpl:webcrypto,
+   executeImpl:async args=>{called++;seen=args;return {
+    status:"PACMAN_OPERATION_VERIFIED",operationId:intent.operationId,
+    branch:intent.branch,path:intent.path
+   }}
+  });
+  assert.equal(out.status,200);
+  assert.equal(called,1);
+  assert.equal(seen.controlledEnabled,enabled);
+  assert.deepEqual(seen.intent,intent);
+ }
+});
