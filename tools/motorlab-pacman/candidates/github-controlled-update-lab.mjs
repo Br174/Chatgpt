@@ -26,7 +26,7 @@ const digest=async content=>{
  return Array.from(hash,x=>x.toString(16).padStart(2,"0")).join("");
 };
 export async function runGithubControlledFileUpdate({
- operationId,branch,path,expectedSha,content,adapter,ledger,onCheckpoint,verifyApproval
+ operationId,branch,path,expectedSha,content,adapter,ledger,onCheckpoint,verifyApproval,onBeforeClaim
 }={}){
  if(!OP.test(operationId||""))fail("INVALID_OPERATION_ID");
  if(branch!==CONTROLLED_LAB_BRANCH)fail("CONTROLLED_LAB_BRANCH_REQUIRED");
@@ -55,6 +55,13 @@ export async function runGithubControlledFileUpdate({
  if(before?.exists!==true||before.sha!==expectedSha||typeof before.content!=="string")
     fail("PRECONDITION_SHA_MISMATCH");
  if(before.content===content)fail("NO_CHANGE_REQUESTED");
+ // Optional signed-approval nonce gate used by the new trusted chat route.
+ // It runs only AFTER read-only preflight and BEFORE an operation is claimed/written.
+ if(onBeforeClaim!==undefined){
+  if(typeof onBeforeClaim!=="function")fail("APPROVAL_NONCE_CLAIM_REQUIRED");
+  try{await onBeforeClaim(attested);}
+  catch{fail("APPROVAL_NONCE_ALREADY_USED_OR_UNVERIFIED");}
+ }
  await claimOperation(ledger,operationId,{operationId,branch,path,state:"CLAIMED"});
  const record=(state,extra={})=>({schema:1,operationId,branch,path,expectedSha,contentSha256,state,...extra});
  try{
