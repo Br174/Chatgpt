@@ -44,13 +44,32 @@ Obiettivo complessivo: richiesta in chat -> autorizzazione verificata -> operazi
 | Fase | Gate verificati | Percentuale fase | Evidenza verificata | Gate ancora aperti |
 | --- | ---: | ---: | --- | --- |
 | A. Operazioni GitHub su nuovo LAB | 3/4 | 75% | Ramo isolato e codice; PUT+GET reale con SHA; test di sicurezza isolati | CI Node 22 completa e runtime workerd |
-| B. Richiesta chat e autorizzazione | 1/4 | 25% | Metodo del coordinatore esistente implementato e simulato | issuer reale firmato per nuova capacità; trasporto chat attivo; conferma owner per nuova operazione |
+| B. Richiesta chat e autorizzazione | 2/4 | 50% | Coordinatore esistente; validatore intenti; verifier HMAC scoped + nonce claim implementati e 16 test nuovi isolati | issuer WebAuthn autenticato realmente collegato alla nuova capacità; richiesta dalla chat live effettivamente eseguita |
 | C. Nuova capacità su Cloudflare staging | 0/4 | 0% | Nessun deploy nuovo, risorse storiche NON equivalgono alla nuova capacità | integrazione handler; protezioni deploy; staging deploy autorizzato; readback verificato |
 | D. Recupero e prova completa | 2/4 | 50% | Codice di riconciliazione read-only; test isolati anti-replay/race/timeout | prova runtime workerd della nuova capacità; ciclo reale completo e ricevuta indipendente |
 
-**Totale nuovo obiettivo Pac-Man: 6/16 = 37,5%.** La fase corrente A è al 75%; attività corrente «due test di concorrenza e recupero» completata al 100% in ambiente isolato. Dal checkpoint precedente: 23 -> 25 test isolati (+2), gate complessivi invariati (+0 punti percentuali). Queste cifre non riducono il 100% del vecchio collaudo WebAuthn/Execution limitato al singolo percorso storico, già completato.
+**Totale nuovo obiettivo Pac-Man: 7/16 = 43,75% (+6,25 punti).** Fase corrente B = 50% (+25 punti); attività corrente «codice chat firmata + test isolati» = 100% (+100 punti). Fase A = 75% (Δ 0), C = 0% (Δ 0), D = 50% (Δ 0). Il test isolato è passato da 25/25 a 41/41 (25 fase 1 + 16 fase 2): questo aggiunge 1 gate B, NON prova un issuer WebAuthn connesso. Queste cifre non riducono il 100% del vecchio collaudo WebAuthn/Execution limitato al singolo percorso storico, già completato.
 
 Percentuali per fase/attività e globale sono distinte. R37 CORE e integrazione in MADRE già consolidati; il 37,5% misura **esclusivamente** l'estensione Real Operations, non la versione MotorLab nel suo insieme né la disponibilità runtime di un MCP per ChatGPT.
+
+## Fase 2 LAB autorizzata — intenti firmati, approvazioni e nonce
+
+Autorizzazione utente successiva al rapporto preventivo: solo nuova fase 2 in questo ramo LAB, nessun Worker/deploy, nessuna mutazione a main/MADRE, produzione, vecchio LAB, D1 o segreti, costo €0.
+
+**Implementato:**
+- `chat-approval.mjs`: `validateControlledChatIntent` verifica forma esatta e scope `github.lab-file-update`, repository implicitamente bloccato dall'adattatore, solo ramo nuovo LAB e file nel sottoalbero `lab-workspace`, SHA iniziale e impronta SHA-256 del contenuto. Respinge campi imprevisti inclusi token o `approved:true`.
+- `approval-attestation.mjs`: `verifyControlledApprovalAttestation` controlla un'attestazione HMAC-SHA256 già firmata da un host attendibile, vincolata a dominio `MOTORLAB:PACMAN:CONTROLLED_UPDATE:V1`, repository `Br174/Chatgpt`, capability, operation ID, ramo, percorso, SHA iniziale, SHA-256 contenuto, soggetto proprietario atteso, nonce, issuedAt, expiresAt e decisione `authorize`. Validità massima 120 secondi. **Nessuna funzione di emissione fidata è stata connessa o dichiarata operativa.**
+- `chat-coordinator.mjs`: aggiunta `executeSignedControlledRequest` al coordinatore unico preesistente; il verificatore riceve segreto e identità solo dalla factory dell'host, non dalla richiesta chat. Un'attestazione mancante/errata è respinta prima del GET e non autorizza nulla. Nessun nuovo HTTP endpoint.
+- `github-controlled-update-lab.mjs`: aggiunto hook facoltativo `onBeforeClaim` che può consumare il nonce tramite lo **stesso** registro durevole/atomico, dopo il preflight read-only e prima di qualsiasi tentativo di scrittura. La nuova route lo richiede; il percorso storico rimane compatibile. Duplicato o ledger non verificato = stop senza PUT.
+- `candidates/chat-signed-controlled-lab.test.mjs`: 16 test positivi/negativi nuovi. I cinque test inizialmente non allineati ai codici d'errore pubblici sono stati corretti per rispettare il comportamento fail-closed del coordinatore. Il verificatore interno mantiene codici distinti per diagnostica protetta.
+
+**Verificato senza provider reali (test di simulazione, NON test WebCrypto ufficiali):**
+- Test delle sorgenti GitHub effettive, interpretate in sandbox V8 con shim **non crittografici**: fase 2 **16/16**, regressione fase 1 **25/25**, totale **41/41**.
+- Casi coperti: firma manomessa, approvazione in JSON, proprietario errato, branch main e vecchio LAB, path traversal, contenuto/SHA alterati, scadenza, nonce duplicate con operationId diverso, 20 operazioni concorrenti, checkpoint fallito, integrità della vecchia route.
+- Il workflow di GitHub Actions per il LAB include automaticamente questi test con `candidates/*.test.mjs`, insieme a CORE/regressione/workerd, ma la sua esecuzione Node 22 reale NON è ancora verificata con gli strumenti disponibili.
+- **Esecuzione firmata live**: NON VERIFICATA; approvazione autentica di proprietario/passkey per `github.lab-file-update`: NON CONNESSA; nessun segreto creato/letto o modificato; nessun deploy/endpoint nuovo.
+
+**Prossimo confine:** verificare l'esito Node 22 con crittografia reale. Integrare e collaudare un issuer owner/WebAuthn per questa nuova capacità richiederà successivo rapporto di sicurezza e autorizzazione separata se implica operazioni sui provider.
 
 ## Ultimo checkpoint operativo
 
@@ -69,4 +88,4 @@ Percentuali per fase/attività e globale sono distinte. R37 CORE e integrazione 
 4. Later expand to PR lifecycle and Cloudflare staging deployment through separate narrowly authorized review.
 5. On recovery use this checkpoint and do not repeat the completed 2026-10-17 historical WebAuthn file-cycle.
 
-State: CODE_COMMITTED; CONTROLLED_GITHUB_CONNECTOR_WRITE_VERIFIED; NEGATIVE_STALE_SHA_HTTP409_VERIFIED; SIMULATED_EXACT_TEST_CASES_25_OF_25; READONLY_RECOVERY_ADDED_NOT_DEPLOYED; NODE_CI_UNVERIFIED; WORKER_NEW_CAPABILITY_NOT_DEPLOYED.
+State: PHASE2_SIGNED_CHAT_CODE_COMMITTED; PHASE1_GITHUB_CONNECTOR_WRITE_AND_HTTP409_VERIFIED; PHASE1_SIMULATED_TESTS_25_OF_25; PHASE2_SIMULATED_TESTS_16_OF_16; TOTAL_SIMULATED_41_OF_41; LIVE_CRYPTO_ISSUER_NOT_CONNECTED; NODE_CI_UNVERIFIED; NO_NEW_WORKER_DEPLOYMENT; OVERALL_7_OF_16_43.75_PERCENT.
