@@ -4,6 +4,7 @@
   "main": "./worker.mjs",
   "compatibility_date": "2026-10-16",
   "workers_dev": true,
+  "services": [{"binding": "PACMAN_EXECUTION_SERVICE", "service": "motorlab-pacman-execution-staging-lab"}],
   "d1_databases": [
     {
       "binding": "DB",

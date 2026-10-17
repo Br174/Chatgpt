@@ -51,6 +51,9 @@ jobs:
           const account='b86f445c2b57e604c02f79c8da64bb9c',name='motorlab-pacman-webauthn-staging-lab';
           const conf=JSON.parse(fs.readFileSync('tools/motorlab-pacman/webauthn/wrangler.pacman-webauthn-staging.jsonc','utf8'));
           if(conf.name!==name||conf.main!=='./worker.mjs'||conf.workers_dev!==true||
+             conf.services?.length!==1||
+             conf.services[0].binding!=='PACMAN_EXECUTION_SERVICE'||
+             conf.services[0].service!=='motorlab-pacman-execution-staging-lab'||
              conf.d1_databases?.length!==1||conf.d1_databases[0].binding!=='DB'||
              conf.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
             throw Error('HOTFIX_SCOPE_MISMATCH');
@@ -101,6 +104,7 @@ jobs:
           const secrets=['PACMAN_WEBAUTHN_ENABLED','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN',
             'PACMAN_EXECUTION_KEY','PACMAN_EXECUTION_URL','PACMAN_WEBAUTHN_ORIGIN','PACMAN_WEBAUTHN_RP_ID'];
           if(secrets.some(n=>!b.some(x=>x.name===n&&x.type==='secret_text'))||
+             !b.some(x=>x.name==='PACMAN_EXECUTION_SERVICE'&&x.type==='service'&&x.service==='motorlab-pacman-execution-staging-lab')||
              !b.some(x=>x.name==='DB'&&x.type==='d1'&&x.id==='eb834fc1-5589-4f75-bcb9-d311d0d72261'))
            throw Error('HOTFIX_BINDING_REGRESSION');
           let ok=false;
@@ -151,4 +155,35 @@ jobs:
           if(report.authManualHttp!==200&&report.publicManualHttp!==200&&
              !(report.publicFollowHttp===200&&report.publicFollowHost==='api.github.com'))
             throw Error('GITHUB_BOOTSTRAP_OUTBOUND_UNAVAILABLE');
+          NODE
+      - name: Verify service binding and interrupted operation without mutations
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          const key=process.env.EXECUTION_KEY;
+          if(typeof key!=='string'||key.length<32)throw Error('INTERNAL_DIAGNOSTIC_KEY_MISSING');
+          const origin='https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev';
+          for(const [path,component] of [
+           ['/__motorlab_lab/diagnostics/execution-binding','pacmanExecutionInternalBinding'],
+           ['/__motorlab_lab/diagnostics/approval-recovery','pacmanLABApprovalRecoveryReadOnly']
+          ]){
+           const r=await fetch(origin+path,{headers:{authorization:'Bearer '+key},method:'GET',redirect:'error',signal:AbortSignal.timeout(15000)});
+           let data;try{data=await r.json();}catch{throw Error('PACMAN_READONLY_DIAGNOSTIC_INVALID');}
+           if(r.status!==200||data.component!==component)throw Error('PACMAN_READONLY_DIAGNOSTIC_FAILED_'+component);
+           if(component==='pacmanExecutionInternalBinding'){
+            if(data.connected!==true||data.transport!=='SERVICE_BINDING_STAGING'||
+               data.revision!=='pacman-v2-webauthn-relay-20261016')throw Error('SERVICE_BINDING_NOT_VERIFIED');
+            console.log('PACMAN_INTERNAL_STAGING_BINDING_CONNECTED');
+           }else{
+            if(data.operationId!=='pacman-webauthn-lab-20261017-ff59959a-01'||
+               !Number.isInteger(data.challengeCount)||!Number.isInteger(data.consumedCount)||
+               typeof data.claimPresent!=='boolean')throw Error('RECOVERY_READBACK_INVALID');
+            console.log('PACMAN_PREVIOUS_OPERATION_STATE_'+data.checkpointState+
+              '_CLAIM_'+data.claimPresent+'_CHALLENGES_'+data.challengeCount+
+              '_CONSUMED_'+data.consumedCount);
+            if(data.checkpointState!=='NONE'&&data.checkpointState!=='VERIFIED_AND_REMOVED')
+              throw Error('PACMAN_PREVIOUS_OPERATION_NEEDS_RECOVERY');
+           }
+          }
           NODE

@@ -79,6 +79,43 @@ export async function handleWebAuthnRequest(request,env,{
 }={}){
  try{
   const url=new URL(request.url),cfg=config(env);
+  // Protected read-only checkpoint recovery for the single interrupted LAB operation.
+  if(url.pathname==="/__motorlab_lab/diagnostics/approval-recovery"){
+   if(request.method!=="GET")return reply({error:"NOT_FOUND"},404);
+   if(!exactBearer(request,env?.PACMAN_EXECUTION_KEY))return reply({error:"UNAUTHORIZED"},401);
+   if(!cfg)return reply({error:"STAGING_D1_NOT_CONFIGURED"},503);
+   const op="pacman-webauthn-lab-20261017-ff59959a-01";
+   try{
+    const [checkpoint,claim,challenge]=await Promise.all([
+     cfg.db.prepare("SELECT state FROM pacman_cycle_checkpoints WHERE operation_id=? LIMIT 1").bind(op).first(),
+     cfg.db.prepare("SELECT operation_id FROM pacman_approval_claims WHERE operation_id=? LIMIT 1").bind(op).first(),
+     cfg.db.prepare("SELECT COUNT(*) AS total,COUNT(consumed_at) AS consumed FROM pacman_webauthn_challenges WHERE operation_id=?").bind(op).first()
+    ]);
+    const state=checkpoint?.state??"NONE";
+    if(!new Set(["NONE","PREPARED","WRITE_ATTEMPTED","CLEANUP_ATTEMPTED","VERIFIED_AND_REMOVED","RECOVERY_REQUIRED"]).has(state))
+      return reply({error:"CHECKPOINT_STATE_UNEXPECTED"},503);
+    return reply({component:"pacmanLABApprovalRecoveryReadOnly",operationId:op,checkpointState:state,
+      claimPresent:!!claim,challengeCount:Number(challenge?.total??0),consumedCount:Number(challenge?.consumed??0)});
+   }catch{return reply({error:"D1_RECOVERY_AUDIT_UNAVAILABLE"},503);}
+  }
+  // Prove the private transport using a harmless GET; never call /execute from this diagnostic.
+  if(url.pathname==="/__motorlab_lab/diagnostics/execution-binding"){
+   if(request.method!=="GET")return reply({error:"NOT_FOUND"},404);
+   if(!exactBearer(request,env?.PACMAN_EXECUTION_KEY))return reply({error:"UNAUTHORIZED"},401);
+   if(!cfg||typeof env?.PACMAN_EXECUTION_SERVICE?.fetch!=="function")
+    return reply({error:"EXECUTION_SERVICE_BINDING_MISSING"},503);
+   let health;
+   try{
+    const r=await env.PACMAN_EXECUTION_SERVICE.fetch("https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev/health",{method:"GET",redirect:"error"});
+    if(r.status!==200)return reply({error:"EXECUTION_SERVICE_HEALTH_REJECTED"},503);
+    health=await r.json();
+   }catch{return reply({error:"EXECUTION_SERVICE_UNREACHABLE"},503);}
+   if(health?.service!=="pacman-execution-staging"||health?.database!=="CONNECTED"||
+      health?.revision!=="pacman-v2-webauthn-relay-20261016")
+     return reply({error:"EXECUTION_SERVICE_IDENTITY_MISMATCH"},503);
+   return reply({component:"pacmanExecutionInternalBinding",connected:true,
+    revision:health.revision,transport:"SERVICE_BINDING_STAGING"});
+  }
   // Guarded diagnostic: fixed public issue and HTTP status codes only, no data or credentials returned.
   if(url.pathname==="/__motorlab_lab/diagnostics/github-bootstrap"){
    if(request.method!=="GET")return reply({error:"NOT_FOUND"},404);

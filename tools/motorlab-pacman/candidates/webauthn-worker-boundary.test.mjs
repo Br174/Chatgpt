@@ -204,3 +204,46 @@ test("diagnostic errors remain secret-free even if outbound requests fail",async
  assert.equal(calls[4].auth,undefined);assert.equal(calls[4].redirect,"follow");
  assert.ok(!JSON.stringify(body).includes(key));assert.ok(!JSON.stringify(body).includes("SECRET_SHOULD_NOT_LEAK"));
 });
+
+test("internal staging binding diagnostic is protected, read-only and cannot fall back to public transport",async()=>{
+ const key="k".repeat(48),env={...baseEnv,DB:db(),PACMAN_EXECUTION_KEY:key};
+ const url=endpoint+"/__motorlab_lab/diagnostics/execution-binding";
+ let external=0,calls=0;
+ const denied=await handleWebAuthnRequest(new Request(url),env,{fetchImpl:async()=>{external++;}});
+ assert.equal(denied.status,401);
+ const request=new Request(url,{headers:{authorization:"Bearer "+key}});
+ const missing=await handleWebAuthnRequest(request,env,{fetchImpl:async()=>{external++;}});
+ assert.equal(missing.status,503);assert.equal((await missing.json()).error,"EXECUTION_SERVICE_BINDING_MISSING");
+ const service={fetch:async(u,init)=>{
+  calls++;assert.equal(u,"https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev/health");assert.equal(init.method,"GET");
+  return Response.json({service:"pacman-execution-staging",revision:"pacman-v2-webauthn-relay-20261016",database:"CONNECTED"});
+ }};
+ const good=await handleWebAuthnRequest(request,{...env,PACMAN_EXECUTION_SERVICE:service},{fetchImpl:async()=>{external++;}});
+ assert.equal(good.status,200);assert.equal((await good.json()).transport,"SERVICE_BINDING_STAGING");
+ assert.equal(calls,1);assert.equal(external,0);
+ const impostor=await handleWebAuthnRequest(request,{...env,PACMAN_EXECUTION_SERVICE:{fetch:async()=>Response.json({service:"wrong",database:"CONNECTED"})}},{});
+ assert.equal(impostor.status,503);assert.equal((await impostor.json()).error,"EXECUTION_SERVICE_IDENTITY_MISMATCH");
+});
+test("read-only recovery diagnostic returns bounded checkpoint/claim/challenge state, never secrets",async()=>{
+ const key="k".repeat(48),queries=[];
+ const DB={prepare(sql){
+  queries.push(sql);
+  return {bind:(op)=>({first:async()=>{
+   assert.equal(op,"pacman-webauthn-lab-20261017-ff59959a-01");
+   if(sql.startsWith("SELECT state"))return null;
+   if(sql.startsWith("SELECT operation_id"))return null;
+   if(sql.startsWith("SELECT COUNT"))return {total:1,consumed:1};
+   throw Error("READ_ONLY_SQL_UNEXPECTED");
+  }})};
+ }};
+ const uri=endpoint+"/__motorlab_lab/diagnostics/approval-recovery";
+ const no=await handleWebAuthnRequest(new Request(uri),{...baseEnv,DB,PACMAN_EXECUTION_KEY:key});
+ assert.equal(no.status,401);assert.equal(queries.length,0);
+ const yes=await handleWebAuthnRequest(new Request(uri,{headers:{authorization:"Bearer "+key}}),{...baseEnv,DB,PACMAN_EXECUTION_KEY:key});
+ assert.equal(yes.status,200);const result=await yes.json();
+ assert.equal(result.component,"pacmanLABApprovalRecoveryReadOnly");
+ assert.equal(result.checkpointState,"NONE");assert.equal(result.claimPresent,false);
+ assert.equal(result.challengeCount,1);assert.equal(result.consumedCount,1);
+ assert.equal(queries.length,3);assert.ok(queries.every(q=>q.startsWith("SELECT ")));
+ assert.equal(JSON.stringify(result).includes(key),false);
+});
