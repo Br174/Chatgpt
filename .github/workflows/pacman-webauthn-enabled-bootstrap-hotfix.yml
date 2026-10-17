@@ -1,4 +1,5 @@
 name: Pac-Man WebAuthn public bootstrap hotfix (enabled LAB)
+# Canonical WebAuthn LAB cycle probe: tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt
 # 2026-10-17 LAB: fixed-endpoint GitHub bootstrap GET uses manual redirect and rejects 3xx.
 # Targeted diagnostic regression: mock unauthenticated request and redirect mode accurately.
 on:
