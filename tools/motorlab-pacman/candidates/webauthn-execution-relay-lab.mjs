@@ -3,6 +3,7 @@
 import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.mjs";
 
 const fail=code=>{throw Error(code);};
+const EXECUTOR_ORIGIN="https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev";
 function exactHttpsOrigin(value){
  if(typeof value!=="string")return null;
  let u;try{u=new URL(value);}catch{return null;}
@@ -12,12 +13,14 @@ function exactHttpsOrigin(value){
 
 export async function executePacmanWithWebAuthnLab({
  db,intent,content,challenge,credentialId,assertion,signingSecret,
- executionUrl,executionKey,fetchImpl=fetch,cryptoImpl=globalThis.crypto,nowMs=Date.now(),
+ executionUrl,executionKey,executionService,cryptoImpl=globalThis.crypto,nowMs=Date.now(),
  issueApproval=issuePacmanApprovalFromWebAuthnLab
 }={}){
  const base=exactHttpsOrigin(executionUrl);
- if(!base||typeof executionKey!=="string"||executionKey.length<32||typeof fetchImpl!=="function")
+ if(base!==EXECUTOR_ORIGIN||typeof executionKey!=="string"||executionKey.length<32)
   fail("WEBAUTHN_EXECUTOR_NOT_CONFIGURED");
+ // No public Worker-to-Worker transport fallback. Refuse before signing if the binding is absent.
+ if(typeof executionService?.fetch!=="function")fail("WEBAUTHN_EXECUTOR_BINDING_UNAVAILABLE");
 
  if(intent?.capability!=="github.lab-file-cycle"||
     intent?.branch!=="motorlab/pacman-execution-v2-lab-20261014"||
@@ -39,7 +42,7 @@ export async function executePacmanWithWebAuthnLab({
  };
  let response;
  try{
-  response=await fetchImpl(base+"/execute",{
+  response=await executionService.fetch(base+"/execute",{
    method:"POST",redirect:"error",
    headers:{authorization:"Bearer "+executionKey,"content-type":"application/json"},
    body:JSON.stringify(payload)

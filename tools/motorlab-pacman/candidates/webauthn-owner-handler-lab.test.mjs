@@ -12,7 +12,8 @@ const ownerRow={credential_id:"cred_owner_0001",public_key_jwk:JSON.stringify({k
 function env(db,extra={}){return {
  DB:db,PACMAN_WEBAUTHN_ENABLED:"YES_ZERO_COST_WEBAUTHN_STAGING",
  PACMAN_WEBAUTHN_ORIGIN:origin,PACMAN_WEBAUTHN_RP_ID:rpId,
- PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:token,...extra
+ PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:token,
+  PACMAN_EXECUTION_SERVICE:{fetch:async()=>{throw Error("UNEXPECTED_SERVICE_FETCH");}},...extra
 };}
 function req(path,body={},headers={}){return new Request(origin+path,{
  method:"POST",headers:{"content-type":"application/json","origin":origin,...headers},
@@ -132,7 +133,7 @@ test("approval execute delegates exact owner-bound LAB operation to server-side 
   return {status:"PACMAN_OPERATION_VERIFIED",operationId:intent.operationId,branch:intent.branch,path:intent.path};
  };
  const e=env(d,{
-  PACMAN_EXECUTION_URL:"https://motorlab-pacman-execution-staging-lab.example.workers.dev",
+  PACMAN_EXECUTION_URL:"https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev",
   PACMAN_EXECUTION_KEY:"k".repeat(48)
  });
  const r=await handleWebAuthnOwnerLab(
@@ -149,6 +150,7 @@ test("approval execute delegates exact owner-bound LAB operation to server-side 
  assert.deepEqual(seen.assertion,assertion);
  assert.equal(seen.executionUrl,e.PACMAN_EXECUTION_URL);
  assert.equal(seen.executionKey,e.PACMAN_EXECUTION_KEY);
+ assert.equal(seen.executionService,e.PACMAN_EXECUTION_SERVICE);
  assert.equal(seen.signingSecret,secret);
 });
 
@@ -167,4 +169,11 @@ test("status remains fail-closed while WebAuthn runtime is disabled",async()=>{
  const r=await handleWebAuthnOwnerLab(new Request(origin+"/webauthn/status"),{});
  assert.equal(r.status,503);
  assert.deepEqual(await r.json(),{service:"pacman-webauthn-owner-staging-lab",configured:false,enrolled:false});
+});
+
+test("missing private binding prevents challenge creation before D1 mutation",async()=>{
+ const d=db({owner:ownerRow});
+ const intent={operationId:"pacman-owner-binding-missing-01",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
+ const r=await handleWebAuthnOwnerLab(req("/webauthn/approval/start",{intent,content:"probe"}),env(d,{PACMAN_EXECUTION_SERVICE:null}),{cryptoImpl:webcrypto});
+ assert.equal(r.status,503);assert.equal((await r.json()).error,"WEBAUTHN_EXECUTOR_BINDING_UNAVAILABLE");assert.equal(d.challenges.size,0);
 });

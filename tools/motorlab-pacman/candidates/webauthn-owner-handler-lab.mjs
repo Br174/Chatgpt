@@ -45,7 +45,8 @@ function config(env){
   db:env.DB,origin:env.PACMAN_WEBAUTHN_ORIGIN,rpId:env.PACMAN_WEBAUTHN_RP_ID,
   signingSecret:env.PACMAN_APPROVAL_SIGNING_SECRET,githubToken:env.PACMAN_GITHUB_TOKEN,
   executionUrl:typeof env.PACMAN_EXECUTION_URL==="string"?env.PACMAN_EXECUTION_URL:null,
-  executionKey:typeof env.PACMAN_EXECUTION_KEY==="string"?env.PACMAN_EXECUTION_KEY:null
+  executionKey:typeof env.PACMAN_EXECUTION_KEY==="string"?env.PACMAN_EXECUTION_KEY:null,
+  executionService:env?.PACMAN_EXECUTION_SERVICE??null
  };
 }
 
@@ -185,6 +186,7 @@ export async function handleWebAuthnOwnerLab(request,env,{
   }
 
   if(url.pathname==="/webauthn/approval/start"){
+   if(typeof cfg.executionService?.fetch!=="function")throw fail("WEBAUTHN_EXECUTOR_BINDING_UNAVAILABLE",503);
    const credential=await loadOwnerWebAuthnCredentialD1(cfg.db,OWNER_SUBJECT);
    const intent=input?.intent,content=input?.content;
    if(!intent||typeof intent!=="object"||Array.isArray(intent)||typeof content!=="string"||!content)
@@ -211,6 +213,7 @@ export async function handleWebAuthnOwnerLab(request,env,{
    const {intent,content,challenge,assertion}=input||{};
    if(typeof cfg.executionUrl!=="string"||typeof cfg.executionKey!=="string")
     throw fail("WEBAUTHN_EXECUTOR_NOT_CONFIGURED",503);
+   if(typeof cfg.executionService?.fetch!=="function")throw fail("WEBAUTHN_EXECUTOR_BINDING_UNAVAILABLE",503);
    if(!intent||typeof intent!=="object"||Array.isArray(intent)||typeof content!=="string"||!content||
       typeof challenge!=="string"||!assertion||typeof assertion!=="object")
     throw fail("INVALID_APPROVAL_REQUEST",400);
@@ -220,7 +223,7 @@ export async function handleWebAuthnOwnerLab(request,env,{
     db:cfg.db,intent,content,challenge,credentialId:credential.id,assertion,
     signingSecret:cfg.signingSecret,
     executionUrl:cfg.executionUrl,executionKey:cfg.executionKey,
-    fetchImpl,cryptoImpl,nowMs
+    executionService:cfg.executionService,cryptoImpl,nowMs
    });
    return reply(result,200);
   }
