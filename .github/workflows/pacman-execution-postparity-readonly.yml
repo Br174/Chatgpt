@@ -1,0 +1,88 @@
+name: Pac-Man post-parity execution readiness audit (read-only LAB)
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/workflows/pacman-execution-postparity-readonly.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-execution-postparity-readonly-lab
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read-only diagnostics regressions, credentials and fake Worker responses
+        run: node --test tools/motorlab-pacman/candidates/execution-postparity-readonly-lab.test.mjs
+  audit:
+    needs: validate
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Confirm current LAB head and exact GitHub probe absence without writes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base='https://api.github.com/repos/Br174/Chatgpt/';
+          const headers={authorization:'Bearer '+process.env.GH_TOKEN,accept:'application/vnd.github+json',
+           'user-agent':'motorlab-readonly-postparity'};
+          const request=async path=>fetch(base+path,{method:'GET',headers,redirect:'manual',signal:AbortSignal.timeout(15000)});
+          const head=await request('git/ref/heads/motorlab/pacman-execution-v2-lab-20261014');
+          if(head.status!==200||(await head.json())?.object?.sha!==process.env.EXPECTED_SHA)
+           throw Error('POSTPARITY_HEAD_CHANGED_ABORT');
+          const file=await request('contents/tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt?ref=motorlab%2Fpacman-execution-v2-lab-20261014');
+          if(file.status!==404)throw Error('POSTPARITY_PROBE_ABSENCE_NOT_VERIFIED');
+          console.log('PACMAN_POSTPARITY_GITHUB_ACTIONS_PROBE_ABSENT');
+          NODE
+      - name: Inspect protected Execution readiness and WebAuthn GitHub egress, GET only
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {inspectPostParityReadiness} from './tools/motorlab-pacman/candidates/execution-postparity-readonly-lab.mjs';
+          const report=await inspectPostParityReadiness({key:process.env.EXECUTION_KEY});
+          const allow=new Set(['EXECUTION_READY_FOR_OWNER_BIOMETRIC_APPROVAL',
+           'SCHEMA_OR_SIGNATURE_PARITY_NOT_CONFIRMED','EXECUTION_GITHUB_EGRESS_READ_FAILURE',
+           'LAB_FILE_ALREADY_PRESENT_REQUIRES_RECOVERY','EXECUTION_FLAGS_NOT_READY',
+           'EXECUTION_D1_SCHEMA_NOT_READY','EXECUTION_ISSUER_PARITY_RELOCKED',
+           'EXECUTION_KEY_MISMATCH','REMOTE_RESPONSE_UNCLASSIFIED']);
+          if(!allow.has(report.category)||report.readOnly!==true)throw Error('AUDIT_REPORT_NOT_ALLOWLISTED');
+          console.log('PACMAN_POSTPARITY_CATEGORY_'+report.category);
+          console.log('PACMAN_POSTPARITY_SCHEMA_VERIFIED_'+report.schemaValid);
+          console.log('PACMAN_POSTPARITY_READINESS_HTTP_'+report.readinessHttp);
+          console.log('PACMAN_POSTPARITY_READINESS_ERROR_'+report.readinessError);
+          console.log('PACMAN_POSTPARITY_WEBAUTHN_GITHUB_'+report.webAuthnGitHubDiagnostic);
+          console.log('PACMAN_POSTPARITY_WEBAUTHN_GITHUB_AUTH_HTTP_'+report.webAuthnGithubAuthHttp);
+          console.log('PACMAN_POSTPARITY_WEBAUTHN_GITHUB_PUBLIC_HTTP_'+report.webAuthnGithubPublicHttp);
+          console.log('PACMAN_POSTPARITY_WEBAUTHN_GITHUB_AUTH_CATEGORY_'+report.webAuthnGithubAuthReason);
+          console.log('PACMAN_POSTPARITY_AUDIT_DONE_NO_DEPLOY_NO_GITHUB_MUTATION');
+          if(report.category==='LAB_FILE_ALREADY_PRESENT_REQUIRES_RECOVERY')
+           throw Error('POSTPARITY_PROBE_PRESENCE_ABORT_RECOVERY_REQUIRED');
+          NODE
