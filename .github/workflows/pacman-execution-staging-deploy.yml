@@ -115,32 +115,22 @@ jobs:
            if(!bindings.some(b=>b.name===secret&&b.type==='secret_text'))
             throw Error('PACMAN_EXECUTION_SECRET_BINDING_MISSING');
           }
-          for(const name of Object.keys(flags)){
-           // Existing issuer authority is not verified yet; refuse *any* live enable flag.
-           if(bindings.some(b=>b.name===name))
-            throw Error('PACMAN_EXECUTION_PREMATURE_FLAG_FOUND');
+          // Four legacy switches are secret_text on live staging. Do not infer their value.
+          for(const [name,value] of Object.entries(flags)){
+           const found=bindings.filter(b=>b.name===name);
+           if(found.length>1)throw Error('PACMAN_DUPLICATE_EXECUTION_FLAG_BINDING');
+           if(found.length===1&&!['secret_text','plain_text'].includes(found[0].type))
+            throw Error('PACMAN_UNKNOWN_EXECUTION_FLAG_TYPE');
+           if(found[0]?.type==='plain_text'&&found[0]?.text===value)
+            throw Error('PACMAN_PREMATURE_VISIBLE_FLAG_ACTIVATION');
           }
-          for(const [table,columns,types] of [
-           ['pacman_approval_claims',['operation_id','approval_signature','claimed_at','expires_at'],['TEXT','TEXT','INTEGER','INTEGER']],
-           ['pacman_cycle_checkpoints',['operation_id','state','branch','path','sha','updated_at'],['TEXT','TEXT','TEXT','TEXT','TEXT','TEXT']]
-          ]){
-           const response=await fetch(base+'/d1/database/'+db+'/query',{
-            method:'POST',headers:{...headers,'content-type':'application/json'},
-            body:JSON.stringify({sql:'PRAGMA table_info('+table+')'}),
-            redirect:'manual',signal:AbortSignal.timeout(15000)
-           });
-           if(response.status!==200)throw Error('PACMAN_STAGING_D1_READ_NOT_AVAILABLE');
-           const data=await response.json(),entry=data?.result?.[0],rows=entry?.results;
-           if(data?.success!==true||entry?.success!==true||!Array.isArray(rows))
-            throw Error('PACMAN_STAGING_D1_SCHEMA_UNVERIFIED');
-           for(let i=0;i<columns.length;i++){
-            const row=rows.find(r=>r.name===columns[i]);
-            const nullable=table==='pacman_cycle_checkpoints'&&(columns[i]==='operation_id'||columns[i]==='sha');
-            if(!row||row.type?.toUpperCase()!==types[i]||
-               (i===0&&row.pk!==1)||(!nullable&&row.notnull!==1))
-             throw Error('PACMAN_STAGING_D1_SCHEMA_MISMATCH');
-           }
-          }
+          // Hard, independent owner-signature parity gate must not exist yet.
+          if(bindings.some(b=>b.name==='PACMAN_ISSUER_PARITY_VERIFIED'))
+           throw Error('PACMAN_ISSUER_PARITY_PREMATURELY_CONFIGURED');
+          // D1 API direct query returns 403 under this protected token.
+          // Read-only schema audit will use existing isolated Execution Worker DB binding.
+          console.log('PACMAN_D1_SCHEMA_REMOTE_API_DENIED_WORKER_BINDING_CHECK_REQUIRED');
+          console.log('PACMAN_OPAQUE_FLAG_BINDINGS_RECOGNIZED_WITH_PARITY_GATE_CLOSED');
           console.log('PACMAN_EXECUTION_READONLY_PREFLIGHT_VERIFIED');
           NODE
       - name: Deploy dedicated staging Worker
@@ -174,19 +164,30 @@ jobs:
           console.log('PACMAN_STAGING_WORKER_HEALTH_AND_D1_BINDING_VERIFIED');
           if(body.revision!=='pacman-v2-webauthn-relay-20261016')
             throw Error('EXECUTION_REVISION_UNEXPECTED');
-          const diagnostic=base+'/__motorlab_lab/diagnostics/execution-readiness';
-          const untrusted=await fetch(diagnostic,{method:'GET',redirect:'manual',signal:AbortSignal.timeout(15000)});
-          if(untrusted.status!==401)throw Error('EXECUTION_READINESS_MUST_REQUIRE_AUTH');
-          if(typeof process.env.EXECUTION_KEY!=='string'||process.env.EXECUTION_KEY.length<32)
-           throw Error('EXECUTION_READBACK_KEY_UNAVAILABLE');
-          const authorized=await fetch(diagnostic,{
-           method:'GET',headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},
-           redirect:'manual',signal:AbortSignal.timeout(15000)
-          });
-          let ready;try{ready=await authorized.json();}catch{throw Error('EXECUTION_READINESS_RESPONSE_INVALID');}
-          // This initial safety deployment MUST remain disabled until issuer proof is verified.
-          if(authorized.status!==503||ready.error!=='STAGING_CYCLE_ROUTE_DISABLED')
-           throw Error('EXECUTION_CYCLE_SAFETY_GATE_NOT_CLOSED');
-          console.log('PACMAN_EXECUTION_DIAGNOSTICS_STAGING_READY_ROUTE_STILL_CLOSED');
+          // Only GETs, via protected Worker DB binding: PRAGMA, no writes or secrets returned.
+          const auditUrl=base+'/__motorlab_lab/diagnostics/execution-schema-audit';
+          const unauthorized=await fetch(auditUrl,{method:'GET',redirect:'manual',signal:AbortSignal.timeout(15000)});
+          if(unauthorized.status!==401)throw Error('AUDIT_ENDPOINT_AUTH_UNVERIFIED');
+          const audit=await fetch(auditUrl,{method:'GET',redirect:'manual',
+           headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},
+           signal:AbortSignal.timeout(15000)});
+          let result;try{result=await audit.json();}catch{throw Error('WORKER_D1_AUDIT_NON_JSON');}
+          const schema=result?.schema,flags=result?.flags||{};
+          console.log('PACMAN_EXECUTION_SCHEMA_'+
+            (['EXACT','STAGING_CONFIGURATION_MISSING','STAGING_D1_SCHEMA_UNVERIFIED'].includes(schema)?schema:'UNKNOWN'));
+          for(const name of ['PACMAN_TRUSTED_ISSUER_CONNECTED','PACMAN_GITHUB_LAB_WRITE_ENABLED',
+            'PACMAN_CYCLE_ROUTE_ENABLED','PACMAN_D1_CHECKPOINTS_VERIFIED']){
+           console.log('PACMAN_EXECUTION_FLAG_'+name+'_'+
+            (flags[name]==='MATCH'?'MATCH':flags[name]==='NOT_MATCH'?'NOT_MATCH':'UNKNOWN'));
+          }
+          if(result?.component!=='pacmanExecutionReadOnlySchemaAudit'||
+             result?.issuerParityLocked!==true)
+           throw Error('EXECUTION_PARITY_SAFETY_GATE_NOT_CONFIRMED');
+          if(audit.status!==200||schema!=='EXACT')
+           throw Error('EXECUTION_D1_SCHEMA_NOT_VERIFIED');
+          console.log('PACMAN_EXECUTION_BINDING_SCHEMA_VERIFIED_NO_MUTATIONS');
+
+          console.log('PACMAN_EXECUTION_STAGING_READONLY_AUDIT_PASSED');
+          console.log('PACMAN_GITHUB_MUTATIONS_BLOCKED_PENDING_OWNER_PARITY');
 
           NODE

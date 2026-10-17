@@ -310,3 +310,70 @@ test("GET execution-readiness fails closed before GitHub if D1 schema is unverif
  assert.equal(r.status,503);assert.equal((await r.json()).error,"STAGING_D1_SCHEMA_UNVERIFIED");
  assert.equal(calls,1);
 });
+
+test("authenticated Execution schema audit reads only PRAGMA and classifies opaque flags without exposing secret text",async()=>{
+ const uri="https://staging.example/__motorlab_lab/diagnostics/execution-schema-audit";
+ const sql=[],secretMarker="PRIVATE_opaque_value_NEVER_PRINT";
+ const claims=["operation_id","approval_signature","claimed_at","expires_at"].map((name,i)=>({
+  name,type:i<2?"TEXT":"INTEGER",pk:i===0?1:0,notnull:1
+ }));
+ const points=["operation_id","state","branch","path","sha","updated_at"].map((name,i)=>({
+  name,type:"TEXT",pk:i===0?1:0,notnull:i===0||i===4?0:1
+ }));
+ const env={PACMAN_EXECUTION_KEY:key,
+  PACMAN_TRUSTED_ISSUER_CONNECTED:secretMarker,
+  PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",
+  PACMAN_GITHUB_LAB_WRITE_ENABLED:secretMarker,
+  PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",
+  DB:{prepare(q){sql.push(q);if(!q.startsWith("PRAGMA table_info("))throw Error("WRITES_FORBIDDEN");
+   return {all:async()=>({results:q.includes("pacman_approval_claims")?claims:points})};
+  }}
+ };
+ const no=await worker.fetch(new Request(uri),env);
+ assert.equal(no.status,401);assert.equal(sql.length,0);
+ const badMethod=await worker.fetch(new Request(uri,{method:"POST",headers:{authorization:"Bearer "+key}}),env);
+ assert.equal(badMethod.status,404);assert.equal(sql.length,0);
+ const result=await worker.fetch(new Request(uri,{headers:{authorization:"Bearer "+key}}),env);
+ assert.equal(result.status,200);
+ const data=await result.json();
+ assert.equal(data.component,"pacmanExecutionReadOnlySchemaAudit");
+ assert.equal(data.schema,"EXACT");
+ assert.equal(data.issuerParityLocked,true);
+ assert.equal(data.flags.PACMAN_CYCLE_ROUTE_ENABLED,"MATCH");
+ assert.equal(data.flags.PACMAN_TRUSTED_ISSUER_CONNECTED,"NOT_MATCH");
+ assert.equal(data.flags.PACMAN_GITHUB_LAB_WRITE_ENABLED,"NOT_MATCH");
+ assert.deepEqual(sql,["PRAGMA table_info(pacman_approval_claims)","PRAGMA table_info(pacman_cycle_checkpoints)"]);
+ assert.equal(JSON.stringify(data).includes(secretMarker),false);
+});
+test("Execution schema audit refuses invalid D1 schema without claiming approvals or touching GitHub",async()=>{
+ const uri="https://staging.example/__motorlab_lab/diagnostics/execution-schema-audit";
+ let reads=0;
+ const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(query){
+  assert.ok(query.startsWith("PRAGMA table_info("));reads++;
+  return {all:async()=>({results:[]})};
+ }}};
+ const r=await worker.fetch(new Request(uri,{headers:{authorization:"Bearer "+key}}),env);
+ assert.equal(r.status,503);
+ const d=await r.json();assert.equal(d.schema,"STAGING_D1_SCHEMA_UNVERIFIED");
+ assert.equal(d.issuerParityLocked,true);assert.equal(reads,1);
+});
+test("Execution mutations remain impossible even if every old Cloudflare flag is enabled",async()=>{
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-parity-guard-001",
+  branch:"motorlab/pacman-execution-v2-lab-20261014",
+  path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
+ const payload={mode:"github-lab-cycle",intent,approval:{...intent,decision:"authorize"},
+  attestation:{signature:"a".repeat(64)},content:"probe"};
+ let touch=0;
+ const env={PACMAN_EXECUTION_KEY:key,
+  PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",
+  PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",
+  PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",
+  PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",
+  PACMAN_APPROVAL_SIGNING_SECRET:"s".repeat(48),
+  PACMAN_GITHUB_TOKEN:"t".repeat(40),
+  DB:{prepare(){touch++;throw Error("MUST_NOT_ACCESS_D1")}}
+ };
+ const r=await worker.fetch(req("POST",JSON.stringify(payload),key),env);
+ assert.equal(r.status,503);assert.equal((await r.json()).error,"STAGING_ISSUER_PARITY_NOT_VERIFIED");
+ assert.equal(touch,0);
+});

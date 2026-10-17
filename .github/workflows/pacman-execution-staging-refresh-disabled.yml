@@ -1,15 +1,7 @@
 name: Pac-Man execution staging refresh (V2, disabled)
 
+# Manual disaster-recovery only. Never auto-deploy in parallel with protected Execution LAB.
 on:
-  push:
-    branches:
-      - motorlab/pacman-execution-v2-lab-20261014
-    paths:
-      - '.github/workflows/pacman-execution-staging-refresh-disabled.yml'
-      - 'tools/motorlab-pacman/worker-execution-staging.mjs'
-      - 'tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc'
-      - 'tools/motorlab-pacman/candidates/staging-cycle-dispatch.mjs'
-      - 'tools/motorlab-pacman/candidates/staging-runtime-cycle-handler.mjs'
   workflow_dispatch:
 
 permissions:
