@@ -119,6 +119,18 @@ jobs:
           const current=await status.json();
           if(status.status!==200||current.configured!==true||current.enrolled!==true)
            throw Error('PARITY_OWNER_PASSKEY_NOT_ENROLLED');
+          // Read old attempt metadata only. A previously uncertain write must block activation.
+          const recovery=await fetch(webOrigin+'/__motorlab_lab/diagnostics/approval-recovery',{
+           method:'GET',headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},
+           redirect:'manual',signal:AbortSignal.timeout(15000)});
+          let state;try{state=await recovery.json();}catch{throw Error('PARITY_PREVIOUS_OPERATION_UNREADABLE');}
+          if(recovery.status!==200||state?.component!=='pacmanLABApprovalRecoveryReadOnly'||
+             state.operationId!=='pacman-webauthn-lab-20261017-ff59959a-01'||
+             !['NONE','VERIFIED_AND_REMOVED'].includes(state.checkpointState)||
+             state.claimPresent!==false||!Number.isInteger(state.challengeCount)||
+             !Number.isInteger(state.consumedCount)||
+             state.consumedCount>state.challengeCount)
+           throw Error('PARITY_PREVIOUS_OPERATION_REQUIRES_RECOVERY');
           const d=await fetch(exOrigin+'/__motorlab_lab/diagnostics/execution-schema-audit',{
            headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},redirect:'manual',signal:AbortSignal.timeout(15000)});
           const schema=await d.json();
