@@ -84,7 +84,7 @@ test("approval challenge writes only a namespaced WebAuthn challenge row",async(
   operationId:"pacman-worker-approval-001",
   capability:"github.lab-file-cycle",
   branch:"motorlab/pacman-execution-v2-lab-20261014",
-  path:"tools/motorlab-pacman/probe-integration.txt"
+  path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"
  };
  const r=await handleWebAuthnRequest(req("/approve/challenge",{intent,content:"worker approval probe"}),env,{cryptoImpl:webcrypto,nowMs:1780000000000});
  assert.equal(r.status,200);
@@ -99,7 +99,7 @@ test("main branch cannot obtain an approval challenge",async()=>{
   operationId:"pacman-worker-approval-main",
   capability:"github.lab-file-cycle",
   branch:"main",
-  path:"tools/motorlab-pacman/probe-integration.txt"
+  path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"
  };
  const r=await handleWebAuthnRequest(req("/approve/challenge",{intent,content:"blocked"}),env,{cryptoImpl:webcrypto,nowMs:1780000000000});
  assert.equal(r.status,403);

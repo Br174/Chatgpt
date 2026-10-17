@@ -40,7 +40,7 @@ export async function runGithubLabFileCycle({operationId, branch, path, content,
   approval = false, ledger, onCheckpoint} = {}) {
   check(typeof operationId === "string" && allowedId.test(operationId), "INVALID_OPERATION_ID");
   check(branch === EXECUTION_LAB_BRANCH, "LAB_BRANCH_REQUIRED");
-  check(path === EXECUTION_PROBE_PATH || path === "tools/motorlab-pacman/probe-integration.txt",
+  check(path === EXECUTION_PROBE_PATH || path === "tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt",
     "LAB_PATH_REQUIRED");
   check(typeof content === "string" && content.length > 0 && content.length <= 4096,
     "INVALID_PROBE_CONTENT");

@@ -1,7 +1,7 @@
 // GitHub LAB-only adapter. Credentials supplied by authorized host, never persisted.
 // Use only with makePacmanStagingRunner and a D1 durable ledger.
 const BRANCH = "motorlab/pacman-execution-v2-lab-20261014";
-const PATHS = new Set(["tools/motorlab-pacman/probe.txt","tools/motorlab-pacman/probe-integration.txt"]);
+const PATHS = new Set(["tools/motorlab-pacman/probe.txt","tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"]);
 const API = "https://api.github.com/repos/Br174/Chatgpt/contents/";
 function check(branch,path) {
   if(branch!==BRANCH || !PATHS.has(path)) throw Error("GITHUB_LAB_SCOPE_DENIED");

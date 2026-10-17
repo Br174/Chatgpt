@@ -2,7 +2,7 @@
 // This module is not exposed as a Worker endpoint and never accepts raw chat approval.
 import {LAB_BRANCH,LAB_PROBE} from "./chat-approval.mjs";
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
-const API="https://api.github.com/repos/Br174/Chatgpt/contents/tools/motorlab-pacman/probe-integration.txt";
+const API="https://api.github.com/repos/Br174/Chatgpt/contents/tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const headers=token=>({Authorization:"Bearer "+token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","Content-Type":"application/json"});
 export async function writeApprovedLabProbe({intent,approval,attestation,secret,db,content,token,fetchImpl,now}={}){
  if(intent?.capability!=="github.lab-file-cycle"||intent.branch!==LAB_BRANCH||intent.path!==LAB_PROBE)throw Error("GITHUB_SCOPE_DENIED");

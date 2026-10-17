@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import {verifyApprovalAttestation,signApprovalInTrustedHost} from "../approval-attestation.mjs";
 import {verifyAndConsumeTrustedApproval} from "../trusted-approval-gate.mjs";
 const secret="local-test-only-signing-secret-000000000000000";
-const intent={operationId:"pacman-regression-issuer-0001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+const intent={operationId:"pacman-regression-issuer-0001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
 const approval={...intent,decision:"authorize"};
 test("missing trusted issuer secret fails closed",async()=>{
  await assert.rejects(verifyApprovalAttestation({intent,attestation:{},secret:"",content:"test"}),/TRUSTED_ISSUER_NOT_CONFIGURED/);

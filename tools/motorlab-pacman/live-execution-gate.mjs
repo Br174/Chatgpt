@@ -1,7 +1,7 @@
 // Pacman staging execution gate: no mutation without independent host checks.
 // This module never reads secrets, calls GitHub, or modifies D1.
 const BRANCH="motorlab/pacman-execution-v2-lab-20261014";
-const PATH="tools/motorlab-pacman/probe-integration.txt";
+const PATH="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 export function evaluateLiveExecutionGate({branch,path,approval,stagingDatabaseId,workerName,githubTokenPresent,checkpointReady,health}={}) {
  const blockers=[];
  if(branch!==BRANCH) blockers.push("LAB_BRANCH_REQUIRED");
