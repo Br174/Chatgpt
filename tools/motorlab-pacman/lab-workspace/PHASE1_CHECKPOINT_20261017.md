@@ -309,3 +309,15 @@ Reference: https://github.com/Br174/Chatgpt/actions/runs/39073211241
 
 **Progress**: historical HMAC provenance and new code-only tests verified; new protected live audit remains WAITING. Global remains A 4/4=100%, B 2/4=50%, C 1/4=25%, D 2/4=50%; **9/16=56.25%, delta 0 pp**. No percentages advanced on simulated/missing live evidence.
 Status: PARITY_HISTORICAL_PROVENANCE_VERIFIED; NEW_GET_ONLY_AUDIT_CODE_VERIFIED; PROTECTED_RUN3_OWNER_REVIEW_PENDING; NO_D1_REMOTE_SCHEMA_READ; NEW_CONTROLLED_FEATURE_OFF; MAIN_UNCHANGED.
+
+## Exact first parity flag activation lineage — 2026-10-18 retrospective
+
+Found first documented successful enabling of parity flag in OLD historical LAB workflow run #2 id 39037378193, protected job proof_and_gate id 117409861708, 2026-10-17:
+- Live private binding cryptographic test logged PARITY_LIVE_SIGNING_KEY_MATCH_PROVEN_BY_PRIVATE_BINDING at 17:08:46 UTC.
+- The immediately subsequent step Enable independent Execution parity gate only after verified HMAC match SUCCEEDED and Wrangler logged Success! Uploaded secret PACMAN_ISSUER_PARITY_VERIFIED at 17:08:48 UTC. Flag contents are NOT reproduced and no secrets were read.
+- The workflow's last readiness step then failed at 17:09:09 UTC with PARITY_STAGING_POSTDEPLOY_GITHUB_LAB_READINESS_UNVERIFIED. Hence overall run #2 was marked FAILURE but the earlier cryptographic validation and secret-binding change ALREADY committed. No rollback is assumed.
+- Later runs #3 (39058170571) and #4 (39061359612) both SUCCESS; their parity enabling step was SKIPPED because flag was already present. Their private binding live key equality proof passed again.
+- This explains live issuerParityLocked=false and diagnostic category UNEXPECTED_EXECUTION_PARITY_ALREADY_OPEN; the older diagnostic expected an unconfigured gate, whereas verified provenance establishes it was intentionally configured earlier. This observation does not authorize controlled updates or substitute for latest live key parity recheck.
+- New GET-only run #3 (39075283947) is waiting for protected environment reviewer to rerun private binding parity verification and compare latest staging Worker deployment group identifiers with run #4 historic ids. Do not bypass reviewer.
+- No additional Cloudflare/secret mutation, deploy, D1 schema update or actual GitHub provider write occurred in this retrospective. Global remains 9/16=56.25% (delta 0), pending new authenticated live results.
+Reference: https://github.com/Br174/Chatgpt/actions/runs/39037378193
