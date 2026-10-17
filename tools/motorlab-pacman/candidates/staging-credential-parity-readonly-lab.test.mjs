@@ -14,8 +14,9 @@ function stub(webResult,execResult){
   assert.equal(init.method,"GET");assert.equal(init.redirect,"manual");
   assert.equal(init.headers.authorization,"Bearer "+secret);
   assert.ok(url.startsWith("https://motorlab-pacman-"));
-  if(url.includes("/diagnostics/execution-binding"))return webResult;
-  if(url.includes("/diagnostics/execution-schema-audit"))return execResult;
+  // Each call receives its own response body; reusing a consumed Response creates false negatives.
+  if(url.includes("/diagnostics/execution-binding"))return webResult.clone();
+  if(url.includes("/diagnostics/execution-schema-audit"))return execResult.clone();
   throw Error("UNEXPECTED_URL");
  };
  return {calls,fn};
