@@ -1,12 +1,13 @@
 // LAB-only trusted issuer driven by the owner's registered WebAuthn/passkey.
 // No GitHub mutation occurs here. Successful output is a short-lived Pac-Man
 // attestation that the existing executor still verifies and consumes once.
-import {verifyPacmanWebAuthnAssertion} from "./webauthn-approval-lab.mjs";
+import {verifyPacmanWebAuthnAssertion,controlledWebAuthnRequestDigest} from "./webauthn-approval-lab.mjs";
+import {validateControlledChatIntent} from "../chat-approval.mjs";
 import {
  loadWebAuthnChallengeD1,consumeWebAuthnChallengeD1,
  loadWebAuthnCredentialD1,advanceWebAuthnSignCountD1
 } from "./webauthn-d1-lab.mjs";
-import {signApprovalInTrustedHost} from "../approval-attestation.mjs";
+import {signApprovalInTrustedHost,signControlledApprovalAfterWebAuthnLab} from "../approval-attestation.mjs";
 
 const OWNER_SUBJECT="202558590";
 const enc=new TextEncoder();
@@ -22,7 +23,16 @@ export async function issuePacmanApprovalFromWebAuthnLab({
     typeof signingSecret!=="string"||signingSecret.length<32||!Number.isSafeInteger(nowMs))
   fail("WEBAUTHN_ISSUER_NOT_CONFIGURED");
 
- const contentSha256=hex(await cryptoImpl.subtle.digest("SHA-256",enc.encode(content)));
+ const controlled=intent?.capability==="github.lab-file-update";
+ let contentSha256=hex(await cryptoImpl.subtle.digest("SHA-256",enc.encode(content)));
+ if(controlled){
+  let scoped;
+  try{scoped=validateControlledChatIntent(intent);}catch{fail("WEBAUTHN_SCOPE_DENIED");}
+  if(scoped.contentSha256!==contentSha256)fail("WEBAUTHN_CONTENT_MISMATCH");
+  // Persisted content_sha256 is the full request binding for controlled
+  // updates, not merely the body digest. No D1 schema modification.
+  contentSha256=await controlledWebAuthnRequestDigest(scoped,{cryptoImpl});
+ }
  const challengeRecord=await loadWebAuthnChallengeD1(db,challenge);
  if(challengeRecord.consumedAt!==null&&challengeRecord.consumedAt!==undefined)
   fail("WEBAUTHN_CHALLENGE_REPLAY_OR_EXPIRED");
@@ -44,9 +54,12 @@ export async function issuePacmanApprovalFromWebAuthnLab({
 
  const expiresAt=Math.min(challengeRecord.expiresAt,nowMs+60000);
  if(expiresAt<=nowMs)fail("WEBAUTHN_CHALLENGE_REPLAY_OR_EXPIRED");
- const attestation=await signApprovalInTrustedHost({
-  intent,expiresAt,secret:signingSecret,content
- });
+ const attestation=controlled?
+  await signControlledApprovalAfterWebAuthnLab({
+   intent,verifiedWebAuthn:verified,ownerSubject:credential.ownerSubject,
+   issuedAt:nowMs,expiresAt,secret:signingSecret,cryptoImpl
+  }):
+  await signApprovalInTrustedHost({intent,expiresAt,secret:signingSecret,content});
  return Object.freeze({
   status:"WEBAUTHN_APPROVAL_ISSUED",
   operationId:intent.operationId,
