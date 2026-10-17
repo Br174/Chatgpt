@@ -1,6 +1,6 @@
 # Pac-Man LAB — GitHub egress recovery, 17 October 2026
 
-Status: `RELAY_POST_FIX_VERIFIED_LOCAL_WAITING_PROTECTED_ROLLOUT`. GitHub GET readiness succeeded, but the subsequent owner attempt stopped with `PACMAN_EXECUTOR_UNREACHABLE`. Do not request another biometric until the corrected POST transport and D1 recovery are verified on staging.
+Status: `LIVE_PRIVATE_POST_AND_RECOVERY_VERIFIED_WAITING_FRESH_OWNER_ASSERTION`. The corrected private POST transport, D1 recovery, HMAC and GitHub GET readiness have all passed the protected staging rollout. The actual owner-approved GitHub file cycle remains pending.
 Session release pin: `2026.10.14-r37`. R38 continuity rules remain applicable as recorded by the canonical CORE; this is not an r38 release promotion.
 
 ## Identity and verified baseline
@@ -14,13 +14,23 @@ Session release pin: `2026.10.14-r37`. R38 continuity rules remain applicable as
 
 ## New POST relay failure and verified local correction
 
+Successful repair rollout: https://github.com/Br174/Chatgpt/actions/runs/39061359612
+
+- Deployed source: `efc4dfd973489b430949fa1b2ae6d56cf70ffd64`.
+- WebAuthn Worker version: `23428a1c-920d-4d63-9514-49eb92fc04bf`.
+- Execution Worker version: `8e5680ab-ce88-4785-9fc4-dbc84604f0ba`.
+- Real recovery readback: checkpoint `NONE`, approval claim absent, challenge count `3`, consumed count `3`. Previous challenges must not be replayed; the next owner click must create a fresh challenge for the same exact operation.
+- `PACMAN_PRIVATE_POST_TRANSPORT_VERIFIED_NO_MUTATIONS` passed on the real staging Service Binding after deployment.
+- `PACMAN_EXECUTION_READY_FOR_SEPARATE_OWNER_BIOMETRIC_APPROVAL` and `PACMAN_LAB_PROBE_WAS_NOT_CREATED_OR_DELETED` both passed.
+- The historical initial WebAuthn deployment workflow is now manual-only, preserving its already-activated abort guard. It no longer auto-competes on WebAuthn source changes. An older pending run is not a continuation target and must not be approved.
+
 - At approximately 21:00 Europe/Rome the owner's portal reported `PACMAN_EXECUTOR_UNREACHABLE` after the passkey step.
 - Current remote HEAD was `f94456c2db0aee0731c42209c4c311903414ed4d`; the latest commit history contained no probe create/delete. The live D1 state must still be read through the protected recovery gate before another attempt.
 - The exact source relay reproduced the same failure in workerd through Miniflare `4.20260730.0`: `redirect:"error"` throws during Request construction. Node's Request accepted it, so Node-only tests had missed this runtime incompatibility.
 - The actual runtime error requires `follow` or `manual`; the correction uses `manual`, rejects all 3xx explicitly, never retries an ambiguous call, and retains the private Service Binding without public fallback.
 - One request constructor is shared by real execution and the protected diagnostic. The diagnostic sends only empty JSON `{}` to the existing `/execute` gate, which must return HTTP400 `INVALID_REQUEST` before approval, D1 or GitHub mutation paths.
 - The workerd test uses the actual relay and actual Execution validation handler with synthetic credentials, no real D1, and external network disabled by the test harness. RED500 `PACMAN_EXECUTOR_UNREACHABLE` became GREEN; internal redirects are rejected and the inert POST diagnostic passes.
-- Local regression suite: 744 passed, 0 failed. The runtime test runs separately and is mandatory in CI before protected deployment.
+- Local regression suite after final legacy-trigger retirement: 745 passed, 0 failed. The runtime test runs separately and is mandatory in CI before protected deployment; it also passed in the successful repair run.
 - The single canonical rollout now deploys the WebAuthn Worker only when its current private POST proof/revision is missing; it preserves existing secrets, owner enrollment and parity marker. Preflight checks the real recovery state, then postdeploy requires private POST proof plus HMAC, D1 schema and GitHub GET readiness.
 - A consumed WebAuthn challenge is not a reusable approval. Do not repeat the actual file cycle, create a new operation ID, clear claims, or bypass recovery merely because the previous Request failed.
 
@@ -87,10 +97,10 @@ Negative tests block wrong HMAC, public transport, duplicate/non-secret marker, 
 ## Resume sequence
 
 1. Recheck current LAB HEAD before any source ref update; reconcile concurrent changes.
-2. Continue the existing canonical workflow `.github/workflows/pacman-issuer-parity-staging-lab.yml` for the new confirmed relay defect. The earlier successful run `39058170571` covered GET readiness and does not prove the real POST path. Do not approve older staging runs.
-3. Require real D1 recovery with no existing claim or uncertain checkpoint, fresh private HMAC, preservation of enrollment/secrets/parity, successful private POST diagnostic, exact D1 schema, and GitHub GET readiness. No schema changes are permitted.
-4. Only after those checks succeed, prepare the full approval link from the exact non-secret operation JSON above; preserve the same operation ID, branch, path and content.
-5. Then request a separate fresh owner passkey assertion; an assertion consumed by the failed transport must not be replayed. The owner button performs the existing create/read/delete/read LAB cycle after successful passkey verification. Do not invoke it on the owner's behalf.
+2. The canonical repair run `39061359612` has completed successfully. Do not rerun enrollment, deployment or environment review merely to resume this operation. The earlier successful run `39058170571` proved GET readiness only and is historical.
+3. Real D1 recovery with no existing claim or uncertain checkpoint, fresh private HMAC, preserved enrollment/secrets/parity, successful private POST diagnostic, exact D1 schema, and GitHub GET readiness are now verified. No schema changes occurred.
+4. Prepare the full approval link from the exact non-secret operation JSON above; preserve the same operation ID, branch, path and content.
+5. Request a separate fresh owner passkey assertion; the three consumed challenges from prior failed attempts must not be replayed. The owner button performs the existing create/read/delete/read LAB cycle after successful passkey verification. Do not invoke it on the owner's behalf.
 6. Preserve checkpoint/claim integrity; do not retry an uncertain mutation blindly.
 
 ## Scope and progress

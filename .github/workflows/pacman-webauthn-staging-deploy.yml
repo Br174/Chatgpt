@@ -1,14 +1,8 @@
 name: Pac-Man WebAuthn staging deploy (zero-cost, fail-closed)
 
+# Initial disabled-target recovery only. The canonical issuer-parity rollout
+# owns updates of the already enrolled, enabled staging Worker.
 on:
-  push:
-    branches:
-      - motorlab/pacman-execution-v2-lab-20261014
-    paths:
-      - '.github/workflows/pacman-webauthn-staging-deploy.yml'
-      - 'tools/motorlab-pacman/webauthn/**'
-      - 'tools/motorlab-pacman/candidates/webauthn-*.mjs'
-      - 'tools/motorlab-pacman/candidates/webauthn-*.test.mjs'
   workflow_dispatch:
 
 permissions:

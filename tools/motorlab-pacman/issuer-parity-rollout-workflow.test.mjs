@@ -4,6 +4,7 @@ import {readFileSync} from "node:fs";
 const read=p=>readFileSync(new URL(p,import.meta.url),"utf8");
 const workflow=read("../../.github/workflows/pacman-issuer-parity-staging-lab.yml");
 const legacy=read("../../.github/workflows/pacman-execution-staging-deploy.yml");
+const legacyWeb=read("../../.github/workflows/pacman-webauthn-staging-deploy.yml");
 const exec=read("./worker-execution-staging.mjs");
 const web=read("./webauthn/worker.mjs");
 test("one protected staging rollout alone checks exact branch, fixed Worker names, D1 and absent GitHub file",()=>{
@@ -42,4 +43,10 @@ test("issuer parity challenge is bound to internal Worker and Execution requires
  assert.match(exec,/verifyIssuerParityProof/);
  assert.match(exec,/PARITY_MISMATCH/);
  assert.match(exec,/STAGING_ISSUER_PARITY_NOT_VERIFIED/);
+});
+test("completed initial WebAuthn deployment cannot auto-compete with the canonical rollout",()=>{
+ assert.match(legacyWeb,/on:\s+workflow_dispatch:/);
+ assert.doesNotMatch(legacyWeb,/^  push:|^  pull_request:/m);
+ assert.match(legacyWeb,/WEBAUTHN_ALREADY_ACTIVATED_ABORT/);
+ assert.match(legacyWeb,/environment: pacman-execution-staging/);
 });
