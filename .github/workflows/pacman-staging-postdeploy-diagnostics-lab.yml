@@ -1,0 +1,101 @@
+name: Pac-Man Staging Post-Deploy GET-Only Incident LAB
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/workflows/pacman-staging-postdeploy-diagnostics-lab.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-staging-postdeploy-getonly-incident-lab
+  cancel-in-progress: false
+
+jobs:
+  local-preflight:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check guarded rollout and D1 read-only diagnostics tests
+        run: |
+          node --test tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.test.mjs tools/motorlab-pacman/candidates/staging-runtime-cycle-handler.test.mjs tools/motorlab-pacman/candidates/webauthn-worker-boundary.test.mjs
+
+  protected-getonly-diagnostics:
+    needs: local-preflight
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read ONLY runtime schema category, HMAC and actual Worker deployment metadata
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {
+            inspectProtectedWorker, protectedRuntimeEvidence,HISTORY,EXEC,WEB,ACCOUNT
+          } from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          // All queries below are authenticated GET. No Wrangler, D1 SQL or GitHub writes.
+          const key=process.env.EXECUTION_KEY;
+          if(process.env.CF_ACCOUNT!==ACCOUNT||!process.env.CF_TOKEN||!key||key.length<32)
+            throw Error('INCIDENT_READONLY_CREDENTIAL_SCOPE_UNVERIFIED');
+          const opts={account:ACCOUNT,token:process.env.CF_TOKEN};
+          const e=await inspectProtectedWorker({name:EXEC,...opts});
+          const w=await inspectProtectedWorker({name:WEB,...opts});
+          const eCategory=e.version===HISTORY[EXEC]?'HISTORICAL_VERSION_UNCHANGED':'NEW_VERSION_PRESENT';
+          const wCategory=w.version===HISTORY[WEB]?'HISTORICAL_VERSION_UNCHANGED':'UNEXPECTED_WEB_AUTHN_VERSION_CHANGE';
+          console.log('PACMAN_INCIDENT_EXECUTION_VERSION='+eCategory);
+          console.log('PACMAN_INCIDENT_WEBAUTHN_VERSION='+wCategory);
+          // inspectProtectedWorker validates D1, service, protected secret-name classes
+          // and both disabled controlled flags; it never logs any binding values.
+          console.log('PACMAN_INCIDENT_BINDINGS_AND_DISABLED_FLAGS=VERIFIED');
+          const read=async(url)=>{
+            const r=await fetch(url,{method:'GET',redirect:'manual',
+              headers:{authorization:'Bearer '+key},signal:AbortSignal.timeout(12000)});
+            if(r.status!==200)throw Error('INCIDENT_RUNTIME_SCHEMA_HTTP_NOT_200');
+            return r.json();
+          };
+          const data=await read('https://'+EXEC+'.motorlab-staging.workers.dev/__motorlab_lab/diagnostics/execution-schema-audit');
+          const kind=data?.component==='pacmanExecutionReadOnlySchemaAudit'?'EXPECTED':'MISMATCH';
+          const legacy=data?.schema==='EXACT'?'EXACT':'NOT_EXACT_OR_UNVERIFIED';
+          const ledger=data?.controlledLedgerSchema==='EXACT'?'EXACT':
+            data?.controlledLedgerSchema==='CONTROLLED_LEDGER_SCHEMA_UNVERIFIED'?'SCHEMA_UNVERIFIED':
+            'FIELD_MISSING_OR_UNEXPECTED';
+          const parity=data?.issuerParityLocked===false?'OPEN_AS_VERIFIED':
+            data?.issuerParityLocked===true?'LOCKED_UNEXPECTED':'UNVERIFIED';
+          console.log('PACMAN_INCIDENT_SCHEMA_COMPONENT='+kind);
+          console.log('PACMAN_INCIDENT_HISTORIC_D1_SCHEMA='+legacy);
+          console.log('PACMAN_INCIDENT_CONTROLLED_D1_SCHEMA='+ledger);
+          console.log('PACMAN_INCIDENT_ISSUER_PARITY='+parity);
+          let live="UNVERIFIED";
+          try{
+            live=await protectedRuntimeEvidence({executionKey:key,requireOwner:true})===
+              'PROTECTED_RUNTIME_HMAC_AND_SCOPE_VERIFIED'?'HMAC_AND_OWNER_OK':'UNVERIFIED';
+          }catch{live='UNVERIFIED';}
+          console.log('PACMAN_INCIDENT_LIVE_HMAC_AND_OWNER='+live);
+          console.log('PACMAN_INCIDENT_NO_DEPLOY_NO_D1_SQL_NO_REMOTE_WRITES');
+          if(eCategory!=='NEW_VERSION_PRESENT'||wCategory!=='HISTORICAL_VERSION_UNCHANGED'||
+             kind!=='EXPECTED'||legacy!=='EXACT'||ledger!=='EXACT'||
+             parity!=='OPEN_AS_VERIFIED'||live!=='HMAC_AND_OWNER_OK')
+            process.exitCode=1;
+          NODE
