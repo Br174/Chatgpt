@@ -32,6 +32,39 @@ export async function stagingSchemaAudit(db){
  return null;
 }
 
+// Separate, strictly read-only schema checker for the NEW controlled-update ledger.
+// This does not change the historical cycle's stagingSchemaAudit() result or
+// grant permission to deploy or to execute any GitHub write.
+// All names/SQL statements are fixed; database-provided SQL is never executed.
+// Only fixed classifications are returned, never column/index metadata.
+export async function controlledLedgerSchemaAudit(db){
+ if(!db?.prepare)return "STAGING_CONFIGURATION_MISSING";
+ try{
+  const info=await db.prepare("PRAGMA table_info(pacman_operations)").all();
+  const rows=info?.results;
+  if(!Array.isArray(rows)||rows.length!==3)
+   return "CONTROLLED_LEDGER_SCHEMA_UNVERIFIED";
+  const expected=[
+   {name:"operation_id",pk:1,notnull:1,dflt_value:null},
+   {name:"receipt_json",pk:0,notnull:1,dflt_value:null},
+   {name:"updated_at",pk:0,notnull:1,dflt_value:"CURRENT_TIMESTAMP"}
+  ];
+  if(!expected.every((e,i)=>{
+   const row=rows[i];
+   return row?.name===e.name&&row?.type?.toUpperCase()==="TEXT"&&
+    row.pk===e.pk&&row.notnull===e.notnull&&
+    row.dflt_value===e.dflt_value;
+  }))return "CONTROLLED_LEDGER_SCHEMA_UNVERIFIED";
+  // SQLite enforces PRIMARY KEY TEXT uniqueness via a unique PK index.
+  // Refuse success if index introspection is missing, ambiguous or not PK.
+  const indexes=await db.prepare("PRAGMA index_list(pacman_operations)").all();
+  if(!Array.isArray(indexes?.results)||!indexes.results.some(x=>
+   x?.origin==="pk"&&x.unique===1&&x.partial===0))
+   return "CONTROLLED_LEDGER_SCHEMA_UNVERIFIED";
+  return "EXACT";
+ }catch{return "CONTROLLED_LEDGER_SCHEMA_UNVERIFIED";}
+}
+
 export async function stagingCyclePreflight(env){
  if(env?.PACMAN_TRUSTED_ISSUER_CONNECTED!=="YES_VERIFIED_TRUSTED_HOST" ||
     env?.PACMAN_GITHUB_LAB_WRITE_ENABLED!=="YES_STAGING_LAB_ONLY" ||
