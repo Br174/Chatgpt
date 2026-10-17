@@ -1,0 +1,178 @@
+name: Pac-Man WebAuthn-Only Staging Resume LAB (protected, OFF)
+# Owner-authorized WebAuthn ONLY. Never redeploy Execution.
+# One push-triggered candidate and one protected reviewer. No secret/flag/DB edits.
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/workflows/pacman-webauthn-only-resume-lab.yml'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-staging-webauthn-only-one-shot
+  cancel-in-progress: false
+jobs:
+  static-and-runtime-preflight:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Original MotorLab Pac-Man suite and all LAB security tests
+        run: |
+          node --test tools/motorlab-pacman/test-pacman-core.mjs tools/motorlab-pacman/*.test.mjs tools/motorlab-pacman/candidates/*.test.mjs tools/motorlab-pacman/tests/*.test.mjs
+      - name: Original Workers Miniflare regression with NO deployment
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pacman-worker-runtime" --no-save --package-lock=false miniflare@4.20260730.0
+          PACMAN_MINIFLARE_MODULE="$RUNNER_TEMP/pacman-worker-runtime/node_modules/miniflare" node tools/motorlab-pacman/ci-worker-binding-runtime.mjs
+      - name: Validate exact isolated Worker targets and controlled capability OFF
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {inspectControlledStagingDeploymentCandidate,STAGING_BRANCH}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-preflight-lab.mjs';
+          const rd=p=>fs.readFileSync(p,'utf8');
+          const t='tools/motorlab-pacman/';
+          const state=inspectControlledStagingDeploymentCandidate({
+            branch:STAGING_BRANCH,
+            executionConfig:rd(t+'wrangler.pacman-execution-staging.jsonc'),
+            webauthnConfig:rd(t+'webauthn/wrangler.pacman-webauthn-staging.jsonc'),
+            executionSource:rd(t+'worker-execution-staging.mjs'),
+            webauthnSource:rd(t+'webauthn/worker.mjs'),
+            ownerRouteSource:rd(t+'candidates/webauthn-owner-handler-lab.mjs'),
+            relaySource:rd(t+'candidates/webauthn-execution-relay-lab.mjs')
+          });
+          if(!state.ready||state.deployAllowed||state.activationAllowed)
+            throw Error('PACMAN_STAGING_SOURCE_SCOPE_BLOCKED');
+          console.log('PACMAN_WEB_ONLY_STATIC_STAGING_SCOPE_VERIFIED');
+          NODE
+      - name: Prevent any Execution deployment or secret/flag mutation in this workflow
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const file=fs.readFileSync('.github/workflows/pacman-webauthn-only-resume-lab.yml','utf8');
+          if(!file.includes("environment: pacman-execution-staging")||
+             !file.includes("github.run_attempt == 1")||
+             !file.includes("persist-credentials: false")||
+             !file.includes("'--keep-vars'")||
+             !file.includes("wrangler.pacman-webauthn-staging.jsonc")||
+             /wrangler\.pacman-execution-staging\.jsonc.{0,40}--keep-vars/.test(file)||
+             /(?:secret put|d1 execute|migration apply|wrangler delete)/i.test(file))
+            throw Error('PACMAN_WEB_ONLY_WORKFLOW_CONTRACT_BLOCKED');
+          // All Cloudflare settings mutations MUST originate exclusively from
+          // the single WebAuthn deploy step below.
+          console.log('PACMAN_WEB_ONLY_WORKFLOW_CONTRACT_VERIFIED');
+          NODE
+  protected-webauthn-only:
+    needs: static-and-runtime-preflight
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1
+    environment: pacman-execution-staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read baseline, deploy ONLY WebAuthn once, verify source, binding preservation, HMAC and owner
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          GITHUB_READONLY_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import cp from 'node:child_process';
+          import {
+            inspectProtectedWorker,assertBindingPreservation,requireVersion,
+            parseWranglerVersion,protectedRuntimeEvidence,HISTORY,EXEC,WEB,ACCOUNT
+          } from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          const token=process.env.CF_TOKEN,key=process.env.EXECUTION_KEY;
+          if(process.env.CF_ACCOUNT!==ACCOUNT||!token||token.length<10||
+             !key||key.length<32||!process.env.GITHUB_READONLY_TOKEN||!process.env.EXPECTED_SHA)
+            throw Error('PACMAN_WEB_ONLY_PROTECTED_SCOPE_UNVERIFIED');
+          // Pin both branch HEAD and protected main before touching any Worker.
+          const auth={authorization:'Bearer '+process.env.GITHUB_READONLY_TOKEN,
+            accept:'application/vnd.github+json'};
+          const getGit=async(url)=>{
+            const r=await fetch(url,{method:'GET',headers:auth,redirect:'manual',
+              signal:AbortSignal.timeout(15000)});
+            if(r.status!==200)throw Error('PACMAN_WEB_ONLY_GITHUB_READ_BLOCKED');
+            return r.json();
+          };
+          const root='https://api.github.com/repos/Br174/Chatgpt';
+          const branch=await getGit(root+'/git/ref/heads/motorlab/pacman-real-operations-lab-20261017');
+          const main=await getGit(root+'/branches/main');
+          if(branch?.object?.sha!==process.env.EXPECTED_SHA||
+             main?.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7')
+            throw Error('PACMAN_WEB_ONLY_GITHUB_HEAD_DRIFT');
+          const opts={token,account:ACCOUNT};
+          const beforeE=await inspectProtectedWorker({name:EXEC,...opts});
+          const beforeW=await inspectProtectedWorker({name:WEB,...opts});
+          if(beforeE.version===HISTORY[EXEC])
+            throw Error('PACMAN_WEB_ONLY_EXECUTION_NOT_UPDATED');
+          requireVersion(WEB,beforeW.version,HISTORY[WEB]);
+          // Detailed legacy and controlled D1 schema EXACT, private HMAC and
+          // enrolled passkey owner must pass BEFORE the only allowed deploy.
+          await protectedRuntimeEvidence({
+            executionKey:key,requireControlledSchema:true,requireOwner:true
+          });
+          console.log('PACMAN_WEB_ONLY_PREDEPLOY_HMAC_OWNER_D1_AND_FLAGS_VERIFIED');
+          // Exactly ONE provider-changing command in this workflow.
+          // No Execution deploy, D1 queries, schema changes, secret puts or flag edits.
+          let stdout;
+          try{
+            stdout=cp.execFileSync('npx',[
+              '--yes','wrangler@4','deploy','--config',
+              'wrangler.pacman-webauthn-staging.jsonc','--keep-vars'
+            ],{
+              cwd:'tools/motorlab-pacman/webauthn',
+              env:{...process.env,CLOUDFLARE_API_TOKEN:token,
+                CLOUDFLARE_ACCOUNT_ID:process.env.CF_ACCOUNT},
+              encoding:'utf8',timeout:180000,maxBuffer:5_000_000,
+              stdio:['ignore','pipe','pipe']
+            });
+          }catch{
+            throw Error('PACMAN_WEB_ONLY_DEPLOY_FAILED_NO_AUTOMATIC_RETRY');
+          }
+          const deployedVersion=parseWranglerVersion(stdout);
+          console.log('PACMAN_WEB_ONLY_DEPLOY_ACKNOWLEDGED');
+          // Check versions and bindings immediately; any unexpected drift is
+          // a hard STOP, not a second deployment or automatic rollback.
+          let afterE,afterW,ready=false;
+          for(let attempt=0;attempt<8;attempt++){
+            afterE=await inspectProtectedWorker({name:EXEC,...opts});
+            afterW=await inspectProtectedWorker({name:WEB,...opts});
+            requireVersion(EXEC,afterE.version,beforeE.version);
+            assertBindingPreservation(beforeE.bindingSnapshot,afterE.bindingSnapshot);
+            assertBindingPreservation(beforeW.bindingSnapshot,afterW.bindingSnapshot);
+            if(afterW.version===deployedVersion){
+              try{
+                await protectedRuntimeEvidence({
+                  executionKey:key,requireControlledSchema:true,requireOwner:true
+                });
+                ready=true;break;
+              }catch{ /* bounded GET-only propagation interval */ }
+            }else if(afterW.version!==beforeW.version){
+              throw Error('PACMAN_WEB_ONLY_UNEXPECTED_VERSION_DRIFT');
+            }
+            if(attempt<7)await new Promise(r=>setTimeout(r,3000));
+          }
+          if(!ready)throw Error('PACMAN_WEB_ONLY_POSTDEPLOY_EVIDENCE_NOT_STABLE');
+          requireVersion(WEB,afterW.version,deployedVersion);
+          console.log('PACMAN_WEB_ONLY_EXECUTION_VERSION_UNCHANGED');
+          console.log('PACMAN_WEB_ONLY_BINDINGS_AND_SECRETS_METADATA_PRESERVED');
+          console.log('PACMAN_WEB_ONLY_CURRENT_HMAC_D1_AND_OWNER_VERIFIED');
+          console.log('PACMAN_CONTROLLED_UPDATE_REMAINS_OFF_BOTH_WORKERS');
+          NODE
