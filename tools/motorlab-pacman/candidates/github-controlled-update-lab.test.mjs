@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {runGithubControlledFileUpdate,CONTROLLED_LAB_BRANCH,controlledLabPath} from "./github-controlled-update-lab.mjs";
+import {runGithubControlledFileUpdate,inspectGithubControlledUpdateRecovery,CONTROLLED_LAB_BRANCH,controlledLabPath} from "./github-controlled-update-lab.mjs";
 import {makeControlledGitHubLabAdapter} from "./github-contents-lab-adapter.mjs";
 import {createChatAuthorizedCoordinator} from "../chat-coordinator.mjs";
 
@@ -167,4 +167,61 @@ test("verified final ledger remains success when notification fails",async()=>{
  const receipt=await run(r);
  assert.equal(receipt.state,"VERIFIED_UPDATED");
  assert.equal((await r.ledger.get(operationId)).state,"VERIFIED_UPDATED");
+});
+
+test("checkpoint file is protected from new controlled-update capability",async()=>{
+ const r=rig();
+ const protectedPath="tools/motorlab-pacman/lab-workspace/PHASE1_CHECKPOINT_20261017.md";
+ assert.equal(controlledLabPath(protectedPath),false);
+ await assert.rejects(run(r,{path:protectedPath}),{code:"CONTROLLED_LAB_PATH_REQUIRED"});
+ assert.equal(r.getWrites(),0);
+});
+test("recovery cannot start without prior ambiguous receipt",async()=>{
+ const r=rig();
+ await assert.rejects(inspectGithubControlledUpdateRecovery({
+  operationId,branch,path,adapter:r.adapter,ledger:r.ledger,onCheckpoint:r.onCheckpoint
+ }),{code:"RECOVERY_RECEIPT_REQUIRED"});
+ assert.equal(r.getWrites(),0);
+});
+test("ambiguous PUT with matching content reconciles without mutation or authorship claim",async()=>{
+ const r=rig();
+ let current=initial,sha=originalSha,mutations=0;
+ r.adapter.readControlled=async()=>({exists:true,content:current,sha});
+ r.adapter.updateControlled=async args=>{
+  mutations++;current=args.content;sha=nextSha;throw Error("lost GitHub response");
+ };
+ await assert.rejects(run(r),{code:"PROVIDER_OR_CHECKPOINT_ERROR"});
+ assert.equal((await r.ledger.get(operationId)).state,"RECOVERY_REQUIRED");
+ assert.equal((await r.ledger.get(operationId)).expectedSha,originalSha);
+ assert.equal((await r.ledger.get(operationId)).contentSha256.length,64);
+ const receipt=await inspectGithubControlledUpdateRecovery({
+  operationId,branch,path,adapter:r.adapter,ledger:r.ledger,onCheckpoint:r.onCheckpoint
+ });
+ assert.equal(receipt.state,"RECOVERY_CONTENT_MATCH_UNATTRIBUTED");
+ assert.equal(receipt.safeToRetry,false);
+ assert.equal(receipt.note,"CONTENT_MATCH_NOT_PROOF_OF_AUTHOR_OR_COMMIT");
+ assert.equal(receipt.commitSha,undefined);
+ assert.equal(mutations,1);
+ assert.equal((await r.ledger.get(operationId)).state,"RECOVERY_CONTENT_MATCH_UNATTRIBUTED");
+});
+test("recovery mismatched target stays unresolved and does not retry",async()=>{
+ const r=rig();r.adapter.updateControlled=async()=>{throw Error("provider timeout")};
+ await assert.rejects(run(r),{code:"PROVIDER_OR_CHECKPOINT_ERROR"});
+ const x=await inspectGithubControlledUpdateRecovery({
+  operationId,branch,path,adapter:r.adapter,ledger:r.ledger,onCheckpoint:r.onCheckpoint
+ });
+ assert.equal(x.state,"RECOVERY_MANUAL_REVIEW_REQUIRED");
+ assert.equal(x.safeToRetry,false);
+ assert.equal((await r.ledger.get(operationId)).state,"RECOVERY_REQUIRED");
+});
+test("recovery read error remains unresolved, no GitHub write",async()=>{
+ const r=rig();r.adapter.updateControlled=async()=>{throw Error("timeout")};
+ await assert.rejects(run(r),{code:"PROVIDER_OR_CHECKPOINT_ERROR"});
+ r.adapter.readControlled=async()=>{throw Error("network unavailable")};
+ const x=await inspectGithubControlledUpdateRecovery({
+  operationId,branch,path,adapter:r.adapter,ledger:r.ledger,onCheckpoint:r.onCheckpoint
+ });
+ assert.equal(x.state,"RECOVERY_READ_UNAVAILABLE");
+ assert.equal(x.safeToRetry,false);
+ assert.equal((await r.ledger.get(operationId)).state,"RECOVERY_REQUIRED");
 });
