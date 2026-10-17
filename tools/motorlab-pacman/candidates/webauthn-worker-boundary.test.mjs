@@ -215,7 +215,7 @@ test("internal staging binding diagnostic is protected, read-only and cannot fal
  const missing=await handleWebAuthnRequest(request,env,{fetchImpl:async()=>{external++;}});
  assert.equal(missing.status,503);assert.equal((await missing.json()).error,"EXECUTION_SERVICE_BINDING_MISSING");
  const service={fetch:async(u,init)=>{
-  calls++;assert.ok(u instanceof Request);assert.equal(u.url,"https://pacman-execution.internal/health");assert.equal(u.method,"GET");
+  calls++;assert.ok(u instanceof Request);assert.equal(u.url,"https://example.com/health");assert.equal(u.method,"GET");assert.equal(u.redirect,"manual");
   return Response.json({service:"pacman-execution-staging",revision:"pacman-v2-webauthn-relay-20261016",database:"CONNECTED"});
  }};
  const good=await handleWebAuthnRequest(request,{...env,PACMAN_EXECUTION_SERVICE:service},{fetchImpl:async()=>{external++;}});
@@ -254,7 +254,7 @@ test("safe binding transport error classification does not expose exception text
  const env={...baseEnv,DB:db(),PACMAN_EXECUTION_KEY:key};
  const r=await handleWebAuthnRequest(req,{...env,PACMAN_EXECUTION_SERVICE:{fetch:async()=>{throw Error("1042 private-secret-must-not-leak");}}});
  assert.equal(r.status,503);
- const d=await r.json();assert.deepEqual(d,{error:"EXECUTION_SERVICE_UNREACHABLE",phase:"FETCH",reason:"CF_1042"});
+ const d=await r.json();assert.deepEqual(d,{error:"EXECUTION_SERVICE_UNREACHABLE",phase:"BINDING_FETCH",reason:"CF_1042"});
  assert.equal(JSON.stringify(d).includes("private-secret"),false);
  const x=await handleWebAuthnRequest(req,{...env,PACMAN_EXECUTION_SERVICE:{fetch:async()=>({status:200,json:async()=>{throw SyntaxError("secret-json");}})}});
  assert.equal(x.status,503);assert.equal((await x.json()).phase,"DECODE");

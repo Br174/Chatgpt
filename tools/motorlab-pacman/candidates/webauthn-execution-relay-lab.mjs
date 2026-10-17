@@ -5,7 +5,8 @@ import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.
 const fail=code=>{throw Error(code);};
 const EXECUTOR_ORIGIN="https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev";
 // The binding pins the actual target; this hostname is only a Request URL.
-const PRIVATE_ORIGIN="https://pacman-execution.internal";
+// Cloudflare service binding pins the Worker; fully qualified URL is only a Request routing key.
+const PRIVATE_ORIGIN="https://example.com";
 function exactHttpsOrigin(value){
  if(typeof value!=="string")return null;
  let u;try{u=new URL(value);}catch{return null;}

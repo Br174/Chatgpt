@@ -104,9 +104,11 @@ export async function handleWebAuthnRequest(request,env,{
    if(!exactBearer(request,env?.PACMAN_EXECUTION_KEY))return reply({error:"UNAUTHORIZED"},401);
    if(!cfg||typeof env?.PACMAN_EXECUTION_SERVICE?.fetch!=="function")
     return reply({error:"EXECUTION_SERVICE_BINDING_MISSING"},503);
-   let health,phase="FETCH";
+   let health,phase="CONSTRUCT";
    try{
-    const request=new Request("https://pacman-execution.internal/health",{method:"GET",redirect:"error"});
+    // The service binding itself pins the target, never ordinary network fetch.
+    const request=new Request("https://example.com/health",{method:"GET",redirect:"manual"});
+    phase="BINDING_FETCH";
     const r=await env.PACMAN_EXECUTION_SERVICE.fetch(request);
     if(r.status!==200)return reply({error:"EXECUTION_SERVICE_HEALTH_REJECTED"},503);
     phase="DECODE";
@@ -114,7 +116,9 @@ export async function handleWebAuthnRequest(request,env,{
    }catch(e){
     // Expose only strictly enumerated error categories, never a raw message or stack.
     const msg=typeof e?.message==="string"?e.message:"";
-    const reason=/\b1042\b/.test(msg)?"CF_1042":/\b1101\b/.test(msg)?"CF_1101":
+    const reason=/invalid url|parse url|url.*invalid/i.test(msg)?"INVALID_URL":
+     /invalid request|request.*invalid/i.test(msg)?"INVALID_REQUEST":
+     /\b1042\b/.test(msg)?"CF_1042":/\b1101\b/.test(msg)?"CF_1101":
      /\b1019\b/.test(msg)?"CF_1019":/\b1021\b/.test(msg)?"CF_1021":
      /\b1027\b/.test(msg)?"CF_1027":
      /network|connection|fetch failed|upstream|transport/i.test(msg)?"NETWORK":

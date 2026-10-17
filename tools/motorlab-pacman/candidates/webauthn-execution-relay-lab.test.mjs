@@ -15,7 +15,7 @@ test("verified passkey issuer sends exact signed LAB operation over private serv
  const out=await executePacmanWithWebAuthnLab({...request,executionService});
  assert.deepEqual(out,{status:"PACMAN_OPERATION_VERIFIED",operationId:intent.operationId,branch,path});
  assert.ok(seen instanceof Request);
- assert.equal(seen.url,"https://pacman-execution.internal/execute");assert.equal(seen.method,"POST");
+ assert.equal(seen.url,"https://example.com/execute");assert.equal(seen.method,"POST");
  assert.equal(seen.headers.get("authorization"),"Bearer "+executionKey);
  const payload=JSON.parse(await seen.text());
  assert.equal(payload.mode,"github-lab-cycle");assert.deepEqual(payload.approval,{...intent,decision:"authorize"});
