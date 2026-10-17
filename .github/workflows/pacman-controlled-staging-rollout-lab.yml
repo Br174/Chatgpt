@@ -1,0 +1,217 @@
+name: Pac-Man Controlled Staging Rollout LAB (protected, OFF)
+# ONE authorized rollout. No D1 SQL, no secret put, no flag toggles, no GitHub provider writes.
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/workflows/pacman-controlled-staging-rollout-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-controlled-staging-rollout-lab-single-writer
+  cancel-in-progress: false
+
+jobs:
+  safety-preflight:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test official LAB security suites and staged rollout guards
+        run: |
+          node --test tools/motorlab-pacman/*.test.mjs tools/motorlab-pacman/candidates/*.test.mjs
+      - name: Verify static execution and WebAuthn target configuration
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {inspectControlledStagingDeploymentCandidate,STAGING_BRANCH}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-preflight-lab.mjs';
+          const rd=p=>fs.readFileSync(p,'utf8');
+          const t='tools/motorlab-pacman/';
+          const audit=inspectControlledStagingDeploymentCandidate({
+            branch:STAGING_BRANCH,executionConfig:rd(t+'wrangler.pacman-execution-staging.jsonc'),
+            webauthnConfig:rd(t+'webauthn/wrangler.pacman-webauthn-staging.jsonc'),
+            executionSource:rd(t+'worker-execution-staging.mjs'),
+            webauthnSource:rd(t+'webauthn/worker.mjs'),
+            ownerRouteSource:rd(t+'candidates/webauthn-owner-handler-lab.mjs'),
+            relaySource:rd(t+'candidates/webauthn-execution-relay-lab.mjs')
+          });
+          if(!audit.ready||audit.deployAllowed!==false||audit.activationAllowed!==false)
+            throw Error('CONTROLLED_LAB_STATIC_SCOPE_DENIED');
+          console.log('PACMAN_DEPLOY_STATIC_STAGING_TARGETS_VALIDATED');
+          NODE
+  protected-execution:
+    needs: safety-preflight
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 15
+    outputs:
+      deployed_version: ${{ steps.execution.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preflight, deploy Execution ONLY, preserve bindings and verify HMAC and D1 in staging
+        id: execution
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          GITHUB_READONLY_TOKEN: ${{ github.token }}
+          EXPECTED_HEAD: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          import {inspectProtectedWorker,assertBindingPreservation,requireVersion,
+            parseWranglerVersion,protectedRuntimeEvidence,HISTORY,EXEC,WEB,ACCOUNT}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          if(process.env.CF_ACCOUNT!==ACCOUNT||!process.env.CF_TOKEN||
+            !process.env.GITHUB_READONLY_TOKEN||!process.env.EXPECTED_HEAD||
+            !process.env.EXECUTION_KEY)throw Error('STAGING_SCOPE_OR_SECRET_MISSING');
+          const gitBase='https://api.github.com/repos/Br174/Chatgpt';
+          const auth={authorization:'Bearer '+process.env.GITHUB_READONLY_TOKEN,accept:'application/vnd.github+json'};
+          const check=async(url)=>{
+            const r=await fetch(url,{method:'GET',redirect:'manual',headers:auth,signal:AbortSignal.timeout(15000)});
+            if(r.status!==200)throw Error('GITHUB_HEAD_READBACK_BLOCKED');
+            return r.json();
+          };
+          const head=await check(gitBase+'/git/ref/heads/motorlab/pacman-real-operations-lab-20261017');
+          const main=await check(gitBase+'/branches/main');
+          if(head?.object?.sha!==process.env.EXPECTED_HEAD||
+             main?.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7')
+            throw Error('STAGING_HEAD_OR_MAIN_DRIFT_STOP');
+          const opts={token:process.env.CF_TOKEN,account:process.env.CF_ACCOUNT};
+          const beforeE=await inspectProtectedWorker({name:EXEC,...opts});
+          const beforeW=await inspectProtectedWorker({name:WEB,...opts});
+          requireVersion(EXEC,beforeE.version,HISTORY[EXEC]);
+          requireVersion(WEB,beforeW.version,HISTORY[WEB]);
+          await protectedRuntimeEvidence({executionKey:process.env.EXECUTION_KEY,requireOwner:true});
+          console.log('PACMAN_EXECUTION_PREDEPLOY_BASELINE_AND_HMAC_VERIFIED');
+          // Wrangler's documented --keep-vars preserves configured vars; existing
+          // secrets are preserved. No secret put, D1 SQL or flag changes permitted.
+          let deployment;
+          try{
+            deployment=cp.execFileSync('npx',['--yes','wrangler@4','deploy','--config',
+             'wrangler.pacman-execution-staging.jsonc','--keep-vars'],{
+              cwd:'tools/motorlab-pacman',env:{
+                ...process.env,CLOUDFLARE_API_TOKEN:process.env.CF_TOKEN,
+                CLOUDFLARE_ACCOUNT_ID:process.env.CF_ACCOUNT
+              },encoding:'utf8',timeout:180000,maxBuffer:5_000_000,stdio:['ignore','pipe','pipe']
+            });
+          }catch{throw Error('PACMAN_EXECUTION_WRANGLER_DEPLOY_FAILED');}
+          const deployedVersion=parseWranglerVersion(deployment);
+          console.log('PACMAN_EXECUTION_DEPLOY_ATTEMPT_RECORDED');
+          let afterE,afterW;
+          for(let i=0;i<5;i++){
+            afterE=await inspectProtectedWorker({name:EXEC,...opts});
+            afterW=await inspectProtectedWorker({name:WEB,...opts});
+            if(afterE.version===deployedVersion)break;
+            await new Promise(r=>setTimeout(r,2000));
+          }
+          requireVersion(EXEC,afterE.version,deployedVersion);
+          requireVersion(WEB,afterW.version,HISTORY[WEB]);
+          assertBindingPreservation(beforeE.bindingSnapshot,afterE.bindingSnapshot);
+          assertBindingPreservation(beforeW.bindingSnapshot,afterW.bindingSnapshot);
+          await protectedRuntimeEvidence({executionKey:process.env.EXECUTION_KEY,
+            requireControlledSchema:true,requireOwner:true});
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'version='+deployedVersion+'\n');
+          console.log('PACMAN_EXECUTION_DEPLOYED_VERIFIED_BINDINGS_HMAC_D1');
+          console.log('PACMAN_CONTROLLED_UPDATE_REMAINS_OFF');
+          NODE
+  protected-webauthn:
+    needs: protected-execution
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Re-check Execution; deploy WebAuthn ONLY; verify all protected staging readbacks
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          GITHUB_READONLY_TOKEN: ${{ github.token }}
+          EXPECTED_HEAD: ${{ github.sha }}
+          EXPECTED_EXECUTION_VERSION: ${{ needs.protected-execution.outputs.deployed_version }}
+        run: |
+          node --input-type=module <<'NODE'
+          import cp from 'node:child_process';
+          import {inspectProtectedWorker,assertBindingPreservation,requireVersion,
+            parseWranglerVersion,protectedRuntimeEvidence,HISTORY,EXEC,WEB,ACCOUNT}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          if(process.env.CF_ACCOUNT!==ACCOUNT||!process.env.CF_TOKEN||
+            !process.env.GITHUB_READONLY_TOKEN||!process.env.EXPECTED_HEAD||
+            !process.env.EXECUTION_KEY||!process.env.EXPECTED_EXECUTION_VERSION)
+            throw Error('STAGING_SCOPE_OR_SECRET_MISSING');
+          const auth={authorization:'Bearer '+process.env.GITHUB_READONLY_TOKEN,accept:'application/vnd.github+json'};
+          const check=async(url)=>{
+            const r=await fetch(url,{method:'GET',redirect:'manual',headers:auth,signal:AbortSignal.timeout(15000)});
+            if(r.status!==200)throw Error('GITHUB_HEAD_READBACK_BLOCKED');
+            return r.json();
+          };
+          const root='https://api.github.com/repos/Br174/Chatgpt';
+          const head=await check(root+'/git/ref/heads/motorlab/pacman-real-operations-lab-20261017');
+          const main=await check(root+'/branches/main');
+          if(head?.object?.sha!==process.env.EXPECTED_HEAD||
+             main?.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7')
+            throw Error('STAGING_HEAD_OR_MAIN_DRIFT_STOP');
+          const opts={token:process.env.CF_TOKEN,account:process.env.CF_ACCOUNT};
+          const beforeE=await inspectProtectedWorker({name:EXEC,...opts});
+          const beforeW=await inspectProtectedWorker({name:WEB,...opts});
+          requireVersion(EXEC,beforeE.version,process.env.EXPECTED_EXECUTION_VERSION);
+          requireVersion(WEB,beforeW.version,HISTORY[WEB]);
+          await protectedRuntimeEvidence({executionKey:process.env.EXECUTION_KEY,
+            requireControlledSchema:true,requireOwner:true});
+          console.log('PACMAN_WEBAUTHN_PREDEPLOY_EXECUTION_READBACK_VERIFIED');
+          let deployment;
+          try{
+            deployment=cp.execFileSync('npx',['--yes','wrangler@4','deploy','--config',
+             'wrangler.pacman-webauthn-staging.jsonc','--keep-vars'],{
+              cwd:'tools/motorlab-pacman/webauthn',env:{
+                ...process.env,CLOUDFLARE_API_TOKEN:process.env.CF_TOKEN,
+                CLOUDFLARE_ACCOUNT_ID:process.env.CF_ACCOUNT
+              },encoding:'utf8',timeout:180000,maxBuffer:5_000_000,stdio:['ignore','pipe','pipe']
+            });
+          }catch{throw Error('PACMAN_WEBAUTHN_WRANGLER_DEPLOY_FAILED');}
+          const deployedVersion=parseWranglerVersion(deployment);
+          console.log('PACMAN_WEBAUTHN_DEPLOY_ATTEMPT_RECORDED');
+          let afterE,afterW;
+          for(let i=0;i<5;i++){
+            afterE=await inspectProtectedWorker({name:EXEC,...opts});
+            afterW=await inspectProtectedWorker({name:WEB,...opts});
+            if(afterW.version===deployedVersion)break;
+            await new Promise(r=>setTimeout(r,2000));
+          }
+          requireVersion(EXEC,afterE.version,process.env.EXPECTED_EXECUTION_VERSION);
+          requireVersion(WEB,afterW.version,deployedVersion);
+          assertBindingPreservation(beforeE.bindingSnapshot,afterE.bindingSnapshot);
+          assertBindingPreservation(beforeW.bindingSnapshot,afterW.bindingSnapshot);
+          await protectedRuntimeEvidence({executionKey:process.env.EXECUTION_KEY,
+            requireControlledSchema:true,requireOwner:true});
+          console.log('PACMAN_WEBAUTHN_DEPLOYED_VERIFIED_OWNER_HMAC_D1');
+          console.log('PACMAN_CONTROLLED_UPDATE_REMAINS_OFF');
+          NODE
