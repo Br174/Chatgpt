@@ -1,0 +1,72 @@
+name: Pac-Man Controlled D1 Schema Read-Only LAB
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/workflows/pacman-controlled-d1-schema-readonly-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: pacman-controlled-d1-schema-readonly-lab
+  cancel-in-progress: false
+
+jobs:
+  preflight-local:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify synthetic D1 read-only client, 403 abort and all schema constraints
+        run: |
+          node --test tools/motorlab-pacman/candidates/controlled-ledger-d1-remote-readonly-lab.test.mjs tools/motorlab-pacman/candidates/staging-runtime-cycle-handler.test.mjs
+
+  protected-d1-readonly:
+    needs: preflight-local
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Execute ONLY two approved fixed D1 PRAGMA queries, stop on 403
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {verifyRemoteControlledLedgerSchemaReadOnly} from './tools/motorlab-pacman/candidates/controlled-ledger-d1-remote-readonly-lab.mjs';
+          const status=await verifyRemoteControlledLedgerSchemaReadOnly({
+            cloudflareToken:process.env.CF_TOKEN,
+            accountId:process.env.CF_ACCOUNT,
+            databaseId:'eb834fc1-5589-4f75-bcb9-d311d0d72261'
+          });
+          // Deliberately log only a fixed allowlist of categorical facts.
+          console.log('PACMAN_D1_REMOTE_AUDIT='+status.status);
+          console.log('PACMAN_D1_REMOTE_PRAGMA_COUNT='+status.queries);
+          console.log('PACMAN_D1_REMOTE_SCHEMA='+status.schema);
+          console.log('PACMAN_D1_REMOTE_SQL_WRITE_STATEMENTS='+status.writeStatements);
+          console.log('PACMAN_D1_REMOTE_ROWS_WRITTEN='+status.observedRowsWritten);
+          if(status.status==='HTTP_403_ABORTED_NO_MORE_QUERIES')
+            console.log('PACMAN_D1_REMOTE_STOP_ON_403_CONFIRMED');
+          if(status.status!=='D1_SCHEMA_EXACT_READ_ONLY'||
+             status.schema!=='EXACT'||status.queries!==2||
+             status.writeStatements!==0||status.observedRowsWritten!=='ZERO')
+            process.exitCode=1;
+          NODE
