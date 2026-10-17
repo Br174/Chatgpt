@@ -68,18 +68,18 @@ test("missing Execution flag, ledger/approval/parity guard is a hard failure",()
   "STAGING_ISSUER_PARITY_NOT_VERIFIED",
   "CONTROLLED_APPROVAL_MISMATCH",
   "controlledLedgerSchemaAudit(env.DB)"]){
-  const replaced=real.replace(token,"REMOVED_BY_TEST");
+  const replaced=real.replaceAll(token,"REMOVED_BY_TEST");
   assert.notEqual(replaced,real);
   expectBlock({...baseline(),executionSource:replaced},"EXECUTION_GATES_MISSING");
  }
 });
 test("missing WebAuthn issuer flag, owner route or private relay guard fails",()=>{
  const b=baseline();
- expectBlock({...b,webauthnSource:b.webauthnSource.replace(
+ expectBlock({...b,webauthnSource:b.webauthnSource.replaceAll(
   "createControlledPacmanWebAuthnChallenge","REMOVED")}, "WEBAUTHN_GATES_MISSING");
- expectBlock({...b,ownerRouteSource:b.ownerRouteSource.replace(
+ expectBlock({...b,ownerRouteSource:b.ownerRouteSource.replaceAll(
   "controlledEnabled:","REMOVED")}, "OWNER_APPROVAL_ROUTE_NOT_GATED");
- expectBlock({...b,relaySource:b.relaySource.replace(
+ expectBlock({...b,relaySource:b.relaySource.replaceAll(
   "controlledEnabled!==true","REMOVED")}, "PRIVATE_RELAY_GATES_MISSING");
 });
 test("invalid configs and absent source are denied without executing any code",()=>{
