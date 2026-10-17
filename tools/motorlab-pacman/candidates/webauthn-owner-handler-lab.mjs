@@ -5,7 +5,7 @@ import {createEnrollmentChallengeLab,verifyEnrollmentChallengeLab} from "./webau
 import {verifyNoneRegistrationLab} from "./webauthn-registration-verifier-none-lab.mjs";
 import {digestRegistrationCandidateLab,githubBootstrapCommentBodyLab} from "./webauthn-github-bootstrap-lab.mjs";
 import {enrollOwnerPasskeyFromGithubLab} from "./webauthn-github-enrollment-lab.mjs";
-import {createPacmanWebAuthnChallenge} from "./webauthn-approval-lab.mjs";
+import {createPacmanWebAuthnChallenge,createControlledPacmanWebAuthnChallenge} from "./webauthn-approval-lab.mjs";
 import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.mjs";
 import {executePacmanWithWebAuthnLab} from "./webauthn-execution-relay-lab.mjs";
 import {storeWebAuthnChallengeD1,loadOwnerWebAuthnCredentialD1} from "./webauthn-d1-lab.mjs";
@@ -192,9 +192,12 @@ export async function handleWebAuthnOwnerLab(request,env,{
    if(!intent||typeof intent!=="object"||Array.isArray(intent)||typeof content!=="string"||!content)
     throw fail("INVALID_APPROVAL_REQUEST",400);
    const contentSha256=await sha256Hex(content,cryptoImpl);
-   const challengeRecord=createPacmanWebAuthnChallenge({
-    intent,contentSha256,rpId:cfg.rpId,origin:cfg.origin,nowMs,ttlMs:120000,cryptoImpl
-   });
+   if(intent.capability==="github.lab-file-update"&&intent.contentSha256!==contentSha256)
+    throw fail("WEBAUTHN_CONTENT_MISMATCH",403);
+   const params={intent,rpId:cfg.rpId,origin:cfg.origin,nowMs,ttlMs:120000,cryptoImpl};
+   const challengeRecord=intent.capability==="github.lab-file-update"?
+    await createControlledPacmanWebAuthnChallenge(params):
+    createPacmanWebAuthnChallenge({...params,contentSha256});
    await storeWebAuthnChallengeD1(cfg.db,challengeRecord);
    return reply({
     status:"APPROVAL_CHALLENGE_READY",
