@@ -177,3 +177,40 @@ test("missing private binding prevents challenge creation before D1 mutation",as
  const r=await handleWebAuthnOwnerLab(req("/webauthn/approval/start",{intent,content:"probe"}),env(d,{PACMAN_EXECUTION_SERVICE:null}),{cryptoImpl:webcrypto});
  assert.equal(r.status,503);assert.equal((await r.json()).error,"WEBAUTHN_EXECUTOR_BINDING_UNAVAILABLE");assert.equal(d.challenges.size,0);
 });
+
+
+test("owner approval/start stores full controlled update digest, without enabling a GitHub write",async()=>{
+ const d=db({owner:ownerRow}),content="# Controlled owner challenge\n";
+ const contentSha256=await webcrypto.subtle.digest("SHA-256",new TextEncoder().encode(content));
+ const hash=Buffer.from(contentSha256).toString("hex");
+ const intent={capability:"github.lab-file-update",operationId:"controlled-owner-challenge-0001",
+  branch:"motorlab/pacman-real-operations-lab-20261017",
+  path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
+  expectedSha:"a".repeat(40),contentSha256:hash};
+ const r=await handleWebAuthnOwnerLab(req("/webauthn/approval/start",{intent,content}),env(d),
+  {cryptoImpl:webcrypto,nowMs:1780000000000});
+ assert.equal(r.status,200);
+ assert.equal((await r.json()).status,"APPROVAL_CHALLENGE_READY");
+ const stored=[...d.challenges.values()][0];
+ assert.equal(stored.capability,intent.capability);
+ assert.notEqual(stored.content_sha256,hash);
+ const {controlledWebAuthnRequestDigest}=await import("./webauthn-approval-lab.mjs");
+ assert.equal(stored.content_sha256,await controlledWebAuthnRequestDigest(intent,{cryptoImpl:webcrypto}));
+});
+
+test("owner approval/start refuses changed content or protected branch without consuming D1",async()=>{
+ const content="# Confirmed controlled owner scope\n";
+ const hash=Buffer.from(await webcrypto.subtle.digest("SHA-256",new TextEncoder().encode(content))).toString("hex");
+ const base={capability:"github.lab-file-update",operationId:"controlled-owner-denial-0001",
+  branch:"motorlab/pacman-real-operations-lab-20261017",
+  path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
+  expectedSha:"a".repeat(40),contentSha256:hash};
+ for(const [intent,body] of [[base,content+"ALTERED"],[{...base,branch:"main"},content],
+   [{...base,branch:"motorlab/pacman-execution-v2-lab-20261014"},content]]){
+  const d=db({owner:ownerRow});
+  const r=await handleWebAuthnOwnerLab(req("/webauthn/approval/start",{intent,content:body}),
+   env(d),{cryptoImpl:webcrypto,nowMs:1780000000000});
+  assert.equal(r.status,403);
+  assert.equal(d.challenges.size,0);
+ }
+});
