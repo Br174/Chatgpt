@@ -7,7 +7,7 @@ import {verifyApprovalAttestation} from "../approval-attestation.mjs";
 
 const enc=new TextEncoder();
 const branch="motorlab/pacman-execution-v2-lab-20261014";
-const path="tools/motorlab-pacman/probe-integration.txt";
+const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const rpId="pacman.example.workers.dev",origin="https://pacman.example.workers.dev";
 const secret="s".repeat(48);
 const b64u=b=>Buffer.from(b).toString("base64url");

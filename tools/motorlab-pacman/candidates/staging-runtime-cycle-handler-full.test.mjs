@@ -4,7 +4,7 @@ import {stagingCycleHandler} from "./staging-runtime-cycle-handler.mjs";
 import {signApprovalInTrustedHost} from "../approval-attestation.mjs";
 
 const branch="motorlab/pacman-execution-v2-lab-20261014";
-const path="tools/motorlab-pacman/probe-integration.txt";
+const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const secret="s".repeat(48),token="t".repeat(24),sha="a".repeat(40),commit="b".repeat(40);
 const schema={
  pacman_approval_claims:[["operation_id","TEXT",1,1],["approval_signature","TEXT",1,0],["claimed_at","INTEGER",1,0],["expires_at","INTEGER",1,0]],

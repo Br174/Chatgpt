@@ -49,7 +49,7 @@ test("integrated LAB Worker ignores unrecognized routing flag even with independ
 });
 
 test("integrated LAB Worker rejects production branch before any GitHub network call",async()=>{
- const input={mode:"github-lab-cycle",intent:{operationId:"production-denied",capability:"github.lab-file-cycle",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"},approval:{decision:"authorize"},content:"probe"};
+ const input={mode:"github-lab-cycle",intent:{operationId:"production-denied",capability:"github.lab-file-cycle",branch:"main",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"},approval:{decision:"authorize"},content:"probe"};
  const request=new Request("https://staging.invalid/execute",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+key},body:JSON.stringify(input)});
  let statements=[];
  const env={PACMAN_EXECUTION_KEY:key,PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",
@@ -62,7 +62,7 @@ test("integrated LAB Worker rejects production branch before any GitHub network 
 });
 
 test("integrated LAB Worker with valid D1 schema rejects main before approval claim or GitHub",async()=>{
- const input={mode:"github-lab-cycle",intent:{operationId:"valid-schema-main-denied",capability:"github.lab-file-cycle",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"},approval:{decision:"authorize",branch:"main"},content:"probe"};
+ const input={mode:"github-lab-cycle",intent:{operationId:"valid-schema-main-denied",capability:"github.lab-file-cycle",branch:"main",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"},approval:{decision:"authorize",branch:"main"},content:"probe"};
  const request=new Request("https://staging.invalid/execute",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+key},body:JSON.stringify(input)});
  const calls=[];
  const schema={

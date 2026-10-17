@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {stagingCycleHandler} from "./staging-runtime-cycle-handler.mjs";
 import {signApprovalInTrustedHost} from "../approval-attestation.mjs";
 const secret="s".repeat(48),token="t".repeat(24),content="probe";
-const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-integration.txt";
+const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const sha="a".repeat(40),commit="b".repeat(40);
 const response=(status,body)=>({status,ok:status>=200&&status<300,json:async()=>body});
 const flags={PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED"};

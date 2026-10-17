@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {makeD1Checkpoint,CHECKPOINT_SCHEMA} from "./staging-checkpoint-d1.mjs";
-const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-integration.txt",sha="a".repeat(40);
+const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt",sha="a".repeat(40);
 const step=(state,extra={})=>({state,branch,path,...extra});
 function mockDb(){
  const calls=[];let current=null;

@@ -9,7 +9,7 @@ import {
 
 const encoder=new TextEncoder();
 const branch="motorlab/pacman-execution-v2-lab-20261014";
-const path="tools/motorlab-pacman/probe-integration.txt";
+const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 
 async function record(){
  const intent={operationId:"pacman-webauthn-d1-001",capability:"github.lab-file-cycle",branch,path};
