@@ -1,6 +1,6 @@
 // LAB-only zero-cost WebAuthn/passkey approval primitive.
 // No deployment, D1 writes or GitHub side effects. Intended for a dedicated HTTPS staging Worker.
-import {LAB_BRANCH,LAB_PROBE} from "../chat-approval.mjs";
+import {LAB_BRANCH,LAB_PROBE,validateControlledChatIntent} from "../chat-approval.mjs";
 
 const OP_ID=/^[a-zA-Z0-9][a-zA-Z0-9._-]{7,119}$/;
 const DIGEST=/^[a-f0-9]{64}$/;
@@ -51,12 +51,42 @@ function derEcdsaToRaw(sig,size=32){
  r=trim(r);s=trim(s);return concat(r,s);
 }
 
+// The challenge table's existing content_sha256 field is reused as a *request
+// binding digest* for controlled updates; no D1 schema migration is needed.
+// Legacy probe challenges still store their original content SHA-256 unchanged.
+const CONTROLLED_DOMAIN="MOTORLAB:PACMAN:WEBAUTHN_CONTROLLED_UPDATE:V1";
+export async function controlledWebAuthnRequestDigest(intent,{cryptoImpl=globalThis.crypto}={}){
+ let scoped;
+ try{scoped=validateControlledChatIntent(intent);}catch{fail("WEBAUTHN_SCOPE_DENIED");}
+ if(!cryptoImpl?.subtle)fail("WEBAUTHN_CRYPTO_REQUIRED");
+ const payload=JSON.stringify([CONTROLLED_DOMAIN,"Br174/Chatgpt",
+  scoped.capability,scoped.operationId,scoped.branch,scoped.path,
+  scoped.expectedSha,scoped.contentSha256]);
+ const hash=await cryptoImpl.subtle.digest("SHA-256",encoder.encode(payload));
+ return Array.from(new Uint8Array(hash),x=>x.toString(16).padStart(2,"0")).join("");
+}
 export function validatePacmanWebAuthnIntent({intent,contentSha256}={}){
  if(!intent||!OP_ID.test(intent.operationId||"")||
-    intent.capability!=="github.lab-file-cycle"||
-    intent.branch!==LAB_BRANCH||intent.path!==LAB_PROBE||
-    typeof contentSha256!=="string"||!DIGEST.test(contentSha256))fail("WEBAUTHN_SCOPE_DENIED");
- return true;
+    typeof contentSha256!=="string"||!DIGEST.test(contentSha256))
+   fail("WEBAUTHN_SCOPE_DENIED");
+ if(intent.capability==="github.lab-file-cycle"){
+  if(intent.branch!==LAB_BRANCH||intent.path!==LAB_PROBE)fail("WEBAUTHN_SCOPE_DENIED");
+  return true;
+ }
+ if(intent.capability==="github.lab-file-update"){
+  try{validateControlledChatIntent(intent);}catch{fail("WEBAUTHN_SCOPE_DENIED");}
+  return true;
+ }
+ fail("WEBAUTHN_SCOPE_DENIED");
+}
+// Canonical async constructor for the NEW capability. Do not call the generic
+// constructor with a caller-chosen digest in any untrusted host endpoint.
+export async function createControlledPacmanWebAuthnChallenge({
+ intent,rpId,origin,nowMs=Date.now(),ttlMs=120000,cryptoImpl=globalThis.crypto
+}={}){
+ const contentSha256=await controlledWebAuthnRequestDigest(intent,{cryptoImpl});
+ return createPacmanWebAuthnChallenge({intent,contentSha256,rpId,origin,
+  nowMs,ttlMs,cryptoImpl});
 }
 
 export function createPacmanWebAuthnChallenge({
@@ -81,6 +111,12 @@ export async function verifyPacmanWebAuthnAssertion({
  nowMs=Date.now(),cryptoImpl=globalThis.crypto,requireUserVerification=true
 }={}){
  validatePacmanWebAuthnIntent({intent,contentSha256});
+ if(intent.capability==="github.lab-file-update"){
+  // Enforce complete intent-to-passkey binding at the verifier, not just
+  // the challenge creator. A fabricated persisted digest cannot bypass this.
+  const canonical=await controlledWebAuthnRequestDigest(intent,{cryptoImpl});
+  if(contentSha256!==canonical)fail("WEBAUTHN_INTENT_BINDING_MISMATCH");
+ }
  if(!challengeRecord||challengeRecord.operationId!==intent.operationId||
     challengeRecord.capability!==intent.capability||challengeRecord.branch!==intent.branch||
     challengeRecord.path!==intent.path||challengeRecord.contentSha256!==contentSha256||
