@@ -20,3 +20,22 @@ test("API requests reject 3xx with manual redirects; never rewrite target host",
  await assert.rejects(a.remove({branch,path,sha}),/GITHUB_DELETE_FAILED_302/);
  assert.equal(count,3);
 });
+
+test("GitHub accepts explicit application User-Agent on read, create and cleanup",async()=>{
+ const methods=[];
+ const a=makeGitHubContentsLabAdapter({token:"unit-test-token-000000000000",fetchImpl:async(_url,init)=>{
+  const headers=new Headers(init.headers);
+  // GitHub rejects requests with no valid User-Agent. Workers do not add Node's default.
+  if(!headers.get("user-agent"))return json(403,{message:"User agent required"});
+  assert.equal(headers.get("user-agent"),"motorlab-pacman-execution");
+  assert.equal(init.redirect,"manual");
+  methods.push(init.method);
+  if(init.method==="GET")return json(404,{});
+  if(init.method==="PUT")return json(201,{content:{sha},commit:{sha:commit}});
+  return json(200,{commit:{sha:commit}});
+ }});
+ assert.deepEqual(await a.read({branch,path}),{exists:false});
+ await a.create({branch,path,content:"probe"});
+ await a.remove({branch,path,sha});
+ assert.deepEqual(methods,["GET","PUT","DELETE"]);
+});

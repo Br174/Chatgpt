@@ -414,3 +414,39 @@ test("readiness refuses to fetch GitHub until cryptographic parity marker is set
  assert.equal(r.status,503);assert.equal((await r.json()).error,"STAGING_ISSUER_PARITY_NOT_VERIFIED");
  assert.equal(touched,0);
 });
+
+test("Execution readiness passes GitHub User-Agent requirement using only GET and D1 PRAGMA",async()=>{
+ const {handleExecutionRequest}=await import("./worker-execution-staging.mjs");
+ const calls=[],sql=[];
+ const claims=["operation_id","approval_signature","claimed_at","expires_at"].map((name,i)=>({
+  name,type:i<2?"TEXT":"INTEGER",pk:i===0?1:0,notnull:1
+ }));
+ const points=["operation_id","state","branch","path","sha","updated_at"].map((name,i)=>({
+  name,type:"TEXT",pk:i===0?1:0,notnull:i===0||i===4?0:1
+ }));
+ const env={PACMAN_EXECUTION_KEY:key,
+  PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",
+  PACMAN_ISSUER_PARITY_VERIFIED:"YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED",
+  PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",
+  PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",
+  PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",
+  PACMAN_APPROVAL_SIGNING_SECRET:"s".repeat(48),PACMAN_GITHUB_TOKEN:"t".repeat(40),
+  DB:{prepare(q){sql.push(q);assert.match(q,/^PRAGMA table_info\(/);
+   return {all:async()=>({results:q.includes("pacman_approval_claims")?claims:points})};
+  }}
+ };
+ const request=new Request("https://staging.example/__motorlab_lab/diagnostics/execution-readiness",{
+  headers:{authorization:"Bearer "+key}
+ });
+ const r=await handleExecutionRequest(request,env,{fetchImpl:async(url,init)=>{
+  calls.push(init.method);assert.equal(init.method,"GET");assert.equal(init.redirect,"manual");
+  assert.ok(url.startsWith("https://api.github.com/repos/Br174/Chatgpt/contents/"));
+  return Response.json({}, {status:new Headers(init.headers).get("user-agent")?404:403});
+ }});
+ assert.equal(r.status,200);
+ const body=await r.json();
+ assert.equal(body.status,"STAGING_CYCLE_READY_FOR_OWNER_PASSKEY");
+ assert.equal(body.approval,"WEBAUTHN_REQUIRED");
+ assert.deepEqual(calls,["GET"]);
+ assert.equal(sql.length,2);
+});

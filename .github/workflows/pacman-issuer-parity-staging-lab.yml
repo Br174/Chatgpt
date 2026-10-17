@@ -48,6 +48,7 @@ jobs:
         with:
           node-version: '22'
       - name: Strict staging scope, existing secrets, exact D1 readback and absent file preflight
+        id: preflight
         env:
           CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
           CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
@@ -91,6 +92,7 @@ jobs:
           if(file.status!==404)throw Error('PARITY_PROBE_FILE_NOT_ABSENT');
           const base='https://api.cloudflare.com/client/v4/accounts/'+account;
           const headers={authorization:'Bearer '+process.env.CF_TOKEN};
+          let executionRefresh=false;
           for(const [worker,secretNames] of [
            [webName,['PACMAN_EXECUTION_KEY','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN','PACMAN_WEBAUTHN_ENABLED']],
            [exName,['PACMAN_EXECUTION_KEY','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN',
@@ -107,8 +109,13 @@ jobs:
             if(!bindings.some(x=>x.name===name&&x.type==='secret_text'))
              throw Error('PARITY_STAGING_SECRET_BINDING_MISSING');
            }
-           if(bindings.some(x=>x.name==='PACMAN_ISSUER_PARITY_VERIFIED'))
-            throw Error('PARITY_GATE_ALREADY_PRESENT_REQUIRE_MANUAL_AUDIT');
+           const parityBindings=bindings.filter(x=>x.name==='PACMAN_ISSUER_PARITY_VERIFIED');
+           if(worker===exName){
+            if(parityBindings.length>1||parityBindings.some(x=>x.type!=='secret_text'))
+             throw Error('PARITY_REFRESH_GATE_BINDING_INVALID');
+            executionRefresh=parityBindings.length===1;
+           }else if(parityBindings.length)
+            throw Error('PARITY_REFRESH_GATE_BINDING_INVALID');
            if(worker===webName&&!bindings.some(x=>x.name==='PACMAN_EXECUTION_SERVICE'&&
               x.type==='service'&&x.service===exName))
             throw Error('PARITY_WORKER_SERVICE_BINDING_MISMATCH');
@@ -135,19 +142,34 @@ jobs:
            headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},redirect:'manual',signal:AbortSignal.timeout(15000)});
           const schema=await d.json();
           if(d.status!==200||schema.component!=='pacmanExecutionReadOnlySchemaAudit'||
-             schema.schema!=='EXACT'||schema.issuerParityLocked!==true||
+             schema.schema!=='EXACT'||schema.issuerParityLocked!==!executionRefresh||
              Object.values(schema.flags||{}).length!==4||
              !Object.values(schema.flags).every(x=>x==='MATCH'))
            throw Error('PARITY_PREEXISTING_RUNTIME_GATE_UNVERIFIED');
+          // A verified existing gate is never rewritten or treated as initial enrollment.
+          // Re-prove real signing-key equality before refreshing an already active Execution Worker.
+          if(executionRefresh){
+           const p=await fetch(webOrigin+'/__motorlab_lab/diagnostics/issuer-parity',{
+            method:'GET',headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},
+            redirect:'manual',signal:AbortSignal.timeout(15000)});
+           let proof=null;try{proof=await p.json();}catch{}
+           if(p.status!==200||proof?.component!=='pacmanSigningSecretParity'||
+              proof.match!==true||proof.transport!=='SERVICE_BINDING_STAGING')
+            throw Error('PARITY_LIVE_REFRESH_PROOF_UNVERIFIED');
+           console.log('PARITY_REFRESH_EXISTING_CRYPTOGRAPHIC_GATE_REVERIFIED');
+          }
+          if(!process.env.GITHUB_OUTPUT)throw Error('PARITY_OUTPUT_CHANNEL_MISSING');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'execution_refresh='+executionRefresh+'\n');
           console.log('PARITY_STAGING_PREFLIGHT_PASS_READONLY_PROBE_ABSENT_OWNER_ENROLLED_SCHEMA_EXACT');
           NODE
       - name: Deploy passkey Worker with existing D1 and secrets preserved
+        if: steps.preflight.outputs.execution_refresh != 'true'
         working-directory: tools/motorlab-pacman/webauthn
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
         run: npx --yes wrangler@4 deploy --config wrangler.pacman-webauthn-staging.jsonc --keep-vars
-      - name: Deploy Execution Worker with independent parity gate still LOCKED
+      - name: Deploy Execution Worker preserving verified parity state
         working-directory: tools/motorlab-pacman
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
@@ -177,6 +199,7 @@ jobs:
           console.log('PARITY_LIVE_SIGNING_KEY_MATCH_PROVEN_BY_PRIVATE_BINDING');
           NODE
       - name: Enable independent Execution parity gate only after verified HMAC match
+        if: steps.preflight.outputs.execution_refresh != 'true'
         working-directory: tools/motorlab-pacman
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
