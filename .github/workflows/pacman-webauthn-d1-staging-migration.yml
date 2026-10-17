@@ -1,0 +1,93 @@
+name: Pac-Man WebAuthn D1 staging migration
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/workflows/pacman-webauthn-d1-staging-migration.yml'
+      - 'tools/motorlab-pacman/candidates/staging-d1-webauthn-migration.sql'
+      - 'tools/motorlab-pacman/candidates/staging-d1-webauthn-migration.test.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-webauthn-d1-staging-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify additive-only migration contract
+        run: |
+          node --test tools/motorlab-pacman/candidates/staging-d1-webauthn-migration.test.mjs
+
+      - name: Apply exact WebAuthn schema to dedicated Pac-Man staging D1 and verify
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFile} from 'node:fs/promises';
+          const expectedAccount='b86f445c2b57e604c02f79c8da64bb9c';
+          const dbId='eb834fc1-5589-4f75-bcb9-d311d0d72261';
+          const endpoint='https://api.cloudflare.com/client/v4/accounts/'+expectedAccount+'/d1/database/'+dbId+'/query';
+          if(process.env.CF_ACCOUNT!==expectedAccount || !process.env.CF_TOKEN) throw Error('STAGING_D1_CREDENTIALS_INVALID');
+
+          async function query(sql){
+            const r=await fetch(endpoint,{
+              method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
+              headers:{Authorization:'Bearer '+process.env.CF_TOKEN,'Content-Type':'application/json'},
+              body:JSON.stringify({sql})
+            });
+            if(!r.ok)throw Error('D1_HTTP_'+r.status);
+            const j=await r.json();
+            if(j.success!==true || !Array.isArray(j.result) || j.result.some(x=>x.success!==true))
+              throw Error('D1_QUERY_FAILED');
+            return j.result;
+          }
+
+          const protectedTables=['pacman_operations','pacman_approval_claims','pacman_cycle_checkpoints'];
+          const snapshotSql=`
+            SELECT name, sql
+            FROM sqlite_master
+            WHERE type='table' AND name IN ('pacman_operations','pacman_approval_claims','pacman_cycle_checkpoints')
+            ORDER BY name
+          `;
+          const before=await query(snapshotSql);
+          console.log('PROTECTED_SCHEMA_SNAPSHOT_BEFORE: '+JSON.stringify(before.map(x=>x.results)));
+
+          const sql=await readFile('tools/motorlab-pacman/candidates/staging-d1-webauthn-migration.sql','utf8');
+          const stripped=sql.replace(/--.*$/gm,'').trim();
+          const statements=stripped.split(';').map(x=>x.trim()).filter(Boolean);
+          if(statements.length!==2 || statements.some(s=>!/^CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+pacman_webauthn_(?:credentials|challenges)\b/i.test(s)))
+            throw Error('MIGRATION_SCOPE_REJECTED');
+          for(const statement of statements) await query(statement);
+
+          const after=await query(snapshotSql);
+          console.log('PROTECTED_SCHEMA_SNAPSHOT_AFTER: '+JSON.stringify(after.map(x=>x.results)));
+          if(JSON.stringify(before)!==JSON.stringify(after))throw Error('PROTECTED_SCHEMA_CHANGED');
+
+          const created=await query(`
+            SELECT name, sql
+            FROM sqlite_master
+            WHERE type='table' AND name IN ('pacman_webauthn_credentials','pacman_webauthn_challenges')
+            ORDER BY name
+          `);
+          const rows=created.flatMap(x=>x.results||[]);
+          const names=rows.map(x=>x.name).sort();
+          if(JSON.stringify(names)!==JSON.stringify(['pacman_webauthn_challenges','pacman_webauthn_credentials']))
+            throw Error('WEBAUTHN_TABLES_NOT_VERIFIED');
+          console.log('WEBAUTHN_D1_STAGING_TABLES: VERIFIED');
+          console.log('TARGET_D1: '+dbId);
+          console.log('PROTECTED_TABLES: '+protectedTables.join(',')+' UNCHANGED');
+          console.log('SECRET_VALUES: NEVER_READ_OR_PRINTED');
+          NODE

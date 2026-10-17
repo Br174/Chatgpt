@@ -127,6 +127,25 @@ AUTHORITY: GitHub remains durable technical authority; D1 is live operational re
 RUNTIME IMPACT: NONE; control-plane only
 COST SAFETY: no paid deployment path may be enabled silently
 
+9. Pacman Execution V2 — existing MotorLab function, verified staging scope
+CORE: existing Pacman/AutoSetup route; MotorLab remains its single orchestrator
+SOURCE: tools/motorlab-pacman/PACMAN_EXECUTION_V2_RELEASE.md
+VERIFIED_LAB_SOURCE: 2818f80ec9c75ce376a83b50d91744f70c73c5f8
+CONNECTION: CONNECTED_VERIFIED for the exact staging scope below
+RESOURCE: RESOURCE_READY for the dedicated WebAuthn/Execution staging Workers and D1
+VERIFIED_CAPABILITY: github.lab-file-cycle
+AUTHORIZED_TARGET: Br174/Chatgpt motorlab/pacman-execution-v2-lab-20261014 tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt
+OWNER_APPROVAL: enrolled Android WebAuthn/passkey; fresh assertion for each authorized operation; short-lived content-bound HMAC and single-use D1 claim
+TRANSPORT: private PACMAN_EXECUTION_SERVICE binding; no public fallback
+FINAL_AUDIT: https://github.com/Br174/Chatgpt/actions/runs/39062615761 SUCCESS
+FINAL_RECEIPT: VERIFIED_AND_REMOVED; claim present; challenge_count=4; consumed_count=4
+COMPLETED_OPERATION: pacman-webauthn-lab-20261017-ff59959a-01; do not replay
+PRODUCTION_DEPLOYMENT: not performed by source integration
+CHATGPT_MCP_APP_CONNECTION: not verified; PR49 lineage remains draft and separate from the verified staging receipt
+BROADER_PROVIDER_ADMINISTRATION: not implied by this single capability
+COST_AND_SCOPE: existing staging resources only; no paid service, Cloudflare Access/Zero Trust, new D1 schema or APK
+RELEASE: r37 unchanged; no separate Pacman product/MADRE or second execution coordinator
+
 CONNECTION RULE
 Connecting/installing a ChatGPT plugin or custom MCP app requires explicit user action. Once connected, update this registry only after a real tool capability check verifies access.
 

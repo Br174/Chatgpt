@@ -1,0 +1,29 @@
+name: Pacman V2 Complete LAB Suite
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - 'tools/motorlab-pacman/**'
+      - 'cloudflare/motorlab-state-bridge/wrangler.jsonc'
+      - '.github/workflows/pacman-v2-complete-tests.yml'
+  pull_request:
+    branches:
+      - motorlab/pacman-steel-guard-lab-20261014
+    paths:
+      - 'tools/motorlab-pacman/**'
+      - '.github/workflows/pacman-v2-complete-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complete-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run Pacman V2 complete suite
+        run: node --test tools/motorlab-pacman/atomic-claim.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/d1-ledger.test.mjs tools/motorlab-pacman/d1-runner-integration.test.mjs tools/motorlab-pacman/staging-readiness.test.mjs tools/motorlab-pacman/d1-isolation-audit.test.mjs tools/motorlab-pacman/d1-repository-config.test.mjs tools/motorlab-pacman/staging-d1-entry.test.mjs tools/motorlab-pacman/worker-health-staging.test.mjs tools/motorlab-pacman/staging-deploy-gate.test.mjs tools/motorlab-pacman/verify-live-staging.test.mjs tools/motorlab-pacman/github-lab-adapter.test.mjs tools/motorlab-pacman/authorized-runner.test.mjs tools/motorlab-pacman/authorized-runner-integration.test.mjs tools/motorlab-pacman/live-execution-gate.test.mjs tools/motorlab-pacman/worker-execution-staging.test.mjs tools/motorlab-pacman/chat-approval.test.mjs tools/motorlab-pacman/chat-coordinator.test.mjs tools/motorlab-pacman/approval-attestation.test.mjs tools/motorlab-pacman/approval-single-use.test.mjs tools/motorlab-pacman/trusted-approval-gate.test.mjs tools/motorlab-pacman/worker-credential-intake-staging.test.mjs tools/motorlab-pacman/chat-control-command.test.mjs tools/motorlab-pacman/chat-control-plan.test.mjs

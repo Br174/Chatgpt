@@ -1,0 +1,17 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {verifyRegistrationClientDataLab as verify} from "./webauthn-registration-preflight-lab.mjs";
+const challenge="test-challenge-123",origin="https://example.com";
+const encode=o=>Buffer.from(JSON.stringify(o)).toString("base64url");
+const client=(overrides={})=>encode({type:"webauthn.create",challenge,origin,...overrides});
+const run=(overrides={})=>verify({clientDataJSON:client(),challenge,origin,...overrides});
+test("accepts valid registration client data preflight",()=>assert.equal(run().type,"webauthn.create"));
+test("rejects assertion ceremony",()=>assert.throws(()=>run({clientDataJSON:client({type:"webauthn.get"})})));
+test("rejects challenge mismatch",()=>assert.throws(()=>run({challenge:"wrong"})));
+test("rejects origin mismatch",()=>assert.throws(()=>run({origin:"https://evil.example"})));
+test("rejects cross-origin",()=>assert.throws(()=>run({clientDataJSON:client({crossOrigin:true})})));
+test("rejects topOrigin field",()=>assert.throws(()=>run({clientDataJSON:client({topOrigin:"https://example.com"})})));
+test("rejects HTTP origin",()=>assert.throws(()=>run({origin:"http://example.com"})));
+test("rejects malformed base64url",()=>assert.throws(()=>run({clientDataJSON:"!bad"})));
+test("rejects malformed JSON",()=>assert.throws(()=>run({clientDataJSON:Buffer.from("{").toString("base64url")})));
+test("rejects noncanonical base64url",()=>assert.throws(()=>run({clientDataJSON:client()+"="})));

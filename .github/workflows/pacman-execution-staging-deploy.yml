@@ -1,0 +1,188 @@
+name: Pacman execution staging deploy (LAB branch, protected)
+
+# Manual recovery only: the guarded signer-parity workflow owns this LAB rollout.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-execution-staging-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact isolated staging target
+        working-directory: tools/motorlab-pacman
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('wrangler.pacman-execution-staging.jsonc','utf8'));
+          if(c.workers_dev!==true ||
+             c.name!=='motorlab-pacman-execution-staging-lab' ||
+             c.main!=='./worker-execution-staging.mjs' ||
+             c.d1_databases?.length!==1 ||
+             c.d1_databases[0].binding!=='DB' ||
+             c.d1_databases[0].database_name!=='motorlab-pacman-staging' ||
+             c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261') {
+            throw Error('STAGING_SCOPE_MISMATCH');
+          }
+          console.log('DEDICATED_STAGING_WORKER_AND_D1_VERIFIED');
+          NODE
+      - name: Run Pacman LAB tests
+        run: node --test tools/motorlab-pacman/*.test.mjs
+      - name: Run isolated candidate and Worker boundary tests
+        run: node --test tools/motorlab-pacman/candidates/*.test.mjs
+      - name: Require protected staging credentials and activation flag
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          ACTIVATION_APPROVED: ${{ vars.PACMAN_EXECUTION_ACTIVATION_APPROVED }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::PACMAN_CF_API_TOKEN is missing from the protected staging environment"; exit 1; }
+          test "$CLOUDFLARE_ACCOUNT_ID" = b86f445c2b57e604c02f79c8da64bb9c || { echo "::error::Cloudflare account is not MotorLab-Staging"; exit 1; }
+          test "$ACTIVATION_APPROVED" = YES_STAGING_EXECUTION_ONLY || { echo "::error::Staging activation flag is not approved"; exit 1; }
+      - name: Read-only preflight of LAB head, protected Worker secrets and exact D1 schemas
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          GH_TOKEN: ${{ github.token }}
+          HEAD: ${{ github.sha }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const db='eb834fc1-5589-4f75-bcb9-d311d0d72261';
+          const name='motorlab-pacman-execution-staging-lab';
+          const branch='motorlab/pacman-execution-v2-lab-20261014';
+          const probe='tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt';
+          const conf=JSON.parse(fs.readFileSync('tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc','utf8'));
+          const flags={
+           PACMAN_CYCLE_ROUTE_ENABLED:'YES_REVIEWED_STAGING_CANDIDATE',
+           PACMAN_TRUSTED_ISSUER_CONNECTED:'YES_VERIFIED_TRUSTED_HOST',
+           PACMAN_GITHUB_LAB_WRITE_ENABLED:'YES_STAGING_LAB_ONLY',
+           PACMAN_D1_CHECKPOINTS_VERIFIED:'YES_STAGING_D1_CHECKPOINTS_VERIFIED'
+          };
+          if(process.env.ACCOUNT!==account||!process.env.CF_TOKEN||
+             !process.env.GH_TOKEN||!process.env.HEAD||
+             typeof process.env.EXECUTION_KEY!=='string'||process.env.EXECUTION_KEY.length<32)
+            throw Error('PACMAN_STAGING_CREDENTIALS_UNAVAILABLE');
+          if(conf.name!==name||conf.main!=='./worker-execution-staging.mjs'||
+             conf.workers_dev!==true||conf.d1_databases?.length!==1||
+             conf.d1_databases[0].binding!=='DB'||
+             conf.d1_databases[0].database_id!==db||
+             conf.d1_databases[0].database_name!=='motorlab-pacman-staging'||
+             Object.keys(conf.vars||{}).length!==0)
+           throw Error('PACMAN_EXECUTION_SCOPE_INVALID');
+          const ghHeaders={authorization:'Bearer '+process.env.GH_TOKEN,
+            accept:'application/vnd.github+json','user-agent':'motorlab-pacman-execution-audit'};
+          const git=async(url)=>fetch(url,{headers:ghHeaders,redirect:'manual',signal:AbortSignal.timeout(15000)});
+          const gitHead=await git('https://api.github.com/repos/Br174/Chatgpt/git/ref/heads/'+branch);
+          if(gitHead.status!==200||(await gitHead.json())?.object?.sha!==process.env.HEAD)
+           throw Error('PACMAN_STALE_LAB_HEAD');
+          const file=await git('https://api.github.com/repos/Br174/Chatgpt/contents/'+probe+'?ref='+encodeURIComponent(branch));
+          if(file.status!==404)throw Error('PACMAN_PROBE_NOT_PROVEN_ABSENT');
+          const base='https://api.cloudflare.com/client/v4/accounts/'+account;
+          const headers={authorization:'Bearer '+process.env.CF_TOKEN,accept:'application/json'};
+          const live=await fetch(base+'/workers/scripts/'+name+'/settings',{
+           headers,redirect:'manual',signal:AbortSignal.timeout(15000)});
+          if(live.status!==200)throw Error('PACMAN_EXECUTION_SETTINGS_UNAVAILABLE');
+          const settings=await live.json(),bindings=settings?.result?.bindings;
+          if(settings.success!==true||!Array.isArray(bindings))
+           throw Error('PACMAN_EXECUTION_BINDINGS_UNVERIFIED');
+          if(!bindings.some(b=>b.name==='DB'&&b.type==='d1'&&b.id===db))
+           throw Error('PACMAN_EXECUTION_D1_TARGET_MISMATCH');
+          for(const secret of ['PACMAN_EXECUTION_KEY','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN']){
+           if(!bindings.some(b=>b.name===secret&&b.type==='secret_text'))
+            throw Error('PACMAN_EXECUTION_SECRET_BINDING_MISSING');
+          }
+          // Four legacy switches are secret_text on live staging. Do not infer their value.
+          for(const [name,value] of Object.entries(flags)){
+           const found=bindings.filter(b=>b.name===name);
+           if(found.length>1)throw Error('PACMAN_DUPLICATE_EXECUTION_FLAG_BINDING');
+           if(found.length===1&&!['secret_text','plain_text'].includes(found[0].type))
+            throw Error('PACMAN_UNKNOWN_EXECUTION_FLAG_TYPE');
+           if(found[0]?.type==='plain_text'&&found[0]?.text===value)
+            throw Error('PACMAN_PREMATURE_VISIBLE_FLAG_ACTIVATION');
+          }
+          // Hard, independent owner-signature parity gate must not exist yet.
+          if(bindings.some(b=>b.name==='PACMAN_ISSUER_PARITY_VERIFIED'))
+           throw Error('PACMAN_ISSUER_PARITY_PREMATURELY_CONFIGURED');
+          // D1 API direct query returns 403 under this protected token.
+          // Read-only schema audit will use existing isolated Execution Worker DB binding.
+          console.log('PACMAN_D1_SCHEMA_REMOTE_API_DENIED_WORKER_BINDING_CHECK_REQUIRED');
+          console.log('PACMAN_OPAQUE_FLAG_BINDINGS_RECOGNIZED_WITH_PARITY_GATE_CLOSED');
+          console.log('PACMAN_EXECUTION_READONLY_PREFLIGHT_VERIFIED');
+          NODE
+      - name: Deploy dedicated staging Worker
+        id: deploy
+        working-directory: tools/motorlab-pacman
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 deploy --config wrangler.pacman-execution-staging.jsonc --keep-vars 2>&1 | tee "$RUNNER_TEMP/pacman-wrangler-deploy.log"
+          worker_url="$(grep -Eo 'https://[[:alnum:].-]+\.workers\.dev' "$RUNNER_TEMP/pacman-wrangler-deploy.log" | head -n 1 || true)"
+          if [[ -z "$worker_url" ]]; then
+            echo "::error::Deployment completed but Wrangler did not report a workers.dev URL; health readback is unverified."
+            exit 1
+          fi
+          echo "worker_url=$worker_url" >> "$GITHUB_OUTPUT"
+      - name: Verify deployed Worker and isolated D1 binding
+        env:
+          WORKER_URL: ${{ steps.deploy.outputs.worker_url }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base=process.env.WORKER_URL;
+          if(!base || !/^https:\/\/[a-zA-Z0-9.-]+\.workers\.dev$/.test(base)) throw Error('INVALID_STAGING_WORKER_URL');
+          const r=await fetch(base+'/health',{redirect:'error',signal:AbortSignal.timeout(15000)});
+          const body=await r.json();
+          if(!r.ok || body.service!=='pacman-execution-staging' || body.database!=='CONNECTED')
+            throw Error('STAGING_HEALTH_READBACK_FAILED');
+          console.log('PACMAN_STAGING_WORKER_HEALTH_AND_D1_BINDING_VERIFIED');
+          if(body.revision!=='pacman-v2-webauthn-relay-20261016')
+            throw Error('EXECUTION_REVISION_UNEXPECTED');
+          // Only GETs, via protected Worker DB binding: PRAGMA, no writes or secrets returned.
+          const auditUrl=base+'/__motorlab_lab/diagnostics/execution-schema-audit';
+          const unauthorized=await fetch(auditUrl,{method:'GET',redirect:'manual',signal:AbortSignal.timeout(15000)});
+          if(unauthorized.status!==401)throw Error('AUDIT_ENDPOINT_AUTH_UNVERIFIED');
+          const audit=await fetch(auditUrl,{method:'GET',redirect:'manual',
+           headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},
+           signal:AbortSignal.timeout(15000)});
+          let result;try{result=await audit.json();}catch{throw Error('WORKER_D1_AUDIT_NON_JSON');}
+          const schema=result?.schema,flags=result?.flags||{};
+          console.log('PACMAN_EXECUTION_SCHEMA_'+
+            (['EXACT','STAGING_CONFIGURATION_MISSING','STAGING_D1_SCHEMA_UNVERIFIED'].includes(schema)?schema:'UNKNOWN'));
+          for(const name of ['PACMAN_TRUSTED_ISSUER_CONNECTED','PACMAN_GITHUB_LAB_WRITE_ENABLED',
+            'PACMAN_CYCLE_ROUTE_ENABLED','PACMAN_D1_CHECKPOINTS_VERIFIED']){
+           console.log('PACMAN_EXECUTION_FLAG_'+name+'_'+
+            (flags[name]==='MATCH'?'MATCH':flags[name]==='NOT_MATCH'?'NOT_MATCH':'UNKNOWN'));
+          }
+          if(result?.component!=='pacmanExecutionReadOnlySchemaAudit'||
+             result?.issuerParityLocked!==true)
+           throw Error('EXECUTION_PARITY_SAFETY_GATE_NOT_CONFIRMED');
+          if(audit.status!==200||schema!=='EXACT')
+           throw Error('EXECUTION_D1_SCHEMA_NOT_VERIFIED');
+          console.log('PACMAN_EXECUTION_BINDING_SCHEMA_VERIFIED_NO_MUTATIONS');
+
+          console.log('PACMAN_EXECUTION_STAGING_READONLY_AUDIT_PASSED');
+          console.log('PACMAN_GITHUB_MUTATIONS_BLOCKED_PENDING_OWNER_PARITY');
+
+          NODE

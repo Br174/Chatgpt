@@ -1,0 +1,14 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {normalizeGithubWorkflowRunsLab as norm} from "./github-actions-run-normalizer-lab.mjs";
+const commitSha="a".repeat(40),branch="motorlab/pacman-execution-v2-lab-20261014",repository="Br174/Chatgpt";
+const run={id:1,name:"Pacman V2 Complete LAB Suite",status:"completed",conclusion:"success",event:"push",head_sha:commitSha,head_branch:branch,repository:{full_name:repository}};
+const call=r=>norm({response:{workflow_runs:r},repository,branch,commitSha});
+test("preserves exact matching successful run",()=>assert.equal(call([run]).length,1));
+test("excludes stale commit",()=>assert.equal(call([{...run,head_sha:"b".repeat(40)}]).length,0));
+test("excludes other branch",()=>assert.equal(call([{...run,head_branch:"main"}]).length,0));
+test("excludes other repository",()=>assert.equal(call([{...run,repository:{full_name:"other/repo"}}]).length,0));
+test("rejects duplicate run IDs",()=>assert.throws(()=>call([run,run])));
+test("rejects malformed response",()=>assert.throws(()=>norm({response:{},repository,branch,commitSha})));
+test("rejects invalid run ID",()=>assert.throws(()=>call([{...run,id:0}])));
+test("preserves failed run status",()=>assert.equal(call([{...run,conclusion:"failure"}])[0].conclusion,"failure"));

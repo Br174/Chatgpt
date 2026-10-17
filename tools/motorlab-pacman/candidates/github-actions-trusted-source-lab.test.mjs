@@ -1,0 +1,15 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {calculateGithubBackedProgressLab as calc} from "./github-actions-trusted-source-lab.mjs";
+const sha="a".repeat(40),repository="Br174/Chatgpt",branch="motorlab/pacman-execution-v2-lab-20261014",name="Pacman V2 Complete LAB Suite";
+const tree={children:[{id:"ci",weight:1,kind:"ci",commitSha:sha,workflowName:name}]};
+const evidence=[{id:"ci",completion:100}];
+const run={id:5,name,status:"completed",conclusion:"success",head_sha:sha,head_branch:branch,repository:{full_name:repository},event:"push"};
+const args={tree,evidence,repository,branch,allowedWorkflows:[name]};
+test("trusted fetcher credits matching CI evidence",async()=>assert.equal((await calc({...args,fetchRuns:async()=>[run]})).percent,100));
+test("failed run credits zero",async()=>assert.equal((await calc({...args,fetchRuns:async()=>[{...run,conclusion:"failure"}]})).percent,0));
+test("missing fetcher fails closed",async()=>assert.rejects(()=>calc(args)));
+test("fetcher error fails closed",async()=>assert.rejects(()=>calc({...args,fetchRuns:async()=>{throw Error("offline");}})));
+test("malformed fetch response fails closed",async()=>assert.rejects(()=>calc({...args,fetchRuns:async()=>({runs:[run]})})));
+test("caller-supplied runs cannot replace fetcher output",async()=>assert.equal((await calc({...args,runs:[run],fetchRuns:async()=>[]})).percent,0));
+test("fetcher receives expected scope",async()=>{let received;await calc({...args,fetchRuns:async scope=>{received=scope;return [];}});assert.deepEqual(received,{repository,branch});});

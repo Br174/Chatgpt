@@ -1,0 +1,15 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {webcrypto} from "node:crypto";
+import {verifyAndClaimEnrollmentBootstrapLab} from "./webauthn-bootstrap-verified-claim-lab.mjs";
+const now=1780000000000,owner="owner-lab-001";
+const secret=webcrypto.getRandomValues(new Uint8Array(32));
+const payloadData={purpose:"pacman.webauthn.enroll.v1",ownerId:owner,nonce:"n".repeat(32),issuedAt:now-1000,expiresAt:now+60000};
+const sign=async data=>{const payload=Buffer.from(JSON.stringify(data)).toString("base64url");const key=await webcrypto.subtle.importKey("raw",secret,{name:"HMAC",hash:"SHA-256"},false,["sign"]);const signature=Buffer.from(await webcrypto.subtle.sign("HMAC",key,new TextEncoder().encode(payload))).toString("base64url");return {payload,signature};};
+const run=async(data=payloadData,claimOnce=async()=>true,overrides={})=>verifyAndClaimEnrollmentBootstrapLab({...await sign(data),secret,expectedOwner:owner,claimOnce,now,...overrides});
+test("signed proof claims nonce once",async()=>assert.equal((await run()).claimed,true));
+test("tampered proof never reaches claim callback",async()=>{let calls=0;const signed=await sign(payloadData);await assert.rejects(()=>run(payloadData,async()=>{calls++;return true;},{...signed,signature:"AAAA"}));assert.equal(calls,0);});
+test("expired proof never reaches claim callback",async()=>{let calls=0;await assert.rejects(()=>run({...payloadData,expiresAt:now},async()=>{calls++;return true;}));assert.equal(calls,0);});
+test("wrong owner never reaches claim callback",async()=>{let calls=0;await assert.rejects(()=>run({...payloadData,ownerId:"other"},async()=>{calls++;return true;}));assert.equal(calls,0);});
+test("duplicate nonce is rejected",async()=>{const seen=new Set();const claimOnce=async({nonce})=>{if(seen.has(nonce))return false;seen.add(nonce);return true;};await run(payloadData,claimOnce);await assert.rejects(()=>run(payloadData,claimOnce));});
+test("claim backend errors fail closed",async()=>assert.rejects(()=>run(payloadData,async()=>{throw Error("db offline");}),/DENIED/));

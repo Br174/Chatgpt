@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const code=readFileSync(new URL('./steel-guard.mjs',import.meta.url),'utf8');
+test('read-only default',()=>assert.match(code,/if\(!apply\)\{await audit\(\);return;\}/));
+test('explicit admin token required',()=>assert.match(code,/if\(!token\)throw new Error/));
+test('main only',()=>assert.match(code,/const branch = 'main'/));
+test('no secret in command line',()=>assert.match(code,/process\.env\.PACMAN_GITHUB_ADMIN_TOKEN/));
+test('deletion and force-push blocked',()=>{assert.match(code,/type:'deletion'/);assert.match(code,/type:'non_fast_forward'/)});
+test('pull request required',()=>assert.match(code,/type:'pull_request'/));
+test('no bypass actors',()=>assert.match(code,/bypass_actors:\[\]/));
+test('refuse duplicate',()=>assert.match(code,/refusing duplicate or mutation/));
+test('verify after apply',()=>assert.match(code,/if\(!await audit\(\)\)/));

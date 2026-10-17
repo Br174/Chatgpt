@@ -1,0 +1,12 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {calculateBidirectionalProgressLab as calc,compareBidirectionalProgressLab as compare} from "./bidirectional-progress-lab.mjs";
+const tree=(a,b)=>({children:[{weight:3,children:[{weight:1,verified:true,completion:a},{weight:1,verified:true,completion:b}]},{weight:1,verified:true,completion:100}]});
+test("weighted cascade propagates partial completion",()=>assert.equal(calc(tree(100,50)),81.25));
+test("regression reduces parent and total",()=>{const r=compare(tree(100,100),tree(100,50));assert.equal(r.before,100);assert.equal(r.after,81.25);assert.equal(r.delta,-18.75);assert.equal(r.direction,"regression");});
+test("repair restores lost points",()=>assert.equal(compare(tree(100,50),tree(100,100)).delta,18.75));
+test("unverified work receives no credit",()=>assert.equal(calc({verified:false,completion:100}),0));
+test("fractional verified progress is preserved",()=>assert.equal(calc({verified:true,completion:0.01}),0.01));
+test("all mandatory children complete yields 100",()=>assert.equal(calc(tree(100,100)),100));
+test("invalid weight is rejected",()=>assert.throws(()=>calc({children:[{weight:0,verified:true,completion:100}]})));
+test("invalid completion is rejected",()=>assert.throws(()=>calc({verified:true,completion:101})));

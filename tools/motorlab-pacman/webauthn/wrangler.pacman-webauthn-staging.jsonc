@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "motorlab-pacman-webauthn-staging-lab",
+  "main": "./worker.mjs",
+  "compatibility_date": "2026-10-16",
+  "workers_dev": true,
+  "services": [{"binding": "PACMAN_EXECUTION_SERVICE", "service": "motorlab-pacman-execution-staging-lab"}],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "motorlab-pacman-staging",
+      "database_id": "eb834fc1-5589-4f75-bcb9-d311d0d72261"
+    }
+  ]
+}

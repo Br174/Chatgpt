@@ -1,0 +1,15 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {validateApprovalChallengeLab} from "./webauthn-approval-challenge-lab.mjs";
+const now=1780000000000;
+const expected={origin:"https://pacman-staging.example",rpId:"pacman-staging.example",operationId:"lab-operation-001",contentSha256:"a".repeat(64)};
+const challenge={challenge:"A".repeat(43),origin:expected.origin,rpId:expected.rpId,operationId:expected.operationId,capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt",contentSha256:expected.contentSha256,createdAt:now-1000,expiresAt:now+60000,consumed:false};
+const check=c=>validateApprovalChallengeLab({challenge:c,expected,now});
+test("LAB challenge accepts bound, fresh, unconsumed request",()=>assert.equal(check(challenge).operationId,expected.operationId));
+test("LAB challenge rejects expired request",()=>assert.throws(()=>check({...challenge,expiresAt:now}),/WEBAUTHN_CHALLENGE_DENIED/));
+test("LAB challenge rejects consumed request",()=>assert.throws(()=>check({...challenge,consumed:true}),/WEBAUTHN_CHALLENGE_DENIED/));
+test("LAB challenge rejects mismatched content",()=>assert.throws(()=>check({...challenge,contentSha256:"b".repeat(64)}),/WEBAUTHN_CHALLENGE_DENIED/));
+test("LAB challenge rejects main branch",()=>assert.throws(()=>check({...challenge,branch:"main"}),/WEBAUTHN_CHALLENGE_DENIED/));
+test("LAB challenge rejects wrong origin",()=>assert.throws(()=>check({...challenge,origin:"https://evil.example"}),/WEBAUTHN_CHALLENGE_DENIED/));
+test("LAB challenge rejects excessive lifetime",()=>assert.throws(()=>check({...challenge,expiresAt:now+180000}),/WEBAUTHN_CHALLENGE_DENIED/));
+test("LAB challenge rejects weak challenge",()=>assert.throws(()=>check({...challenge,challenge:"short"}),/WEBAUTHN_CHALLENGE_DENIED/));
