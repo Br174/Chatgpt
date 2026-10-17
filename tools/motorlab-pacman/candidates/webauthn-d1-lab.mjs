@@ -1,3 +1,16 @@
+// Keep existing D1 challenge table and all SQL operations unchanged.
+// The controlled flow persists a SHA-256 of its *full* operation intent in
+// content_sha256, then recomputes/verifies it before issuing any attestation.
+import {CONTROLLED_LAB_BRANCH,controlledLabPath} from "./github-controlled-update-lab.mjs";
+function isAllowedWebAuthnChallengeScope(record){
+ if(record?.capability==="github.lab-file-cycle")
+  return record.branch==="motorlab/pacman-execution-v2-lab-20261014"&&
+   record.path==="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
+ if(record?.capability==="github.lab-file-update")
+  return record.branch===CONTROLLED_LAB_BRANCH&&controlledLabPath(record.path);
+ return false;
+}
+
 // LAB-only D1 persistence primitives for the zero-cost WebAuthn path.
 // Schemas are definitions only; importing this module never mutates D1.
 export const WEBAUTHN_CREDENTIALS_SCHEMA=`CREATE TABLE IF NOT EXISTS pacman_webauthn_credentials (
@@ -34,9 +47,7 @@ const fail=code=>{throw Error(code);};
 export async function storeWebAuthnChallengeD1(db,record){
  if(!db?.prepare)fail("WEBAUTHN_D1_UNAVAILABLE");
  if(!record||!id.test(record.challenge||"")||!op.test(record.operationId||"")||
-    record.capability!=="github.lab-file-cycle"||
-    record.branch!=="motorlab/pacman-execution-v2-lab-20261014"||
-    record.path!=="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"||
+    !isAllowedWebAuthnChallengeScope(record)||
     !digest.test(record.contentSha256||"")||
     typeof record.rpId!=="string"||!record.rpId||
     typeof record.origin!=="string"||!record.origin.startsWith("https://")||
