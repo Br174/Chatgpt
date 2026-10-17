@@ -254,3 +254,33 @@ Status: `CONTROLLED_RELAY_WORKER_CODE_VERIFIED_CI44`; `DEDICATED_FLAG_ABSENT_AND
 - No Worker deployment, real WebAuthn activation, secret/flag edits, Cloudflare/D1 mutations, branch promotion or Pac-Man GitHub provider write. Cost remains €0 under existing account; do not claim remote Cloudflare inspection yet.
 - NEXT: reviewer approves only the queued GET-only `readonly-audit` deployment job, then inspect its final GitHub Actions status and safe category-only logs; persist verified findings without exposing credentials or responding to unknown instructions from external logs.
 - Progress: allowed-branch setup 100% (new activity), audit preparations/tests 100%, remote Cloudflare GET audit 0% until completion; global Real Operations remains 8/16=50%, delta 0 percentage points.
+
+## Protected read-only Cloudflare audit PASSED — 2026-10-18
+
+### Source and privilege boundary
+- Original GitHub Actions run #2, id 39073211241, attempt 2, exact code SHA 74b6dc14ca972677f29461ba41d46e467a4af5f2 completed SUCCESS at 2026-10-17T22:19:29Z (Italy Oct 18 00:19 local). Job `preflight-local` ID 117518580196 SUCCESS; protected `readonly-audit` ID 117518561449 SUCCESS, all steps green, including GET-only real Cloudflare staging inspection.
+- Owner approved required review on GitHub environment pacman-execution-staging. Three deployment branches allowed; existing reviewers and other rules preserved. This GitHub environment approval permitted ONLY a GET-only CI audit run and is NOT authorization for a Cloudflare Worker deployment.
+- Actual logs were fetched through GitHub's job-log connector, parsed for fixed categorical PACMAN_* lines only; secrets and raw payloads were NOT copied into checkpoint. Exact LAB HEAD before this checkpoint 1b870c2c812ac153e8d5e9617a440655b45bc3a3; protected main remains 8615e8321bf9896f28826a09aa0c9f61ce5ecbb7.
+
+### Verified remote read-only observations
+- Execution Worker settings=HTTP_200_API_SUCCESS; DB binding ID=MATCH (motorlab-pacman-staging); deployment metadata=VERSION_IDENTIFIERS_PRESENT; public /health=HTTP_200 and SOURCE_REVISION_LABEL_MATCH (historic `pacman-v2-webauthn-relay-20261016` label, not proof that the latest LAB source is deployed).
+- WebAuthn Worker settings=HTTP_200_API_SUCCESS; D1 binding=MATCH; deployment metadata=VERSION_IDENTIFIERS_PRESENT; public /health=HTTP_200; private PACMAN_EXECUTION_SERVICE binding=MATCH.
+- Required secret binding names PACMAN_EXECUTION_KEY, PACMAN_GITHUB_TOKEN, PACMAN_APPROVAL_SIGNING_SECRET reported SECRET_BINDING_PRESENT in both Worker settings. No values or cryptographic equality inferred.
+- Controlled update flag PACMAN_CONTROLLED_UPDATE_ENABLED reported NOT_LISTED on real Execution Worker. Hence new controlled capability remains NOT ENABLED in staging; do not infer deployed new route from identical source revision label.
+- Protected GET-only execution-schema-audit=HTTP 200 with schema=EXACT, and WebAuthn internal binding diagnostic=HTTP 200. Inspecting canonical stagingSchemaAudit source verifies that EXACT checks specifically existing tables pacman_approval_claims and pacman_cycle_checkpoints including their documented columns, types, and PK. Separate /health 200 verifies the existence of pacman_operations, but neither check proves its full canonical columns/indices/concurrency semantics. No D1 SQL writes performed.
+- Parity diagnostic issuerParityLocked=false and category UNEXPECTED_EXECUTION_PARITY_ALREADY_OPEN. This means the historical parity activation flag is already set in existing staging, NOT necessarily that signature key equality has just been independently proved by this audit, NOR that new controlled updates are enabled. The old diagnostic's expectation was parityLocked=true, so do not classify the gate as safe simply because the workflow returned SUCCESS. Require a separate read-only provenance/parity review before any activation approval.
+
+### Remaining security and activation gates
+- Independent deployment-version/source SHA provenance is NOT established by `VERSION_IDENTIFIERS_PRESENT` nor by the historic revision string. Verify separately under read-only permissions.
+- Verify live pacman_operations schema and allowed ledger writer semantics and bound token permissions; do not alter remote schema/table or secrets without new explicit owner authorization.
+- Compare prior verified historical parity proof and current flag configuration (read-only); category is diagnostic compatibility issue until evidence proves otherwise. Do not alter parity flag or bypass auth.
+- Activation of `github.lab-file-update` still needs separately approved, scoped Worker staging deployment, WebAuthn owner ceremony, controlled endpoint flag change, narrow live GitHub operation, durable readback and fail-closed replay recovery. All unapproved.
+- No Cloudflare deployment, remote writes, secret changes, database changes, real WebAuthn, main/MADRE or old LAB writes occurred in this cycle. No incremental paid service.
+
+### Hierarchical progress recalibrated from external evidence
+- Scoped GET-only staging audit: **100%**, delta **+100 pp** from not-started remote audit.
+- Phase A Github LAB = 4/4 = **100%** (delta 0); Phase B chat/real WebAuthn = 2/4 = **50%** (delta 0); Phase C Cloudflare staging = **1/4 = 25%** (delta +25 pp): gate C1 `authenticated read-only remote staging connectivity and bindings` now passed; C2 live version/code+identity provenance, C3 controlled staging activation, C4 real controlled stage end-to-end remain NOT VERIFIED. Phase D recovery/end-to-end = 2/4 = **50%** (delta 0).
+- **GLOBAL 9/16 = 56.25% (delta +6.25 percentage points)**, revised only after real protected read-only staging evidence. No claim of end-to-end execution.
+
+Verified checkpoint status: `GET_ONLY_REMOTE_STAGING_AUDIT_SUCCESS`; `EXECUTION_AND_WEBAUTHN_WORKERS_HTTP_200`; `D1_BINDINGS_MATCH`; `CONTROLLED_FLAG_NOT_LISTED`; `ISSUER_PARITY_FLAG_OPEN_PROVENANCE_UNVERIFIED`; `LIVE_CONTROLLED_WRITE_NOT_ENABLED`; `NO_REMOTE_MUTATIONS`; `MAIN_UNCHANGED`.
+Reference: https://github.com/Br174/Chatgpt/actions/runs/39073211241
