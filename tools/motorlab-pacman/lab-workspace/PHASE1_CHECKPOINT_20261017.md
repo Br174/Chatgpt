@@ -217,3 +217,30 @@ Scope: previously approved LAB-only WebAuthn challenge/validation/attestation co
 3. When separately approved and only after protected read-only checks: staging-only controlled route activation, real owner passkey approval, one narrowly scoped file-update test, independent GitHub readback, durable D1 receipt and recovery/anti-replay negative tests. No main/MADRE/production touches; cost €0.
 
 Status: `CONTROLLED_RELAY_WORKER_CODE_VERIFIED_CI44`; `DEDICATED_FLAG_ABSENT_AND_UNPROVISIONED`; `NO_REMOTE_SIDE_EFFECTS`; `RELEASE_UNCHANGED`; `LIVE_STAGE_NOT_AUTHORIZED`; `GLOBAL_8_OF_16_50_PERCENT`.
+
+## Protected Cloudflare staging read-only audit — 2026-10-17
+
+**Scope**: user authorized only branch motorlab/pacman-real-operations-lab-20261017, GET-only Cloudflare staging audit workflow, tests and checkpoint. Reuse existing protected environment pacman-execution-staging. No deploy, real WebAuthn activation, flag/secret changes, remote D1/schema changes, real GitHub mutation via new issuer, main/MADRE/historical LAB/production change, or paid service.
+
+### Changes and security
+- Existing CORE MotorLab r37 and previous checkpoint verified. LAB pre-change HEAD b796ae2cbe3f547d1be0fc8e2add247062c622b6; main 8615e8321bf9896f28826a09aa0c9f61ce5ecbb7 unchanged.
+- Created GET-only evidence module tools/motorlab-pacman/candidates/controlled-staging-readonly-audit-lab.mjs, commit a72254a3ae52867217a3ce85bc0f1727e1de6966. Exact account, two Worker names, staging D1 and service binding pinned. Six calls are only GET: two settings, two deployments and two health endpoints. Manual redirects and bounded timeouts. Output is allowlisted classifications only, no API payload or secret values and no claim of live activation.
+- Created synthetic test file candidates/controlled-staging-readonly-audit-lab.test.mjs, commit 0c52a42c67c619654ccd662bcc3e02466f8db0bf. Five tests check account/credential guard, six GET requests, binding and version classification, missing D1/service, opaque flags, 302/403/malformed responses and network error redaction.
+- Created workflow .github/workflows/pacman-controlled-staging-readonly-audit.yml commit 90f77722bdc389f41b6b910965f5b065c4c4329c. Refined at 74b6dc14ca972677f29461ba41d46e467a4af5f2 to separate preflight-local from readonly-audit protected environment job. Branch/repository restricted, read-only permissions, checkout persist-credentials false, no runner secret output, no deploy/mutation commands, reads ONLY via existing protected credentials. Reuses pre-existing staging-credential-parity-readonly-lab.mjs protected GET diagnostics; no duplicate execution engine.
+
+### Tests and protected boundary
+- Existing Pac-Man full CI #46 (39072948574) and #47 (39072982393) both SUCCESS. Includes new test file and original Workers runtime regression.
+- New read-only workflow run #1 (39073065478) failed BEFORE job steps/runner allocation. Zero steps, runner_name empty. Job logs endpoint returned 404 BlobNotFound.
+- New workflow run #2 (39073211241): preflight-local SUCCESS (synthetic tests verified). The separate protected readonly-audit job failed BEFORE any steps or runner allocation (job 117514978824). Exact cause cannot be determined because annotations are not accessible via current connector. Do not assert the specific environment/permission rule; must inspect UI error or obtain authorized environment readback.
+- No Cloudflare request was executed by the protected audit job, so remote Worker revision, D1 schema, binding metadata and issuer parity are NOT verified. Public health URL was unavailable through separate web retrieval, NOT proof of Worker outage.
+- New runtime flag stays disabled by default. No deploy, D1 modification, remote secret/flag change or real GitHub update was attempted.
+
+### Recovery instructions
+1. Owner can open https://github.com/Br174/Chatgpt/actions/runs/39073211241 and inspect readonly-audit startup annotations. Share only error text/screenshot, never secrets or credentials. Do NOT bypass protected environment or change other branches.
+2. Once GitHub's protected environment permits the new LAB branch legitimately, run the existing GET-only audit. Confirm job completion and classify remote settings, deployment, service binding and protected schema diagnostics before any request for later activation.
+3. Explicit new approval remains necessary for any deployment, remote mutations or WebAuthn activation. Historical WebAuthn cycle must never be replayed.
+
+### Progress
+- Scoped GET-only audit code and isolated CI: 100% (+100 pp from task start). Protected actual Cloudflare audit: 0%, delta 0.
+- Cascading A GitHub 4/4 100% (delta 0); B real WebAuthn/chat 2/4 50% (delta 0); C Cloudflare staging 0/4 0% (delta 0); D recovery/end-to-end 2/4 50% (delta 0). GLOBAL 8/16 = 50% (delta 0 pp).
+- Status: CODE_VERIFIED_CI47 / PROTECTED_RUNNER_STARTUP_BLOCKED_UNDIAGNOSED / NO_REMOTE_CLOUDFLARE_AUDIT / MAIN_UNCHANGED / NO_REMOTE_MUTATIONS / R37.
