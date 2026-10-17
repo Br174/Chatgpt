@@ -88,7 +88,7 @@ test("public read fallback handles 401/403/404 and never forwards GitHub token",
   const res=await findGithubOwnerBootstrapCommentLab({nonce,registrationSha256:f.registrationSha256,githubToken:token,fetchImpl,nowMs:now});
   assert.equal(res.ownerId,"202558590");assert.equal(calls.length,2);
   assert.equal(calls[0].auth,"Bearer "+token);assert.equal(calls[1].auth,undefined);
-  assert.equal(calls[1].url,calls[0].url);assert.equal(calls[1].method,"GET");assert.equal(calls[1].redirect,"error");
+  assert.equal(calls[1].url,calls[0].url);assert.equal(calls[1].method,"GET");assert.equal(calls[0].redirect,"manual");assert.equal(calls[1].redirect,"manual");
   assert.match(calls[1].url,/\/issues\/72\/comments\?per_page=100$/);
  }
 });
@@ -137,4 +137,43 @@ test("both fetch modes rejecting fails closed without owner credential issuance"
  const f=await fixture();let count=0;
  await assert.rejects(findGithubOwnerBootstrapCommentLab({nonce,registrationSha256:f.registrationSha256,githubToken:token,fetchImpl:async()=>{count++;throw Error("NO_EGRESS");},nowMs:now}),/GITHUB_BOOTSTRAP_UNAVAILABLE/);
  assert.equal(count,2);
+});
+
+test("Cloudflare Worker redirect-error regression uses manual GET and verifies exact owner proof",async()=>{
+ const f=await fixture();const calls=[];
+ const fetchImpl=async(url,opts)=>{
+  calls.push({url,redirect:opts.redirect,auth:opts.headers.authorization});
+  if(opts.redirect==="error")throw Error("REDIRECT_ERROR_ON_CLOUDFLARE_WORKER");
+  return {status:200,ok:true,json:async()=>[{id:12345,...f.json}]};
+ };
+ const v=await findGithubOwnerBootstrapCommentLab({nonce,registrationSha256:f.registrationSha256,githubToken:token,fetchImpl,nowMs:now});
+ assert.equal(v.commentId,12345);assert.equal(calls.length,1);
+ assert.equal(calls[0].redirect,"manual");
+ assert.equal(calls[0].auth,"Bearer "+token);
+ assert.match(calls[0].url,/^https:\/\/api\.github\.com\/repos\/Br174\/Chatgpt\/issues\/72\/comments\?per_page=100$/);
+});
+
+test("manual GitHub redirect responses are rejected without following or revealing token",async()=>{
+ const f=await fixture();
+ for(const status of [301,302,307,308]){
+  let calls=0;
+  const fetchImpl=async(u,o)=>{
+   calls++;assert.equal(o.redirect,"manual");assert.equal(o.headers.authorization,"Bearer "+token);
+   return {status,ok:false,headers:{get:()=> "https://attacker.example/"},json:async()=>{throw Error("body unexpected")}};
+  };
+  await assert.rejects(findGithubOwnerBootstrapCommentLab({nonce,registrationSha256:f.registrationSha256,githubToken:token,fetchImpl,nowMs:now}),/GITHUB_BOOTSTRAP_UNAVAILABLE/);
+  assert.equal(calls,1);
+ }
+});
+
+test("401 public fallback also uses manual redirect and retains owner validation",async()=>{
+ const f=await fixture();let calls=0;
+ const fetchImpl=async(_u,o)=>{
+  calls++;assert.equal(o.redirect,"manual");
+  if(calls===1){assert.equal(o.headers.authorization,"Bearer "+token);return {status:401,ok:false};}
+  assert.equal(o.headers.authorization,undefined);
+  return {status:200,ok:true,json:async()=>[{id:12345,...f.json}]};
+ };
+ const v=await findGithubOwnerBootstrapCommentLab({nonce,registrationSha256:f.registrationSha256,githubToken:token,fetchImpl,nowMs:now});
+ assert.equal(v.ownerId,"202558590");assert.equal(calls,2);
 });

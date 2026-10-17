@@ -124,3 +124,20 @@ test("valid WebAuthn credential stores only after anonymous GitHub fallback conf
  const out=await enrollOwnerPasskeyFromGithubLab({db:f.db,githubToken:token,signingSecret:secret,registrationResponse:f.registrationResponse,challenge,...await challengeProof(),origin,rpId,fetchImpl,cryptoImpl:webcrypto,nowMs:now});
  assert.equal(out.status,"OWNER_PASSKEY_ENROLLED");assert.equal(f.db.rows.size,1);assert.equal(calls,2);
 });
+
+test("end-to-end owner enrollment survives Cloudflare redirect:error failure without weakening GitHub checks",async()=>{
+ const f=await fixture();let count=0;
+ const fetchImpl=async(u,opt)=>{
+  count++;
+  assert.match(u,/\/issues\/72\/comments\?per_page=100$/);
+  assert.equal(opt.redirect,"manual");
+  return {status:200,ok:true,json:async()=>[{id:12345,...f.comment}]};
+ };
+ const result=await enrollOwnerPasskeyFromGithubLab({
+  db:f.db,githubToken:token,signingSecret:secret,
+  registrationResponse:f.registrationResponse,challenge,...await challengeProof(),origin,rpId,
+  fetchImpl,cryptoImpl:webcrypto,nowMs:now
+ });
+ assert.equal(result.status,"OWNER_PASSKEY_ENROLLED");assert.equal(count,1);
+ assert.equal(f.db.rows.size,1);
+});

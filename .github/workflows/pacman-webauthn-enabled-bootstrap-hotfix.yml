@@ -1,4 +1,5 @@
 name: Pac-Man WebAuthn public bootstrap hotfix (enabled LAB)
+# 2026-10-17 LAB: fixed-endpoint GitHub bootstrap GET uses manual redirect and rejects 3xx.
 # Targeted diagnostic regression: mock unauthenticated request and redirect mode accurately.
 on:
   push:
