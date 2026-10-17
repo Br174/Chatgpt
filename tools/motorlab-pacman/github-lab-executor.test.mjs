@@ -19,7 +19,7 @@ test("GitHub LAB executor denies main and unexpected file before network access"
 test("GitHub LAB executor performs only scoped GET preflight",async()=>{
  let calls=0;
  const fetchImpl=async(url,opts)=>{
-  calls++;assert.equal(opts.method,"GET");assert.match(url,/\/repos\/Br174\/Chatgpt\/contents\/tools\/motorlab-pacman\/probe-integration\.txt\?ref=/);
+  calls++;assert.equal(opts.method,"GET");assert.match(url,/\/repos\/Br174\/Chatgpt\/contents\/tools\/motorlab-pacman\/probe-webauthn-cycle-20261017\.txt\?ref=/);
   assert.equal(opts.redirect,"error");
   return {ok:true,async json(){return {type:"file",sha:"a".repeat(40)};}};
  };
