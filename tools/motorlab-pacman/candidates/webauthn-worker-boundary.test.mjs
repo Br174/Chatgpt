@@ -215,12 +215,23 @@ test("internal staging binding diagnostic is protected, read-only and cannot fal
  const missing=await handleWebAuthnRequest(request,env,{fetchImpl:async()=>{external++;}});
  assert.equal(missing.status,503);assert.equal((await missing.json()).error,"EXECUTION_SERVICE_BINDING_MISSING");
  const service={fetch:async(u,init)=>{
-  calls++;assert.ok(u instanceof Request);assert.equal(u.url,"https://example.com/health");assert.equal(u.method,"GET");assert.equal(u.redirect,"manual");
+  calls++;assert.ok(u instanceof Request);assert.equal(u.redirect,"manual");
+  if(u.method==="POST"){
+   assert.equal(u.url,"https://example.com/execute");
+   assert.equal(u.headers.get("authorization"),"Bearer "+key);
+   assert.deepEqual(await u.json(),{});
+   return Response.json({error:"INVALID_REQUEST"},{status:400});
+  }
+  assert.equal(u.url,"https://example.com/health");assert.equal(u.method,"GET");
   return Response.json({service:"pacman-execution-staging",revision:"pacman-v2-webauthn-relay-20261016",database:"CONNECTED"});
  }};
  const good=await handleWebAuthnRequest(request,{...env,PACMAN_EXECUTION_SERVICE:service},{fetchImpl:async()=>{external++;}});
- assert.equal(good.status,200);assert.equal((await good.json()).transport,"SERVICE_BINDING_STAGING");
- assert.equal(calls,1);assert.equal(external,0);
+ assert.equal(good.status,200);const connected=await good.json();
+ assert.equal(connected.transport,"SERVICE_BINDING_STAGING");
+ assert.equal(connected.postConnected,true);assert.equal(connected.postStatus,400);
+ assert.equal(connected.postResult,"INVALID_REQUEST");
+ assert.equal(connected.relayRevision,"private-post-relay-20261017-v1");
+ assert.equal(calls,2);assert.equal(external,0);
  const impostor=await handleWebAuthnRequest(request,{...env,PACMAN_EXECUTION_SERVICE:{fetch:async()=>Response.json({service:"wrong",database:"CONNECTED"})}},{});
  assert.equal(impostor.status,503);assert.equal((await impostor.json()).error,"EXECUTION_SERVICE_IDENTITY_MISMATCH");
 });
@@ -258,6 +269,23 @@ test("safe binding transport error classification does not expose exception text
  assert.equal(JSON.stringify(d).includes("private-secret"),false);
  const x=await handleWebAuthnRequest(req,{...env,PACMAN_EXECUTION_SERVICE:{fetch:async()=>({status:200,json:async()=>{throw SyntaxError("secret-json");}})}});
  assert.equal(x.status,503);assert.equal((await x.json()).phase,"DECODE");
+});
+
+test("private POST diagnostic fails closed on redirects, wrong validation or network errors",async()=>{
+ const key="k".repeat(48),uri=endpoint+"/__motorlab_lab/diagnostics/execution-binding";
+ const health=()=>Response.json({service:"pacman-execution-staging",revision:"pacman-v2-webauthn-relay-20261016",database:"CONNECTED"});
+ for(const invalid of [()=>Response.json({error:"INVALID_REQUEST"},{status:302}),
+  ()=>Response.json({error:"OTHER"},{status:400}),()=>{throw Error("PRIVATE_TOKEN_MUST_NOT_LEAK")}]){
+  let calls=0;
+  const r=await handleWebAuthnRequest(new Request(uri,{headers:{authorization:"Bearer "+key}}),{
+   ...baseEnv,DB:db(),PACMAN_EXECUTION_KEY:key,PACMAN_EXECUTION_SERVICE:{fetch:async req=>{
+    calls++;return req.method==="GET"?health():invalid();
+   }}
+  });
+  assert.equal(r.status,503);const data=await r.json();
+  assert.ok(["EXECUTION_POST_VALIDATION_UNVERIFIED","EXECUTION_POST_SERVICE_UNREACHABLE"].includes(data.error));
+  assert.equal(JSON.stringify(data).includes("PRIVATE_TOKEN"),false);assert.equal(calls,2);
+ }
 });
 
 test("WebAuthn staging proves signing parity through internal Service Binding with no D1/GitHub reads",async()=>{

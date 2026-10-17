@@ -16,6 +16,7 @@ test("verified passkey issuer sends exact signed LAB operation over private serv
  assert.deepEqual(out,{status:"PACMAN_OPERATION_VERIFIED",operationId:intent.operationId,branch,path});
  assert.ok(seen instanceof Request);
  assert.equal(seen.url,"https://example.com/execute");assert.equal(seen.method,"POST");
+ assert.equal(seen.redirect,"manual");
  assert.equal(seen.headers.get("authorization"),"Bearer "+executionKey);
  const payload=JSON.parse(await seen.text());
  assert.equal(payload.mode,"github-lab-cycle");assert.deepEqual(payload.approval,{...intent,decision:"authorize"});
@@ -50,4 +51,11 @@ test("ambiguous service-binding network error does not retry",async()=>{
  let calls=0;
  await assert.rejects(executePacmanWithWebAuthnLab({...request,executionService:{fetch:async()=>{calls++;throw Error("transport failed");}}}),/PACMAN_EXECUTOR_UNREACHABLE/);
  assert.equal(calls,1);
+});
+test("internal redirects are rejected before reading a response body or retrying",async()=>{
+ let calls=0,reads=0;
+ await assert.rejects(executePacmanWithWebAuthnLab({...request,executionService:{fetch:async()=>{
+  calls++;return {status:302,ok:false,json:async()=>{reads++;throw Error("BODY_MUST_NOT_BE_READ")}};
+ }}}),/PACMAN_EXECUTOR_REDIRECT_REJECTED/);
+ assert.equal(calls,1);assert.equal(reads,0);
 });

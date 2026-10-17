@@ -17,6 +17,7 @@ import {renderWebAuthnOwnerPage} from "./page.mjs";
 import {renderWebAuthnApprovalPage} from "./approval-page.mjs";
 import {bootstrapWebAuthnSchemaLab} from "../candidates/webauthn-schema-bootstrap-lab.mjs";
 import {makeIssuerParityProof} from "../candidates/issuer-parity-crypto-lab.mjs";
+import {makePacmanExecutionRequestLab,PACMAN_WEBAUTHN_RELAY_REVISION} from "../candidates/webauthn-execution-relay-lab.mjs";
 
 const MAX_BODY=32768;
 const reply=(body,status=200)=>Response.json(body,{status,headers:{
@@ -123,7 +124,8 @@ export async function handleWebAuthnRequest(request,env,{
       claimPresent:!!claim,challengeCount:Number(challenge?.total??0),consumedCount:Number(challenge?.consumed??0)});
    }catch{return reply({error:"D1_RECOVERY_AUDIT_UNAVAILABLE"},503);}
   }
-  // Prove the private transport using a harmless GET; never call /execute from this diagnostic.
+  // Prove GET and POST transport privately. The empty JSON POST is rejected by
+  // /execute as INVALID_REQUEST before approval, D1 or GitHub mutation paths.
   if(url.pathname==="/__motorlab_lab/diagnostics/execution-binding"){
    if(request.method!=="GET")return reply({error:"NOT_FOUND"},404);
    if(!exactBearer(request,env?.PACMAN_EXECUTION_KEY))return reply({error:"UNAUTHORIZED"},401);
@@ -154,8 +156,19 @@ export async function handleWebAuthnRequest(request,env,{
    if(health?.service!=="pacman-execution-staging"||health?.database!=="CONNECTED"||
       health?.revision!=="pacman-v2-webauthn-relay-20261016")
      return reply({error:"EXECUTION_SERVICE_IDENTITY_MISMATCH"},503);
+   try{
+    const post=await env.PACMAN_EXECUTION_SERVICE.fetch(makePacmanExecutionRequestLab({
+     payload:{},executionKey:env.PACMAN_EXECUTION_KEY
+    }));
+    if(post.status!==400)return reply({error:"EXECUTION_POST_VALIDATION_UNVERIFIED"},503);
+    const rejected=await post.json();
+    if(rejected?.error!=="INVALID_REQUEST")
+     return reply({error:"EXECUTION_POST_VALIDATION_UNVERIFIED"},503);
+   }catch{return reply({error:"EXECUTION_POST_SERVICE_UNREACHABLE"},503);}
    return reply({component:"pacmanExecutionInternalBinding",connected:true,
-    revision:health.revision,transport:"SERVICE_BINDING_STAGING"});
+    revision:health.revision,transport:"SERVICE_BINDING_STAGING",
+    postConnected:true,postStatus:400,postResult:"INVALID_REQUEST",
+    relayRevision:PACMAN_WEBAUTHN_RELAY_REVISION});
   }
   // Guarded diagnostic: fixed public issue and HTTP status codes only, no data or credentials returned.
   if(url.pathname==="/__motorlab_lab/diagnostics/github-bootstrap"){

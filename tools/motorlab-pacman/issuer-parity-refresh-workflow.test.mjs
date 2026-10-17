@@ -16,7 +16,8 @@ const base="https://api.cloudflare.com/client/v4/accounts/"+account;
 const secretNames=["PACMAN_EXECUTION_KEY","PACMAN_APPROVAL_SIGNING_SECRET","PACMAN_GITHUB_TOKEN"];
 
 function fixture({existing=true,parity=true,transport="SERVICE_BINDING_STAGING",gateType="secret_text",
- duplicateGate=false,locked=!existing,claim=false,head="expected-lab-head",fileStatus=404}={}){
+ duplicateGate=false,locked=!existing,claim=false,head="expected-lab-head",fileStatus=404,
+ postReady=false,bindingValid=true}={}){
  const output=[],requests=[],logs=[];
  const env={CF_ACCOUNT:account,CF_TOKEN:"unit-test-cf-token",GH_TOKEN:"unit-test-gh-token",
   HEAD:"expected-lab-head",EXECUTION_KEY:"unit-test-execution-key-000000000000000000",GITHUB_OUTPUT:"unit-test-output"};
@@ -50,6 +51,10 @@ function fixture({existing=true,parity=true,transport="SERVICE_BINDING_STAGING",
     flags:{issuer:"MATCH",write:"MATCH",route:"MATCH",checkpoint:"MATCH"}});
   if(url.endsWith("/__motorlab_lab/diagnostics/issuer-parity"))
    return json({component:"pacmanSigningSecretParity",match:parity,transport});
+  if(url.endsWith("/__motorlab_lab/diagnostics/execution-binding"))
+   return json({component:bindingValid?"pacmanExecutionInternalBinding":"wrong",connected:true,
+    transport:"SERVICE_BINDING_STAGING",...(postReady?{postConnected:true,postStatus:400,
+     postResult:"INVALID_REQUEST",relayRevision:"private-post-relay-20261017-v1"}:{})});
   throw Error("UNEXPECTED_TEST_URL");
  };
  return {output,requests,logs,run:()=>run({env},fetch,fs,{log:x=>logs.push(x)})};
@@ -57,13 +62,21 @@ function fixture({existing=true,parity=true,transport="SERVICE_BINDING_STAGING",
 
 test("initial rollout keeps the parity gate locked until its existing crypto-proof stage",async()=>{
  const f=fixture({existing:false});await f.run();
- assert.deepEqual(f.output,["execution_refresh=false\n"]);
+ assert.deepEqual(f.output,["execution_refresh=false\nwebauthn_refresh=true\n"]);
  assert.equal(f.requests.some(x=>x.endsWith("/diagnostics/issuer-parity")),false);
 });
-test("existing parity gate permits Execution-only refresh after a fresh private HMAC proof",async()=>{
+test("existing parity gate deploys the WebAuthn relay when private POST proof is missing",async()=>{
  const f=fixture();await f.run();
- assert.deepEqual(f.output,["execution_refresh=true\n"]);
+ assert.deepEqual(f.output,["execution_refresh=true\nwebauthn_refresh=true\n"]);
  assert.ok(f.requests.some(x=>x.endsWith("/diagnostics/issuer-parity")));
+});
+test("verified current private POST relay skips an unnecessary WebAuthn deployment",async()=>{
+ const f=fixture({postReady:true});await f.run();
+ assert.deepEqual(f.output,["execution_refresh=true\nwebauthn_refresh=false\n"]);
+});
+test("refresh rejects an unverified private binding before deployment",async()=>{
+ const f=fixture({bindingValid:false});await assert.rejects(f.run(),/PARITY_REFRESH_BINDING_UNVERIFIED/);
+ assert.deepEqual(f.output,[]);
 });
 test("refresh rejects mismatched HMAC without emitting permission to deploy",async()=>{
  const f=fixture({parity:false});await assert.rejects(f.run(),/PARITY_LIVE_REFRESH_PROOF_UNVERIFIED/);
@@ -95,13 +108,38 @@ test("refresh rejects an existing probe before Worker access",async()=>{
  const f=fixture({fileStatus:200});await assert.rejects(f.run(),/PARITY_PROBE_FILE_NOT_ABSENT/);
  assert.equal(f.requests.length,2);assert.deepEqual(f.output,[]);
 });
-test("refresh preserves one rollout owner and skips WebAuthn deployment and gate rewriting",()=>{
- for(const name of ["Deploy passkey Worker","Enable independent Execution parity gate"]){
-  const block=workflow.slice(workflow.indexOf("      - name: "+name)).split(/\n      - name:/)[0];
-  assert.match(block,/if: steps\.preflight\.outputs\.execution_refresh != 'true'/);
- }
+test("refresh preserves one rollout owner, updates the required relay and preserves the gate",()=>{
+ const web=workflow.slice(workflow.indexOf("      - name: Deploy passkey Worker")).split(/\n      - name:/)[0];
+ assert.match(web,/if: steps\.preflight\.outputs\.webauthn_refresh == 'true'/);
+ const gate=workflow.slice(workflow.indexOf("      - name: Enable independent Execution parity gate")).split(/\n      - name:/)[0];
+ assert.match(gate,/if: steps\.preflight\.outputs\.execution_refresh != 'true'/);
+ assert.match(workflow,/ci-worker-binding-runtime\.mjs/);
  assert.match(section,/id: preflight/);
  assert.match(workflow,/group: motorlab-pacman-issuer-parity-staging-20261017/);
  assert.match(workflow,/environment: pacman-execution-staging/);
  assert.doesNotMatch(workflow,/CREATE TABLE|ALTER TABLE|DROP TABLE|DELETE FROM|method:\s*['"](?:PUT|DELETE)['"]/i);
+});
+
+test("postdeploy transport gate requires the real inert POST proof, not just healthy GET",async()=>{
+ const start=workflow.indexOf("      - name: Verify private POST transport");
+ assert.ok(start>0,"live POST gate must exist before another owner biometric");
+ const block=workflow.slice(start).split(/\n      - name:/)[0];
+ const body=block.match(/<<'NODE'\n([\s\S]*?)\n          NODE/)[1];
+ const verify=new AsyncFunction("process","fetch","console","setTimeout",body);
+ const healthy={component:"pacmanExecutionInternalBinding",connected:true,transport:"SERVICE_BINDING_STAGING",
+  postConnected:true,postStatus:400,postResult:"INVALID_REQUEST",relayRevision:"private-post-relay-20261017-v1"};
+ const invoke=async(data,status=200)=>{
+  const logs=[];
+  await verify({env:{EXECUTION_KEY:"unit-test-execution-key-00000000000000000"}},async(url,init)=>{
+   assert.equal(new URL(url).pathname,"/__motorlab_lab/diagnostics/execution-binding");
+   assert.equal(init.method,"GET");assert.equal(init.redirect,"manual");
+   return Response.json(data,{status});
+  },{log:v=>logs.push(v)},fn=>fn());
+  return logs;
+ };
+ assert.deepEqual(await invoke(healthy),["PACMAN_PRIVATE_POST_TRANSPORT_VERIFIED_NO_MUTATIONS"]);
+ for(const bad of [{...healthy,postConnected:false},{...healthy,postStatus:200},
+  {...healthy,relayRevision:"old-get-only"},{...healthy,transport:"PUBLIC_FETCH"}])
+  await assert.rejects(invoke(bad),/PARITY_PRIVATE_POST_TRANSPORT_UNVERIFIED/);
+ await assert.rejects(invoke({error:"PRIVATE_VALUE_MUST_NOT_BE_LOGGED"},503),/PARITY_PRIVATE_POST_TRANSPORT_UNVERIFIED/);
 });

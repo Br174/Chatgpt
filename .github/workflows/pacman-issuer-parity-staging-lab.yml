@@ -32,6 +32,10 @@ jobs:
         run: |
           node --test tools/motorlab-pacman/*.test.mjs
           node --test tools/motorlab-pacman/candidates/*.test.mjs
+      - name: Verify POST relay in the real Workers runtime before protected staging
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pacman-worker-runtime" --no-save --package-lock=false miniflare@4.20260730.0
+          PACMAN_MINIFLARE_MODULE="$RUNNER_TEMP/pacman-worker-runtime/node_modules/miniflare" node tools/motorlab-pacman/ci-worker-binding-runtime.mjs
 
   proof_and_gate:
     needs: validate
@@ -92,7 +96,7 @@ jobs:
           if(file.status!==404)throw Error('PARITY_PROBE_FILE_NOT_ABSENT');
           const base='https://api.cloudflare.com/client/v4/accounts/'+account;
           const headers={authorization:'Bearer '+process.env.CF_TOKEN};
-          let executionRefresh=false;
+          let executionRefresh=false,webauthnRefresh=true;
           for(const [worker,secretNames] of [
            [webName,['PACMAN_EXECUTION_KEY','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN','PACMAN_WEBAUTHN_ENABLED']],
            [exName,['PACMAN_EXECUTION_KEY','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN',
@@ -136,8 +140,13 @@ jobs:
              !['NONE','VERIFIED_AND_REMOVED'].includes(state.checkpointState)||
              state.claimPresent!==false||!Number.isInteger(state.challengeCount)||
              !Number.isInteger(state.consumedCount)||
+             state.challengeCount<0||state.consumedCount<0||
              state.consumedCount>state.challengeCount)
            throw Error('PARITY_PREVIOUS_OPERATION_REQUIRES_RECOVERY');
+          console.log('PARITY_RECOVERY_STATE_'+state.checkpointState);
+          console.log('PARITY_RECOVERY_CLAIM_ABSENT');
+          console.log('PARITY_RECOVERY_CHALLENGE_COUNT_'+state.challengeCount);
+          console.log('PARITY_RECOVERY_CONSUMED_COUNT_'+state.consumedCount);
           const d=await fetch(exOrigin+'/__motorlab_lab/diagnostics/execution-schema-audit',{
            headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},redirect:'manual',signal:AbortSignal.timeout(15000)});
           const schema=await d.json();
@@ -157,13 +166,22 @@ jobs:
               proof.match!==true||proof.transport!=='SERVICE_BINDING_STAGING')
             throw Error('PARITY_LIVE_REFRESH_PROOF_UNVERIFIED');
            console.log('PARITY_REFRESH_EXISTING_CRYPTOGRAPHIC_GATE_REVERIFIED');
+           const b=await fetch(webOrigin+'/__motorlab_lab/diagnostics/execution-binding',{
+            method:'GET',headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},
+            redirect:'manual',signal:AbortSignal.timeout(15000)});
+           let binding=null;try{binding=await b.json();}catch{}
+           if(b.status!==200||binding?.component!=='pacmanExecutionInternalBinding'||
+              binding.connected!==true||binding.transport!=='SERVICE_BINDING_STAGING')
+            throw Error('PARITY_REFRESH_BINDING_UNVERIFIED');
+           webauthnRefresh=!(binding.postConnected===true&&binding.postStatus===400&&
+             binding.postResult==='INVALID_REQUEST'&&binding.relayRevision==='private-post-relay-20261017-v1');
           }
           if(!process.env.GITHUB_OUTPUT)throw Error('PARITY_OUTPUT_CHANNEL_MISSING');
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,'execution_refresh='+executionRefresh+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'execution_refresh='+executionRefresh+'\nwebauthn_refresh='+webauthnRefresh+'\n');
           console.log('PARITY_STAGING_PREFLIGHT_PASS_READONLY_PROBE_ABSENT_OWNER_ENROLLED_SCHEMA_EXACT');
           NODE
       - name: Deploy passkey Worker with existing D1 and secrets preserved
-        if: steps.preflight.outputs.execution_refresh != 'true'
+        if: steps.preflight.outputs.webauthn_refresh == 'true'
         working-directory: tools/motorlab-pacman/webauthn
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
@@ -207,6 +225,30 @@ jobs:
         run: |
           printf %s 'YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED' |
             npx --yes wrangler@4 secret put PACMAN_ISSUER_PARITY_VERIFIED --config wrangler.pacman-execution-staging.jsonc
+      - name: Verify private POST transport without approvals or GitHub mutations
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          const url='https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/__motorlab_lab/diagnostics/execution-binding';
+          let verified=false;
+          for(const delay of [0,1000,2000]){
+           if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
+           try{
+            const r=await fetch(url,{method:'GET',redirect:'manual',
+             headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},signal:AbortSignal.timeout(15000)});
+            let proof=null;try{proof=await r.json();}catch{}
+            if(r.status===200&&proof?.component==='pacmanExecutionInternalBinding'&&
+               proof.connected===true&&proof.transport==='SERVICE_BINDING_STAGING'&&
+               proof.postConnected===true&&proof.postStatus===400&&proof.postResult==='INVALID_REQUEST'&&
+               proof.relayRevision==='private-post-relay-20261017-v1'){
+             verified=true;break;
+            }
+           }catch{}
+          }
+          if(!verified)throw Error('PARITY_PRIVATE_POST_TRANSPORT_UNVERIFIED');
+          console.log('PACMAN_PRIVATE_POST_TRANSPORT_VERIFIED_NO_MUTATIONS');
+          NODE
       - name: Verify live Execution issuer parity, exact D1 schema and GitHub read-only readiness
         env:
           EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
