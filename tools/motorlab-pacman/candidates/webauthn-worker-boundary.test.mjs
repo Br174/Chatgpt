@@ -326,7 +326,7 @@ test("WebAuthn parity fails closed without service binding and accepts GET only"
 
 
 test("canonical challenge endpoint stores controlled request binding, not untrusted body hash",async()=>{
- const D1=db(),env={...baseEnv,DB:D1},content="# Controlled direct route\n";
+ const D1=db(),env={...baseEnv,DB:D1,PACMAN_CONTROLLED_UPDATE_ENABLED:"YES_REVIEWED_STAGING_CONTROLLED_UPDATE"},content="# Controlled direct route\n";
  const digest=Buffer.from(await webcrypto.subtle.digest("SHA-256",new TextEncoder().encode(content))).toString("hex");
  const intent={capability:"github.lab-file-update",operationId:"controlled-direct-challenge-0001",
   branch:"motorlab/pacman-real-operations-lab-20261017",
@@ -350,10 +350,28 @@ test("canonical challenge refuses content mismatch and main without writing D1",
   path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
   expectedSha:"a".repeat(40),contentSha256:digest};
  for(const [intent,body] of [[base,content+"CHANGED"],[{...base,branch:"main"},content]]){
-  const D1=db(),env={...baseEnv,DB:D1};
+  const D1=db(),env={...baseEnv,DB:D1,PACMAN_CONTROLLED_UPDATE_ENABLED:"YES_REVIEWED_STAGING_CONTROLLED_UPDATE"};
   const r=await handleWebAuthnRequest(req("/approve/challenge",{intent,content:body}),
    env,{cryptoImpl:webcrypto,nowMs:1780000000000});
   assert.equal(r.status,403);
   assert.equal(D1.challenges.size,0);
  }
+});
+
+
+test("controlled direct challenge and finish are disabled BEFORE any D1 access when flag absent",async()=>{
+ const content="# controlled OFF\\n";
+ const digest=Buffer.from(await webcrypto.subtle.digest("SHA-256",new TextEncoder().encode(content))).toString("hex");
+ const intent={capability:"github.lab-file-update",operationId:"controlled-direct-disabled-0001",
+  branch:"motorlab/pacman-real-operations-lab-20261017",
+  path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
+  expectedSha:"a".repeat(40),contentSha256:digest};
+ let calls=0;
+ const env={...baseEnv,DB:{prepare(){calls++;throw Error("NO_D1_ALLOWED");}}};
+ for(const endpoint of ["/approve/challenge","/approve/finish"]){
+  const r=await handleWebAuthnRequest(req(endpoint,{intent,content}),env,{cryptoImpl:webcrypto});
+  assert.equal(r.status,503);
+  assert.equal((await r.json()).error,"WEBAUTHN_CONTROLLED_UPDATE_DISABLED");
+ }
+ assert.equal(calls,0);
 });
