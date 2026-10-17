@@ -38,3 +38,53 @@ export async function signApprovalInTrustedHost({intent,expiresAt,secret,content
  const key=await crypto.subtle.importKey("raw",encoder.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
  return {...a,signature:hex(await crypto.subtle.sign("HMAC",key,encoder.encode(payload)))};
 }
+
+
+// V2 Real Operations LAB verifier. The authenticated owner-facing issuer remains
+// a separate, NOT CONNECTED host. This code verifies an already-issued signature;
+// it does not issue one or accept a chat boolean as an approval.
+import {validateControlledChatIntent} from "./chat-approval.mjs";
+const CONTROLLED_DOMAIN="MOTORLAB:PACMAN:CONTROLLED_UPDATE:V1";
+const CONTROLLED_REPOSITORY="Br174/Chatgpt";
+const CONTROLLED_ATTESTATION_KEYS=[
+ "decision","expiresAt","issuedAt","nonce","operationId","signature","subject"
+];
+export function controlledApprovalPayload(intent,attestation){
+ const scoped=validateControlledChatIntent(intent);
+ return JSON.stringify([CONTROLLED_DOMAIN,CONTROLLED_REPOSITORY,
+  scoped.capability,scoped.operationId,scoped.branch,scoped.path,
+  scoped.expectedSha,scoped.contentSha256,
+  attestation.subject,attestation.nonce,attestation.issuedAt,
+  attestation.expiresAt,attestation.decision]);
+}
+export async function verifyControlledApprovalAttestation({
+ intent,attestation,secret,expectedOwnerSubject,now=Date.now()
+}={}){
+ const scoped=validateControlledChatIntent(intent);
+ if(typeof secret!=="string"||secret.length<32||
+    typeof expectedOwnerSubject!=="string"||!expectedOwnerSubject)
+   throw Error("CONTROLLED_TRUSTED_ISSUER_NOT_CONNECTED");
+ if(!Number.isSafeInteger(now)||
+    !attestation||typeof attestation!=="object"||Array.isArray(attestation)||
+    Object.keys(attestation).sort().join(",")!==CONTROLLED_ATTESTATION_KEYS.join(",")||
+    attestation.decision!=="authorize"||
+    attestation.operationId!==scoped.operationId||
+    attestation.subject!==expectedOwnerSubject||
+    typeof attestation.nonce!=="string"||
+    !/^[A-Za-z0-9][A-Za-z0-9._-]{7,63}$/.test(attestation.nonce)||
+    !Number.isSafeInteger(attestation.issuedAt)||
+    !Number.isSafeInteger(attestation.expiresAt)||
+    attestation.issuedAt>now||now-attestation.issuedAt>120000||
+    attestation.expiresAt<=now||
+    attestation.expiresAt-attestation.issuedAt>120000||
+    typeof attestation.signature!=="string"||
+    !/^[a-f0-9]{64}$/.test(attestation.signature))
+   throw Error("CONTROLLED_ATTESTATION_INVALID");
+ const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(secret),
+  {name:"HMAC",hash:"SHA-256"},false,["verify"]);
+ const bytes=Uint8Array.from(attestation.signature.match(/../g),h=>parseInt(h,16));
+ const payload=controlledApprovalPayload(scoped,attestation);
+ if(!await crypto.subtle.verify("HMAC",key,bytes,new TextEncoder().encode(payload)))
+   throw Error("CONTROLLED_SIGNATURE_INVALID");
+ return Object.freeze({approved:true,...scoped,approvalNonce:attestation.nonce});
+}
