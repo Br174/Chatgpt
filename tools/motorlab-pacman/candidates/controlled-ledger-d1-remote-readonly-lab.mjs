@@ -63,6 +63,7 @@ export async function verifyRemoteControlledLedgerSchemaReadOnly({
   transportFailure?"D1_HTTP_OR_RESULT_UNVERIFIED":
   schema==="EXACT"&&calls===2?"D1_SCHEMA_EXACT_READ_ONLY":
   "D1_SCHEMA_MISMATCH";
- return Object.freeze({status,queries:calls,writes:0,
+ return Object.freeze({status,queries:calls,writeStatements:0,
+  observedRowsWritten:status==="D1_SCHEMA_EXACT_READ_ONLY"?"ZERO":"UNVERIFIED",
   schema:status==="D1_SCHEMA_EXACT_READ_ONLY"?"EXACT":"NOT_VERIFIED"});
 }
