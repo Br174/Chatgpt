@@ -71,6 +71,18 @@ Autorizzazione utente successiva al rapporto preventivo: solo nuova fase 2 in qu
 
 **Prossimo confine:** verificare l'esito Node 22 con crittografia reale. Integrare e collaudare un issuer owner/WebAuthn per questa nuova capacità richiederà successivo rapporto di sicurezza e autorizzazione separata se implica operazioni sui provider.
 
+## Node 22 WebCrypto reale — verifica locale 2026-10-17
+
+- Ambiente Node.js 22.16.0 locale, esecuzione immediata senza GitHub Actions, servizi a pagamento, token, credenziali reali o modifiche Cloudflare.
+- I moduli `chat-approval.mjs` e `approval-attestation.mjs` sono stati ricostruiti byte-for-byte da GitHub e verificati contro Git blob SHA rispettivamente `63dd13102ebaadad32d24cc95aa5221249e528a8` e `9e7d30b4a492cbd43aee1ccc21404b67a400deae`.
+- Dipendenza `controlledLabPath` ricostruita come fixture isolata dal codice già letto; la prova NON comprende l'esecutore completo, una firma WebAuthn reale o il Worker.
+- **15/15 test con WebCrypto/HMAC-SHA256 autentico di Node 22**: firma valida; impronta SHA256 Unicode; firma contraffatta; segreto errato; nonce alterato; contenuto, SHA blob e percorso modificati; main/vecchio LAB/checkpoint protetti; proprietario errato; scadenza; consenso `approved:true` come campo extra; cambio operationId; vecchio issuer che rifiuta la nuova capability; validatore del vecchio ciclo ancora compatibile.
+- Nuovo file di regressione real-crypto **aggiunto al LAB**: `tools/motorlab-pacman/candidates/chat-real-webcrypto-lab.test.mjs` (15 test). La suite completa GitHub Actions lo include per glob `candidates/*.test.mjs`, ma **l'esito effettivo Node/GitHub Actions sul HEAD non è ancora verificato**.
+- Importante: l'HMAC con segreto sintetico nel test dimostra la compatibilità crittografica, NON la presenza di un issuer autenticato e collegato alla chat; la chiave di produzione e la passkey non sono state lette né modificate.
+- Le cifre 25/25 + 16/16 sono i test del precedente harness isolato con WebCrypto simulata; i nuovi 15/15 con crypto reale sono una verifica differente. Non sommare automaticamente come se fosse la suite ufficiale.
+- Scala 16 gate Real Operations **invariata**: fase A 75% Δ0, B 50% Δ0, C 0% Δ0, D 50% Δ0; **totale 7/16 = 43,75% Δ0**. Sottoattività verifica HMAC reale Node22 = 100%. Gate A4 (suite Node22 completa + workerd) ancora aperto, così come l'issuer live della fase B.
+- Prossimo passo senza espansione di ambito: ottenere evidenza verificabile del workflow GitHub Actions completo sul commit LAB e correggere eventuali regressioni nel solo ramo autorizzato. Nessun nuovo deploy e nessuna firma reale dell'utente finché manca separata autorizzazione di provider/sicurezza.
+
 ## Ultimo checkpoint operativo
 
 - Branch corrente: `motorlab/pacman-real-operations-lab-20261017`.
