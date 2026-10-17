@@ -1,6 +1,6 @@
 # Pac-Man LAB — GitHub egress recovery, 17 October 2026
 
-Status: `REAL_OWNER_BIOMETRIC_GITHUB_CYCLE_VERIFIED_WAITING_PROTECTED_FINAL_D1_READBACK`. The owner completed a fresh Android passkey assertion and the actual GitHub create/read/delete/read LAB cycle. Independent GitHub inspection confirms both commits, exact approved content, probe removal, and restoration of the whole pre-cycle repository tree. Do not execute this operation again.
+Status: `VERIFIED_COMPLETE_AUTHORIZED_STAGING_LAB`. The owner completed a fresh Android passkey assertion and the actual GitHub create/read/delete/read LAB cycle. Independent GitHub inspection confirms both commits, exact approved content, probe removal, and restoration of the whole pre-cycle repository tree. A subsequent protected GET-only audit independently read the completed D1 checkpoint and consumed approval. Do not execute this operation again.
 Session release pin: `2026.10.14-r37`. R38 continuity rules remain applicable as recorded by the canonical CORE; this is not an r38 release promotion.
 
 ## Identity and verified baseline
@@ -21,10 +21,22 @@ Session release pin: `2026.10.14-r37`. R38 continuity rules remain applicable as
 - Cleanup commit at 19:23:27 UTC: https://github.com/Br174/Chatgpt/commit/bf2bea705188d2c01be462e514c8c385c8342a72
 - Each commit changes only `tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt`; creation content was independently checked byte-for-byte, including the final newline, against the approved JSON below.
 - Pre-cycle and cleanup trees are identical: `173894b405655186296d6a58c1c6e742bcf67d07`. GitHub comparison contains two commits and zero net changed files. The probe is absent after cleanup.
-- The deployed relay emits `PACMAN_OPERATION_VERIFIED` only for a matching `VERIFIED_AND_REMOVED` Execution receipt. Execution awaits successful D1 persistence (`success:true`, exactly one changed row) before returning that receipt. This is strong receipt-path evidence; a separate protected GET readback of the post-cycle D1 state remains pending.
+- The deployed relay emits `PACMAN_OPERATION_VERIFIED` only for a matching `VERIFIED_AND_REMOVED` Execution receipt. Execution awaits successful D1 persistence (`success:true`, exactly one changed row) before returning that receipt. This receipt-path evidence is now corroborated by the independent protected post-cycle D1 readback below.
 - The existing read-only audit workflow now additionally reads the already deployed fixed-operation recovery endpoint. It requires final checkpoint `VERIFIED_AND_REMOVED`, an existing single-use approval claim, valid consumed challenge counts, exact D1 schema, current GitHub readiness and probe absence. It never starts WebAuthn, executes a cycle, changes a schema, deploys a Worker, clears claims or emits credentials.
-- Final-audit regression verification: 12/12 targeted tests and 750/750 full local tests passed; YAML and GET-only protected boundaries passed. Independent code review reported no findings. This verification covers the audit code, not yet the live post-cycle D1 readback.
-- Current user-action boundary: GitHub environment review for this final read-only audit. The GitHub connector cannot approve protected deployments. No further biometric assertion is needed for this completed operation.
+- Final-audit regression verification: 12/12 targeted tests and 750/750 full local tests passed; YAML and GET-only protected boundaries passed. Independent code review reported no findings. The protected live audit also subsequently passed.
+- The owner approved the final GitHub environment review. There is no remaining user-action boundary for this completed operation and no further biometric assertion is needed.
+
+## Independent final operational audit — VERIFIED COMPLETE
+
+- Run: https://github.com/Br174/Chatgpt/actions/runs/39062615761
+- Audited source: `0bddb6496b6e46e06334203122c5cb4ffaf3ec12`.
+- `validate` job `117483526966`: SUCCESS. Protected `audit` job `117483549991`: SUCCESS, including exact current-HEAD check, GitHub probe absence, Execution readiness and D1 recovery readback.
+- Authenticated GET through the already deployed recovery endpoint returned the exact fixed operation, checkpoint `VERIFIED_AND_REMOVED`, approval claim present, challenge count `4`, consumed count `4`.
+- Actual log proofs: `PACMAN_OWNER_CYCLE_D1_STATE_VERIFIED_AND_REMOVED`, `PACMAN_OWNER_CYCLE_APPROVAL_CLAIM_PRESENT`, `PACMAN_OWNER_CYCLE_CHALLENGE_COUNT_4`, `PACMAN_OWNER_CYCLE_CONSUMED_COUNT_4`, `PACMAN_OWNER_CYCLE_FINAL_AUDIT_VERIFIED_GET_ONLY`.
+- Independent GitHub probe absence was confirmed again: `PACMAN_POSTPARITY_GITHUB_ACTIONS_PROBE_ABSENT`. Execution schema verification was `true`; authenticated readiness HTTP was `200`; authenticated and public WebAuthn GitHub GET diagnostics were both HTTP `200`.
+- The post-cycle audit performed no deployment, GitHub mutation, schema change, new assertion, approval consumption or replay. It preserved the completed checkpoint and consumed claim.
+- Root Cause Closure: the missing GitHub User-Agent and the Workers-incompatible `redirect:"error"` Request construction are corrected in the existing owners, covered by negative tests, and corroborated by the actual owner-approved cycle and final persisted-state readback. The mandatory workerd runtime test prevents recurrence of the Request-construction incompatibility that Node alone had missed.
+- Terminal seal: `VERIFIED_COMPLETE` for the authorized Android WebAuthn -> private staging Service Binding -> Execution -> GitHub isolated file cycle -> D1 receipt path. This is not a production promotion, a main/MADRE change, an unrestricted provider administrator, or proof of a connected ChatGPT MCP app.
 
 ## New POST relay failure and verified local correction
 
@@ -112,14 +124,13 @@ Negative tests block wrong HMAC, public transport, duplicate/non-secret marker, 
 ## Resume sequence
 
 1. Recheck current LAB HEAD before any source ref update; reconcile concurrent changes.
-2. The canonical repair run `39061359612` and real owner-approved GitHub cycle have completed successfully. Do not repeat registration, bootstrap, deployment, passkey assertion or file cycle.
-3. Continue only the current `.github/workflows/pacman-execution-postparity-readonly.yml` final audit after its protected environment review. Do not approve historical pending deployment runs.
-4. Require GET-only final D1 readback: `VERIFIED_AND_REMOVED`, claim present, sane consumed challenge counts; also require current GitHub probe absence, exact schema and healthy readiness.
-5. Read the actual final-audit logs, record the run ID and verified values in this checkpoint, and close the authorized staging LAB milestone. A green source test alone does not close the audit.
-6. Preserve the consumed claim and completed checkpoint. Any broader capability, promotion, main/MADRE/production change or new operation needs its own authorized scope.
+2. The canonical repair run `39061359612`, real owner-approved GitHub cycle and protected final read-only audit `39062615761` have all completed successfully. Do not repeat registration, bootstrap, deployment, passkey assertion, file cycle or final audit just to resume this completed operation.
+3. Use the immutable commit links, final-audit logs and this GitHub checkpoint as the recovery record. Preserve operation `pacman-webauthn-lab-20261017-ff59959a-01`, its consumed claim and final D1 checkpoint.
+4. Do not approve historical pending deployment runs or clear/replace claims to repeat the probe.
+5. The authorized staging LAB milestone is closed with `VERIFIED_COMPLETE`. Any broader capability, promotion, main/MADRE/production change or new operation needs its own authorized scope; do not infer authorization from this completion seal.
 
 ## Scope and progress
 
 No main, MADRE, production, D1 schema, Cloudflare Access, new token, paid service, or permission expansion is authorized. Existing protected staging deploys and necessary LAB repairs remain within the approved scope. Do not approve old run `39037125095`.
 
-Progress since the previous checkpoint: WebAuthn/passkey `100%` (delta `+1%`); actual owner-approved GitHub LAB cycle `100%` (previously incomplete); Pac-Man global historical estimate `99%` (delta `+1%`), pending the independent protected final D1 readback. The last two points of the earlier 98% estimate are tracked as one point for the actual biometric GitHub cycle and one for final persisted-state verification. These are continuity estimates, not a newly reconstructed weighted inventory of every possible Pac-Man capability. Global 100% remains unavailable before the final audit, and completion will apply only to the authorized staging LAB milestone, never unrestricted provider administration or production promotion.
+Progress at closure: WebAuthn/passkey `100%` (delta `0%` from the previous checkpoint); actual owner-approved GitHub LAB cycle `100%`; independent final operational audit `100%`; authorized Pac-Man Execution V2 staging LAB milestone `100%` (delta `+1%` from the prior 99% continuity estimate). The final two points of the earlier 98% estimate were the actual biometric GitHub cycle and independent persisted-state verification, and both are now evidenced. The completion percentage applies strictly to this authorized staging LAB milestone. A weighted percentage for every possible Pac-Man provider capability has not been reconstructed or certified; no general administrator, production or connected ChatGPT MCP completion is claimed.
