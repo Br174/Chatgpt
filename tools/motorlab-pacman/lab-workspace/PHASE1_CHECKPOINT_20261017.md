@@ -346,3 +346,31 @@ Reference: https://github.com/Br174/Chatgpt/actions/runs/39037378193
 
 Reference: https://github.com/Br174/Chatgpt/actions/runs/39075283947
 Checkpoint outcome: GET_ONLY_REMOTE_AUDIT3_SUCCESS, TWO_WORKER_LATEST_HISTORICAL_VERSIONS_MATCH, HMAC_CURRENT_MATCH, HISTORICAL_PARITY_UNLOCK_VERIFIED, NEW_CONTROLLED_FLAG_ABSENT, D1_OPERATIONS_COLUMNS_UNVERIFIED, NO_DEPLOY_NO_WRITES, MAIN_UNCHANGED.
+
+## Full controlled D1 ledger schema gate prepared (code only) — 2026-10-18
+
+Scope: user requested continuation of D1 schema verification after prior audited read-only staging and explicit no deploy/no Cloudflare mutation boundaries. All updates on motorlab/pacman-real-operations-lab-20261017 ONLY. No Worker deploy, actual remote D1 query, schema or secret/flag mutation, WebAuthn ceremony, real GitHub provider action, main/MADRE/old LAB/production touch, or new paid service.
+
+### Read-only implementation and fail-closed enforcement
+- Existing candidates/staging-runtime-cycle-handler.mjs extended at dc8db2004b3f2aba71ec51434cf1a84940a46c5d with export controlledLedgerSchemaAudit(db), no second schema engine/DB. Executes ONLY fixed SQLite read-only PRAGMA table_info(pacman_operations) and PRAGMA index_list(pacman_operations); does not expose raw schema, index names, JSON receipts, secret values or provider exceptions. Returns EXACT only for canonical three TEXT columns in exact sequence: operation_id TEXT PRIMARY KEY NOT NULL (pk=1); receipt_json TEXT NOT NULL; updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, plus unique origin='pk' non-partial index. Invalid/missing metadata is CONTROLLED_LEDGER_SCHEMA_UNVERIFIED and missing DB is STAGING_CONFIGURATION_MISSING.
+- Existing worker-execution-staging.mjs extended at 2e3d4bda044a706a6c316d81c90d145873440f50: authenticated GET-only existing /__motorlab_lab/diagnostics/execution-schema-audit now includes strictly categorical field controlledLedgerSchema. Historical schema field remains unchanged for legacy cycle; /health and legacy routes preserved. New github-lab-controlled-update and -recovery route refuses ANY claim/receipt or provider call with STAGING_CONTROLLED_LEDGER_SCHEMA_UNVERIFIED (HTTP 503) unless exact schema has been independently checked using PRAGMA. New controlled flag remains OFF by default.
+- Existing candidates/controlled-worker-route-lab.test.mjs synthetic in-memory D1 fixture updated at 389e134b844ce4a63caa7c2d8e3afdfeee47d3cf to emulate PRAGMA readbacks, including negative invalid PK/missing unique PK index before GitHub or atomic claims. No real DB was queried.
+- Existing worker-execution-staging.test.mjs historical two-table expectations and no-write assertions updated at 28d2aa6acee9b17d6e4541fba36ecb4fadc20513 to check the additional controlled table and unique-index PRAGMAs, preserve old EXACT result and keep unauthorized diagnostics inaccessible.
+- Existing candidates/staging-runtime-cycle-handler.test.mjs augmented at 40667e3a3e9dadf61318c8ddb9f8f270c6d33cbc with exact valid schema and 16 fail-closed schema/index/transport variants, all using fake DB.
+
+### Regression and diagnosis
+- Official GitHub Actions source runs #57 and #58 initially FAILED due solely to outdated historical test mocks that expected exactly two PRAGMA calls instead of four on the authorized GET endpoint; no evidence of provider-side effect. Root cause fixed in existing tests.
+- Run #59 SUCCESS after compatibility fix. Final #60 id 39076383865 SUCCESS on exact HEAD 40667e3a3e9dadf61318c8ddb9f8f270c6d33cbc. Node22 Pac-Man suite 867/867 passed, 0 failed; original Workers/miniflare regression passed. No duplicate module or uncontrolled writer introduced.
+- Live Cloudflare not re-queried in this stage; the already deployed historical Worker version does not include the new diagnostic field. Do NOT claim live D1 schema passes. Current deployed controlled update feature remains NOT ENABLED. DO NOT deploy merely to produce schema evidence without new explicit approval.
+
+### Required next decision
+- Preferred lowest-risk live verification: a specifically authorized read-only schema introspection through an existing trusted Cloudflare dashboard or an independently approved read-only D1 channel. PRAGMA table_info(pacman_operations) and PRAGMA index_list(pacman_operations) are read-only SQL, but submitting SQL through D1 REST/wrangler can require HTTP POST and stronger D1 permissions. This was NOT authorized, attempted or assumed accessible.
+- Alternative requiring separate, stricter authorization: deploy only an audited read-only Worker diagnostics revision to protected staging, preserving all secrets/bindings and with the new controlled feature disabled, then call the existing authenticated GET diagnostics route. No deployment currently allowed.
+- Strict stop: no Cloudflare API SQL POST, Worker deploy, enabling feature flags, credentials, D1/schema mutation, GitHub writes via controlled issuer, main/MADRE/old LAB changes without explicit NEW authorization.
+
+### Hierarchical progress
+- Task: prepare robust read-only schema verifier + fail-closed guarded Worker integration + full CI: 100% (delta +100 pp new task). Live pacman_operations schema verified: 0% (delta 0).
+- A GitHub 4/4=100% (delta 0); B controlled WebAuthn 2/4=50% (delta 0); C staging 2/4=50% (delta 0); D recovery 2/4=50% (delta 0). GLOBAL 10/16=62.50% (delta 0 pp). Do not inflate percentages from source tests only.
+- Verified source/CI, not live deployment. main remained 8615e8321bf9896f28826a09aa0c9f61ce5ecbb7 before this checkpoint.
+
+References: https://github.com/Br174/Chatgpt/actions/runs/39076383865 and https://github.com/Br174/Chatgpt/actions/runs/39075283947
