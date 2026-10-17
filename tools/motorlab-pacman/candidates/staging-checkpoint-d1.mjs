@@ -14,7 +14,7 @@ export function makeD1Checkpoint({db,operationId}={}){
  if(!db?.prepare || typeof operationId!=="string" || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{7,119}$/.test(operationId))throw Error("CHECKPOINT_STORE_NOT_CONFIGURED");
  let previous=null;
  return async ({state,branch,path,sha}={})=>{
-  if(!allowed.has(state) || branch!=="motorlab/pacman-execution-v2-lab-20261014" || path!=="tools/motorlab-pacman/probe-integration.txt" || (sha!==undefined && !/^[a-f0-9]{40}$/.test(sha)))throw Error("CHECKPOINT_INVALID");
+  if(!allowed.has(state) || branch!=="motorlab/pacman-execution-v2-lab-20261014" || path!=="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt" || (sha!==undefined && !/^[a-f0-9]{40}$/.test(sha)))throw Error("CHECKPOINT_INVALID");
   if(previous===null && state!=="PREPARED")throw Error("CHECKPOINT_SEQUENCE_INVALID");
   if(previous!==null && !transitions[previous]?.has(state))throw Error("CHECKPOINT_SEQUENCE_INVALID");
   const stmt=previous===null

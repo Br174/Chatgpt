@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
 import {signApprovalInTrustedHost} from "./approval-attestation.mjs";
 const secret="trusted-gate-local-test-secret-000000000000000";
-const intent={operationId:"pacman-gate-001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+const intent={operationId:"pacman-gate-001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
 const approval={...intent,decision:"authorize"};
 const now=Date.now();
 function db(){

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {validateIssuerApproval} from "./trusted-issuer-policy-lab.mjs";
 const now=1780000000000;
-const intent={operationId:"pacman-issuer-001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+const intent={operationId:"pacman-issuer-001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
 const contentSha256="a".repeat(64);
 const identity={authenticated:true,source:"trusted-host",subject:"owner-fixture",ownerAuthorized:true,sessionFresh:true};
 const confirmation={decision:"authorize",operationId:intent.operationId,capability:intent.capability,branch:intent.branch,path:intent.path,contentSha256,subject:identity.subject,issuedAt:now-1000,nonce:"nonce-unique-001"};

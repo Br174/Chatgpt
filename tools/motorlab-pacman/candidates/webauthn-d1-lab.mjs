@@ -36,7 +36,7 @@ export async function storeWebAuthnChallengeD1(db,record){
  if(!record||!id.test(record.challenge||"")||!op.test(record.operationId||"")||
     record.capability!=="github.lab-file-cycle"||
     record.branch!=="motorlab/pacman-execution-v2-lab-20261014"||
-    record.path!=="tools/motorlab-pacman/probe-integration.txt"||
+    record.path!=="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"||
     !digest.test(record.contentSha256||"")||
     typeof record.rpId!=="string"||!record.rpId||
     typeof record.origin!=="string"||!record.origin.startsWith("https://")||

@@ -12,7 +12,7 @@ export function validateApprovalChallengeLab({challenge,expected,now=Date.now()}
     challenge.operationId!==expected.operationId||
     challenge.capability!=="github.lab-file-cycle"||
     challenge.branch!=="motorlab/pacman-execution-v2-lab-20261014"||
-    challenge.path!=="tools/motorlab-pacman/probe-integration.txt"||
+    challenge.path!=="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"||
     challenge.contentSha256!==expected.contentSha256||
     !Number.isSafeInteger(challenge.createdAt)||!Number.isSafeInteger(challenge.expiresAt)||
     challenge.createdAt>now||challenge.expiresAt<=now||
