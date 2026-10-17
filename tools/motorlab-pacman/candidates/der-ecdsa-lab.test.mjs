@@ -1,0 +1,20 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {webcrypto} from "node:crypto";
+import {derEcdsaToP1363} from "./der-ecdsa-lab.mjs";
+const encode=(bytes)=>new Uint8Array(bytes);
+const asnInt=bytes=>{let i=0;while(i<bytes.length-1&&bytes[i]===0)i++;let b=bytes.slice(i);if(b[0]&128)b=Uint8Array.from([0,...b]);return Uint8Array.from([2,b.length,...b]);};
+const toDer=raw=>{const r=asnInt(raw.slice(0,32)),s=asnInt(raw.slice(32));return Uint8Array.from([0x30,r.length+s.length,...r,...s]);};
+test("DER conversion verifies a real ES256 signature",async()=>{
+ const pair=await webcrypto.subtle.generateKey({name:"ECDSA",namedCurve:"P-256"},true,["sign","verify"]);
+ const msg=new TextEncoder().encode("MotorLab LAB-only signature fixture");
+ const raw=encode(await webcrypto.subtle.sign({name:"ECDSA",hash:"SHA-256"},pair.privateKey,msg));
+ const decoded=derEcdsaToP1363(toDer(raw));
+ assert.deepEqual(decoded,raw);
+ assert.equal(await webcrypto.subtle.verify({name:"ECDSA",hash:"SHA-256"},pair.publicKey,decoded,msg),true);
+});
+test("rejects wrong ASN.1 tag",()=>assert.throws(()=>derEcdsaToP1363(Uint8Array.from([0x31,6,2,1,1,2,1,1])),/INVALID_DER_ECDSA/));
+test("rejects trailing bytes",()=>assert.throws(()=>derEcdsaToP1363(Uint8Array.from([0x30,6,2,1,1,2,1,1,0])),/INVALID_DER_ECDSA/));
+test("rejects negative integer",()=>assert.throws(()=>derEcdsaToP1363(Uint8Array.from([0x30,6,2,1,0x80,2,1,1])),/INVALID_DER_ECDSA/));
+test("rejects redundant leading zero",()=>assert.throws(()=>derEcdsaToP1363(Uint8Array.from([0x30,7,2,2,0,1,2,1,1])),/INVALID_DER_ECDSA/));
+test("rejects incomplete signature",()=>assert.throws(()=>derEcdsaToP1363(Uint8Array.from([0x30,6,2,1,1,2,1])),/INVALID_DER_ECDSA/));

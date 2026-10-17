@@ -1,0 +1,73 @@
+name: Pac-Man Cloudflare Access read-only audit
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/workflows/pacman-access-readonly-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 5
+    steps:
+      - name: Inspect Cloudflare Access staging metadata read-only
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          const expected='b86f445c2b57e604c02f79c8da64bb9c';
+          if(process.env.CF_ACCOUNT!==expected || !process.env.CF_TOKEN){
+            console.error('ACCESS_AUDIT: STAGING_CREDENTIALS_MISSING_OR_WRONG_ACCOUNT');
+            process.exit(1);
+          }
+          const headers={Authorization:'Bearer '+process.env.CF_TOKEN,Accept:'application/json'};
+          const base='https://api.cloudflare.com/client/v4/accounts/'+expected;
+          const safeText=v=>typeof v==='string'?v.replace(/[^a-zA-Z0-9._:@/-]/g,'').slice(0,240):'';
+          async function get(label,path){
+            try{
+              const r=await fetch(base+path,{method:'GET',headers,redirect:'error',signal:AbortSignal.timeout(12000)});
+              if(!r.ok){console.log(label+': HTTP_'+r.status);return null;}
+              const j=await r.json();
+              if(j?.success!==true){console.log(label+': API_UNAVAILABLE');return null;}
+              return j.result;
+            }catch{console.log(label+': NETWORK_OR_API_ERROR');return null;}
+          }
+          const org=await get('ACCESS_ORGANIZATION','/access/organizations');
+          if(org){
+            const o=Array.isArray(org)?org[0]:org;
+            if(o){
+              console.log('ACCESS_ORGANIZATION: PRESENT');
+              if(o.auth_domain)console.log('ACCESS_AUTH_DOMAIN: '+safeText(o.auth_domain));
+              if(o.name)console.log('ACCESS_ORG_NAME: '+safeText(o.name));
+            }else console.log('ACCESS_ORGANIZATION: EMPTY');
+          }
+          const apps=await get('ACCESS_APPS','/access/apps?per_page=100');
+          if(Array.isArray(apps)){
+            console.log('ACCESS_APPS_COUNT: '+apps.length);
+            for(const app of apps){
+              const name=safeText(app?.name);
+              const domain=safeText(app?.domain);
+              const type=safeText(app?.type);
+              const aud=Array.isArray(app?.aud)?app.aud.map(safeText).filter(Boolean):[];
+              console.log('ACCESS_APP: '+JSON.stringify({name,domain,type,aud_count:aud.length,aud:aud.slice(0,3)}));
+            }
+          }
+          const idps=await get('ACCESS_IDPS','/access/identity_providers?per_page=100');
+          if(Array.isArray(idps)){
+            console.log('ACCESS_IDPS_COUNT: '+idps.length);
+            for(const idp of idps){
+              console.log('ACCESS_IDP: '+JSON.stringify({name:safeText(idp?.name),type:safeText(idp?.type)}));
+            }
+          }
+          console.log('ACCESS_AUDIT: READ_ONLY_COMPLETE');
+          console.log('SECRET_VALUES: NEVER_READ_OR_PRINTED');
+          NODE

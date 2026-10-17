@@ -1,0 +1,36 @@
+name: MotorLab Pac-Man Execution regression
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tools/motorlab-pacman/**'
+      - '.github/workflows/pacman-*.yml'
+      - 'MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/motorlab-pacman/**'
+      - '.github/workflows/pacman-*.yml'
+      - 'MOTORLAB_SERVICE_INTEGRATION_STATUS_V1.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: MotorLab policy and complete Pac-Man regression suite
+        run: node --test tools/motorlab-pacman/test-pacman-core.mjs tools/motorlab-pacman/*.test.mjs tools/motorlab-pacman/candidates/*.test.mjs tools/motorlab-pacman/tests/*.test.mjs
+      - name: Verify private POST transport in the actual Workers runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pacman-worker-runtime" --no-save --package-lock=false miniflare@4.20260730.0
+          PACMAN_MINIFLARE_MODULE="$RUNNER_TEMP/pacman-worker-runtime/node_modules/miniflare" node tools/motorlab-pacman/ci-worker-binding-runtime.mjs

@@ -1,0 +1,82 @@
+name: Pac-Man staging read-only audit
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/workflows/pacman-staging-readonly-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 5
+    steps:
+      - name: Check out exact reviewed LAB commit for local diagnostics
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Require read-only diagnostic code and tests
+        run: |
+          test -f tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.mjs
+          test -f tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.test.mjs
+          node --test tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.test.mjs
+      - name: Read-only Cloudflare staging audit (names only)
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          const expected='b86f445c2b57e604c02f79c8da64bb9c';
+          const workers=['motorlab-pacman-execution-staging-lab','motorlab-pacman-staging-lab'];
+          if(process.env.CF_ACCOUNT!==expected || !process.env.CF_TOKEN) {
+            console.log('STAGING_DEPLOY_CREDENTIALS: MISSING_OR_WRONG_ACCOUNT');
+            process.exitCode=1;
+          } else {
+            const expectedNames=['PACMAN_EXECUTION_KEY','PACMAN_GITHUB_TOKEN','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_TRUSTED_ISSUER_CONNECTED','PACMAN_GITHUB_LAB_WRITE_ENABLED','PACMAN_APPROVAL_READINESS_ENABLED','PACMAN_CYCLE_ROUTE_ENABLED','PACMAN_D1_CHECKPOINTS_VERIFIED'];
+            for(const worker of workers){
+              const url='https://api.cloudflare.com/client/v4/accounts/'+expected+'/workers/scripts/'+worker+'/settings';
+              try {
+                const r=await fetch(url,{headers:{Authorization:'Bearer '+process.env.CF_TOKEN},signal:AbortSignal.timeout(12000),redirect:'error'});
+                if(!r.ok){console.log(worker+' SETTINGS: HTTP_'+r.status);continue;}
+                const j=await r.json();
+                if(j.success!==true){console.log(worker+' SETTINGS: API_UNAVAILABLE');continue;}
+                const bindings=Array.isArray(j.result?.bindings)?j.result.bindings:null;
+                if(!bindings){console.log(worker+' SETTINGS: NO_BINDINGS_ARRAY (cannot infer missing secrets)');continue;}
+                console.log(worker+' BINDINGS_COUNT: '+bindings.length);
+                for(const name of expectedNames){
+                  const b=bindings.find(b=>b.name===name);
+                  console.log(worker+' '+name+': '+(b?'PRESENT_TYPE_'+String(b.type||'unknown').replace(/[^a-z0-9_-]/gi,''):'NOT_LISTED'));
+                }
+                const db=bindings.find(b=>b.name==='DB' && b.type==='d1');
+                console.log(worker+' D1_BINDING: '+(db?.id==='eb834fc1-5589-4f75-bcb9-d311d0d72261'?'MATCH':'OTHER_OR_MISSING'));
+              } catch {console.log(worker+' SETTINGS: NETWORK_OR_API_ERROR');}
+            }
+            console.log('SECRET_VALUES: NEVER_READ_OR_PRINTED');
+          }
+          NODE
+
+      - name: Compare protected GitHub key with both Worker gates, read-only
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {inspectStagingCredentialParityReadOnly} from "./tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.mjs";
+          const result=await inspectStagingCredentialParityReadOnly({executionKey:process.env.EXECUTION_KEY});
+          // Only fixed category labels, numeric HTTP statuses and allowlisted gate classifications.
+          console.log('PACMAN_READONLY_AUTH_DIAGNOSIS_'+result.category);
+          console.log('PACMAN_READONLY_WEBAUTHN_HTTP_'+result.webAuthnHttp);
+          console.log('PACMAN_READONLY_EXECUTION_HTTP_'+result.executionHttp);
+          console.log('PACMAN_READONLY_EXECUTION_SCHEMA_'+result.executionSchema);
+          console.log('PACMAN_READONLY_ISSUER_PARITY_LOCKED_'+String(result.issuerParityLocked));
+          for(const [name,value] of Object.entries(result.flags))
+           console.log('PACMAN_READONLY_'+name+'_'+value);
+          console.log('PACMAN_READONLY_AUDIT_DONE_NO_DEPLOY_NO_MUTATIONS');
+          NODE

@@ -1,0 +1,13 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {consumeVerifiedBootstrapLab} from "./webauthn-bootstrap-consumption-lab.mjs";
+const now=1780000000000,owner="owner-lab-001",proof={ownerId:owner,nonce:"n".repeat(32),expiresAt:now+60000};
+const run=(p=proof,claimOnce=async()=>true)=>consumeVerifiedBootstrapLab({verifiedProof:p,expectedOwner:owner,claimOnce,now});
+test("accepts a successful atomic claim",async()=>assert.equal((await run()).claimed,true));
+test("denies duplicate claim",async()=>assert.rejects(()=>run(proof,async()=>false),/DENIED/));
+test("denies claim errors",async()=>assert.rejects(()=>run(proof,async()=>{throw Error("db unavailable");}),/DENIED/));
+test("denies expired proof",async()=>assert.rejects(()=>run({...proof,expiresAt:now}),/DENIED/));
+test("denies wrong owner",async()=>assert.rejects(()=>run({...proof,ownerId:"other"}),/DENIED/));
+test("denies missing atomic claim callback",async()=>assert.rejects(()=>run(proof,null),/DENIED/));
+test("denies truthy non-boolean claim",async()=>assert.rejects(()=>run(proof,async()=>1),/DENIED/));
+test("second attempt fails using simulated unique claim",async()=>{const seen=new Set();const claimOnce=async({nonce})=>{if(seen.has(nonce))return false;seen.add(nonce);return true;};await run(proof,claimOnce);await assert.rejects(()=>run(proof,claimOnce),/DENIED/);});

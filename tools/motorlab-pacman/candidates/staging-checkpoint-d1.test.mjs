@@ -1,0 +1,30 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {makeD1Checkpoint,CHECKPOINT_SCHEMA} from "./staging-checkpoint-d1.mjs";
+const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt",sha="a".repeat(40);
+const step=(state,extra={})=>({state,branch,path,...extra});
+function mockDb(){
+ const calls=[];let current=null;
+ return {
+  calls,
+  prepare(sql){return {
+   bind(...args){return {
+    async run(){
+     calls.push({sql,args});
+     if(sql.startsWith("INSERT")){
+      if(current!==null)return {success:true,meta:{changes:0}};
+      current=args[1];return {success:true,meta:{changes:1}};
+     }
+     if(args[3]!==current)return {success:true,meta:{changes:0}};
+     current=args[0];return {success:true,meta:{changes:1}};
+    }
+   };}
+  };}
+ };
+}
+test("checkpoint schema declares operation primary key",()=>assert.match(CHECKPOINT_SCHEMA,/operation_id TEXT PRIMARY KEY/));
+test("durable D1 state transitions preserve order and SHA",async()=>{const db=mockDb(),save=makeD1Checkpoint({db,operationId:"cycle-001"});for(const s of [step("PREPARED"),step("WRITE_ATTEMPTED"),step("CLEANUP_ATTEMPTED",{sha}),step("VERIFIED_AND_REMOVED")])await save(s);assert.equal(db.calls.length,4);assert.equal(db.calls[2].args[1],sha);assert.equal(db.calls[3].args[3],"CLEANUP_ATTEMPTED");});
+test("invalid transitions are denied before database write",async()=>{const db=mockDb(),save=makeD1Checkpoint({db,operationId:"cycle-002"});await assert.rejects(save(step("WRITE_ATTEMPTED")),/CHECKPOINT_SEQUENCE_INVALID/);await save(step("PREPARED"));await assert.rejects(save(step("VERIFIED_AND_REMOVED")),/CHECKPOINT_SEQUENCE_INVALID/);await assert.rejects(save(step("PREPARED")),/CHECKPOINT_SEQUENCE_INVALID/);assert.equal(db.calls.length,1);});
+test("scope and SHA mismatch are denied",async()=>{const db=mockDb(),save=makeD1Checkpoint({db,operationId:"cycle-003"});await assert.rejects(save(step("PREPARED",{branch:"main"})),/CHECKPOINT_INVALID/);await assert.rejects(save(step("PREPARED",{sha:"invalid"})),/CHECKPOINT_INVALID/);assert.equal(db.calls.length,0);});
+test("duplicate operation ID fails closed",async()=>{const db=mockDb();await makeD1Checkpoint({db,operationId:"cycle-004"})(step("PREPARED"));await assert.rejects(makeD1Checkpoint({db,operationId:"cycle-004"})(step("PREPARED")),/CHECKPOINT_PERSISTENCE_UNVERIFIED/);});
+test("unconfirmed D1 write does not advance in-memory state",async()=>{let n=0;const db={prepare:()=>({bind:()=>({run:async()=>{n++;return {success:true,meta:{changes:n===1?0:1}};}})})};const save=makeD1Checkpoint({db,operationId:"cycle-005"});await assert.rejects(save(step("PREPARED")),/CHECKPOINT_PERSISTENCE_UNVERIFIED/);await save(step("PREPARED"));assert.equal(n,2);});

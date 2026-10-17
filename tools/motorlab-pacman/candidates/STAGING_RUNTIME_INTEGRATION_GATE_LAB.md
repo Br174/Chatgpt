@@ -1,0 +1,67 @@
+# Pac-Man LAB — staging runtime integration gate (NO-GO)
+
+Verified 2026-10-16 from branch source and GitHub Actions. Candidate isolated suite: 45/45 pass, run 38834207549. These are simulated tests, not live execution evidence.
+
+## Runtime mismatch
+
+Current `tools/motorlab-pacman/worker-execution-staging.mjs` still routes `mode=github-lab-write` to `writeApprovedLabProbe` from `github-lab-write.mjs`. It does **not** call `approvedVerifiedLabCycleWithD1`. Existing-file overwrite differs materially from candidate's absent-target create/readback/delete/readback contract. The runtime health endpoint only checks `pacman_operations`, not `pacman_cycle_checkpoints`.
+
+## Required before staging enablement
+
+1. Explicitly adopt one canonical probe contract and review existing probe state (never overwrite unexpectedly).
+2. Create and validate the checkpoint table in the *actual dedicated staging D1*; verify schema, migration permissions, operation ID uniqueness, and restart recovery semantics. `CHECKPOINT_SCHEMA` in source does not apply a migration.
+3. Integrate the candidate lifecycle into the actual Worker handler under disabled-by-default staging controls; add tests invoking the Worker entry point with mocked D1 and GitHub HTTP responses.
+4. Verify trusted host issuer independently authenticates user and signs exact operation/content with server-held secret. A chat 'OK' is not a signed issuer approval.
+5. Verify scoped GitHub token and deploy isolation, audit logs and fail-closed flags. Do not enable any write/issuer switches until all checks pass.
+6. Test recovery after ambiguous PUT/DELETE and failed final checkpoint without blind retry; confirm manual reconciliation process.
+
+## Decision
+
+**NO-GO** for live Worker GitHub mutation. Keep `PACMAN_TRUSTED_ISSUER_CONNECTED`, `PACMAN_GITHUB_LAB_WRITE_ENABLED`, and `PACMAN_APPROVAL_READINESS_ENABLED` disabled. No main/MADRE/production changes. Candidate-only source and tests are permitted in the LAB branch.
+
+## Verified progress — 2026-10-16 (post-58-test run)
+
+- Isolated candidate suite: **58/58 pass**, GitHub Actions run **38834944764**; full LAB and CORE workflows also succeeded.
+- Candidate `staging-runtime-cycle-handler.mjs` checks three independent flags, signing secret, GitHub token, D1 approval ledger columns/primary key and checkpoint columns/primary key before attempting an approved cycle.
+- Tests invoke the *actual* `worker-execution-staging.mjs` and confirm that the new candidate mode remains **unrouted and disabled**. This is evidence of isolation, **not** a live integration test.
+- The real Worker still offers legacy `github-lab-write` under separate flags. That path is not the reversible create/verify/delete cycle and must not be mistaken for the new candidate.
+- **No actual staging D1 migration, trusted-host issuer authentication, real token scope check, or deployment has been verified.** Live mutation remains **NO-GO**.
+
+### Precise next integration checkpoint
+
+Before modifying or deploying the Worker entry point, confirm that the dedicated staging deployment is isolated, inventory its D1 binding and actual table schemas, inspect the Worker deploy workflow trigger paths, and establish an authenticated issuer design. Then integrate the candidate cycle with disabled-by-default routing and test the real Worker entry point using mocked D1/GitHub. Do not set enablement flags from test evidence alone.
+
+## Deployment boundary audit — 2026-10-16
+
+Source inspection of `.github/workflows/pacman-execution-staging-deploy.yml` confirms that deployment is triggered by changes to top-level `tools/motorlab-pacman/*.mjs`, `*.jsonc`, or the deploy workflow itself, **not** by `candidates/**` changes. The deploy job also requires protected Cloudflare credentials, an explicit activation variable, and checks the exact dedicated staging Worker name and D1 database ID before deploying. These are source-level safeguards, not evidence that a deployment succeeded.
+
+**Critical distinction:** the deploy workflow's current tests run `node --test tools/motorlab-pacman/*.test.mjs`, which excludes the candidate test directory. The separate isolated candidate CI provides that coverage. Any future integration into the top-level Worker must update the deployment test gate to include the relevant candidate tests and must avoid accidentally triggering a live deployment before review.
+
+The Worker `/health` currently checks only `pacman_operations`, so a healthy response does **not** prove the approval ledger or cycle checkpoint schema exists. Do not interpret a green health check as readiness to enable GitHub writes.
+
+## Read-only Cloudflare D1 verification procedure (pending execution)
+
+The GitHub connector validates repository code and CI, **not** live Cloudflare D1 table state. The source pins dedicated staging D1 database ID `eb834fc1-5589-4f75-bcb9-d311d0d72261` and binding `DB`. Before any Worker routing or write enablement, an authorized operator must run **read-only** queries against this exact staging database using Cloudflare's authenticated dashboard or CLI, never production:
+
+```sql
+SELECT name FROM sqlite_master WHERE type='table' AND name IN ('pacman_approval_claims','pacman_cycle_checkpoints');
+PRAGMA table_info(pacman_approval_claims);
+PRAGMA table_info(pacman_cycle_checkpoints);
+SELECT state, COUNT(*) AS total FROM pacman_cycle_checkpoints GROUP BY state;
+```
+
+Required approval ledger columns: `operation_id` (primary key), `approval_signature`, `claimed_at`, `expires_at`. Required checkpoint columns: `operation_id` (primary key), `state`, `branch`, `path`, `sha`, `updated_at`. Any `RECOVERY_REQUIRED` or incomplete state requires manual reconciliation before enabling writes. Do **not** print signing secrets, tokens, approval signatures, or raw operation content. If a table is missing, stop; schema migration requires separate review and is not authorized by a green CI run.
+
+Current status: **not executed** against Cloudflare; live D1 readiness remains **UNVERIFIED / NO-GO**.
+
+## Live Cloudflare observation and prepared migration — 2026-10-16
+
+Authenticated browser inspection located Cloudflare account **MotorLab-Staging** and D1 database **motorlab-pacman-staging**, ID `eb834fc1-5589-4f75-bcb9-d311d0d72261`. The Cloudflare overview reported **0 tables** and **0 queries**; SQL console query results were **not captured**. Therefore table absence is strongly suggested by UI metrics but **not conclusively established by SQL**. Do not claim a successful D1 schema inspection or migration.
+
+The candidate-only, non-executing file `staging-d1-schema-migration.sql` contains two `CREATE TABLE IF NOT EXISTS` statements matching the canonical approval ledger and checkpoint schema. Its three consistency tests passed as part of **65/65 isolated candidate tests**, GitHub Actions run **38837054809**. These tests do not prove live database readiness.
+
+**Installation gate (pending):** obtain definitive read-only schema results; confirm exact staging account/database ID and existing data; review migration against current schema; obtain explicit authorization for the staging-only D1 schema write; apply once with rollback/recovery plan; independently verify both tables/primary keys after execution. Keep all GitHub write and trusted-issuer flags disabled throughout. Never apply to production or other D1 databases.
+
+## Manual D1 staging migration verified — 2026-10-16
+
+User explicitly authorized creation of only `pacman_approval_claims` and `pacman_cycle_checkpoints` in `motorlab-pacman-staging` (D1 ID `eb834fc1-5589-4f75-bcb9-d311d0d72261`). User executed both canonical `CREATE TABLE IF NOT EXISTS` statements through Cloudflare SQL Console and supplied screenshots showing success. Follow-up `sqlite_master` SELECT returned exactly the three expected names: `pacman_approval_claims`, `pacman_cycle_checkpoints`, `pacman_operations`. Both `PRAGMA table_info` outputs showed expected columns and types; final `SELECT name, sql FROM sqlite_master` displayed `operation_id TEXT PRIMARY KEY NOT NULL` for claims and `operation_id TEXT PRIMARY KEY` for checkpoints. The schema migration and read-only structural verification are complete. This does NOT validate the full runtime integration, authenticated issuer, or live GitHub mutation; write flags remain disabled and production is not targeted. Candidate tests previously passed 65/65 in run 38837054809. Historical pre-migration sections above are superseded for schema status by this verified update.

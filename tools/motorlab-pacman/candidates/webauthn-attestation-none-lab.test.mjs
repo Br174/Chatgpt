@@ -1,0 +1,12 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {parseNoneAttestationObjectLab as parse} from "./webauthn-attestation-none-lab.mjs";
+const s=x=>[0x60+x.length,...new TextEncoder().encode(x)];
+const obj=(fmt="none",data=[1,2,3],stmt=[0xa0])=>new Uint8Array([0xa3,...s("fmt"),...s(fmt),...s("authData"),0x40+data.length,...data,...s("attStmt"),...stmt]);
+test("parses strict none attestation",()=>{const r=parse(obj());assert.equal(r.fmt,"none");assert.deepEqual([...r.authData],[1,2,3]);});
+test("rejects non-none format",()=>assert.throws(()=>parse(obj("packed"))));
+test("rejects nonempty statement",()=>assert.throws(()=>parse(obj("none",[1],[0xa1]))));
+test("rejects trailing bytes",()=>assert.throws(()=>parse(new Uint8Array([...obj(),0]))));
+test("rejects truncated data",()=>assert.throws(()=>parse(obj().slice(0,-1))));
+test("rejects duplicate field",()=>{const b=obj();assert.throws(()=>parse(new Uint8Array([0xa3,...s("fmt"),...s("none"),...s("fmt"),...s("none"),...s("attStmt"),0xa0])));});
+test("rejects oversized input",()=>assert.throws(()=>parse(new Uint8Array(16385))));

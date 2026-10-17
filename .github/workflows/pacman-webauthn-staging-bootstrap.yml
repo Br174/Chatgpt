@@ -1,0 +1,246 @@
+name: Pac-Man WebAuthn staging bootstrap (zero-cost, protected)
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/pacman-webauthn-bootstrap-trigger'
+      - '.github/workflows/pacman-webauthn-staging-bootstrap.yml'
+  workflow_dispatch:
+    inputs:
+      confirm_staging_only:
+        description: 'Type BOOTSTRAP_WEBAUTHN_STAGING_ONLY'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-webauthn-staging-bootstrap
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' && (github.event_name == 'push' || inputs.confirm_staging_only == 'BOOTSTRAP_WEBAUTHN_STAGING_ONLY')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify complete Pac-Man LAB suites before approval gate
+        run: |
+          node --test tools/motorlab-pacman/*.test.mjs
+          node --test tools/motorlab-pacman/candidates/*.test.mjs
+
+      - name: Verify exact WebAuthn staging target before approval gate
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('tools/motorlab-pacman/webauthn/wrangler.pacman-webauthn-staging.jsonc','utf8'));
+          if(c.workers_dev!==true ||
+             c.name!=='motorlab-pacman-webauthn-staging-lab' ||
+             c.main!=='./worker.mjs' ||
+             c.d1_databases?.length!==1 ||
+             c.d1_databases[0].binding!=='DB' ||
+             c.d1_databases[0].database_name!=='motorlab-pacman-staging' ||
+             c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
+            throw Error('WEBAUTHN_STAGING_SCOPE_MISMATCH');
+          console.log('WEBAUTHN_STAGING_SCOPE_VERIFIED');
+          NODE
+
+      - name: Verify exact execution V2 staging target before approval gate
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc','utf8'));
+          if(c.workers_dev!==true ||
+             c.name!=='motorlab-pacman-execution-staging-lab' ||
+             c.main!=='./worker-execution-staging.mjs' ||
+             c.d1_databases?.length!==1 ||
+             c.d1_databases[0].binding!=='DB' ||
+             c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
+            throw Error('EXECUTION_STAGING_SCOPE_MISMATCH');
+          NODE
+
+      - name: Bundle execution V2 Worker dry-run before approval gate
+        working-directory: tools/motorlab-pacman
+        run: |
+          npx --yes wrangler@4 deploy --dry-run --config wrangler.pacman-execution-staging.jsonc --outdir "$RUNNER_TEMP/execution-dry-run"
+          test -n "$(find "$RUNNER_TEMP/execution-dry-run" -type f -maxdepth 2 -print -quit)"
+          echo "EXECUTION_V2_BUNDLE_PREFLIGHT_VERIFIED"
+
+      - name: Bundle WebAuthn Worker dry-run before approval gate
+        working-directory: tools/motorlab-pacman/webauthn
+        run: |
+          npx --yes wrangler@4 deploy --dry-run --config wrangler.pacman-webauthn-staging.jsonc --outdir "$RUNNER_TEMP/webauthn-dry-run"
+          test -f "$RUNNER_TEMP/webauthn-dry-run/worker.js" || test -n "$(find "$RUNNER_TEMP/webauthn-dry-run" -type f -maxdepth 2 -print -quit)"
+          echo "WEBAUTHN_BUNDLE_PREFLIGHT_VERIFIED"
+
+  bootstrap:
+    needs: preflight
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014' && (github.event_name == 'push' || inputs.confirm_staging_only == 'BOOTSTRAP_WEBAUTHN_STAGING_ONLY')
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify exact isolated WebAuthn staging target
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('tools/motorlab-pacman/webauthn/wrangler.pacman-webauthn-staging.jsonc','utf8'));
+          if(c.workers_dev!==true ||
+             c.name!=='motorlab-pacman-webauthn-staging-lab' ||
+             c.main!=='./worker.mjs' ||
+             c.d1_databases?.length!==1 ||
+             c.d1_databases[0].binding!=='DB' ||
+             c.d1_databases[0].database_name!=='motorlab-pacman-staging' ||
+             c.d1_databases[0].database_id!=='eb834fc1-5589-4f75-bcb9-d311d0d72261')
+            throw Error('WEBAUTHN_STAGING_SCOPE_MISMATCH');
+          console.log('WEBAUTHN_STAGING_SCOPE_VERIFIED');
+          NODE
+
+      - name: Require exact Cloudflare staging credentials and execution key
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          PACMAN_EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          test -n "$CF_TOKEN" || { echo "::error::PACMAN_CF_API_TOKEN missing"; exit 1; }
+          test "$CF_ACCOUNT" = "b86f445c2b57e604c02f79c8da64bb9c" || { echo "::error::Wrong Cloudflare account"; exit 1; }
+          test ${#PACMAN_EXECUTION_KEY} -ge 32 || { echo "::error::PACMAN_EXECUTION_KEY missing or too short"; exit 1; }
+
+      - name: Refuse pre-existing WebAuthn activation
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const worker='motorlab-pacman-webauthn-staging-lab';
+          const url='https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/scripts/'+worker+'/settings';
+          const r=await fetch(url,{headers:{Authorization:'Bearer '+process.env.CF_TOKEN},redirect:'error',signal:AbortSignal.timeout(15000)});
+          if(r.status===404){console.log('WEBAUTHN_WORKER_NEW_TARGET');process.exit(0);}
+          if(!r.ok)throw Error('WEBAUTHN_PREFLIGHT_HTTP_'+r.status);
+          const j=await r.json();
+          if(j.success!==true||!Array.isArray(j.result?.bindings))throw Error('WEBAUTHN_PREFLIGHT_INVALID');
+          if(j.result.bindings.some(x=>x.name==='PACMAN_WEBAUTHN_ENABLED'))
+            throw Error('WEBAUTHN_ALREADY_ACTIVATED_ABORT');
+          console.log('WEBAUTHN_TARGET_CONFIRMED_DISABLED');
+          NODE
+
+      - name: Deploy WebAuthn Worker still disabled
+        id: deploy
+        working-directory: tools/motorlab-pacman/webauthn
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 deploy --config wrangler.pacman-webauthn-staging.jsonc 2>&1 | tee "$RUNNER_TEMP/webauthn-deploy.log"
+          worker_url="$(grep -Eo 'https://[[:alnum:].-]+\.workers\.dev' "$RUNNER_TEMP/webauthn-deploy.log" | head -n 1 || true)"
+          test -n "$worker_url" || { echo "::error::Worker URL not reported"; exit 1; }
+          echo "worker_url=$worker_url" >> "$GITHUB_OUTPUT"
+
+      - name: Bind server-only execution key to disabled WebAuthn Worker
+        working-directory: tools/motorlab-pacman/webauthn
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          PACMAN_EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "$PACMAN_EXECUTION_KEY" | npx --yes wrangler@4 secret put PACMAN_EXECUTION_KEY --config wrangler.pacman-webauthn-staging.jsonc
+          echo "WEBAUTHN_SERVER_EXECUTION_KEY_BOUND"
+
+      - name: Verify staging binding names after secret upload (never read secret values)
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const worker='motorlab-pacman-webauthn-staging-lab';
+          const url='https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/scripts/'+worker+'/settings';
+          const r=await fetch(url,{headers:{Authorization:'Bearer '+process.env.CF_TOKEN},redirect:'error',signal:AbortSignal.timeout(15000)});
+          if(!r.ok)throw Error('WEBAUTHN_POST_SECRET_SETTINGS_HTTP_'+r.status);
+          const j=await r.json();
+          if(j.success!==true||!Array.isArray(j.result?.bindings))throw Error('WEBAUTHN_POST_SECRET_SETTINGS_INVALID');
+          const bindings=j.result.bindings;
+          if(!bindings.some(b=>b.name==='PACMAN_EXECUTION_KEY'&&b.type==='secret_text'))
+            throw Error('WEBAUTHN_EXECUTION_KEY_BINDING_MISSING');
+          if(!bindings.some(b=>b.name==='DB'&&b.type==='d1'))
+            throw Error('WEBAUTHN_D1_BINDING_MISSING');
+          if(bindings.some(b=>b.name==='PACMAN_WEBAUTHN_ENABLED'))
+            throw Error('WEBAUTHN_ALREADY_ACTIVATED_ABORT');
+          console.log('WEBAUTHN_BINDINGS_VERIFIED_NO_SECRET_VALUES_READ');
+          NODE
+
+      - name: Bootstrap exact WebAuthn schema through Worker D1 binding
+        env:
+          WORKER_URL: ${{ steps.deploy.outputs.worker_url }}
+          PACMAN_EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base=process.env.WORKER_URL;
+          if(!/^https:\/\/[a-zA-Z0-9.-]+\.workers\.dev$/.test(base||''))throw Error('INVALID_WEBAUTHN_WORKER_URL');
+          // Secret publication can briefly precede its serving deployment: retry only
+          // the exact fail-closed 401 from this Worker, never SQL/5xx/mismatched replies.
+          for(let attempt=1;attempt<=12;attempt++){
+            const r=await fetch(base+'/bootstrap/webauthn-schema',{
+              method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),cache:'no-store',
+              headers:{
+                authorization:'Bearer '+process.env.PACMAN_EXECUTION_KEY,
+                'x-pacman-bootstrap':'WEBAUTHN_SCHEMA_V1',
+                'cache-control':'no-store'
+              }
+            });
+            let body;try{body=await r.json();}catch{throw Error('WEBAUTHN_BOOTSTRAP_NON_JSON_HTTP_'+r.status);}
+            const code=typeof body?.error==='string'&&/^WEBAUTHN_[A-Z0-9_]+$/.test(body.error)
+              ? body.error : 'UNEXPECTED_RESPONSE';
+            if(r.status===401&&code==='WEBAUTHN_BOOTSTRAP_UNAUTHORIZED'){
+              if(attempt===12)throw Error('WEBAUTHN_AUTH_UNRESOLVED_AFTER_12_ATTEMPTS');
+              console.log('WEBAUTHN_AUTH_NOT_YET_READY_RETRY_'+attempt);
+              await new Promise(resolve=>setTimeout(resolve,2000));
+              continue;
+            }
+            if(r.status!==200||body?.status!=='WEBAUTHN_SCHEMA_BOOTSTRAPPED'||
+               JSON.stringify(body?.createdTables)!==JSON.stringify(['pacman_webauthn_challenges','pacman_webauthn_credentials'])||
+               JSON.stringify(body?.protectedTables)!==JSON.stringify(['pacman_approval_claims','pacman_cycle_checkpoints','pacman_operations']))
+              throw Error('WEBAUTHN_SCHEMA_BOOTSTRAP_FAILED_HTTP_'+r.status+'_'+code);
+            console.log('WEBAUTHN_D1_SCHEMA_BOOTSTRAPPED_THROUGH_BINDING');
+            console.log('PROTECTED_D1_SCHEMAS_VERIFIED_UNCHANGED');
+            break;
+          }
+          NODE
+
+      - name: Verify deployed Worker remains fail-closed
+        env:
+          WORKER_URL: ${{ steps.deploy.outputs.worker_url }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base=process.env.WORKER_URL;
+          const r=await fetch(base+'/health',{redirect:'error',signal:AbortSignal.timeout(15000)});
+          const body=await r.json();
+          if(r.status!==503||body.service!=='motorlab-pacman-webauthn-staging-lab'||body.configured!==false||body.path!=='WEBAUTHN_ZERO_COST')
+            throw Error('WEBAUTHN_WORKER_NOT_FAIL_CLOSED');
+          console.log('WEBAUTHN_BOOTSTRAP_COMPLETE_DISABLED_AND_VERIFIED');
+          console.log('NO_MAIN_NO_PRODUCTION_NO_RUNTIME_ENABLEMENT');
+          NODE
