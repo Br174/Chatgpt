@@ -186,6 +186,9 @@ export async function handleWebAuthnOwnerLab(request,env,{
   }
 
   if(url.pathname==="/webauthn/approval/start"){
+   if(input?.intent?.capability==="github.lab-file-update"&&
+      env?.PACMAN_CONTROLLED_UPDATE_ENABLED!=="YES_REVIEWED_STAGING_CONTROLLED_UPDATE")
+    throw fail("WEBAUTHN_CONTROLLED_UPDATE_DISABLED",503);
    if(typeof cfg.executionService?.fetch!=="function")throw fail("WEBAUTHN_EXECUTOR_BINDING_UNAVAILABLE",503);
    const credential=await loadOwnerWebAuthnCredentialD1(cfg.db,OWNER_SUBJECT);
    const intent=input?.intent,content=input?.content;
@@ -212,6 +215,9 @@ export async function handleWebAuthnOwnerLab(request,env,{
   }
 
   if(url.pathname==="/webauthn/approval/execute"){
+   if(input?.intent?.capability==="github.lab-file-update"&&
+      env?.PACMAN_CONTROLLED_UPDATE_ENABLED!=="YES_REVIEWED_STAGING_CONTROLLED_UPDATE")
+    throw fail("WEBAUTHN_CONTROLLED_UPDATE_DISABLED",503);
    const credential=await loadOwnerWebAuthnCredentialD1(cfg.db,OWNER_SUBJECT);
    const {intent,content,challenge,assertion}=input||{};
    if(typeof cfg.executionUrl!=="string"||typeof cfg.executionKey!=="string")
@@ -234,6 +240,9 @@ export async function handleWebAuthnOwnerLab(request,env,{
   }
 
   if(url.pathname==="/webauthn/approval/finish"){
+   if(input?.intent?.capability==="github.lab-file-update"&&
+      env?.PACMAN_CONTROLLED_UPDATE_ENABLED!=="YES_REVIEWED_STAGING_CONTROLLED_UPDATE")
+    throw fail("WEBAUTHN_CONTROLLED_UPDATE_DISABLED",503);
    const credential=await loadOwnerWebAuthnCredentialD1(cfg.db,OWNER_SUBJECT);
    const {intent,content,challenge,assertion}=input||{};
    if(!intent||typeof intent!=="object"||Array.isArray(intent)||typeof content!=="string"||!content||
