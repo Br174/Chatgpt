@@ -71,7 +71,7 @@ export async function verifyControlledApprovalAttestation({
     attestation.operationId!==scoped.operationId||
     attestation.subject!==expectedOwnerSubject||
     typeof attestation.nonce!=="string"||
-    !/^[A-Za-z0-9][A-Za-z0-9._-]{7,63}$/.test(attestation.nonce)||
+    !/^[A-Za-z0-9_-]{8,63}$/.test(attestation.nonce)||
     !Number.isSafeInteger(attestation.issuedAt)||
     !Number.isSafeInteger(attestation.expiresAt)||
     attestation.issuedAt>now||now-attestation.issuedAt>120000||
@@ -105,7 +105,7 @@ export async function signControlledApprovalAfterWebAuthnLab({
     typeof verifiedWebAuthn.credentialId!=="string"||
     !verifiedWebAuthn.credentialId||
     typeof verifiedWebAuthn.challenge!=="string"||
-    !/^[A-Za-z0-9][A-Za-z0-9_-]{31,63}$/.test(verifiedWebAuthn.challenge)||
+    !/^[A-Za-z0-9_-]{32,63}$/.test(verifiedWebAuthn.challenge)||
     !Number.isSafeInteger(issuedAt)||!Number.isSafeInteger(expiresAt)||
     expiresAt<=issuedAt||expiresAt-issuedAt>120000||
     !cryptoImpl?.subtle)
