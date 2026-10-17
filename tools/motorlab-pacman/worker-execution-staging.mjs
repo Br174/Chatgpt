@@ -1,7 +1,9 @@
-// Separate staging-only execution Worker. NOT deployed; read-only health Worker remains untouched.
+// Dedicated LAB staging-only Execution Worker; never deployed to main, MADRE or production.
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
 import {candidateCycleDispatch} from "./candidates/staging-cycle-dispatch.mjs";
+import {stagingCyclePreflight} from "./candidates/staging-runtime-cycle-handler.mjs";
+import {makeGitHubContentsLabAdapter} from "./candidates/github-contents-lab-adapter.mjs";
 // Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
 export const PACMAN_EXECUTION_RUNTIME_REVISION="pacman-v2-webauthn-relay-20261016";
 const MAX_BYTES=8192;
@@ -26,6 +28,28 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
     const found=await env.DB.prepare("SELECT COUNT(*) AS total FROM sqlite_master WHERE type = 'table' AND name = 'pacman_operations'").first();
     return response({service:"pacman-execution-staging",revision:PACMAN_EXECUTION_RUNTIME_REVISION,database:found?.total===1?"CONNECTED":"SCHEMA_MISSING"},found?.total===1?200:503);
    } catch {return response({service:"pacman-execution-staging",revision:PACMAN_EXECUTION_RUNTIME_REVISION,database:"ERROR"},503);}
+  }
+  // Authenticated read-only proof: verifies all runtime gates, D1 schema and GitHub probe absence.
+  // Never signs a WebAuthn challenge, claims D1 approval or creates/deletes a repository file.
+  if(url.pathname==="/__motorlab_lab/diagnostics/execution-readiness"){
+   if(request.method!=="GET")return response({error:"NOT_FOUND"},404);
+   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY))return response({error:"UNAUTHORIZED"},401);
+   if(env?.PACMAN_CYCLE_ROUTE_ENABLED!=="YES_REVIEWED_STAGING_CANDIDATE")
+    return response({error:"STAGING_CYCLE_ROUTE_DISABLED"},503);
+   const reason=await stagingCyclePreflight(env);
+   if(reason)return response({error:reason},503);
+   let state;
+   try{
+    state=await makeGitHubContentsLabAdapter({token:env.PACMAN_GITHUB_TOKEN,fetchImpl}).read({
+     branch:"motorlab/pacman-execution-v2-lab-20261014",
+     path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"
+    });
+   }catch{return response({error:"STAGING_GITHUB_READ_UNAVAILABLE"},503);}
+   if(state?.exists!==false)return response({error:"STAGING_PROBE_NOT_EMPTY"},409);
+   return response({status:"STAGING_CYCLE_READY_FOR_OWNER_PASSKEY",
+     branch:"motorlab/pacman-execution-v2-lab-20261014",
+     path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt",
+     approval:"WEBAUTHN_REQUIRED",mode:"GITHUB_LAB_CYCLE_ONLY"});
   }
   if(url.pathname!=="/execute" || request.method!=="POST") return response({error:"NOT_FOUND"},404);
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);

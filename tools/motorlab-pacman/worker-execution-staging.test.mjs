@@ -286,3 +286,27 @@ test("declared Content-Length larger than actual body is rejected",async()=>{
  assert.equal(result.status,400);
  assert.equal((await result.json()).error,"CONTENT_LENGTH_MISMATCH");
 });
+
+test("GET execution-readiness refuses anonymous requests without database or GitHub traffic",async()=>{
+ let calls=0;const url="https://staging.example/__motorlab_lab/diagnostics/execution-readiness";
+ const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){calls++;throw Error("Unexpected D1");}}};
+ const denied=await worker.fetch(new Request(url),env);
+ assert.equal(denied.status,401);assert.equal(calls,0);
+ const off=await worker.fetch(new Request(url,{headers:{authorization:"Bearer "+key}}),env);
+ assert.equal(off.status,503);assert.equal((await off.json()).error,"STAGING_CYCLE_ROUTE_DISABLED");
+ assert.equal(calls,0);
+});
+test("GET execution-readiness fails closed before GitHub if D1 schema is unverified",async()=>{
+ const url="https://staging.example/__motorlab_lab/diagnostics/execution-readiness";
+ let calls=0;
+ const env={PACMAN_EXECUTION_KEY:key,PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",
+  PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",
+  PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",
+  PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",
+  PACMAN_APPROVAL_SIGNING_SECRET:"s".repeat(48),PACMAN_GITHUB_TOKEN:"t".repeat(40),
+  DB:{prepare(){calls++;return {all:async()=>({results:[]})};}}
+ };
+ const r=await worker.fetch(new Request(url,{headers:{authorization:"Bearer "+key}}),env);
+ assert.equal(r.status,503);assert.equal((await r.json()).error,"STAGING_D1_SCHEMA_UNVERIFIED");
+ assert.equal(calls,1);
+});

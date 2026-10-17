@@ -10,7 +10,8 @@ export function makeGitHubContentsLabAdapter({token,fetchImpl}={}){
  if(typeof token!=="string"||token.length<20||typeof fetchImpl!=="function")throw Error("ADAPTER_NOT_CONFIGURED");
  const headers={Authorization:"Bearer "+token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","Content-Type":"application/json"};
  const scope=(branch,path)=>{if(branch!==LAB||path!==PATH)throw Error("LAB_SCOPE_REQUIRED");};
- const request=(url,init)=>fetchImpl(url,{...init,headers,redirect:"error"});
+ // Reject unexpected 3xx without forwarding bearer; manual mode avoids Worker redirect:error egress failures.
+ const request=(url,init)=>fetchImpl(url,{...init,headers,redirect:"manual"});
  return {
   async read({branch,path}){scope(branch,path);const r=await request(URL+"?ref="+encodeURIComponent(LAB),{method:"GET"});if(r.status===404)return {exists:false};if(!r.ok)throw Error("GITHUB_READ_FAILED_"+r.status);const f=await r.json();if(f?.type!=="file"||!validSha(f.sha)||f.encoding!=="base64")throw Error("GITHUB_FILE_INVALID");return {exists:true,sha:f.sha,content:decode(f.content.replace(/\s/g,""))};},
   async create({branch,path,content}){scope(branch,path);if(typeof content!=="string"||content.length===0||new TextEncoder().encode(content).length>4096)throw Error("INVALID_CONTENT");const body={message:"test(pacman): LAB isolated probe create",branch:LAB,content:encode(content)};const r=await request(URL,{method:"PUT",body:JSON.stringify(body)});if(!r.ok)throw Error("GITHUB_CREATE_FAILED_"+r.status);const f=await r.json();if(!validSha(f?.content?.sha)||!validSha(f?.commit?.sha))throw Error("GITHUB_CREATE_RESPONSE_INVALID");},
