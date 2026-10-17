@@ -1,0 +1,23 @@
+name: Pac-Man Controlled GitHub Operations LAB
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - 'tools/motorlab-pacman/**'
+      - '.github/workflows/pacman-controlled-operations-lab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  controlled-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run new safety tests and legacy Pac-Man regressions
+        run: |
+          node --test tools/motorlab-pacman/candidates/github-controlled-update-lab.test.mjs tools/motorlab-pacman/candidates/github-contents-lab-adapter.test.mjs tools/motorlab-pacman/chat-coordinator.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/atomic-claim.test.mjs
