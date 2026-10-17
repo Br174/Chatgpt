@@ -215,7 +215,7 @@ test("internal staging binding diagnostic is protected, read-only and cannot fal
  const missing=await handleWebAuthnRequest(request,env,{fetchImpl:async()=>{external++;}});
  assert.equal(missing.status,503);assert.equal((await missing.json()).error,"EXECUTION_SERVICE_BINDING_MISSING");
  const service={fetch:async(u,init)=>{
-  calls++;assert.equal(u,"https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev/health");assert.equal(init.method,"GET");
+  calls++;assert.ok(u instanceof Request);assert.equal(u.url,"https://pacman-execution.internal/health");assert.equal(u.method,"GET");
   return Response.json({service:"pacman-execution-staging",revision:"pacman-v2-webauthn-relay-20261016",database:"CONNECTED"});
  }};
  const good=await handleWebAuthnRequest(request,{...env,PACMAN_EXECUTION_SERVICE:service},{fetchImpl:async()=>{external++;}});
@@ -246,4 +246,16 @@ test("read-only recovery diagnostic returns bounded checkpoint/claim/challenge s
  assert.equal(result.challengeCount,1);assert.equal(result.consumedCount,1);
  assert.equal(queries.length,3);assert.ok(queries.every(q=>q.startsWith("SELECT ")));
  assert.equal(JSON.stringify(result).includes(key),false);
+});
+
+test("safe binding transport error classification does not expose exception text",async()=>{
+ const key="k".repeat(48);
+ const req=new Request(endpoint+"/__motorlab_lab/diagnostics/execution-binding",{headers:{authorization:"Bearer "+key}});
+ const env={...baseEnv,DB:db(),PACMAN_EXECUTION_KEY:key};
+ const r=await handleWebAuthnRequest(req,{...env,PACMAN_EXECUTION_SERVICE:{fetch:async()=>{throw Error("1042 private-secret-must-not-leak");}}});
+ assert.equal(r.status,503);
+ const d=await r.json();assert.deepEqual(d,{error:"EXECUTION_SERVICE_UNREACHABLE",phase:"FETCH",reason:"CF_1042"});
+ assert.equal(JSON.stringify(d).includes("private-secret"),false);
+ const x=await handleWebAuthnRequest(req,{...env,PACMAN_EXECUTION_SERVICE:{fetch:async()=>({status:200,json:async()=>{throw SyntaxError("secret-json");}})}});
+ assert.equal(x.status,503);assert.equal((await x.json()).phase,"DECODE");
 });

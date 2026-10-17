@@ -4,6 +4,8 @@ import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.
 
 const fail=code=>{throw Error(code);};
 const EXECUTOR_ORIGIN="https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev";
+// The binding pins the actual target; this hostname is only a Request URL.
+const PRIVATE_ORIGIN="https://pacman-execution.internal";
 function exactHttpsOrigin(value){
  if(typeof value!=="string")return null;
  let u;try{u=new URL(value);}catch{return null;}
@@ -42,11 +44,12 @@ export async function executePacmanWithWebAuthnLab({
  };
  let response;
  try{
-  response=await executionService.fetch(base+"/execute",{
+  const request=new Request(PRIVATE_ORIGIN+"/execute",{
    method:"POST",redirect:"error",
    headers:{authorization:"Bearer "+executionKey,"content-type":"application/json"},
    body:JSON.stringify(payload)
   });
+  response=await executionService.fetch(request);
  }catch{fail("PACMAN_EXECUTOR_UNREACHABLE");}
  let body;try{body=await response.json();}catch{fail("PACMAN_EXECUTOR_RESPONSE_INVALID");}
  if(!response.ok)fail("PACMAN_EXECUTOR_REJECTED");

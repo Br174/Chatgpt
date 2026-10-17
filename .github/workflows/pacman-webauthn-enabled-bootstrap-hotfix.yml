@@ -1,5 +1,5 @@
 name: Pac-Man WebAuthn public bootstrap hotfix (enabled LAB)
-# Canonical WebAuthn LAB cycle probe (preflight test aligned): tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt
+# Canonical WebAuthn LAB cycle probe (private service Request + sanitized diagnostics): tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt
 # 2026-10-17 LAB: fixed-endpoint GitHub bootstrap GET uses manual redirect and rejects 3xx.
 # Targeted diagnostic regression: mock unauthenticated request and redirect mode accurately.
 on:
@@ -191,7 +191,11 @@ jobs:
             }catch{lastReason='TRANSPORT_UNAVAILABLE';}
            }
            if(!verified){
-            console.log('PACMAN_SAFE_DIAGNOSTIC_'+component+'_HTTP_'+lastStatus+'_CATEGORY_'+lastReason);
+            const safePhase=new Set(['FETCH','DECODE']).has(data?.phase)?data.phase:'UNKNOWN';
+            const safeReason=new Set(['CF_1042','CF_1101','CF_1019','CF_1021','CF_1027','NETWORK','DECODE','BINDING','OTHER'])
+              .has(data?.reason)?data.reason:'UNKNOWN';
+            console.log('PACMAN_SAFE_DIAGNOSTIC_'+component+'_HTTP_'+lastStatus+'_CATEGORY_'+lastReason+
+             '_PHASE_'+safePhase+'_REASON_'+safeReason);
             throw Error('PACMAN_READONLY_DIAGNOSTIC_FAILED_'+component);
            }
            if(component==='pacmanExecutionInternalBinding'){

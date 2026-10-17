@@ -104,12 +104,24 @@ export async function handleWebAuthnRequest(request,env,{
    if(!exactBearer(request,env?.PACMAN_EXECUTION_KEY))return reply({error:"UNAUTHORIZED"},401);
    if(!cfg||typeof env?.PACMAN_EXECUTION_SERVICE?.fetch!=="function")
     return reply({error:"EXECUTION_SERVICE_BINDING_MISSING"},503);
-   let health;
+   let health,phase="FETCH";
    try{
-    const r=await env.PACMAN_EXECUTION_SERVICE.fetch("https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev/health",{method:"GET",redirect:"error"});
+    const request=new Request("https://pacman-execution.internal/health",{method:"GET",redirect:"error"});
+    const r=await env.PACMAN_EXECUTION_SERVICE.fetch(request);
     if(r.status!==200)return reply({error:"EXECUTION_SERVICE_HEALTH_REJECTED"},503);
+    phase="DECODE";
     health=await r.json();
-   }catch{return reply({error:"EXECUTION_SERVICE_UNREACHABLE"},503);}
+   }catch(e){
+    // Expose only strictly enumerated error categories, never a raw message or stack.
+    const msg=typeof e?.message==="string"?e.message:"";
+    const reason=/\b1042\b/.test(msg)?"CF_1042":/\b1101\b/.test(msg)?"CF_1101":
+     /\b1019\b/.test(msg)?"CF_1019":/\b1021\b/.test(msg)?"CF_1021":
+     /\b1027\b/.test(msg)?"CF_1027":
+     /network|connection|fetch failed|upstream|transport/i.test(msg)?"NETWORK":
+     /invalid|json|parse|syntax/i.test(msg)?"DECODE":
+     /binding|service|worker/i.test(msg)?"BINDING":"OTHER";
+    return reply({error:"EXECUTION_SERVICE_UNREACHABLE",phase,reason},503);
+   }
    if(health?.service!=="pacman-execution-staging"||health?.database!=="CONNECTED"||
       health?.revision!=="pacman-v2-webauthn-relay-20261016")
      return reply({error:"EXECUTION_SERVICE_IDENTITY_MISMATCH"},503);

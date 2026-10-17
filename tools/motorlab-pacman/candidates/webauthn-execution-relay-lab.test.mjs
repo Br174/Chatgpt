@@ -11,12 +11,13 @@ const issueApproval=async ({intent:i,content})=>{assert.equal(i,intent);assert.e
 const request={db:{},intent,content:"probe",challenge:"c",credentialId:"cred",assertion:{},signingSecret:"s".repeat(48),executionUrl,executionKey,issueApproval};
 test("verified passkey issuer sends exact signed LAB operation over private service binding",async()=>{
  let seen;
- const executionService={fetch:async(url,init)=>{seen={url,init};return {ok:true,status:200,json:async()=>({status:"VERIFIED_AND_REMOVED",branch,path})};}};
+ const executionService={fetch:async(req)=>{seen=req;return {ok:true,status:200,json:async()=>({status:"VERIFIED_AND_REMOVED",branch,path})};}};
  const out=await executePacmanWithWebAuthnLab({...request,executionService});
  assert.deepEqual(out,{status:"PACMAN_OPERATION_VERIFIED",operationId:intent.operationId,branch,path});
- assert.equal(seen.url,executionUrl+"/execute");assert.equal(seen.init.method,"POST");
- assert.equal(seen.init.headers.authorization,"Bearer "+executionKey);
- const payload=JSON.parse(seen.init.body);
+ assert.ok(seen instanceof Request);
+ assert.equal(seen.url,"https://pacman-execution.internal/execute");assert.equal(seen.method,"POST");
+ assert.equal(seen.headers.get("authorization"),"Bearer "+executionKey);
+ const payload=JSON.parse(await seen.text());
  assert.equal(payload.mode,"github-lab-cycle");assert.deepEqual(payload.approval,{...intent,decision:"authorize"});
  assert.deepEqual(payload.attestation,attestation);assert.equal(payload.content,"probe");
 });
