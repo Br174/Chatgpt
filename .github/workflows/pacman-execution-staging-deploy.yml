@@ -91,8 +91,7 @@ jobs:
              conf.d1_databases[0].binding!=='DB'||
              conf.d1_databases[0].database_id!==db||
              conf.d1_databases[0].database_name!=='motorlab-pacman-staging'||
-             Object.keys(conf.vars||{}).length!==4||
-             Object.entries(flags).some(([key,value])=>conf.vars?.[key]!==value))
+             Object.keys(conf.vars||{}).length!==0)
            throw Error('PACMAN_EXECUTION_SCOPE_INVALID');
           const ghHeaders={authorization:'Bearer '+process.env.GH_TOKEN,
             accept:'application/vnd.github+json','user-agent':'motorlab-pacman-execution-audit'};
@@ -117,8 +116,9 @@ jobs:
             throw Error('PACMAN_EXECUTION_SECRET_BINDING_MISSING');
           }
           for(const name of Object.keys(flags)){
-           if(bindings.some(b=>b.name===name&&b.type!=='plain_text'))
-            throw Error('PACMAN_EXECUTION_FLAG_CONFLICT');
+           // Existing issuer authority is not verified yet; refuse *any* live enable flag.
+           if(bindings.some(b=>b.name===name))
+            throw Error('PACMAN_EXECUTION_PREMATURE_FLAG_FOUND');
           }
           for(const [table,columns,types] of [
            ['pacman_approval_claims',['operation_id','approval_signature','claimed_at','expires_at'],['TEXT','TEXT','INTEGER','INTEGER']],
@@ -184,11 +184,9 @@ jobs:
            redirect:'manual',signal:AbortSignal.timeout(15000)
           });
           let ready;try{ready=await authorized.json();}catch{throw Error('EXECUTION_READINESS_RESPONSE_INVALID');}
-          if(authorized.status!==200||ready.status!=='STAGING_CYCLE_READY_FOR_OWNER_PASSKEY'||
-             ready.approval!=='WEBAUTHN_REQUIRED'||ready.mode!=='GITHUB_LAB_CYCLE_ONLY'||
-             ready.branch!=='motorlab/pacman-execution-v2-lab-20261014'||
-             ready.path!=='tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt')
-           throw Error('EXECUTION_BIOMETRIC_READY_NOT_VERIFIED');
-          console.log('PACMAN_EXECUTION_READY_FOR_SEPARATE_OWNER_PASSKEY');
+          // This initial safety deployment MUST remain disabled until issuer proof is verified.
+          if(authorized.status!==503||ready.error!=='STAGING_CYCLE_ROUTE_DISABLED')
+           throw Error('EXECUTION_CYCLE_SAFETY_GATE_NOT_CLOSED');
+          console.log('PACMAN_EXECUTION_DIAGNOSTICS_STAGING_READY_ROUTE_STILL_CLOSED');
 
           NODE

@@ -3,17 +3,9 @@
   "main": "./worker-execution-staging.mjs",
   "compatibility_date": "2026-10-14",
   "workers_dev": true,
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "motorlab-pacman-staging",
-      "database_id": "eb834fc1-5589-4f75-bcb9-d311d0d72261"
-    }
-  ],
-  "vars": {
-    "PACMAN_CYCLE_ROUTE_ENABLED": "YES_REVIEWED_STAGING_CANDIDATE",
-    "PACMAN_TRUSTED_ISSUER_CONNECTED": "YES_VERIFIED_TRUSTED_HOST",
-    "PACMAN_GITHUB_LAB_WRITE_ENABLED": "YES_STAGING_LAB_ONLY",
-    "PACMAN_D1_CHECKPOINTS_VERIFIED": "YES_STAGING_D1_CHECKPOINTS_VERIFIED"
-  }
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "motorlab-pacman-staging",
+    "database_id": "eb834fc1-5589-4f75-bcb9-d311d0d72261"
+  }]
 }
