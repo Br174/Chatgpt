@@ -10,7 +10,7 @@ import {
 } from "./webauthn-approval-lab.mjs";
 import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.mjs";
 import {storeWebAuthnChallengeD1,WEBAUTHN_CHALLENGES_SCHEMA} from "./webauthn-d1-lab.mjs";
-import {verifyControlledApprovalAttestation} from "../approval-attestation.mjs";
+import {verifyControlledApprovalAttestation,signControlledApprovalAfterWebAuthnLab} from "../approval-attestation.mjs";
 import {CONTROLLED_LAB_BRANCH} from "./github-controlled-update-lab.mjs";
 const enc=new TextEncoder(),now=Date.now();
 const owner="202558590",secret="synthetic-webauthn-control-issuer-secret-123456";
@@ -189,4 +189,20 @@ test("legacy challenge shape and single-purpose capability remain valid",()=>{
  });
  assert.equal(c.capability,"github.lab-file-cycle");
  assert.equal(c.contentSha256,digest("legacy body"));
+});
+
+test("valid WebAuthn base64url challenge beginning with '_' or '-' is a usable signed nonce",async()=>{
+ for(const first of ["_","-"]){
+  const intent=validIntent(),challenge=first+"a".repeat(42);
+  const attestation=await signControlledApprovalAfterWebAuthnLab({
+   intent,ownerSubject:owner,secret,issuedAt:now,expiresAt:now+30000,
+   verifiedWebAuthn:{verified:true,challenge,credentialId:"synthetic-owner-credential",
+    operationId:intent.operationId},cryptoImpl:webcrypto
+  });
+  assert.equal(attestation.nonce,challenge);
+  const checked=await verifyControlledApprovalAttestation({
+   intent,attestation,secret,expectedOwnerSubject:owner,now:now+1
+  });
+  assert.equal(checked.approved,true);
+ }
 });
