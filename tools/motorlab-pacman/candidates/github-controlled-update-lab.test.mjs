@@ -263,3 +263,36 @@ test("chat coordinator keeps main and completed historical branch out of recover
   {code:"CONTROLLED_LAB_BRANCH_REQUIRED"});
  assert.equal(count.calls,0);
 });
+
+test("distinct operation IDs competing for one path allow at most one SHA-conditional GitHub PUT",async()=>{
+ const r=rig();
+ let value=initial,blob=originalSha,writes=0;
+ r.adapter.readControlled=async()=>({exists:true,content:value,sha:blob});
+ r.adapter.updateControlled=async({sha,content})=>{
+  if(sha!==blob)throw Error("GITHUB_CONTROLLED_UPDATE_FAILED_409");
+  writes++;
+  value=content;blob=nextSha;
+  return {sha:nextSha,commitSha};
+ };
+ const a=run(r,{operationId:"pacman-target-race-00001"});
+ const b=run(r,{operationId:"pacman-target-race-00002"});
+ const results=await Promise.allSettled([a,b]);
+ assert.equal(results.filter(x=>x.status==="fulfilled").length,1);
+ assert.equal(writes,1);
+ assert.equal(blob,nextSha);
+ assert.equal(value,updated);
+});
+test("recovery receipt cannot be replayed as a fresh verified update",async()=>{
+ const r=rig();
+ let current=initial,sha=originalSha;
+ r.adapter.readControlled=async()=>({exists:true,content:current,sha});
+ r.adapter.updateControlled=async({content})=>{
+  current=content;sha=nextSha;throw Error("ambiguous response");
+ };
+ await assert.rejects(run(r),{code:"PROVIDER_OR_CHECKPOINT_ERROR"});
+ const got=await inspectGithubControlledUpdateRecovery({operationId,branch,path,
+   adapter:r.adapter,ledger:r.ledger,onCheckpoint:r.onCheckpoint});
+ assert.equal(got.state,"RECOVERY_CONTENT_MATCH_UNATTRIBUTED");
+ await assert.rejects(run(r),{code:"PRECONDITION_SHA_MISMATCH"});
+ assert.equal((await r.ledger.get(operationId)).state,"RECOVERY_CONTENT_MATCH_UNATTRIBUTED");
+});
