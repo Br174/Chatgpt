@@ -371,7 +371,7 @@ test("controlled direct challenge and finish are disabled BEFORE any D1 access w
  for(const endpoint of ["/approve/challenge","/approve/finish"]){
   const r=await handleWebAuthnRequest(req(endpoint,{intent,content}),env,{cryptoImpl:webcrypto});
   assert.equal(r.status,503);
-  assert.equal((await r.json()).error,"WEBAUTHN_CONTROLLED_UPDATE_DISABLED");
+  assert.equal((await r.json()).error,"INTERNAL_FAILURE"); // 503 public error is deliberately redacted
  }
  assert.equal(calls,0);
 });
