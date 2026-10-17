@@ -5,10 +5,17 @@ import {candidateCycleDispatch} from "./candidates/staging-cycle-dispatch.mjs";
 import {stagingCyclePreflight,stagingSchemaAudit} from "./candidates/staging-runtime-cycle-handler.mjs";
 import {makeGitHubContentsLabAdapter} from "./candidates/github-contents-lab-adapter.mjs";
 import {verifyIssuerParityProof} from "./candidates/issuer-parity-crypto-lab.mjs";
+import {validateControlledChatIntent} from "./chat-approval.mjs";
+import {createChatAuthorizedCoordinator} from "./chat-coordinator.mjs";
+import {createD1Ledger} from "./d1-ledger.mjs";
 // Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
 export const PACMAN_EXECUTION_RUNTIME_REVISION="pacman-v2-webauthn-relay-20261016";
 const MAX_BYTES=8192;
 const LAB_CYCLE_MODE="github-lab-cycle";
+const CONTROLLED_UPDATE_MODE="github-lab-controlled-update";
+const CONTROLLED_RECOVERY_MODE="github-lab-controlled-recovery";
+const CONTROLLED_FLAG="YES_REVIEWED_STAGING_CONTROLLED_UPDATE";
+const OWNER_SUBJECT="202558590";
 const response=(body,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"no-store"}});
 async function authorized(request,secret){
  if(typeof secret!=="string" || secret.length<32) return false;
@@ -138,6 +145,70 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
      env?.PACMAN_CYCLE_ROUTE_ENABLED==="YES_REVIEWED_STAGING_CANDIDATE" &&
      env?.PACMAN_ISSUER_PARITY_VERIFIED!=="YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED")
    return response({error:"STAGING_ISSUER_PARITY_NOT_VERIFIED"},503);
+  // The new capability is explicitly OFF by default and does not reuse the
+  // historical cycle flag as permission. Never reach GitHub or D1 unless the
+  // dedicated gate AND the existing trusted issuer, parity and D1 gates pass.
+  if(input.mode===CONTROLLED_UPDATE_MODE||input.mode===CONTROLLED_RECOVERY_MODE){
+   if(env?.PACMAN_CONTROLLED_UPDATE_ENABLED!==CONTROLLED_FLAG)
+    return response({error:"STAGING_CONTROLLED_UPDATE_DISABLED"},503);
+   if(env?.PACMAN_ISSUER_PARITY_VERIFIED!=="YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED")
+    return response({error:"STAGING_ISSUER_PARITY_NOT_VERIFIED"},503);
+   if(env?.PACMAN_TRUSTED_ISSUER_CONNECTED!=="YES_VERIFIED_TRUSTED_HOST"||
+      env?.PACMAN_GITHUB_LAB_WRITE_ENABLED!=="YES_STAGING_LAB_ONLY"||
+      env?.PACMAN_D1_CHECKPOINTS_VERIFIED!=="YES_STAGING_D1_CHECKPOINTS_VERIFIED")
+    return response({error:"STAGING_CONTROLLED_PREREQUISITES_MISSING"},503);
+   if(typeof env?.PACMAN_APPROVAL_SIGNING_SECRET!=="string"||
+      env.PACMAN_APPROVAL_SIGNING_SECRET.length<32||
+      typeof env?.PACMAN_GITHUB_TOKEN!=="string"||env.PACMAN_GITHUB_TOKEN.length<20)
+    return response({error:"STAGING_CONTROLLED_CREDENTIALS_UNAVAILABLE"},503);
+   let scoped;
+   try{scoped=validateControlledChatIntent(input.intent);}
+   catch{return response({error:"CONTROLLED_INTENT_DENIED"},403);}
+   if(input.approval.decision!=="authorize"||
+      Object.keys(input.approval).sort().join(",")!=="branch,capability,contentSha256,decision,expectedSha,operationId,path"||
+      Object.keys(scoped).some(k=>input.approval[k]!==scoped[k]))
+    return response({error:"CONTROLLED_APPROVAL_MISMATCH"},403);
+   if(new TextEncoder().encode(input.content).length<1||
+      new TextEncoder().encode(input.content).length>8192)
+    return response({error:"CONTROLLED_CONTENT_INVALID"},403);
+   const sha=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(input.content));
+   const contentSha256=Array.from(new Uint8Array(sha),b=>b.toString(16).padStart(2,"0")).join("");
+   if(scoped.contentSha256!==contentSha256)
+    return response({error:"CONTROLLED_CONTENT_MISMATCH"},403);
+   // Reuse the ONE existing D1 operation ledger, coordinator and GitHub Contents
+   // adapter. The readback callback verifies that PREPARED and WRITE_ATTEMPTED
+   // receipts are durably stored before the first provider PUT.
+   const ledger=createD1Ledger(env.DB);
+   const onCheckpoint=async receipt=>{
+    const persisted=await ledger.get(receipt.operationId);
+    if(JSON.stringify(persisted)!==JSON.stringify(receipt))
+     throw Error("CONTROLLED_CHECKPOINT_READBACK_FAILED");
+   };
+   const coordinator=createChatAuthorizedCoordinator({
+    githubToken:env.PACMAN_GITHUB_TOKEN,fetchImpl,operationLedger:ledger,
+    onCheckpoint,trustedApprovalSecret:env.PACMAN_APPROVAL_SIGNING_SECRET,
+    expectedOwnerSubject:OWNER_SUBJECT
+   });
+   try{
+    if(input.mode===CONTROLLED_RECOVERY_MODE){
+     // Read-only. This never reissues a PUT and never consumes a new nonce.
+     const receipt=await coordinator.inspectControlledUpdateRecovery({
+      operationId:scoped.operationId,branch:scoped.branch,path:scoped.path});
+     return response(receipt);
+    }
+    const receipt=await coordinator.executeSignedControlledRequest({
+     intent:scoped,attestation:input.attestation,content:input.content});
+    if(receipt?.state!=="VERIFIED_UPDATED"||receipt.operationId!==scoped.operationId||
+       receipt.expectedSha!==scoped.expectedSha||
+       receipt.contentSha256!==scoped.contentSha256)
+     return response({error:"CONTROLLED_RECEIPT_UNVERIFIED"},409);
+    return response(receipt);
+   }catch{
+    // An ambiguous provider result must be recovered by the separate
+    // read-only mode. Never replay the write or expose internal credentials.
+    return response({error:"CONTROLLED_UPDATE_NOT_VERIFIED_OR_RECOVERY_REQUIRED"},409);
+   }
+  }
   const candidateResult=await candidateCycleDispatch({input,env,fetchImpl});
   if(candidateResult!==null)return candidateResult;
   // V1 existing-file write contract is retired. V2 reversible cycle is the only canonical GitHub mutation route.
