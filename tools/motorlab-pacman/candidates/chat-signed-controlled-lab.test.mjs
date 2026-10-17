@@ -78,7 +78,7 @@ test("a chat approval boolean cannot substitute for a signed attestation",async(
  const r=rig();
  await assert.rejects(r.coordinator.executeSignedControlledRequest({
   intent:baseIntent(),attestation:{approved:true,decision:"authorize"},content:after
- }),/CONTROLLED_ATTESTATION_INVALID/);
+ }),/OWNER_APPROVAL_UNVERIFIED/);
  assert.equal(r.calls.length,0);
 });
 
@@ -94,7 +94,7 @@ test("unsigned path requires configured issuer and never reaches GitHub",async()
 test("signature corruption and trusted host secret mismatch are refused",async()=>{
  for(const invalid of ["0".repeat(64),"f".repeat(64)]){
   const r=rig(),i=baseIntent(),a={...sign(i),signature:invalid};
-  await assert.rejects(execute(r,i,a),/CONTROLLED_SIGNATURE_INVALID/);
+  await assert.rejects(execute(r,i,a),/OWNER_APPROVAL_UNVERIFIED/);
   assert.equal(r.calls.length,0);
  }
 });
@@ -109,7 +109,7 @@ test("content changes after signing are blocked before any network call",async()
 test("expectedSHA changed without new matching signature is refused",async()=>{
  const r=rig(),i=baseIntent(),a=sign(i);
  const wrong={...i,expectedSha:"f".repeat(40)};
- await assert.rejects(execute(r,wrong,a),/CONTROLLED_SIGNATURE_INVALID/);
+ await assert.rejects(execute(r,wrong,a),/OWNER_APPROVAL_UNVERIFIED/);
  assert.equal(r.calls.length,0);
 });
 
@@ -135,7 +135,7 @@ test("wrong owner, missing expiry, future issuedAt and excessive TTL blocked",as
   {nonce:"bad"},{decision:"deny"},{operationId:"different-operation"}
  ]){
   const r=rig(),a=sign(i,changes);
-  await assert.rejects(execute(r,i,a),/CONTROLLED_ATTESTATION_INVALID/);
+  await assert.rejects(execute(r,i,a),/OWNER_APPROVAL_UNVERIFIED/);
   assert.equal(r.calls.length,0);
  }
 });
@@ -143,7 +143,7 @@ test("wrong owner, missing expiry, future issuedAt and excessive TTL blocked",as
 test("invalid signature cannot be rescued by a caller-provided owner approval",async()=>{
  const r=rig(),i=baseIntent();
  const a={...sign(i),approved:true};
- await assert.rejects(execute(r,i,a),/CONTROLLED_ATTESTATION_INVALID/);
+ await assert.rejects(execute(r,i,a),/OWNER_APPROVAL_UNVERIFIED/);
  assert.equal(r.calls.length,0);
 });
 
@@ -216,4 +216,20 @@ test("historical isolated probe route retains its own scope and is not rewritten
    decision:"deny"},content:"probe"
  }),/CHAT_APPROVAL_MISMATCH/);
  assert.equal(r.calls.length,0);
+});
+
+test("independent signed-attestation verifier distinguishes invalid signature and expired claims",async()=>{
+ const intent=baseIntent();
+ const forged={...sign(intent),signature:"0".repeat(64)};
+ await assert.rejects(verifyControlledApprovalAttestation({
+  intent,attestation:forged,secret,expectedOwnerSubject:subject
+ }),/CONTROLLED_SIGNATURE_INVALID/);
+ const expired=sign(intent,{issuedAt:Date.now()-180000,expiresAt:Date.now()-50000});
+ await assert.rejects(verifyControlledApprovalAttestation({
+  intent,attestation:expired,secret,expectedOwnerSubject:subject
+ }),/CONTROLLED_ATTESTATION_INVALID/);
+ const ownerMismatch=sign(intent,{subject:"intruder"});
+ await assert.rejects(verifyControlledApprovalAttestation({
+  intent,attestation:ownerMismatch,secret,expectedOwnerSubject:subject
+ }),/CONTROLLED_ATTESTATION_INVALID/);
 });
