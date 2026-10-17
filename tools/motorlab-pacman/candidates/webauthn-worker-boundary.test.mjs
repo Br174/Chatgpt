@@ -259,3 +259,39 @@ test("safe binding transport error classification does not expose exception text
  const x=await handleWebAuthnRequest(req,{...env,PACMAN_EXECUTION_SERVICE:{fetch:async()=>({status:200,json:async()=>{throw SyntaxError("secret-json");}})}});
  assert.equal(x.status,503);assert.equal((await x.json()).phase,"DECODE");
 });
+
+test("WebAuthn staging proves signing parity through internal Service Binding with no D1/GitHub reads",async()=>{
+ const {webcrypto}=await import("node:crypto");
+ const {handleExecutionRequest}=await import("../worker-execution-staging.mjs");
+ const execKey="secret-lab-execution-key-00000000000000000",secret="secret-signing-key-000000000000000000000";
+ const req=new Request(endpoint+"/__motorlab_lab/diagnostics/issuer-parity",{headers:{authorization:"Bearer "+execKey}});
+ let reads=0,calls=0,external=0;
+ const env={...baseEnv,PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_EXECUTION_KEY:execKey,
+  DB:{prepare(){reads++;throw Error("DB_MUST_NOT_BE_READ");}},
+  PACMAN_EXECUTION_SERVICE:{fetch:async(r)=>{
+   calls++;assert.ok(r instanceof Request);
+   assert.equal(r.url,"https://example.com/__motorlab_lab/diagnostics/issuer-parity-verify");
+   assert.equal(r.method,"GET");
+   return handleExecutionRequest(r,{PACMAN_EXECUTION_KEY:execKey,PACMAN_APPROVAL_SIGNING_SECRET:secret});
+  }}};
+ const denied=await handleWebAuthnRequest(new Request(req.url),env,{cryptoImpl:webcrypto});
+ assert.equal(denied.status,401);assert.equal(calls,0);
+ const yes=await handleWebAuthnRequest(req,env,{cryptoImpl:webcrypto,fetchImpl:async()=>{external++}});
+ assert.equal(yes.status,200);
+ const body=await yes.json();
+ assert.deepEqual(body,{component:"pacmanSigningSecretParity",match:true,transport:"SERVICE_BINDING_STAGING"});
+ assert.equal(calls,1);assert.equal(reads,0);assert.equal(external,0);
+ assert.equal(JSON.stringify(body).includes(secret),false);
+ const mismatch=await handleWebAuthnRequest(req,{...env,PACMAN_APPROVAL_SIGNING_SECRET:secret+"wrong"},{cryptoImpl:webcrypto});
+ assert.equal(mismatch.status,409);assert.equal((await mismatch.json()).match,false);
+});
+test("WebAuthn parity fails closed without service binding and accepts GET only",async()=>{
+ const {webcrypto}=await import("node:crypto");
+ const execKey="secret-lab-execution-key-00000000000000000";
+ const uri=endpoint+"/__motorlab_lab/diagnostics/issuer-parity";
+ const env={...baseEnv,PACMAN_EXECUTION_KEY:execKey,DB:db()};
+ const r=await handleWebAuthnRequest(new Request(uri,{headers:{authorization:"Bearer "+execKey}}),env,{cryptoImpl:webcrypto});
+ assert.equal(r.status,503);assert.equal((await r.json()).error,"PARITY_CONFIG_UNAVAILABLE");
+ const p=await handleWebAuthnRequest(new Request(uri,{method:"POST"}),env,{cryptoImpl:webcrypto});
+ assert.equal(p.status,404);
+});

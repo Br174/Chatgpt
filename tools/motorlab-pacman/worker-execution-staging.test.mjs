@@ -377,3 +377,39 @@ test("Execution mutations remain impossible even if every old Cloudflare flag is
  assert.equal(r.status,503);assert.equal((await r.json()).error,"STAGING_ISSUER_PARITY_NOT_VERIFIED");
  assert.equal(touch,0);
 });
+
+test("Execution verifier checks signing parity but never touches GitHub/D1",async()=>{
+ const {webcrypto}=await import("node:crypto");
+ const {makeIssuerParityProof}=await import("./candidates/issuer-parity-crypto-lab.mjs");
+ const secret="signing-lab-test-secret-000000000000000000000000";
+ const proof=await makeIssuerParityProof({secret,cryptoImpl:webcrypto});
+ const uri="https://staging.example/__motorlab_lab/diagnostics/issuer-parity-verify";
+ const proofRequest=new Request(uri,{headers:{authorization:"Bearer "+key,
+  "x-pacman-parity-nonce":proof.nonce,"x-pacman-parity-proof":proof.proof}});
+ let touches=0;
+ const env={PACMAN_EXECUTION_KEY:key,PACMAN_APPROVAL_SIGNING_SECRET:secret,
+  DB:{prepare(){touches++;throw Error("NO_DB_ACCESS_ALLOWED");}}};
+ assert.equal((await worker.fetch(new Request(uri),env)).status,401);
+ const yes=await worker.fetch(proofRequest,env);
+ assert.equal(yes.status,200);
+ assert.deepEqual(await yes.json(),{component:"pacmanExecutionIssuerParity",match:true});
+ const no=await worker.fetch(proofRequest,{...env,PACMAN_APPROVAL_SIGNING_SECRET:secret+"wrong"});
+ assert.equal(no.status,403);assert.equal((await no.json()).error,"PARITY_MISMATCH");
+ const bad=await worker.fetch(new Request(uri,{method:"POST"}),env);assert.equal(bad.status,404);
+ assert.equal(touches,0);
+});
+test("readiness refuses to fetch GitHub until cryptographic parity marker is set",async()=>{
+ const uri="https://staging.example/__motorlab_lab/diagnostics/execution-readiness";
+ let touched=0;
+ const env={
+  PACMAN_EXECUTION_KEY:key,PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",
+  PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",
+  PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",
+  PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",
+  PACMAN_APPROVAL_SIGNING_SECRET:"s".repeat(48),PACMAN_GITHUB_TOKEN:"t".repeat(40),
+  DB:{prepare(){touched++;throw Error("NO_DB_BEFORE_PARITY");}}
+ };
+ const r=await worker.fetch(new Request(uri,{headers:{authorization:"Bearer "+key}}),env);
+ assert.equal(r.status,503);assert.equal((await r.json()).error,"STAGING_ISSUER_PARITY_NOT_VERIFIED");
+ assert.equal(touched,0);
+});

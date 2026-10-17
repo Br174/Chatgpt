@@ -1,13 +1,8 @@
 name: Pacman execution staging deploy (LAB branch, protected)
 
+# Manual recovery only: the guarded signer-parity workflow owns this LAB rollout.
 on:
-  push:
-    branches:
-      - motorlab/pacman-execution-v2-lab-20261014
-    paths:
-      - '.github/workflows/pacman-execution-staging-deploy.yml'
-      - 'tools/motorlab-pacman/*.mjs'
-      - 'tools/motorlab-pacman/*.jsonc'
+  workflow_dispatch:
 
 permissions:
   contents: read

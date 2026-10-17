@@ -4,6 +4,7 @@ import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
 import {candidateCycleDispatch} from "./candidates/staging-cycle-dispatch.mjs";
 import {stagingCyclePreflight,stagingSchemaAudit} from "./candidates/staging-runtime-cycle-handler.mjs";
 import {makeGitHubContentsLabAdapter} from "./candidates/github-contents-lab-adapter.mjs";
+import {verifyIssuerParityProof} from "./candidates/issuer-parity-crypto-lab.mjs";
 // Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
 export const PACMAN_EXECUTION_RUNTIME_REVISION="pacman-v2-webauthn-relay-20261016";
 const MAX_BYTES=8192;
@@ -29,6 +30,20 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
     const found=await env.DB.prepare("SELECT COUNT(*) AS total FROM sqlite_master WHERE type = 'table' AND name = 'pacman_operations'").first();
     return response({service:"pacman-execution-staging",revision:PACMAN_EXECUTION_RUNTIME_REVISION,database:found?.total===1?"CONNECTED":"SCHEMA_MISSING"},found?.total===1?200:503);
    } catch {return response({service:"pacman-execution-staging",revision:PACMAN_EXECUTION_RUNTIME_REVISION,database:"ERROR"},503);}
+  }
+  // One-way read-only nonce verifier; never returns a signature or mutates GitHub/D1.
+  if(url.pathname==="/__motorlab_lab/diagnostics/issuer-parity-verify"){
+   if(request.method!=="GET")return response({error:"NOT_FOUND"},404);
+   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY))
+    return response({error:"UNAUTHORIZED"},401);
+   const match=await verifyIssuerParityProof({
+    secret:env?.PACMAN_APPROVAL_SIGNING_SECRET,
+    nonce:request.headers.get("x-pacman-parity-nonce"),
+    proof:request.headers.get("x-pacman-parity-proof")
+   });
+   return match?
+    response({component:"pacmanExecutionIssuerParity",match:true}):
+    response({error:"PARITY_MISMATCH"},403);
   }
   // Private metadata only: read-only D1 PRAGMA and in-memory exact-value gates.
   // No approval consumption, GitHub fetch, token output, signature or Worker-to-Worker calls.
@@ -61,6 +76,8 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
    if(!await authorized(request,env?.PACMAN_EXECUTION_KEY))return response({error:"UNAUTHORIZED"},401);
    if(env?.PACMAN_CYCLE_ROUTE_ENABLED!=="YES_REVIEWED_STAGING_CANDIDATE")
     return response({error:"STAGING_CYCLE_ROUTE_DISABLED"},503);
+   if(env?.PACMAN_ISSUER_PARITY_VERIFIED!=="YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED")
+    return response({error:"STAGING_ISSUER_PARITY_NOT_VERIFIED"},503);
    const reason=await stagingCyclePreflight(env);
    if(reason)return response({error:reason},503);
    let state;

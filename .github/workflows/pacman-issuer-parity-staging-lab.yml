@@ -1,0 +1,209 @@
+name: Pac-Man signing-key parity and gated Execution staging (LAB)
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-execution-v2-lab-20261014
+    paths:
+      - '.github/workflows/pacman-issuer-parity-staging-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motorlab-pacman-issuer-parity-staging-20261017
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Full LAB security and integration suites, including mismatched-signature negatives
+        run: |
+          node --test tools/motorlab-pacman/*.test.mjs
+          node --test tools/motorlab-pacman/candidates/*.test.mjs
+
+  proof_and_gate:
+    needs: validate
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-execution-v2-lab-20261014'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Strict staging scope, existing secrets, exact D1 readback and absent file preflight
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          GH_TOKEN: ${{ github.token }}
+          HEAD: ${{ github.sha }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const account='b86f445c2b57e604c02f79c8da64bb9c';
+          const db='eb834fc1-5589-4f75-bcb9-d311d0d72261';
+          const branch='motorlab/pacman-execution-v2-lab-20261014';
+          const probe='tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt';
+          const exName='motorlab-pacman-execution-staging-lab';
+          const webName='motorlab-pacman-webauthn-staging-lab';
+          if(process.env.CF_ACCOUNT!==account||!process.env.CF_TOKEN||
+             !process.env.GH_TOKEN||!process.env.HEAD||
+             typeof process.env.EXECUTION_KEY!=='string'||process.env.EXECUTION_KEY.length<32)
+           throw Error('PARITY_STAGING_AUTH_SCOPE_INVALID');
+          const ex=JSON.parse(fs.readFileSync('tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc'));
+          const web=JSON.parse(fs.readFileSync('tools/motorlab-pacman/webauthn/wrangler.pacman-webauthn-staging.jsonc'));
+          const inScope=c=>c.workers_dev===true&&c.d1_databases?.length===1&&
+           c.d1_databases[0].binding==='DB'&&c.d1_databases[0].database_id===db;
+          if(!inScope(ex)||!inScope(web)||ex.name!==exName||
+             ex.main!=='./worker-execution-staging.mjs'||web.name!==webName||
+             web.main!=='./worker.mjs'||web.services?.length!==1||
+             web.services[0].binding!=='PACMAN_EXECUTION_SERVICE'||
+             web.services[0].service!==exName||
+             Object.keys(ex.vars||{}).length!==0)
+           throw Error('PARITY_WRANGLER_STAGING_SCOPE_INVALID');
+          const gh=await fetch('https://api.github.com/repos/Br174/Chatgpt/git/ref/heads/'+branch,{
+           headers:{authorization:'Bearer '+process.env.GH_TOKEN,
+            accept:'application/vnd.github+json','user-agent':'motorlab-pacman-parity'},
+           redirect:'manual',signal:AbortSignal.timeout(15000)});
+          if(gh.status!==200||(await gh.json())?.object?.sha!==process.env.HEAD)
+           throw Error('PARITY_STALE_LAB_HEAD');
+          const file=await fetch('https://api.github.com/repos/Br174/Chatgpt/contents/'+probe+'?ref='+encodeURIComponent(branch),{
+           headers:{authorization:'Bearer '+process.env.GH_TOKEN,
+            accept:'application/vnd.github+json','user-agent':'motorlab-pacman-parity'},
+           redirect:'manual',signal:AbortSignal.timeout(15000)});
+          if(file.status!==404)throw Error('PARITY_PROBE_FILE_NOT_ABSENT');
+          const base='https://api.cloudflare.com/client/v4/accounts/'+account;
+          const headers={authorization:'Bearer '+process.env.CF_TOKEN};
+          for(const [worker,secretNames] of [
+           [webName,['PACMAN_EXECUTION_KEY','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN','PACMAN_WEBAUTHN_ENABLED']],
+           [exName,['PACMAN_EXECUTION_KEY','PACMAN_APPROVAL_SIGNING_SECRET','PACMAN_GITHUB_TOKEN',
+            'PACMAN_TRUSTED_ISSUER_CONNECTED','PACMAN_GITHUB_LAB_WRITE_ENABLED','PACMAN_CYCLE_ROUTE_ENABLED','PACMAN_D1_CHECKPOINTS_VERIFIED']]
+          ]){
+           const r=await fetch(base+'/workers/scripts/'+worker+'/settings',{headers,redirect:'manual',signal:AbortSignal.timeout(15000)});
+           if(r.status!==200)throw Error('PARITY_STAGING_SETTINGS_NOT_AVAILABLE');
+           const d=await r.json(),bindings=d?.result?.bindings;
+           if(d?.success!==true||!Array.isArray(bindings))
+            throw Error('PARITY_STAGING_BINDINGS_INVALID');
+           if(!bindings.some(x=>x.name==='DB'&&x.type==='d1'&&x.id===db))
+            throw Error('PARITY_D1_BINDING_MISMATCH');
+           for(const name of secretNames){
+            if(!bindings.some(x=>x.name===name&&x.type==='secret_text'))
+             throw Error('PARITY_STAGING_SECRET_BINDING_MISSING');
+           }
+           if(bindings.some(x=>x.name==='PACMAN_ISSUER_PARITY_VERIFIED'))
+            throw Error('PARITY_GATE_ALREADY_PRESENT_REQUIRE_MANUAL_AUDIT');
+           if(worker===webName&&!bindings.some(x=>x.name==='PACMAN_EXECUTION_SERVICE'&&
+              x.type==='service'&&x.service===exName))
+            throw Error('PARITY_WORKER_SERVICE_BINDING_MISMATCH');
+          }
+          const exOrigin='https://'+exName+'.motorlab-staging.workers.dev';
+          const webOrigin='https://'+webName+'.motorlab-staging.workers.dev';
+          const status=await fetch(webOrigin+'/webauthn/status',{redirect:'manual',signal:AbortSignal.timeout(15000)});
+          const current=await status.json();
+          if(status.status!==200||current.configured!==true||current.enrolled!==true)
+           throw Error('PARITY_OWNER_PASSKEY_NOT_ENROLLED');
+          const d=await fetch(exOrigin+'/__motorlab_lab/diagnostics/execution-schema-audit',{
+           headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},redirect:'manual',signal:AbortSignal.timeout(15000)});
+          const schema=await d.json();
+          if(d.status!==200||schema.component!=='pacmanExecutionReadOnlySchemaAudit'||
+             schema.schema!=='EXACT'||schema.issuerParityLocked!==true||
+             Object.values(schema.flags||{}).length!==4||
+             !Object.values(schema.flags).every(x=>x==='MATCH'))
+           throw Error('PARITY_PREEXISTING_RUNTIME_GATE_UNVERIFIED');
+          console.log('PARITY_STAGING_PREFLIGHT_PASS_READONLY_PROBE_ABSENT_OWNER_ENROLLED_SCHEMA_EXACT');
+          NODE
+      - name: Deploy passkey Worker with existing D1 and secrets preserved
+        working-directory: tools/motorlab-pacman/webauthn
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: npx --yes wrangler@4 deploy --config wrangler.pacman-webauthn-staging.jsonc --keep-vars
+      - name: Deploy Execution Worker with independent parity gate still LOCKED
+        working-directory: tools/motorlab-pacman
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: npx --yes wrangler@4 deploy --config wrangler.pacman-execution-staging.jsonc --keep-vars
+      - name: Prove equality of actual signing keys through private Worker binding only
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          const url='https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/__motorlab_lab/diagnostics/issuer-parity';
+          let matched=false,lastHttp=0;
+          for(const delay of [0,2000,3000,4000,6000]){
+           if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
+           const r=await fetch(url,{method:'GET',
+            headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},
+            redirect:'manual',signal:AbortSignal.timeout(15000)});
+           lastHttp=r.status;let body=null;
+           try{body=await r.json();}catch{}
+           if(r.status===200&&body?.component==='pacmanSigningSecretParity'&&
+              body?.match===true&&body?.transport==='SERVICE_BINDING_STAGING'){
+            matched=true;break;
+           }
+           if(r.status===409)throw Error('PARITY_SIGNING_SECRETS_DIFFER_ABORT_NO_ENABLE');
+          }
+          if(!matched)throw Error('PARITY_LIVE_MATCH_NOT_VERIFIED_HTTP_'+lastHttp);
+          console.log('PARITY_LIVE_SIGNING_KEY_MATCH_PROVEN_BY_PRIVATE_BINDING');
+          NODE
+      - name: Enable independent Execution parity gate only after verified HMAC match
+        working-directory: tools/motorlab-pacman
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+        run: |
+          printf %s 'YES_OWNER_WEBAUTHN_SIGNING_PARITY_VERIFIED' |
+            npx --yes wrangler@4 secret put PACMAN_ISSUER_PARITY_VERIFIED --config wrangler.pacman-execution-staging.jsonc
+      - name: Verify live Execution issuer parity, exact D1 schema and GitHub read-only readiness
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base='https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev';
+          const headers={authorization:'Bearer '+process.env.EXECUTION_KEY};
+          let verified=false,last='NO_RESPONSE';
+          for(const delay of [0,2000,3000,5000,8000]){
+           if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
+           try{
+            const s=await fetch(base+'/__motorlab_lab/diagnostics/execution-schema-audit',{
+             method:'GET',headers,redirect:'manual',signal:AbortSignal.timeout(15000)});
+            const schema=await s.json();
+            if(s.status!==200||schema.component!=='pacmanExecutionReadOnlySchemaAudit'||
+               schema.schema!=='EXACT'||schema.issuerParityLocked!==false||
+               !Object.values(schema.flags||{}).every(x=>x==='MATCH')){
+             last='SCHEMA_OR_PARITY_GATE_UNVERIFIED';continue;
+            }
+            const r=await fetch(base+'/__motorlab_lab/diagnostics/execution-readiness',{
+             method:'GET',headers,redirect:'manual',signal:AbortSignal.timeout(15000)});
+            const data=await r.json();
+            if(r.status!==200||data.status!=='STAGING_CYCLE_READY_FOR_OWNER_PASSKEY'||
+               data.approval!=='WEBAUTHN_REQUIRED'||data.mode!=='GITHUB_LAB_CYCLE_ONLY'||
+               data.branch!=='motorlab/pacman-execution-v2-lab-20261014'||
+               data.path!=='tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt'){
+              last='GITHUB_LAB_READINESS_UNVERIFIED';continue;
+            }
+            verified=true;break;
+           }catch{last='READONLY_TRANSPORT_UNAVAILABLE';}
+          }
+          if(!verified)throw Error('PARITY_STAGING_POSTDEPLOY_'+last);
+          console.log('PACMAN_EXECUTION_READY_FOR_SEPARATE_OWNER_BIOMETRIC_APPROVAL');
+          console.log('PACMAN_LAB_PROBE_WAS_NOT_CREATED_OR_DELETED');
+          NODE

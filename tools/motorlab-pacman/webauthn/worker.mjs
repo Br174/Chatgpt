@@ -16,6 +16,7 @@ import {handleWebAuthnOwnerLab} from "../candidates/webauthn-owner-handler-lab.m
 import {renderWebAuthnOwnerPage} from "./page.mjs";
 import {renderWebAuthnApprovalPage} from "./approval-page.mjs";
 import {bootstrapWebAuthnSchemaLab} from "../candidates/webauthn-schema-bootstrap-lab.mjs";
+import {makeIssuerParityProof} from "../candidates/issuer-parity-crypto-lab.mjs";
 
 const MAX_BODY=32768;
 const reply=(body,status=200)=>Response.json(body,{status,headers:{
@@ -79,6 +80,30 @@ export async function handleWebAuthnRequest(request,env,{
 }={}){
  try{
   const url=new URL(request.url),cfg=config(env);
+  // Authenticated read-only signing-key parity via private Execution Service Binding.
+  // HMAC is domain-separated and never returned to the client; this is NOT an approval.
+  if(url.pathname==="/__motorlab_lab/diagnostics/issuer-parity"){
+   if(request.method!=="GET")return reply({error:"NOT_FOUND"},404);
+   if(!exactBearer(request,env?.PACMAN_EXECUTION_KEY))return reply({error:"UNAUTHORIZED"},401);
+   if(!cfg||typeof env?.PACMAN_EXECUTION_SERVICE?.fetch!=="function")
+    return reply({error:"PARITY_CONFIG_UNAVAILABLE"},503);
+   try{
+    const {nonce,proof}=await makeIssuerParityProof({secret:cfg.signingSecret,cryptoImpl});
+    const r=await env.PACMAN_EXECUTION_SERVICE.fetch(new Request(
+      "https://example.com/__motorlab_lab/diagnostics/issuer-parity-verify",{
+       method:"GET",redirect:"manual",
+       headers:{authorization:"Bearer "+env.PACMAN_EXECUTION_KEY,
+        "x-pacman-parity-nonce":nonce,"x-pacman-parity-proof":proof}
+      }));
+    if(r.status===200){
+     const body=await r.json();
+     if(body?.component==="pacmanExecutionIssuerParity"&&body?.match===true)
+      return reply({component:"pacmanSigningSecretParity",match:true,transport:"SERVICE_BINDING_STAGING"});
+    }
+    if(r.status===403)return reply({component:"pacmanSigningSecretParity",match:false},409);
+    return reply({error:"PARITY_EXECUTION_UNVERIFIED"},503);
+   }catch{return reply({error:"PARITY_EXECUTION_UNREACHABLE"},503);}
+  }
   // Protected read-only checkpoint recovery for the single interrupted LAB operation.
   if(url.pathname==="/__motorlab_lab/diagnostics/approval-recovery"){
    if(request.method!=="GET")return reply({error:"NOT_FOUND"},404);
