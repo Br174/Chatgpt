@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import {createHash} from "node:crypto";
 import {executePacmanWithWebAuthnLab} from "./webauthn-execution-relay-lab.mjs";
 const branch="motorlab/pacman-execution-v2-lab-20261014";
 const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
@@ -58,4 +59,82 @@ test("internal redirects are rejected before reading a response body or retrying
   calls++;return {status:302,ok:false,json:async()=>{reads++;throw Error("BODY_MUST_NOT_BE_READ")}};
  }}}),/PACMAN_EXECUTOR_REDIRECT_REJECTED/);
  assert.equal(calls,1);assert.equal(reads,0);
+});
+
+const controlledContent="# Controlled LAB update\\n";
+const controlledIntent={capability:"github.lab-file-update",
+ operationId:"controlled-relay-test-0001",
+ branch:"motorlab/pacman-real-operations-lab-20261017",
+ path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
+ expectedSha:"a".repeat(40),
+ contentSha256:createHash("sha256").update(controlledContent).digest("hex")
+};
+const controlledReq={...request,intent:controlledIntent,content:controlledContent};
+
+test("controlled capability refuses to issue passkey while host flag is disabled",async()=>{
+ let issued=0,dispatched=0;
+ const args={...controlledReq,executionService:{fetch:async()=>{dispatched++;}},
+  issueApproval:async()=>{issued++;}};
+ await assert.rejects(executePacmanWithWebAuthnLab(args),/WEBAUTHN_CONTROLLED_UPDATE_DISABLED/);
+ assert.equal(issued,0);assert.equal(dispatched,0);
+});
+test("controlled intent, content hash and historical branch protections fail before issuance",async()=>{
+ let issued=0,calls=0;
+ const args={...controlledReq,controlledEnabled:true,
+  executionService:{fetch:async()=>{calls++;}},
+  issueApproval:async()=>{issued++;}};
+ for(const changed of [
+  {content:controlledContent+"changed"},
+  {intent:{...controlledIntent,branch:"main"}},
+  {intent:{...controlledIntent,branch:"motorlab/pacman-execution-v2-lab-20261014"}},
+  {intent:{...controlledIntent,path:"tools/motorlab-pacman/worker-execution-staging.mjs"}},
+  {intent:{...controlledIntent,expectedSha:"not-a-blob"}}
+ ]){
+  await assert.rejects(executePacmanWithWebAuthnLab({...args,...changed}));
+ }
+ assert.equal(issued,0);assert.equal(calls,0);
+});
+test("controlled relay sends scoped signed request and requires matching independent receipt",async()=>{
+ let seen,issued=0;
+ const fakeAttestation={nonce:"n".repeat(43),signature:"a".repeat(64)};
+ const executionService={fetch:async req=>{
+  seen=req;
+  return {ok:true,status:200,json:async()=>({
+   state:"VERIFIED_UPDATED",operationId:controlledIntent.operationId,
+   branch:controlledIntent.branch,path:controlledIntent.path,
+   expectedSha:controlledIntent.expectedSha,contentSha256:controlledIntent.contentSha256,
+   blobSha:"b".repeat(40),commitSha:"c".repeat(40)
+  })};
+ }};
+ const result=await executePacmanWithWebAuthnLab({
+  ...controlledReq,controlledEnabled:true,executionService,
+  issueApproval:async()=>{issued++;return {status:"WEBAUTHN_APPROVAL_ISSUED",attestation:fakeAttestation}}
+ });
+ assert.equal(issued,1);
+ assert.equal(result.status,"PACMAN_OPERATION_VERIFIED");
+ assert.equal(result.commitSha,"c".repeat(40));
+ const payload=JSON.parse(await seen.text());
+ assert.equal(payload.mode,"github-lab-controlled-update");
+ assert.deepEqual(payload.approval,{...controlledIntent,decision:"authorize"});
+ assert.deepEqual(payload.attestation,fakeAttestation);
+ assert.equal(seen.url,"https://example.com/execute");
+ assert.equal(seen.redirect,"manual");
+ assert.equal(seen.headers.get("authorization"),"Bearer "+executionKey);
+});
+test("controlled relay refuses forged or incomplete receipt, never claims success",async()=>{
+ let calls=0;
+ const base={state:"VERIFIED_UPDATED",operationId:controlledIntent.operationId,
+  branch:controlledIntent.branch,path:controlledIntent.path,
+  expectedSha:controlledIntent.expectedSha,contentSha256:controlledIntent.contentSha256,
+  blobSha:"b".repeat(40),commitSha:"c".repeat(40)};
+ for(const body of [{...base,operationId:"OTHER"}, {...base,branch:"main"},
+  {...base,contentSha256:"0".repeat(64)}, {...base,commitSha:"invalid"},
+  {...base,state:"RECOVERY_REQUIRED"}]){
+  await assert.rejects(executePacmanWithWebAuthnLab({
+   ...controlledReq,controlledEnabled:true,
+   issueApproval:async()=>({status:"WEBAUTHN_APPROVAL_ISSUED",attestation:{signature:"a".repeat(64)}}),
+   executionService:{fetch:async()=>{calls++;return {ok:true,status:200,json:async()=>body}}}
+  }),/PACMAN_EXECUTOR_RESULT_UNVERIFIED/);
+ }
+ assert.equal(calls,5);
 });
