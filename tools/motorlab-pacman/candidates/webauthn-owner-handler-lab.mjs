@@ -226,7 +226,9 @@ export async function handleWebAuthnOwnerLab(request,env,{
     db:cfg.db,intent,content,challenge,credentialId:credential.id,assertion,
     signingSecret:cfg.signingSecret,
     executionUrl:cfg.executionUrl,executionKey:cfg.executionKey,
-    executionService:cfg.executionService,cryptoImpl,nowMs
+    executionService:cfg.executionService,
+    controlledEnabled:env?.PACMAN_CONTROLLED_UPDATE_ENABLED==="YES_REVIEWED_STAGING_CONTROLLED_UPDATE",
+    cryptoImpl,nowMs
    });
    return reply(result,200);
   }
