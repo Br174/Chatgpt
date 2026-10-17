@@ -8,6 +8,11 @@ const REQUIRED=["PACMAN_EXECUTION_KEY","PACMAN_GITHUB_TOKEN","PACMAN_APPROVAL_SI
 const FLAGS=["PACMAN_CONTROLLED_UPDATE_ENABLED","PACMAN_TRUSTED_ISSUER_CONNECTED",
  "PACMAN_GITHUB_LAB_WRITE_ENABLED","PACMAN_D1_CHECKPOINTS_VERIFIED","PACMAN_ISSUER_PARITY_VERIFIED"];
 const REVISION="pacman-v2-webauthn-relay-20261016";
+// Independently recorded by GitHub parity #4 (39061359612); no raw IDs in reports.
+const HISTORICAL_RUN4_VERSIONS=Object.freeze({
+ [EXECUTION]:"8e5680ab-ce88-4785-9fc4-dbc84604f0ba",
+ [WEBAUTHN]:"23428a1c-920d-4d63-9514-49eb92fc04bf"
+});
 const api="https://api.cloudflare.com/client/v4/accounts/"+ACCOUNT+"/workers/scripts/";
 const http=n=>[200,401,403,404,409,429,500,502,503,504].includes(n)?"HTTP_"+n:"HTTP_UNVERIFIED";
 function bindingsSummary(raw,worker){
@@ -59,7 +64,38 @@ function deploymentSummary(data){
   typeof v?.version_id==="string"&&/^[a-f0-9-]{36}$/i.test(v.version_id)))?
   "VERSION_IDENTIFIERS_PRESENT":"DEPLOYMENT_RECORDS_NO_VERIFIED_VERSION";
 }
-export async function auditControlledStagingReadOnly({cloudflareToken,accountId,fetchImpl=fetch}={}){
+function historyProvenance(data,worker){
+ const expected=HISTORICAL_RUN4_VERSIONS[worker];
+ const ds=data?.result?.deployments;
+ if(!Array.isArray(ds)||!ds.length)return "UNVERIFIED_DEPLOYMENT_ORDER";
+ // Cloudflare Deployments API lists the latest group first. Do not use public
+ // /health revision strings or presence of an older ID as proof of live source.
+ const versionIds=deployment=>Array.isArray(deployment?.versions)?
+  deployment.versions.map(v=>v?.version_id).filter(x=>typeof x==="string"):[];
+ if(versionIds(ds[0]).includes(expected))return "LATEST_MATCHES_GITHUB_PARITY_RUN4_VERSION";
+ if(ds.slice(1).some(d=>versionIds(d).includes(expected)))
+  return "HISTORICAL_GITHUB_PARITY_RUN4_VERSION_NOT_LATEST";
+ return versionIds(ds[0]).length?"LATEST_DEPLOYMENT_NOT_GITHUB_PARITY_RUN4_VERSION":
+  "LATEST_DEPLOYMENT_VERSION_UNVERIFIED";
+}
+async function liveParityReadOnly(executionKey,fetchImpl){
+ if(typeof executionKey!=="string"||executionKey.length<32)
+  return "PROTECTED_KEY_NOT_PROVIDED";
+ try{
+  const r=await fetchImpl("https://"+WEBAUTHN+
+   ".motorlab-staging.workers.dev/__motorlab_lab/diagnostics/issuer-parity",{
+    method:"GET",redirect:"manual",
+    headers:{authorization:"Bearer "+executionKey},
+    signal:AbortSignal.timeout(12000)});
+  if(r.status===409)return "LIVE_SIGNING_KEYS_MISMATCH";
+  if(r.status!==200)return "LIVE_PARITY_"+http(r.status);
+  const p=await r.json();
+  return p?.component==="pacmanSigningSecretParity"&&p?.match===true&&
+   p?.transport==="SERVICE_BINDING_STAGING"?
+   "LIVE_PRIVATE_BINDING_HMAC_MATCH":"PARITY_PROOF_UNVERIFIED";
+ }catch{return "PARITY_TRANSPORT_UNVERIFIED";}
+}
+export async function auditControlledStagingReadOnly({cloudflareToken,accountId,executionKey,fetchImpl=fetch}={}){
  if(accountId!==ACCOUNT||typeof cloudflareToken!=="string"||cloudflareToken.length<10||
     typeof fetchImpl!=="function")throw Error("PROTECTED_CLOUDFLARE_STAGING_ACCESS_UNAVAILABLE");
  const result={};
@@ -72,8 +108,11 @@ export async function auditControlledStagingReadOnly({cloudflareToken,accountId,
    ...bindingsSummary(s.status==="HTTP_200_API_SUCCESS"?s.data?.result?.bindings:null,name),
    deploymentsHttp:d.status,
    deployment:d.status==="HTTP_200_API_SUCCESS"?deploymentSummary(d.data):
-    "DEPLOYMENT_METADATA_UNVERIFIED",health:h};
+    "DEPLOYMENT_METADATA_UNVERIFIED",
+   parityRun4Version:d.status==="HTTP_200_API_SUCCESS"?historyProvenance(d.data,name):
+    "UNVERIFIED_DEPLOYMENT_ORDER",health:h};
  }
+ const parity=await liveParityReadOnly(executionKey,fetchImpl);
  return Object.freeze({audit:"CLOUDFLARE_STAGING_READ_ONLY",scope:"MOTORLAB_PACMAN_LAB",
-  remoteWrites:0,executionAllowed:false,result});
+  remoteWrites:0,executionAllowed:false,liveIssuerParity:parity,result});
 }
