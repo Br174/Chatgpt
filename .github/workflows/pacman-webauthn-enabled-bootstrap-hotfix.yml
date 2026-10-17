@@ -164,13 +164,36 @@ jobs:
           const key=process.env.EXECUTION_KEY;
           if(typeof key!=='string'||key.length<32)throw Error('INTERNAL_DIAGNOSTIC_KEY_MISSING');
           const origin='https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev';
+          // Read-only diagnostics: bounded retries handle newly deployed Worker propagation.
+          // Report ONLY HTTP status and allowlisted non-secret error category.
+          const allowed=new Set([
+           'EXECUTION_SERVICE_BINDING_MISSING','EXECUTION_SERVICE_HEALTH_REJECTED',
+           'EXECUTION_SERVICE_UNREACHABLE','EXECUTION_SERVICE_IDENTITY_MISMATCH',
+           'STAGING_D1_NOT_CONFIGURED','D1_RECOVERY_AUDIT_UNAVAILABLE',
+           'CHECKPOINT_STATE_UNEXPECTED','INTERNAL_FAILURE','UNAUTHORIZED','NOT_FOUND'
+          ]);
           for(const [path,component] of [
            ['/__motorlab_lab/diagnostics/execution-binding','pacmanExecutionInternalBinding'],
            ['/__motorlab_lab/diagnostics/approval-recovery','pacmanLABApprovalRecoveryReadOnly']
           ]){
-           const r=await fetch(origin+path,{headers:{authorization:'Bearer '+key},method:'GET',redirect:'error',signal:AbortSignal.timeout(15000)});
-           let data;try{data=await r.json();}catch{throw Error('PACMAN_READONLY_DIAGNOSTIC_INVALID');}
-           if(r.status!==200||data.component!==component)throw Error('PACMAN_READONLY_DIAGNOSTIC_FAILED_'+component);
+           let data=null,verified=false,lastStatus=0,lastReason='NONE';
+           for(const delay of [0,2000,4000,6000,8000]){
+            if(delay)await new Promise(resolve=>setTimeout(resolve,delay));
+            try{
+             const r=await fetch(origin+path,{
+              headers:{authorization:'Bearer '+key},method:'GET',redirect:'error',
+              signal:AbortSignal.timeout(15000)
+             });
+             lastStatus=r.status;
+             try{data=await r.json();}catch{lastReason='NON_JSON_RESPONSE';continue;}
+             if(r.status===200&&data?.component===component){verified=true;break;}
+             lastReason=allowed.has(data?.error)?data.error:'UNEXPECTED_RESPONSE';
+            }catch{lastReason='TRANSPORT_UNAVAILABLE';}
+           }
+           if(!verified){
+            console.log('PACMAN_SAFE_DIAGNOSTIC_'+component+'_HTTP_'+lastStatus+'_CATEGORY_'+lastReason);
+            throw Error('PACMAN_READONLY_DIAGNOSTIC_FAILED_'+component);
+           }
            if(component==='pacmanExecutionInternalBinding'){
             if(data.connected!==true||data.transport!=='SERVICE_BINDING_STAGING'||
                data.revision!=='pacman-v2-webauthn-relay-20261016')throw Error('SERVICE_BINDING_NOT_VERIFIED');
