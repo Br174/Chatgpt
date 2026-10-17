@@ -321,13 +321,23 @@ test("authenticated Execution schema audit reads only PRAGMA and classifies opaq
  const points=["operation_id","state","branch","path","sha","updated_at"].map((name,i)=>({
   name,type:"TEXT",pk:i===0?1:0,notnull:i===0||i===4?0:1
  }));
+ const operations=[
+  {name:"operation_id",type:"TEXT",pk:1,notnull:1,dflt_value:null},
+  {name:"receipt_json",type:"TEXT",pk:0,notnull:1,dflt_value:null},
+  {name:"updated_at",type:"TEXT",pk:0,notnull:1,dflt_value:"CURRENT_TIMESTAMP"}
+ ];
  const env={PACMAN_EXECUTION_KEY:key,
   PACMAN_TRUSTED_ISSUER_CONNECTED:secretMarker,
   PACMAN_CYCLE_ROUTE_ENABLED:"YES_REVIEWED_STAGING_CANDIDATE",
   PACMAN_GITHUB_LAB_WRITE_ENABLED:secretMarker,
   PACMAN_D1_CHECKPOINTS_VERIFIED:"YES_STAGING_D1_CHECKPOINTS_VERIFIED",
-  DB:{prepare(q){sql.push(q);if(!q.startsWith("PRAGMA table_info("))throw Error("WRITES_FORBIDDEN");
-   return {all:async()=>({results:q.includes("pacman_approval_claims")?claims:points})};
+  DB:{prepare(q){
+   sql.push(q);
+   if(q==="PRAGMA index_list(pacman_operations)")
+    return {all:async()=>({results:[{name:"pk_index",unique:1,origin:"pk",partial:0}]})};
+   if(!q.startsWith("PRAGMA table_info("))throw Error("WRITES_FORBIDDEN");
+   return {all:async()=>({results:q.includes("pacman_approval_claims")?claims:
+    q.includes("pacman_cycle_checkpoints")?points:operations})};
   }}
  };
  const no=await worker.fetch(new Request(uri),env);
@@ -339,11 +349,14 @@ test("authenticated Execution schema audit reads only PRAGMA and classifies opaq
  const data=await result.json();
  assert.equal(data.component,"pacmanExecutionReadOnlySchemaAudit");
  assert.equal(data.schema,"EXACT");
+ assert.equal(data.controlledLedgerSchema,"EXACT");
  assert.equal(data.issuerParityLocked,true);
  assert.equal(data.flags.PACMAN_CYCLE_ROUTE_ENABLED,"MATCH");
  assert.equal(data.flags.PACMAN_TRUSTED_ISSUER_CONNECTED,"NOT_MATCH");
  assert.equal(data.flags.PACMAN_GITHUB_LAB_WRITE_ENABLED,"NOT_MATCH");
- assert.deepEqual(sql,["PRAGMA table_info(pacman_approval_claims)","PRAGMA table_info(pacman_cycle_checkpoints)"]);
+ assert.deepEqual(sql,["PRAGMA table_info(pacman_approval_claims)",
+ "PRAGMA table_info(pacman_cycle_checkpoints)","PRAGMA table_info(pacman_operations)",
+ "PRAGMA index_list(pacman_operations)"]);
  assert.equal(JSON.stringify(data).includes(secretMarker),false);
 });
 test("Execution schema audit refuses invalid D1 schema without claiming approvals or touching GitHub",async()=>{
@@ -356,7 +369,8 @@ test("Execution schema audit refuses invalid D1 schema without claiming approval
  const r=await worker.fetch(new Request(uri,{headers:{authorization:"Bearer "+key}}),env);
  assert.equal(r.status,503);
  const d=await r.json();assert.equal(d.schema,"STAGING_D1_SCHEMA_UNVERIFIED");
- assert.equal(d.issuerParityLocked,true);assert.equal(reads,1);
+ assert.equal(d.controlledLedgerSchema,"CONTROLLED_LEDGER_SCHEMA_UNVERIFIED");
+ assert.equal(d.issuerParityLocked,true);assert.equal(reads,2);
 });
 test("Execution mutations remain impossible even if every old Cloudflare flag is enabled",async()=>{
  const intent={capability:"github.lab-file-cycle",operationId:"pacman-parity-guard-001",
