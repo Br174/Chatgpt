@@ -26,7 +26,13 @@ test("deployment workflow is manual-only, branch-locked and secret-gated",()=>{
 test("execution staging workflow has a protected approval expression and isolated D1",()=>{
  const workflow=fs.readFileSync(new URL("../../.github/workflows/pacman-execution-staging-deploy.yml",base),"utf8");
  const config=JSON.parse(fs.readFileSync(new URL("wrangler.pacman-execution-staging.jsonc",base),"utf8"));
- assert.match(workflow,/^  push:/m);
+ // The legacy path is manual-only; the new parity workflow owns automatic staging.
+ assert.match(workflow,/^  workflow_dispatch:/m);
+ assert.doesNotMatch(workflow,/^  push:/m);
+ const guarded=fs.readFileSync(new URL("../../.github/workflows/pacman-issuer-parity-staging-lab.yml",base),"utf8");
+ assert.match(guarded,/^  push:/m);
+ assert.match(guarded,/environment: pacman-execution-staging/);
+ assert.match(guarded,/PARITY_LIVE_SIGNING_KEY_MATCH_PROVEN_BY_PRIVATE_BINDING/);
  assert.doesNotMatch(workflow,/^  pull_request:/m);
  assert.ok(workflow.includes("motorlab/pacman-execution-v2-lab-20261014"));
  assert.match(workflow,/environment: pacman-execution-staging/);
