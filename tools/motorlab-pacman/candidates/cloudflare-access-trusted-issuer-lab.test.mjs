@@ -5,7 +5,7 @@ import {issuePacmanApprovalFromCloudflareAccessLab} from "./cloudflare-access-tr
 import {verifyApprovalAttestation} from "../approval-attestation.mjs";
 
 const branch="motorlab/pacman-execution-v2-lab-20261014";
-const path="tools/motorlab-pacman/probe-integration.txt";
+const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const secret="s".repeat(48);
 const b64=o=>Buffer.from(JSON.stringify(o)).toString("base64url");
 

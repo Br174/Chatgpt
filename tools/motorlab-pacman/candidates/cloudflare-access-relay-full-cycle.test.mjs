@@ -5,7 +5,7 @@ import {relayApprovedPacmanOperationLab} from "./cloudflare-access-to-executor-r
 import {handleExecutionRequest} from "../worker-execution-staging.mjs";
 
 const branch="motorlab/pacman-execution-v2-lab-20261014";
-const path="tools/motorlab-pacman/probe-integration.txt";
+const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const origin="https://pacman-approval.example";
 const issuerSecret="s".repeat(48),executionKey="k".repeat(48),githubToken="t".repeat(24);
 const sha="a".repeat(40),commit="b".repeat(40);

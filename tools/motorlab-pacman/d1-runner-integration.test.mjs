@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {runGithubLabFileCycle} from "./execution-v2.mjs";
 import {createD1Ledger} from "./d1-ledger.mjs";
 const branch="motorlab/pacman-execution-v2-lab-20261014";
-const path="tools/motorlab-pacman/probe-integration.txt";
+const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 function mockD1() {
   const rows=new Map();
   return {prepare(sql) {return {bind(...params) {return {

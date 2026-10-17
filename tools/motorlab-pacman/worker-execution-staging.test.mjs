@@ -39,14 +39,14 @@ test("authenticated request requires explicit boolean approval",async()=>{
 test("authenticated chat intent for main is refused before D1",async()=>{
  let calls=0;
  const env={PACMAN_EXECUTION_KEY:key,PACMAN_GITHUB_TOKEN:"test-token-123",DB:{prepare(){calls++;throw Error("DB touched");}}};
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"main",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const r=await worker.fetch(req("POST",JSON.stringify({intent,approval:{...intent,decision:"authorize"},content:"probe"}),key),env);
  assert.equal(r.status,503);assert.equal((await r.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");assert.equal(calls,0);
 });
 test("authenticated mismatched chat approval is refused before D1",async()=>{
  let calls=0;
  const env={PACMAN_EXECUTION_KEY:key,PACMAN_GITHUB_TOKEN:"test-token-123",DB:{prepare(){calls++;throw Error("DB touched");}}};
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const r=await worker.fetch(req("POST",JSON.stringify({intent,approval:{...intent,operationId:"pacman-test-002",decision:"authorize"},content:"probe"}),key),env);
  assert.equal(r.status,503);assert.equal((await r.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");assert.equal(calls,0);
 });
@@ -54,7 +54,7 @@ test("authenticated mismatched chat approval is refused before D1",async()=>{
 test("even a valid-looking chat approval cannot bypass absent trusted issuer",async()=>{
  let calls=0;
  const env={PACMAN_EXECUTION_KEY:key,PACMAN_GITHUB_TOKEN:"test-token-123",DB:{prepare(){calls++;throw Error("DB touched");}}};
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const r=await worker.fetch(req("POST",JSON.stringify({intent,approval:{...intent,decision:"authorize"},content:"probe"}),key),env);
  assert.equal(r.status,503);
  assert.equal((await r.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");
@@ -63,7 +63,7 @@ test("even a valid-looking chat approval cannot bypass absent trusted issuer",as
 
 test("Worker refuses unsigned chat approval when signing secret is configured",async()=>{
  let calls=0;
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const env={PACMAN_EXECUTION_KEY:key,PACMAN_GITHUB_TOKEN:"test-token-123",PACMAN_APPROVAL_SIGNING_SECRET:"local-test-only-signing-secret-0000000000000",DB:{prepare(){calls++;throw Error("DB touched");}}};
  const r=await worker.fetch(req("POST",JSON.stringify({intent,approval:{...intent,decision:"authorize"},content:"probe"}),key),env);
  assert.equal(r.status,503);assert.equal((await r.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");assert.equal(calls,0);
@@ -72,7 +72,7 @@ test("Worker refuses unsigned chat approval when signing secret is configured",a
 // Regression: no caller-supplied JSON can consume D1 while trusted host/executor flags are absent.
 test("approval readiness fails closed without trusted issuer and does not touch D1",async()=>{
  let calls=0;
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-003",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-003",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const env={PACMAN_EXECUTION_KEY:key,PACMAN_GITHUB_TOKEN:"test-token-123",PACMAN_APPROVAL_SIGNING_SECRET:"local-test-only-signing-secret-0000000000000",PACMAN_APPROVAL_READINESS_ENABLED:"YES_STAGING_D1_ONLY",DB:{prepare(){calls++;throw Error("DB touched");}}};
  const r=await worker.fetch(req("POST",JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},attestation:{},content:"probe"}),key),env);
  assert.equal(r.status,503);assert.equal((await r.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");assert.equal(calls,0);
@@ -80,7 +80,7 @@ test("approval readiness fails closed without trusted issuer and does not touch 
 
 test("readiness without GitHub token remains gated by trusted issuer",async()=>{
  let calls=0;
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-004",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-test-004",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){calls++;throw Error("unexpected DB access");}}};
  const r=await worker.fetch(req("POST",JSON.stringify({mode:"approval-readiness",intent,approval:{...intent,decision:"authorize"},content:"probe"}),key),env);
  assert.equal(r.status,503);assert.equal((await r.json()).error,"TRUSTED_CHAT_ISSUER_INTEGRATION_PENDING");assert.equal(calls,0);
@@ -88,7 +88,7 @@ test("readiness without GitHub token remains gated by trusted issuer",async()=>{
 
 test("signed readiness claim is single-use, without GitHub token (mock D1)",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-readiness-replay-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-readiness-replay-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const approval={...intent,decision:"authorize"};
  const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
  const claimed=new Set();
@@ -109,7 +109,7 @@ test("signed readiness claim is single-use, without GitHub token (mock D1)",asyn
 });
 test("signed readiness rejects unauthorized branch before mock D1 write",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-readiness-main-001",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-readiness-main-001",branch:"main",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  await assert.rejects(signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"}),/ISSUER_SCOPE_DENIED/);
 
  let writes=0;
@@ -156,7 +156,7 @@ test("malformed intent and approval types are rejected before trusted issuer and
 
 test("content tampering cannot claim a signed readiness approval",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-content-tamper-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-content-tamper-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"approved"});
  let writes=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){writes++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_APPROVAL_READINESS_ENABLED:"YES_STAGING_D1_ONLY"};
@@ -166,7 +166,7 @@ test("content tampering cannot claim a signed readiness approval",async()=>{
 
 test("legacy GitHub LAB write mode is permanently retired",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-001",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
  let dbCalls=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:"test-only-github-token-123456789"};
@@ -176,7 +176,7 @@ test("legacy GitHub LAB write mode is permanently retired",async()=>{
 });
 test("legacy GitHub LAB write stays retired even when old switch is present",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-002",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-002",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  let dbCalls=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY"};
  const payload=JSON.stringify({mode:"github-lab-write",intent,approval:{...intent,decision:"authorize"},content:"probe"});
@@ -185,7 +185,7 @@ test("legacy GitHub LAB write stays retired even when old switch is present",asy
 });
 test("legacy GitHub LAB write rejects unsigned payload before D1",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-003",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-003",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  let dbCalls=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",PACMAN_GITHUB_TOKEN:"test-only-github-token-123456789"};
  const payload=JSON.stringify({mode:"github-lab-write",intent,approval:{...intent,decision:"authorize"},content:"probe"});
@@ -195,7 +195,7 @@ test("legacy GitHub LAB write rejects unsigned payload before D1",async()=>{
 
 test("legacy Worker write mode is retired even for tampered signed payload",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-tamper-004",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-tamper-004",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"original"});
  let dbCalls=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",PACMAN_GITHUB_TOKEN:"test-only-github-token-123456789"};
@@ -205,7 +205,7 @@ test("legacy Worker write mode is retired even for tampered signed payload",asyn
 });
 test("Worker write mode refuses signed authorization targeting main, before D1",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-main-005",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-write-main-005",branch:"main",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  await assert.rejects(signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"}),/ISSUER_SCOPE_DENIED/);
 
  let dbCalls=0;
@@ -214,7 +214,7 @@ test("Worker write mode refuses signed authorization targeting main, before D1",
 
 test("unknown execution mode does not consume signed approval or access D1",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-unknown-mode-006",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-unknown-mode-006",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
  let dbCalls=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret};
@@ -224,7 +224,7 @@ test("unknown execution mode does not consume signed approval or access D1",asyn
 });
 test("readiness stays disabled with issuer configured but readiness switch absent",async()=>{
  const secret="test-only-signing-secret-not-for-deployment-12345";
- const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-readiness-off-007",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={capability:"github.lab-file-cycle",operationId:"pacman-worker-readiness-off-007",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const attestation=await signApprovalInTrustedHost({intent,expiresAt:Date.now()+60000,secret,content:"probe"});
  let dbCalls=0;
  const env={PACMAN_EXECUTION_KEY:key,DB:{prepare(){dbCalls++;throw Error("D1 must not be touched");}},PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",PACMAN_APPROVAL_SIGNING_SECRET:secret};
