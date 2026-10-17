@@ -225,3 +225,41 @@ test("recovery read error remains unresolved, no GitHub write",async()=>{
  assert.equal(x.safeToRetry,false);
  assert.equal((await r.ledger.get(operationId)).state,"RECOVERY_REQUIRED");
 });
+
+test("chat coordinator recovers uncertain provider PUT by GET, without a second write",async()=>{
+ const state={sha:originalSha,content:initial};
+ const records=new Map(),events=[];let putCount=0;
+ const ledger={durable:true,atomic:true,
+  claim:async(id,v)=>{if(records.has(id))return false;records.set(id,v);return true},
+  put:async(id,v)=>records.set(id,v),get:async id=>records.get(id)};
+ const fetchImpl=async(_url,init)=>{
+  if(init.method==="GET")return response(200,{type:"file",sha:state.sha,
+   encoding:"base64",content:Buffer.from(state.content).toString("base64")});
+  if(init.method==="PUT"){
+   putCount++;state.sha=nextSha;state.content=updated;
+   throw Error("uncertain GitHub PUT network result");
+  }
+ };
+ const c=createChatAuthorizedCoordinator({githubToken:"host-token-verified-only-in-test",
+  fetchImpl,operationLedger:ledger,onCheckpoint:async r=>events.push(r),
+  approvalVerifier:async intent=>({...intent,approved:true})});
+ await assert.rejects(c.executeControlledUpdate({operationId,branch,path,
+  expectedSha:originalSha,content:updated}),{code:"PROVIDER_OR_CHECKPOINT_ERROR"});
+ const receipt=await c.inspectControlledUpdateRecovery({operationId,branch,path});
+ assert.equal(receipt.state,"RECOVERY_CONTENT_MATCH_UNATTRIBUTED");
+ assert.equal(receipt.safeToRetry,false);
+ assert.equal(putCount,1);
+ assert.equal((await ledger.get(operationId)).state,"RECOVERY_CONTENT_MATCH_UNATTRIBUTED");
+});
+test("chat coordinator keeps main and completed historical branch out of recovery",async()=>{
+ const r=rig(),count={calls:0};
+ const c=createChatAuthorizedCoordinator({githubToken:"host-token-verified-only-in-test",
+  operationLedger:r.ledger,onCheckpoint:r.onCheckpoint,
+  fetchImpl:async()=>{count.calls++;throw Error("unexpected provider call")}});
+ await assert.rejects(c.inspectControlledUpdateRecovery({operationId,branch:"main",path}),
+  {code:"CONTROLLED_LAB_BRANCH_REQUIRED"});
+ await assert.rejects(c.inspectControlledUpdateRecovery({
+  operationId,branch:"motorlab/pacman-execution-v2-lab-20261014",path}),
+  {code:"CONTROLLED_LAB_BRANCH_REQUIRED"});
+ assert.equal(count.calls,0);
+});
