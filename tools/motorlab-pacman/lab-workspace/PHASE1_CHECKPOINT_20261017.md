@@ -83,6 +83,18 @@ Autorizzazione utente successiva al rapporto preventivo: solo nuova fase 2 in qu
 - Scala 16 gate Real Operations **invariata**: fase A 75% Δ0, B 50% Δ0, C 0% Δ0, D 50% Δ0; **totale 7/16 = 43,75% Δ0**. Sottoattività verifica HMAC reale Node22 = 100%. Gate A4 (suite Node22 completa + workerd) ancora aperto, così come l'issuer live della fase B.
 - Prossimo passo senza espansione di ambito: ottenere evidenza verificabile del workflow GitHub Actions completo sul commit LAB e correggere eventuali regressioni nel solo ramo autorizzato. Nessun nuovo deploy e nessuna firma reale dell'utente finché manca separata autorizzazione di provider/sicurezza.
 
+## Node.js 22 adversarial boundary follow-up — 2026-10-17
+
+- Added a new LAB-only seven-test file: `tools/motorlab-pacman/candidates/chat-security-boundary-lab.test.mjs`.
+- The local file was executed with Node.js v22.16.0 and **real WebCrypto** together with the previous 15 real-crypto tests: **22/22 PASS, 0 FAIL**. Results are local, not an official GitHub Actions check.
+- Independent GitHub readback confirmed exact test source Git blob `442aa7afe3e2e871d90a33d0e7423851c4310410` matches the locally tested file.
+- Covered 23 unsafe relative/path-like variants, restricted file extensions, hidden names, URL-encoded traversal, wrong branch/history scope, unexpected token/consent fields, SHA/operation validation, tampered HMAC signature and content digest, clock and expiry boundaries, owner identity and operation reuse.
+- Existing `chat-approval.mjs` and `approval-attestation.mjs` were read from prior GitHub-verified local copies. The `controlledLabPath` dependency was represented by a separately checked isolated fixture: this is **not** a full-executor or Worker runtime test.
+- No provider token, remote D1, custom MCP, deployment, branch protection, main, historical LAB, production Worker or secret changes.
+- GitHub Actions workflow includes `candidates/*.test.mjs`, so the new suite is included in the existing LAB-only read-only job. But `fetch_commit_workflow_runs` exposes PR-triggered runs only, and `get_commit_combined_status` returns no check details. **The complete Actions run and Miniflare/workerd status remain NOT_VERIFIED**.
+- Progress: operation activity **100% (+100 pp)** for the new seven adversarial tests; Phase A **75% (Δ0)**, Phase B **50% (Δ0)**, Phase C **0% (Δ0)**, Phase D **50% (Δ0)**. **Pac-Man Real Operations total 7/16 = 43.75% (Δ0 pp)**, since the official full-suite and live issuer gates remain open.
+- Next goal within approved scope: obtain an independently viewable Actions run result for this LAB head and validate the full Node22 + Miniflare run; if unavailable, report the exact external evidence blocker rather than claiming CI success.
+
 ## Ultimo checkpoint operativo
 
 - Branch corrente: `motorlab/pacman-real-operations-lab-20261017`.
