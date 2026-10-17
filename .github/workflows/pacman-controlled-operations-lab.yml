@@ -12,12 +12,17 @@ permissions:
 jobs:
   controlled-lab:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run new safety tests and legacy Pac-Man regressions
+      - name: Complete original MotorLab Pac-Man suite plus new controlled-operations tests
+        run: node --test tools/motorlab-pacman/test-pacman-core.mjs tools/motorlab-pacman/*.test.mjs tools/motorlab-pacman/candidates/*.test.mjs tools/motorlab-pacman/tests/*.test.mjs
+      - name: Original Workers runtime regression without deployment
         run: |
-          node --test tools/motorlab-pacman/candidates/github-controlled-update-lab.test.mjs tools/motorlab-pacman/candidates/github-contents-lab-adapter.test.mjs tools/motorlab-pacman/chat-coordinator.test.mjs tools/motorlab-pacman/execution-v2.test.mjs tools/motorlab-pacman/atomic-claim.test.mjs
+          npm install --prefix "$RUNNER_TEMP/pacman-worker-runtime" --no-save --package-lock=false miniflare@4.20260730.0
+          PACMAN_MINIFLARE_MODULE="$RUNNER_TEMP/pacman-worker-runtime/node_modules/miniflare" node tools/motorlab-pacman/ci-worker-binding-runtime.mjs
