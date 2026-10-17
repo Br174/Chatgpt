@@ -67,7 +67,7 @@ test("cross-origin POST is rejected before D1 reads or writes",async()=>{
 
 test("approval start selects owner credential server-side and stores operation-bound challenge",async()=>{
  const d=db({owner:ownerRow});
- const intent={operationId:"pacman-handler-approval-001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={operationId:"pacman-handler-approval-001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const r=await handleWebAuthnOwnerLab(req("/webauthn/approval/start",{intent,content:"probe"}),env(d),{cryptoImpl:webcrypto,nowMs:1780000000000});
  assert.equal(r.status,200);
  const j=await r.json();
@@ -84,7 +84,7 @@ test("approval start selects owner credential server-side and stores operation-b
 
 test("approval start rejects main branch and stores nothing",async()=>{
  const d=db({owner:ownerRow});
- const intent={operationId:"pacman-handler-approval-001",capability:"github.lab-file-cycle",branch:"main",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={operationId:"pacman-handler-approval-001",capability:"github.lab-file-cycle",branch:"main",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const r=await handleWebAuthnOwnerLab(req("/webauthn/approval/start",{intent,content:"probe"}),env(d),{cryptoImpl:webcrypto,nowMs:1780000000000});
  assert.equal(r.status,403);
  assert.equal(d.challenges.size,0);
@@ -110,7 +110,7 @@ test("body size is bounded before JSON parsing",async()=>{
 
 test("approval execute stays fail-closed without executor configuration",async()=>{
  const d=db({owner:ownerRow});let calls=0;
- const intent={operationId:"pacman-handler-execute-001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={operationId:"pacman-handler-execute-001",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const assertion={id:ownerRow.credential_id,type:"public-key",response:{}};
  const r=await handleWebAuthnOwnerLab(
   req("/webauthn/approval/execute",{intent,content:"probe",challenge:"c".repeat(43),assertion}),
@@ -124,7 +124,7 @@ test("approval execute stays fail-closed without executor configuration",async()
 
 test("approval execute delegates exact owner-bound LAB operation to server-side relay",async()=>{
  const d=db({owner:ownerRow});
- const intent={operationId:"pacman-handler-execute-002",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-integration.txt"};
+ const intent={operationId:"pacman-handler-execute-002",capability:"github.lab-file-cycle",branch:"motorlab/pacman-execution-v2-lab-20261014",path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt"};
  const assertion={id:ownerRow.credential_id,type:"public-key",response:{clientDataJSON:"a",authenticatorData:"b",signature:"c"}};
  let seen;
  const executeImpl=async args=>{

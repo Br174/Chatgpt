@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {verifiedLabCycle} from "./verified-lab-cycle.mjs";
-const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-integration.txt";
+const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const sha="a".repeat(40);
 function mock(){let file=null;const calls=[];return {calls,adapter:{
  async read(){calls.push("read");return file===null?{exists:false}:{exists:true,content:file,sha};},

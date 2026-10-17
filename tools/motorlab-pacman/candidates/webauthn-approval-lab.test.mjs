@@ -4,7 +4,7 @@ import {webcrypto} from "node:crypto";
 import {createPacmanWebAuthnChallenge,verifyPacmanWebAuthnAssertion} from "./webauthn-approval-lab.mjs";
 
 const branch="motorlab/pacman-execution-v2-lab-20261014";
-const path="tools/motorlab-pacman/probe-integration.txt";
+const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const origin="https://motorlab-pacman-webauthn-staging-lab.example.workers.dev";
 const rpId="motorlab-pacman-webauthn-staging-lab.example.workers.dev";
 const b64u=bytes=>Buffer.from(bytes).toString("base64url");

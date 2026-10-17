@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {verifiedLabCycle} from "./verified-lab-cycle.mjs";
 import {makeGitHubContentsLabAdapter} from "./github-contents-lab-adapter.mjs";
-const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-integration.txt",sha="a".repeat(40),commit="b".repeat(40);
+const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt",sha="a".repeat(40),commit="b".repeat(40);
 const response=(status,body)=>({status,ok:status>=200&&status<300,json:async()=>body});
 test("LAB candidate and GitHub adapter complete simulated create-read-delete-read cycle",async()=>{
  let file=null;const methods=[],states=[];

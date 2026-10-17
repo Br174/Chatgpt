@@ -4,7 +4,7 @@ import {handleExecutionRequest} from "../worker-execution-staging.mjs";
 import {signApprovalInTrustedHost} from "../approval-attestation.mjs";
 
 const key="k".repeat(48),secret="s".repeat(48),token="t".repeat(24);
-const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-integration.txt";
+const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 const sha="a".repeat(40),commit="b".repeat(40);
 const schema={
  pacman_approval_claims:[["operation_id","TEXT",1,1],["approval_signature","TEXT",1,0],["claimed_at","INTEGER",1,0],["expires_at","INTEGER",1,0]],

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {makeGitHubContentsLabAdapter} from "./github-contents-lab-adapter.mjs";
-const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-integration.txt",sha="a".repeat(40),commit="b".repeat(40);
+const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt",sha="a".repeat(40),commit="b".repeat(40);
 const json=(status,obj)=>({status,ok:status>=200&&status<300,json:async()=>obj});
 test("missing token fails before network",()=>assert.throws(()=>makeGitHubContentsLabAdapter({token:"x",fetchImpl:async()=>{}}),/ADAPTER_NOT_CONFIGURED/));
 test("read 404 confirms absence on LAB",async()=>{const a=makeGitHubContentsLabAdapter({token:"x".repeat(20),fetchImpl:async(url,init)=>{assert.match(url,/ref=motorlab/);assert.equal(init.method,"GET");return json(404,{});}});assert.deepEqual(await a.read({branch,path}),{exists:false});});
