@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {stagingCycleHandler} from "./staging-runtime-cycle-handler.mjs";
+import {stagingCycleHandler,controlledLedgerSchemaAudit} from "./staging-runtime-cycle-handler.mjs";
 import {signApprovalInTrustedHost} from "../approval-attestation.mjs";
 const secret="s".repeat(48),token="t".repeat(24),content="probe";
 const branch="motorlab/pacman-execution-v2-lab-20261014",path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
@@ -47,4 +47,58 @@ test("handler rejects nullable required D1 column before approval claim",async()
  }throw Error("approval must not be claimed");}};
  const result=await stagingCycleHandler({input:request,env:{...flags,DB:store,PACMAN_APPROVAL_SIGNING_SECRET:secret,PACMAN_GITHUB_TOKEN:token},fetchImpl:async()=>{calls++;}});
  assert.equal(result.status,503);assert.equal((await result.json()).error,"STAGING_D1_SCHEMA_UNVERIFIED");assert.equal(calls,0);
+});
+
+const controlledLedgerColumns=[
+ {name:"operation_id",type:"TEXT",pk:1,notnull:1,dflt_value:null},
+ {name:"receipt_json",type:"TEXT",pk:0,notnull:1,dflt_value:null},
+ {name:"updated_at",type:"TEXT",pk:0,notnull:1,dflt_value:"CURRENT_TIMESTAMP"}
+];
+const controlledLedgerIndexes=[{name:"sqlite_autoindex_pacman_operations_1",
+ origin:"pk",unique:1,partial:0}];
+function schemaDbFor({columns=controlledLedgerColumns,indexes=controlledLedgerIndexes,throws=false}={}){
+ const calls=[];
+ return {calls,prepare(sql){
+  calls.push(sql);
+  if(sql!=="PRAGMA table_info(pacman_operations)"&&
+     sql!=="PRAGMA index_list(pacman_operations)")throw Error("MUTATION_FORBIDDEN");
+  return {all:async()=>{
+   if(throws)throw Error("INTERNAL_D1_DATA_MUST_NOT_ESCAPE");
+   return {results:structuredClone(sql.includes("table_info")?columns:indexes)};
+  }};
+ }};
+}
+test("controlled ledger schema audit validates exact columns, default and unique primary-key index with only PRAGMA",async()=>{
+ const store=schemaDbFor();
+ assert.equal(await controlledLedgerSchemaAudit(store),"EXACT");
+ assert.deepEqual(store.calls,["PRAGMA table_info(pacman_operations)",
+  "PRAGMA index_list(pacman_operations)"]);
+});
+test("controlled ledger schema audit fails closed for missing DB, changed schema, PK and malformed metadata",async()=>{
+ assert.equal(await controlledLedgerSchemaAudit(null),"STAGING_CONFIGURATION_MISSING");
+ const variants=[
+  {columns:[]},
+  {columns:controlledLedgerColumns.slice(0,2)},
+  {columns:[...controlledLedgerColumns,{name:"extra",type:"TEXT",pk:0,notnull:0,dflt_value:null}]},
+  {columns:controlledLedgerColumns.map((x,i)=>i===0?{...x,type:"INTEGER"}:x)},
+  {columns:controlledLedgerColumns.map((x,i)=>i===0?{...x,pk:0}:x)},
+  {columns:controlledLedgerColumns.map((x,i)=>i===0?{...x,notnull:0}:x)},
+  {columns:controlledLedgerColumns.map((x,i)=>i===1?{...x,notnull:0}:x)},
+  {columns:controlledLedgerColumns.map((x,i)=>i===2?{...x,dflt_value:null}:x)},
+  {columns:controlledLedgerColumns.map((x,i)=>i===2?{...x,dflt_value:"'CURRENT_TIMESTAMP'"}:x)},
+  {columns:null},
+  {indexes:[]},
+  {indexes:[{name:"malicious",origin:"c",unique:1,partial:0}]},
+  {indexes:[{name:"fake_pk",origin:"pk",unique:0,partial:0}]},
+  {indexes:[{name:"partial",origin:"pk",unique:1,partial:1}]},
+  {indexes:null},
+  {throws:true}
+ ];
+ for(const variant of variants){
+  const store=schemaDbFor(variant);
+  const output=await controlledLedgerSchemaAudit(store);
+  assert.equal(output,"CONTROLLED_LEDGER_SCHEMA_UNVERIFIED");
+  assert.ok(store.calls.every(sql=>sql.startsWith("PRAGMA ")));
+  assert.doesNotMatch(output,/INTERNAL_D1|malicious|CURRENT_TIMESTAMP/);
+ }
 });
