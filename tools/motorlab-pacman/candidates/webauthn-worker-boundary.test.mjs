@@ -323,3 +323,37 @@ test("WebAuthn parity fails closed without service binding and accepts GET only"
  const p=await handleWebAuthnRequest(new Request(uri,{method:"POST"}),env,{cryptoImpl:webcrypto});
  assert.equal(p.status,404);
 });
+
+
+test("canonical challenge endpoint stores controlled request binding, not untrusted body hash",async()=>{
+ const D1=db(),env={...baseEnv,DB:D1},content="# Controlled direct route\n";
+ const digest=Buffer.from(await webcrypto.subtle.digest("SHA-256",new TextEncoder().encode(content))).toString("hex");
+ const intent={capability:"github.lab-file-update",operationId:"controlled-direct-challenge-0001",
+  branch:"motorlab/pacman-real-operations-lab-20261017",
+  path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
+  expectedSha:"a".repeat(40),contentSha256:digest};
+ const r=await handleWebAuthnRequest(req("/approve/challenge",{intent,content}),env,
+  {cryptoImpl:webcrypto,nowMs:1780000000000});
+ assert.equal(r.status,200);
+ assert.equal((await r.json()).status,"APPROVAL_CHALLENGE");
+ const stored=[...D1.challenges.values()][0];
+ assert.notEqual(stored[5],digest);
+ const {controlledWebAuthnRequestDigest}=await import("./webauthn-approval-lab.mjs");
+ assert.equal(stored[5],await controlledWebAuthnRequestDigest(intent,{cryptoImpl:webcrypto}));
+});
+
+test("canonical challenge refuses content mismatch and main without writing D1",async()=>{
+ const content="# Controlled scope\n";
+ const digest=Buffer.from(await webcrypto.subtle.digest("SHA-256",new TextEncoder().encode(content))).toString("hex");
+ const base={capability:"github.lab-file-update",operationId:"controlled-direct-denial-0001",
+  branch:"motorlab/pacman-real-operations-lab-20261017",
+  path:"tools/motorlab-pacman/lab-workspace/SAMPLE.md",
+  expectedSha:"a".repeat(40),contentSha256:digest};
+ for(const [intent,body] of [[base,content+"CHANGED"],[{...base,branch:"main"},content]]){
+  const D1=db(),env={...baseEnv,DB:D1};
+  const r=await handleWebAuthnRequest(req("/approve/challenge",{intent,content:body}),
+   env,{cryptoImpl:webcrypto,nowMs:1780000000000});
+  assert.equal(r.status,403);
+  assert.equal(D1.challenges.size,0);
+ }
+});
