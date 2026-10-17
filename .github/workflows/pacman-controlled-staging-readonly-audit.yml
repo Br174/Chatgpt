@@ -15,7 +15,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  preflight-local:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run read-only audit unit tests with synthetic credentials only
+        run: |
+          node --test tools/motorlab-pacman/candidates/controlled-staging-readonly-audit-lab.test.mjs tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.test.mjs
   readonly-audit:
+    needs: preflight-local
     if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017'
     runs-on: ubuntu-latest
     environment: pacman-execution-staging
