@@ -1,0 +1,82 @@
+name: Pac-Man Controlled Staging Read-Only Audit LAB
+
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/workflows/pacman-controlled-staging-readonly-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: pacman-controlled-staging-readonly-audit-lab
+  cancel-in-progress: false
+
+jobs:
+  readonly-audit:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 7
+    steps:
+      - name: Check out the exact authorized LAB commit, without Git credentials
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify isolated GET-only audit and existing diagnostics
+        run: |
+          node --test tools/motorlab-pacman/candidates/controlled-staging-readonly-audit-lab.test.mjs tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.test.mjs
+      - name: Inspect staging Worker settings, deployment metadata and protected GET diagnostics
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {auditControlledStagingReadOnly} from './tools/motorlab-pacman/candidates/controlled-staging-readonly-audit-lab.mjs';
+          import {inspectStagingCredentialParityReadOnly} from './tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.mjs';
+          // Existing protected environment, GET-only diagnostics, no raw response logs.
+          let snapshot;
+          try{
+            snapshot=await auditControlledStagingReadOnly({
+              cloudflareToken:process.env.CF_TOKEN,accountId:process.env.CF_ACCOUNT
+            });
+          }catch{
+            console.log('PACMAN_READONLY_CLOUDFLARE=BLOCKED_PROTECTED_ENV_OR_ACCOUNT');
+            process.exitCode=1;
+          }
+          if(snapshot){
+            console.log('PACMAN_READONLY_CLOUDFLARE=INSPECTION_ATTEMPTED');
+            for(const worker of ['motorlab-pacman-execution-staging-lab','motorlab-pacman-webauthn-staging-lab']){
+              const x=snapshot.result[worker];
+              const label=worker==='motorlab-pacman-execution-staging-lab'?'EXECUTION':'WEBAUTHN';
+              console.log('PACMAN_'+label+'_SETTINGS='+x.settingsHttp);
+              console.log('PACMAN_'+label+'_D1='+String(x.database||'UNVERIFIED'));
+              console.log('PACMAN_'+label+'_DEPLOYMENT='+x.deployment);
+              console.log('PACMAN_'+label+'_HEALTH='+x.health.http);
+              if(label==='EXECUTION'){
+                console.log('PACMAN_EXECUTION_SOURCE_REVISION='+x.health.revision);
+                console.log('PACMAN_CONTROLLED_FLAG_BINDING='+x.flags?.PACMAN_CONTROLLED_UPDATE_ENABLED);
+              }else console.log('PACMAN_WEBAUTHN_EXECUTION_SERVICE='+x.service);
+              for(const [name,type] of Object.entries(x.keys||{}))
+                console.log('PACMAN_'+label+'_SECRET_'+name+'='+type);
+            }
+          }
+          if(typeof process.env.EXECUTION_KEY==='string'&&process.env.EXECUTION_KEY.length>=32){
+            try{
+              const p=await inspectStagingCredentialParityReadOnly({executionKey:process.env.EXECUTION_KEY});
+              console.log('PACMAN_READONLY_PROTECTED_DIAGNOSTICS='+p.category);
+              console.log('PACMAN_READONLY_EXECUTION_SCHEMA='+p.executionSchema);
+              console.log('PACMAN_READONLY_ISSUER_PARITY_LOCKED='+String(p.issuerParityLocked));
+              console.log('PACMAN_READONLY_EXECUTION_HTTP='+p.executionHttp);
+              console.log('PACMAN_READONLY_WEBAUTHN_HTTP='+p.webAuthnHttp);
+            }catch{console.log('PACMAN_READONLY_PROTECTED_DIAGNOSTICS=UNVERIFIED');}
+          }else console.log('PACMAN_READONLY_PROTECTED_DIAGNOSTICS=BLOCKED_KEY_UNAVAILABLE');
+          console.log('PACMAN_READONLY_NO_DEPLOY_NO_MUTATIONS');
+          NODE
