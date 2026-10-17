@@ -2,7 +2,7 @@
 // Secrets must be configured on a dedicated Worker; never embed them in source or logs.
 import {verifyAndConsumeTrustedApproval} from "./trusted-approval-gate.mjs";
 import {candidateCycleDispatch} from "./candidates/staging-cycle-dispatch.mjs";
-import {stagingCyclePreflight,stagingSchemaAudit} from "./candidates/staging-runtime-cycle-handler.mjs";
+import {stagingCyclePreflight,stagingSchemaAudit,controlledLedgerSchemaAudit} from "./candidates/staging-runtime-cycle-handler.mjs";
 import {makeGitHubContentsLabAdapter} from "./candidates/github-contents-lab-adapter.mjs";
 import {verifyIssuerParityProof} from "./candidates/issuer-parity-crypto-lab.mjs";
 import {validateControlledChatIntent} from "./chat-approval.mjs";
@@ -59,6 +59,7 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
    if(!await authorized(request,env?.PACMAN_EXECUTION_KEY))
     return response({error:"UNAUTHORIZED"},401);
    const schema=await stagingSchemaAudit(env?.DB);
+   const controlledLedgerSchema=await controlledLedgerSchemaAudit(env?.DB);
    const expected={
     PACMAN_TRUSTED_ISSUER_CONNECTED:"YES_VERIFIED_TRUSTED_HOST",
     PACMAN_GITHUB_LAB_WRITE_ENABLED:"YES_STAGING_LAB_ONLY",
@@ -72,6 +73,7 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
    return response({
     component:"pacmanExecutionReadOnlySchemaAudit",
     schema:schema===null?"EXACT":schema,
+    controlledLedgerSchema,
     flags,issuerParityLocked:parityLocked,
     writes:"DISABLED_UNTIL_INDEPENDENT_ISSUER_PARITY_VERIFIED"
    },schema===null?200:503);
@@ -175,6 +177,10 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
    const contentSha256=Array.from(new Uint8Array(sha),b=>b.toString(16).padStart(2,"0")).join("");
    if(scoped.contentSha256!==contentSha256)
     return response({error:"CONTROLLED_CONTENT_MISMATCH"},403);
+   // Require the complete ledger shape and unique PK before any claim or write.
+   // The preflight performs fixed, read-only PRAGMA calls only.
+   if(await controlledLedgerSchemaAudit(env.DB)!=="EXACT")
+    return response({error:"STAGING_CONTROLLED_LEDGER_SCHEMA_UNVERIFIED"},503);
    // Reuse the ONE existing D1 operation ledger, coordinator and GitHub Contents
    // adapter. The readback callback verifies that PREPARED and WRITE_ATTEMPTED
    // receipts are durably stored before the first provider PUT.
