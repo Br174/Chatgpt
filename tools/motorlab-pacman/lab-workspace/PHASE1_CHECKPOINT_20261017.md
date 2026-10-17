@@ -321,3 +321,28 @@ Found first documented successful enabling of parity flag in OLD historical LAB 
 - New GET-only run #3 (39075283947) is waiting for protected environment reviewer to rerun private binding parity verification and compare latest staging Worker deployment group identifiers with run #4 historic ids. Do not bypass reviewer.
 - No additional Cloudflare/secret mutation, deploy, D1 schema update or actual GitHub provider write occurred in this retrospective. Global remains 9/16=56.25% (delta 0), pending new authenticated live results.
 Reference: https://github.com/Br174/Chatgpt/actions/runs/39037378193
+
+## Protected cloud staging #3 actual evidence — 2026-10-18
+
+### Exact official success evidence
+- Owner approved the existing mandatory reviewer for GET-only Pac-Man Controlled Staging Read-Only Audit LAB run #3, ID 39075283947, source SHA ede9c9e9be01cf84e29eb9e7e4ff5e49306ea8f2. GitHub API independently confirms the run COMPLETED SUCCESS. Local synthetic preflight job 117521064155 SUCCESS, protected readonly-audit job 117521088551 SUCCESS, all steps.
+- Protected job logs retrieved via GitHub Actions connector and read only allowlisted PACMAN_* classifications. No secret or raw Cloudflare payload persisted. Real Execution and WebAuthn settings HTTP_200_API_SUCCESS; health HTTP_200 both; exact staging D1 binding MATCH both; WebAuthn private Execution Service binding MATCH; required protected credential bindings PRESENT. Deployment metadata VERSION_IDENTIFIERS_PRESENT.
+- Live latest Cloudflare Deployment group of Execution Worker and WebAuthn Worker both returned LATEST_MATCHES_GITHUB_PARITY_RUN4_VERSION against Version IDs independently recovered from historical protected GitHub Actions parity run #4 (39061359612) on OLD LAB SHA efc4dfd97348. This proves the latest deployed version groups match the historically reviewed staging versions, NOT a live deployment of NEW controlled-update LAB code.
+- Fresh authenticated GET-only cross-Worker cryptographic proof returned LIVE_PRIVATE_BINDING_HMAC_MATCH. Cryptographic key equality currently verified; legacy diagnostic continues printing UNEXPECTED_EXECUTION_PARITY_ALREADY_OPEN solely because its expected pre-activation flag state was stale. In this specific checkpoint the composite evidence is CURRENT_HMAC_VERIFIED, HISTORICAL_PARITY_GATE_ENABLED_AS_DESIGNED, NEW_CONTROLLED_CAPABILITY_DISABLED.
+- New controlled feature flag PACMAN_CONTROLLED_UPDATE_ENABLED reported NOT_LISTED. No new issuing/deploy/approval operation enabled or executed. New controlled capability remains OFF.
+- Execution-schema-audit reported EXACT and both Worker protected diagnostics HTTP 200, but source shows schema EXACT examines only pacman_approval_claims and pacman_cycle_checkpoints. Separate /health confirms that pacman_operations table exists, not that its columns/types/unique PK/index/atomicity match d1-ledger.mjs. Do not mark detailed pacman_operations schema as verified.
+
+### New and remaining boundaries
+- This live audit confirms historical Worker version provenance AND present HMAC keys. No unreviewed deployment or direct Cloudflare secret, flag, database or schema modification was performed. No main/MADRE/legacy LAB writes and no new GitHub content write via the issuer.
+- Remaining remote evidence: a permitted read-only PRAGMA table_info(pacman_operations) plus source-match of operation_id TEXT PRIMARY KEY, receipt_json TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP; no suitable mounted read-only SQL channel has yet been verified. Historical Cloudflare API D1 query was rejected HTTP 403; user prohibited remote schema changes and deploy. Never replace this evidence with guesses or POST-based API mutation.
+- Current LAB new controlled-update relay/Worker code remains undeployed. Next distinct authorization boundary: narrowly scoped staging-only deploy, enabled route and a biometric approval to perform a single controlled file update. Before seeking that, resolve the remote ledger schema evidence, review deploy safety and exact source identity; no unapproved mutation.
+
+### Hierarchical progress updated with verified evidence
+- Phase A GitHub LAB: 4/4 = 100%, delta 0 pp.
+- Phase B chat / REAL controlled WebAuthn: 2/4 = 50%, delta 0 pp.
+- Phase C staging: 2/4 = 50%, delta +25 pp. C1 authenticated GET-only connectivity/D1-binding verified in audit #2; C2 historical deployed Worker version identity and current cryptographic parity independently verified in audit #3; C3 new controlled staging activation and C4 controlled real end-to-end remain open. Full pacman_operations schema check is a prerequisite to C3, NOT verified.
+- Phase D recovery and end-to-end: 2/4 = 50%, delta 0 pp.
+- GLOBAL REAL OPERATIONS: 10/16 = 62.50%, delta +6.25 pp from 9/16=56.25%. Work is NOT ready for live controlled update despite positive current parity.
+
+Reference: https://github.com/Br174/Chatgpt/actions/runs/39075283947
+Checkpoint outcome: GET_ONLY_REMOTE_AUDIT3_SUCCESS, TWO_WORKER_LATEST_HISTORICAL_VERSIONS_MATCH, HMAC_CURRENT_MATCH, HISTORICAL_PARITY_UNLOCK_VERIFIED, NEW_CONTROLLED_FLAG_ABSENT, D1_OPERATIONS_COLUMNS_UNVERIFIED, NO_DEPLOY_NO_WRITES, MAIN_UNCHANGED.
