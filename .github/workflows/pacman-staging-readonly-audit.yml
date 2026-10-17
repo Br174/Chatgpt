@@ -18,6 +18,16 @@ jobs:
     environment: pacman-execution-staging
     timeout-minutes: 5
     steps:
+      - name: Check out exact reviewed LAB commit for local diagnostics
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Require read-only diagnostic code and tests
+        run: |
+          test -f tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.mjs
+          test -f tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.test.mjs
+          node --test tools/motorlab-pacman/candidates/staging-credential-parity-readonly-lab.test.mjs
       - name: Read-only Cloudflare staging audit (names only)
         env:
           CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
