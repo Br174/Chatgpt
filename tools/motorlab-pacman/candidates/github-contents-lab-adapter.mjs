@@ -18,3 +18,49 @@ export function makeGitHubContentsLabAdapter({token,fetchImpl}={}){
   async remove({branch,path,sha}){scope(branch,path);if(!validSha(sha))throw Error("INVALID_SHA");const body={message:"test(pacman): LAB isolated probe cleanup",branch:LAB,sha};const r=await request(URL,{method:"DELETE",body:JSON.stringify(body)});if(!r.ok)throw Error("GITHUB_DELETE_FAILED_"+r.status);const f=await r.json();if(!validSha(f?.commit?.sha))throw Error("GITHUB_DELETE_RESPONSE_INVALID");}
  };
 }
+
+
+// Separate capability inside the same existing GitHub Contents adapter module.
+// The legacy verified probe methods above stay byte-for-byte unchanged.
+// No worker routing, production deployment, token creation or permission escalation.
+import {CONTROLLED_LAB_BRANCH,controlledLabPath} from "./github-controlled-update-lab.mjs";
+export function makeControlledGitHubLabAdapter({token,fetchImpl}={}){
+ if(typeof token!=="string"||token.length<20||typeof fetchImpl!=="function")
+  throw Error("ADAPTER_NOT_CONFIGURED");
+ const headers={Authorization:"Bearer "+token,Accept:"application/vnd.github+json",
+   "X-GitHub-Api-Version":"2022-11-28","Content-Type":"application/json",
+   "User-Agent":"motorlab-pacman-execution"};
+ const scope=(branch,path)=>{
+  if(branch!==CONTROLLED_LAB_BRANCH||!controlledLabPath(path))
+   throw Error("CONTROLLED_LAB_SCOPE_REQUIRED");
+ };
+ const url=path=>"https://api.github.com/repos/Br174/Chatgpt/contents/"+
+   path.split("/").map(encodeURIComponent).join("/");
+ const request=(path,init,query="")=>fetchImpl(url(path)+query,{...init,headers,redirect:"manual"});
+ return Object.freeze({
+  async readControlled({branch,path}={}){
+   scope(branch,path);
+   const r=await request(path,{method:"GET"},"?ref="+encodeURIComponent(CONTROLLED_LAB_BRANCH));
+   if(r.status===404)return {exists:false};
+   if(!r.ok)throw Error("GITHUB_CONTROLLED_READ_FAILED_"+r.status);
+   const file=await r.json();
+   if(file?.type!=="file"||!validSha(file.sha)||file.encoding!=="base64"||
+      typeof file.content!=="string")throw Error("GITHUB_CONTROLLED_FILE_INVALID");
+   return {exists:true,sha:file.sha,content:decode(file.content.replace(/\s/g,""))};
+  },
+  async updateControlled({branch,path,sha,content}={}){
+   scope(branch,path);
+   if(!validSha(sha))throw Error("EXPECTED_BLOB_SHA_REQUIRED");
+   if(typeof content!=="string"||new TextEncoder().encode(content).length===0||
+      new TextEncoder().encode(content).length>8192)throw Error("INVALID_CONTENT");
+   const body={message:"test(pacman): approved LAB controlled file update",
+      branch:CONTROLLED_LAB_BRANCH,sha,content:encode(content)};
+   const r=await request(path,{method:"PUT",body:JSON.stringify(body)});
+   if(!r.ok)throw Error("GITHUB_CONTROLLED_UPDATE_FAILED_"+r.status);
+   const response=await r.json();
+   if(!validSha(response?.content?.sha)||!validSha(response?.commit?.sha))
+    throw Error("GITHUB_CONTROLLED_UPDATE_UNVERIFIED");
+   return {sha:response.content.sha,commitSha:response.commit.sha};
+  }
+ });
+}
