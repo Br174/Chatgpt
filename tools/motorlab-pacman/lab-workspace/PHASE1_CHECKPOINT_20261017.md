@@ -43,12 +43,12 @@ Obiettivo complessivo: richiesta in chat -> autorizzazione verificata -> operazi
 
 | Fase | Gate verificati | Percentuale fase | Evidenza verificata | Gate ancora aperti |
 | --- | ---: | ---: | --- | --- |
-| A. Operazioni GitHub su nuovo LAB | 3/4 | 75% | Ramo isolato e codice; PUT+GET reale con SHA; test di sicurezza isolati | CI Node 22 completa e runtime workerd |
+| A. Operazioni GitHub su nuovo LAB | 4/4 | 100% | Ramo e codice isolati; PUT+GET reale e SHA; test di sicurezza; workflow GitHub Actions #23 verde sul commit esatto con suite Node 22 + controllo Miniflare/workerd | Nessun gate A aperto |
 | B. Richiesta chat e autorizzazione | 2/4 | 50% | Coordinatore esistente; validatore intenti; verifier HMAC scoped + nonce claim implementati e 16 test nuovi isolati | issuer WebAuthn autenticato realmente collegato alla nuova capacità; richiesta dalla chat live effettivamente eseguita |
 | C. Nuova capacità su Cloudflare staging | 0/4 | 0% | Nessun deploy nuovo, risorse storiche NON equivalgono alla nuova capacità | integrazione handler; protezioni deploy; staging deploy autorizzato; readback verificato |
 | D. Recupero e prova completa | 2/4 | 50% | Codice di riconciliazione read-only; test isolati anti-replay/race/timeout | prova runtime workerd della nuova capacità; ciclo reale completo e ricevuta indipendente |
 
-**Totale nuovo obiettivo Pac-Man: 7/16 = 43,75% (+6,25 punti).** Fase corrente B = 50% (+25 punti); attività corrente «codice chat firmata + test isolati» = 100% (+100 punti). Fase A = 75% (Δ 0), C = 0% (Δ 0), D = 50% (Δ 0). Il test isolato è passato da 25/25 a 41/41 (25 fase 1 + 16 fase 2): questo aggiunge 1 gate B, NON prova un issuer WebAuthn connesso. Queste cifre non riducono il 100% del vecchio collaudo WebAuthn/Execution limitato al singolo percorso storico, già completato.
+**Totale nuovo obiettivo Pac-Man: 8/16 = 50% (+6,25 punti dall'ultimo checkpoint).** Fase A = 100% (+25 punti), B = 50% (Δ 0), C = 0% (Δ 0), D = 50% (Δ 0). Attività corrente «conferma GitHub Actions sulla HEAD» = 100% (+100 punti). Il test isolato è passato da 25/25 a 41/41 (25 fase 1 + 16 fase 2): questo aggiunge 1 gate B, NON prova un issuer WebAuthn connesso. Queste cifre non riducono il 100% del vecchio collaudo WebAuthn/Execution limitato al singolo percorso storico, già completato.
 
 Percentuali per fase/attività e globale sono distinte. R37 CORE e integrazione in MADRE già consolidati; il 37,5% misura **esclusivamente** l'estensione Real Operations, non la versione MotorLab nel suo insieme né la disponibilità runtime di un MCP per ChatGPT.
 
@@ -95,6 +95,16 @@ Autorizzazione utente successiva al rapporto preventivo: solo nuova fase 2 in qu
 - Progress: operation activity **100% (+100 pp)** for the new seven adversarial tests; Phase A **75% (Δ0)**, Phase B **50% (Δ0)**, Phase C **0% (Δ0)**, Phase D **50% (Δ0)**. **Pac-Man Real Operations total 7/16 = 43.75% (Δ0 pp)**, since the official full-suite and live issuer gates remain open.
 - Next goal within approved scope: obtain an independently viewable Actions run result for this LAB head and validate the full Node22 + Miniflare run; if unavailable, report the exact external evidence blocker rather than claiming CI success.
 
+## GitHub Actions LAB: screenshot verificabile del workflow #23 (17 ottobre 2026)
+
+- **Nuova evidenza presentata dall'utente**: schermata del repository privato GitHub nella vista `Pac-Man Controlled GitHub Operations LAB`; elenco di **23 workflow run**; esecuzione più recente **#23, segno di spunta verde**, collegata al commit abbreviato `112009b9`, ramo `motorlab/pacman-real-operations-lab-20261017`.
+- Il connettore GitHub ha verificato indipendentemente HEAD LAB = `112009b96dcea5791aee8f33654fc4e7db8af90f`; `main` = `8615e8321bf9896f28826a09aa0c9f61ce5ecbb7` e il file workflow a quel preciso ref. La configurazione ha Node 22 e step obbligatori `node --test ...test-pacman-core.mjs ...candidates/*.test.mjs` **più** `ci-worker-binding-runtime.mjs` con Miniflare, nessun deploy e autorizzazioni GitHub read-only.
+- La stessa schermata mostra verdi anche #22, #21 e #20. Una precedente run #17 è rossa, superata temporalmente dalle successive run verdi. Non dedurre numeri esatti di test o job logs da questa schermata: non sono visibili.
+- **Gate A4 ora completo**: stato GREEN del workflow sulla HEAD esatta attestato dalla schermata dell'utente e associato alla configurazione letta dal connettore; ciò equivale al collaudo CI complessivo di quel commit, pur senza dettagli individuali dei job/log accessibili dal connettore.
+- La CI esamina il codice LAB e l'attuale test del runtime Workers con simulazione locale. **NON certifica** un nuovo Worker distribuito, un issuer WebAuthn reale, un provider MCP di scrittura o un'operazione firmata live per `github.lab-file-update`.
+- **Cascata nuova scala**: A `4/4 = 100% (+25 pp)`; B `2/4 = 50% (Δ0)`; C `0/4 = 0% (Δ0)`; D `2/4 = 50% (Δ0)`. **TOTALE `8/16 = 50% (+6,25 pp)`**. Attività `Verifica CI sulla HEAD` `100% (+100 pp)`; collaudo storico del precedente ciclo `100%` non ripetuto.
+- Provenienza prova CI: screenshot utente `Screenshot_20261017-230347_Chrome.jpg`; GitHub connector non fornisce i run avviati da push, quindi link ID specifico della run #23 e conteggio test restano da leggere se necessario. Non assegnare un run ID numerico arbitrario.
+
 ## Ultimo checkpoint operativo
 
 - Branch corrente: `motorlab/pacman-real-operations-lab-20261017`.
@@ -112,4 +122,4 @@ Autorizzazione utente successiva al rapporto preventivo: solo nuova fase 2 in qu
 4. Later expand to PR lifecycle and Cloudflare staging deployment through separate narrowly authorized review.
 5. On recovery use this checkpoint and do not repeat the completed 2026-10-17 historical WebAuthn file-cycle.
 
-State: PHASE2_SIGNED_CHAT_CODE_COMMITTED; PHASE1_GITHUB_CONNECTOR_WRITE_AND_HTTP409_VERIFIED; PHASE1_SIMULATED_TESTS_25_OF_25; PHASE2_SIMULATED_TESTS_16_OF_16; TOTAL_SIMULATED_41_OF_41; LIVE_CRYPTO_ISSUER_NOT_CONNECTED; NODE_CI_UNVERIFIED; NO_NEW_WORKER_DEPLOYMENT; OVERALL_7_OF_16_43.75_PERCENT.
+State: PHASE2_SIGNED_CHAT_CODE_COMMITTED; PHASE1_GITHUB_CONNECTOR_WRITE_AND_HTTP409_VERIFIED; PHASE1_SIMULATED_TESTS_25_OF_25; PHASE2_SIMULATED_TESTS_16_OF_16; TOTAL_SIMULATED_41_OF_41; NODE_22_REAL_WEBCRYPTO_LOCAL_22_OF_22; GITHUB_ACTIONS_WORKFLOW_23_GREEN_ON_EXACT_HEAD_USER_SCREENSHOT; CI_PER_JOB_LOGS_NOT_RETRIEVED; LIVE_CRYPTO_ISSUER_NOT_CONNECTED; NO_NEW_WORKER_DEPLOYMENT; OVERALL_8_OF_16_50_PERCENT.
