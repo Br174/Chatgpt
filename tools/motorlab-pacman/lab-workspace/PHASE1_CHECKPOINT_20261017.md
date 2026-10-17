@@ -162,3 +162,27 @@ Autorizzazione utente successiva al rapporto preventivo: solo nuova fase 2 in qu
 5. On recovery use this checkpoint and do not repeat the completed 2026-10-17 historical WebAuthn file-cycle.
 
 State: WEB_AUTHN_CONTROLLED_CAPABILITY_LAB_CODE_WRITTEN; WEB_AUTHN_SCOPE_SIMULATION_7_OF_7; NEW_NODE22_REAL_CRYPTO_TESTS_12_DEFINED_CI_PENDING; LEGACY_APPROVAL_RETAINED; DB_SCHEMA_UNCHANGED; PREVIOUS_WORKFLOW_23_GREEN_ON_OLD_HEAD_ONLY; NEW_HEAD_CI_UNVERIFIED; LIVE_OWNER_ISSUER_NOT_CONNECTED; CLOUD_DEPLOY_NOT_AUTHORIZED; NO_PRODUCTION_OR_MAIN_CHANGE; OVERALL_8_OF_16_50_PERCENT.
+
+## Controlled WebAuthn challenge entrypoint repair — 2026-10-17, code-only LAB continuation
+
+Scope: previously approved LAB-only WebAuthn challenge/validation/attestation correction, tests, workflow and checkpoint. No Worker deploy, no actual owner-passkey activation, no live GitHub mutation by the new issuer, no D1 remote/schema or secret changes, no main/MADRE/historical LAB/production writes. Cost €0.
+
+### Root cause and correction
+- The dedicated controlled capability already supported a full request digest through `createControlledPacmanWebAuthnChallenge`, but the canonical Worker `/approve/challenge` and the owner portal `/webauthn/approval/start` still invoked the legacy generic constructor with raw content SHA-256.
+- These two entrypoints now route `github.lab-file-update` through the existing canonical async controlled challenge constructor; `github.lab-file-cycle` retains its legacy constructor and unchanged body-hash format.
+- Both endpoints independently compare submitted content against the controlled intent's `contentSha256` before creating or storing a challenge; mismatches fail closed without a challenge row. No new D1 schema or authority was added.
+- Exact challenge binding covers operation ID, repository, capability, target LAB branch, allowed path, initial blob SHA and approved content digest. Old challenge and old issuer remain intact.
+
+### Evidence
+- Four LAB-only updates with independently matching GET readback: `d97d73b1` (owner handler), `2bfa46ac` (canonical WebAuthn Worker), `da15fcb9` (owner-handler tests), `983164ef` (canonical Worker tests).
+- Four additional Node tests in existing suites: two controlled-digest positive cases and two negative groups covering changed content, main and historical LAB; each negative verifies no D1 row. No test uses real owner credentials, provider secrets or live D1.
+- Official GitHub Actions `Pac-Man Controlled GitHub Operations LAB` run #37 `39071525134` passed on exact HEAD `983164ef4c9fc8dc29b3bfdb8a3aa96d08d5ec16`. Node 22 full Pac-Man suite and original Workers/Miniflare runtime regression steps both reported SUCCESS. Prior #34–36 also green.
+- This CI tests current LAB source only; it does NOT certify a newly deployed Cloudflare Worker, registered-owner passkey challenge or real GitHub update through the new issuer.
+
+### Current boundary / next scoped review
+- The existing passkey execution relay `candidates/webauthn-execution-relay-lab.mjs` still enforces the historical `github.lab-file-cycle` only. The current staging `worker-execution-staging.mjs` dispatches only that historical cycle and does not mount `github.lab-file-update`.
+- Before enabling real execution, perform a distinct pre-change security and compatibility report for staging entrypoint + relay + durable D1 ledger/receipt and obtain specific authorization. Do NOT simply turn on an existing flag to bypass this boundary.
+- A public `/health` endpoint could not be checked from this session's web retrieval surface; this is NOT evidence of Worker outage and no secret-protected diagnostics were attempted.
+- The new challenge code remains LAB-only and inert on the deployed Worker until separately approved deployment. No remote passkey or GH provider action was attempted.
+- Hierarchical progress unchanged: A GitHub 4/4=100% (delta 0), B chat/passkey 2/4=50% (delta 0), C staging 0/4=0% (delta 0), D recovery 2/4=50% (delta 0); **TOTAL 8/16=50% (delta 0 pp)**. Activity `challenge route binding + official CI` is 100% (new targeted activity).
+- Existing historical operation `pacman-webauthn-lab-20261017-ff59959a-01` remains completed and MUST NOT be replayed.
