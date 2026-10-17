@@ -21,10 +21,18 @@ function req(payload){return new Request("https://example.com/execute",{
  method:"POST",headers:{authorization:"Bearer "+key,"content-type":"application/json"},
  body:JSON.stringify(payload)
 });}
-function memoryDb({missingReadback=false}={}){
+function memoryDb({missingReadback=false,invalidPk=false,missingIndex=false}={}){
  const receipts=new Map();let mutations=0;
  return {receipts,get mutationCount(){return mutations;},
   prepare(sql){
+   if(sql==="PRAGMA table_info(pacman_operations)")return {all:async()=>({results:[
+    {name:"operation_id",type:"TEXT",pk:invalidPk?0:1,notnull:1,dflt_value:null},
+    {name:"receipt_json",type:"TEXT",pk:0,notnull:1,dflt_value:null},
+    {name:"updated_at",type:"TEXT",pk:0,notnull:1,dflt_value:"CURRENT_TIMESTAMP"}
+   ]})};
+   if(sql==="PRAGMA index_list(pacman_operations)")return {all:async()=>({results:
+    missingIndex?[]:[{name:"sqlite_autoindex_pacman_operations_1",origin:"pk",unique:1,partial:0}]
+   })};
    return {bind(...args){
     return {
      async run(){
@@ -186,4 +194,17 @@ test("lost durable prewrite readback prevents any provider mutation",async()=>{
  const response=await run(r,await signed(intentFor("controlled-checkpoint-fail-01")));
  assert.equal(response.status,409);
  assert.equal(r.state.put,0);
+});
+
+test("controlled mode blocks malformed D1 primary key or missing unique PK index before any claim/GitHub call",async()=>{
+ for(const badDb of [memoryDb({invalidPk:true}),memoryDb({missingIndex:true})]){
+  const r=rig({db:badDb}),payload=await signed(intentFor("controlled-ledger-negative-001"));
+  const result=await run(r,payload);
+  assert.equal(result.status,503);
+  assert.equal((await result.json()).error,"STAGING_CONTROLLED_LEDGER_SCHEMA_UNVERIFIED");
+  assert.equal(r.state.put,0);
+  assert.equal(r.state.reads,0);
+  assert.equal(badDb.receipts.size,0);
+  assert.equal(badDb.mutationCount,0);
+ }
 });
