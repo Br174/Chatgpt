@@ -465,3 +465,33 @@ Date: 2026-10-18, LAB-only read-only CI audit / synthetic negative regression. S
 - NEXT allowed read-only step: inspect the official new GitHub Actions run for the exact current LAB source commit, if a genuine run/job ID becomes accessible via an authorized GitHub read-only path. Do not invent run IDs or claim Node22/Miniflare passed. Only fix an actual observed failure inside already-approved LAB scope. A genuinely live ChatGPT-native transport, fresh genuine owner passkey, staging deployment and novel provider operation require separate capability proof and new explicit owner authorization at their protected boundaries.
 
 STATE: SOURCE_LEVEL_NEGATIVE_34_OF_34_PASS; HEAD_FRESH_PREWRITE; MAIN_UNCHANGED; PUSH_ACTIONS_UNVERIFIED; NO_EXTERNAL_SIDE_EFFECTS; CHECKPOINT_PERSISTED; REAL_OPERATIONS_12_OF_16_75_PERCENT.
+
+
+## OFFICIAL_EXACT_HEAD_CI_GREEN_AND_VISIBILITY_AUDIT_20261018
+
+Source of truth: protected GitHub repository connector, read-only GitHub Actions REST GET and official job logs. Date: 2026-10-18. Approved mutation boundary: checkpoint update ONLY on existing LAB; no main/MADRE/old LAB, provider execution, Cloudflare D1/Worker/flags/secrets, deploy or user passkey.
+
+### CI blocker resolved with independent official evidence
+- On re-entry the LAB HEAD was **IDENTICAL** to `9c326634e7cc1894a58e9d50b7504c574262158a`; main remained **IDENTICAL** to protected `8615e8321bf9896f28826a09aa0c9f61ce5ecbb7`.
+- GitHub REST repository Actions runs collection is readable via the authenticated GitHub connector's generic `fetch` action at `https://api.github.com/repos/Br174/Chatgpt/actions/runs`; the previously used `fetch_commit_workflow_runs` is pull_request-filtered and should not be the sole CI discovery path. A workflow-specific API URL with branch query was rejected by connector URL validation, but collection GET succeeded. This discovery retires the previous mistaken `push CI inaccessible` diagnostic, not earlier historical evidence.
+- Authoritative run **#111, ID 39120990922**, event `push`, workflow `Pac-Man Controlled GitHub Operations LAB`, exact head SHA `9c326634e7cc1894a58e9d50b7504c574262158a`, status `completed`, conclusion **SUCCESS**.
+- Authorized direct job read: `controlled-lab` job **117656382193**, status completed, conclusion **SUCCESS**. Official Node 22 suite logs show **928 tests / 928 pass / 0 fail**. The next step `Original Workers runtime regression without deployment` also SUCCESS, recording exact workerd/Miniflare marker `PACMAN_WORKERS_RUNTIME_POST_CYCLE_REDIRECT_AND_INERT_DIAGNOSTIC_VERIFIED`. The worker runtime used Miniflare and did NOT deploy to Cloudflare.
+- Verified URL: https://github.com/Br174/Chatgpt/actions/runs/39120990922
+- All source/test changes introduced by the prior authorized LAB operation are now certified by official CI. The previous CI-visibility blocker is **CLOSED**. No added gate in the Real Operations live 16-gate scale, since a genuine ChatGPT-native executor and a distinct passkey-controlled live operation remain unproven.
+
+### Capability and security inventory (read only)
+- Pull request **#49** (`MotorLab LAB06 · funzione AutoSetup nella chat, poi nella stessa APK`) remains **OPEN, DRAFT, UNMERGED** (head `motorlab/autosetup-cloudflare-lab06-20261013`). Do NOT equate this draft with a mounted ChatGPT-native executable integration or deploy it by implication.
+- `GET /repos/Br174/Chatgpt` currently reports **`private:false`, `visibility:public`**, despite earlier description as a private repository. Treat repository visibility as a security/planning discrepancy requiring owner review. **Do not change privacy or expose credentials.** Branch `main` metadata reports `protected:true`; detailed branch-protection settings are NOT readable through the active GitHub App connection (403), so protected flag is observed but detailed rule strength is not attested.
+- No remote Worker, D1 or new biometric authentication was used; no historic GitHub PUT, challenge, nonce, or old operation ID was replayed; no changes to any branch other than the current LAB checkpoint.
+
+### Hierarchical progress
+- Task official exact-head CI certification **100% (delta +100 percentage points)**, 928/928 tests + Workers smoke.
+- A GitHub **4/4 = 100% (delta 0pp)**; B chat/WebAuthn **2/4 = 50% (delta 0pp)**; C Cloudflare staging **3/4 = 75% (delta 0pp)**; D recovery/E2E **3/4 = 75% (delta 0pp)**.
+- **GLOBAL Real Operations 12/16 = 75% (delta 0pp)**. No artificial promotion to 13/16 from CI verification alone.
+
+### Next protected boundary
+- Read-only first: independently define distinct acceptance criteria for B3 new owner WebAuthn operation, B4 ChatGPT-native authenticated transport, C4 staging live ability beyond prior receipt, D4 persistent disaster/recovery on a NEW distinct operation; ensure each previously completed historical gate is not double counted.
+- Any fresh WebAuthn challenge/owner ceremony, GitHub PUT through Pac-Man, Worker staging deploy, Cloudflare D1 remote action, flag/secret change, production/main promotion, or repository visibility change needs a new explicit scoped owner authorization. Prepare exact security plan and fresh operation/branch/path/SHA/content before such a request, verify HEAD and idempotent ledger preflight.
+- Keep Pac-Man as subordinate function of MotorLab (AutoSetup alias), one coordinator, one existing ledger, single-writer, no duplicate executor. Avoid creating new staging resources, authorizers, or using paid services.
+
+STATE: EXACT_HEAD_CI_111_GREEN_928_OF_928; WORKER_MINIFLARE_PASS; PR49_DRAFT_UNMERGED; REPO_VISIBILITY_PUBLIC_OWNER_REVIEW_NEEDED; MAIN_PROTECTED_FLAG_TRUE; NO_PROVIDER_MUTATIONS; REAL_OPERATIONS_12_OF_16_75_PERCENT.
