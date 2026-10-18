@@ -5,6 +5,7 @@
 // Only an independently authorized, protected future action may change flags.
 export const CONTROLLED_STAGING_BRANCH="motorlab/pacman-real-operations-lab-20261017";
 export const CONTROLLED_STAGING_VALUE="YES_REVIEWED_STAGING_CONTROLLED_UPDATE";
+export const CONTROLLED_PROTECTED_MAIN_SHA="8615e8321bf9896f28826a09aa0c9f61ce5ecbb7";
 export const CONTROLLED_WORKERS=Object.freeze({
  execution:"motorlab-pacman-execution-staging-lab",
  webauthn:"motorlab-pacman-webauthn-staging-lab"
@@ -18,11 +19,12 @@ const verdict=(status,gate,details)=>Object.freeze({
  liveGitHubOperationAuthorized:false,realBiometricChallengeAuthorized:false,
  needsSeparateOwnerAuthorization:true
 });
-export function classifyControlledStagingActivation(snapshot){
+export function classifyControlledStagingActivation(snapshot,{expectedLabSha}={}){
  const s=snapshot;
  if(!s||typeof s!=="object"||Array.isArray(s)||
     s.branch!==CONTROLLED_STAGING_BRANCH||!SHA.test(s.labSha||"")||
-    s.mainProtected!==true||!SHA.test(s.mainSha||"")||
+    !SHA.test(expectedLabSha||"")||s.labSha!==expectedLabSha||
+    s.mainProtected!==true||s.mainSha!==CONTROLLED_PROTECTED_MAIN_SHA||
     s.executionName!==CONTROLLED_WORKERS.execution||
     s.webauthnName!==CONTROLLED_WORKERS.webauthn||
     !UUID.test(s.executionVersion||"")||!UUID.test(s.webauthnVersion||""))
