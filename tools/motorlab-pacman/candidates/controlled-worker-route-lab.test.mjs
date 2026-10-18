@@ -208,3 +208,49 @@ test("controlled mode blocks malformed D1 primary key or missing unique PK index
   assert.equal(badDb.mutationCount,0);
  }
 });
+
+
+test("private intent-only recovery is idempotent with no new passkey, nonce, or second PUT",async()=>{
+ const r=rig({ambiguousPut:true}),intent=intentFor("controlled-intent-only-recovery-01");
+ const payload=await signed(intent);
+ const first=await run(r,payload);
+ assert.equal(first.status,409);
+ assert.equal(r.state.put,1);
+ assert.equal(r.db.receipts.get(intent.operationId).state,"RECOVERY_REQUIRED");
+ const minimum={mode:"github-lab-controlled-recovery",intent};
+ const recovered=await run(r,minimum);
+ assert.equal(recovered.status,200);
+ const settled=await recovered.json();
+ assert.equal(settled.state,"RECOVERY_CONTENT_MATCH_UNATTRIBUTED");
+ assert.equal(settled.safeToRetry,false);
+ assert.equal(r.state.put,1);
+ const priorReads=r.state.reads,priorMutations=r.db.mutationCount;
+ const again=await run(r,minimum);
+ assert.equal(again.status,200);
+ assert.deepEqual(await again.json(),settled);
+ assert.equal(r.state.reads,priorReads);
+ assert.equal(r.db.mutationCount,priorMutations);
+ assert.equal(r.state.put,1);
+ const bogus=await run(r,{...minimum,intent:{...intent,operationId:"controlled-never-claimed-002"}});
+ assert.equal(bogus.status,409);
+ assert.equal(r.state.put,1);
+});
+
+test("intent-only recovery refuses unsigned writes, altered scope and unexpected fields",async()=>{
+ const r=rig(),intent=intentFor("controlled-inert-negative-001");
+ const minimal={mode:"github-lab-controlled-recovery",intent};
+ const noRecord=await run(r,minimal);
+ assert.equal(noRecord.status,409);
+ const writeBypass=await run(r,{...minimal,mode:"github-lab-controlled-update"});
+ assert.equal(writeBypass.status,400);
+ const unexpected=await run(r,{...minimal,approved:true});
+ assert.equal(unexpected.status,400);
+ const wrongBranch=await run(r,{...minimal,intent:{...intent,branch:"main"}});
+ assert.equal(wrongBranch.status,403);
+ const unauth=await handleExecutionRequest(new Request("https://example.com/execute",{
+  method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(minimal)
+ }),r.env,{fetchImpl:r.fetchImpl});
+ assert.equal(unauth.status,401);
+ assert.equal(r.state.put,0);
+ assert.equal(r.db.mutationCount,0);
+});
