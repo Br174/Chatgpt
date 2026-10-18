@@ -1,0 +1,135 @@
+name: Pac-Man Controlled Flag Activation Staging LAB (protected one-shot)
+# Owner approved EXACTLY two OFF->ON controlled Worker secrets in strict order.
+# GitHub environment mandatory reviewer. NO other Worker/code/D1/GitHub write.
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/workflows/pacman-controlled-flag-activation-staging-lab.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pacman-controlled-staging-activation-one-shot
+  cancel-in-progress: false
+
+jobs:
+  activation-preflight:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run all original LAB, WebAuthn, D1 and flag-activation security tests
+        run: |
+          node --test tools/motorlab-pacman/test-pacman-core.mjs tools/motorlab-pacman/*.test.mjs tools/motorlab-pacman/candidates/*.test.mjs tools/motorlab-pacman/tests/*.test.mjs
+      - name: Original Workers/Miniflare runtime regression without Cloudflare access
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pacman-worker-runtime" --no-save --package-lock=false miniflare@4.20260730.0
+          PACMAN_MINIFLARE_MODULE="$RUNNER_TEMP/pacman-worker-runtime/node_modules/miniflare" node tools/motorlab-pacman/ci-worker-binding-runtime.mjs
+      - name: Verify exact staging config, both source guards and OFF-first activation policy
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {inspectControlledStagingDeploymentCandidate,STAGING_BRANCH}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-preflight-lab.mjs';
+          const read=p=>fs.readFileSync(p,'utf8'),t='tools/motorlab-pacman/';
+          const checked=inspectControlledStagingDeploymentCandidate({
+            branch:STAGING_BRANCH,
+            executionConfig:read(t+'wrangler.pacman-execution-staging.jsonc'),
+            webauthnConfig:read(t+'webauthn/wrangler.pacman-webauthn-staging.jsonc'),
+            executionSource:read(t+'worker-execution-staging.mjs'),
+            webauthnSource:read(t+'webauthn/worker.mjs'),
+            ownerRouteSource:read(t+'candidates/webauthn-owner-handler-lab.mjs'),
+            relaySource:read(t+'candidates/webauthn-execution-relay-lab.mjs')
+          });
+          if(checked.ready!==true||checked.deployAllowed!==false||
+            checked.activationAllowed!==false)throw Error('PACMAN_STAGING_SCOPE_GUARD_FAILED');
+          console.log('PACMAN_ACTIVATION_STATIC_SCOPE_GUARDS_VERIFIED');
+          NODE
+
+  protected-execution-flag:
+    needs: activation-preflight
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 12
+    outputs:
+      execution_version: ${{ steps.one_execution.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: One OFF-to-ON flag only, Execution Worker, protected no-retry
+        id: one_execution
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          GITHUB_READONLY_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {runControlledActivationPhase}
+            from './tools/motorlab-pacman/candidates/controlled-activation-runner-lab.mjs';
+          const outcome=await runControlledActivationPhase({
+            phase:'execution',emit:x=>console.log(x)
+          });
+          if(outcome.status!=='EXECUTION_ON_WEBAUTHN_OFF_HOLD'||
+            outcome.providerWrites!==1||outcome.gitHubOperations!==0||
+            outcome.webAuthnChallenges!==0)
+             throw Error('EXECUTION_ACTIVATION_RESULT_UNVERIFIED');
+          // A version UUID is non-secret; only the dependent protected job sees it.
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'version='+outcome.version+'\n');
+          console.log('PACMAN_ACTIVATION_EXECUTION_ONLY_VERIFIED_OWNER_ENTRY_STILL_OFF');
+          NODE
+
+  protected-webauthn-flag:
+    needs: protected-execution-flag
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Execution pinned; one WebAuthn flag only; preserve HMAC/D1/owner
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          GITHUB_READONLY_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ github.sha }}
+          EXPECTED_EXEC_VERSION: ${{ needs.protected-execution-flag.outputs.execution_version }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {runControlledActivationPhase}
+            from './tools/motorlab-pacman/candidates/controlled-activation-runner-lab.mjs';
+          const outcome=await runControlledActivationPhase({
+            phase:'webauthn',emit:x=>console.log(x)
+          });
+          if(outcome.status!=='BOTH_FLAGS_PRESENT_RUNTIME_VALUE_OPAQUE'||
+            outcome.providerWrites!==1||outcome.gitHubOperations!==0||
+            outcome.webAuthnChallenges!==0)
+             throw Error('WEBAUTHN_ACTIVATION_RESULT_UNVERIFIED');
+          console.log('PACMAN_ACTIVATION_BOTH_CONTROLLED_FLAG_BINDINGS_PRESENT');
+          console.log('PACMAN_ACTIVATION_NO_BIOMETRIC_NO_D1_WRITE_NO_GITHUB_FILE_UPDATE');
+          NODE
