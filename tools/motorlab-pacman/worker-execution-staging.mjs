@@ -9,6 +9,7 @@ import {validateControlledChatIntent} from "./chat-approval.mjs";
 import {createChatAuthorizedCoordinator} from "./chat-coordinator.mjs";
 import {createD1Ledger} from "./d1-ledger.mjs";
 import {handlePacmanMcpReadOnly} from "./candidates/mcp-readonly-transport-lab.mjs";
+import {inspectPacmanReceipt003D1} from "./candidates/mcp-readonly-transport-lab.mjs";
 // Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
 export const PACMAN_EXECUTION_RUNTIME_REVISION="pacman-v2-webauthn-relay-20261016";
 const MAX_BYTES=8192;
@@ -149,6 +150,26 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
      challengeCount:total,consumedCount:consumed,nonceClaimCount:claimed,
      safeToRetry:false,d1Writes:0,gitHubWrites:0,newChallenges:0});
    }catch{return response({error:"TERMINAL_READONLY_D1_UNAVAILABLE"},503);}
+  }
+  // LAB-only fixed authenticated private GET: expose the same read-only D1
+  // receipt verifier through the pre-existing GitHub Actions protected bridge.
+  // No generic SQL, no WebAuthn creation, no D1 mutation or provider operation.
+  if(url.pathname==="/__motorlab_lab/diagnostics/terminal-receipt-003"){
+   if(request.method!=="GET")return response({error:"NOT_FOUND"},404);
+   if(url.search!==""||request.headers.has("origin"))
+    return response({error:"DIAGNOSTIC_SCOPE_DENIED"},403);
+   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY))
+    return response({error:"UNAUTHORIZED"},401);
+   const verdict=await inspectPacmanReceipt003D1(env?.DB);
+   if(verdict!=="VERIFIED_D1_RECEIPT_CHALLENGE_NONCE_003")
+    return response({component:"pacmanTerminalReceipt003ReadOnly",status:"HOLD",
+     verification:"D1_EVIDENCE_INCOMPLETE",d1Writes:0,githubWrites:0,
+     newChallenges:0},409);
+   return response({component:"pacmanTerminalReceipt003ReadOnly",
+    operationId:"pacman-chat-passkey-sample-20261018-003",
+    status:"PASS",state:"VERIFIED_UPDATED",
+    verification:"EXACT_D1_RECEIPT_CONSUMED_CHALLENGE_SINGLE_NONCE",
+    safeToRetry:false,d1Writes:0,githubWrites:0,newChallenges:0});
   }
   // B4 MCP LAB candidate: private stateless, fixed SELECT-only tool. No execute fallthrough.
   if(url.pathname==="/mcp")
