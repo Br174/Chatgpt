@@ -1,0 +1,3 @@
+PACMAN_CONTROLLED_FRESH_PROBE_V1
+state=READY_FOR_SEPARATE_OWNER_APPROVAL
+purpose=fresh-lab-owner-controlled-update
