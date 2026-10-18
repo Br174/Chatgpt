@@ -37,3 +37,20 @@ Evidence: https://github.com/Br174/Chatgpt/commit/d6d571d4716092a60156bd20b4a30f
 - GitHub Actions #100 run 39111082512 SUCCESS on the exact fix commit, including ALL Node22 security tests and Workers/Miniflare runtime regression. Original failed CI #98/#99 retained in history.
 - The operation receipt/challenge persisted D1 values still await independent D1 Console SELECT from the owner; do NOT mark full E2E durable anti-replay verified until confirmed. Global gates remain 11/16=68.75%, delta 0.
 Evidence: https://github.com/Br174/Chatgpt/actions/runs/39111082512
+
+
+## Official D1 Console independent readback: owner screenshots 2026-10-18 11:46-11:49 local
+
+**Verified on exact operation** `pacman-controlled-e2e-20261018-001`: the owner executed one read-only SQL query in Cloudflare's official `motorlab-pacman-staging` D1 Console and supplied horizontally scrolled screenshots. No new D1 mutations, WebAuthn challenges, or GitHub PUT were performed.
+
+- `pacman_operations` row count for the exact operation: **1**; parsed receipt `state`: **VERIFIED_UPDATED**.
+- Parsed `blobSha` matches independent GitHub file blob `8f21733e2487abf01a75ed49f8e044b652497857`.
+- `pacman_webauthn_challenges` count **1**, with `consumed_at IS NOT NULL` count **1**.
+- `pacman_approval_claims` exact-operation count **0**: this is **expected on the controlled-update path**. Code inspection confirms `chat-coordinator.mjs` creates `approval-nonce-<challenge>` atomic claim keys in the `pacman_operations` ledger via `createD1Ledger`, not in the legacy approval-claims table. That nonce-key row was **not** separately queried or independently attested: do not claim its count is verified.
+- Original provider commit `d6d571d4716092a60156bd20b4a30f1b27826b7a` changed only the previously authorized one LAB file, content and Git SHA independently matched. **NEVER replay** this operation or biometric nonce.
+- Post-write fixture regression GitHub Actions #98/#99 failed, root cause corrected. Protected LAB CI #100 `39111082512`, job `117627175920` **SUCCESS**, official logs **923/923 Node22 passed, 0 failed**, Miniflare/workerd smoke PASSED. #101 was also green on a documentation-only commit in the owner screenshot.
+
+**Evidence-backed progress:** A GitHub=4/4 **100% (delta 0)**; B chat/WebAuthn=2/4 **50% (delta 0)**; C staging=3/4 **75% (delta 0)**; D recovery/E2E=3/4 **75% (delta +25 percentage points)** because independent durable receipt and spent challenge were verified; GLOBAL=12/16 **75% (delta +6.25 percentage points)** versus 11/16=68.75%. No assertion that the ChatGPT-native transport, separate nonce ledger row or all disaster recovery has been independently demonstrated.
+
+State: REAL_GITHUB_CONTROLLED_UPDATE_VERIFIED; DURABLE_D1_RECEIPT_VERIFIED; CHALLENGE_CONSUMED_1_OF_1; HISTORICAL_APPROVAL_CLAIMS_0_EXPECTED; NONCE_CLAIM_SEPARATE_ROW_NOT_QUERIED; OLD_OPERATION_DO_NOT_REPLAY; NEW_CI_923_OF_923_GREEN.
+
