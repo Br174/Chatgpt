@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "operationId": "pacman-current-controlled-flags-get-20261018-001",
+  "branch": "motorlab/pacman-real-operations-lab-20261017",
+  "cloudflareHttpMethod": "GET",
+  "scriptNames": [
+    "motorlab-pacman-execution-staging-lab",
+    "motorlab-pacman-webauthn-staging-lab"
+  ],
+  "allowedCloudflarePaths": [
+    "/settings",
+    "/deployments"
+  ],
+  "maximumCloudflareGets": 4,
+  "expectedFlag": "PACMAN_CONTROLLED_UPDATE_ENABLED",
+  "expectedFlagBindingType": "secret_text",
+  "flagValueReadable": false,
+  "protectedEnvironment": "pacman-execution-staging",
+  "ownerFreeDailyLimit": 100000,
+  "ownerObservedDailyRequests": 113,
+  "costPolicy": "NO_EXTRA_PAID_SERVICE_OR_WORKER_GET",
+  "expectedProtectedMainSha": "8615e8321bf9896f28826a09aa0c9f61ce5ecbb7",
+  "writesAllowed": false,
+  "challengeAllowed": false,
+  "replayAllowed": false,
+  "expectedParentSha": "1d82e02a8c98ed8635c1cf0076e23410f720bf96"
+}
