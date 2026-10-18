@@ -8,6 +8,7 @@ import {verifyIssuerParityProof} from "./candidates/issuer-parity-crypto-lab.mjs
 import {validateControlledChatIntent} from "./chat-approval.mjs";
 import {createChatAuthorizedCoordinator} from "./chat-coordinator.mjs";
 import {createD1Ledger} from "./d1-ledger.mjs";
+import {handlePacmanMcpReadOnly} from "./candidates/mcp-readonly-transport-lab.mjs";
 // Staging-only authorization gate; GitHub writes require explicit flags, a trusted issuer, a valid signed approval and a scoped token.
 export const PACMAN_EXECUTION_RUNTIME_REVISION="pacman-v2-webauthn-relay-20261016";
 const MAX_BYTES=8192;
@@ -149,6 +150,9 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
      safeToRetry:false,d1Writes:0,gitHubWrites:0,newChallenges:0});
    }catch{return response({error:"TERMINAL_READONLY_D1_UNAVAILABLE"},503);}
   }
+  // B4 MCP LAB candidate: private stateless, fixed SELECT-only tool. No execute fallthrough.
+  if(url.pathname==="/mcp")
+   return handlePacmanMcpReadOnly(request,env,{isAuthorized:authorized});
   if(url.pathname!=="/execute" || request.method!=="POST") return response({error:"NOT_FOUND"},404);
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);
   if(!env?.DB?.prepare)
