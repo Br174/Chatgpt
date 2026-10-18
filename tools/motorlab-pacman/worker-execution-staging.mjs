@@ -211,7 +211,8 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
     if(input.mode===CONTROLLED_RECOVERY_MODE){
      // Read-only. This never reissues a PUT and never consumes a new nonce.
      const receipt=await coordinator.inspectControlledUpdateRecovery({
-      operationId:scoped.operationId,branch:scoped.branch,path:scoped.path});
+      operationId:scoped.operationId,branch:scoped.branch,path:scoped.path,
+      expectedSha:scoped.expectedSha,contentSha256:scoped.contentSha256});
      return response(receipt);
     }
     const receipt=await coordinator.executeSignedControlledRequest({
