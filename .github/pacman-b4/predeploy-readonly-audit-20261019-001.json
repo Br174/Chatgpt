@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "operationId": "pacman-b4-predeploy-get-audit-20261019-001",
+  "repository": "Br174/Chatgpt",
+  "branch": "motorlab/pacman-real-operations-lab-20261017",
+  "workerExecution": "motorlab-pacman-execution-staging-lab",
+  "workerWebAuthn": "motorlab-pacman-webauthn-staging-lab",
+  "databaseName": "motorlab-pacman-staging",
+  "databaseId": "eb834fc1-5589-4f75-bcb9-d311d0d72261",
+  "allowedHttpMethod": "GET",
+  "maxCloudflareGets": 6,
+  "allowWorkerChanges": false,
+  "allowD1Queries": false,
+  "allowGitHubProviderPut": false,
+  "allowNewChallenge": false,
+  "allowPaidService": false,
+  "replayAllowed": false,
+  "protectedEnvironment": "pacman-execution-staging",
+  "expectedMainHead": "8615e8321bf9896f28826a09aa0c9f61ce5ecbb7",
+  "expectedParentSha": "a53e2ad3e6d0da54142752f3a8fd9370f39cb3e7",
+  "workflowBlobSha": "ab89952ebd1b9efc98956ff9ea9388b615c09446"
+}
