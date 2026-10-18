@@ -49,3 +49,12 @@ GLOBAL 10/16=62.50%, delta 0 percentage points. C3 controlled activation still o
 NEXT_BOUNDARY: NEW_OWNER_AUTHORIZATION_REQUIRED_FOR_BOTH_FLAG_WRITES.
 Tests: https://github.com/Br174/Chatgpt/actions/runs/39081506956
 Staging rollout: https://github.com/Br174/Chatgpt/actions/runs/39080886387
+
+## Final source-pin hardening and regression checkpoint
+
+- Initial pure state classifier+tests passed #83 (900/900), source commit 14419088ea23bd8ca32e4269cb5538d6a502efec.
+- Static scope was tightened: require an INDEPENDENT expectedLabSha supplied by the caller to exactly match snapshot.labSha AND exact protected main SHA 8615e8321bf9896f28826a09aa0c9f61ce5ecbb7. An arbitrary valid-looking SHA no longer passes. Neither a model-only source claim nor a screenshot may replace provider-verified current HEAD.
+- Added tests for 40-char plausible but wrong branch/main SHA, missing independent expected SHA, all invalid flag permutations, unhealthy signing/owner/D1/recovery dependency classes. Intermediate #85 failed because prior tests were not yet updated to pass independently pinned source evidence. Fixed tests without deleting a gate.
+- Official GitHub Actions Pac-Man Controlled GitHub Operations LAB run #86 id 39081751645 completed SUCCESS on exact commit bb239be91182b7913c2089072b4a6a9c57a00406: full Node22 suite successful and Workers/Miniflare regression successful. No protected Cloudflare deploy/secret writes or D1/GitHub provider operations have occurred as part of this phase.
+- CURRENT STATUS: preparatory logic/code complete, independent live execution of controlled activation NOT performed, both controlled flags remain OFF per last protected post-WebAuthn-deploy evidence, global gating stays 10/16=62.50% (delta 0). Owner must give separate explicit permission for the two staging flag changes. No unilateral activation workflow is created.
+Reference: https://github.com/Br174/Chatgpt/actions/runs/39081751645
