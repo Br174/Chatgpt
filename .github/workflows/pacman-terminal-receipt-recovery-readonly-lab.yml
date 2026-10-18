@@ -1,0 +1,196 @@
+name: Pac-Man Completed Receipt Recovery Audit LAB (read-only, one shot)
+# This only inspects the already COMPLETED 20261018-002 operation.
+# No deploy, no Worker upload, no secret/flag/permission changes, no D1 writes,
+# no new passkey/challenge/nonce, no GitHub PUT, no retry of old operation.
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/workflows/pacman-terminal-receipt-recovery-readonly-lab.yml'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-terminal-receipt-recovery-readonly-one-shot
+  cancel-in-progress: true
+jobs:
+  inert-preflight:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.event_name == 'push' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify read-only workflow boundary and exact existing recovery route
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const src=fs.readFileSync('.github/workflows/pacman-terminal-receipt-recovery-readonly-lab.yml','utf8');
+          const exec=fs.readFileSync('tools/motorlab-pacman/worker-execution-staging.mjs','utf8');
+          const rec=fs.readFileSync('tools/motorlab-pacman/candidates/github-controlled-update-lab.mjs','utf8');
+          if(!src.includes('environment: pacman-execution-staging')||
+             !src.includes('github.run_attempt == 1')||
+             !src.includes('persist-credentials: false')||
+             src.includes('workflow_dispatch:')||
+             !src.includes("state!=='VERIFIED_UPDATED'")||
+             !src.includes("mode:'github-lab-controlled-recovery'")||
+             !rec.includes('verification:"PERSISTED_RECEIPT_ONLY"')||
+             !exec.includes('if(input.mode===CONTROLLED_RECOVERY_MODE)'))
+           throw Error('PACMAN_TERMINAL_READONLY_CONTRACT_DENIED');
+          console.log('PACMAN_TERMINAL_READONLY_STATIC_GUARD_PASS');
+          NODE
+
+  protected-terminal-readback:
+    needs: inert-preflight
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.event_name == 'push' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect terminal D1 receipt before one intent-only recovery readback, no mutation
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          GH_READ_TOKEN: ${{ github.token }}
+          EXPECTED_HEAD: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {createHash} from 'node:crypto';
+          import {inspectActivationWorker,EXEC,WEB,ACCOUNT,D1}
+           from './tools/motorlab-pacman/candidates/controlled-activation-provider-guard-lab.mjs';
+          import {protectedRuntimeEvidence}
+           from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          const stop=reason=>{throw Error('PACMAN_READONLY_RECOVERY_STOP_'+reason)};
+          const operationId='pacman-controlled-fresh-20261018-002';
+          const branch='motorlab/pacman-real-operations-lab-20261017';
+          const path='tools/motorlab-pacman/lab-workspace/pacman-fresh-owner-20261018-002.txt';
+          const expectedSha='6efd503cf4ab437ca96004365916854075be4723';
+          const blobSha='a75724abdc7bd7681621c4c84790f860a6b8fe34';
+          const commitSha='ff37c8af10854cb296116e911ab6c3092f78b69d';
+          const contentSha256='332495567676c9d4229d48e4855f5a532413484056395a6aeef4c0d77382f785';
+          const content='PACMAN_CONTROLLED_FRESH_PROBE_V1\nstate=APPROVED_BIOMETRICALLY_AND_VERIFIED\npurpose=fresh-lab-owner-controlled-update\n';
+          const intent={branch,capability:'github.lab-file-update',contentSha256,
+           expectedSha,operationId,path};
+          const token=process.env.CF_TOKEN,key=process.env.EXECUTION_KEY;
+          if(process.env.CF_ACCOUNT!==ACCOUNT||typeof token!=='string'||token.length<10||
+             typeof key!=='string'||key.length<32||!process.env.GH_READ_TOKEN||
+             !process.env.EXPECTED_HEAD)stop('MISSING_PROTECTED_SCOPE');
+          const exactGet=async url=>{
+           const r=await fetch(url,{method:'GET',redirect:'manual',
+            headers:{authorization:'Bearer '+process.env.GH_READ_TOKEN,
+             accept:'application/vnd.github+json'},signal:AbortSignal.timeout(15000)});
+           if(r.status!==200)stop('GITHUB_READ_UNAVAILABLE');
+           return r.json();
+          };
+          const g='https://api.github.com/repos/Br174/Chatgpt/';
+          const head=async()=>{
+           const [lab,main,gitFile]=await Promise.all([
+            exactGet(g+'git/ref/heads/'+branch),
+            exactGet(g+'branches/main'),
+            exactGet(g+'contents/'+path+'?ref='+encodeURIComponent(branch))]);
+           if(lab?.object?.sha!==process.env.EXPECTED_HEAD||
+              main?.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7'||
+              gitFile?.sha!==blobSha||gitFile?.encoding!=='base64')stop('HEAD_OR_BLOB_DRIFT');
+           const bytes=Buffer.from(gitFile.content.replace(/\s/g,''),'base64');
+           if(bytes.toString('utf8')!==content||
+              createHash('sha256').update(bytes).digest('hex')!==contentSha256)
+              stop('GITHUB_CONTENT_DRIFT');
+          };
+          await head();
+          const [beforeE,beforeW]=await Promise.all([
+           inspectActivationWorker({name:EXEC,account:ACCOUNT,token,expectedFlag:'ON'}),
+           inspectActivationWorker({name:WEB,account:ACCOUNT,token,expectedFlag:'ON'})]);
+          await protectedRuntimeEvidence({executionKey:key,requireControlledSchema:true,requireOwner:true});
+          console.log('PACMAN_RECOVERY_HEAD_AND_PROTECTED_RUNTIME_VERIFIED');
+          // Cloudflare D1 query endpoint uses HTTP POST but executes only exact
+          // pinned SELECT statements; never execute arbitrary or mutating SQL.
+          const d1Url='https://api.cloudflare.com/client/v4/accounts/'+ACCOUNT+
+            '/d1/database/'+D1+'/query';
+          async function select(sql,params){
+           if(!/^SELECT /i.test(sql)||/;|INSERT|UPDATE|DELETE|ALTER|DROP|PRAGMA/i.test(sql))
+            stop('SQL_NOT_READONLY');
+           const r=await fetch(d1Url,{method:'POST',redirect:'manual',
+            headers:{authorization:'Bearer '+token,'content-type':'application/json'},
+            body:JSON.stringify({sql,params}),signal:AbortSignal.timeout(15000)});
+           if(r.status!==200)stop('D1_READ_ONLY_API_HTTP_'+r.status);
+           const data=await r.json();
+           if(data?.success!==true||!Array.isArray(data.result)||
+              data.result.length!==1||!Array.isArray(data.result[0]?.results))
+             stop('D1_READ_ONLY_QUERY_UNVERIFIED');
+           return data.result[0].results;
+          }
+          const sql='SELECT receipt_json FROM pacman_operations WHERE operation_id = ?';
+          const rows=await select(sql,[operationId]);
+          if(rows.length!==1||typeof rows[0]?.receipt_json!=='string')
+           stop('D1_VERIFIED_TERMINAL_RECEIPT_MISSING');
+          let record;
+          try{record=JSON.parse(rows[0].receipt_json)}catch{stop('D1_RECEIPT_JSON_INVALID')}
+          if(record.schema!==1||record.state!=='VERIFIED_UPDATED'||
+             record.operationId!==operationId||record.branch!==branch||
+             record.path!==path||record.expectedSha!==expectedSha||
+             record.previousSha!==expectedSha||record.blobSha!==blobSha||
+             record.commitSha!==commitSha||record.contentSha256!==contentSha256)
+           stop('D1_TERMINAL_RECEIPT_MISMATCH');
+          console.log('PACMAN_TERMINAL_D1_RECEIPT_INDEPENDENTLY_READ_VERIFIED');
+          const challenge=await select('SELECT COUNT(*) AS total, COUNT(consumed_at) AS consumed FROM pacman_webauthn_challenges WHERE operation_id = ?',[operationId]);
+          const nonce=await select("SELECT COUNT(*) AS total FROM pacman_operations WHERE operation_id LIKE 'approval-nonce-%' AND json_extract(receipt_json, '$.operationId') = ?",[operationId]);
+          if(challenge.length!==1||nonce.length!==1)stop('D1_APPROVAL_AUDIT_SHAPE_INVALID');
+          const total=Number(challenge[0].total),consumed=Number(challenge[0].consumed),claimed=Number(nonce[0].total);
+          if(!Number.isSafeInteger(total)||!Number.isSafeInteger(consumed)||
+             !Number.isSafeInteger(claimed))stop('D1_APPROVAL_AUDIT_UNVERIFIED');
+          // These are count-only output categories, never secret values.
+          console.log('PACMAN_FRESH_OWNER_CHALLENGE_ROWS_'+total);
+          console.log('PACMAN_FRESH_OWNER_CHALLENGE_CONSUMED_'+consumed);
+          console.log('PACMAN_FRESH_OWNER_NONCE_CLAIMS_'+claimed);
+          if(total!==1||consumed!==1||claimed!==1)stop('FRESH_OWNER_CHALLENGE_OR_NONCE_NOT_VERIFIED');
+          await head();
+          // Only AFTER proving a terminal D1 receipt, call the existing
+          // private read-only recovery mode. Exactly one POST. No challenge,
+          // attestation or content supplied; a write-mode dispatch is impossible.
+          const host='https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev';
+          const res=await fetch(host+'/execute',{method:'POST',redirect:'manual',
+           headers:{authorization:'Bearer '+key,'content-type':'application/json'},
+           body:JSON.stringify({mode:'github-lab-controlled-recovery',intent}),
+           signal:AbortSignal.timeout(15000)});
+          if(res.status!==200)stop('EXECUTION_TERMINAL_READBACK_HTTP_'+res.status);
+          let recovered;try{recovered=await res.json()}catch{stop('EXECUTION_RECEIPT_INVALID_JSON')}
+          if(recovered?.state!=='VERIFIED_UPDATED'||
+             recovered?.verification!=='PERSISTED_RECEIPT_ONLY'||
+             recovered?.safeToRetry!==false||
+             recovered?.operationId!==operationId||
+             recovered?.branch!==branch||recovered?.path!==path||
+             recovered?.expectedSha!==expectedSha||
+             recovered?.contentSha256!==contentSha256||
+             recovered?.blobSha!==blobSha||recovered?.commitSha!==commitSha)
+           stop('LIVE_RECOVERY_RECEIPT_MISMATCH');
+          console.log('PACMAN_REAL_TERMINAL_D1_RECOVERY_READBACK_VERIFIED_NO_RETRY');
+          // Another independent SELECT asserts no receipt mutation.
+          const after=await select(sql,[operationId]);
+          if(after.length!==1||after[0]?.receipt_json!==rows[0].receipt_json)
+           stop('D1_TERMINAL_RECEIPT_CHANGED');
+          const [afterE,afterW]=await Promise.all([
+           inspectActivationWorker({name:EXEC,account:ACCOUNT,token,expectedFlag:'ON'}),
+           inspectActivationWorker({name:WEB,account:ACCOUNT,token,expectedFlag:'ON'})]);
+          if(afterE.version!==beforeE.version||
+             afterW.version!==beforeW.version||
+             afterE.stableBindings!==beforeE.stableBindings||
+             afterW.stableBindings!==beforeW.stableBindings)
+           stop('WORKER_VERSION_OR_BINDING_CHANGED');
+          await head();
+          console.log('PACMAN_RECOVERY_D1_RECEIPT_UNCHANGED');
+          console.log('PACMAN_RECOVERY_EXECUTION_WEBAUTHN_VERSIONS_PRESERVED');
+          console.log('PACMAN_RECOVERY_NO_DEPLOY_NO_D1_WRITE_NO_GITHUB_PUT_NO_NEW_PASSKEY');
+          NODE
