@@ -1,0 +1,226 @@
+name: Pac-Man B4 PREDEPLOY metadata-cost GET audit protected ONE-SHOT LAB
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/pacman-b4/predeploy-readonly-audit-20261019-001.json'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-b4-predeploy-readonly-20261019-001
+  cancel-in-progress: false
+jobs:
+  preflight:
+    if: >-
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' && github.run_attempt == 1 &&
+      github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact new trigger, source compatibility, manifest and pre-existing Free dashboard evidence
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          const fail=x=>{throw Error('PACMAN_B4_PREDEPLOY_SOURCE_HOLD_'+x)};
+          const trigger='.github/pacman-b4/predeploy-readonly-audit-20261019-001.json';
+          const config=JSON.parse(fs.readFileSync(trigger,'utf8'));
+          const expectation={
+            schema:1,
+            operationId:'pacman-b4-predeploy-get-audit-20261019-001',
+            repository:'Br174/Chatgpt',
+            branch:'motorlab/pacman-real-operations-lab-20261017',
+            workerExecution:'motorlab-pacman-execution-staging-lab',
+            workerWebAuthn:'motorlab-pacman-webauthn-staging-lab',
+            databaseName:'motorlab-pacman-staging',
+            databaseId:'eb834fc1-5589-4f75-bcb9-d311d0d72261',
+            allowedHttpMethod:'GET',
+            maxCloudflareGets:6,
+            allowWorkerChanges:false,allowD1Queries:false,
+            allowGitHubProviderPut:false,allowNewChallenge:false,
+            allowPaidService:false,replayAllowed:false,
+            protectedEnvironment:'pacman-execution-staging',
+            expectedMainHead:'8615e8321bf9896f28826a09aa0c9f61ce5ecbb7'
+          };
+          const allowed=[...Object.keys(expectation),'expectedParentSha','workflowBlobSha'].sort();
+          if(Object.keys(config).sort().join(',')!==allowed.join(','))fail('TRIGGER_EXTRA_FIELDS');
+          for(const [k,v] of Object.entries(expectation))
+            if(JSON.stringify(config[k])!==JSON.stringify(v))fail('TRIGGER_'+k);
+          const git=a=>cp.execFileSync('git',a,{encoding:'utf8'}).trim();
+          if(git(['rev-parse','HEAD'])!==process.env.GITHUB_SHA)fail('SHA');
+          if(git(['rev-parse','HEAD^'])!==config.expectedParentSha)fail('PARENT');
+          if(git(['diff-tree','--no-commit-id','--name-only','-r','HEAD'])!==trigger)fail('DIFF_SCOPE');
+          const wf='.github/workflows/pacman-b4-predeploy-metadata-cost-readonly-20261019-lab.yml';
+          if(git(['hash-object',wf])!==config.workflowBlobSha)fail('WORKFLOW_BLOB_DRIFT');
+          const json=JSON.parse(fs.readFileSync('tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc','utf8'));
+          if(json.name!==config.workerExecution||
+             json.main!=='./worker-execution-staging.mjs'||
+             json.workers_dev!==true||
+             json.d1_databases?.length!==1||
+             json.d1_databases[0].database_id!==config.databaseId||
+             json.d1_databases[0].database_name!==config.databaseName||
+             json.d1_databases[0].binding!=='DB')fail('EXECUTION_CONFIGURATION');
+          const worker=fs.readFileSync('tools/motorlab-pacman/worker-execution-staging.mjs','utf8');
+          if(!worker.includes('terminal-receipt-003')||
+             !worker.includes('handlePacmanMcpReadOnly')||
+             !worker.includes('url.pathname==="/mcp"')||
+             !worker.includes('url.pathname!=="/execute"'))fail('B4_SOURCE_GUARD');
+          const checkpoint=fs.readFileSync('tools/motorlab-pacman/lab-workspace/B4_CHAT_BRIDGE_READONLY_003_LAB_VERIFIED_20261019.md','utf8');
+          if(!checkpoint.includes('992/992')||!checkpoint.includes('NO_DEPLOY'))fail('CHECKPOINT_DRIFT');
+          const freeEvidence=fs.readFileSync('tools/motorlab-pacman/lab-workspace/B4_PUBLIC_HEALTH_CHAT_BRIDGE_VERIFIED_20261018.md','utf8');
+          if(!freeEvidence.includes('113 of 100,000 requests'))fail('OLD_FREE_EVIDENCE_MISSING');
+          if(!fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8')
+             .includes('CURRENT_RELEASE=2026.10.14-r37'))fail('RELEASE_DRIFT');
+          console.log('PACMAN_B4_PREDEPLOY_SOURCE_ONE_SHOT_GUARD_PASS');
+          console.log('PACMAN_B4_PREDEPLOY_HISTORICAL_FREE_DASHBOARD_ONLY_CURRENT_FREE_NOT_YET_VERIFIED');
+          console.log('PACMAN_B4_PREDEPLOY_ZERO_REMOTE_CALLS_ZERO_WRITES');
+          NODE
+      - name: Existing positive and negative binding and diagnostics tests (synthetic only)
+        run: |
+          node --test tools/motorlab-pacman/candidates/controlled-activation-provider-guard-lab.test.mjs tools/motorlab-pacman/candidates/chat-bridge-private-receipt-003-lab.test.mjs
+  protected-audit:
+    needs: preflight
+    if: >-
+      needs.preflight.result == 'success' &&
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' && github.run_attempt == 1
+    environment: pacman-execution-staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: After-review independent GitHub LAB HEAD and protected main GET
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const fail=x=>{throw Error('PACMAN_B4_PREDEPLOY_AFTER_REVIEW_HOLD_'+x)};
+          const get=async route=>{
+            const response=await fetch('https://api.github.com/repos/Br174/Chatgpt/'+route,{
+             method:'GET',redirect:'manual',headers:{Accept:'application/vnd.github+json',
+              'User-Agent':'pacman-staging-readonly-predeploy'},
+             signal:AbortSignal.timeout(15000)
+            });
+            if(response.status!==200)fail('GITHUB_'+response.status);
+            return response.json();
+          };
+          const lab=await get('commits?sha=motorlab%2Fpacman-real-operations-lab-20261017&per_page=1');
+          if(!Array.isArray(lab)||lab[0]?.sha!==process.env.GITHUB_SHA)
+            fail('LAB_HEAD_CHANGED');
+          const main=await get('branches/main');
+          if(main?.protected!==true||
+             main?.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7')
+            fail('MAIN_PROTECTED_HEAD_CHANGED');
+          console.log('PACMAN_B4_PREDEPLOY_AFTER_REVIEW_HEAD_MAIN_PASS');
+          NODE
+      - name: Six GET maximum, Workers metadata before restricted billing and usage; STOP on first HOLD
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {inspectActivationWorker,EXEC,WEB,ACCOUNT}
+            from './tools/motorlab-pacman/candidates/controlled-activation-provider-guard-lab.mjs';
+          const fail=x=>{throw Error('PACMAN_B4_PREDEPLOY_HOLD_'+x)};
+          if(process.env.CF_ACCOUNT!==ACCOUNT||
+             typeof process.env.CF_TOKEN!=='string'||
+             process.env.CF_TOKEN.length<10)fail('PROTECTED_TOKEN_OR_ACCOUNT_MISSING');
+          const api='https://api.cloudflare.com/client/v4/accounts/'+ACCOUNT;
+          const endpoints=[EXEC,WEB].flatMap(name=>
+           [api+'/workers/scripts/'+name+'/settings',api+'/workers/scripts/'+name+'/deployments'])
+           .concat([api+'/subscriptions',api+'/billable/usage']);
+          let calls=0;
+          const one=async (url,options={})=>{
+            if(!endpoints.includes(url)||options.method!=='GET'||
+               options.redirect!=='manual'||calls>=6)
+              fail('GET_SCOPE');
+            calls++;
+            // No retry even on 403, timeout, parse error or unknown account state.
+            const response=await fetch(url,{...options,signal:AbortSignal.timeout(15000)});
+            if(response.status!==200){
+              console.log('PACMAN_B4_PREDEPLOY_GET_'+calls+'_HTTP_STATUS='+response.status);
+              fail('CLOUDFLARE_HTTP_DENIED_NO_RETRY');
+            }
+            return response;
+          };
+          for(const [name,label] of [[EXEC,'EXECUTION'],[WEB,'WEBAUTHN']]){
+            let result;
+            try{result=await inspectActivationWorker({name,account:ACCOUNT,
+              token:process.env.CF_TOKEN,expectedFlag:'ON',fetchImpl:one});}
+            catch{
+              console.log('PACMAN_B4_PREDEPLOY_'+label+'_METADATA=HOLD');
+              console.log('PACMAN_B4_PREDEPLOY_GET_COUNT='+calls);
+              fail('WORKER_BINDING_VERSION_INCOMPATIBLE');
+            }
+            if(result.controlledBinding!=='SECRET_PRESENT_VALUE_OPAQUE')
+              fail('CONTROLLED_SECRET_BINDING_MISSING');
+            console.log('PACMAN_B4_PREDEPLOY_'+label+'_METADATA=PASS_FLAG_OPAQUE');
+            console.log('PACMAN_B4_PREDEPLOY_'+label+'_VERSION='+result.version);
+            console.log('PACMAN_B4_PREDEPLOY_'+label+'_D1_AND_SECRET_BINDINGS=PASS');
+          }
+          if(calls!==4)fail('WORKER_GET_COUNT');
+          const billingHeaders={authorization:'Bearer '+process.env.CF_TOKEN,
+           accept:'application/json'};
+          // Cloudflare subscriptions requires Billing Read (previously 403).
+          // This is a NEW one-shot GET only, no privilege additions.
+          const subResponse=await one(api+'/subscriptions',{method:'GET',
+           redirect:'manual',headers:billingHeaders});
+          let subs;try{subs=await subResponse.json()}catch{fail('SUBSCRIPTION_JSON')};
+          if(subs?.success!==true||!Array.isArray(subs.result))
+            fail('BILLING_SUBSCRIPTIONS_NOT_VERIFIED');
+          // A website Free subscription is NOT proof of Workers Free.
+          const workers=subs.result.filter(s=>{
+            const tags=[s?.product?.name,s?.product?.id,s?.rate_plan?.scope,
+             s?.rate_plan?.public_name,s?.name].filter(x=>typeof x==='string');
+            return tags.some(x=>/\\bworkers\\b/i.test(x));
+          });
+          if(workers.length!==1||workers[0]?.rate_plan?.id!=='free')
+            fail('WORKERS_FREE_PLAN_NOT_UNAMBIGUOUS');
+          console.log('PACMAN_B4_PREDEPLOY_WORKERS_FREE_PLAN_EXACT=PASS');
+          const usageResponse=await one(api+'/billable/usage',{method:'GET',
+           redirect:'manual',headers:billingHeaders});
+          let usage;try{usage=await usageResponse.json()}catch{fail('USAGE_JSON')};
+          if(usage?.success!==true||!Array.isArray(usage.result))
+            fail('ACCOUNT_USAGE_NOT_READABLE');
+          // Restrictive fail-closed gate: require distinct current-day Workers
+          // request and D1 row-read counts, never infer from historical dashboard.
+          const today=new Date().toISOString().slice(0,10);
+          const metric=(words)=>{
+            const rows=usage.result.filter(row=>{
+              const name=[row.x_BillableMetricId,row.x_BillableMetricName,
+               row.ChargeDescription,row.ServiceFamilyName].join(' ').toLowerCase();
+              const periodStart=String(row.ChargePeriodStart||'').slice(0,10);
+              const periodEnd=String(row.ChargePeriodEnd||'').slice(0,10);
+              return words.every(w=>name.includes(w))&&periodStart===today&&
+                periodEnd>=today&&Number.isFinite(Number(row.ConsumedQuantity));
+            });
+            return rows.length===1?Number(rows[0].ConsumedQuantity):null;
+          };
+          const req=metric(['workers','requests']),d1=metric(['d1','read']);
+          if(!Number.isSafeInteger(req)||req<0||req>=99000||
+             !Number.isSafeInteger(d1)||d1<0||d1>=4900000)
+            fail('DAILY_WORKERS_OR_D1_QUOTA_NOT_PROVEN');
+          console.log('PACMAN_B4_PREDEPLOY_WORKERS_D1_FREE_QUOTAS_PASS');
+          console.log('PACMAN_B4_PREDEPLOY_TOTAL_CLOUDFLARE_GETS='+calls);
+          console.log('PACMAN_B4_PREDEPLOY_READONLY_COMPLETE_NO_WRITES_NO_DEPLOY');
+          NODE
