@@ -1,0 +1,133 @@
+name: Pac-Man D4 Response Loss Recovery LAB (protected read only)
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/workflows/pacman-d4-response-loss-readonly-lab.yml'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-d4-response-loss-readonly-one-shot
+  cancel-in-progress: true
+jobs:
+  source-preflight:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.event_name == 'push' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Confirm recovery and private D1 diagnostic source exist without changing any state
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const code=fs.readFileSync('tools/motorlab-pacman/worker-execution-staging.mjs','utf8');
+          const rec=fs.readFileSync('tools/motorlab-pacman/candidates/github-controlled-update-lab.mjs','utf8');
+          if(!code.includes('diagnostics/terminal-fresh-recovery-002')||
+             !code.includes('github-lab-controlled-recovery')||
+             !rec.includes('verification:"PERSISTED_RECEIPT_ONLY"'))
+           throw Error('D4_RECOVERY_SOURCE_CONTRACT_NOT_PROVEN');
+          console.log('PACMAN_D4_RECOVERY_SOURCE_CONTRACT_PASSED');
+          NODE
+  protected-lost-response:
+    needs: source-preflight
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.event_name == 'push' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Demonstrate one simulated lost CLIENT receipt and read-only remote recovery
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          GH_READ: ${{ github.token }}
+          EXPECTED_HEAD: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          const stop=x=>{throw Error('D4_READ_ONLY_FAULT_AUDIT_STOP_'+x)};
+          const branch='motorlab/pacman-real-operations-lab-20261017';
+          const op='pacman-controlled-fresh-20261018-002';
+          const p='tools/motorlab-pacman/lab-workspace/pacman-fresh-owner-20261018-002.txt';
+          const sha='6efd503cf4ab437ca96004365916854075be4723';
+          const hash='332495567676c9d4229d48e4855f5a532413484056395a6aeef4c0d77382f785';
+          const blob='a75724abdc7bd7681621c4c84790f860a6b8fe34';
+          const commit='ff37c8af10854cb296116e911ab6c3092f78b69d';
+          const key=process.env.EXECUTION_KEY;
+          if(typeof key!=='string'||key.length<32||!process.env.GH_READ||!process.env.EXPECTED_HEAD)
+           stop('PROTECTED_SCOPE_UNAVAILABLE');
+          const github=async url=>{
+           const r=await fetch('https://api.github.com/repos/Br174/Chatgpt/'+url,{
+            method:'GET',redirect:'manual',headers:{authorization:'Bearer '+process.env.GH_READ,
+              accept:'application/vnd.github+json'},signal:AbortSignal.timeout(15000)});
+           if(r.status!==200)stop('GITHUB_GET_DENIED');
+           return r.json();
+          };
+          const pinned=async()=>{
+           const [lab,main,file]=await Promise.all([
+            github('git/ref/heads/'+branch),github('branches/main'),
+            github('contents/'+p+'?ref='+encodeURIComponent(branch))
+           ]);
+           if(lab.object?.sha!==process.env.EXPECTED_HEAD||
+              main.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7'||
+              file.sha!==blob)stop('GITHUB_SHA_OR_MAIN_DRIFT');
+          };
+          await pinned();
+          const host='https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev';
+          const headers={authorization:'Bearer '+key,'content-type':'application/json'};
+          const diag=async()=>{
+           const r=await fetch(host+'/__motorlab_lab/diagnostics/terminal-fresh-recovery-002',{
+            method:'GET',redirect:'manual',headers:{authorization:'Bearer '+key},
+            signal:AbortSignal.timeout(15000)});
+           if(r.status!==200)stop('PRIVATE_D1_DIAGNOSTIC_NOT_OK');
+           const d=await r.json();
+           if(d?.operationId!==op||d?.state!=='VERIFIED_UPDATED'||
+              d?.verification!=='EXACT_D1_RECEIPT'||
+              d?.expectedSha!==sha||d?.contentSha256!==hash||
+              d?.blobSha!==blob||d?.commitSha!==commit||
+              d?.challengeCount!==1||d?.consumedCount!==1||d?.nonceClaimCount!==1||
+              d?.safeToRetry!==false)stop('IMMUTABLE_D1_OR_OWNER_PROOF_MISMATCH');
+           return d;
+          };
+          const before=await diag();
+          console.log('PACMAN_D4_REAL_D1_RECEIPT_PERSISTED_BEFORE_FAULT');
+          const intent={operationId:op,capability:'github.lab-file-update',branch,
+            path:p,expectedSha:sha,contentSha256:hash};
+          const readRecovery=async()=>{
+           const r=await fetch(host+'/execute',{method:'POST',redirect:'manual',
+            headers,body:JSON.stringify({mode:'github-lab-controlled-recovery',intent}),
+            signal:AbortSignal.timeout(15000)});
+           if(r.status!==200)stop('RECOVERY_STATUS_NOT_OK');
+           return r;
+          };
+          // This is a controlled CLIENT response loss, not a new provider PUT.
+          // Discard only the first read-only recovery response, then reconnect.
+          const first=await readRecovery();
+          await first.body?.cancel();
+          console.log('PACMAN_D4_CLIENT_RESPONSE_INTENTIONALLY_DISCARDED');
+          const second=await readRecovery();
+          const receipt=await second.json();
+          if(receipt?.operationId!==op||receipt?.state!=='VERIFIED_UPDATED'||
+             receipt?.verification!=='PERSISTED_RECEIPT_ONLY'||
+             receipt?.safeToRetry!==false||receipt?.branch!==branch||receipt?.path!==p||
+             receipt?.expectedSha!==sha||receipt?.contentSha256!==hash||
+             receipt?.blobSha!==blob||receipt?.commitSha!==commit)
+            stop('READ_ONLY_RECOVERY_AFTER_RESPONSE_LOSS_FAILED');
+          console.log('PACMAN_D4_REAL_REMOTE_RESPONSE_LOSS_RECOVERED_WITHOUT_PROVIDER_REPLAY');
+          const after=await diag();
+          if(JSON.stringify(before)!==JSON.stringify(after))
+           stop('REAL_D1_RECEIPT_CHANGED');
+          await pinned();
+          console.log('PACMAN_D4_D1_TERMINAL_RECEIPT_STABLE_NO_NEW_APPROVAL_NO_GITHUB_PUT');
+          NODE
