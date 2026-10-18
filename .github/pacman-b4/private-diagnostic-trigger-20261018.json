@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "operationId": "pacman-b4-private-get-20261018-001",
+  "targetBranch": "motorlab/pacman-real-operations-lab-20261017",
+  "method": "GET",
+  "path": "/__motorlab_lab/diagnostics/execution-schema-audit",
+  "worker": "motorlab-pacman-execution-staging-lab",
+  "allowedGets": 1,
+  "protectedEnvironment": "pacman-execution-staging",
+  "costGuard": "OWNER_DASHBOARD_WORKERS_FREE_LIMIT_100000_CONFIRMED_20261018",
+  "replayAllowed": false,
+  "writesAllowed": false,
+  "expectedParentSha": "81592a01fe8df9620253c6526618c7d9aca65bf9"
+}
