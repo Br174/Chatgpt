@@ -30,3 +30,10 @@ purpose=isolated-lab-webauthn-github-proof
 - Previous globally confirmed A GitHub 4/4 100%; B chat/real WebAuthn 2/4 50%; C staging 3/4 75%; D recovery/end-to-end 2/4 50%. GLOBAL 11/16 = 68.75% (delta +0 pp until D1 validated). Don't conflate transaction substeps with closed global gates.
 - Next: obtain user-selected official D1 SELECT screenshot of operation state, challenge rows/consumed count, and approval claim counts; then reconcile and update checkpoint.
 Evidence: https://github.com/Br174/Chatgpt/commit/d6d571d4716092a60156bd20b4a30f1b27826b7a
+
+## Post-real-file mutation CI regression closed
+- Official GitHub Actions run #98 (39110720931) failed 1/923 Node22 tests exclusively because the previous preparation fixture test asserted the file was still in initial `READY_FOR_OWNER_APPROVAL` state. Run #99 carried this same stale assertion. This is not evidence of a failed real GitHub update: independent commit and file readback were successful.
+- Changed ONLY `candidates/controlled-e2e-probe-preparation-lab.test.mjs` on LAB commit 8fdd647326e16bfec5450ef5ae2248390fc7e7c7: fixture must now equal exact `FIRST_TRIAL_UPDATED` and new blob SHA `8f21733e2487abf01a75ed49f8e044b652497857`; original starting SHA remains independently asserted and a new negative test requires `prepare()` to reject the terminal file as a stale attempt. No new Pac-Man put/challenge was executed; no change to the test fixture file.
+- GitHub Actions #100 run 39111082512 SUCCESS on the exact fix commit, including ALL Node22 security tests and Workers/Miniflare runtime regression. Original failed CI #98/#99 retained in history.
+- The operation receipt/challenge persisted D1 values still await independent D1 Console SELECT from the owner; do NOT mark full E2E durable anti-replay verified until confirmed. Global gates remain 11/16=68.75%, delta 0.
+Evidence: https://github.com/Br174/Chatgpt/actions/runs/39111082512
