@@ -60,12 +60,13 @@ export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onChe
    return runGithubControlledFileUpdate({operationId,branch,path,expectedSha,content,
      adapter,ledger:operationLedger,onCheckpoint,verifyApproval:approvalVerifier});
   },
-  async inspectControlledUpdateRecovery({operationId,branch,path}={}){
+  async inspectControlledUpdateRecovery({operationId,branch,path,expectedSha,contentSha256}={}){
    if(!operationLedger?.durable||!operationLedger?.atomic)
     throw Error("ATOMIC_DURABLE_LEDGER_REQUIRED");
    if(typeof onCheckpoint!=="function")throw Error("CHECKPOINT_WRITER_REQUIRED");
    const adapter=makeControlledGitHubLabAdapter({token:githubToken,fetchImpl});
-   return inspectGithubControlledUpdateRecovery({operationId,branch,path,adapter,
+   return inspectGithubControlledUpdateRecovery({operationId,branch,path,
+     expectedSha,contentSha256,adapter,
      ledger:operationLedger,onCheckpoint});
   },
   async execute({intent,approval,content}={}){
