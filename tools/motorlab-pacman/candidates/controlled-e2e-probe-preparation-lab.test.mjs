@@ -53,10 +53,16 @@ function memory({providerLostResponse=false,readbackError=false}={}){
   readCurrent:()=>({content:current,sha:currentSha})};
 }
 
-test("real GitHub fixture is independently SHA-pinned to immutable prepared intent",()=>{
+test("real GitHub fixture is now terminal and old SHA-bound approval cannot be reused",()=>{
  const disk=readFileSync(new URL("../lab-workspace/pacman-controlled-e2e-probe-20261018.txt",import.meta.url),"utf8");
- assert.equal(disk,FIRST_TRIAL_INITIAL);
- assert.equal(blobSha(disk),FIRST_TRIAL_EXPECTED_BLOB_SHA);
+ assert.equal(disk,FIRST_TRIAL_UPDATED);
+ assert.equal(blobSha(disk),"8f21733e2487abf01a75ed49f8e044b652497857");
+ assert.equal(blobSha(FIRST_TRIAL_INITIAL),FIRST_TRIAL_EXPECTED_BLOB_SHA);
+ // The initial SHA and approved intent remain immutable test fixtures.
+ // The real LAB file has progressed, so any attempt to prepare the
+ // original operation against the current GitHub blob MUST fail closed.
+ assert.throws(()=>prepare({content:disk,blobSha:blobSha(disk)}),
+  /FIRST_TRIAL_FILE_OR_BLOB_MISMATCH/);
  assert.equal(createHash("sha256").update(FIRST_TRIAL_UPDATED).digest("hex"),
   FIRST_TRIAL_CONTENT_SHA256);
  const p=prepare();
