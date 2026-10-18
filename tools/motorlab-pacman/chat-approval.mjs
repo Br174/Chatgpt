@@ -33,3 +33,34 @@ export function validateControlledChatIntent(intent){
   throw Error("CONTROLLED_INTENT_SCOPE_DENIED");
  return Object.freeze({...intent});
 }
+
+
+// Chat host integration seam, NOT an approval issuer and NOT an executor.
+// Strict content/digest binding is checked before a host may display a WebAuthn
+// handoff. The only subsequent authority is a NEW owner passkey assertion.
+// This function performs no D1, GitHub, Worker or network request.
+export async function prepareControlledChatHandoff(request,{cryptoImpl=globalThis.crypto}={}){
+ if(!request||typeof request!=="object"||Array.isArray(request)||
+    Object.keys(request).sort().join(",")!=="content,intent")
+  throw Error("CHAT_HANDOFF_FIELDS_DENIED");
+ const scoped=validateControlledChatIntent(request.intent);
+ // Old E2E credentials and operation identities are terminal; never repurpose.
+ if(scoped.operationId==="pacman-controlled-e2e-20261018-001"||
+    scoped.operationId==="pacman-webauthn-lab-20261017-ff59959a-01")
+  throw Error("CHAT_HANDOFF_COMPLETED_OPERATION_DENIED");
+ if(typeof request.content!=="string"||!cryptoImpl?.subtle)
+  throw Error("CHAT_HANDOFF_CONTENT_OR_CRYPTO_UNAVAILABLE");
+ const data=new TextEncoder().encode(request.content);
+ if(data.length===0||data.length>8192)
+  throw Error("CHAT_HANDOFF_CONTENT_DENIED");
+ const hash=await cryptoImpl.subtle.digest("SHA-256",data);
+ const actual=Array.from(new Uint8Array(hash),v=>v.toString(16).padStart(2,"0")).join("");
+ if(scoped.contentSha256!==actual)
+  throw Error("CHAT_HANDOFF_CONTENT_MISMATCH");
+ return Object.freeze({
+  status:"OWNER_WEBAUTHN_REQUIRED",
+  intent:scoped,content:request.content,
+  approvalRequired:"REGISTERED_OWNER_PASSKEY",
+  mayExecute:false
+ });
+}
