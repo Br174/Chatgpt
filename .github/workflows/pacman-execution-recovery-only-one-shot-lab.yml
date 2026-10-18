@@ -11,7 +11,9 @@ permissions:
   contents: read
 concurrency:
   group: pacman-execution-recovery-only-one-shot
-  cancel-in-progress: false
+  # Retire an obsolete pending reviewer attempt before any protected job runs.
+  # A new source SHA is the single writer; protected HEAD preflight still applies.
+  cancel-in-progress: true
 jobs:
   safety-preflight:
     if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1 && github.event_name == 'push'
