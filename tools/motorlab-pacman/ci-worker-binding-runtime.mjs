@@ -18,6 +18,11 @@ const branch="motorlab/pacman-execution-v2-lab-20261014";
 const path="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
 export default {async fetch(request,env){
  const route=new URL(request.url).pathname;
+ if(route==="/mcp")return env.INERT.fetch(new Request(
+  "https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev/mcp",{
+   method:request.method,headers:request.headers,
+   ...(request.method==="POST"?{body:request.body}: {})
+  }));
  if(route==="/diagnostic")return handleWebAuthnRequest(new Request(
   "https://owner.test/__motorlab_lab/diagnostics/execution-binding",{headers:{authorization:"Bearer "+key}}),{
    PACMAN_EXECUTION_KEY:key,PACMAN_EXECUTION_SERVICE:env.INERT,
@@ -73,6 +78,40 @@ try{
  assert.equal(proof.postConnected,true);assert.equal(proof.postStatus,400);
  assert.equal(proof.postResult,"INVALID_REQUEST");
  assert.equal(proof.relayRevision,"private-post-relay-20261017-v1");
+
+ // Authentic workerd/Miniflare dispatch via the SINGLE existing Execution Worker.
+ // Synthetic bearer only; actual Cloudflare D1, secrets and provider never contacted.
+ const syntheticKey="synthetic-runtime-test-execution-key-0000000000000";
+ const makeMcpRequest=(method,auth=true,extraHeaders={})=>mf.dispatchFetch("http://runtime.test/mcp",{
+  method:"POST",
+  headers:{"content-type":"application/json",
+   accept:"application/json, text/event-stream",
+   "mcp-protocol-version":"2025-11-25",
+   ...(auth?{authorization:"Bearer "+syntheticKey}:{}),...extraHeaders},
+  body:JSON.stringify({jsonrpc:"2.0",id:91,method,
+   ...(method==="initialize"?{params:{protocolVersion:"2025-11-25",capabilities:{},clientInfo:{name:"workerd-synthetic",version:"1"}}}:{}),
+   ...(method==="tools/call"?{params:{name:"pacman_receipt_003_readonly",arguments:{}}}:{})
+  })
+ });
+ const mcpInit=await makeMcpRequest("initialize");
+ assert.equal(mcpInit.status,200);assert.equal((await mcpInit.json()).result.protocolVersion,"2025-11-25");
+ const mcpList=await makeMcpRequest("tools/list");
+ const list=await mcpList.json();
+ assert.equal(mcpList.status,200);
+ assert.equal(list.result.tools.length,1);
+ assert.equal(list.result.tools[0].annotations.readOnlyHint,true);
+ const mcpCall=await makeMcpRequest("tools/call");
+ const callBody=await mcpCall.json();
+ assert.equal(mcpCall.status,200);assert.equal(callBody.result.isError,true);
+ assert.equal(callBody.result.structuredContent.status,"HOLD");
+ const anonymous=await makeMcpRequest("tools/list",false);
+ assert.equal(anonymous.status,401);
+ const fromBrowser=await makeMcpRequest("tools/list",true,{origin:"https://untrusted.example"});
+ assert.equal(fromBrowser.status,403);
+ assert.equal((await mf.dispatchFetch("http://runtime.test/mcp",{
+  method:"GET",headers:{authorization:"Bearer "+syntheticKey}
+ })).status,405);
+ console.log("PACMAN_MCP_READONLY_REAL_WORKER_RUNTIME_NO_WRITE_GUARDS_VERIFIED");
  console.log("PACMAN_WORKERS_RUNTIME_POST_CYCLE_REDIRECT_AND_INERT_DIAGNOSTIC_VERIFIED");
 }finally{
  try{if(mf)await mf.dispose();}
