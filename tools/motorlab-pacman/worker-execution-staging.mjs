@@ -137,7 +137,17 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
    for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
    input=JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(bytes));
   } catch {return response({error:"INVALID_JSON"},400);}
-  if(!input || typeof input!=="object" || Array.isArray(input) || !input.intent || typeof input.intent!=="object" || Array.isArray(input.intent) || !input.approval || typeof input.approval!=="object" || Array.isArray(input.approval) || typeof input.content!=="string")
+  // Private bearer-authenticated recovery may carry ONLY its scoped intent.
+  // It never produces or reuses a passkey, attestation or approved write.
+  // Historical full-body recovery remains backward compatible.
+  const intentOnlyRecovery=input?.mode===CONTROLLED_RECOVERY_MODE&&
+    input&&typeof input==="object"&&!Array.isArray(input)&&
+    Object.keys(input).sort().join(",")==="intent,mode";
+  if(!input || typeof input!=="object" || Array.isArray(input) ||
+     !input.intent || typeof input.intent!=="object" || Array.isArray(input.intent) ||
+     (!intentOnlyRecovery&&(!input.approval||
+       typeof input.approval!=="object"||Array.isArray(input.approval)||
+       typeof input.content!=="string")))
    return response({error:"INVALID_REQUEST"},400);
   // V2 route is wired into the real staging Worker but remains disabled unless the exact LAB-only route flag is set.
   // Hard, independent staging-only gate. Pre-existing opaque Cloudflare flags do not prove
@@ -166,17 +176,19 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
    let scoped;
    try{scoped=validateControlledChatIntent(input.intent);}
    catch{return response({error:"CONTROLLED_INTENT_DENIED"},403);}
-   if(input.approval.decision!=="authorize"||
-      Object.keys(input.approval).sort().join(",")!=="branch,capability,contentSha256,decision,expectedSha,operationId,path"||
-      Object.keys(scoped).some(k=>input.approval[k]!==scoped[k]))
-    return response({error:"CONTROLLED_APPROVAL_MISMATCH"},403);
-   if(new TextEncoder().encode(input.content).length<1||
-      new TextEncoder().encode(input.content).length>8192)
-    return response({error:"CONTROLLED_CONTENT_INVALID"},403);
-   const sha=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(input.content));
-   const contentSha256=Array.from(new Uint8Array(sha),b=>b.toString(16).padStart(2,"0")).join("");
-   if(scoped.contentSha256!==contentSha256)
-    return response({error:"CONTROLLED_CONTENT_MISMATCH"},403);
+   if(!intentOnlyRecovery){
+    if(input.approval.decision!=="authorize"||
+       Object.keys(input.approval).sort().join(",")!=="branch,capability,contentSha256,decision,expectedSha,operationId,path"||
+       Object.keys(scoped).some(k=>input.approval[k]!==scoped[k]))
+     return response({error:"CONTROLLED_APPROVAL_MISMATCH"},403);
+    if(new TextEncoder().encode(input.content).length<1||
+       new TextEncoder().encode(input.content).length>8192)
+     return response({error:"CONTROLLED_CONTENT_INVALID"},403);
+    const sha=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(input.content));
+    const contentSha256=Array.from(new Uint8Array(sha),b=>b.toString(16).padStart(2,"0")).join("");
+    if(scoped.contentSha256!==contentSha256)
+     return response({error:"CONTROLLED_CONTENT_MISMATCH"},403);
+   }
    // Require the complete ledger shape and unique PK before any claim or write.
    // The preflight performs fixed, read-only PRAGMA calls only.
    if(await controlledLedgerSchemaAudit(env.DB)!=="EXACT")
