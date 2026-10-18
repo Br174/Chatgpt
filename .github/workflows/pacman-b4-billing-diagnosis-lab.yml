@@ -1,0 +1,98 @@
+name: Pac-Man B4 Cloudflare Billing Permission Diagnosis LAB (GET only)
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/pacman-b4/billing-diagnosis-trigger-20261018.json'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-b4-billing-permission-one-shot-lab
+  cancel-in-progress: false
+jobs:
+  source-preflight:
+    if: >-
+      github.repository == 'Br174/Chatgpt' &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.run_attempt == 1 &&
+      github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Verify one-shot exact branch, commit, trigger and scope
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          const fail=why=>{throw Error('PACMAN_B4_BILLING_PREFLIGHT_DENIED_'+why)};
+          const triggerPath='.github/pacman-b4/billing-diagnosis-trigger-20261018.json';
+          const t=JSON.parse(fs.readFileSync(triggerPath,'utf8'));
+          if(Object.keys(t).sort().join(',')!==[
+            'allowedApiGets','allowedWorkerGets','expectedParentSha','kind','operationId',
+            'replayAllowed','schema','targetBranch','writesAllowed'
+          ].sort().join(','))fail('UNEXPECTED_TRIGGER_FIELDS');
+          if(t.schema!==1||
+             t.operationId!=='pacman-b4-billing-diagnosis-20261018-001'||
+             t.kind!=='CLOUDFLARE_BILLING_PERMISSION_DIAGNOSTIC_ONLY'||
+             t.targetBranch!=='motorlab/pacman-real-operations-lab-20261017'||
+             t.allowedApiGets!==1||t.allowedWorkerGets!==0||
+             t.writesAllowed!==false||t.replayAllowed!==false)fail('INVALID_TRIGGER_SCOPE');
+          const git=args=>cp.execFileSync('git',args,{encoding:'utf8'}).trim();
+          if(git(['rev-parse','HEAD'])!==process.env.GITHUB_SHA)fail('SHA_MISMATCH');
+          if(git(['rev-parse','HEAD^'])!==t.expectedParentSha)fail('STALE_PARENT_SHA');
+          const changed=git(['diff-tree','--no-commit-id','--name-only','-r','HEAD']);
+          if(changed!==triggerPath)fail('DIFF_NOT_TRIGGER_ONLY');
+          console.log('PACMAN_B4_BILLING_EXACT_SINGLE_USE_TRIGGER_VERIFIED');
+          NODE
+      - name: Test read-only billing classification, positive and negative
+        shell: bash
+        run: |
+          node --test .github/pacman-b4/billing-readonly-diagnosis.test.mjs
+  protected-diagnosis:
+    needs: source-preflight
+    if: >-
+      needs.source-preflight.result == 'success' &&
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.run_attempt == 1 &&
+      github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    environment: pacman-execution-staging
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Exactly one Cloudflare billing GET; sanitized status only; NO Worker GET
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {diagnoseBillingReadOnly} from './.github/pacman-b4/billing-readonly-diagnosis.mjs';
+          const result=await diagnoseBillingReadOnly({
+            token:process.env.CF_TOKEN,accountId:process.env.CF_ACCOUNT
+          });
+          console.log('PACMAN_B4_BILLING_API_HTTP='+String(result.http));
+          console.log('PACMAN_B4_BILLING_DIAGNOSIS='+result.code);
+          console.log('PACMAN_B4_CLOUDFLARE_API_GET_MAX_ONE');
+          console.log('PACMAN_B4_WORKER_GET_COUNT_ZERO');
+          console.log('PACMAN_B4_D1_MUTATIONS_ZERO_GITHUB_PROVIDER_PUT_ZERO');
+          // Diagnostic is not a cost or quota clearance, and never invokes the Worker.
+          if(result.code!=='WORKERS_FREE_SUBSCRIPTION_CANDIDATE_QUOTAS_UNVERIFIED'){
+            console.log('PACMAN_B4_BILLING_RESULT_HOLD_NOT_VERIFIED');
+            process.exitCode=1;
+          }else{
+            console.log('PACMAN_B4_BILLING_FREE_CANDIDATE_ONLY_QUOTAS_NOT_VERIFIED');
+          }
+          NODE
