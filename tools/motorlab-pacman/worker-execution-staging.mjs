@@ -102,6 +102,53 @@ export async function handleExecutionRequest(request,env,{fetchImpl=fetch}={}){
      path:"tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt",
      approval:"WEBAUTHN_REQUIRED",mode:"GITHUB_LAB_CYCLE_ONLY"});
   }
+  // Private, exact-scope, fixed GET diagnostic of the ONE terminal owner operation.
+  // Existing D1 binding; only SELECT/PRAGMA, no state changes, provider calls or caller SQL.
+  if(url.pathname==="/__motorlab_lab/diagnostics/terminal-fresh-recovery-002"){
+   if(request.method!=="GET")return response({error:"NOT_FOUND"},404);
+   if(url.search!==""||request.headers.has("origin"))
+    return response({error:"DIAGNOSTIC_SCOPE_DENIED"},403);
+   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY))
+    return response({error:"UNAUTHORIZED"},401);
+   if(!env?.DB?.prepare)return response({error:"STAGING_CONFIGURATION_MISSING"},503);
+   if(await controlledLedgerSchemaAudit(env.DB)!=="EXACT")
+    return response({error:"STAGING_CONTROLLED_LEDGER_SCHEMA_UNVERIFIED"},503);
+   const op="pacman-controlled-fresh-20261018-002";
+   const branch="motorlab/pacman-real-operations-lab-20261017";
+   const path="tools/motorlab-pacman/lab-workspace/pacman-fresh-owner-20261018-002.txt";
+   const expectedSha="6efd503cf4ab437ca96004365916854075be4723";
+   const blobSha="a75724abdc7bd7681621c4c84790f860a6b8fe34";
+   const commitSha="ff37c8af10854cb296116e911ab6c3092f78b69d";
+   const contentSha256="332495567676c9d4229d48e4855f5a532413484056395a6aeef4c0d77382f785";
+   try{
+    const row=await env.DB.prepare(
+     "SELECT receipt_json FROM pacman_operations WHERE operation_id=? LIMIT 1").bind(op).first();
+    if(typeof row?.receipt_json!=="string")
+     return response({error:"TERMINAL_RECEIPT_NOT_VERIFIED"},409);
+    const receipt=JSON.parse(row.receipt_json);
+    if(receipt?.schema!==1||receipt.state!=="VERIFIED_UPDATED"||
+       receipt.operationId!==op||receipt.branch!==branch||receipt.path!==path||
+       receipt.expectedSha!==expectedSha||receipt.previousSha!==expectedSha||
+       receipt.blobSha!==blobSha||receipt.commitSha!==commitSha||
+       receipt.contentSha256!==contentSha256)
+     return response({error:"TERMINAL_RECEIPT_NOT_VERIFIED"},409);
+    const challenge=await env.DB.prepare(
+     "SELECT COUNT(*) AS total,COUNT(consumed_at) AS consumed FROM pacman_webauthn_challenges WHERE operation_id=?"
+    ).bind(op).first();
+    const nonce=await env.DB.prepare(
+     "SELECT COUNT(*) AS total FROM pacman_operations WHERE operation_id LIKE 'approval-nonce-%' AND json_extract(receipt_json, '$.operationId')=?"
+    ).bind(op).first();
+    const total=Number(challenge?.total),consumed=Number(challenge?.consumed),claimed=Number(nonce?.total);
+    if(![total,consumed,claimed].every(Number.isSafeInteger)||total!==1||
+       consumed!==1||claimed!==1)
+     return response({error:"TERMINAL_APPROVAL_AUDIT_NOT_VERIFIED"},409);
+    return response({component:"pacmanTerminalRecoveryReadOnly",
+     operationId:op,state:"VERIFIED_UPDATED",verification:"EXACT_D1_RECEIPT",
+     expectedSha,blobSha,commitSha,contentSha256,
+     challengeCount:total,consumedCount:consumed,nonceClaimCount:claimed,
+     safeToRetry:false,d1Writes:0,gitHubWrites:0,newChallenges:0});
+   }catch{return response({error:"TERMINAL_READONLY_D1_UNAVAILABLE"},503);}
+  }
   if(url.pathname!=="/execute" || request.method!=="POST") return response({error:"NOT_FOUND"},404);
   if(!await authorized(request,env?.PACMAN_EXECUTION_KEY)) return response({error:"UNAUTHORIZED"},401);
   if(!env?.DB?.prepare)
