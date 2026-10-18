@@ -1,6 +1,6 @@
 // Chat-approved coordinator. Approval is bound to the exact operation before any adapter mutation.
 // This module does not mint OAuth credentials or bypass provider permission prompts.
-import {validateChatApproval,validateControlledChatIntent} from "./chat-approval.mjs";
+import {validateChatApproval,validateControlledChatIntent,prepareControlledChatHandoff} from "./chat-approval.mjs";
 import {verifyControlledApprovalAttestation} from "./approval-attestation.mjs";
 import {claimOperation} from "./atomic-claim.mjs";
 import {createAuthorizedPacmanRunner} from "./authorized-runner.mjs";
@@ -8,6 +8,11 @@ import {makeControlledGitHubLabAdapter} from "./candidates/github-contents-lab-a
 import {runGithubControlledFileUpdate,inspectGithubControlledUpdateRecovery} from "./candidates/github-controlled-update-lab.mjs";
 export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onCheckpoint,approvalVerifier,operationLedger,trustedApprovalSecret,expectedOwnerSubject}={}){
  return Object.freeze({
+  // Safe chat-to-owner handoff only. Not proof of ChatGPT-native connectivity.
+  // No provider access, challenge, signer or ledger state is created.
+  async prepareControlledChatHandoff(request){
+   return prepareControlledChatHandoff(request);
+  },
   // LAB-only expansion; no ChatGPT host issuer is assumed or silently manufactured.
   // A verified host must inject its approval verifier and durable atomic ledger.
   // The new signed path is opt-in and stays disabled until a verified host
