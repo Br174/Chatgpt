@@ -233,3 +233,53 @@ test("independent signed-attestation verifier distinguishes invalid signature an
   intent,attestation:ownerMismatch,secret,expectedOwnerSubject:subject
  }),/CONTROLLED_ATTESTATION_INVALID/);
 });
+
+
+test("chat host handoff validates content without creating consent, nonce, D1 rows or GitHub calls",async()=>{
+ const r=rig(),i=baseIntent();
+ const handoff=await r.coordinator.prepareControlledChatHandoff({intent:i,content:after});
+ assert.equal(handoff.status,"OWNER_WEBAUTHN_REQUIRED");
+ assert.equal(handoff.approvalRequired,"REGISTERED_OWNER_PASSKEY");
+ assert.equal(handoff.mayExecute,false);
+ assert.deepEqual(handoff.intent,i);
+ assert.equal(handoff.content,after);
+ assert.equal(handoff.attestation,undefined);
+ assert.equal(r.records.size,0);
+ assert.equal(r.calls.length,0);
+});
+
+test("handoff rejects caller consent, old completed operation, altered digest and protected scope",async()=>{
+ const r=rig(),i=baseIntent();
+ const attempts=[
+  {intent:i,content:after,approved:true},
+  {intent:i,content:after,attestation:sign(i)},
+  {intent:i,content:after+"tampered"},
+  {intent:{...i,branch:"main"},content:after},
+  {intent:{...i,path:"tools/motorlab-pacman/worker-execution-staging.mjs"},content:after},
+  {intent:{...i,operationId:"pacman-controlled-e2e-20261018-001"},content:after},
+  {intent:i,content:""},
+  {intent:i,content:"x".repeat(8193)}
+ ];
+ for(const attempt of attempts)
+  await assert.rejects(r.coordinator.prepareControlledChatHandoff(attempt),
+   /CHAT_HANDOFF_|CONTROLLED_INTENT_/);
+ assert.equal(r.records.size,0);
+ assert.equal(r.calls.length,0);
+});
+
+test("two distinct synthetic owner operations need different fresh signed nonces and update sequentially",async()=>{
+ const r=rig(),first=baseIntent(),a1=sign(first);
+ const firstReceipt=await execute(r,first,a1);
+ assert.equal(firstReceipt.state,"VERIFIED_UPDATED");
+ const updated="# New owner-approved edit with distinct operation\\n";
+ const second=baseIntent(updated,"pacman-second-distinct-op-002",s2);
+ const a2=sign(second,{nonce:"nonce-test-pacman-002"});
+ const secondReceipt=await execute(r,second,a2,updated);
+ assert.equal(secondReceipt.state,"VERIFIED_UPDATED");
+ assert.equal(r.putCount(),2);
+ assert.equal(r.getState().content,updated);
+ assert.equal(r.records.get("approval-nonce-"+a1.nonce).state,"APPROVAL_NONCE_CLAIMED");
+ assert.equal(r.records.get("approval-nonce-"+a2.nonce).state,"APPROVAL_NONCE_CLAIMED");
+ await assert.rejects(execute(r,second,a2,updated));
+ assert.equal(r.putCount(),2);
+});
