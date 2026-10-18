@@ -412,3 +412,38 @@ Date/time evidence: 2026-10-18 11:46–11:49 Italy local. Exact completed contro
 
 **Next scope boundary:** no further write permitted for the completed operation; no production/main/legacy LAB changes. Optional narrow read-only SQL could count approval-nonce keys by scoped owner operation if independent anti-replay claim evidence becomes necessary, without viewing signatures or raw nonce. Remaining gates still require separately scoped permission and verification. No Cloudflare query or repeat GitHub mutation performed in this checkpoint step.
 
+
+## CHAT_HANDOFF_AND_IDEMPOTENT_RECOVERY_LAB_20261018 — authorized LAB-only continuation
+
+Scope approved on 2026-10-18: only `motorlab/pacman-real-operations-lab-20261017`, existing chat intent/coordinator, controlled update recovery, Worker and tests/workflow/checkpoints. No main/MADRE/historical LAB, production, Cloudflare remote/D1/schema, secrets/flags, deploy, real passkey or Pac-Man-originated GitHub PUT; no paid service. The already completed `pacman-controlled-e2e-20261018-001` and `pacman-webauthn-lab-20261017-ff59959a-01` MUST NEVER replay.
+
+### Exact pre-change and compatibility
+- PRE-CHANGE source HEAD `b82cc7dba7a8390a322c784a4e423c334857d506`, branch compare IDENTICAL at start; main remained `8615e8321bf9896f28826a09aa0c9f61ce5ecbb7`.
+- Change Compatibility Guard: MERGE_REQUIRED/COMPLEMENTARY. One existing `createChatAuthorizedCoordinator`, one existing WebAuthn trusted issuer, one Execution Worker and one D1 operation ledger; no new writer, runtime, issuer, resolver, schema, token or HTTP endpoint.
+- OLD -> NEW map: chat intake was only signed execution -> existing `chat-approval.mjs` + coordinator now ALSO offer inert, digest-validated host handoff; original signed execution remains canonical. Recovery required repeated full-body input and threw after settled receipt -> existing Execution Worker now supports narrowly scoped private bearer-authenticated intent-only recovery; original full-body recovery remains accepted. Existing recovery handler now returns an already settled safeToRetry=false receipt without another provider read/write. Legacy `github.lab-file-cycle` remains independent and unchanged.
+- Fail-closed: chat handoff cannot approve, challenge, issue a signature, claim nonce or execute; completed historic operation IDs refused by new handoff. Content SHA-256, branch/path, operation ID and initial blob SHA validated. Recovery requires existing private execution key, dedicated controlled mode flag, staging protections, ledger schema and a previously persisted `RECOVERY_REQUIRED` receipt. New requests to execute still require verified WebAuthn signature and atomic one-time claim. Never replay ambiguous GitHub PUT.
+
+### GitHub edits, exactly six source/test files
+1. `chat-approval.mjs` `5a6a38959f1d8a92f36bc6265b3d9aed4291dc23`: pure `prepareControlledChatHandoff` returns `OWNER_WEBAUTHN_REQUIRED` and `mayExecute:false`, rejects injected approval/attestation/extra fields and historical IDs.
+2. `chat-coordinator.mjs` `d73e628f155b680d2f2d88d92abf1c8a06e31572`: exposes same pure handoff as a method of the ONE existing coordinator.
+3. `candidates/github-controlled-update-lab.mjs` `3062fa3c54faf0a11621d162b6a529e9246ee154`: terminal `RECOVERY_CONTENT_MATCH_UNATTRIBUTED` receipt is read back idempotently; no retry/nonce/PUT.
+4. `worker-execution-staging.mjs` `305349c1be402dda85f6c0e7917e20374020a913`: existing controlled recovery mode accepts `{mode,intent}` with private bearer auth; no change to write mode and no runtime deployment.
+5. `candidates/chat-signed-controlled-lab.test.mjs` `ec160bd70a2f5f0c3881b8a51a91b627bfb8cbf1`: extra synthetic tests for safe inert chat handoff, tampering and separate fresh signed nonces across distinct operations.
+6. `candidates/controlled-worker-route-lab.test.mjs` `357143d4a264ddd9b0001377850549e185a5b979`: extra synthetic tests for private intent-only recovery, idempotence, bad scope, missing private key and non-write enforcement.
+- GitHub independent file GET after EACH update matched the exact written text/blob. Compare with checkpoint base: exactly six LAB commits ahead, only the six listed paths modified. Main is IDENTICAL.
+
+### Test evidence and limitations
+- Source syntax: 6/6 updated JS files parse in a V8 syntax harness after import/export stripping. This is NOT Node 22 or Miniflare.
+- Pure chat handoff + cached recovery targeted V8 synthetic source-evaluation: 6/6 PASS, including negative misuse and historical replay cases.
+- Controlled Worker fake private-binding synthetic V8: 5/5 PASS after correcting an ASYNC test stub to accurately model synchronous intent validation (the earlier harness-only false positive is NOT a repository defect). No write path called, no real provider/network interaction.
+- Existing branch-only workflow `.github/workflows/pacman-controlled-operations-lab.yml` is configured for push and includes complete Node22 Pac-Man tests and Miniflare/workerd smoke. Official Actions result on this new exact HEAD is NOT YET independently read/verified. Do NOT reuse historical #100 923/923 success as certification of these new changes. Inspect current exact-head Actions logs before claiming new code fully regression-verified.
+- No Cloudflare API, D1 remote query/write, Worker deploy, secrets, passkey ceremony, live user approval or Pac-Man GitHub PUT occurred in this continuation. The ONLY GitHub writes were normal explicitly authorized code/test/checkpoint commits through the connected GitHub repository tool.
+
+### Gate progression and exact next resume
+- Real Operations A=4/4 100% (delta 0), B=2/4 50% (delta 0), C=3/4 75% (delta 0), D=3/4 75% (delta 0). **GLOBAL 12/16=75%, delta 0 percentage points**. Do not count synthetic tests or inert handoff as live ChatGPT-native transport, fresh owner passkey, new staging E2E or full disaster recovery.
+- Activity: LAB code/tests written and six-file source readback 100%; focused synthetic source checks 11/11 100%; official Node22/Miniflare exact-head CI PENDING VERIFICATION.
+- Four gates remain: B3 new genuine owner authorization for a different unique operation, B4 genuine ChatGPT-to-Pac-Man host transport, C4 distinct controlled staging readiness/real transaction criterion without double-counting historical D1 evidence, D4 persistent recovery/failure test for a fresh operation. Canonical acceptance criteria must remain distinct.
+- Immediate next step read-only: inspect GitHub Actions protected `controlled-lab` run on the NEW checkpoint HEAD, verify the complete Node22 suite and Miniflare/workerd, resolve any failures with LAB-only changes and new checkpoint. GitHub connector `fetch_commit_workflow_runs` currently PR-filtered and `get_commit_combined_status` may return [] for push runs; such absence is NOT proof of success or failure. Do not invent CI status.
+- All deploy/remote D1/new GitHub Pac-Man PUT and real owner-passkey steps remain FORBIDDEN until separately reviewed and explicitly authorized. Do not replay historical IDs or nonce. GitHub branch remains the technical durable authority; local chat state is not a persistent executor.
+
+STATE: LAB_HANDOFF_SOURCE_COMPLETE; SYNTAX_6_OF_6_PASS; SYNTHETIC_11_OF_11_PASS; EXACT_HEAD_OFFICIAL_CI_PENDING; NO_RUNTIME_DEPLOY; NO_LIVE_CHAT_HOST_CONNECTION_CLAIM; NO_PROVIDER_SIDE_EFFECTS; REAL_OPERATIONS_12_OF_16_75_PERCENT.
