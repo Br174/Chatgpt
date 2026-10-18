@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "operationId": "pacman-b4-billing-diagnosis-20261018-001",
+  "kind": "CLOUDFLARE_BILLING_PERMISSION_DIAGNOSTIC_ONLY",
+  "targetBranch": "motorlab/pacman-real-operations-lab-20261017",
+  "expectedParentSha": "d46af9061dc9b71d3365a79077b57c8292af4953",
+  "allowedApiGets": 1,
+  "allowedWorkerGets": 0,
+  "writesAllowed": false,
+  "replayAllowed": false
+}
