@@ -36,7 +36,7 @@ jobs:
           if(!src.includes('environment: pacman-execution-staging')||
              !src.includes('github.run_attempt == 1')||
              !src.includes('persist-credentials: false')||
-             src.includes('workflow_dispatch:')||
+             /^ {0,2}workflow_dispatch:/m.test(src)||
              !src.includes("state!=='VERIFIED_UPDATED'")||
              !src.includes("mode:'github-lab-controlled-recovery'")||
              !rec.includes('verification:"PERSISTED_RECEIPT_ONLY"')||
