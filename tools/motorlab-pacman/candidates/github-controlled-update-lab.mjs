@@ -103,7 +103,7 @@ export async function runGithubControlledFileUpdate({
 // Presence of matching content does NOT prove which commit/actor authored the update.
 // The durable recovery receipt retains the content fingerprint rather than storing content.
 export async function inspectGithubControlledUpdateRecovery({
- operationId,branch,path,adapter,ledger,onCheckpoint
+ operationId,branch,path,expectedSha,contentSha256,adapter,ledger,onCheckpoint
 }={}){
  if(!OP.test(operationId||""))fail("INVALID_OPERATION_ID");
  if(branch!==CONTROLLED_LAB_BRANCH)fail("CONTROLLED_LAB_BRANCH_REQUIRED");
@@ -112,7 +112,16 @@ export async function inspectGithubControlledUpdateRecovery({
     typeof ledger.put!=="function")fail("DURABLE_RECOVERY_LEDGER_REQUIRED");
  if(typeof adapter?.readControlled!=="function")fail("CONTROLLED_ADAPTER_REQUIRED");
  if(typeof onCheckpoint!=="function")fail("CHECKPOINT_WRITER_REQUIRED");
+ // Full intent binding is mandatory when invoked through the guarded Worker.
+ // Optional parameters preserve earlier internal recovery callers.
+ const bound=expectedSha!==undefined||contentSha256!==undefined;
+ if(bound&&(!SHA.test(expectedSha||"")||
+    !/^[a-f0-9]{64}$/.test(contentSha256||"")))
+   fail("RECOVERY_INTENT_MISMATCH");
  const prior=await ledger.get(operationId);
+ if(bound&&prior&&(prior.expectedSha!==expectedSha||
+     prior.contentSha256!==contentSha256))
+   fail("RECOVERY_INTENT_MISMATCH");
  // A previously VERIFIED_UPDATED operation is terminal and already has a
  // durable provider readback receipt. Recover its D1 receipt in read-only mode,
  // without another challenge, nonce claim, GitHub GET, PUT or D1 mutation.
