@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "operationId": "pacman-b4-chat-public-health-20261018-001",
+  "targetBranch": "motorlab/pacman-real-operations-lab-20261017",
+  "exactEndpoint": "/health",
+  "requestMethod": "GET",
+  "worker": "motorlab-pacman-execution-staging-lab",
+  "workerGetLimit": 1,
+  "freeDailyLimit": 100000,
+  "ownerDashboardObservedRequests": 113,
+  "ownerDashboardObservedDate": "2026-10-18",
+  "dashboardProofType": "OWNER_SUPPLIED_WORKERS_FREE_LIMIT_SCREENSHOT",
+  "writePermissions": false,
+  "replayAllowed": false,
+  "expectedParentSha": "b18d5885bdd5a4187194bea413af6de83db96506"
+}
