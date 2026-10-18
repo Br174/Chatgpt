@@ -395,3 +395,20 @@ Authorization: owner explicitly allowed EXACTLY two remote read-only SQL stateme
 - New restricted D1 read-only transport + unit tests + workflow = 100% (scoped code task). Remote D1 execution and verified schema = 0% while waiting reviewer.
 - A GitHub=4/4 100% delta 0; B chat/WebAuthn=2/4 50% delta 0; C Cloudflare staging=2/4 50% delta 0; D recovery/E2E=2/4 50% delta 0. GLOBAL=10/16=62.50%, delta 0 percentage points. No remote schema verification yet.
 - Status: D1_PRAGMA_WORKFLOW_PREPARED_LOCAL_PREFLIGHT_SUCCESS; PROTECTED_REVIEW_REQUIRED; NO_REMOTE_D1_API_QUERY_YET; NO_REMOTE_WRITES; MAIN_UNCHANGED.
+
+
+## D1_OWNER_PROOF_20261018_1149 — proof closed by owner SQL screenshots
+
+Date/time evidence: 2026-10-18 11:46–11:49 Italy local. Exact completed controlled operation `pacman-controlled-e2e-20261018-001`. The user ran one read-only SELECT in the official Cloudflare D1 Console, then supplied three screenshots of horizontally scrolled output. This is provider data, not synthetic test output.
+
+- `pacman_operations` exact operation row count **1**, `receipt_json.state=VERIFIED_UPDATED`, resulting `blobSha=8f21733e2487abf01a75ed49f8e044b652497857` matching the exact live GitHub file and prior one-file commit.
+- `pacman_webauthn_challenges` exact operation count **1**, consumed challenge count **1** (`consumed_at IS NOT NULL`).
+- `pacman_approval_claims` count **0**, **not an error** for `github.lab-file-update`: the new path claims the nonce in `pacman_operations` using `approval-nonce-<challenge>` keys, while `pacman_approval_claims` is used in the legacy path. An independent count of the new nonce claim key was NOT queried. Do not imply this row was verified.
+- GitHub Actions #100 id 39111082512, job 117627175920 official logs: **923/923 Node 22 passing** and Miniflare/workerd verification marker. #101 green (owner screenshot). Earlier #98/#99 stale fixture assertion failures repaired, not a failed provider operation.
+- Prior operation `pacman-controlled-e2e-20261018-001` completed. **Never repeat GitHub PUT, passkey challenge, nonce or operation ID**.
+- Proof appended to `lab-workspace/CONTROLLED_E2E_FIRST_REAL_WRITE_20261018.md`, source commit `bf52560e9458d29e8b703d8659dd665ac1bb18ba`.
+
+**Updated hierarchical progress:** GitHub A 4/4=100% (delta 0); chat/WebAuthn B 2/4=50% (delta 0); Cloudflare staging C 3/4=75% (delta 0); recovery/E2E D 3/4=75% (delta **+25 pp**). **GLOBAL 12/16=75% (delta +6.25 pp)** from 11/16=68.75%. This completes ONE previously blocked durable-receipt/passkey-consumption gate, not the full open-ended multi-operation ChatGPT-native executor goal.
+
+**Next scope boundary:** no further write permitted for the completed operation; no production/main/legacy LAB changes. Optional narrow read-only SQL could count approval-nonce keys by scoped owner operation if independent anti-replay claim evidence becomes necessary, without viewing signatures or raw nonce. Remaining gates still require separately scoped permission and verification. No Cloudflare query or repeat GitHub mutation performed in this checkpoint step.
+
