@@ -495,3 +495,31 @@ Source of truth: protected GitHub repository connector, read-only GitHub Actions
 - Keep Pac-Man as subordinate function of MotorLab (AutoSetup alias), one coordinator, one existing ledger, single-writer, no duplicate executor. Avoid creating new staging resources, authorizers, or using paid services.
 
 STATE: EXACT_HEAD_CI_111_GREEN_928_OF_928; WORKER_MINIFLARE_PASS; PR49_DRAFT_UNMERGED; REPO_VISIBILITY_PUBLIC_OWNER_REVIEW_NEEDED; MAIN_PROTECTED_FLAG_TRUE; NO_PROVIDER_MUTATIONS; REAL_OPERATIONS_12_OF_16_75_PERCENT.
+
+
+## TERMINAL_D1_RECOVERY_READBACK_VERIFIED_IN_LAB_20261018
+
+**Scope and authority.** Owner requested continuing Pac-Man Real Operations and fixing persistent recovery/chat coordination without repeating historic tests. Existing narrow LAB authority permits edits to existing coordinator, Worker, recovery handler, tests and durable LAB checkpoints. Main/MADRE/old LAB/production, Cloudflare remote D1/deploy/secrets/flags, paid services, real owner challenge and Pac-Man GitHub PUT were NOT touched in this continuation.
+
+### Independent new real transaction already concluded (do not replay)
+- Fresh distinct owner portal WebAuthn operation `pacman-controlled-fresh-20261018-002` yielded success screenshot. GitHub verified exact one-file update commit `ff37c8af10854cb296116e911ab6c3092f78b69d`, blob `a75724abdc7bd7681621c4c84790f860a6b8fe34`, and CI #114 928/928 PASS. Main unchanged.
+- Official Cloudflare owner dashboard SELECT screenshot showed `operation_rows=1`, `receipt_state=VERIFIED_UPDATED`, and a partial matching blob SHA prefix. **Challenge count, consumed count and separate nonce row were not visible in screenshot. Do not claim they were independently confirmed for this new operation.** Earlier user closed console; no extra manual SQL requested. No replay or additional passkey.
+- Cloudflare staging public GET health (Execution, WebAuthn, owner status) was previously independently confirmed in this conversation, including D1 CONNECTED and owner enrolled. Public health is NOT a private Worker deployment UUID or secret parity certification.
+
+### Specific root-cause closure in code, not another historical real trial
+- Observed defect: `inspectGithubControlledUpdateRecovery` treated a durable successful `VERIFIED_UPDATED` receipt as `RECOVERY_RECEIPT_REQUIRED` instead of allowing safe readback after loss of chat/host response.
+- Changed only existing `candidates/github-controlled-update-lab.mjs` to return strictly validated, immutable `VERIFIED_UPDATED` from D1, explicitly marked `verification:PERSISTED_RECEIPT_ONLY` and `safeToRetry:false`, without GitHub GET, PUT, D1 write, new challenge or nonce. Malformed persisted receipt fails closed. Existing ambiguous recovery remains unattributed, not falsely converted into an authenticated GitHub success.
+- Corrected recovery intent binding by carrying `expectedSha` and `contentSha256` through the SAME existing `chat-coordinator.mjs` and private `worker-execution-staging.mjs`, checking both against the durable receipt before recovery. No duplicate coordinator/ledger, new endpoint, schema or remote flag.
+- Added 3 targeted tests to EXISTING `candidates/controlled-worker-route-lab.test.mjs`: immutable successful D1 receipt replay-safe recovery; reject stale SHA/digest/tampered stored receipt; reject wrong digest during ambiguous recovery without a second PUT. Private bearer and existing gate tests preserved.
+- LAB commits in sequence: `31e3da7878ee30641b5f55bc1979deeaa1bed8ed`, `e9cd397adcde111cd8524f183e8684c0b4c14314`, `5d1d1a8595474d6e5ad6d0cc23e2d718ace2e5cb`, `a91d033d7f58fb607a29a2d1119a09c069049a30`, `b3c465241abf315f6d869cb43714baa76d28767d`, `f87eac8c8875b7bc9bfb29a126421a71816d8cd9`.
+- Official CI #119 identified exactly 3 NEW fixture assertion typos (`before.put` vs `before.puts`); all other 928 tests passed. Root cause fixed in the test file only; the failed run is retained transparently.
+- Official CI #120 run `39131036447` on exact code/test HEAD `f87eac8c8875b7bc9bfb29a126421a71816d8cd9`: **931 tests, 931 passed, 0 failed**, Workers Miniflare/workerd marker `PACMAN_WORKERS_RUNTIME_POST_CYCLE_REDIRECT_AND_INERT_DIAGNOSTIC_VERIFIED`, no deployment. https://github.com/Br174/Chatgpt/actions/runs/39131036447
+- Source guard pre/post: branch LAB only, `main` unchanged at `8615e8321bf9896f28826a09aa0c9f61ce5ecbb7`; no real GitHub Pac-Man write, WebAuthn ceremony, staging provider mutation or replay during this code fix.
+
+### Remaining goal / hard gates
+- Phase A GitHub 4/4=100%; Phase B chat/owner 2/4=50% (fresh B3 nonce/consumption independent D1 count NOT VERIFIED, native B4 ChatGPT host transport NOT IMPLEMENTED); Phase C staging 4/4=100% (second new real GitHub transaction plus official D1 durable receipt confirmed); Phase D recovery 3/4=75% (new successful D1 terminal receipt recovery CODE TESTED, but **NOT DEPLOYED/REAL FAILURE PROVEN**, D4 remains OPEN).
+- **Real Operations global 13/16 = 81.25%, delta 0pp versus immediately previous verified 13/16.** Focused source repair and 3 new tests 100%; no synthetic test counts as a live gate.
+- Next required separate authority: a nonmutating protected staging Worker version/binding/readiness inspection (private GET), followed by an explicitly scoped **Execution Worker staging deploy** to make this code reachable, if needed. No deploy inferred from code CI. Require fresh approval before provider mutation. B4 would still require a genuine ChatGPT-host app/tool connection, not the already working one-tap portal handoff.
+- Never repeat historic real operations `pacman-controlled-e2e-20261018-001` or `pacman-controlled-fresh-20261018-002`; both are terminal. If provider outcome ever becomes uncertain, use only private read-only recovery, not a second PUT.
+
+STATE: PACMAN_CODE_DURABLE_TERMINAL_RECOVERY_FIXED; OFFICIAL_931_OF_931_GREEN; NO_NEW_REAL_PROVIDER_OPERATION; PRIVATE_RUNTIME_DEPLOY_NOT_DONE; CHATGPT_NATIVE_HOST_NOT_CONNECTED; LIVE_GATE_13_OF_16_81_25_PERCENT.
