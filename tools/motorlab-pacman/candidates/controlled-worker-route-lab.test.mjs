@@ -278,7 +278,7 @@ test("persisted VERIFIED_UPDATED recovers from the same D1 ledger without new Gi
  assert.equal(again.status,200);
  assert.deepEqual(await again.json(),stable);
  assert.equal(r.state.reads,before.reads);
- assert.equal(r.state.put,before.put);
+ assert.equal(r.state.put,before.puts);
  assert.equal(r.db.mutationCount,before.db);
  assert.equal(r.db.receipts.size,before.ledgerSize);
  assert.equal(r.db.receipts.get(intent.operationId).state,"VERIFIED_UPDATED");
@@ -307,7 +307,7 @@ test("terminal D1 receipt cannot be recovered with altered expected SHA, content
   assert.equal(rejected.status,409);
  }
  r.db.receipts.set(intent.operationId,originalReceipt);
- assert.equal(r.state.put,before.put);
+ assert.equal(r.state.put,before.puts);
  assert.equal(r.state.reads,before.reads);
  assert.equal(r.db.mutationCount,before.db);
 });
@@ -321,6 +321,6 @@ test("ambiguous-provider recovery refuses a different content hash for the same 
  const rejected=await run(r,{mode:"github-lab-controlled-recovery",intent:wrong});
  assert.equal(rejected.status,409);
  assert.equal(r.state.reads,before.reads);
- assert.equal(r.state.put,before.put);
+ assert.equal(r.state.put,before.puts);
  assert.equal(r.db.mutationCount,before.db);
 });
