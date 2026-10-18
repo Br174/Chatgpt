@@ -1,0 +1,102 @@
+name: Pac-Man B4 Public Health Chat Bridge LAB (single GET)
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/pacman-b4/public-health-trigger-20261018.json'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-b4-public-health-once-20261018
+  cancel-in-progress: false
+jobs:
+  health-chat-bridge:
+    if: >-
+      github.repository == 'Br174/Chatgpt' &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.run_attempt == 1 &&
+      github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact commit, read-only single use, user Free-limit evidence
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          const fail=r=>{throw Error('PACMAN_B4_PUBLIC_HEALTH_PREFLIGHT_DENIED_'+r)};
+          const path='.github/pacman-b4/public-health-trigger-20261018.json';
+          const t=JSON.parse(fs.readFileSync(path,'utf8'));
+          const wanted={
+            schema:1,
+            operationId:'pacman-b4-chat-public-health-20261018-001',
+            targetBranch:'motorlab/pacman-real-operations-lab-20261017',
+            exactEndpoint:'/health',
+            requestMethod:'GET',
+            worker:'motorlab-pacman-execution-staging-lab',
+            workerGetLimit:1,
+            freeDailyLimit:100000,
+            ownerDashboardObservedRequests:113,
+            ownerDashboardObservedDate:'2026-10-18',
+            dashboardProofType:'OWNER_SUPPLIED_WORKERS_FREE_LIMIT_SCREENSHOT',
+            writePermissions:false,
+            replayAllowed:false
+          };
+          for(const [k,v] of Object.entries(wanted))if(t[k]!==v)fail('SCOPE_'+k);
+          if(Object.keys(t).sort().join(',')!==[...Object.keys(wanted),'expectedParentSha'].sort().join(','))
+            fail('EXTRA_FIELDS');
+          const git=args=>cp.execFileSync('git',args,{encoding:'utf8'}).trim();
+          if(git(['rev-parse','HEAD'])!==process.env.GITHUB_SHA)fail('HEAD_MISMATCH');
+          if(git(['rev-parse','HEAD^'])!==t.expectedParentSha)fail('PARENT_MISMATCH');
+          if(git(['diff-tree','--no-commit-id','--name-only','-r','HEAD'])!==path)fail('CHANGES_NOT_EXACT');
+          console.log('PACMAN_B4_CHAT_TO_GITHUB_SINGLE_GET_TRIGGER_VERIFIED');
+          console.log('PACMAN_B4_OWNER_DASHBOARD_FREE_LIMIT_OBSERVED_113_OF_100000');
+          NODE
+      - name: Negative and positive validations, no network
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const ok=(status,value)=>status===200&&value?.service==='pacman-execution-staging'&&value.database==='CONNECTED'&&typeof value.revision==='string'&&value.revision.startsWith('pacman-v2-');
+          assert.equal(ok(200,{service:'pacman-execution-staging',database:'CONNECTED',revision:'pacman-v2-test'}),true);
+          for(const [status,json] of [
+            [503,{service:'pacman-execution-staging',database:'SCHEMA_MISSING',revision:'pacman-v2-test'}],
+            [302,{service:'pacman-execution-staging',database:'CONNECTED',revision:'pacman-v2-test'}],
+            [401,{error:'UNAUTHORIZED'}],
+            [200,{service:'other',database:'CONNECTED',revision:'pacman-v2-test'}],
+            [200,{service:'pacman-execution-staging',database:'CONNECTED',revision:9}],
+            [200,null]
+          ])assert.equal(ok(status,json),false);
+          console.log('PACMAN_B4_HEALTH_CONTRACT_NEGATIVE_POSITIVE_7_OF_7_PASS');
+          NODE
+      - name: Exactly one public Worker health GET, no environment or secrets
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import crypto from 'node:crypto';
+          const url='https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev/health';
+          const r=await fetch(url,{method:'GET',redirect:'manual',headers:{Accept:'application/json'},signal:AbortSignal.timeout(12000)});
+          if(r.status!==200)throw Error('PACMAN_B4_PUBLIC_WORKER_GET_STATUS_'+r.status);
+          const txt=await r.text();
+          if(txt.length>2048)throw Error('PACMAN_B4_HEALTH_RESPONSE_TOO_LARGE');
+          let j;try{j=JSON.parse(txt);}catch{throw Error('PACMAN_B4_HEALTH_RESPONSE_INVALID_JSON')}
+          if(j?.service!=='pacman-execution-staging'||j.database!=='CONNECTED'||
+             typeof j.revision!=='string'||!j.revision.startsWith('pacman-v2-'))
+            throw Error('PACMAN_B4_HEALTH_RESPONSE_CONTRACT_MISMATCH');
+          const safe=JSON.stringify({service:j.service,database:j.database,revision:j.revision});
+          console.log('PACMAN_B4_CHAT_GITHUB_REAL_PUBLIC_WORKER_HEALTH_GET_VERIFIED');
+          console.log('PACMAN_B4_SAFE_RESPONSE_SHA256='+crypto.createHash('sha256').update(safe).digest('hex'));
+          console.log('PACMAN_B4_HEALTH_DATABASE_CONNECTED');
+          console.log('PACMAN_B4_NO_PRIVATE_DIAGNOSTIC_NO_AUTH_ASSERTION_NO_WRITES');
+          NODE
