@@ -1,0 +1,106 @@
+name: Pac-Man B4 Authenticated Private Diagnostic LAB (one GET, protected)
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/pacman-b4/private-diagnostic-trigger-20261018.json'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-b4-private-diagnostic-one-shot-lab
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: >-
+      github.repository == 'Br174/Chatgpt' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact one-use HEAD, branch, scope, Free-tier owner evidence and no replay
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          const deny=reason=>{throw Error('PACMAN_B4_PRIVATE_PREFLIGHT_DENIED_'+reason)};
+          const file='.github/pacman-b4/private-diagnostic-trigger-20261018.json';
+          const t=JSON.parse(fs.readFileSync(file,'utf8'));
+          const expected={
+            schema:1,
+            operationId:'pacman-b4-private-get-20261018-001',
+            targetBranch:'motorlab/pacman-real-operations-lab-20261017',
+            method:'GET',
+            path:'/__motorlab_lab/diagnostics/execution-schema-audit',
+            worker:'motorlab-pacman-execution-staging-lab',
+            allowedGets:1,
+            protectedEnvironment:'pacman-execution-staging',
+            costGuard:'OWNER_DASHBOARD_WORKERS_FREE_LIMIT_100000_CONFIRMED_20261018',
+            replayAllowed:false,
+            writesAllowed:false
+          };
+          for(const [key,value] of Object.entries(expected))if(t[key]!==value)deny('SCOPE_'+key);
+          if(Object.keys(t).sort().join(',')!==[...Object.keys(expected),'expectedParentSha'].sort().join(','))
+            deny('EXTRA_FIELDS');
+          const git=args=>cp.execFileSync('git',args,{encoding:'utf8'}).trim();
+          if(git(['rev-parse','HEAD'])!==process.env.GITHUB_SHA)deny('HEAD_MISMATCH');
+          if(git(['rev-parse','HEAD^'])!==t.expectedParentSha)deny('STALE_PARENT_SHA');
+          if(git(['diff-tree','--no-commit-id','--name-only','-r','HEAD'])!==file)
+            deny('DIFF_NOT_TRIGGER_ONLY');
+          const proof=fs.readFileSync('tools/motorlab-pacman/lab-workspace/B4_PUBLIC_HEALTH_CHAT_BRIDGE_VERIFIED_20261018.md','utf8');
+          if(!proof.includes('113 of 100,000 requests')||
+             !proof.includes('39163976495')||
+             !proof.includes('AUTHENTICATED_B4_STILL_OPEN'))
+            deny('OWNER_FREE_DASHBOARD_EVIDENCE_MISSING');
+          console.log('PACMAN_B4_PRIVATE_SCOPED_TRIGGER_AND_FREE_DASHBOARD_GATE_PASS');
+          NODE
+      - name: Run negative and positive synthetic GET tests, with no Worker traffic
+        run: |
+          node --test tools/motorlab-pacman/candidates/b4-private-readonly-verify-lab.test.mjs
+  protected-private-get:
+    needs: verify
+    if: >-
+      needs.verify.result == 'success' &&
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    environment: pacman-execution-staging
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exactly one authenticated private GET through existing protected key
+        shell: bash
+        env:
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {getPrivateSchemaAuditOnce} from './tools/motorlab-pacman/candidates/b4-private-readonly-verify-lab.mjs';
+          const result=await getPrivateSchemaAuditOnce({
+            url:'https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev/__motorlab_lab/diagnostics/execution-schema-audit',
+            key:process.env.EXECUTION_KEY
+          });
+          console.log('PACMAN_B4_PRIVATE_AUTH_DIAGNOSTIC='+result.reason);
+          console.log('PACMAN_B4_READONLY_ONLY_NO_DEPLOY_NO_D1_WRITE_NO_GITHUB_PUT');
+          if(!result.ok)process.exitCode=1;
+          else console.log('PACMAN_B4_CHAT_GITHUB_PRIVATE_WORKER_RESPONSE_VERIFIED');
+          NODE
