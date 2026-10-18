@@ -1,0 +1,162 @@
+name: Pac-Man Current Controlled Flags GET Audit LAB (protected one-shot)
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/pacman-b4/controlled-flags-get-audit-trigger-20261018.json'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-current-controlled-flags-get-20261018-001
+  cancel-in-progress: false
+jobs:
+  source-preflight:
+    if: >-
+      github.repository == 'Br174/Chatgpt' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact one-shot LAB trigger, GitHub HEAD, FREE dashboard and diff guard
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          const deny=(why)=>{throw Error('PACMAN_FLAGS_AUDIT_PREFLIGHT_HOLD_'+why)};
+          const path='.github/pacman-b4/controlled-flags-get-audit-trigger-20261018.json';
+          const trigger=JSON.parse(fs.readFileSync(path,'utf8'));
+          const exact={
+            schema:1,operationId:'pacman-current-controlled-flags-get-20261018-001',
+            branch:'motorlab/pacman-real-operations-lab-20261017',
+            cloudflareHttpMethod:'GET',
+            scriptNames:['motorlab-pacman-execution-staging-lab','motorlab-pacman-webauthn-staging-lab'],
+            allowedCloudflarePaths:['/settings','/deployments'],
+            maximumCloudflareGets:4,
+            expectedFlag:'PACMAN_CONTROLLED_UPDATE_ENABLED',
+            expectedFlagBindingType:'secret_text',
+            flagValueReadable:false,
+            protectedEnvironment:'pacman-execution-staging',
+            ownerFreeDailyLimit:100000,
+            ownerObservedDailyRequests:113,
+            costPolicy:'NO_EXTRA_PAID_SERVICE_OR_WORKER_GET',
+            expectedProtectedMainSha:'8615e8321bf9896f28826a09aa0c9f61ce5ecbb7',
+            writesAllowed:false,challengeAllowed:false,replayAllowed:false
+          };
+          if(Object.keys(trigger).sort().join(',')!==[...Object.keys(exact),'expectedParentSha'].sort().join(','))
+            deny('TRIGGER_FIELDS');
+          for(const key of Object.keys(exact))
+            if(JSON.stringify(trigger[key])!==JSON.stringify(exact[key]))deny('TRIGGER_'+key);
+          const git=arr=>cp.execFileSync('git',arr,{encoding:'utf8'}).trim();
+          if(git(['rev-parse','HEAD'])!==process.env.GITHUB_SHA)deny('SHA');
+          if(git(['rev-parse','HEAD^'])!==trigger.expectedParentSha)deny('PARENT');
+          if(git(['diff-tree','--no-commit-id','--name-only','-r','HEAD'])!==path)
+            deny('EXTRA_CHANGE');
+          const checkpoint=fs.readFileSync(
+            'tools/motorlab-pacman/lab-workspace/B4_PUBLIC_HEALTH_CHAT_BRIDGE_VERIFIED_20261018.md','utf8');
+          if(!checkpoint.includes('113 of 100,000 requests')||
+             !checkpoint.includes('39163976495'))deny('OWNER_FREE_QUOTA_PROOF');
+          const manifest=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
+          if(!manifest.includes('CURRENT_RELEASE=2026.10.14-r37'))deny('MOTORLAB_RELEASE');
+          console.log('PACMAN_FLAGS_AUDIT_SOURCE_ONE_SHOT_AND_FREE_EVIDENCE_PASS');
+          console.log('PACMAN_FLAGS_AUDIT_NO_WORKER_GET_NO_WRITES');
+          NODE
+      - name: Negative and positive provider guard tests with synthetic token only
+        run: |
+          node --test tools/motorlab-pacman/candidates/controlled-activation-provider-guard-lab.test.mjs
+  protected-cloudflare-get:
+    needs: source-preflight
+    if: >-
+      needs.source-preflight.result == 'success' &&
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1
+    environment: pacman-execution-staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Recheck live GitHub branch HEAD and protected main before ANY Cloudflare GET
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const fail=why=>{throw Error('PACMAN_FLAGS_AUDIT_POSTREVIEW_HEAD_HOLD_'+why)};
+          const url='https://api.github.com/repos/Br174/Chatgpt/';
+          const read=async path=>{
+            const r=await fetch(url+path,{method:'GET',redirect:'manual',
+              headers:{Accept:'application/vnd.github+json','User-Agent':'pacman-lab-readonly'},
+              signal:AbortSignal.timeout(12000)});
+            if(r.status!==200)fail('GITHUB_STATUS_'+r.status);
+            return r.json();
+          };
+          const trigger=JSON.parse((await import('node:fs')).readFileSync(
+            '.github/pacman-b4/controlled-flags-get-audit-trigger-20261018.json','utf8'));
+          const commits=await read('commits?sha=motorlab%2Fpacman-real-operations-lab-20261017&per_page=1');
+          if(!Array.isArray(commits)||commits[0]?.sha!==process.env.GITHUB_SHA)fail('LAB_HEAD_DRIFT');
+          const main=await read('branches/main');
+          if(main?.commit?.sha!==trigger.expectedProtectedMainSha||main?.protected!==true)
+            fail('MAIN_PROTECTION_OR_HEAD_DRIFT');
+          console.log('PACMAN_FLAGS_AUDIT_POSTREVIEW_HEAD_AND_MAIN_VERIFIED');
+          NODE
+      - name: Maximum four Cloudflare GET, two exact Worker names, opaque secret values
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {inspectActivationWorker,EXEC,WEB,ACCOUNT}
+            from './tools/motorlab-pacman/candidates/controlled-activation-provider-guard-lab.mjs';
+          if(process.env.CF_ACCOUNT!==ACCOUNT||
+             typeof process.env.CF_TOKEN!=='string'||process.env.CF_TOKEN.length<10)
+            throw Error('PACMAN_FLAGS_AUDIT_PROTECTED_SCOPED_CREDENTIALS_HOLD');
+          let count=0;
+          const fetchOnce=async(url,options)=>{
+            const root='https://api.cloudflare.com/client/v4/accounts/'+ACCOUNT+'/workers/scripts/';
+            const targets=[EXEC,WEB].flatMap(w=>[root+w+'/settings',root+w+'/deployments']);
+            if(!targets.includes(url)||options?.method!=='GET'||options?.redirect!=='manual'||
+               count>=4)throw Error('PACMAN_FLAGS_AUDIT_REQUEST_SCOPE_HOLD');
+            count++;
+            return fetch(url,options);
+          };
+          for(const [worker,label] of [[EXEC,'EXECUTION'],[WEB,'WEBAUTHN']]){
+            let info;
+            try{info=await inspectActivationWorker({
+              name:worker,account:ACCOUNT,token:process.env.CF_TOKEN,
+              expectedFlag:'ON',fetchImpl:fetchOnce
+            });}catch{
+              console.log('PACMAN_FLAGS_AUDIT_'+label+'=HOLD_HTTP_OR_BINDING_INCOMPATIBLE');
+              console.log('PACMAN_FLAGS_AUDIT_CLOUDFLARE_GET_ATTEMPTS='+count);
+              throw Error('PACMAN_FLAGS_AUDIT_STOP_NO_RETRY');
+            }
+            if(info.controlledBinding!=='SECRET_PRESENT_VALUE_OPAQUE'||
+               typeof info.version!=='string')
+              throw Error('PACMAN_FLAGS_AUDIT_INVALID_READBACK');
+            console.log('PACMAN_FLAGS_AUDIT_'+label+'_CONTROLLED_FLAG_SECRET_PRESENT_VALUE_OPAQUE');
+            console.log('PACMAN_FLAGS_AUDIT_'+label+'_D1_REQUIRED_SECRETS_AND_SERVICE_COMPATIBLE');
+            console.log('PACMAN_FLAGS_AUDIT_'+label+'_LIVE_DEPLOYMENT_ID_VALID');
+          }
+          if(count!==4)throw Error('PACMAN_FLAGS_AUDIT_EXPECTED_FOUR_GET_NOT_MET');
+          console.log('PACMAN_FLAGS_AUDIT_CLOUDFLARE_GET_ATTEMPTS='+count);
+          console.log('PACMAN_FLAGS_AUDIT_BOTH_WORKERS_FLAG_PRESENT_BINDINGS_COMPATIBLE');
+          console.log('PACMAN_FLAGS_AUDIT_NO_WORKER_GET_NO_CHALLENGE_NO_D1_NO_DEPLOY_NO_GITHUB_PUT');
+          NODE
