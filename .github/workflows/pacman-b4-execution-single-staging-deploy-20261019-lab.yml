@@ -1,0 +1,296 @@
+name: Pac-Man B4 ONE Execution staging deploy + receipt 003 protected LAB
+# Owner-authorized only: ONE new trigger, ONE protected staging Execution Worker deploy.
+# No prod/main/WebAuthn deployment or provider GitHub mutation. No reruns/retries.
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/pacman-b4/execution-single-deploy-trigger-20261019-001.json'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-b4-execution-one-deploy-20261019-001
+  cancel-in-progress: false
+jobs:
+  lab-safety:
+    if: >-
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' && github.run_attempt == 1 &&
+      github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: One-shot HEAD, manifest, source and exact Free cost owner evidence guard
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          const fail=x=>{throw Error('PACMAN_B4_ONE_DEPLOY_PRECHECK_HOLD_'+x)};
+          const trigger='.github/pacman-b4/execution-single-deploy-trigger-20261019-001.json';
+          const t=JSON.parse(fs.readFileSync(trigger,'utf8'));
+          const expected={
+           schema:1,operationId:'pacman-b4-execution-staging-one-deploy-20261019-001',
+           repository:'Br174/Chatgpt',branch:'motorlab/pacman-real-operations-lab-20261017',
+           target:'motorlab-pacman-execution-staging-lab',
+           immutablePeer:'motorlab-pacman-webauthn-staging-lab',
+           expectedExecutionVersion:'10b12647-e7e5-4321-84a0-fbfafb59365b',
+           expectedWebAuthnVersion:'86dce5ee-1710-4ad0-83c0-3e52271af753',
+           expectedMainHead:'8615e8321bf9896f28826a09aa0c9f61ce5ecbb7',
+           databaseId:'eb834fc1-5589-4f75-bcb9-d311d0d72261',
+           protectedEnvironment:'pacman-execution-staging',
+           allowedWorkerDeploys:1,allowedPrivateReceipt003Gets:1,
+           keepVars:true,allowD1SchemaMutation:false,allowD1Writes:false,
+           allowCloudflareSecretsMutation:false,allowGithubProviderPut:false,
+           allowNewWebAuthnChallenge:false,allowPluginMutation:false,
+           allowPaidServices:false,allowReplay:false,
+           costOwnerEvidence:'OWNER_2026-10-19_WORKERS_FREE_ACTIVE_NO_PAYMENT_METHOD',
+           workersOwnerObservedRequests:120,workersOwnerDailyLimit:100000,
+           d1Owner24HoursRowsRead:428,d1Owner24HoursRowsWritten:35
+          };
+          if(Object.keys(t).sort().join(',')!==[...Object.keys(expected),
+             'expectedParentSha','workflowBlobSha','sourceBlobSha','mcpBlobSha','configBlobSha'].sort().join(','))
+             fail('TRIGGER_FIELDS');
+          for(const [k,v] of Object.entries(expected))
+           if(JSON.stringify(t[k])!==JSON.stringify(v))fail('TRIGGER_'+k);
+          const git=a=>cp.execFileSync('git',a,{encoding:'utf8'}).trim();
+          if(git(['rev-parse','HEAD'])!==process.env.GITHUB_SHA)fail('HEAD');
+          if(git(['rev-parse','HEAD^'])!==t.expectedParentSha)fail('PARENT');
+          if(git(['diff-tree','--no-commit-id','--name-only','-r','HEAD'])!==trigger)
+            fail('UNAUTHORIZED_DIFF');
+          for(const [p,s] of [
+           ['.github/workflows/pacman-b4-execution-single-staging-deploy-20261019-lab.yml',t.workflowBlobSha],
+           ['tools/motorlab-pacman/worker-execution-staging.mjs',t.sourceBlobSha],
+           ['tools/motorlab-pacman/candidates/mcp-readonly-transport-lab.mjs',t.mcpBlobSha],
+           ['tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc',t.configBlobSha]
+          ])if(git(['hash-object',p])!==s)fail('SOURCE_BLOB_'+p);
+          const cf=JSON.parse(fs.readFileSync('tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc','utf8'));
+          if(cf.name!==t.target||cf.main!=='./worker-execution-staging.mjs'||cf.workers_dev!==true||
+            cf.d1_databases?.length!==1||cf.d1_databases[0]?.binding!=='DB'||
+            cf.d1_databases[0]?.database_name!=='motorlab-pacman-staging'||
+            cf.d1_databases[0]?.database_id!==t.databaseId||
+            cf.vars!==undefined||cf.routes!==undefined||cf.route!==undefined)fail('CF_CONFIG');
+          const code=fs.readFileSync('tools/motorlab-pacman/worker-execution-staging.mjs','utf8');
+          if(!code.includes('url.pathname==="/mcp"')||
+             !code.includes('url.pathname==="/__motorlab_lab/diagnostics/terminal-receipt-003"')||
+             !code.includes('url.pathname!=="/execute"'))fail('EXECUTION_SOURCE');
+          const ck=fs.readFileSync('tools/motorlab-pacman/lab-workspace/B4_CHAT_BRIDGE_READONLY_003_LAB_VERIFIED_20261019.md','utf8');
+          if(!ck.includes('992/992')||!ck.includes('NO_DEPLOY'))fail('MISSING_VERIFIED_CHECKPOINT');
+          const manifest=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
+          if(!manifest.includes('CURRENT_RELEASE=2026.10.14-r37'))fail('RELEASE_DRIFT');
+          // Owner dashboard proof, NOT the provider billing API (403; never retry).
+          // Explicit observed usage far below Free limits; no new paid services.
+          if(t.workersOwnerObservedRequests>=90000||t.d1Owner24HoursRowsRead>=4500000||
+             t.d1Owner24HoursRowsWritten>=90000)fail('COST_HEADROOM');
+          console.log('PACMAN_B4_ONE_DEPLOY_EXACT_SOURCE_AND_OWNER_FREE_EVIDENCE_PASS');
+          console.log('PACMAN_B4_ONE_DEPLOY_PRECHECK_NO_REMOTE_PROVIDER_CALL');
+          NODE
+      - name: Complete 992+ positive/negative LAB regressions without provider credentials
+        run: |
+          node --test tools/motorlab-pacman/test-pacman-core.mjs tools/motorlab-pacman/*.test.mjs tools/motorlab-pacman/candidates/*.test.mjs tools/motorlab-pacman/tests/*.test.mjs
+      - name: Bundled workerd runtime tests, no remote D1 or provider
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pacman-synthetic-workerd" --no-save --package-lock=false miniflare@4.20260730.0
+          PACMAN_MINIFLARE_MODULE="$RUNNER_TEMP/pacman-synthetic-workerd/node_modules/miniflare" node tools/motorlab-pacman/ci-worker-binding-runtime.mjs
+      - name: Build only, dry run of existing Worker config (must not deploy)
+        run: |
+          npx --yes wrangler@4 deploy --config tools/motorlab-pacman/wrangler.pacman-execution-staging.jsonc --dry-run --outdir "$RUNNER_TEMP/pacman-b4-dry-run" >/dev/null
+          echo PACMAN_B4_EXECUTION_BUNDLE_DRYRUN_PASS
+  protected-one-execution:
+    needs: lab-safety
+    if: >-
+      needs.lab-safety.result == 'success' &&
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    environment: pacman-execution-staging
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Owner-approved post-review LAB HEAD/main protection
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const fail=x=>{throw Error('PACMAN_B4_PROTECTED_HOLD_'+x)};
+          const get=async path=>{
+           const r=await fetch('https://api.github.com/repos/Br174/Chatgpt/'+path,{
+            method:'GET',redirect:'manual',signal:AbortSignal.timeout(12000),
+            headers:{accept:'application/vnd.github+json','user-agent':'pacman-owner-protected-staging'}});
+           if(r.status!==200)fail('GITHUB_GET_DENIED');return r.json();
+          };
+          const branch=await get('commits?sha=motorlab%2Fpacman-real-operations-lab-20261017&per_page=1');
+          const main=await get('branches/main');
+          if(branch[0]?.sha!==process.env.GITHUB_SHA||
+             main?.protected!==true||
+             main?.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7')
+             fail('SOURCE_OR_PROTECTED_MAIN_CHANGED');
+          console.log('PACMAN_B4_ONE_DEPLOY_AFTER_REVIEW_HEAD_MAIN_PINNED');
+          NODE
+      - name: Pre-deploy exact current Worker versions, preserved bindings, runtime HMAC and D1
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import crypto from 'node:crypto';
+          import {inspectActivationWorker,EXEC,WEB,ACCOUNT}
+            from './tools/motorlab-pacman/candidates/controlled-activation-provider-guard-lab.mjs';
+          import {protectedRuntimeEvidence}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          const fail=x=>{throw Error('PACMAN_B4_ONE_DEPLOY_PREFLIGHT_HOLD_'+x)};
+          if(process.env.CF_ACCOUNT!==ACCOUNT||
+             typeof process.env.CF_TOKEN!=='string'||process.env.CF_TOKEN.length<10||
+             typeof process.env.EXECUTION_KEY!=='string'||process.env.EXECUTION_KEY.length<32)
+            fail('MISSING_PROTECTED_SCOPED_SECRETS');
+          const snap={};
+          for(const name of [EXEC,WEB]){
+           let record;
+           try{record=await inspectActivationWorker({
+             name,account:ACCOUNT,token:process.env.CF_TOKEN,expectedFlag:'ON'});}
+           catch{fail('LIVE_BINDINGS_OR_VERSION_INVALID_'+name);}
+           const required=name===EXEC?'10b12647-e7e5-4321-84a0-fbfafb59365b':
+            '86dce5ee-1710-4ad0-83c0-3e52271af753';
+           if(record.version!==required||record.controlledBinding!=='SECRET_PRESENT_VALUE_OPAQUE')
+            fail('PINNED_VERSION_DRIFT_'+name);
+           snap[name]={version:record.version,
+            bindingSha256:crypto.createHash('sha256').update(record.stableBindings).digest('hex')};
+          }
+          try{await protectedRuntimeEvidence({
+            executionKey:process.env.EXECUTION_KEY,requireControlledSchema:true,requireOwner:true});
+          }catch{fail('HMAC_D1_OR_WEBAUTHN_RUNTIME_GUARD_FAILED');}
+          // Only low-sensitivity fingerprints, never secret values or snapshots.
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/pacman_b4_predeploy.json',JSON.stringify(snap),{mode:0o600,flag:'wx'});
+          console.log('PACMAN_B4_ONE_DEPLOY_LIVE_VERSIONS_BINDINGS_HMAC_D1_OWNER_PASS');
+          console.log('PACMAN_B4_ONE_DEPLOY_EXECUTION_BEFORE='+snap[EXEC].version);
+          console.log('PACMAN_B4_ONE_DEPLOY_WEBAUTHN_IMMUTABLE='+snap[WEB].version);
+          NODE
+      - name: Final just-in-time HEAD lease before deploy
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const r=await fetch('https://api.github.com/repos/Br174/Chatgpt/commits?sha=motorlab%2Fpacman-real-operations-lab-20261017&per_page=1',{
+           method:'GET',redirect:'manual',signal:AbortSignal.timeout(12000),
+           headers:{accept:'application/vnd.github+json','user-agent':'pacman-b4-last-gate'}});
+          if(r.status!==200||(await r.json())[0]?.sha!==process.env.GITHUB_SHA)
+           throw Error('PACMAN_B4_SOURCE_HEAD_DRIFT_JUST_BEFORE_DEPLOY');
+          console.log('PACMAN_B4_ONE_DEPLOY_JUST_IN_TIME_GITHUB_HEAD_PASS');
+          NODE
+      - name: ONE authorized deploy of existing Execution Worker only, --keep-vars and no retry
+        id: deploy
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          import {parseWranglerVersion}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          if(process.env.CF_ACCOUNT!=='b86f445c2b57e604c02f79c8da64bb9c'||
+             typeof process.env.CF_TOKEN!=='string'||process.env.CF_TOKEN.length<10||
+             !fs.existsSync(process.env.RUNNER_TEMP+'/pacman_b4_predeploy.json'))
+           throw Error('PACMAN_B4_ONE_DEPLOY_STAGING_SCOPE_STOP');
+          console.log('PACMAN_B4_ONE_EXECUTION_DEPLOY_ATTEMPT_START');
+          // Exactly one attempt, no automatic retries, no other worker or version upload.
+          let output;
+          try{
+           output=cp.execFileSync('npx',['--yes','wrangler@4','deploy','--config',
+             'wrangler.pacman-execution-staging.jsonc','--keep-vars'],{
+             cwd:'tools/motorlab-pacman',
+             env:{...process.env,CLOUDFLARE_API_TOKEN:process.env.CF_TOKEN,
+              CLOUDFLARE_ACCOUNT_ID:process.env.CF_ACCOUNT},
+             encoding:'utf8',timeout:180000,maxBuffer:3000000,
+             stdio:['ignore','pipe','pipe']
+           });
+          }catch{throw Error('PACMAN_B4_ONE_EXECUTION_DEPLOY_AMBIGUOUS_STOP_NO_RETRY');}
+          let version;
+          try{version=parseWranglerVersion(output)}
+          catch{throw Error('PACMAN_B4_ONE_DEPLOY_ACK_AMBIGUOUS_STOP_NO_RETRY')}
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'version='+version+'\n');
+          console.log('PACMAN_B4_ONE_EXECUTION_DEPLOY_ACKNOWLEDGED_VERSION='+version);
+          NODE
+      - name: Confirm both Worker versions, unchanged bindings, runtime HMAC, ONE terminal 003 GET
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          DEPLOYED_VERSION: ${{ steps.deploy.outputs.version }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import crypto from 'node:crypto';
+          import {inspectActivationWorker,EXEC,WEB,ACCOUNT}
+            from './tools/motorlab-pacman/candidates/controlled-activation-provider-guard-lab.mjs';
+          import {protectedRuntimeEvidence}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          const fail=x=>{throw Error('PACMAN_B4_ONE_DEPLOY_POST_HOLD_'+x)};
+          if(process.env.CF_ACCOUNT!==ACCOUNT||
+             typeof process.env.EXECUTION_KEY!=='string'||
+             typeof process.env.DEPLOYED_VERSION!=='string')fail('SCOPE_OR_DEPLOY_VERSION');
+          const old=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/pacman_b4_predeploy.json','utf8'));
+          for(const name of [EXEC,WEB]){
+           let current;
+           try{current=await inspectActivationWorker({
+             name,account:ACCOUNT,token:process.env.CF_TOKEN,expectedFlag:'ON'});}
+           catch{fail('POST_BINDINGS_OR_VERSION_INVALID_'+name);}
+           const hash=crypto.createHash('sha256').update(current.stableBindings).digest('hex');
+           if(hash!==old[name]?.bindingSha256)fail('BINDINGS_CHANGED_'+name);
+           if(name===WEB && (current.version!==old[WEB].version||
+                 current.version!=='86dce5ee-1710-4ad0-83c0-3e52271af753'))
+             fail('WEBAUTHN_VERSION_CHANGED');
+           if(name===EXEC && (current.version!==process.env.DEPLOYED_VERSION||
+                 current.version===old[EXEC].version))
+             fail('EXECUTION_VERSION_NOT_EXACT_NEW');
+          }
+          console.log('PACMAN_B4_ONE_DEPLOY_EXECUTION_NEW_VERSION_BINDINGS_PRESERVED');
+          console.log('PACMAN_B4_ONE_DEPLOY_WEBAUTHN_VERSION_AND_BINDINGS_UNCHANGED');
+          try{await protectedRuntimeEvidence({
+           executionKey:process.env.EXECUTION_KEY,
+           requireControlledSchema:true,requireOwner:true
+          });}catch{fail('POST_HMAC_D1_OWNER_HEALTH_FAILED')}
+          console.log('PACMAN_B4_ONE_DEPLOY_POST_HMAC_D1_OWNER_RUNTIME_PASS');
+          // Exactly ONE authenticated private GET; no query/body/automatic retry.
+          const url='https://'+EXEC+'.motorlab-staging.workers.dev/__motorlab_lab/diagnostics/terminal-receipt-003';
+          let response;
+          try{response=await fetch(url,{method:'GET',redirect:'manual',
+            headers:{authorization:'Bearer '+process.env.EXECUTION_KEY},
+            signal:AbortSignal.timeout(15000)});}
+          catch{fail('ONE_PRIVATE_GET_UNAVAILABLE_NO_RETRY')}
+          let result;
+          try{result=await response.json()}catch{fail('PRIVATE_GET_NON_JSON')}
+          const keys=Object.keys(result||{}).sort();
+          if(response.status!==200||
+             keys.join(',')!==['component','d1Writes','githubWrites','newChallenges','operationId','safeToRetry','state','status','verification'].sort().join(',')||
+             result.component!=='pacmanTerminalReceipt003ReadOnly'||
+             result.operationId!=='pacman-chat-passkey-sample-20261018-003'||
+             result.status!=='PASS'||result.state!=='VERIFIED_UPDATED'||
+             result.verification!=='EXACT_D1_RECEIPT_CONSUMED_CHALLENGE_SINGLE_NONCE'||
+             result.safeToRetry!==false||
+             result.d1Writes!==0||result.githubWrites!==0||result.newChallenges!==0)
+            fail('PRIVATE_RECEIPT_003_NOT_EXACT_PASS');
+          console.log('PACMAN_B4_ONE_PRIVATE_003_GET_EXACT_PASS');
+          console.log('PACMAN_B4_ONE_DEPLOY_VERIFIED_NO_D1_WRITE_NO_PROVIDER_PUT_NO_CHALLENGE');
+          NODE
