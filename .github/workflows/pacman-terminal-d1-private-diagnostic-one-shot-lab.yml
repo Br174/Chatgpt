@@ -1,0 +1,284 @@
+name: Pac-Man Terminal D1 Private Diagnostic LAB (protected one-shot)
+# Owner-authorized Execution staging recovery-only source overlay.
+# No new WebAuthn deploy, no remote D1 mutation, no flags, secrets or permissions changes.
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/workflows/pacman-terminal-d1-private-diagnostic-one-shot-lab.yml'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-execution-terminal-diagnostic-one-shot
+  # Retire an obsolete pending reviewer attempt before any protected job runs.
+  # A new source SHA is the single writer; protected HEAD preflight still applies.
+  cancel-in-progress: true
+jobs:
+  safety-preflight:
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1 && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Recovery-only security regression (no historical provider operation)
+        run: |
+          node --test tools/motorlab-pacman/candidates/controlled-worker-route-lab.test.mjs tools/motorlab-pacman/candidates/terminal-recovery-readonly-lab.test.mjs
+      - name: Check isolated Execution and WebAuthn configurations and scope
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {inspectControlledStagingDeploymentCandidate,STAGING_BRANCH} from './tools/motorlab-pacman/candidates/controlled-staging-deploy-preflight-lab.mjs';
+          const rd=p=>fs.readFileSync('tools/motorlab-pacman/'+p,'utf8');
+          const v=inspectControlledStagingDeploymentCandidate({
+           branch:STAGING_BRANCH,
+           executionConfig:rd('wrangler.pacman-execution-staging.jsonc'),
+           webauthnConfig:rd('webauthn/wrangler.pacman-webauthn-staging.jsonc'),
+           executionSource:rd('worker-execution-staging.mjs'),
+           webauthnSource:rd('webauthn/worker.mjs'),
+           ownerRouteSource:rd('candidates/webauthn-owner-handler-lab.mjs'),
+           relaySource:rd('candidates/webauthn-execution-relay-lab.mjs')
+          });
+          if(v.ready!==true||v.deployAllowed!==false||v.activationAllowed!==false)
+            throw Error('RECOVERY_ONLY_CONFIG_OR_GUARD_REJECTED');
+          console.log('PACMAN_RECOVERY_ONLY_STATIC_SCOPE_PASS');
+          NODE
+
+  protected-execution-recovery-only:
+    needs: safety-preflight
+    if: github.repository == 'Br174/Chatgpt' && github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' && github.run_attempt == 1 && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build exact recovery-only Execution source overlay with no chat handoff feature change
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import os from 'node:os';
+          import path from 'node:path';
+          import cp from 'node:child_process';
+          import {createHash} from 'node:crypto';
+          const BASE='7639c8c10831c72f9a52d35e081c3639de2c9808';
+          const T='tools/motorlab-pacman/';
+          const original=p=>cp.execFileSync('git',['show',BASE+':'+T+p],{encoding:'utf8',timeout:20000});
+          const read=p=>fs.readFileSync(T+p,'utf8');
+          const gitHash=s=>createHash('sha1').update('blob '+Buffer.byteLength(s)+'\0').update(s).digest('hex');
+          const pinned={
+           'worker-execution-staging.mjs':'fc96209738be47837b1d0280c7ed403c155c93e1',
+           'candidates/github-controlled-update-lab.mjs':'2fb0aa52a2cbba95ab4f62345115ff30977c2f3c',
+           'chat-approval.mjs':'adda78b86f78ef702861cfe34a63cfcbd068fc8f',
+           'chat-coordinator.mjs':'1b1382fa53c1d532c0d82b50ada4ec467dfe67b1'
+          };
+          if(cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()!==process.env.EXPECTED_SHA)
+           throw Error('RECOVERY_OVERLAY_HEAD_DRIFT');
+          for(const [name,sha] of Object.entries(pinned))
+           if(gitHash(read(name))!==sha)throw Error('RECOVERY_OVERLAY_SOURCE_DRIFT');
+          // The last protected Worker source is pinned by exact previous commit.
+          // Reject any differences other than this newly authorized fixed GET route.
+          const priorWorker=cp.execFileSync('git',[
+           'show','f6cbce055247fc7c5eb98c4ac11a844f74673145:'+T+'worker-execution-staging.mjs'
+          ],{encoding:'utf8',timeout:20000});
+          const currentWorker=read('worker-execution-staging.mjs');
+          const routeStart='  // Private, exact-scope, fixed GET diagnostic of the ONE terminal owner operation.';
+          const nextRoute='  if(url.pathname!=="/execute" || request.method!=="POST")';
+          const start=currentWorker.indexOf(routeStart);
+          const end=currentWorker.indexOf(nextRoute,start);
+          if(start<0||end<=start||currentWorker.indexOf(routeStart,start+1)!==-1||
+             currentWorker.slice(0,start)+currentWorker.slice(end)!==priorWorker)
+           throw Error('TERMINAL_DIAGNOSTIC_ONLY_WORKER_GRAFT_DRIFT');
+          console.log('PACMAN_PRIVATE_TERMINAL_DIAGNOSTIC_ONLY_SOURCE_DIFF_VERIFIED');
+          const oldApproval=original('chat-approval.mjs');
+          const oldCoordinator=original('chat-coordinator.mjs');
+          if(gitHash(oldApproval)!=='63dd13102ebaadad32d24cc95aa5221249e528a8'||
+             gitHash(oldCoordinator)!=='771e795b3259eb5bee3d802c8b4e441c490c9625'||
+             !read('chat-approval.mjs').startsWith(oldApproval))
+           throw Error('RECOVERY_DEPLOY_LEGACY_BASE_UNVERIFIED');
+          let limited=oldCoordinator;
+          const replaceOnce=(before,after)=>{
+           if(limited.split(before).length!==2)throw Error('RECOVERY_ONLY_GRAFT_SCOPE_FAILED');
+           limited=limited.replace(before,after);
+          };
+          replaceOnce('  async inspectControlledUpdateRecovery({operationId,branch,path}={}){',
+           '  async inspectControlledUpdateRecovery({operationId,branch,path,expectedSha,contentSha256}={}){');
+          replaceOnce('   return inspectGithubControlledUpdateRecovery({operationId,branch,path,adapter,',
+           '   return inspectGithubControlledUpdateRecovery({operationId,branch,path,\n     expectedSha,contentSha256,adapter,');
+          // Reject unrelated chat integration additions in the deployed bundle.
+          let stripped=read('chat-coordinator.mjs');
+          const newImport='import {validateChatApproval,validateControlledChatIntent,prepareControlledChatHandoff} from "./chat-approval.mjs";';
+          const oldImport='import {validateChatApproval,validateControlledChatIntent} from "./chat-approval.mjs";';
+          if(stripped.split(newImport).length!==2)throw Error('RECOVERY_ONLY_CHAT_IMPORT_DRIFT');
+          stripped=stripped.replace(newImport,oldImport);
+          const handoff=[
+           '  // Safe chat-to-owner handoff only. Not proof of ChatGPT-native connectivity.',
+           '  // No provider access, challenge, signer or ledger state is created.',
+           '  async prepareControlledChatHandoff(request){',
+           '   return prepareControlledChatHandoff(request);',
+           '  },',
+           ''
+          ].join('\n');
+          if(stripped.split(handoff).length!==2)throw Error('RECOVERY_ONLY_CHAT_HANDOFF_DRIFT');
+          stripped=stripped.replace(handoff,'');
+          if(stripped!==limited)throw Error('RECOVERY_ONLY_OTHER_COORDINATOR_CHANGES_DETECTED');
+          const out=path.join(os.tmpdir(),'pacman-execution-recovery-only-'+process.env.GITHUB_RUN_ID);
+          if(fs.existsSync(out))throw Error('RECOVERY_ONLY_OVERLAY_ALREADY_EXISTS');
+          fs.cpSync(T,out,{recursive:true});
+          fs.writeFileSync(path.join(out,'chat-approval.mjs'),oldApproval);
+          fs.writeFileSync(path.join(out,'chat-coordinator.mjs'),limited);
+          if(gitHash(fs.readFileSync(path.join(out,'chat-approval.mjs'),'utf8'))!=='63dd13102ebaadad32d24cc95aa5221249e528a8')
+           throw Error('RECOVERY_ONLY_APPROVAL_SOURCE_NOT_PRESERVED');
+          fs.appendFileSync(process.env.GITHUB_ENV,'PACMAN_RECOVERY_OVERLAY='+out+'\n');
+          console.log('PACMAN_RECOVERY_ONLY_OVERLAY_CONSTRUCTED_VALIDATED');
+          NODE
+      - name: Verify the exact temporary recovery-only Worker bundle with targeted tests
+        run: |
+          node --test "$PACMAN_RECOVERY_OVERLAY/candidates/controlled-worker-route-lab.test.mjs" "$PACMAN_RECOVERY_OVERLAY/candidates/terminal-recovery-readonly-lab.test.mjs"
+      - name: One protected preflight, exactly one Execution deploy, full postreadback
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          GH_READ_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import cp from 'node:child_process';
+          import {inspectActivationWorker,EXEC,WEB,ACCOUNT}
+            from './tools/motorlab-pacman/candidates/controlled-activation-provider-guard-lab.mjs';
+          import {protectedRuntimeEvidence,parseWranglerVersion}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          const fail=x=>{throw Error('RECOVERY_DEPLOY_STOP_'+x)};
+          const token=process.env.CF_TOKEN,key=process.env.EXECUTION_KEY;
+          if(process.env.CF_ACCOUNT!==ACCOUNT||typeof token!=='string'||token.length<10||
+             typeof key!=='string'||key.length<32||!process.env.GH_READ_TOKEN||
+             !process.env.PACMAN_RECOVERY_OVERLAY||!process.env.EXPECTED_SHA)fail('CREDENTIALS_OR_SCOPE');
+          const root='https://api.github.com/repos/Br174/Chatgpt';
+          const auth={authorization:'Bearer '+process.env.GH_READ_TOKEN,accept:'application/vnd.github+json'};
+          const gitGet=async url=>{
+           const r=await fetch(url,{method:'GET',redirect:'manual',headers:auth,signal:AbortSignal.timeout(15000)});
+           if(r.status!==200)fail('GITHUB_READ');
+           return r.json();
+          };
+          const assertHead=async()=>{
+           const [lab,main]=await Promise.all([
+            gitGet(root+'/git/ref/heads/motorlab/pacman-real-operations-lab-20261017'),
+            gitGet(root+'/branches/main')
+           ]);
+           if(lab?.object?.sha!==process.env.EXPECTED_SHA||
+              main?.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7')
+            fail('SOURCE_OR_MAIN_HEAD_DRIFT');
+          };
+          await assertHead();
+          const check=n=>inspectActivationWorker({name:n,account:ACCOUNT,token,expectedFlag:'ON'});
+          const beforeE=await check(EXEC),beforeW=await check(WEB);
+          await protectedRuntimeEvidence({executionKey:key,requireControlledSchema:true,requireOwner:true});
+          if(beforeE.controlledBinding!=='SECRET_PRESENT_VALUE_OPAQUE'||
+             beforeW.controlledBinding!=='SECRET_PRESENT_VALUE_OPAQUE')
+           fail('STAGING_FLAG_UNVERIFIED');
+          await assertHead();
+          console.log('PACMAN_RECOVERY_PROTECTED_PREDPLOY_VERSION_D1_FLAGS_HMAC_OWNER_VERIFIED');
+          // One and ONLY ONE remote changing command. No retries or rollback.
+          let output;
+          try {
+           output=cp.execFileSync('npx',['--yes','wrangler@4','deploy','--config',
+            'wrangler.pacman-execution-staging.jsonc','--keep-vars'],{
+             cwd:process.env.PACMAN_RECOVERY_OVERLAY,encoding:'utf8',timeout:180000,
+             maxBuffer:5_000_000,stdio:['ignore','pipe','pipe'],
+             env:{...process.env,CLOUDFLARE_API_TOKEN:token,CLOUDFLARE_ACCOUNT_ID:ACCOUNT}
+            });
+          }catch{fail('SINGLE_WRANGLER_DEPLOY_FAILED_NO_RETRY')}
+          const version=parseWranglerVersion(output);
+          console.log('PACMAN_RECOVERY_ONE_EXECUTION_DEPLOY_ACKNOWLEDGED');
+          // POST checks are GET-only. On anomaly stop, do NOT retry or rollback.
+          const afterE=await check(EXEC),afterW=await check(WEB);
+          if(afterE.version!==version||afterE.version===beforeE.version||
+             afterW.version!==beforeW.version||
+             afterE.stableBindings!==beforeE.stableBindings||
+             afterW.stableBindings!==beforeW.stableBindings||
+             afterE.controlledBinding!==beforeE.controlledBinding||
+             afterW.controlledBinding!==beforeW.controlledBinding)
+           fail('DEPLOY_VERSION_OR_BINDING_POSTCHECK');
+          await protectedRuntimeEvidence({executionKey:key,requireControlledSchema:true,requireOwner:true});
+          await assertHead();
+          console.log('PACMAN_RECOVERY_EXECUTION_ONLY_VERSION_CHANGED');
+          console.log('PACMAN_RECOVERY_WEBAUTHN_VERSION_UNCHANGED');
+          console.log('PACMAN_RECOVERY_SECRET_FLAG_D1_AND_HMAC_METADATA_PRESERVED');
+          console.log('PACMAN_RECOVERY_DEPLOY_VERIFIED_NO_GITHUB_PUT_NO_CHALLENGE');
+          // Strictly non-mutating verification of one already completed operation.
+          // Terminal D1 proof is required BEFORE the one recovery-mode POST.
+          const host='https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev';
+          const diagUrl=host+'/__motorlab_lab/diagnostics/terminal-fresh-recovery-002';
+          async function terminal(){
+           const r=await fetch(diagUrl,{method:'GET',redirect:'manual',
+            headers:{authorization:'Bearer '+key},signal:AbortSignal.timeout(15000)});
+           if(r.status!==200)fail('TERMINAL_READONLY_DIAG_HTTP_'+r.status);
+           let p;try{p=await r.json()}catch{fail('TERMINAL_READONLY_JSON_INVALID')}
+           if(p?.component!=='pacmanTerminalRecoveryReadOnly'||
+              p.operationId!=='pacman-controlled-fresh-20261018-002'||
+              p.state!=='VERIFIED_UPDATED'||p.verification!=='EXACT_D1_RECEIPT'||
+              p.expectedSha!=='6efd503cf4ab437ca96004365916854075be4723'||
+              p.blobSha!=='a75724abdc7bd7681621c4c84790f860a6b8fe34'||
+              p.commitSha!=='ff37c8af10854cb296116e911ab6c3092f78b69d'||
+              p.contentSha256!=='332495567676c9d4229d48e4855f5a532413484056395a6aeef4c0d77382f785'||
+              p.challengeCount!==1||p.consumedCount!==1||p.nonceClaimCount!==1||
+              p.safeToRetry!==false||p.d1Writes!==0||p.gitHubWrites!==0||
+              p.newChallenges!==0)
+            fail('TERMINAL_D1_RECEIPT_OR_APPROVAL_NOT_VERIFIED');
+           return p;
+          }
+          const proven=await terminal();
+          console.log('PACMAN_TERMINAL_D1_CHALLENGE_AND_NONCE_ALL_VERIFIED_ON_WORKER');
+          // Private recovery dispatch for TERMINAL evidence only. One call.
+          // No attestation, content, approval or new operation is ever submitted.
+          const intent={
+           capability:'github.lab-file-update',
+           operationId:proven.operationId,
+           branch:'motorlab/pacman-real-operations-lab-20261017',
+           path:'tools/motorlab-pacman/lab-workspace/pacman-fresh-owner-20261018-002.txt',
+           expectedSha:proven.expectedSha,
+           contentSha256:proven.contentSha256
+          };
+          const rr=await fetch(host+'/execute',{method:'POST',redirect:'manual',
+           headers:{authorization:'Bearer '+key,'content-type':'application/json'},
+           body:JSON.stringify({mode:'github-lab-controlled-recovery',intent}),
+           signal:AbortSignal.timeout(15000)});
+          if(rr.status!==200)fail('TERMINAL_RECOVERY_HTTP_'+rr.status);
+          let recovered;try{recovered=await rr.json()}catch{fail('TERMINAL_RECOVERY_JSON_INVALID')}
+          if(recovered?.state!=='VERIFIED_UPDATED'||
+             recovered.verification!=='PERSISTED_RECEIPT_ONLY'||
+             recovered.safeToRetry!==false||
+             recovered.operationId!==proven.operationId||
+             recovered.branch!==intent.branch||recovered.path!==intent.path||
+             recovered.expectedSha!==proven.expectedSha||
+             recovered.contentSha256!==proven.contentSha256||
+             recovered.blobSha!==proven.blobSha||recovered.commitSha!==proven.commitSha)
+           fail('TERMINAL_RECOVERY_MISMATCH');
+          console.log('PACMAN_TERMINAL_REAL_RECOVERY_READBACK_VERIFIED_NO_RETRY');
+          const unchanged=await terminal();
+          if(JSON.stringify(unchanged)!==JSON.stringify(proven))
+           fail('TERMINAL_D1_AUDIT_CHANGED_AFTER_RECOVERY');
+          const [endExecution,endWeb]=await Promise.all([check(EXEC),check(WEB)]);
+          if(endExecution.version!==afterE.version||endWeb.version!==afterW.version||
+             endExecution.stableBindings!==afterE.stableBindings||
+             endWeb.stableBindings!==afterW.stableBindings)
+           fail('POST_RECOVERY_WORKER_METADATA_DRIFT');
+          await assertHead();
+          console.log('PACMAN_TERMINAL_D1_RECEIPT_AND_WORKER_VERSIONS_UNCHANGED');
+          console.log('PACMAN_TERMINAL_DIAGNOSTIC_NO_D1_WRITES_NO_GITHUB_PUT_NO_CHALLENGE');
+          NODE
