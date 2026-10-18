@@ -1,0 +1,113 @@
+name: Pac-Man B4 Chat to Worker Read-Only LAB
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/pacman-b4/trigger-readonly-20261018.json'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-b4-chat-readonly-one-shot-lab
+  cancel-in-progress: false
+jobs:
+  source-preflight:
+    if: >-
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1 &&
+      github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Fail closed on unexpected commit, scope, or repetition
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          const fail=why=>{throw Error('PACMAN_B4_PREFLIGHT_DENIED_'+why)};
+          const expectedPath='.github/pacman-b4/trigger-readonly-20261018.json';
+          const t=JSON.parse(fs.readFileSync(expectedPath,'utf8'));
+          if(t.schema!==1||t.operationId!=='pacman-b4-chat-readonly-20261018-001'||
+             t.kind!=='READ_ONLY_SINGLE_WORKER_GET'||t.allowedGets!==1||
+             t.targetBranch!=='motorlab/pacman-real-operations-lab-20261017'||
+             t.endpoint!=='/__motorlab_lab/diagnostics/execution-schema-audit'||
+             t.costMode!=='FREE_VERIFIED_OR_HOLD'||
+             t.productionChangesAllowed!==false||t.replayAllowed!==false)fail('INVALID_TRIGGER');
+          const cmd=arg=>cp.execFileSync('git',arg,{encoding:'utf8'}).trim();
+          const parent=cmd(['rev-parse','HEAD^']);
+          const changed=cmd(['diff-tree','--no-commit-id','--name-only','-r','HEAD']).split('\n');
+          if(changed.length!==1||changed[0]!==expectedPath)fail('UNEXPECTED_DIFF');
+          if(parent!==t.expectedParentSha)fail('STALE_PARENT');
+          if(cmd(['rev-parse','HEAD'])!==process.env.GITHUB_SHA)fail('HEAD_CHANGED');
+          console.log('PACMAN_B4_TRIGGER_EXACT_SHA_BRANCH_PATH_SINGLE_USE_PREFLIGHT_PASS');
+          NODE
+  protected-diagnostic:
+    needs: source-preflight
+    if: >-
+      needs.source-preflight.result == 'success' &&
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-latest
+    environment: pacman-execution-staging
+    timeout-minutes: 4
+    steps:
+      - name: Free-plan guard then ONE authenticated Worker GET, otherwise HOLD
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import crypto from 'node:crypto';
+          const hold=reason=>{console.log('PACMAN_B4_HOLD_NO_WORKER_GET_'+reason);process.exit(0)};
+          const denied=reason=>{throw Error('PACMAN_B4_DIAGNOSTIC_FAILED_'+reason)};
+          if(!process.env.CF_TOKEN||!process.env.CF_ACCOUNT||!process.env.EXECUTION_KEY)hold('EXISTING_PROTECTED_CREDENTIALS_UNAVAILABLE');
+          if(!/^[a-f0-9]{32}$/i.test(process.env.CF_ACCOUNT))hold('INVALID_CF_ACCOUNT_ID');
+          if(process.env.EXECUTION_KEY.length<32)hold('INVALID_EXECUTION_KEY');
+          // Read billing metadata only. Unknown or paid plan blocks ALL Worker traffic.
+          const cfUrl=`https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT}/subscriptions`;
+          let bill;
+          try {
+            const r=await fetch(cfUrl,{method:'GET',headers:{Authorization:`Bearer ${process.env.CF_TOKEN}`},
+              redirect:'manual',signal:AbortSignal.timeout(10000)});
+            if(r.status!==200)hold('FREE_PLAN_UNVERIFIED');
+            bill=await r.json();
+          } catch {hold('FREE_PLAN_UNVERIFIED')}
+          if(bill?.success!==true||!Array.isArray(bill.result))hold('FREE_PLAN_UNVERIFIED');
+          const workers=bill.result.filter(s=>/workers/i.test(JSON.stringify({
+            product:s.product,rate_plan:s.rate_plan,name:s.name,plan:s.plan})));
+          const free=workers.length===1&&
+            /(^|[ _-])free($|[ _-])/i.test(String(workers[0].rate_plan?.id||workers[0].rate_plan?.name||workers[0].plan?.id||''))&&
+            !/paid|pro|enterprise|business/i.test(JSON.stringify(workers[0].rate_plan||workers[0].plan||''));
+          if(!free)hold('FREE_PLAN_NOT_PROVEN');
+          console.log('PACMAN_B4_CLOUDFLARE_WORKERS_FREE_BILLING_PREFLIGHT_PASS');
+          const host='https://motorlab-pacman-execution-staging-lab.motorlab-staging.workers.dev';
+          const path='/__motorlab_lab/diagnostics/execution-schema-audit';
+          let result;
+          try {
+            const r=await fetch(host+path,{method:'GET',
+              headers:{Authorization:`Bearer ${process.env.EXECUTION_KEY}`},
+              redirect:'manual',signal:AbortSignal.timeout(12000)});
+            if(r.status!==200)denied('WORKER_HTTP_'+r.status);
+            result=await r.json();
+          } catch(e) {denied('TRANSPORT_OR_RESPONSE_INVALID')}
+          if(result?.component!=='pacmanExecutionReadOnlySchemaAudit'||
+             result?.schema!=='EXACT'||result?.controlledLedgerSchema!=='EXACT')
+             denied('SCHEMA_OR_COMPONENT_MISMATCH');
+          const publicProof={component:result.component,schema:result.schema,
+            controlledLedgerSchema:result.controlledLedgerSchema};
+          const digest=crypto.createHash('sha256').update(JSON.stringify(publicProof)).digest('hex');
+          console.log('PACMAN_B4_REAL_WORKER_GET_VERIFIED');
+          console.log('PACMAN_B4_PUBLIC_METADATA_DIGEST_SHA256='+digest);
+          console.log('PACMAN_B4_SINGLE_GET_NO_DEPLOY_NO_D1_WRITE_NO_GITHUB_PUT');
+          NODE
