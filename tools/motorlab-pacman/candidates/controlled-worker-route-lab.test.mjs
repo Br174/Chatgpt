@@ -254,3 +254,73 @@ test("intent-only recovery refuses unsigned writes, altered scope and unexpected
  assert.equal(r.state.put,0);
  assert.equal(r.db.mutationCount,0);
 });
+
+test("persisted VERIFIED_UPDATED recovers from the same D1 ledger without new GitHub GET/PUT or nonce claim",async()=>{
+ const intent=intentFor("controlled-terminal-proof-001"),r=rig();
+ const result=await run(r,await signed(intent));
+ assert.equal(result.status,200);
+ const receipt=await result.json();
+ assert.equal(receipt.state,"VERIFIED_UPDATED");
+ const before={reads:r.state.reads,puts:r.state.put,db:r.db.mutationCount,
+  ledgerSize:r.db.receipts.size};
+ const scoped={mode:"github-lab-controlled-recovery",intent};
+ const recovery=await run(r,scoped);
+ assert.equal(recovery.status,200);
+ const stable=await recovery.json();
+ assert.equal(stable.state,"VERIFIED_UPDATED");
+ assert.equal(stable.verification,"PERSISTED_RECEIPT_ONLY");
+ assert.equal(stable.safeToRetry,false);
+ assert.equal(stable.expectedSha,intent.expectedSha);
+ assert.equal(stable.contentSha256,intent.contentSha256);
+ assert.equal(stable.blobSha,receipt.blobSha);
+ assert.equal(stable.commitSha,receipt.commitSha);
+ const again=await run(r,scoped);
+ assert.equal(again.status,200);
+ assert.deepEqual(await again.json(),stable);
+ assert.equal(r.state.reads,before.reads);
+ assert.equal(r.state.put,before.put);
+ assert.equal(r.db.mutationCount,before.db);
+ assert.equal(r.db.receipts.size,before.ledgerSize);
+ assert.equal(r.db.receipts.get(intent.operationId).state,"VERIFIED_UPDATED");
+});
+
+test("terminal D1 receipt cannot be recovered with altered expected SHA, content digest or malformed durable proof",async()=>{
+ const intent=intentFor("controlled-terminal-scope-001"),r=rig();
+ assert.equal((await run(r,await signed(intent))).status,200);
+ const before={reads:r.state.reads,puts:r.state.put,db:r.db.mutationCount};
+ for(const wrong of [
+  {...intent,expectedSha:"d".repeat(40)},
+  {...intent,contentSha256:"e".repeat(64)}
+ ]){
+  const rejected=await run(r,{mode:"github-lab-controlled-recovery",intent:wrong});
+  assert.equal(rejected.status,409);
+ }
+ const originalReceipt=r.db.receipts.get(intent.operationId);
+ for(const corrupted of [
+  {...originalReceipt,commitSha:"invalid"},
+  {...originalReceipt,blobSha:intent.expectedSha},
+  {...originalReceipt,previousSha:"f".repeat(40)},
+  {...originalReceipt,path:"tools/motorlab-pacman/lab-workspace/OTHER.md"}
+ ]){
+  r.db.receipts.set(intent.operationId,corrupted);
+  const rejected=await run(r,{mode:"github-lab-controlled-recovery",intent});
+  assert.equal(rejected.status,409);
+ }
+ r.db.receipts.set(intent.operationId,originalReceipt);
+ assert.equal(r.state.put,before.put);
+ assert.equal(r.state.reads,before.reads);
+ assert.equal(r.db.mutationCount,before.db);
+});
+
+test("ambiguous-provider recovery refuses a different content hash for the same operation without any repeat PUT",async()=>{
+ const intent=intentFor("controlled-ambiguous-scope-001"),r=rig({ambiguousPut:true});
+ assert.equal((await run(r,await signed(intent))).status,409);
+ assert.equal(r.db.receipts.get(intent.operationId).state,"RECOVERY_REQUIRED");
+ const before={reads:r.state.reads,puts:r.state.put,db:r.db.mutationCount};
+ const wrong={...intent,contentSha256:"e".repeat(64)};
+ const rejected=await run(r,{mode:"github-lab-controlled-recovery",intent:wrong});
+ assert.equal(rejected.status,409);
+ assert.equal(r.state.reads,before.reads);
+ assert.equal(r.state.put,before.put);
+ assert.equal(r.db.mutationCount,before.db);
+});
