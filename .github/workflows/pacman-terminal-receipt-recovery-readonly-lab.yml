@@ -69,8 +69,9 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import {createHash} from 'node:crypto';
-          import {inspectActivationWorker,EXEC,WEB,ACCOUNT,D1}
+          import {inspectActivationWorker,EXEC,WEB,ACCOUNT}
            from './tools/motorlab-pacman/candidates/controlled-activation-provider-guard-lab.mjs';
+          import {D1} from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
           import {protectedRuntimeEvidence}
            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
           const stop=reason=>{throw Error('PACMAN_READONLY_RECOVERY_STOP_'+reason)};
