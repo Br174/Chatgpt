@@ -24,3 +24,26 @@ If either flag PUT is performed but readback fails, STOP without retries or roll
 Activation preparation 100%; actual runtime flag changes 0/2, real provider GitHub update 0.
 A=4/4 100%, B=2/4 50%, C=2/4 50%, D=2/4 50%.
 GLOBAL=10/16=62.50%, delta 0 percentage points until live controlled activation gates are actually verified.
+
+## Protected staging flag activation SUCCESS — 2026-10-18
+
+### Verified live provider evidence
+- User approved BOTH separate mandatory GitHub environment reviews, Execution first and WebAuthn second, in original protected one-shot GitHub Actions workflow run #1 `Pac-Man Controlled Flag Activation Staging LAB` ID 39093772719 at source SHA `9a28d69413ab8bdf8f2ac564c8eeb9b826050b6b`. Official GitHub API independently reports COMPLETED SUCCESS attempt 1; jobs `activation-preflight` ID 117575821147 SUCCESS, `protected-execution-flag` ID 117575869785 SUCCESS, `protected-webauthn-flag` ID 117617063229 SUCCESS.
+- Exact protected Execution log markers, authenticated GitHub action: `PACMAN_ACTIVATION_EXECUTION_PRECHECK_VERIFIED`, `PACMAN_ACTIVATION_EXECUTION_ONE_SECRET_PUT_ACKNOWLEDGED`, `PACMAN_ACTIVATION_EXECUTION_ONLY_FLAG_AND_HMAC_VERIFIED`, `PACMAN_ACTIVATION_NO_GITHUB_WRITE_NO_WEBAUTHN_CHALLENGE`, `PACMAN_ACTIVATION_EXECUTION_ONLY_VERIFIED_OWNER_ENTRY_STILL_OFF`. This shows one approved flag put to Execution, exact other bindings/version HMAC/owner/D1 readback, and WebAuthn owner entry kept OFF while intermediate.
+- Exact protected WebAuthn log markers: `PACMAN_ACTIVATION_WEBAUTHN_PRECHECK_VERIFIED`, `PACMAN_ACTIVATION_WEBAUTHN_ONE_SECRET_PUT_ACKNOWLEDGED`, `PACMAN_ACTIVATION_WEBAUTHN_ONLY_FLAG_AND_HMAC_VERIFIED`, `PACMAN_ACTIVATION_NO_GITHUB_WRITE_NO_WEBAUTHN_CHALLENGE`, `PACMAN_ACTIVATION_BOTH_CONTROLLED_FLAG_BINDINGS_PRESENT`, `PACMAN_ACTIVATION_NO_BIOMETRIC_NO_D1_WRITE_NO_GITHUB_FILE_UPDATE`. Execution new version was pinned in second job and left unchanged; Worker readback included HMAC, D1 schema exact, historic owner and bindings checks.
+- Both Workers' `PACMAN_CONTROLLED_UPDATE_ENABLED` controlled flag was set with exact authorized `YES_REVIEWED_STAGING_CONTROLLED_UPDATE` via ONE protected `wrangler@4 secret put` command per Worker. GET settings confirms a new `secret_text` binding present after each PUT and the other non-secret metadata and secret binding name/type preserved. Provider secret values are opaque and NOT independently readable; do NOT claim proof of byte-for-byte values of unrelated secrets. Actual Worker versions changed as a normal effect of `secret put`.
+- The logged activation is NOT evidence of a live GitHub provider write via Pac-Man, biometric challenge, actual durable D1 write or complete replay/recovery under real conditions. No such actions were authorized or executed. Both flag bindings present with positive HMAC and owner readbacks satisfies only the staging feature enablement milestone.
+- The original Execution postdeploy propagation guard incident is documented separately; do NOT rewrite history or assert root cause conclusively. All current live protected checks passed during these two flag jobs.
+- No main/MADRE/historic LAB/production write or unapproved D1 schema/data mutation, no other Cloudflare services or paid infrastructure, no token/permission/environment protection changes. Main SHA `8615e8321bf9896f28826a09aa0c9f61ce5ecbb7` confirmed unchanged before this checkpoint.
+
+### Hierarchical progress cascade (evidence-based)
+- Staging two-flag activation 2/2 = 100%, delta +50 percentage points compared with earlier verified 1/2 (50%).
+- Stage C Cloudflare staging 3/4 = 75%, delta +25 pp, because C3 controlled staged enablement is now positively verified; C4 real controlled end-to-end remains OPEN.
+- Stage A GitHub 4/4=100%, delta 0 pp; Stage B chat/owner real WebAuthn 2/4=50%, delta 0 pp; Stage D recovery/real e2e 2/4=50%, delta 0 pp.
+- GLOBAL Pac-Man Real Operations 11/16 = 68.75%, delta +6.25 percentage points from 10/16=62.50%. Never count a real GitHub provider operation or owner passkey challenge that did not occur.
+
+### Next explicit authorization boundary
+- Real e2e capability `github.lab-file-update` requires a NEW separate owner approval specifying exactly one LAB branch, allowed temporary test file, starting Git blob SHA, approved new content SHA-256, one operation ID and owner WebAuthn/passkey consent. Perform pre-read of actual file, anti-replay proof, durable D1 approval/receipt, GitHub readback and idempotency/recovery on ambiguity; no main/production/MADRE/old LAB, other files, credential rotation, unrelated D1 query/schema/data manipulation or fees.
+- Do not initiate a live challenge or real provider GitHub content update merely because both flags are enabled. The protected one-shot activation workflow must NOT be rerun. Any next LAB checkpoint commit is a normal source-only GitHub update and not a Pac-Man-issued content mutation.
+STATUS=STAGING_BOTH_CONTROLLED_FLAG_BINDINGS_ON_VERIFIED; LIVE_BIOMETRIC_AND_GITHUB_WRITE_NOT_AUTHORIZED_NOT_TESTED; MAIN_PROTECTED_UNCHANGED.
+Evidence: https://github.com/Br174/Chatgpt/actions/runs/39093772719
