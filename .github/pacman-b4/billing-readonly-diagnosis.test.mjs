@@ -1,0 +1,21 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {classifyBillingReply,diagnoseBillingReadOnly} from "./billing-readonly-diagnosis.mjs";
+const free={success:true,result:[{product:"Workers",rate_plan:{id:"free",public_name:"Workers Free"},state:"Provisioned",price:0}]};
+const paid={success:true,result:[{product:"Workers",rate_plan:{id:"pro",public_name:"Workers Paid"},state:"Paid",price:5}]};
+const fake=reply=>async(u,opts)=>{assert.match(u,/^https:\/\/api\.cloudflare\.com\/client\/v4\/accounts\/[0-9a-f]{32}\/subscriptions$/);assert.equal(opts.method,"GET");assert.equal(opts.redirect,"manual");assert.equal(opts.headers.Accept,"application/json");assert.match(opts.headers.Authorization,/^Bearer /);return {status:reply.status??200,text:async()=>reply.text??JSON.stringify(reply.body)}}; 
+const token="not-a-real-token-1234567890",accountId="a".repeat(32);
+for(const [status,expected] of [[400,"HTTP_400_REQUEST_REJECTED"],[401,"HTTP_401_TOKEN_INVALID_OR_UNAUTHORIZED"],[403,"HTTP_403_BILLING_READ_OR_ACCOUNT_SCOPE_DENIED"],[404,"HTTP_404_ACCOUNT_OR_ENDPOINT_NOT_FOUND"],[429,"HTTP_429_RATE_LIMITED"],[503,"HTTP_5XX_CLOUDFLARE_UNAVAILABLE"]])
+  test("negative response "+status,()=>assert.equal(classifyBillingReply(status,{}).code,expected));
+test("identifies a clearly marked free Workers candidate without asserting quotas",()=>assert.equal(classifyBillingReply(200,free).code,"WORKERS_FREE_SUBSCRIPTION_CANDIDATE_QUOTAS_UNVERIFIED"));
+test("paid Workers blocked",()=>assert.equal(classifyBillingReply(200,paid).code,"NONZERO_OR_PAID_WORKERS_SUBSCRIPTION_DETECTED_HOLD"));
+test("zone free not confused with Workers Free",()=>assert.equal(classifyBillingReply(200,{success:true,result:[{rate_plan:{id:"free",public_name:"Free Website"}}]}).code,"WORKERS_SUBSCRIPTION_NOT_UNIQUELY_IDENTIFIED"));
+test("multiple Workers subscriptions fail closed",()=>assert.equal(classifyBillingReply(200,{success:true,result:[...free.result,...paid.result]}).code,"WORKERS_SUBSCRIPTION_NOT_UNIQUELY_IDENTIFIED"));
+test("missing subscription data fails closed",()=>assert.equal(classifyBillingReply(200,{success:true,result:null}).code,"HTTP_200_INVALID_BILLING_SCHEMA"));
+test("missing price cannot assert free",()=>assert.equal(classifyBillingReply(200,{success:true,result:[{product:"Workers",rate_plan:{id:"free"},state:"Provisioned"}]}).code,"WORKERS_PLAN_OR_COST_UNVERIFIED"));
+test("protected credentials required before network",async()=>{let calls=0;const out=await diagnoseBillingReadOnly({token:"bad",accountId,fetchImpl:()=>{calls++}});assert.equal(out.http,0);assert.equal(calls,0)});
+test("only a single GET request to the account API",async()=>{let calls=0;const out=await diagnoseBillingReadOnly({token,accountId,fetchImpl:async(...args)=>{calls++;return fake({body:free})(...args)}});assert.equal(calls,1);assert.equal(out.http,200)});
+test("403 classified safely without response body or logs",async()=>assert.equal((await diagnoseBillingReadOnly({token,accountId,fetchImpl:fake({status:403})})).code,"HTTP_403_BILLING_READ_OR_ACCOUNT_SCOPE_DENIED"));
+test("non-JSON body yields safe diagnostic",async()=>assert.equal((await diagnoseBillingReadOnly({token,accountId,fetchImpl:fake({text:"invalid"})})).code,"BILLING_RESPONSE_NOT_VALID_JSON"));
+test("transport errors fail closed and never retry",async()=>{let calls=0;const v=await diagnoseBillingReadOnly({token,accountId,fetchImpl:()=>{calls++;throw Error("private details")}});assert.equal(v.code,"CLOUDFLARE_API_TRANSPORT_FAILED");assert.equal(calls,1)});
+test("large responses fail closed",async()=>assert.equal((await diagnoseBillingReadOnly({token,accountId,fetchImpl:fake({text:" ".repeat(66000)})})).code,"BILLING_RESPONSE_EXCEEDS_SAFE_LIMIT"));
