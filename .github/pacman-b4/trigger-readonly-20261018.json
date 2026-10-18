@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "operationId": "pacman-b4-chat-readonly-20261018-001",
+  "kind": "READ_ONLY_SINGLE_WORKER_GET",
+  "targetBranch": "motorlab/pacman-real-operations-lab-20261017",
+  "endpoint": "/__motorlab_lab/diagnostics/execution-schema-audit",
+  "allowedGets": 1,
+  "costMode": "FREE_VERIFIED_OR_HOLD",
+  "productionChangesAllowed": false,
+  "replayAllowed": false,
+  "expectedParentSha": "2c479934a75c6f3d5fbf7c333be60a03b9714577"
+}
