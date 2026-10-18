@@ -130,6 +130,8 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_ENV,'PACMAN_RECOVERY_OVERLAY='+out+'\n');
           console.log('PACMAN_RECOVERY_ONLY_OVERLAY_CONSTRUCTED_VALIDATED');
           NODE
+      - name: Verify the exact temporary recovery-only Worker bundle with targeted tests
+        run: |
           node --test "$PACMAN_RECOVERY_OVERLAY/candidates/controlled-worker-route-lab.test.mjs"
       - name: One protected preflight, exactly one Execution deploy, full postreadback
         env:
