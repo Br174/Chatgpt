@@ -113,6 +113,25 @@ export async function inspectGithubControlledUpdateRecovery({
  if(typeof adapter?.readControlled!=="function")fail("CONTROLLED_ADAPTER_REQUIRED");
  if(typeof onCheckpoint!=="function")fail("CHECKPOINT_WRITER_REQUIRED");
  const prior=await ledger.get(operationId);
+ // A previously VERIFIED_UPDATED operation is terminal and already has a
+ // durable provider readback receipt. Recover its D1 receipt in read-only mode,
+ // without another challenge, nonce claim, GitHub GET, PUT or D1 mutation.
+ // This reports persisted evidence, NOT a fresh independent provider check.
+ if(prior?.state==="VERIFIED_UPDATED"){
+  if(prior.schema!==1||prior.operationId!==operationId||
+     prior.branch!==branch||prior.path!==path||
+     !SHA.test(prior.expectedSha||"")||
+     prior.previousSha!==prior.expectedSha||
+     !SHA.test(prior.blobSha||"")||prior.blobSha===prior.expectedSha||
+     !SHA.test(prior.commitSha||"")||
+     !/^[a-f0-9]{64}$/.test(prior.contentSha256||""))
+    fail("RECOVERY_RECEIPT_REQUIRED");
+  return Object.freeze({schema:1,operationId,branch,path,
+   expectedSha:prior.expectedSha,contentSha256:prior.contentSha256,
+   blobSha:prior.blobSha,commitSha:prior.commitSha,
+   state:"VERIFIED_UPDATED",verification:"PERSISTED_RECEIPT_ONLY",
+   safeToRetry:false});
+ }
  // Idempotent recovery readback: a settled, unattributed receipt is final.
  // No second GitHub GET, nonce claim, ledger write or GitHub PUT is allowed.
  if(prior?.state==="RECOVERY_CONTENT_MATCH_UNATTRIBUTED"&&
