@@ -113,6 +113,20 @@ export async function inspectGithubControlledUpdateRecovery({
  if(typeof adapter?.readControlled!=="function")fail("CONTROLLED_ADAPTER_REQUIRED");
  if(typeof onCheckpoint!=="function")fail("CHECKPOINT_WRITER_REQUIRED");
  const prior=await ledger.get(operationId);
+ // Idempotent recovery readback: a settled, unattributed receipt is final.
+ // No second GitHub GET, nonce claim, ledger write or GitHub PUT is allowed.
+ if(prior?.state==="RECOVERY_CONTENT_MATCH_UNATTRIBUTED"&&
+    prior.schema===1&&prior.operationId===operationId&&
+    prior.branch===branch&&prior.path===path&&
+    SHA.test(prior.expectedSha||"")&&SHA.test(prior.blobSha||"")&&
+    /^[a-f0-9]{64}$/.test(prior.contentSha256||"")&&
+    prior.blobSha!==prior.expectedSha&&
+    prior.safeToRetry===false&&
+    prior.note==="CONTENT_MATCH_NOT_PROOF_OF_AUTHOR_OR_COMMIT")
+   return Object.freeze({schema:1,operationId,branch,path,
+     expectedSha:prior.expectedSha,contentSha256:prior.contentSha256,
+     blobSha:prior.blobSha,state:"RECOVERY_CONTENT_MATCH_UNATTRIBUTED",
+     safeToRetry:false,note:prior.note});
  if(prior?.state!=="RECOVERY_REQUIRED"||prior.operationId!==operationId||
     prior.branch!==branch||prior.path!==path||!SHA.test(prior.expectedSha||"")||
     !/^[a-f0-9]{64}$/.test(prior.contentSha256||""))
