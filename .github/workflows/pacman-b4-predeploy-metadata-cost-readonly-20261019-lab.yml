@@ -192,7 +192,7 @@ jobs:
           const workers=subs.result.filter(s=>{
             const tags=[s?.product?.name,s?.product?.id,s?.rate_plan?.scope,
              s?.rate_plan?.public_name,s?.name].filter(x=>typeof x==='string');
-            return tags.some(x=>/\\bworkers\\b/i.test(x));
+            return tags.some(x=>/\bworkers\b/i.test(x));
           });
           if(workers.length!==1||workers[0]?.rate_plan?.id!=='free')
             fail('WORKERS_FREE_PLAN_NOT_UNAMBIGUOUS');
