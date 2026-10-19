@@ -1,6 +1,7 @@
 // LAB-only zero-cost WebAuthn/passkey approval primitive.
 // No deployment, D1 writes or GitHub side effects. Intended for a dedicated HTTPS staging Worker.
 import {LAB_BRANCH,LAB_PROBE,validateControlledChatIntent} from "../chat-approval.mjs";
+import {validateOwnerReviewWebAuthnIntentLab,digestOwnerReviewWebAuthnIntentLab} from "./github-owner-review-webauthn-scope-lab.mjs";
 
 const OP_ID=/^[a-zA-Z0-9][a-zA-Z0-9._-]{7,119}$/;
 const DIGEST=/^[a-f0-9]{64}$/;
@@ -77,6 +78,10 @@ export function validatePacmanWebAuthnIntent({intent,contentSha256}={}){
   try{validateControlledChatIntent(intent);}catch{fail("WEBAUTHN_SCOPE_DENIED");}
   return true;
  }
+ if(intent.capability==="github.actions.readonly-review"){
+  try{validateOwnerReviewWebAuthnIntentLab(intent);}catch{fail("WEBAUTHN_SCOPE_DENIED");}
+  return true;
+ }
  fail("WEBAUTHN_SCOPE_DENIED");
 }
 // Canonical async constructor for the NEW capability. Do not call the generic
@@ -111,10 +116,12 @@ export async function verifyPacmanWebAuthnAssertion({
  nowMs=Date.now(),cryptoImpl=globalThis.crypto,requireUserVerification=true
 }={}){
  validatePacmanWebAuthnIntent({intent,contentSha256});
- if(intent.capability==="github.lab-file-update"){
-  // Enforce complete intent-to-passkey binding at the verifier, not just
-  // the challenge creator. A fabricated persisted digest cannot bypass this.
-  const canonical=await controlledWebAuthnRequestDigest(intent,{cryptoImpl});
+ if(intent.capability==="github.lab-file-update"||
+    intent.capability==="github.actions.readonly-review"){
+  // Enforce full intent binding even if a stored D1 digest was forged.
+  const canonical=intent.capability==="github.lab-file-update"?
+   await controlledWebAuthnRequestDigest(intent,{cryptoImpl}):
+   await digestOwnerReviewWebAuthnIntentLab(intent,{cryptoImpl});
   if(contentSha256!==canonical)fail("WEBAUTHN_INTENT_BINDING_MISMATCH");
  }
  if(!challengeRecord||challengeRecord.operationId!==intent.operationId||
