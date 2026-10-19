@@ -84,7 +84,9 @@ async function fixture(){
  const f=fakeDb(jwk);
  const start=await createOwnerReviewWebAuthnChallengeLab({db:f.db,intent,rpId,origin,
   nowMs:NOW,cryptoImpl});
- return {...f,start,privateKey:keys.privateKey};
+ return {db:f.db,start,privateKey:keys.privateKey,
+  get row(){return f.row},get consumed(){return f.consumed},
+  get counter(){return f.counter},get runCalls(){return f.runCalls}};
 }
 test("reviewer intent binds owner, specific request, protected environment, run and commit",async()=>{
  const x=validateOwnerReviewWebAuthnIntentLab(intent);
