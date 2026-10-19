@@ -13,7 +13,8 @@ const safePath=p=>typeof p==="string"&&p.startsWith("/")&&!p.includes("//")&&
  !/[?#%\\]/.test(p)&&!p.split("/").includes(".")&&!p.split("/").includes("..")&&
  p.split("/").every(s=>!s.includes("{")&&!s.includes("}")||/^\{[a-zA-Z_][a-zA-Z0-9_]*\}$/.test(s));
 const scopePath=(provider,p)=>{
- if(provider==="github")return (p==="/repos/Br174/Chatgpt"||p.startsWith("/repos/Br174/Chatgpt/"))&&!sensitive(p);
+ if(provider==="github")return (p==="/repos/Br174/Chatgpt"||p.startsWith("/repos/Br174/Chatgpt/")||
+  p==="/repos/{owner}/{repo}"||p.startsWith("/repos/{owner}/{repo}/"))&&!sensitive(p);
  return /^\/client\/v4\/accounts\/\{account_id\}(?:\/|$)/.test(p)&&!sensitive(p);
 };
 const scalar=(v,type)=>{
@@ -46,17 +47,19 @@ export function discoverPacmanReadsLab({provider,openapi,verifiedOrigin}={}){
   !obj(openapi)||typeof openapi.openapi!=="string"||
   !/^3\.(?:0|1)\.\d+$/.test(openapi.openapi)||!obj(openapi.paths))BLOCK("TRUSTED_CATALOG_REQUIRED");
  const ops={},all=Object.entries(openapi.paths);
- if(all.length>128)BLOCK("CATALOG_TOO_LARGE");
+ if(all.length>6000)BLOCK("CATALOG_TOO_LARGE");
  for(const [path,item] of all){
-  if(!safePath(path)||!scopePath(provider,path)||!obj(item)||item.$ref)BLOCK("PATH_SCOPE_DENIED");
+  if(!safePath(path))BLOCK("PATH_SCOPE_DENIED");
+  if(!scopePath(provider,path))continue; // Only vetted repository/account paths.
+  if(!obj(item)||item.$ref)BLOCK("INVALID_PATH_ITEM");
   for(const [method,operation] of Object.entries(item)){
    if(method!=="get")continue; // Discover, but never enable unsafe verbs.
    if(!obj(operation)||!id(operation.operationId)||operation.$ref||
-    item.parameters!==undefined)BLOCK("INVALID_OPERATION");
+    item.parameters!==undefined&&!Array.isArray(item.parameters))BLOCK("INVALID_OPERATION");
    const operationId=provider+":"+operation.operationId;
    if(Object.hasOwn(ops,operationId))BLOCK("DUPLICATE_OPERATION_ID");
    ops[operationId]=Object.freeze({operationId,provider,path,method:"GET",
-    parameters:parameterList(operation.parameters,path),isWrite:false});
+    parameters:parameterList([...(item.parameters??[]),...(operation.parameters??[])],path),isWrite:false});
   }
  }
  const catalog=Object.freeze({provider,origin:ORIGIN[provider],operations:Object.freeze(ops),
@@ -68,16 +71,23 @@ export function preparePacmanReadLab({catalog,operationId,pathParams={},queryPar
   typeof operationId!=="string"||!Object.hasOwn(catalog.operations,operationId))BLOCK("UNREGISTERED_OPERATION");
  const op=catalog.operations[operationId];
  const pnames=op.parameters.filter(p=>p.in==="path"),qnames=op.parameters.filter(p=>p.in==="query");
+ const scopedPathParams={...pathParams};
+ if(op.provider==="github"&&op.path.startsWith("/repos/{owner}/{repo}")){
+  if(Object.hasOwn(scopedPathParams,"owner")&&scopedPathParams.owner!=="Br174"||
+    Object.hasOwn(scopedPathParams,"repo")&&scopedPathParams.repo!=="Chatgpt")
+   BLOCK("REPOSITORY_SCOPE_DENIED");
+  scopedPathParams.owner="Br174";scopedPathParams.repo="Chatgpt";
+ }
  const validate=(actual,allowed)=>{for(const name of keys(actual)){
   if(!allowed.some(p=>p.name===name))BLOCK("UNDECLARED_PARAMETER");
   const def=allowed.find(p=>p.name===name),value=actual[name];
   if(!scalar(value,def.type)||def.enum&&!def.enum.includes(value))BLOCK("INVALID_PARAMETER");
  }for(const p of allowed){if(p.required&&!Object.hasOwn(actual,p.name))BLOCK("MISSING_PARAMETER");}};
- validate(pathParams,pnames);validate(queryParams,qnames);
+ validate(scopedPathParams,pnames);validate(queryParams,qnames);
  if(op.provider==="cloudflare"&&(!/^[a-fA-F0-9]{32}$/.test(ownerAccountId||"")||
     pathParams.account_id!==ownerAccountId))BLOCK("ACCOUNT_SCOPE_DENIED");
  let path=op.path;
- for(const p of pnames)path=path.replace("{"+p.name+"}",encodeURIComponent(String(pathParams[p.name])));
+ for(const p of pnames)path=path.replace("{"+p.name+"}",encodeURIComponent(String(scopedPathParams[p.name])));
  if(path.includes("{")||path.includes("}")||path.includes("//")||
    !path.startsWith(op.provider==="github"?"/repos/Br174/Chatgpt":"/client/v4/accounts/"))BLOCK("PATH_OUT_OF_SCOPE");
  const query=new URLSearchParams();
