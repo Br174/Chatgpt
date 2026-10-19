@@ -19,7 +19,9 @@ export async function handleGithubOwnerOAuthHttpLab(request,env,{
  if(request.method!=="GET")return body("OAUTH_METHOD_DENIED",405);
  if(!host||typeof host.ownerSession!=="function"||typeof host.savePendingOnce!=="function"||
   typeof host.consumePendingOnce!=="function"||typeof host.exchangeGithubCode!=="function"||
-  typeof host.verifyGithubUser!=="function"||typeof host.installOwnerCredential!=="function")
+  typeof host.verifyGithubUser!=="function"||
+  typeof host.verifyOwnerRepositoryPermission!=="function"||
+  typeof host.installOwnerCredential!=="function")
   return body("OAUTH_TRUSTED_HOST_NOT_CONNECTED",503);
  if(typeof env?.PACMAN_GITHUB_OAUTH_CLIENT_ID!=="string"||
   !/^[A-Za-z0-9_-]{10,120}$/.test(env.PACMAN_GITHUB_OAUTH_CLIENT_ID))
