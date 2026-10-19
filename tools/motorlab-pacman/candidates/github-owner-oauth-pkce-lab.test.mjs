@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import {webcrypto} from "node:crypto";
 import {beginGithubOwnerOAuthPkceLab,finishGithubOwnerOAuthPkceLab} from "./github-owner-oauth-pkce-lab.mjs";
 const URI="https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/oauth/github/callback";
-const CLIENT="Iv1_0123456789abcdef",NOW=1792410000000;
+const CLIENT="Iv1.0123456789abcdef",NOW=1792410000000;
 const TOKEN="ghu_"+"a".repeat(40);
 function fixture(opts={}){
- const state=new Map(),logs=[],calls={exchange:0,verify:0,installed:0};
+ const state=new Map(),logs=[],calls={exchange:0,verify:0,permission:0,installed:0};
  const binding="d".repeat(64);
  const host={
   ownerSession:async()=>({verified:opts.verified??true,subject:opts.subject??"202558590",
@@ -20,6 +20,11 @@ function fixture(opts={}){
    return {accessToken:TOKEN};},
   verifyGithubUser:async token=>{calls.verify++;assert.equal(token,TOKEN);
    return {login:opts.wrongIdentity?"attacker":"Br174",id:202558590,type:"User"};},
+  verifyOwnerRepositoryPermission:async token=>{calls.permission++;assert.equal(token,TOKEN);
+   if(opts.deniedPermission)throw Error("synthetic missing deployment permission");
+   return {state:"OWNER_GITHUB_REPO_PERMISSIONS_READ_VERIFIED",owner:"Br174",
+    ownerId:202558590,repo:"Br174/Chatgpt",repoId:1363281702,
+    deploymentsWrite:true,actionsRead:true,contentsRead:true};},
   installOwnerCredential:async data=>{calls.installed++;assert.equal(data.token,TOKEN);
    assert.equal(data.sessionBinding,binding);logs.push("install");return true}
  };
@@ -51,7 +56,8 @@ test("successful GitHub owner-to-server code exchange never returns token to cha
  const r=await finish(f,state);
  assert.equal(r.status,"GITHUB_OWNER_OAUTH_CONNECTED");
  assert.equal(r.tokenReturned,false);
- assert.equal(r.permissionVerificationPending,true);
+ assert.equal(r.permissionVerificationPending,false);
+ assert.equal(r.ownerRepoPermissionPreflightVerified,true);
  assert.equal(JSON.stringify(r).includes(TOKEN),false);
  assert.deepEqual(f.logs,["save","consume","exchange","install"]);
 });
@@ -112,4 +118,13 @@ test("without trusted host no browser OAuth URL or token exchange",async()=>{
  await deny(()=>finishGithubOwnerOAuthPkceLab({
   code:"synthetic-code-123456789",state:"A".repeat(43),
   clientId:CLIENT,redirectUri:URI,cryptoImpl:webcrypto}),"TRUSTED_HTTPS_HOST_REQUIRED");
+});
+
+test("connected owner identity without verified deployment permission never installs token",async()=>{
+ const f=fixture({deniedPermission:true}),started=await begin(f);
+ const state=new URL(started.authorizationUrl).searchParams.get("state");
+ await deny(()=>finish(f,state),"OAUTH_REPOSITORY_PERMISSION_UNVERIFIED");
+ assert.equal(f.calls.permission,1);assert.equal(f.calls.installed,0);
+ await deny(()=>finish(f,state),"INVALID_OR_REPLAYED_STATE");
+ assert.equal(f.calls.exchange,1);
 });
