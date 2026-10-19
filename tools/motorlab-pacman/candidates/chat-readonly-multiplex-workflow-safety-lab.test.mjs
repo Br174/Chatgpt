@@ -41,7 +41,7 @@ test("private Worker bearer only in protected workflow, not in printed output",(
 });
 test("only allowlisted GET target, no SQL or provider write",()=>{
  all(["response=await fetch(target.url,{method:'GET'","readCommandTarget(command)",
- "verifyReadCommandResult(command,response.status,body)"]);
+ "verifyReadCommandResult(command,response.status,body,{currentRequestHead:process.env.GITHUB_SHA})"]);
  assert.equal(source.split("response=await fetch(target.url,").length,2);
  absent(["method:'PUT'","method:'POST'","method:'DELETE'","method:'PATCH'",
  "sql:","/execute'","db.prepare(",".run("]);
