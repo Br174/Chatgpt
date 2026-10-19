@@ -2,7 +2,7 @@
 // This is a sealed boundary for a FUTURE trusted HTTPS host, NOT a deployed OAuth
 // application or a replacement for existing passkey, GitHub reviewer, or D1.
 // Server-owned host alone provisions OAuth client credentials and secure sessions.
-const CLIENT=/^Iv1[._][A-Za-z0-9]{10,120}$/;
+import {isGitHubAppClientIdLab} from "./github-app-client-id-lab.mjs";
 const HASH=/^[a-f0-9]{64}$/;
 const CODE=/^[A-Za-z0-9_-]{12,256}$/;
 const CALLBACK="/oauth/github/callback",SUBJECT="202558590",LOGIN="Br174";
@@ -40,7 +40,7 @@ async function owner(host,nowMs){
 export async function beginGithubOwnerOAuthPkceLab({clientId,redirectUri,host,
  nowMs=Date.now(),cryptoImpl=globalThis.crypto}={}){
  requireHost(host);
- if(!CLIENT.test(clientId||"")||!validUrl(redirectUri)||
+ if(!isGitHubAppClientIdLab(clientId)||!validUrl(redirectUri)||
   !utc(nowMs)||!cryptoImpl?.getRandomValues||!cryptoImpl?.subtle)
   HOLD("TRUSTED_CLIENT_AND_CALLBACK_REQUIRED");
  const session=await owner(host,nowMs);
@@ -72,7 +72,7 @@ export async function finishGithubOwnerOAuthPkceLab({code,state,clientId,redirec
  host,nowMs=Date.now(),cryptoImpl=globalThis.crypto}={}){
  requireHost(host);
  if(!CODE.test(code||"")||typeof state!=="string"||
-  !/^[A-Za-z0-9_-]{43}$/.test(state)||!CLIENT.test(clientId||"")||
+  !/^[A-Za-z0-9_-]{43}$/.test(state)||!isGitHubAppClientIdLab(clientId)||
   !validUrl(redirectUri)||!utc(nowMs)||!cryptoImpl?.subtle)
   HOLD("INVALID_CALLBACK");
  const session=await owner(host,nowMs),stateHash=await digest(state,cryptoImpl);
