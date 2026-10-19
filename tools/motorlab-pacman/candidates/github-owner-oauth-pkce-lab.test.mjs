@@ -64,6 +64,8 @@ test("consumed state prevents callback replay and second token exchange",async()
 test("cross-domain callback URL rejected before session or store",async()=>{
  const f=fixture();
  for(const u of ["https://evil.example/oauth/github/callback",
+  "https://motorlab-pacman-webauthn-staging-lab.evil.workers.dev/oauth/github/callback",
+  "https://fake-motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/oauth/github/callback",
   "http://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/oauth/github/callback",
   URI+"?token=a", URI.replace("/oauth/github/callback","/other")]){
   await deny(()=>begin(f,{redirectUri:u}),"TRUSTED_CLIENT_AND_CALLBACK_REQUIRED");
