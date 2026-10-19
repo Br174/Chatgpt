@@ -7,7 +7,7 @@ import {createAuthorizedPacmanRunner} from "./authorized-runner.mjs";
 import {makeControlledGitHubLabAdapter} from "./candidates/github-contents-lab-adapter.mjs";
 import {runGithubControlledFileUpdate,inspectGithubControlledUpdateRecovery} from "./candidates/github-controlled-update-lab.mjs";
 import {prepareChatReadOnlyApproval,submitChatReadOnlyWorkflowApproval} from "./candidates/chat-owner-approval-handoff-lab.mjs";
-import {discoverPacmanReadsLab} from "./candidates/pacman-dynamic-read-lab.mjs";
+import {discoverPacmanReadsLab,proposePacmanMutationLab} from "./candidates/pacman-dynamic-read-lab.mjs";
 import {describePacmanClientsLab,executePacmanClientReadLab} from "./candidates/pacman-client-boundary-lab.mjs";
 import {createOwnerReviewGitHubRestLab} from "./candidates/github-owner-review-rest-adapter-lab.mjs";
 import {reviewOwnerPendingReadOnlyDeployment} from "./candidates/github-owner-review-provider-lab.mjs";
@@ -18,6 +18,9 @@ export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onChe
   // No extra Worker, OAuth issuance, live plugin, Android deploy or provider write.
   discoverReadCapabilities(request){
    return discoverPacmanReadsLab(request);
+  },
+  proposeMutation(request){
+   return proposePacmanMutationLab(request);
   },
   describeReadClients(){
    return describePacmanClientsLab();
