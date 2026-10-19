@@ -7,9 +7,23 @@ import {createAuthorizedPacmanRunner} from "./authorized-runner.mjs";
 import {makeControlledGitHubLabAdapter} from "./candidates/github-contents-lab-adapter.mjs";
 import {runGithubControlledFileUpdate,inspectGithubControlledUpdateRecovery} from "./candidates/github-controlled-update-lab.mjs";
 import {prepareChatReadOnlyApproval,submitChatReadOnlyWorkflowApproval} from "./candidates/chat-owner-approval-handoff-lab.mjs";
+import {discoverPacmanReadsLab} from "./candidates/pacman-dynamic-read-lab.mjs";
+import {describePacmanClientsLab,executePacmanClientReadLab} from "./candidates/pacman-client-boundary-lab.mjs";
 export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onCheckpoint,approvalVerifier,operationLedger,trustedApprovalSecret,expectedOwnerSubject,
- readOnlyTrustedIssuerSecret,readOnlyOwnerSubject,readOnlyGithubConnector}={}){
+ readOnlyTrustedIssuerSecret,readOnlyOwnerSubject,readOnlyGithubConnector,multiClientTrustedHost}={}){
  return Object.freeze({
+  // Universal discovery and multi-client source candidate extend this existing coordinator.
+  // No extra Worker, OAuth issuance, live plugin, Android deploy or provider write.
+  discoverReadCapabilities(request){
+   return discoverPacmanReadsLab(request);
+  },
+  describeReadClients(){
+   return describePacmanClientsLab();
+  },
+  async executeAuthenticatedClientRead({client,request,catalog,now}={}){
+   return executePacmanClientReadLab({client,request,catalog,
+    trustedHost:multiClientTrustedHost,now});
+  },
   // Read-only five-command bridge: reuse the SAME Pac-Man coordinator.
   // Preparation is inert. Submission needs an actual host-signed owner
   // attestation, existing durable atomic ledger, authenticated GitHub connector
