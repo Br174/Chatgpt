@@ -74,7 +74,8 @@ export function createGithubAppUserOAuthTransportLab({clientId,clientSecret,fetc
    // to verifyGithubUser and installOwnerCredential, never to chat or browser.
    return Object.freeze({accessToken:result.access_token,
     expiresIn:result.expires_in??null,
-    refreshToken:result.refresh_token??null});
+    refreshToken:result.refresh_token??null,
+    refreshTokenExpiresIn:result.refresh_token_expires_in??null});
   },
   async verifyGithubUser(token){return verifiedUser(token)},
   async verifyOwnerRepositoryPermission(token){
