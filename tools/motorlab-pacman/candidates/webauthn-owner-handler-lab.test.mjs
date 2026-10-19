@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {webcrypto} from "node:crypto";
 import {handleWebAuthnOwnerLab} from "./webauthn-owner-handler-lab.mjs";
+import {prepareChatReadOnlyApproval} from "./chat-owner-approval-handoff-lab.mjs";
 
 const origin="https://pacman.example.workers.dev";
 const rpId="pacman.example.workers.dev";
@@ -272,4 +273,58 @@ test("controlled owner start/execute/finish fail closed before D1 and relay when
   assert.equal((await response.json()).error,"WEBAUTHN_CONTROLLED_UPDATE_DISABLED");
  }
  assert.equal(reads,0);assert.equal(executes,0);
+});
+
+test("new GitHub owner-review WebAuthn routes are disabled in existing staging by default",async()=>{
+ const d=db({owner:ownerRow});
+ const r=await handleWebAuthnOwnerLab(req("/webauthn/reviewer/start",{}),
+  env(d),{cryptoImpl:webcrypto,nowMs:1780000000000});
+ assert.equal(r.status,503);
+ assert.equal((await r.json()).error,"WEBAUTHN_OWNER_REVIEW_DISABLED");
+ assert.equal(d.challenges.size,0);
+});
+test("LAB-only enabled reviewer start makes EXACT pinned GitHub run-bound passkey challenge",async()=>{
+ const d=db({owner:ownerRow});
+ const prepared=prepareChatReadOnlyApproval({command:"worker-health",requestId:"request-20261019-020",
+  expectedParentSha:"a".repeat(40),workflowSha:"b".repeat(40),guardSha:"c".repeat(40)});
+ const r=await handleWebAuthnOwnerLab(req("/webauthn/reviewer/start",{
+  prepared,runId:39260000001,requestCommitSha:"d".repeat(40)}),
+  env(d,{PACMAN_OWNER_GITHUB_REVIEW_ENABLED:"YES_REVIEWED_OWNER_PASSKEY_STAGING"}),
+  {cryptoImpl:webcrypto,nowMs:1780000000000});
+ assert.equal(r.status,200);
+ const result=await r.json();
+ assert.equal(result.status,"OWNER_REVIEW_CHALLENGE_READY");
+ assert.equal(result.runId,39260000001);
+ assert.equal(result.githubReviewPerformed,false);
+ assert.equal(result.publicKey.userVerification,"required");
+ assert.equal(d.challenges.size,1);
+ const stored=[...d.challenges.values()][0];
+ assert.equal(stored.capability,"github.actions.readonly-review");
+ assert.equal(stored.branch,"motorlab/pacman-real-operations-lab-20261017");
+ assert.equal(stored.path,prepared.requestPath);
+});
+test("reviewer start rejects caller-controlled main branch and wrong commit without D1 mutation",async()=>{
+ const d=db({owner:ownerRow}),e=env(d,{
+  PACMAN_OWNER_GITHUB_REVIEW_ENABLED:"YES_REVIEWED_OWNER_PASSKEY_STAGING"});
+ const prepared=prepareChatReadOnlyApproval({command:"worker-health",requestId:"request-20261019-020",
+  expectedParentSha:"a".repeat(40),workflowSha:"b".repeat(40),guardSha:"c".repeat(40)});
+ const bad={...prepared,request:{...prepared.request,branch:"main"}};
+ const r=await handleWebAuthnOwnerLab(req("/webauthn/reviewer/start",{
+  prepared:bad,runId:39260000001,requestCommitSha:"d".repeat(40)}),
+  e,{cryptoImpl:webcrypto,nowMs:1780000000000});
+ assert.equal(r.status,403);
+ assert.equal(d.challenges.size,0);
+});
+test("reviewer finish denies passkey ID not in enrolled owner credential",async()=>{
+ const d=db({owner:ownerRow}),e=env(d,{
+  PACMAN_OWNER_GITHUB_REVIEW_ENABLED:"YES_REVIEWED_OWNER_PASSKEY_STAGING"});
+ const prepared=prepareChatReadOnlyApproval({command:"worker-health",requestId:"request-20261019-020",
+  expectedParentSha:"a".repeat(40),workflowSha:"b".repeat(40),guardSha:"c".repeat(40)});
+ const r=await handleWebAuthnOwnerLab(req("/webauthn/reviewer/finish",{
+  prepared,runId:39260000001,requestCommitSha:"d".repeat(40),
+  challenge:"a".repeat(43),assertion:{id:"attacker",type:"public-key"}}),
+  e,{cryptoImpl:webcrypto,nowMs:1780000000000});
+ assert.equal(r.status,403);
+ assert.equal((await r.json()).error,"WEBAUTHN_CREDENTIAL_MISMATCH");
+ assert.equal(d.challenges.size,0);
 });
