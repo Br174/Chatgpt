@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {webcrypto} from "node:crypto";
 import {handleGithubOwnerOAuthHttpLab} from "./github-owner-oauth-http-lab.mjs";
 const ORIGIN="https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev";
-const APP="Iv1_0123456789abcdef",NOW=1792410000000,TOKEN="ghu_"+"f".repeat(35);
+const APP="Iv1.0123456789abcdef",NOW=1792410000000,TOKEN="ghu_"+"f".repeat(35);
 const configuration={PACMAN_OWNER_GITHUB_OAUTH_ENABLED:"YES_REVIEWED_OWNER_OAUTH_STAGING",
  PACMAN_GITHUB_OAUTH_CLIENT_ID:APP};
 const req=(path,method="GET")=>new Request(ORIGIN+path,{method});
@@ -18,6 +18,10 @@ function host(){
    return {accessToken:TOKEN}},
   async verifyGithubUser(token){assert.equal(token,TOKEN);
    return {login:"Br174",id:202558590,type:"User"}},
+  async verifyOwnerRepositoryPermission(token){assert.equal(token,TOKEN);
+   return {state:"OWNER_GITHUB_REPO_PERMISSIONS_READ_VERIFIED",owner:"Br174",
+    ownerId:202558590,repo:"Br174/Chatgpt",repoId:1363281702,
+    deploymentsWrite:true,actionsRead:true,contentsRead:true};},
   async installOwnerCredential({token}){installs++;assert.equal(token,TOKEN);return true}
  };
 }
