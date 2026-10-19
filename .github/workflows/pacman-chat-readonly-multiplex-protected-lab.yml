@@ -1,0 +1,163 @@
+name: Pac-Man CHAT guarded READ-ONLY commands LAB (five-option bridge)
+# Source-only preparation. NO trigger files created without a NEW owner authorization.
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/pacman-b4/read-command-requests/request-*.json'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-chat-readonly-commands-one-writer
+  cancel-in-progress: false
+jobs:
+  source-guard:
+    if: >-
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' && github.run_attempt == 1 &&
+      github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    outputs:
+      command: ${{ steps.contract.outputs.command }}
+      request_id: ${{ steps.contract.outputs.request_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact new request, pinned HEAD and source guard, NO provider call
+        id: contract
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          import {checkReadCommandTrigger,REQUEST_DIR}
+            from './tools/motorlab-pacman/candidates/chat-readonly-multiplex-guard-lab.mjs';
+          const fail=x=>{throw Error('PACMAN_CHAT_MULTI_SOURCE_HOLD_'+x)};
+          const git=a=>cp.execFileSync('git',a,{encoding:'utf8'}).trim();
+          if(git(['rev-parse','HEAD'])!==process.env.GITHUB_SHA)fail('HEAD_CHANGED');
+          const parentSha=git(['rev-parse','HEAD^']);
+          const changedPaths=git(['diff-tree','--no-commit-id','--name-only','-r','HEAD']).split('\n').filter(Boolean);
+          if(changedPaths.length!==1||!changedPaths[0].startsWith(REQUEST_DIR))
+            fail('CHANGED_PATHS');
+          const requestPath=changedPaths[0];
+          const request=JSON.parse(fs.readFileSync(requestPath,'utf8'));
+          const workflowSha=git(['hash-object','.github/workflows/pacman-chat-readonly-multiplex-protected-lab.yml']);
+          const guardSha=git(['hash-object','tools/motorlab-pacman/candidates/chat-readonly-multiplex-guard-lab.mjs']);
+          const approved=checkReadCommandTrigger({request,requestPath,changedPaths,parentSha,workflowSha,guardSha});
+          const checkpoint=fs.readFileSync('tools/motorlab-pacman/lab-workspace/B4_CHAT_D1_RECEIPT003_REUSABLE_PROTECTED_BRIDGE_REAL_GET_VERIFIED_20261019.md','utf8');
+          if(!checkpoint.includes('PACMAN_CHAT_D1_RECEIPT003_RESULT=PASS')||
+             !checkpoint.includes('NATIVE_CHATGPT_MCP_HOST=UNVERIFIED'))fail('CHECKPOINT_NOT_VERIFIED');
+          const manifest=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
+          if(!manifest.includes('CURRENT_RELEASE=2026.10.14-r37'))fail('CORE_RELEASE_CHANGED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'command='+approved.command+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'request_id='+approved.requestId+'\n');
+          console.log('PACMAN_CHAT_MULTI_SOURCE_GUARD_PASS');
+          console.log('PACMAN_CHAT_MULTI_ZERO_REMOTE_CALLS_ZERO_WRITES');
+          NODE
+      - name: All allowlist positive/negative synthetic tests
+        run: node --test tools/motorlab-pacman/candidates/chat-readonly-multiplex-guard-lab.test.mjs
+  protected-readonly:
+    needs: source-guard
+    if: >-
+      needs.source-guard.result == 'success' &&
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' && github.run_attempt == 1
+    environment: pacman-execution-staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: After owner approval verify GitHub HEAD and protected main via GET
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const fail=x=>{throw Error('PACMAN_CHAT_MULTI_HEAD_HOLD_'+x)};
+          const base='https://api.github.com/repos/Br174/Chatgpt/';
+          const get=async route=>{
+           const r=await fetch(base+route,{method:'GET',redirect:'manual',
+             headers:{accept:'application/vnd.github+json','user-agent':'pacman-chat-multi-readonly'},
+             signal:AbortSignal.timeout(12000)});
+           if(r.status!==200)fail('GITHUB_HTTP_'+r.status);
+           return r.json();
+          };
+          const lab=await get('commits?sha=motorlab%2Fpacman-real-operations-lab-20261017&per_page=1');
+          const main=await get('branches/main');
+          if(!Array.isArray(lab)||lab[0]?.sha!==process.env.GITHUB_SHA||
+             main?.protected!==true||main?.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7')
+            fail('HEAD_OR_PROTECTED_MAIN_DRIFT');
+          console.log('PACMAN_CHAT_MULTI_OWNER_REVIEWED_HEAD_MAIN_PASS');
+          NODE
+      - name: Exactly one allowlisted data GET, optionally one Worker deployment metadata GET
+        shell: bash
+        env:
+          OPERATION: ${{ needs.source-guard.outputs.command }}
+          REQUEST_ID: ${{ needs.source-guard.outputs.request_id }}
+          EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {readCommandTarget,verifyReadCommandResult,EXECUTION_VERSION}
+            from './tools/motorlab-pacman/candidates/chat-readonly-multiplex-guard-lab.mjs';
+          import {currentDeploymentVersion,ACCOUNT,EXEC}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          const fail=x=>{throw Error('PACMAN_CHAT_MULTI_RESULT_HOLD_'+x)};
+          const command=process.env.OPERATION;
+          const id=process.env.REQUEST_ID;
+          if(!/^request-[0-9]{8}-[0-9]{3}$/.test(id||''))fail('REQUEST_ID');
+          const target=readCommandTarget(command);
+          if(target.method!=='GET')fail('NOT_READ_ONLY');
+          if(target.source==='worker'){
+           if(process.env.CF_ACCOUNT!==ACCOUNT||typeof process.env.CF_TOKEN!=='string'||
+              process.env.CF_TOKEN.length<10)fail('PROTECTED_CF_TOKEN_MISSING');
+           const url='https://api.cloudflare.com/client/v4/accounts/'+ACCOUNT+
+             '/workers/scripts/'+EXEC+'/deployments';
+           let metaResponse;
+           try{metaResponse=await fetch(url,{method:'GET',redirect:'manual',
+             headers:{authorization:'Bearer '+process.env.CF_TOKEN,accept:'application/json'},
+             signal:AbortSignal.timeout(12000)});}
+           catch{fail('VERSION_METADATA_TRANSPORT_NO_RETRY')}
+           if(metaResponse.status!==200)fail('METADATA_HTTP_'+metaResponse.status);
+           let meta;try{meta=await metaResponse.json()}catch{fail('METADATA_JSON')}
+           let version;try{version=currentDeploymentVersion(meta)}catch{fail('METADATA_INVALID')}
+           if(meta?.success!==true||version!==EXECUTION_VERSION)fail('WORKER_VERSION_DRIFT');
+           console.log('PACMAN_CHAT_MULTI_WORKER_VERSION_PINNED_PASS');
+          }
+          const headers={accept:'application/json','user-agent':'pacman-chat-multi-readonly'};
+          if(target.authenticated){
+           if(typeof process.env.EXECUTION_KEY!=='string'||process.env.EXECUTION_KEY.length<32)
+             fail('PROTECTED_BEARER_MISSING');
+           headers.authorization='Bearer '+process.env.EXECUTION_KEY;
+          }
+          console.log('PACMAN_CHAT_MULTI_ONE_ALLOWLISTED_GET_ATTEMPT_START');
+          let response;
+          try{response=await fetch(target.url,{method:'GET',redirect:'manual',headers,
+            signal:AbortSignal.timeout(12000)});}
+          catch{fail('TARGET_GET_UNAVAILABLE_NO_RETRY')}
+          let body;try{body=await response.json()}catch{fail('TARGET_JSON')}
+          let result;try{result=verifyReadCommandResult(command,response.status,body)}
+          catch{fail('TARGET_PAYLOAD_NOT_VERIFIED')}
+          // No raw D1/Worker/provider data or sensitive headers written to GitHub logs.
+          console.log('PACMAN_CHAT_MULTI_RESULT=PASS');
+          console.log('PACMAN_CHAT_MULTI_COMMAND='+result.command);
+          console.log('PACMAN_CHAT_MULTI_PROOF='+result.proof);
+          if(result.runId)console.log('PACMAN_CHAT_MULTI_LAST_CI_RUN='+result.runId);
+          console.log('PACMAN_CHAT_MULTI_ONE_GET_ZERO_WRITES_VERIFIED');
+          NODE
