@@ -5,7 +5,7 @@ const ORIGIN=Object.freeze({github:"https://api.github.com",cloudflare:"https://
 const CATALOGS=new WeakSet(),PLANS=new WeakSet();
 const BLOCK=reason=>{throw Error("PACMAN_DYNAMIC_READ_HOLD_"+reason)};
 const obj=x=>x!==null&&typeof x==="object"&&!Array.isArray(x)&&Object.getPrototypeOf(x)===Object.prototype;
-const id=x=>typeof x==="string"&&/^[A-Za-z][A-Za-z0-9_]{0,79}$/.test(x);
+const id=x=>typeof x==="string"&&/^[A-Za-z][A-Za-z0-9_/-]{0,119}$/.test(x);
 const names=p=>Array.from(p.matchAll(/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g),x=>x[1]);
 const keys=x=>Object.keys(x||{});
 const sensitive=p=>/(^|\/)(?:secrets?|tokens?|credentials?|passwords?|private_keys?|billing)(?:\/|$)/i.test(p);
@@ -23,11 +23,18 @@ const scalar=(v,type)=>{
  if(type==="boolean")return typeof v==="boolean";
  return false;
 };
-function parameterList(params,path) {
+function parameterList(params,path,openapi) {
  if(params===undefined)params=[];
  if(!Array.isArray(params)||params.length>20)BLOCK("INVALID_PARAMETERS");
  const seen=new Set(),result=[];
- for(const p of params){
+ for(const raw of params){
+  let p=raw;
+  if(obj(raw)&&typeof raw.$ref==="string"){
+   const matched=/^#\/components\/parameters\/([A-Za-z0-9_-]{1,80})$/.exec(raw.$ref);
+   if(!matched||!obj(openapi.components?.parameters?.[matched[1]])||
+      openapi.components.parameters[matched[1]].$ref)BLOCK("EXTERNAL_OR_CHAINED_PARAMETER_REF");
+   p=openapi.components.parameters[matched[1]];
+  }
   if(!obj(p)||!["path","query"].includes(p.in)||!/^[a-zA-Z_][a-zA-Z0-9_]{0,64}$/.test(p.name||"")||
    !obj(p.schema)||!["string","integer","boolean"].includes(p.schema.type)||p.$ref||
    p.schema.$ref||p.style&&p.style!=="form"||p.explode===true)BLOCK("UNSAFE_PARAMETER");
@@ -59,7 +66,7 @@ export function discoverPacmanReadsLab({provider,openapi,verifiedOrigin}={}){
    const operationId=provider+":"+operation.operationId;
    if(Object.hasOwn(ops,operationId))BLOCK("DUPLICATE_OPERATION_ID");
    ops[operationId]=Object.freeze({operationId,provider,path,method:"GET",
-    parameters:parameterList([...(item.parameters??[]),...(operation.parameters??[])],path),isWrite:false});
+    parameters:parameterList([...(item.parameters??[]),...(operation.parameters??[])],path,openapi),isWrite:false});
   }
  }
  const catalog=Object.freeze({provider,origin:ORIGIN[provider],operations:Object.freeze(ops),
