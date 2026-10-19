@@ -98,7 +98,7 @@ test("owner identity read actually checks GitHub /user, login and numerical owne
 });
 test("GitHub App bot or wrong owner id is rejected BEFORE any review POST",async()=>{
  for(const opts of [{login:"github-actions[bot]"},{login:"attacker"},{id:18}]){
-  const f=fixture(opts);await deny(()=>reviewOwnerPendingReadOnlyDeployment(await runArgs(f.provider)));
+  const f=fixture(opts);await deny(async()=>reviewOwnerPendingReadOnlyDeployment(await runArgs(f.provider)));
   assert.equal(f.posts,0);
  }
 });
@@ -121,7 +121,7 @@ test("owner approves only exact pending environment and cannot retry a consumed 
 });
 test("no approval when GitHub denies current user's required reviewer eligibility",async()=>{
  const f=fixture({canApprove:false});
- await deny(()=>reviewOwnerPendingReadOnlyDeployment(await runArgs(f.provider)));
+ await deny(async()=>reviewOwnerPendingReadOnlyDeployment(await runArgs(f.provider)));
  assert.equal(f.posts,0);
 });
 test("tampered signed request cannot authorize approval even though OAuth is valid",async()=>{
@@ -161,7 +161,7 @@ test("provider 403/429/5xx and errors never expose token or retry POST",async()=
 });
 test("readback not verified means NO reported success after single approval POST",async()=>{
  const f=fixture({badHistory:true});
- await deny(()=>reviewOwnerPendingReadOnlyDeployment(await runArgs(f.provider)));
+ await deny(async()=>reviewOwnerPendingReadOnlyDeployment(await runArgs(f.provider)));
  assert.equal(f.posts,1);
 });
 test("provider call always pins api.github.com, never redirects and never puts token in URL",async()=>{
