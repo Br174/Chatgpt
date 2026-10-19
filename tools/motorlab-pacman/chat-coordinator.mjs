@@ -43,8 +43,20 @@ export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onChe
    // this particular workflow run. Demand the existing owner's P-256 passkey
    // proof from the consumed, SHA-pinned WebAuthn D1 challenge FIRST.
    const intent=prepareOwnerReviewWebAuthnIntentLab({prepared,runId,requestCommitSha});
-   await verifyOwnerReviewWebAuthnProofLab({prepared,intent,attestation,reviewProof,
+   const verified=await verifyOwnerReviewWebAuthnProofLab({prepared,intent,attestation,reviewProof,
     trustedIssuerSecret:readOnlyTrustedIssuerSecret,now});
+   // A consumed WebAuthn challenge is not by itself a consumed GitHub POST grant.
+   // Claim exact run AND nonce durably before any authenticated provider request.
+   // Missing/ambiguous ledger fails closed; replay never causes a second POST.
+   if(operationLedger?.durable!==true||operationLedger?.atomic!==true||
+      typeof operationLedger.claim!=="function")
+    throw Error("PACMAN_REVIEW_ATOMIC_LEDGER_NOT_CONNECTED");
+   await claimOperation(operationLedger,"review-nonce-"+reviewProof.nonce,{
+    state:"OWNER_GITHUB_REVIEW_NONCE_CLAIMED",requestId:verified.requestId,
+    runId:verified.runId,requestCommitSha:verified.requestCommitSha});
+   await claimOperation(operationLedger,"review-request-"+verified.requestId,{
+    state:"OWNER_GITHUB_REVIEW_REQUEST_CLAIMED",runId:verified.runId,
+    requestCommitSha:verified.requestCommitSha});
    const ownerReviewerProvider=createOwnerReviewGitHubRestLab({
     getOwnerAccessToken:ownerReviewTrustedHost.getOwnerAccessToken,
     fetchImpl:ownerReviewTrustedHost.fetchImpl});
