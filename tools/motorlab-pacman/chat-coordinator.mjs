@@ -6,8 +6,23 @@ import {claimOperation} from "./atomic-claim.mjs";
 import {createAuthorizedPacmanRunner} from "./authorized-runner.mjs";
 import {makeControlledGitHubLabAdapter} from "./candidates/github-contents-lab-adapter.mjs";
 import {runGithubControlledFileUpdate,inspectGithubControlledUpdateRecovery} from "./candidates/github-controlled-update-lab.mjs";
-export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onCheckpoint,approvalVerifier,operationLedger,trustedApprovalSecret,expectedOwnerSubject}={}){
+import {prepareChatReadOnlyApproval,submitChatReadOnlyWorkflowApproval} from "./candidates/chat-owner-approval-handoff-lab.mjs";
+export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onCheckpoint,approvalVerifier,operationLedger,trustedApprovalSecret,expectedOwnerSubject,
+ readOnlyTrustedIssuerSecret,readOnlyOwnerSubject,readOnlyGithubConnector}={}){
  return Object.freeze({
+  // Read-only five-command bridge: reuse the SAME Pac-Man coordinator.
+  // Preparation is inert. Submission needs an actual host-signed owner
+  // attestation, existing durable atomic ledger, authenticated GitHub connector
+  // and mandatory checkpoint. GitHub environment reviewer remains REQUIRED.
+  prepareReadOnlyWorkflowApproval(request){
+   return prepareChatReadOnlyApproval(request);
+  },
+  async submitReadOnlyWorkflowApproval({prepared,attestation}={}){
+   return submitChatReadOnlyWorkflowApproval({prepared,attestation,
+    trustedIssuerSecret:readOnlyTrustedIssuerSecret,
+    expectedOwnerSubject:readOnlyOwnerSubject,ledger:operationLedger,
+    connector:readOnlyGithubConnector,onCheckpoint});
+  },
   // Safe chat-to-owner handoff only. Not proof of ChatGPT-native connectivity.
   // No provider access, challenge, signer or ledger state is created.
   async prepareControlledChatHandoff(request){
