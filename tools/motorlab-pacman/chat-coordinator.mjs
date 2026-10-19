@@ -13,6 +13,7 @@ import {createOwnerReviewGitHubRestLab} from "./candidates/github-owner-review-r
 import {reviewOwnerPendingReadOnlyDeployment} from "./candidates/github-owner-review-provider-lab.mjs";
 import {prepareOwnerReviewWebAuthnIntentLab} from "./candidates/github-owner-review-webauthn-scope-lab.mjs";
 import {verifyOwnerReviewWebAuthnProofLab} from "./candidates/github-owner-review-webauthn-issuer-lab.mjs";
+import {inspectOwnerReviewRecoveryLab} from "./candidates/github-owner-review-recovery-lab.mjs";
 export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onCheckpoint,approvalVerifier,operationLedger,trustedApprovalSecret,expectedOwnerSubject,
  readOnlyTrustedIssuerSecret,readOnlyOwnerSubject,readOnlyGithubConnector,multiClientTrustedHost,ownerReviewTrustedHost}={}){
  return Object.freeze({
@@ -64,6 +65,18 @@ export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onChe
     trustedIssuerSecret:readOnlyTrustedIssuerSecret,
     expectedOwnerSubject:readOnlyOwnerSubject,
     ownerReviewerProvider,runId,requestCommitSha,now});
+  },
+  // Independent post-error readback. Does not repeat POST, consume another
+  // passkey challenge or grant authority from a caller-provided success flag.
+  async inspectOwnerReviewRecovery({prepared,runId,requestCommitSha,nonce}={}){
+   if(typeof ownerReviewTrustedHost?.getOwnerAccessToken!=="function"||
+      typeof ownerReviewTrustedHost?.fetchImpl!=="function")
+    throw Error("PACMAN_OWNER_REVIEW_HOST_NOT_CONNECTED");
+   const provider=createOwnerReviewGitHubRestLab({
+    getOwnerAccessToken:ownerReviewTrustedHost.getOwnerAccessToken,
+    fetchImpl:ownerReviewTrustedHost.fetchImpl});
+   return inspectOwnerReviewRecoveryLab({prepared,runId,requestCommitSha,
+    nonce,ledger:operationLedger,provider});
   },
   // Read-only five-command bridge: reuse the SAME Pac-Man coordinator.
   // Preparation is inert. Submission needs an actual host-signed owner
