@@ -9,6 +9,8 @@ import {createPacmanWebAuthnChallenge,createControlledPacmanWebAuthnChallenge} f
 import {issuePacmanApprovalFromWebAuthnLab} from "./webauthn-trusted-issuer-lab.mjs";
 import {executePacmanWithWebAuthnLab} from "./webauthn-execution-relay-lab.mjs";
 import {storeWebAuthnChallengeD1,loadOwnerWebAuthnCredentialD1} from "./webauthn-d1-lab.mjs";
+import {prepareOwnerReviewWebAuthnIntentLab} from "./github-owner-review-webauthn-scope-lab.mjs";
+import {createOwnerReviewWebAuthnChallengeLab,issueOwnerReviewAttestationFromWebAuthnLab} from "./github-owner-review-webauthn-issuer-lab.mjs";
 
 const OWNER_SUBJECT="202558590";
 const OWNER_LOGIN="Br174";
@@ -119,6 +121,34 @@ export async function handleWebAuthnOwnerLab(request,env,{
  try{
   requireSameOrigin(request,cfg.origin);
   const input=await readJson(request);
+
+  // Future owner-review passkey endpoint. Source LAB only: deliberately
+  // disabled unless an independently reviewed staging flag is enabled.
+  // A passkey proof is NOT a GitHub OAuth reviewer credential.
+  if(url.pathname==="/webauthn/reviewer/start"||
+     url.pathname==="/webauthn/reviewer/finish"){
+   if(env?.PACMAN_OWNER_GITHUB_REVIEW_ENABLED!=="YES_REVIEWED_OWNER_PASSKEY_STAGING")
+    throw fail("WEBAUTHN_OWNER_REVIEW_DISABLED",503);
+   const intent=prepareOwnerReviewWebAuthnIntentLab({prepared:input?.prepared,
+    runId:input?.runId,requestCommitSha:input?.requestCommitSha});
+   const credential=await loadOwnerWebAuthnCredentialD1(cfg.db,OWNER_SUBJECT);
+   if(url.pathname==="/webauthn/reviewer/start"){
+    const proof=await createOwnerReviewWebAuthnChallengeLab({db:cfg.db,intent,
+     rpId:cfg.rpId,origin:cfg.origin,nowMs,cryptoImpl});
+    return reply({status:proof.status,operationId:intent.operationId,
+     requestId:intent.requestId,runId:intent.runId,githubReviewPerformed:false,
+     publicKey:{challenge:proof.challenge,rpId:cfg.rpId,
+      timeout:120000,userVerification:"required",
+      allowCredentials:[{type:"public-key",id:credential.id}]},
+     expiresAt:proof.expiresAt});
+   }
+   if(!input?.assertion||typeof input.assertion!=="object"||
+      input.assertion.id!==credential.id)throw fail("WEBAUTHN_CREDENTIAL_MISMATCH",403);
+   const result=await issueOwnerReviewAttestationFromWebAuthnLab({
+    db:cfg.db,intent,challenge:input.challenge,credentialId:credential.id,
+    assertion:input.assertion,signingSecret:cfg.signingSecret,nowMs,cryptoImpl});
+   return reply(result);
+  }
 
   if(url.pathname==="/webauthn/enroll/start"){
    const existing=await ownerCredentialOrNull(cfg.db);
