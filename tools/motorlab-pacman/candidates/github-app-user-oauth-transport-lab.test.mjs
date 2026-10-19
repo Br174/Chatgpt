@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {createGithubAppUserOAuthTransportLab} from "./github-app-user-oauth-transport-lab.mjs";
-const id="Iv1.8a61f9b3a7aba766",secret="not-a-real-GitHub-App-client-secret-0123456789";
+const id="Iv23liKpIEhpEJCOIEfm",secret="not-a-real-GitHub-App-client-secret-0123456789";
 const REDIRECT="https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/oauth/github/callback";
 const GHU="ghu_"+"Q".repeat(40);
 const BASE="https://api.github.com",OWNER_ID=202558590,REPO_ID=1363281702;
