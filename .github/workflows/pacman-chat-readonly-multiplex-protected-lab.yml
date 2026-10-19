@@ -152,12 +152,16 @@ jobs:
             signal:AbortSignal.timeout(12000)});}
           catch{fail('TARGET_GET_UNAVAILABLE_NO_RETRY')}
           let body;try{body=await response.json()}catch{fail('TARGET_JSON')}
-          let result;try{result=verifyReadCommandResult(command,response.status,body)}
+          let result;try{result=verifyReadCommandResult(command,response.status,body,{currentRequestHead:process.env.GITHUB_SHA})}
           catch{fail('TARGET_PAYLOAD_NOT_VERIFIED')}
           // No raw D1/Worker/provider data or sensitive headers written to GitHub logs.
           console.log('PACMAN_CHAT_MULTI_RESULT=PASS');
           console.log('PACMAN_CHAT_MULTI_COMMAND='+result.command);
           console.log('PACMAN_CHAT_MULTI_PROOF='+result.proof);
           if(result.runId)console.log('PACMAN_CHAT_MULTI_LAST_CI_RUN='+result.runId);
+          if(result.checkedHead)console.log('PACMAN_CHAT_MULTI_CI_TESTED_HEAD='+result.checkedHead);
+          if(result.matchesRequestHead!==null&&result.matchesRequestHead!==undefined)
+            console.log('PACMAN_CHAT_MULTI_CI_MATCHES_REQUEST_HEAD='+result.matchesRequestHead);
+          if(result.checkpointCommit)console.log('PACMAN_CHAT_MULTI_LATEST_CHECKPOINT_COMMIT='+result.checkpointCommit);
           console.log('PACMAN_CHAT_MULTI_ONE_GET_ZERO_WRITES_VERIFIED');
           NODE
