@@ -79,3 +79,23 @@ test("existing job-scoped GitHub read token authenticates only allowlisted GitHu
  absent(["GH_READ_TOKEN: "+"\u0024{{ secrets.", "console.log(process.env.GH_READ_TOKEN)",
   "console.log(headers.authorization)", "actions: write", "contents: write"]);
 });
+
+
+test("permissions are exactly contents read and Actions read for status GET",()=>{
+ const scope=source.match(/^permissions:\n((?:  [^\n]+\n)+)/m);
+ assert.ok(scope,"workflow permissions block must exist");
+ assert.equal(scope[1],"  contents: read\\n  actions: read\\n".replaceAll("\\n","\n"));
+ assert.equal(source.split("  actions: read").length-1,1);
+ assert.equal(source.split("  contents: read").length-1,1);
+ absent(["contents: write","actions: write","deployments: write","administration:","issues: write",
+  "pull-requests: write","checks: write","id-token: write"]);
+});
+test("test-status GET remains pinned, one-use and protected",()=>{
+ all(["environment: pacman-execution-staging",
+      "github.run_attempt == 1","needs.source-guard.result == 'success'",
+      "readCommandTarget(command)","verifyReadCommandResult(command,response.status,body,{currentRequestHead:process.env.GITHUB_SHA})",
+      "GH_READ_TOKEN: "+"\u0024{{ github.token }}"]);
+ assert.equal(source.split("response=await fetch(target.url,").length-1,1);
+ absent(["workflow_dispatch:","repository_dispatch:","schedule:",
+         "continue-on-error: true","retry(","method:'POST'","method:'PUT'"]);
+});
