@@ -68,13 +68,13 @@ test("one authenticated host can perform browser PKCE and repository permission 
  assert.equal(result.environmentReviewerEligibilityPending,true);
  assert.equal(result.canApprove,false);
  assert.equal(result.tokenReturned,false);
- assert.equal(f.network,4);
+ assert.equal(f.network,5);
  assert.equal(f.token,GHU);
  assert.equal(JSON.stringify(result).includes(GHU),false);
  await assert.rejects(()=>finishGithubOwnerOAuthPkceLab({clientId:ID,redirectUri:URI,
   code:"synthetic-authorization-code-01234567890",state,nowMs:NOW+1001,
   host,cryptoImpl:webcrypto}),/PACMAN_GITHUB_OAUTH_PKCE_HOLD_INVALID_OR_REPLAYED_STATE/);
- assert.equal(f.network,4);
+ assert.equal(f.network,5);
 });
 test("readiness refuses any missing actual OAuth registration, consent, vault or deploy",()=>{
  const base={clientId:ID,callbackOrigin:BASE};
