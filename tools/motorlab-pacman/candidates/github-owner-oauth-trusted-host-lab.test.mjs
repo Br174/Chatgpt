@@ -5,7 +5,7 @@ import {createPacmanGitHubOwnerOAuthHostLab,ownerOAuthDeploymentReadinessLab}
  from "./github-owner-oauth-trusted-host-lab.mjs";
 import {beginGithubOwnerOAuthPkceLab,finishGithubOwnerOAuthPkceLab}
  from "./github-owner-oauth-pkce-lab.mjs";
-const ID="Iv1.8a61f9b3a7aba766",SECRET="synthetic-private-github-client-secret-0123456789";
+const ID="Iv23liKpIEhpEJCOIEfm",SECRET="synthetic-private-github-client-secret-0123456789";
 const BASE="https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev";
 const URI=BASE+"/oauth/github/callback",NOW=1792410000000,GHU="ghu_"+"Z".repeat(40);
 const repos=(repoId=1363281702)=>({total_count:1,repositories:[{id:repoId,full_name:"Br174/Chatgpt"}]});
