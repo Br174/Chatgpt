@@ -13,6 +13,7 @@ import {
 import {storeWebAuthnChallengeD1} from "../candidates/webauthn-d1-lab.mjs";
 import {issuePacmanApprovalFromWebAuthnLab} from "../candidates/webauthn-trusted-issuer-lab.mjs";
 import {handleWebAuthnOwnerLab} from "../candidates/webauthn-owner-handler-lab.mjs";
+import {handleGithubOwnerOAuthHttpLab} from "../candidates/github-owner-oauth-http-lab.mjs";
 import {renderWebAuthnOwnerPage} from "./page.mjs";
 import {renderWebAuthnApprovalPage} from "./approval-page.mjs";
 import {bootstrapWebAuthnSchemaLab} from "../candidates/webauthn-schema-bootstrap-lab.mjs";
@@ -77,7 +78,8 @@ function requireBrowserOrigin(request,cfg){
 }
 
 export async function handleWebAuthnRequest(request,env,{
- fetchImpl=fetch,cryptoImpl=globalThis.crypto,nowMs=Date.now()
+ fetchImpl=fetch,cryptoImpl=globalThis.crypto,nowMs=Date.now(),
+ ownerOAuthHost=null
 }={}){
  try{
   const url=new URL(request.url),cfg=config(env);
@@ -244,6 +246,12 @@ export async function handleWebAuthnRequest(request,env,{
    if(!cfg)return reply({error:"WEBAUTHN_DISABLED_OR_UNCONFIGURED"},503);
    return pageReply(renderWebAuthnOwnerPage());
   }
+  // Optional OAuth browser entrypoints on the EXISTING Worker.
+  // Source-only LAB: disabled by default; an approved authenticated owner host
+  // must be injected before any real user auth flow is possible.
+  if(url.pathname==="/oauth/github/start"||url.pathname==="/oauth/github/callback")
+   return handleGithubOwnerOAuthHttpLab(request,env,{
+    host:ownerOAuthHost,cryptoImpl,nowMs});
   if(url.pathname.startsWith("/webauthn/"))
    return handleWebAuthnOwnerLab(request,env,{fetchImpl,cryptoImpl,nowMs});
   if(url.pathname==="/health"&&request.method==="GET")
