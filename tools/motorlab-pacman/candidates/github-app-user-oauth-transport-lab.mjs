@@ -4,7 +4,7 @@
 // A GitHub App user token, not installation/bot token, is required for owner review.
 const TOKEN_ORIGIN="https://github.com",API_ORIGIN="https://api.github.com";
 const OWNER_ID=202558590,REPO_ID=1363281702,OWNER="Br174",REPO="Br174/Chatgpt";
-const APP_ID=/^Iv1[._][A-Za-z0-9]{10,120}$/;
+import {isGitHubAppClientIdLab} from "./github-app-client-id-lab.mjs";
 const ACCESS=/^ghu_[A-Za-z0-9_]{20,256}$/;
 const CODE=/^[A-Za-z0-9_-]{12,256}$/;
 const VERIFIER=/^[A-Za-z0-9_-]{43,128}$/;
@@ -41,7 +41,7 @@ const strictCallback=(uri)=>{
  catch{return false}
 };
 export function createGithubAppUserOAuthTransportLab({clientId,clientSecret,fetchImpl}={}){
- if(!APP_ID.test(clientId||"")||typeof clientSecret!=="string"||
+ if(!isGitHubAppClientIdLab(clientId)||typeof clientSecret!=="string"||
   clientSecret.length<32||clientSecret.length>256||/\s/.test(clientSecret)||
   typeof fetchImpl!=="function")fail("APP_CLIENT_SECRET_NOT_CONNECTED");
  const get=async(token,path)=>{
