@@ -28,7 +28,7 @@ test("baseline replay: 12/30 to 13/30 gates, automatic phase cascade and honest 
  assert.deepEqual(now.phases.map(p=>p.percent),[60,60,60,20,20,40]);
 });
 test("a caller-provided success flag cannot forge independent evidence",async()=>{
- const fake={id:"p1.oauth-owner-live",completion:100,verified:true,proof:"NOT_CHECKED"};
+ const fake={id:"p1.owner-oauth-live",completion:100,verified:true,proof:"NOT_CHECKED"};
  const r=await calculateSixPhaseProgressLab({evidence:[fake],validateEvidence:trusted});
  assert.equal(r.percent,0);assert.equal(r.completed,0);
 });
