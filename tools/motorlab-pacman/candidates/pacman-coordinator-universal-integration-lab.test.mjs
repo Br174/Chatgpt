@@ -53,6 +53,6 @@ test("OAuth reviewer host presence does not bypass missing real signed owner att
  });
  await assert.rejects(()=>c.reviewPendingReadOnlyDeployment({
   prepared:{approved:true},attestation:{decision:"authorize"},runId:900,
-  requestCommitSha:"a".repeat(40),now:NOW}),/PACMAN_CHAT_OWNER_APPROVAL_HOLD_/);
+  requestCommitSha:"a".repeat(40),now:NOW}),/PACMAN_REVIEW_WEBAUTHN_HOLD_/);
  assert.equal(traffic,0);
 });
