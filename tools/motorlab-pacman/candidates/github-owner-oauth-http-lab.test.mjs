@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {webcrypto} from "node:crypto";
 import {handleGithubOwnerOAuthHttpLab} from "./github-owner-oauth-http-lab.mjs";
 const ORIGIN="https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev";
-const APP="Iv1.0123456789abcdef",NOW=1792410000000,TOKEN="ghu_"+"f".repeat(35);
+const APP="Iv23liKpIEhpEJCOIEfm",NOW=1792410000000,TOKEN="ghu_"+"f".repeat(35);
 const configuration={PACMAN_OWNER_GITHUB_OAUTH_ENABLED:"YES_REVIEWED_OWNER_OAUTH_STAGING",
  PACMAN_GITHUB_OAUTH_CLIENT_ID:APP};
 const req=(path,method="GET")=>new Request(ORIGIN+path,{method});
