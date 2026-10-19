@@ -3,6 +3,7 @@
 // A genuine trusted host cookie/session + private OAuth credential broker must
 // be installed by a separately authorized staging change; without it => 503.
 import {beginGithubOwnerOAuthPkceLab,finishGithubOwnerOAuthPkceLab} from "./github-owner-oauth-pkce-lab.mjs";
+import {isGitHubAppClientIdLab} from "./github-app-client-id-lab.mjs";
 const CALLBACK="/oauth/github/callback",START="/oauth/github/start";
 const ORIGIN="https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev";
 const headers={"Cache-Control":"no-store, private","Referrer-Policy":"no-referrer",
@@ -24,7 +25,7 @@ export async function handleGithubOwnerOAuthHttpLab(request,env,{
   typeof host.installOwnerCredential!=="function")
   return body("OAUTH_TRUSTED_HOST_NOT_CONNECTED",503);
  if(typeof env?.PACMAN_GITHUB_OAUTH_CLIENT_ID!=="string"||
-  !/^Iv1[._][A-Za-z0-9]{10,120}$/.test(env.PACMAN_GITHUB_OAUTH_CLIENT_ID))
+  !isGitHubAppClientIdLab(env.PACMAN_GITHUB_OAUTH_CLIENT_ID))
   return body("OAUTH_GITHUB_APP_NOT_CONFIGURED",503);
  if(!Number.isSafeInteger(nowMs))return body("OAUTH_CLOCK_UNAVAILABLE",503);
  const redirectUri=ORIGIN+CALLBACK;
