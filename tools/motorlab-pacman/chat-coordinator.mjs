@@ -11,6 +11,8 @@ import {discoverPacmanReadsLab,proposePacmanMutationLab} from "./candidates/pacm
 import {describePacmanClientsLab,executePacmanClientReadLab} from "./candidates/pacman-client-boundary-lab.mjs";
 import {createOwnerReviewGitHubRestLab} from "./candidates/github-owner-review-rest-adapter-lab.mjs";
 import {reviewOwnerPendingReadOnlyDeployment} from "./candidates/github-owner-review-provider-lab.mjs";
+import {prepareOwnerReviewWebAuthnIntentLab} from "./candidates/github-owner-review-webauthn-scope-lab.mjs";
+import {verifyOwnerReviewWebAuthnProofLab} from "./candidates/github-owner-review-webauthn-issuer-lab.mjs";
 export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onCheckpoint,approvalVerifier,operationLedger,trustedApprovalSecret,expectedOwnerSubject,
  readOnlyTrustedIssuerSecret,readOnlyOwnerSubject,readOnlyGithubConnector,multiClientTrustedHost,ownerReviewTrustedHost}={}){
  return Object.freeze({
@@ -32,10 +34,17 @@ export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onChe
   // Protected GitHub environment review remains separate from chat consent.
   // This route is inert until an authenticated owner OAuth host is injected;
   // it never removes required reviewers or provisions any tokens.
-  async reviewPendingReadOnlyDeployment({prepared,attestation,runId,requestCommitSha,now}={}){
+  async reviewPendingReadOnlyDeployment({prepared,attestation,reviewProof,
+   runId,requestCommitSha,now}={}){
    if(typeof ownerReviewTrustedHost?.getOwnerAccessToken!=="function"||
       typeof ownerReviewTrustedHost?.fetchImpl!=="function")
     throw Error("PACMAN_OWNER_REVIEW_HOST_NOT_CONNECTED");
+   // An authenticated OAuth connection alone does not prove a user approved
+   // this particular workflow run. Demand the existing owner's P-256 passkey
+   // proof from the consumed, SHA-pinned WebAuthn D1 challenge FIRST.
+   const intent=prepareOwnerReviewWebAuthnIntentLab({prepared,runId,requestCommitSha});
+   await verifyOwnerReviewWebAuthnProofLab({prepared,intent,attestation,reviewProof,
+    trustedIssuerSecret:readOnlyTrustedIssuerSecret,now});
    const ownerReviewerProvider=createOwnerReviewGitHubRestLab({
     getOwnerAccessToken:ownerReviewTrustedHost.getOwnerAccessToken,
     fetchImpl:ownerReviewTrustedHost.fetchImpl});
