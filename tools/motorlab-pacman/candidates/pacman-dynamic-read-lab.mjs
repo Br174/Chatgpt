@@ -3,6 +3,7 @@
 // No arbitrary URL, provider token, database query or write is accepted from an AI prompt.
 const ORIGIN=Object.freeze({github:"https://api.github.com",cloudflare:"https://api.cloudflare.com"});
 const CATALOGS=new WeakSet(),PLANS=new WeakSet();
+const METHODS=new Set(["post","put","patch","delete"]);
 const BLOCK=reason=>{throw Error("PACMAN_DYNAMIC_READ_HOLD_"+reason)};
 const obj=x=>x!==null&&typeof x==="object"&&!Array.isArray(x)&&Object.getPrototypeOf(x)===Object.prototype;
 const id=x=>typeof x==="string"&&/^[A-Za-z][A-Za-z0-9_/-]{0,119}$/.test(x);
@@ -53,24 +54,33 @@ export function discoverPacmanReadsLab({provider,openapi,verifiedOrigin}={}){
  if(!Object.hasOwn(ORIGIN,provider)||verifiedOrigin!==ORIGIN[provider]||
   !obj(openapi)||typeof openapi.openapi!=="string"||
   !/^3\.(?:0|1)\.\d+$/.test(openapi.openapi)||!obj(openapi.paths))BLOCK("TRUSTED_CATALOG_REQUIRED");
- const ops={},all=Object.entries(openapi.paths);
+ const ops={},proposedMutations={},all=Object.entries(openapi.paths);
  if(all.length>6000)BLOCK("CATALOG_TOO_LARGE");
  for(const [path,item] of all){
   if(!safePath(path))BLOCK("PATH_SCOPE_DENIED");
   if(!scopePath(provider,path))continue; // Only vetted repository/account paths.
   if(!obj(item)||item.$ref)BLOCK("INVALID_PATH_ITEM");
   for(const [method,operation] of Object.entries(item)){
-   if(method!=="get")continue; // Discover, but never enable unsafe verbs.
+   if(method!=="get"&&!METHODS.has(method))continue;
    if(!obj(operation)||!id(operation.operationId)||operation.$ref||
     item.parameters!==undefined&&!Array.isArray(item.parameters))BLOCK("INVALID_OPERATION");
    const operationId=provider+":"+operation.operationId;
    if(Object.hasOwn(ops,operationId))BLOCK("DUPLICATE_OPERATION_ID");
+   const parameters=parameterList([...(item.parameters??[]),...(operation.parameters??[])],path,openapi);
+   if(method!=="get"){
+    proposedMutations[operationId]=Object.freeze({operationId,provider,path,
+     method:method.toUpperCase(),parameters,isWrite:true,executable:false,
+     blocker:"REQUIRES_TRUSTED_OWNER_APPROVAL_AND_SCOPED_WRITE_ADAPTER"});
+    continue;
+   }
    ops[operationId]=Object.freeze({operationId,provider,path,method:"GET",
-    parameters:parameterList([...(item.parameters??[]),...(operation.parameters??[])],path,openapi),isWrite:false});
+    parameters,isWrite:false});
   }
  }
  const catalog=Object.freeze({provider,origin:ORIGIN[provider],operations:Object.freeze(ops),
-  count:keys(ops).length,liveConnected:false,readOnly:true});
+  proposedMutations:Object.freeze(proposedMutations),
+  count:keys(ops).length,proposedMutationCount:keys(proposedMutations).length,
+  liveConnected:false,readOnly:true});
  CATALOGS.add(catalog);return catalog;
 }
 export function preparePacmanReadLab({catalog,operationId,pathParams={},queryParams={},ownerAccountId}={}){
@@ -125,4 +135,15 @@ export async function executePacmanReadLab({plan,host}={}){
   credentialStored:false,bodyPersisted:false});
  if(await host.audit(receipt)!==true)BLOCK("AUDIT_FINAL_REQUIRED");
  return receipt; // Response payload is deliberately not exported into chat/ledger.
+}
+
+// A discovered write remains a NON-EXECUTABLE proposal. Do not infer approval from
+// catalog discovery, prompt text or an AI-generated JSON object.
+export function proposePacmanMutationLab({catalog,operationId}={}){
+ if(!CATALOGS.has(catalog)||typeof operationId!=="string"||
+  !Object.hasOwn(catalog.proposedMutations,operationId))BLOCK("UNREGISTERED_MUTATION");
+ const op=catalog.proposedMutations[operationId];
+ return Object.freeze({operationId,provider:op.provider,pathTemplate:op.path,
+  method:op.method,requiresSignedOwnerApproval:true,requiresProviderWriteScope:true,
+  requiresReadback:true,canExecute:false,blocker:op.blocker});
 }
