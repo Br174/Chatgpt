@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {webcrypto} from "node:crypto";
 import {beginGithubOwnerOAuthPkceLab,finishGithubOwnerOAuthPkceLab} from "./github-owner-oauth-pkce-lab.mjs";
 const URI="https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/oauth/github/callback";
-const CLIENT="Iv1.0123456789abcdef",NOW=1792410000000;
+const CLIENT="Iv23liKpIEhpEJCOIEfm",NOW=1792410000000;
 const TOKEN="ghu_"+"a".repeat(40);
 function fixture(opts={}){
  const state=new Map(),logs=[],calls={exchange:0,verify:0,permission:0,installed:0};
