@@ -145,7 +145,7 @@ test("single existing Pac-Man OAuth host + encrypted D1 stages a private real-sh
  const state=new URL(started.authorizationUrl).searchParams.get("state");
  const result=await finishGithubOwnerOAuthPkceLab({
   code:"synthetic-authorization-code-123456789",state,clientId,
-  redirectUri:CALLBACK,host,nowMs:NOW+1000,cryptoImpl});
+  redirectUri:CALLBACK,host,nowMs:NOW+1000,cryptoImpl:webcrypto});
  assert.equal(result.status,"GITHUB_OWNER_OAUTH_CONNECTED");
  assert.equal(result.tokenReturned,false);
  assert.equal(result.canApprove,false);
@@ -157,6 +157,6 @@ test("single existing Pac-Man OAuth host + encrypted D1 stages a private real-sh
  assert.equal(requests,5);
  await assert.rejects(()=>finishGithubOwnerOAuthPkceLab({
   code:"synthetic-authorization-code-123456789",state,clientId,
-  redirectUri:CALLBACK,host,nowMs:NOW+2000,cryptoImpl}),/INVALID_OR_REPLAYED_STATE/);
+  redirectUri:CALLBACK,host,nowMs:NOW+2000,cryptoImpl:webcrypto}),/INVALID_OR_REPLAYED_STATE/);
  assert.equal(requests,5);
 });
