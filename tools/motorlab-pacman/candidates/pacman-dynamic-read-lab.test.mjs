@@ -18,11 +18,16 @@ test("inert discovery does not call a transport or mint user identity",()=>{
  const c=cat();assert.equal(c.readOnly,true);assert.equal(c.origin,"https://api.github.com");
  assert.equal("token" in c,false);
 });
-test("strict owner/repo GitHub resource paths; refuse arbitrary URL and private secrets",()=>{
- for(const path of ["/repos/other/repo/actions/runs","https://evil.test/repos/Br174/Chatgpt",
-  "/repos/Br174/Chatgpt/actions/secrets","/repos/Br174/Chatgpt/../users","/repos/Br174/Chatgpt/%2e%2e"]){
+test("strict owner/repo GitHub resource paths; skip out-of-scope and secret GETs",()=>{
+ for(const path of ["/repos/other/repo/actions/runs","/repos/Br174/Chatgpt/actions/secrets"]){
   const s=spec();s.paths={[path]:{get:{operationId:"read"}}};
-  fails(()=>discoverPacmanReadsLab({provider:"github",verifiedOrigin:"https://api.github.com",openapi:s}),"PATH_SCOPE_DENIED|TRUSTED_CATALOG_REQUIRED");
+  const catalog=discoverPacmanReadsLab({provider:"github",verifiedOrigin:"https://api.github.com",openapi:s});
+  assert.equal(catalog.count,0);
+ }
+ for(const path of ["https://evil.test/repos/Br174/Chatgpt",
+  "/repos/Br174/Chatgpt/../users","/repos/Br174/Chatgpt/%2e%2e"]){
+  const s=spec();s.paths={[path]:{get:{operationId:"read"}}};
+  fails(()=>discoverPacmanReadsLab({provider:"github",verifiedOrigin:"https://api.github.com",openapi:s}),"PATH_SCOPE_DENIED");
  }
 });
 test("reject untrusted OpenAPI origin and malformed spec",()=>{
@@ -92,4 +97,25 @@ test("failing prewrite audit and provider failure never reports verified result"
  host.audit=async()=>false;
  await assert.rejects(()=>executePacmanReadLab({plan:p,host}),/AUDIT_PREPARE_REQUIRED/);
  assert.equal(reads,1);
+});
+
+test("generic OpenAPI repo template is bound to Br174/Chatgpt, never another repository",()=>{
+ const s={openapi:"3.1.0",paths:{"/repos/{owner}/{repo}/actions/runs/{run_id}":{
+  parameters:[
+   {in:"path",name:"owner",required:true,schema:{type:"string"}},
+   {in:"path",name:"repo",required:true,schema:{type:"string"}}],
+  get:{operationId:"getAnyRun",parameters:[
+   {in:"path",name:"run_id",required:true,schema:{type:"integer"}}]}
+ }}};
+ const c=discoverPacmanReadsLab({provider:"github",verifiedOrigin:"https://api.github.com",openapi:s});
+ const p=preparePacmanReadLab({catalog:c,operationId:"github:getAnyRun",pathParams:{run_id:7}});
+ assert.equal(p.path,"/repos/Br174/Chatgpt/actions/runs/7");
+ fails(()=>preparePacmanReadLab({catalog:c,operationId:"github:getAnyRun",
+  pathParams:{owner:"attacker",repo:"other",run_id:7}}),"REPOSITORY_SCOPE_DENIED");
+});
+test("large real-shaped OpenAPI specs skip unrelated operations rather than require one connector each",()=>{
+ const s=spec();
+ for(let i=0;i<800;i++)s.paths["/users/user"+i]={get:{operationId:"getUser"+i}};
+ const c=discoverPacmanReadsLab({provider:"github",verifiedOrigin:"https://api.github.com",openapi:s});
+ assert.equal(c.count,2);
 });
