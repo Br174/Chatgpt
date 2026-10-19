@@ -109,7 +109,9 @@ export async function finishGithubOwnerOAuthPkceLab({code,state,clientId,redirec
  let installed;
  try{installed=await host.installOwnerCredential({
   subject:SUBJECT,token:response.accessToken,githubId:202558590,
-  sessionBinding:session.binding})}catch{HOLD("PRIVATE_CREDENTIAL_STORE_UNVERIFIED")}
+  sessionBinding:session.binding,expiresIn:response.expiresIn,
+  refreshToken:response.refreshToken??null,
+  refreshTokenExpiresIn:response.refreshTokenExpiresIn??null})}catch{HOLD("PRIVATE_CREDENTIAL_STORE_UNVERIFIED")}
  if(installed!==true)HOLD("PRIVATE_CREDENTIAL_STORE_UNVERIFIED");
  return Object.freeze({status:"GITHUB_OWNER_OAUTH_CONNECTED",
   ownerSubject:SUBJECT,githubLogin:LOGIN,tokenReturned:false,
