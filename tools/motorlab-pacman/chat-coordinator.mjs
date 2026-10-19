@@ -9,8 +9,10 @@ import {runGithubControlledFileUpdate,inspectGithubControlledUpdateRecovery} fro
 import {prepareChatReadOnlyApproval,submitChatReadOnlyWorkflowApproval} from "./candidates/chat-owner-approval-handoff-lab.mjs";
 import {discoverPacmanReadsLab} from "./candidates/pacman-dynamic-read-lab.mjs";
 import {describePacmanClientsLab,executePacmanClientReadLab} from "./candidates/pacman-client-boundary-lab.mjs";
+import {createOwnerReviewGitHubRestLab} from "./candidates/github-owner-review-rest-adapter-lab.mjs";
+import {reviewOwnerPendingReadOnlyDeployment} from "./candidates/github-owner-review-provider-lab.mjs";
 export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onCheckpoint,approvalVerifier,operationLedger,trustedApprovalSecret,expectedOwnerSubject,
- readOnlyTrustedIssuerSecret,readOnlyOwnerSubject,readOnlyGithubConnector,multiClientTrustedHost}={}){
+ readOnlyTrustedIssuerSecret,readOnlyOwnerSubject,readOnlyGithubConnector,multiClientTrustedHost,ownerReviewTrustedHost}={}){
  return Object.freeze({
   // Universal discovery and multi-client source candidate extend this existing coordinator.
   // No extra Worker, OAuth issuance, live plugin, Android deploy or provider write.
@@ -23,6 +25,21 @@ export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onChe
   async executeAuthenticatedClientRead({client,request,catalog,now}={}){
    return executePacmanClientReadLab({client,request,catalog,
     trustedHost:multiClientTrustedHost,now});
+  },
+  // Protected GitHub environment review remains separate from chat consent.
+  // This route is inert until an authenticated owner OAuth host is injected;
+  // it never removes required reviewers or provisions any tokens.
+  async reviewPendingReadOnlyDeployment({prepared,attestation,runId,requestCommitSha,now}={}){
+   if(typeof ownerReviewTrustedHost?.getOwnerAccessToken!=="function"||
+      typeof ownerReviewTrustedHost?.fetchImpl!=="function")
+    throw Error("PACMAN_OWNER_REVIEW_HOST_NOT_CONNECTED");
+   const ownerReviewerProvider=createOwnerReviewGitHubRestLab({
+    getOwnerAccessToken:ownerReviewTrustedHost.getOwnerAccessToken,
+    fetchImpl:ownerReviewTrustedHost.fetchImpl});
+   return reviewOwnerPendingReadOnlyDeployment({prepared,attestation,
+    trustedIssuerSecret:readOnlyTrustedIssuerSecret,
+    expectedOwnerSubject:readOnlyOwnerSubject,
+    ownerReviewerProvider,runId,requestCommitSha,now});
   },
   // Read-only five-command bridge: reuse the SAME Pac-Man coordinator.
   // Preparation is inert. Submission needs an actual host-signed owner
