@@ -3,6 +3,7 @@
 // Live runtime MUST inject independently verified encrypted vault, authenticated
 // passkey owner session and per-account GitHub App credentials. Never a Map live.
 import {createGithubAppUserOAuthTransportLab} from "./github-app-user-oauth-transport-lab.mjs";
+import {isGitHubAppClientIdLab} from "./github-app-client-id-lab.mjs";
 const fail=k=>{throw Error("PACMAN_GITHUB_OWNER_TRUSTED_HOST_HOLD_"+k)};
 const methods=["ownerSession","savePendingOnce","consumePendingOnce",
  "installOwnerCredential","getOwnerAccessToken"];
@@ -37,7 +38,7 @@ export function ownerOAuthDeploymentReadinessLab({clientId,callbackOrigin,
  const checks=Object.freeze({
   exactCallback:callbackOrigin==="https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev",
   registeredGitHubApp:githubAppRegistered===true,
-  clientIdConfigured:typeof clientId==="string"&&/^Iv1[._][A-Za-z0-9]{10,120}$/.test(clientId),
+  clientIdConfigured:isGitHubAppClientIdLab(clientId),
   privateEncryptedVault:secureVaultAvailable===true,
   existingWorkerStagingDeployed:workerStagingDeployed===true,
   actualOwnerOAuthConsent:ownerLoginVerified===true
