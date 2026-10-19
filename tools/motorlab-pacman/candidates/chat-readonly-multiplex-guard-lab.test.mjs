@@ -98,19 +98,44 @@ test("exact receipt 003 verified by existing immutable proof helper",()=>{
   {...ok,operationId:"unapproved"},{...ok,secret:"leak"}])
   assert.throws(()=>verifyReadCommandResult("receipt-003",200,bad));
 });
-test("checkpoint command validates fixed known blob, not arbitrary content",()=>{
- const ok={type:"file",sha:"a5b8a0f9e71b770867ed648f88f86c0cf82a91c9",
-  path:"tools/motorlab-pacman/lab-workspace/B4_CHAT_D1_RECEIPT003_REUSABLE_PROTECTED_BRIDGE_REAL_GET_VERIFIED_20261019.md",size:5734};
- assert.equal(verifyReadCommandResult("checkpoint-status",200,ok).status,"PASS");
- for(const bad of [{...ok,sha:s},{...ok,path:"main.md"},{...ok,size:0}])
-  hold(()=>verifyReadCommandResult("checkpoint-status",200,bad));
+test("checkpoint looks up latest workspace commit instead of fixed historical blob",()=>{
+ const u=readCommandTarget("checkpoint-status").url;
+ assert.equal(new URL(u).pathname,"/repos/Br174/Chatgpt/commits");
+ assert.equal(new URL(u).searchParams.get("path"),"tools/motorlab-pacman/lab-workspace");
+ assert.equal(new URL(u).searchParams.get("per_page"),"1");
+ assert.equal(new URL(u).searchParams.get("sha"),BRANCH);
+ const sha="f".repeat(40);
+ const row={sha,html_url:"https://github.com/Br174/Chatgpt/commit/"+sha,
+   commit:{message:"[skip ci] docs(pacman): checkpoint approved source tests",
+    committer:{date:"2026-10-19T02:15:00Z"}}};
+ const result=verifyReadCommandResult("checkpoint-status",200,[row]);
+ assert.equal(result.status,"PASS");assert.equal(result.checkpointCommit,sha);
+ assert.equal(result.proof,"LATEST_WORKSPACE_CHECKPOINT_COMMIT_VERIFIED");
+ for(const bad of [
+   {...row,sha:"bad"},{...row,html_url:"https://evil.invalid/commit/"+sha},
+   {...row,commit:{...row.commit,message:"fix(pacman): changed module"}},
+   {...row,commit:{...row.commit,committer:{date:"yesterday"}}},
+   {...row,commit:{...row.commit,message:"docs(pacman): unrelated documentation"}}
+ ])hold(()=>verifyReadCommandResult("checkpoint-status",200,[bad]));
+ for(const value of [[],[row,row],{sha},null])
+  hold(()=>verifyReadCommandResult("checkpoint-status",200,value));
 });
-test("GitHub CI command reports latest observed CI run, not falsely running tests",()=>{
+test("GitHub CI distinguishes last successful tested commit from current request HEAD",()=>{
  const success={name:"Pac-Man Controlled GitHub Operations LAB",id:39179413936,
   status:"completed",conclusion:"success",run_attempt:1,head_sha:"562f8627e451e687fcb53e74c49522701a4df62c"};
  const data={workflow_runs:[{name:"Unrelated run"},success]};
- const v=verifyReadCommandResult("test-status",200,data);
- assert.equal(v.runId,39179413936);assert.equal(v.status,"PASS");
+ const same=verifyReadCommandResult("test-status",200,data,{currentRequestHead:success.head_sha});
+ assert.equal(same.runId,39179413936);assert.equal(same.status,"PASS");
+ assert.equal(same.matchesRequestHead,true);
+ assert.equal(same.proof,"LATEST_CI_PASS_AT_REQUEST_HEAD");
+ const diff=verifyReadCommandResult("test-status",200,data,{currentRequestHead:"f".repeat(40)});
+ assert.equal(diff.matchesRequestHead,false);
+ assert.equal(diff.checkedHead,success.head_sha);
+ assert.equal(diff.proof,"LATEST_CI_PASS_NOT_AT_REQUEST_HEAD");
+ const unknown=verifyReadCommandResult("test-status",200,data);
+ assert.equal(unknown.matchesRequestHead,null);
+ assert.notEqual(unknown.proof,"LATEST_CI_PASS_AT_REQUEST_HEAD");
+ hold(()=>verifyReadCommandResult("test-status",200,data,{currentRequestHead:"invalid"}));
  for(const bad of [{...success,status:"in_progress"},{...success,conclusion:"failure"},
   {...success,run_attempt:2},{...success,id:"wrong"}])
   hold(()=>verifyReadCommandResult("test-status",200,{workflow_runs:[bad]}));
