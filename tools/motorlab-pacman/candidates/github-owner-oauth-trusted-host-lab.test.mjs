@@ -91,7 +91,9 @@ test("readiness form describes exact requirements, cannot authorize remote actio
  const r=ownerOAuthDeploymentReadinessLab({
   clientId:ID,callbackOrigin:BASE,secureVaultAvailable:true,
   githubAppRegistered:true,workerStagingDeployed:true,ownerLoginVerified:true});
- assert.equal(r.readyForLiveReview,true);
+ assert.equal(r.configurationChecklistComplete,true);
+ assert.equal(r.readyForLiveReview,false);
+ assert.equal(r.liveProviderVerified,false);
  assert.equal(r.remoteWritePerformed,false);
  assert.equal(r.productionModified,false);
 });
