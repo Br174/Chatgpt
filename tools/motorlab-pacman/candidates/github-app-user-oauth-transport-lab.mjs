@@ -49,6 +49,12 @@ export function createGithubAppUserOAuthTransportLab({clientId,clientSecret,fetc
   return fetchExactly(fetchImpl,API_ORIGIN+path,{
    method:"GET",cache:"no-store",headers:restHeaders(token)});
  };
+ const verifiedUser=async token=>{
+  const who=await get(token,"/user");
+  if(who.login!==OWNER||who.id!==OWNER_ID||who.type!=="User")
+   fail("GITHUB_OWNER_IDENTITY_DENIED");
+  return Object.freeze({login:who.login,id:who.id,type:"User"});
+ };
  return Object.freeze({
   async exchangeGithubCode({code,codeVerifier,redirectUri,clientId:requestedClientId}={}){
    if(!CODE.test(code||"")||!VERIFIER.test(codeVerifier||"")||
@@ -70,15 +76,10 @@ export function createGithubAppUserOAuthTransportLab({clientId,clientSecret,fetc
     expiresIn:result.expires_in??null,
     refreshToken:result.refresh_token??null});
   },
-  async verifyGithubUser(token){
-   const who=await get(token,"/user");
-   if(who.login!==OWNER||who.id!==OWNER_ID||who.type!=="User")
-    fail("GITHUB_OWNER_IDENTITY_DENIED");
-   return Object.freeze({login:who.login,id:who.id,type:"User"});
-  },
+  async verifyGithubUser(token){return verifiedUser(token)},
   async verifyOwnerRepositoryPermission(token){
    // GitHub App token scopes are intersection(app, user, installed repo).
-   const id=await this.verifyGithubUser(token);
+   const id=await verifiedUser(token);
    const info=await get(token,"/user/installations?per_page=100&page=1");
    if(!Array.isArray(info.installations)||!safe(info.total_count)||
       info.total_count>100)fail("APP_INSTALLATIONS_UNVERIFIED");
