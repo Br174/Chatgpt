@@ -86,13 +86,18 @@ jobs:
           node-version: '22'
       - name: After owner approval verify GitHub HEAD and protected main via GET
         shell: bash
+        env:
+          GH_READ_TOKEN: ${{ github.token }}
         run: |
           node --input-type=module <<'NODE'
           const fail=x=>{throw Error('PACMAN_CHAT_MULTI_HEAD_HOLD_'+x)};
           const base='https://api.github.com/repos/Br174/Chatgpt/';
           const get=async route=>{
+           if(typeof process.env.GH_READ_TOKEN!=='string'||
+              process.env.GH_READ_TOKEN.length<20)fail('JOB_READ_TOKEN_MISSING');
            const r=await fetch(base+route,{method:'GET',redirect:'manual',
-             headers:{accept:'application/vnd.github+json','user-agent':'pacman-chat-multi-readonly'},
+             headers:{authorization:'Bearer '+process.env.GH_READ_TOKEN,
+               accept:'application/vnd.github+json','user-agent':'pacman-chat-multi-readonly'},
              signal:AbortSignal.timeout(12000)});
            if(r.status!==200)fail('GITHUB_HTTP_'+r.status);
            return r.json();
@@ -109,6 +114,7 @@ jobs:
         env:
           OPERATION: ${{ needs.source-guard.outputs.command }}
           REQUEST_ID: ${{ needs.source-guard.outputs.request_id }}
+          GH_READ_TOKEN: ${{ github.token }}
           EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
           CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
           CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
@@ -141,6 +147,13 @@ jobs:
            console.log('PACMAN_CHAT_MULTI_WORKER_VERSION_PINNED_PASS');
           }
           const headers={accept:'application/json','user-agent':'pacman-chat-multi-readonly'};
+          if(target.source==='github'){
+           if(new URL(target.url).origin!=='https://api.github.com')
+             fail('UNTRUSTED_GITHUB_ORIGIN');
+           if(typeof process.env.GH_READ_TOKEN!=='string'||
+              process.env.GH_READ_TOKEN.length<20)fail('JOB_READ_TOKEN_MISSING');
+           headers.authorization='Bearer '+process.env.GH_READ_TOKEN;
+          }
           if(target.authenticated){
            if(typeof process.env.EXECUTION_KEY!=='string'||process.env.EXECUTION_KEY.length<32)
              fail('PROTECTED_BEARER_MISSING');
