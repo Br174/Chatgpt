@@ -42,7 +42,10 @@ export function ownerOAuthDeploymentReadinessLab({clientId,callbackOrigin,
   existingWorkerStagingDeployed:workerStagingDeployed===true,
   actualOwnerOAuthConsent:ownerLoginVerified===true
  });
- return Object.freeze({checks,readyForLiveReview:Object.values(checks).every(x=>x===true),
+ // These booleans can be caller-supplied; they are a checklist, NOT a
+ // cryptographically backed live-connectivity attestation or provider consent.
+ return Object.freeze({checks,configurationChecklistComplete:Object.values(checks).every(x=>x===true),
+  readyForLiveReview:false,liveProviderVerified:false,
   requiresSeparateDeployApproval:true,requiresUserGithubConsent:true,
   productionModified:false,remoteWritePerformed:false});
 }
