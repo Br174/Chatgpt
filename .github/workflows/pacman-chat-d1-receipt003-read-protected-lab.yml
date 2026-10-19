@@ -1,0 +1,143 @@
+name: Pac-Man CHAT D1 receipt 003 private GET protected LAB (reusable)
+# Prepared source only. No live request trigger may be committed without new owner authorization.
+on:
+  push:
+    branches:
+      - motorlab/pacman-real-operations-lab-20261017
+    paths:
+      - '.github/pacman-b4/receipt003-read-requests/request-*.json'
+permissions:
+  contents: read
+concurrency:
+  group: pacman-chat-receipt003-private-get-single-writer
+  cancel-in-progress: false
+jobs:
+  owner-read-request-guard:
+    if: >-
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1 &&
+      github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      request_id: ${{ steps.contract.outputs.request_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact changed-path scope, fixed intent and workflow SHA guard (NO network)
+        id: contract
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import cp from 'node:child_process';
+          import {verifyReceipt003AuthorizedTrigger,REQUEST_DIR}
+            from './tools/motorlab-pacman/candidates/chat-d1-receipt003-request-guard-lab.mjs';
+          const stop=x=>{throw Error('PACMAN_CHAT_D1_RECEIPT003_SOURCE_HOLD_'+x)};
+          const git=a=>cp.execFileSync('git',a,{encoding:'utf8'}).trim();
+          const actualHead=git(['rev-parse','HEAD']);
+          const actualParent=git(['rev-parse','HEAD^']);
+          if(actualHead!==process.env.GITHUB_SHA)stop('SHA');
+          const changed=git(['diff-tree','--no-commit-id','--name-only','-r','HEAD'])
+            .split('\n').filter(Boolean);
+          if(changed.length!==1||!changed[0].startsWith(REQUEST_DIR))stop('CHANGED_PATHS');
+          const path=changed[0];
+          const doc=JSON.parse(fs.readFileSync(path,'utf8'));
+          const workflowSha=git(['hash-object','.github/workflows/pacman-chat-d1-receipt003-read-protected-lab.yml']);
+          const guardSha=git(['hash-object','tools/motorlab-pacman/candidates/chat-d1-receipt003-request-guard-lab.mjs']);
+          verifyReceipt003AuthorizedTrigger({
+            trigger:doc,triggerPath:path,changedPaths:changed,
+            commitParentSha:actualParent,workflowSha,guardSha
+          });
+          const checkpoint=fs.readFileSync(
+            'tools/motorlab-pacman/lab-workspace/B4_ONE_STAGING_EXECUTION_DEPLOY_PRIVATE_D1_003_VERIFIED_20261019.md','utf8');
+          if(!checkpoint.includes('PACMAN_B4_ONE_PRIVATE_003_GET_EXACT_PASS')||
+             !checkpoint.includes('8e527e98-efc2-424f-b9e0-349a15513970'))
+            stop('PREEXISTING_LIVE_STAGING_NOT_VERIFIED');
+          console.log('PACMAN_CHAT_D1_RECEIPT003_OWNER_NEW_TRIGGER_PRECHECK_PASS');
+          console.log('PACMAN_CHAT_D1_RECEIPT003_ZERO_REMOTE_CALLS_ZERO_WRITES');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'request_id='+doc.requestId+'\n');
+          NODE
+      - name: Synthetic security and negative/positive tests
+        run: node --test tools/motorlab-pacman/candidates/chat-d1-receipt003-request-guard-lab.test.mjs
+  protected-private-get:
+    needs: owner-read-request-guard
+    if: >-
+      needs.owner-read-request-guard.result == 'success' &&
+      github.repository == 'Br174/Chatgpt' &&
+      github.ref == 'refs/heads/motorlab/pacman-real-operations-lab-20261017' &&
+      github.event_name == 'push' && github.run_attempt == 1
+    environment: pacman-execution-staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Post-review verify GitHub HEAD, protected main and immutable deployed Worker metadata
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const stop=x=>{throw Error('PACMAN_CHAT_D1_RECEIPT003_POST_REVIEW_HOLD_'+x)};
+          const get=async url=>{
+            const r=await fetch(url,{method:'GET',redirect:'manual',
+              signal:AbortSignal.timeout(12000),
+              headers:{'user-agent':'pacman-d1-chat-readonly','accept':'application/vnd.github+json'}});
+            if(r.status!==200)stop('GITHUB_HTTP_'+r.status);
+            return r.json();
+          };
+          const base='https://api.github.com/repos/Br174/Chatgpt/';
+          const latest=await get(base+'commits?sha=motorlab%2Fpacman-real-operations-lab-20261017&per_page=1');
+          if(!Array.isArray(latest)||latest[0]?.sha!==process.env.GITHUB_SHA)
+            stop('LAB_HEAD_DRIFT');
+          const main=await get(base+'branches/main');
+          if(main?.protected!==true||
+             main?.commit?.sha!=='8615e8321bf9896f28826a09aa0c9f61ce5ecbb7')
+            stop('PROTECTED_MAIN_DRIFT');
+          console.log('PACMAN_CHAT_D1_RECEIPT003_POST_REVIEW_GITHUB_PASS');
+          NODE
+      - name: Exactly ONE authenticated Worker GET; no Cloudflare API, no SQL input
+        shell: bash
+        env:
+          OWNER_EXECUTION_KEY: ${{ secrets.PACMAN_EXECUTION_KEY }}
+          OWNER_REQUEST_ID: ${{ needs.owner-read-request-guard.outputs.request_id }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {verifyReceipt003WorkerResponse,PRIVATE_RECEIPT_URL}
+            from './tools/motorlab-pacman/candidates/chat-d1-receipt003-request-guard-lab.mjs';
+          const stop=x=>{throw Error('PACMAN_CHAT_D1_RECEIPT003_RESULT_HOLD_'+x)};
+          const key=process.env.OWNER_EXECUTION_KEY;
+          if(typeof key!=='string'||key.length<32||
+             !/^request-[0-9]{8}-[0-9]{3}$/.test(process.env.OWNER_REQUEST_ID||''))
+            stop('OWNER_SECRET_OR_REQUEST_ID');
+          console.log('PACMAN_CHAT_D1_RECEIPT003_ONE_PRIVATE_GET_ATTEMPT_START');
+          let response;
+          try{
+            response=await fetch(PRIVATE_RECEIPT_URL,{
+              method:'GET',redirect:'manual',
+              headers:{authorization:'Bearer '+key,accept:'application/json'},
+              signal:AbortSignal.timeout(15000)
+            });
+          }catch{stop('PRIVATE_GET_TRANSPORT_NO_RETRY')}
+          let data;
+          try{data=await response.json()}catch{stop('PRIVATE_GET_NON_JSON')}
+          try{verifyReceipt003WorkerResponse(response.status,data)}
+          catch{stop('PRIVATE_GET_NOT_EXACT_PASS')}
+          // Only allowlisted proof markers, not raw D1 JSON, secret, token or response.
+          console.log('PACMAN_CHAT_D1_RECEIPT003_RESULT=PASS');
+          console.log('PACMAN_CHAT_D1_RECEIPT003_EXACT_D1_RECEIPT_CHALLENGE_NONCE_PASS');
+          console.log('PACMAN_CHAT_D1_RECEIPT003_ONE_GET_ZERO_REMOTE_WRITES_VERIFIED');
+          NODE
