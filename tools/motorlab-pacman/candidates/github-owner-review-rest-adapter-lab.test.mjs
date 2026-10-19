@@ -38,8 +38,8 @@ function fixture({
  };
  const fn=async(url,init)=>{
   calls.push({url,init});
-  if(url===throwPath)throw Error("provider-exception-with-secret-"+TOKEN);
-  if(url===failPath)return {status:failStatus,json:async()=>({message:"fake error"})};
+  if(url===throwPath&&init.method==="POST")throw Error("provider-exception-with-secret-"+TOKEN);
+  if(url===failPath&&init.method==="POST")return {status:failStatus,json:async()=>({message:"fake error"})};
   assert.equal(init.redirect,"manual");
   assert.equal(init.headers.authorization,"Bearer "+TOKEN);
   assert.equal(init.headers["X-GitHub-Api-Version"],"2022-11-28");
