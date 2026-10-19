@@ -24,7 +24,7 @@ export async function handleGithubOwnerOAuthHttpLab(request,env,{
   typeof host.installOwnerCredential!=="function")
   return body("OAUTH_TRUSTED_HOST_NOT_CONNECTED",503);
  if(typeof env?.PACMAN_GITHUB_OAUTH_CLIENT_ID!=="string"||
-  !/^[A-Za-z0-9_-]{10,120}$/.test(env.PACMAN_GITHUB_OAUTH_CLIENT_ID))
+  !/^Iv1[._][A-Za-z0-9]{10,120}$/.test(env.PACMAN_GITHUB_OAUTH_CLIENT_ID))
   return body("OAUTH_GITHUB_APP_NOT_CONFIGURED",503);
  if(!Number.isSafeInteger(nowMs))return body("OAUTH_CLOCK_UNAVAILABLE",503);
  const redirectUri=ORIGIN+CALLBACK;
