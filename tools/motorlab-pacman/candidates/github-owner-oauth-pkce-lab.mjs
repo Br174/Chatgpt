@@ -13,7 +13,8 @@ const HOLD=x=>{throw Error("PACMAN_GITHUB_OAUTH_PKCE_HOLD_"+x)};
 const validUrl=s=>{try{
  const u=new URL(s);return u.protocol==="https:"&&u.username===""&&u.password===""&&
   u.search===""&&u.hash===""&&u.pathname===CALLBACK&&
-  /\.workers\.dev$/.test(u.hostname)&&/motorlab-pacman-webauthn-staging-lab/.test(u.hostname);
+  u.hostname==="motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev"&&
+  u.port===""
 }catch{return false}};
 const requireHost=host=>{
  if(typeof host?.ownerSession!=="function"||typeof host?.savePendingOnce!=="function"||
