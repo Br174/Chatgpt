@@ -44,7 +44,7 @@ export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onChe
    // proof from the consumed, SHA-pinned WebAuthn D1 challenge FIRST.
    const intent=prepareOwnerReviewWebAuthnIntentLab({prepared,runId,requestCommitSha});
    const verified=await verifyOwnerReviewWebAuthnProofLab({prepared,intent,attestation,reviewProof,
-    trustedIssuerSecret:readOnlyTrustedIssuerSecret,now});
+    trustedIssuerSecret:readOnlyTrustedIssuerSecret,nowMs:now});
    // A consumed WebAuthn challenge is not by itself a consumed GitHub POST grant.
    // Claim exact run AND nonce durably before any authenticated provider request.
    // Missing/ambiguous ledger fails closed; replay never causes a second POST.
