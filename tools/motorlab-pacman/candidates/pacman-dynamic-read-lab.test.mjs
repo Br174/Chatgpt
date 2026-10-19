@@ -119,3 +119,19 @@ test("large real-shaped OpenAPI specs skip unrelated operations rather than requ
  const c=discoverPacmanReadsLab({provider:"github",verifiedOrigin:"https://api.github.com",openapi:s});
  assert.equal(c.count,2);
 });
+
+test("safe OpenAPI internal path parameter references resolve without external dereference",()=>{
+ const s={openapi:"3.0.3",components:{parameters:{
+  owner:{in:"path",name:"owner",required:true,schema:{type:"string"}},
+  repo:{in:"path",name:"repo",required:true,schema:{type:"string"}}
+ }},paths:{"/repos/{owner}/{repo}/commits":{get:{
+  operationId:"repos/list-commits",parameters:[
+   {$ref:"#/components/parameters/owner"},{$ref:"#/components/parameters/repo"}]
+ }}}};
+ const c=discoverPacmanReadsLab({provider:"github",verifiedOrigin:"https://api.github.com",openapi:s});
+ assert.equal(preparePacmanReadLab({catalog:c,operationId:"github:repos/list-commits"}).path,
+  "/repos/Br174/Chatgpt/commits");
+ s.paths["/repos/{owner}/{repo}/commits"].get.parameters[0].$ref="https://evil.test";
+ fails(()=>discoverPacmanReadsLab({provider:"github",verifiedOrigin:"https://api.github.com",openapi:s}),
+  "EXTERNAL_OR_CHAINED_PARAMETER_REF");
+});
