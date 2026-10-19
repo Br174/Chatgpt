@@ -109,6 +109,38 @@ jobs:
             stop('PROTECTED_MAIN_DRIFT');
           console.log('PACMAN_CHAT_D1_RECEIPT003_POST_REVIEW_GITHUB_PASS');
           NODE
+      - name: Exact live Worker deployment pinned (one Cloudflare metadata GET, no billing)
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.PACMAN_CF_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.PACMAN_CF_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {currentDeploymentVersion,ACCOUNT,EXEC}
+            from './tools/motorlab-pacman/candidates/controlled-staging-deploy-verify-lab.mjs';
+          const stop=x=>{throw Error('PACMAN_CHAT_D1_RECEIPT003_LIVE_VERSION_HOLD_'+x)};
+          if(process.env.CF_ACCOUNT!==ACCOUNT||
+             typeof process.env.CF_TOKEN!=='string'||process.env.CF_TOKEN.length<10)
+            stop('PROTECTED_CREDENTIALS');
+          const url='https://api.cloudflare.com/client/v4/accounts/'+ACCOUNT+
+            '/workers/scripts/'+EXEC+'/deployments';
+          let reply;
+          try{
+            reply=await fetch(url,{method:'GET',redirect:'manual',
+              headers:{authorization:'Bearer '+process.env.CF_TOKEN,accept:'application/json'},
+              signal:AbortSignal.timeout(12000)});
+          }catch{stop('CLOUDFLARE_GET_UNAVAILABLE_NO_RETRY')}
+          if(reply.status!==200)stop('CLOUDFLARE_HTTP_'+reply.status+'_NO_RETRY');
+          let meta;
+          try{meta=await reply.json()}catch{stop('CLOUDFLARE_INVALID_JSON')}
+          if(meta?.success!==true)stop('CLOUDFLARE_METADATA_FAILED');
+          let version;
+          try{version=currentDeploymentVersion(meta)}
+          catch{stop('DEPLOYMENTS_FORMAT_CHANGED')}
+          if(version!=='8e527e98-efc2-424f-b9e0-349a15513970')
+            stop('EXECUTION_STAGING_VERSION_DRIFT');
+          console.log('PACMAN_CHAT_D1_RECEIPT003_LIVE_EXECUTION_VERSION_PINNED_PASS');
+          NODE
       - name: Exactly ONE authenticated Worker GET; no Cloudflare API, no SQL input
         shell: bash
         env:
