@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {discoverPacmanReadsLab,preparePacmanReadLab,executePacmanReadLab} from "./pacman-dynamic-read-lab.mjs";
+import {discoverPacmanReadsLab,preparePacmanReadLab,executePacmanReadLab,proposePacmanMutationLab} from "./pacman-dynamic-read-lab.mjs";
 const spec=()=>({openapi:"3.1.0",paths:{
  "/repos/Br174/Chatgpt/actions/runs/{run_id}":{get:{operationId:"getWorkflowRun",parameters:[
   {in:"path",name:"run_id",required:true,schema:{type:"integer"}}]},
@@ -134,4 +134,23 @@ test("safe OpenAPI internal path parameter references resolve without external d
  s.paths["/repos/{owner}/{repo}/commits"].get.parameters[0].$ref="https://evil.test";
  fails(()=>discoverPacmanReadsLab({provider:"github",verifiedOrigin:"https://api.github.com",openapi:s}),
   "EXTERNAL_OR_CHAINED_PARAMETER_REF");
+});
+
+test("write operations discovered dynamically but NEVER gain execution from OpenAPI",()=>{
+ const c=cat();
+ assert.equal(c.proposedMutationCount,1);
+ assert.equal(c.proposedMutations["github:dispatchRun"].method,"POST");
+ const p=proposePacmanMutationLab({catalog:c,operationId:"github:dispatchRun"});
+ assert.equal(p.canExecute,false);assert.equal(p.requiresSignedOwnerApproval,true);
+ assert.equal(p.requiresProviderWriteScope,true);assert.equal(p.requiresReadback,true);
+ assert.equal(typeof p.url,"undefined");
+ fails(()=>preparePacmanReadLab({catalog:c,operationId:"github:dispatchRun"}),
+  "UNREGISTERED_OPERATION");
+});
+test("a fake mutation catalog cannot gain authority; unknown mutation denied",()=>{
+ const c=cat();
+ fails(()=>proposePacmanMutationLab({catalog:structuredClone(c),
+  operationId:"github:dispatchRun"}),"UNREGISTERED_MUTATION");
+ fails(()=>proposePacmanMutationLab({catalog:c,operationId:"github:deleteEverything"}),
+  "UNREGISTERED_MUTATION");
 });
