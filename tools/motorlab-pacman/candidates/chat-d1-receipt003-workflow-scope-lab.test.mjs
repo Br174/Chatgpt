@@ -23,7 +23,7 @@ test("protected exact existing GitHub environment mandatory before remote reads"
 });
 test("static allowlist and changed one-file commit enforced before review",()=>{
  for(const x of ["verifyReceipt003AuthorizedTrigger","diff-tree",
-   "changed.length!==1","expectedParentSha","workflowSha,guardSha"])
+   "changed.length!==1","commitParentSha:actualParent","workflowSha,guardSha"])
   assert.ok(has(x),x);
 });
 test("private key stays in protected environment not the public source or outputs",()=>{
