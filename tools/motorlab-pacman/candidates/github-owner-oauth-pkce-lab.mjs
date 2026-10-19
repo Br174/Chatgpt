@@ -2,7 +2,7 @@
 // This is a sealed boundary for a FUTURE trusted HTTPS host, NOT a deployed OAuth
 // application or a replacement for existing passkey, GitHub reviewer, or D1.
 // Server-owned host alone provisions OAuth client credentials and secure sessions.
-const CLIENT=/^[A-Za-z0-9_-]{10,120}$/;
+const CLIENT=/^Iv1[._][A-Za-z0-9]{10,120}$/;
 const HASH=/^[a-f0-9]{64}$/;
 const CODE=/^[A-Za-z0-9_-]{12,256}$/;
 const CALLBACK="/oauth/github/callback",SUBJECT="202558590",LOGIN="Br174";
@@ -19,7 +19,9 @@ const validUrl=s=>{try{
 const requireHost=host=>{
  if(typeof host?.ownerSession!=="function"||typeof host?.savePendingOnce!=="function"||
   typeof host?.consumePendingOnce!=="function"||typeof host?.exchangeGithubCode!=="function"||
-  typeof host?.verifyGithubUser!=="function"||typeof host?.installOwnerCredential!=="function")
+  typeof host?.verifyGithubUser!=="function"||
+  typeof host?.verifyOwnerRepositoryPermission!=="function"||
+  typeof host?.installOwnerCredential!=="function")
   HOLD("TRUSTED_HTTPS_HOST_REQUIRED");
 };
 const utc=n=>Number.isSafeInteger(n)&&n>=0;
@@ -95,6 +97,15 @@ export async function finishGithubOwnerOAuthPkceLab({code,state,clientId,redirec
  catch{HOLD("OAUTH_USER_IDENTITY_UNVERIFIED")}
  if(identity?.login!==LOGIN||identity?.id!==202558590||identity?.type!=="User")
   HOLD("OAUTH_USER_IDENTITY_UNVERIFIED");
+ let permission;
+ try{permission=await host.verifyOwnerRepositoryPermission(response.accessToken)}
+ catch{HOLD("OAUTH_REPOSITORY_PERMISSION_UNVERIFIED")}
+ if(permission?.state!=="OWNER_GITHUB_REPO_PERMISSIONS_READ_VERIFIED"||
+    permission.owner!==LOGIN||permission.ownerId!==202558590||
+    permission.repo!=="Br174/Chatgpt"||permission.repoId!==1363281702||
+    permission.deploymentsWrite!==true||permission.actionsRead!==true||
+    permission.contentsRead!==true)
+   HOLD("OAUTH_REPOSITORY_PERMISSION_UNVERIFIED");
  let installed;
  try{installed=await host.installOwnerCredential({
   subject:SUBJECT,token:response.accessToken,githubId:202558590,
@@ -102,5 +113,6 @@ export async function finishGithubOwnerOAuthPkceLab({code,state,clientId,redirec
  if(installed!==true)HOLD("PRIVATE_CREDENTIAL_STORE_UNVERIFIED");
  return Object.freeze({status:"GITHUB_OWNER_OAUTH_CONNECTED",
   ownerSubject:SUBJECT,githubLogin:LOGIN,tokenReturned:false,
-  githubReviewPerformed:false,canApprove:false,permissionVerificationPending:true});
+  githubReviewPerformed:false,canApprove:false,permissionVerificationPending:false,
+  ownerRepoPermissionPreflightVerified:true,environmentReviewerEligibilityPending:true});
 }
