@@ -8,6 +8,9 @@ function isAllowedWebAuthnChallengeScope(record){
    record.path==="tools/motorlab-pacman/probe-webauthn-cycle-20261017.txt";
  if(record?.capability==="github.lab-file-update")
   return record.branch===CONTROLLED_LAB_BRANCH&&controlledLabPath(record.path);
+ if(record?.capability==="github.actions.readonly-review")
+  return record.branch==="motorlab/pacman-real-operations-lab-20261017"&&
+   /^\.github\/pacman-b4\/read-command-requests\/request-[0-9]{8}-[0-9]{3}\.json$/.test(record.path);
  return false;
 }
 
