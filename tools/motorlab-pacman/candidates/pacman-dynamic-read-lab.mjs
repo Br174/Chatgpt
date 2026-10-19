@@ -66,13 +66,15 @@ export function discoverPacmanReadsLab({provider,openapi,verifiedOrigin}={}){
     item.parameters!==undefined&&!Array.isArray(item.parameters))BLOCK("INVALID_OPERATION");
    const operationId=provider+":"+operation.operationId;
    if(Object.hasOwn(ops,operationId))BLOCK("DUPLICATE_OPERATION_ID");
-   const parameters=parameterList([...(item.parameters??[]),...(operation.parameters??[])],path,openapi);
    if(method!=="get"){
+    // A mutation proposal is NEVER executable; do not trust/infer missing
+    // writable parameter schemas until a separate signed writer is approved.
     proposedMutations[operationId]=Object.freeze({operationId,provider,path,
-     method:method.toUpperCase(),parameters,isWrite:true,executable:false,
+     method:method.toUpperCase(),isWrite:true,executable:false,
      blocker:"REQUIRES_TRUSTED_OWNER_APPROVAL_AND_SCOPED_WRITE_ADAPTER"});
     continue;
    }
+   const parameters=parameterList([...(item.parameters??[]),...(operation.parameters??[])],path,openapi);
    ops[operationId]=Object.freeze({operationId,provider,path,method:"GET",
     parameters,isWrite:false});
   }
