@@ -14,6 +14,7 @@ import {reviewOwnerPendingReadOnlyDeployment} from "./candidates/github-owner-re
 import {prepareOwnerReviewWebAuthnIntentLab} from "./candidates/github-owner-review-webauthn-scope-lab.mjs";
 import {verifyOwnerReviewWebAuthnProofLab} from "./candidates/github-owner-review-webauthn-issuer-lab.mjs";
 import {inspectOwnerReviewRecoveryLab} from "./candidates/github-owner-review-recovery-lab.mjs";
+import {beginGithubOwnerOAuthPkceLab,finishGithubOwnerOAuthPkceLab} from "./candidates/github-owner-oauth-pkce-lab.mjs";
 export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onCheckpoint,approvalVerifier,operationLedger,trustedApprovalSecret,expectedOwnerSubject,
  readOnlyTrustedIssuerSecret,readOnlyOwnerSubject,readOnlyGithubConnector,multiClientTrustedHost,ownerReviewTrustedHost}={}){
  return Object.freeze({
@@ -65,6 +66,17 @@ export function createChatAuthorizedCoordinator({env,githubToken,fetchImpl,onChe
     trustedIssuerSecret:readOnlyTrustedIssuerSecret,
     expectedOwnerSubject:readOnlyOwnerSubject,
     ownerReviewerProvider,runId,requestCommitSha,now});
+  },
+  // GitHub App user-to-server OAuth+PKCE: a host-bound SOURCE-ONLY handoff,
+  // using the SAME future authenticated ownerReviewTrustedHost.
+  // It is not connected until a real private GitHub App, callback and host exist.
+  async prepareGithubOwnerOAuth({clientId,redirectUri,nowMs}={}){
+   return beginGithubOwnerOAuthPkceLab({clientId,redirectUri,nowMs,
+    host:ownerReviewTrustedHost});
+  },
+  async completeGithubOwnerOAuth({clientId,redirectUri,code,state,nowMs}={}){
+   return finishGithubOwnerOAuthPkceLab({clientId,redirectUri,code,state,
+    nowMs,host:ownerReviewTrustedHost});
   },
   // Independent post-error readback. Does not repeat POST, consume another
   // passkey challenge or grant authority from a caller-provided success flag.
