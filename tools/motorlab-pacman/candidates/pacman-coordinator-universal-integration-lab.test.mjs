@@ -56,3 +56,18 @@ test("OAuth reviewer host presence does not bypass missing real signed owner att
   requestCommitSha:"a".repeat(40),now:NOW}),/PACMAN_REVIEW_WEBAUTHN_HOLD_/);
  assert.equal(traffic,0);
 });
+
+test("OAuth PKCE routes reuse existing coordinator, but no configured trusted host means no login",async()=>{
+ const c=createChatAuthorizedCoordinator();
+ assert.equal(typeof c.prepareGithubOwnerOAuth,"function");
+ assert.equal(typeof c.completeGithubOwnerOAuth,"function");
+ await assert.rejects(()=>c.prepareGithubOwnerOAuth({
+  clientId:"Iv1_0123456789abcdef",
+  redirectUri:"https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/oauth/github/callback",
+  nowMs:1792410000000}),/PACMAN_GITHUB_OAUTH_PKCE_HOLD_TRUSTED_HTTPS_HOST_REQUIRED/);
+ await assert.rejects(()=>c.completeGithubOwnerOAuth({
+  clientId:"Iv1_0123456789abcdef",state:"A".repeat(43),
+  code:"synthetic-oauth-code-12345",
+  redirectUri:"https://motorlab-pacman-webauthn-staging-lab.motorlab-staging.workers.dev/oauth/github/callback",
+  nowMs:1792410000000}),/PACMAN_GITHUB_OAUTH_PKCE_HOLD_TRUSTED_HTTPS_HOST_REQUIRED/);
+});
