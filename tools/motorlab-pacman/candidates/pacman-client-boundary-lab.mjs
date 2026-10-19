@@ -12,7 +12,7 @@ const forbidden=new Set(["accessToken","token","authorization","bearer","secret"
  "approved","signature","apiKey","url","origin","headers"]);
 const deny=x=>{throw Error("PACMAN_MULTICLIENT_HOLD_"+x)};
 const plain=x=>x!==null&&typeof x==="object"&&!Array.isArray(x)&&Object.getPrototypeOf(x)===Object.prototype;
-const validId=x=>typeof x==="string"&&x.length>0&&x.length<=120&&/^[A-Za-z0-9:._-]+$/.test(x);
+const validId=x=>typeof x==="string"&&x.length>0&&x.length<=160&&/^[A-Za-z0-9:._/-]+$/.test(x);
 function checkRequest(req){
  if(!plain(req)||Object.keys(req).some(k=>forbidden.has(k)||!["operationId","pathParams","queryParams",
   "ownerAccountId","requestId"].includes(k))||!validId(req.operationId)||
