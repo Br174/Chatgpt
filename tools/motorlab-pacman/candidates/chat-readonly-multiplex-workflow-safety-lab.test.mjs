@@ -56,3 +56,11 @@ test("Worker metadata gate applies only to Worker commands",()=>{
  all(["if(target.source==='worker')","if(target.authenticated)",
  "PACMAN_CHAT_MULTI_WORKER_VERSION_PINNED_PASS"]);
 });
+
+test("checkpoint and CI use single GET plus explicit request HEAD comparison",()=>{
+ all(["verifyReadCommandResult(command,response.status,body,{currentRequestHead:process.env.GITHUB_SHA})",
+ "PACMAN_CHAT_MULTI_CI_TESTED_HEAD=","PACMAN_CHAT_MULTI_CI_MATCHES_REQUEST_HEAD=",
+ "PACMAN_CHAT_MULTI_LATEST_CHECKPOINT_COMMIT="]);
+ assert.equal(source.split("response=await fetch(target.url,").length,2);
+ absent(["method:'POST'","workflow_dispatch","reviewPendingDeployments"]);
+});
