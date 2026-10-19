@@ -13,7 +13,7 @@ export const COMMANDS=Object.freeze({
  "worker-health":Object.freeze({source:"worker",path:"/health",authenticated:false}),
  "execution-schema":Object.freeze({source:"worker",path:"/__motorlab_lab/diagnostics/execution-schema-audit",authenticated:true}),
  "receipt-003":Object.freeze({source:"worker",path:"/__motorlab_lab/diagnostics/terminal-receipt-003",authenticated:true}),
- "checkpoint-status":Object.freeze({source:"github",path:"contents/tools/motorlab-pacman/lab-workspace/B4_CHAT_D1_RECEIPT003_REUSABLE_PROTECTED_BRIDGE_REAL_GET_VERIFIED_20261019.md"+QUERY,authenticated:false}),
+ "checkpoint-status":Object.freeze({source:"github",path:"commits?sha="+encodeURIComponent(BRANCH)+"&path="+encodeURIComponent("tools/motorlab-pacman/lab-workspace")+"&per_page=1",authenticated:false}),
  "test-status":Object.freeze({source:"github",path:"actions/runs?branch="+encodeURIComponent(BRANCH)+"&per_page=30",authenticated:false})
 });
 export const REQUEST_BASE=Object.freeze({
@@ -53,9 +53,10 @@ export function readCommandTarget(command){
  return Object.freeze({url:spec.source==="worker"?HOST+spec.path:GH+spec.path,
   source:spec.source,authenticated:spec.authenticated,method:"GET"});
 }
-export function verifyReadCommandResult(command,httpStatus,body){
+export function verifyReadCommandResult(command,httpStatus,body,{currentRequestHead}={}){
  if(!Object.hasOwn(COMMANDS,command)||httpStatus!==200||
-    !body||typeof body!=="object"||Array.isArray(body))HOLD("BAD_STATUS_OR_PAYLOAD");
+    !body||typeof body!=="object"||
+    (Array.isArray(body)&&command!=="checkpoint-status"))HOLD("BAD_STATUS_OR_PAYLOAD");
  if(command==="worker-health"){
   if(body.service!=="pacman-execution-staging"||
      body.revision!=="pacman-v2-webauthn-relay-20261016"||body.database!=="CONNECTED")
@@ -79,10 +80,22 @@ export function verifyReadCommandResult(command,httpStatus,body){
   return Object.freeze({command,status:"PASS",proof:"EXACT_RECEIPT_CHALLENGE_NONCE"});
  }
  if(command==="checkpoint-status"){
-  if(body.type!=="file"||body.sha!=="a5b8a0f9e71b770867ed648f88f86c0cf82a91c9"||
-     body.path!=="tools/motorlab-pacman/lab-workspace/B4_CHAT_D1_RECEIPT003_REUSABLE_PROTECTED_BRIDGE_REAL_GET_VERIFIED_20261019.md"||
-     !safeNumber(body.size))HOLD("PINNED_CHECKPOINT_NOT_VERIFIED");
-  return Object.freeze({command,status:"PASS",proof:"PINNED_CHECKPOINT_BLOB_EXISTS"});
+  // Single path-filtered GET: last checkpoint WORKSPACE commit, not a
+  // permanently pinned 2026-10-19 receipt. If the last workspace commit
+  // is not clearly a Pac-Man checkpoint, HOLD instead of inventing one.
+  if(!Array.isArray(body)||body.length!==1)HOLD("CHECKPOINT_HISTORY_FORMAT");
+  const row=body[0];
+  const message=row?.commit?.message;
+  const date=row?.commit?.committer?.date;
+  if(!safeSha(row?.sha)||typeof message!=="string"||
+     !/^(?:\[skip ci\] )?docs\(pacman\): checkpoint\b/i.test(message.split("\n")[0])||
+     typeof date!=="string"||!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/.test(date)||
+     !Number.isFinite(Date.parse(date))||
+     row?.html_url!=="https://github.com/Br174/Chatgpt/commit/"+row.sha)
+    HOLD("LATEST_WORKSPACE_COMMIT_NOT_CHECKPOINT");
+  return Object.freeze({command,status:"PASS",
+    proof:"LATEST_WORKSPACE_CHECKPOINT_COMMIT_VERIFIED",
+    checkpointCommit:row.sha,checkpointDate:date});
  }
  if(command==="test-status"){
   if(!Array.isArray(body.workflow_runs)||body.workflow_runs.length>30)HOLD("CI_LIST_FORMAT");
@@ -91,8 +104,17 @@ export function verifyReadCommandResult(command,httpStatus,body){
   if(!latest||!safeNumber(latest.id)||latest.status!=="completed"||
      latest.conclusion!=="success"||latest.run_attempt!==1||!safeSha(latest.head_sha))
     HOLD("LATEST_CI_NOT_VERIFIED_SUCCESS");
-  return Object.freeze({command,status:"PASS",proof:"LATEST_REPORTED_LAB_CI_SUCCESS",
-    runId:latest.id,checkedHead:latest.head_sha});
+  if(currentRequestHead!==undefined&&!safeSha(currentRequestHead))
+    HOLD("CURRENT_REQUEST_HEAD_INVALID");
+  const matchesRequestHead=currentRequestHead===undefined?null:
+    latest.head_sha===currentRequestHead;
+  return Object.freeze({command,status:"PASS",
+    proof:matchesRequestHead===true?"LATEST_CI_PASS_AT_REQUEST_HEAD":
+      "LATEST_CI_PASS_NOT_AT_REQUEST_HEAD",
+    runId:latest.id,checkedHead:latest.head_sha,
+    currentRequestHead:currentRequestHead??null,
+    matchesRequestHead});
+
  }
  HOLD("UNRECOGNIZED_COMMAND");
 }
