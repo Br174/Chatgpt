@@ -8,6 +8,7 @@ on:
       - '.github/pacman-b4/read-command-requests/request-*.json'
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: pacman-chat-readonly-commands-one-writer
   cancel-in-progress: false
