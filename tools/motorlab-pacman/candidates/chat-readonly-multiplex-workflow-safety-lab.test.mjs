@@ -64,3 +64,18 @@ test("checkpoint and CI use single GET plus explicit request HEAD comparison",()
  assert.equal(source.split("response=await fetch(target.url,").length,2);
  absent(["method:'POST'","workflow_dispatch","reviewPendingDeployments"]);
 });
+
+test("existing job-scoped GitHub read token authenticates only allowlisted GitHub GETs",()=>{
+ all(["permissions:\n  contents: read","GH_READ_TOKEN: "+"\u0024{{ github.token }}",
+  "if(typeof process.env.GH_READ_TOKEN!=='string'",
+  "authorization:'Bearer '+process.env.GH_READ_TOKEN",
+  "if(target.source==='github')",
+  "new URL(target.url).origin!=='https://api.github.com'",
+  "headers.authorization='Bearer '+process.env.GH_READ_TOKEN"]);
+ assert.equal(source.split("GH_READ_TOKEN: "+"\u0024{{ github.token }}").length-1,2);
+ const begin=source.indexOf("if(target.source==='github')");
+ const workerBearer=source.indexOf("headers.authorization='Bearer '+process.env.EXECUTION_KEY");
+ assert.ok(begin>0&&workerBearer>begin);
+ absent(["GH_READ_TOKEN: "+"\u0024{{ secrets.", "console.log(process.env.GH_READ_TOKEN)",
+  "console.log(headers.authorization)", "actions: write", "contents: write"]);
+});
