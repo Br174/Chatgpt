@@ -123,7 +123,8 @@ test("fresh request with consumed nonce is rejected even if request ID changes",
  const first=prep(),backend=mockBackend(),a=await signed(first);
  await submitChatReadOnlyWorkflowApproval(submitArgs(first,a,backend));
  const second=prep({requestId:"request-20261019-003"});
- await hold(()=>submitChatReadOnlyWorkflowApproval(submitArgs(second,await signed(second),backend)));
+ const secondAttestation=await signed(second);
+ await hold(()=>submitChatReadOnlyWorkflowApproval(submitArgs(second,secondAttestation,backend)));
  assert.equal(backend.writes,1);
 });
 test("stale branch HEAD fails before claim or provider write",async()=>{
