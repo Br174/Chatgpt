@@ -18,7 +18,7 @@ test('r38 is a staged Behavior Memory release, not prematurely globally complete
 });
 test('r38 first-context capsule remains under 4000 UTF-8 bytes',()=>{
  assert.match(capsule,/^RELEASE=2026\.10\.22-r38$/m);
- assert.match(capsule,/^BEHAVIOR_MEMORY_R38=existing_guard$/m);
+ assert.match(capsule,/^BEHAVIOR_MEMORY_R38=on$/m);
  assert.ok(Buffer.byteLength(capsule,'utf8')<4000,'boot capsule exceeds 4KB budget');
 });
 test('r38 generic satellite bundle preserves one guard and native engines',()=>{
