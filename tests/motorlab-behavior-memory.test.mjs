@@ -78,5 +78,5 @@ test('generic re-entry bridge loads behavior memory without a second guard or CO
  assert.match(entry,/motorlab-behavior-preflight\.mjs/);
  assert.match(entry,/EXISTING MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1\.txt/);
  assert.match(entry,/PENDING_ENFORCEMENT/);
- assert.match(manifest,/CURRENT_RELEASE=2026\.10\.14-r37/);
+ assert.match(manifest,/CURRENT_RELEASE=2026\.10\.22-r38/);
 });
