@@ -187,3 +187,15 @@ Revision 1.3 (2026-10-12): R35 consolidation integrates IDENTICAL / CONTRADICTOR
 
 R38 CONTINUITY PILLAR SELECTIVE SUPERSESSION (2026-10-16; CORE LAB)
 For the narrow responsibility of deciding whether an already-approved operation should continue, MOTORLAB_EXECUTION_CONTINUITY_V1.txt R38 is canonical and takes priority over all older contradictory pause, step/batch cap, status-as-stop and repeated approval behavior. Classify each old path as IDENTICAL_MERGED, CONFLICT_REPLACED or COMPLEMENTARY. Replace all conflicting active routes, including fallbacks, before declaring ACTIVE_NEW=yes; negative regression tests must show old arbitrary stops no longer fire. Preserve independent approval, safety, integrity, cost and single-writer constraints. This Guard remains the sole conflict resolver; no second authority or unconditional override of higher-priority access controls is created.
+
+
+BEHAVIOR MEMORY LAB V1 — NEW CANDIDATE, NOT ACTIVE IN MAIN (2026-10-22)
+Module: MOTORLAB_BEHAVIOR_MEMORY_V1.txt
+Validator: templates/behavior/motorlab-behavior-memory.mjs
+Core registry: behaviors/motorlab-core.json
+Purpose: before an already-authorized LAB code change, load owner-specific project rule contracts, validate schema/ownership/active-vs-retired version paths, compute OLD->NEW disposition and attach explicit rule/test references to this SAME canonical Change Compatibility Guard.
+No alternate conflict arbiter, scheduler, dynamic cloud rule runtime or writable external service may be introduced.
+A proposed change still requires pre-change approval and single-writer; the typed validator's approved=true input merely checks a previously granted scope and is not host authorization.
+Any missing test path or unexpected ownership is BLOCKED/PENDING, not silently passed.
+MusicLab pilot project registry: Br174/MusicLab/behaviors/musiclab-cover.json (read at verified project ref, never copied into central CORE as shared MusicLab authority).
+Release/CORE deployment/fanout remains unchanged until separate promotion gate.
