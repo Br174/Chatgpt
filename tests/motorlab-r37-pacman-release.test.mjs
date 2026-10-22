@@ -28,9 +28,9 @@ test('r37 policy is same existing AutoSetup and follows boot/reentry without a s
  assert.match(sync,/R37 PACMAN AUTOSETUP ALIAS SYNC/);
 });
 test('r37 release may be COMPLETE only after all six main satellite SHA receipts and four pending LAB refs',()=>{
- assert.match(manifest,/^FANOUT_STATE=IN_PROGRESS$/m);
- assert.match(manifest,/^RELEASE_FANOUT_STATE=IN_PROGRESS$/m);
- assert.match(manifest,/^FANOUT_MAIN_VERIFIED=0\/6$/m);
+ assert.match(manifest,/^FANOUT_STATE=COMPLETE$/m);
+ assert.match(manifest,/^RELEASE_FANOUT_STATE=COMPLETE$/m);
+ assert.match(manifest,/^FANOUT_MAIN_VERIFIED=6\/6$/m);
  assert.match(ledger,/R37_GLOBAL_STATE=COMPLETE/);
  assert.match(ledger,/R37_CURRENT_MAIN_VERIFIED=6\/6/);
  assert.match(ledger,/R37_VERIFICATION=central_content_git_blob_exact_match/);
