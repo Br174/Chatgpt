@@ -33,7 +33,6 @@ PROGRESS_RESET_ON_NEW_CHAT=forbidden
 HOST_OPAQUE_THINKING=host_limited
 VISIBLE_CONTROL_POINT_PROGRESS=required
 VISUAL_STATUS
-⚙️=MotorLab rNN attivo
 🎆=Azione completata
 ⚡=Risveglio / recupero
 ✅=Problema risolto only after root-cause closure
@@ -112,4 +111,4 @@ CAPSULE_FIRST_IN_BOOT_CONTEXT=required
 CAPSULE_TRUNCATION=forbidden
 DETAIL_MODULES=load_on_demand
 
-BEHAVIOR_MEMORY_R38=existing_guard
+BEHAVIOR_MEMORY_R38=on
