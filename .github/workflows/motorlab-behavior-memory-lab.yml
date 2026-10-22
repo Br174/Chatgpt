@@ -1,0 +1,27 @@
+name: MotorLab Behavior Memory LAB Gate
+on:
+  push:
+    branches:
+      - motorlab/behavior-memory-manager-lab-20261022
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  behavior-memory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run behavior memory contract tests
+        run: node --test tests/motorlab-behavior-memory.test.mjs tests/motorlab-behavior-preflight.test.mjs
+      - name: Run existing compatibility guard regression tests
+        run: node --test tests/motorlab-r36-guard-and-boot.test.mjs tests/motorlab-r37-pacman-release.test.mjs
+      - name: Portable project registry preflight (read-only)
+        run: node templates/behavior/motorlab-behavior-preflight.mjs behaviors/motorlab-core.json .
+
+      - name: Check core behavior registry against known test paths
+        run: |
+          node --input-type=module -e "import { readFileSync, existsSync } from 'node:fs'; import { validateBehaviorRegistry } from './templates/behavior/motorlab-behavior-memory.mjs'; const c=JSON.parse(readFileSync('behaviors/motorlab-core.json','utf8')); const v=validateBehaviorRegistry(c,{expectedProject:'motorlab'}); if(!v.valid || c.rules.some(r=>r.testPaths.some(p=>!existsSync(p)))) { console.error(v.errors); process.exit(1); } console.log('Core rules: '+v.activeRuleCount);"

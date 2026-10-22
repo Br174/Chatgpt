@@ -1,0 +1,56 @@
+MOTORLAB BEHAVIOR MEMORY V1
+STATUS=LAB_CANDIDATE_NOT_CORE_ACTIVE
+OWNER=Br174/Chatgpt
+RELEASE_BASE=2026.10.14-r37
+MODULE=MotorLab Behavior Memory / Behavioral Contract Registry
+SCOPE=generic-core-and-per-project
+
+PURPOSE
+One durable, versioned behavioral contract per ownership domain. This extends existing MotorLab Change Compatibility Guard, Project Continuity, Technical Change History and verified Git provenance. It is NOT an independent orchestrator, new AI memory, scheduler or database.
+
+AUTHORITY
+1. GitHub committed contract file is the durable definition. History of approved old contracts remains recoverable through Git, but retired/overridden behavior is never active.
+2. MotorLab Change Compatibility Guard is the single authority for conflict, overlap, duplicate and verified supersession. This module supplies typed contract evidence to that pre-existing coordinator, not a second coordinator.
+3. MotorLab is responsible for shared governance rules; each native project's repo owns its own domain rules and implementation. GitHub project contracts take precedence on that project's subject matter without overriding CORE safety.
+4. Deployed APKs/services implement a pinned, tested projection of the applicable rule set; changing central text alone does NOT remotely alter installed app behavior.
+5. D1 operational state and musical records must never be treated as the authority for behavioral contracts. Do not silently turn Cloud approval decisions into algorithmic rules.
+
+CONTRACT SCHEMA
+- schemaVersion: 1
+- project: namespace
+- rules: array of:
+  - id: globally unique stable identifier
+  - owner: precise project or motorlab
+  - scope: runtime domain / build / governance
+  - version: monotonic positive integer
+  - status: active or retired
+  - behavior: measurable nonempty normative rule
+  - acceptance: nonempty machine or operator verifiable test objectives
+  - testPaths: repository-relative automated tests when implemented
+  - supersedes: preceding rule ids (if any)
+  - protected: boolean, stronger lifecycle/safety contracts require explicit authorization, even when the rule is newer
+
+MANAGEMENT / PRE-CHANGE GATE
+- Read live authoritative repo HEAD and signed-off user intent before proposed writes.
+- Treat a new request as a proposal until separately approved after the pre-change report.
+- Compare proposed contracts against active current contract ids and the existing Change Compatibility Guard's semantic OLD->NEW classification.
+- For conflict, require explicit approved supersession mapping and negative legacy-path tests; neither a timestamp nor an unsupported LLM interpretation grants permission to retire a rule.
+- For equivalent or complementary rules reuse canonical owner and test path; no second behavior engine.
+- Maintain immutable provenance via Git commits, release checkpoint and tests.
+- Reject malformed, unowned, duplicate-active, invalid versioned or dangling replacement contracts prior to a LAB gate.
+- Preserve signed app, production database, release pin, LAST_GOOD, single-writer, all project-native runtime authority.
+- Distribute only verified tested contracts to project satellites at approved safe lifecycle boundaries.
+- Unit tests should cover accepted, rejected, missing, duplicate, supersession and backward compatibility cases.
+
+LIFECYCLE
+LAB proposal -> verified positive AND negative contract tests -> candidate -> approved CORE release/pin and safe fanout. Promotion requires its own previously agreed protected lifecycle authorization.
+Neither writing this LAB document nor passing its unit tests marks the central CORE as upgraded.
+
+PRIVACY / COST
+No personal account credentials, tokens, file attachments or behavioral telemetry in the behavior contract. No new remote service or billable dependency.
+
+ANTI-REGRESSION
+Every project must prove that active rules map to working code/test cases when possible. Audit missing enforcement explicitly instead of falsely marking a documentary rule enforced. Unknown and untested remain unverified.
+
+VERSION
+MOTORLAB-BEHAVIOR-MEMORY-V1.0 LAB
