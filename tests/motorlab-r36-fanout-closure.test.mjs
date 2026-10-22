@@ -7,7 +7,7 @@ test('r36 closes central transaction only with six verified main satellite refs 
  // Verify immutable r36 closure history without asserting it is still the current release.
  assert.match(m,/R36 FINAL RELEASE FANOUT ACCOUNTING/);
  assert.match(m,/All six ACTIVE main repos adopted r36/);
- assert.match(m,/FANOUT_PENDING_SAFE_BOUNDARY=4/);
+ // Current r38 top-level pending count is separate from immutable r36 history.
  assert.match(l,/R36_GLOBAL_STATE=COMPLETE/);
  assert.match(l,/R36_FANOUT_CLOSURE_NOT_TOTAL_LAB_ADOPTION=TRUE/);
  assert.match(l,/R36_PENDING_SAFE_BOUNDARY_COUNT=4/);
