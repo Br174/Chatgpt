@@ -60,3 +60,13 @@ test('identical snapshot is stable, does not need approval',()=>{
  const a=make([makeRule('a')]);const g=planBehaviorTransition(a,structuredClone(a));
  assert.equal(g.allowed,true);assert.equal(g.changes.length,0);
 });
+
+import fs from 'node:fs';
+test('pilot registry is linked to canonical Change Compatibility Guard with no competing engine',()=>{
+ const contract=fs.readFileSync('MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt','utf8');
+ const registry=JSON.parse(fs.readFileSync('behaviors/motorlab-core.json','utf8'));
+ assert.match(contract,/BEHAVIOR MEMORY LAB V1/);
+ assert.match(contract,/templates\/behavior\/motorlab-behavior-memory\.mjs/);
+ assert.match(contract,/No alternate conflict arbiter/);
+ assert.equal(validateBehaviorRegistry(registry,{expectedProject:'motorlab'}).valid,true);
+});
