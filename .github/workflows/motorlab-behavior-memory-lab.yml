@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - motorlab/behavior-memory-manager-lab-20261022
+      - motorlab/behavior-memory-release-r38-20261022
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,7 +17,7 @@ jobs:
         with:
           node-version: '22'
       - name: Run behavior memory contract tests
-        run: node --test tests/motorlab-behavior-memory.test.mjs tests/motorlab-behavior-preflight.test.mjs
+        run: node --test tests/motorlab-behavior-memory.test.mjs tests/motorlab-behavior-preflight.test.mjs tests/motorlab-behavior-r38-release.test.mjs
       - name: Run existing compatibility guard regression tests
         run: node --test tests/motorlab-r36-guard-and-boot.test.mjs tests/motorlab-r37-pacman-release.test.mjs
       - name: Portable project registry preflight (read-only)
