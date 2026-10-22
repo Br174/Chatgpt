@@ -8,13 +8,13 @@ const bundle=read('MOTORLAB_SATELLITE_BUNDLE_V1.txt');
 const ledger=read('MOTORLAB_RELEASE_FANOUT_STATE_V1.txt');
 const memory=read('MOTORLAB_BEHAVIOR_MEMORY_V1.txt');
 const entry=read('MOTORLAB_CORE_ENTRYPOINT_V1.txt');
-test('r38 is a staged Behavior Memory release, not prematurely globally complete',()=>{
+test('r38 Behavior Memory is globally complete only with six verified satellites',()=>{
  assert.match(manifest,/^CURRENT_RELEASE=2026\.10\.22-r38$/m);
- assert.match(manifest,/^FANOUT_STATE=IN_PROGRESS$/m);
- assert.match(manifest,/^FANOUT_MAIN_VERIFIED=0\/6$/m);
- assert.match(manifest,/^RELEASE_FANOUT_STATE=IN_PROGRESS$/m);
+ assert.match(manifest,/^FANOUT_STATE=COMPLETE$/m);
+ assert.match(manifest,/^FANOUT_MAIN_VERIFIED=6\/6$/m);
+ assert.match(manifest,/^RELEASE_FANOUT_STATE=COMPLETE$/m);
  assert.match(manifest,/^R38_AUTOMATIC_HOST_BEHAVIOR=NOT_CLAIMED_WITHOUT_RUNTIME_CONNECTOR$/m);
- assert.match(memory,/STATUS=R38_RELEASE_CANDIDATE_PENDING_SAFE_FANOUT/);
+ assert.match(memory,/STATUS=CORE_R38_VERIFIED_6_MAIN_SATELLITES/);
 });
 test('r38 first-context capsule remains under 4000 UTF-8 bytes',()=>{
  assert.match(capsule,/^RELEASE=2026\.10\.22-r38$/m);
@@ -43,4 +43,14 @@ test('six active main satellite targets and historical LAST_GOOD receipts remain
 test('release record does not claim automatic ChatGPT host memory or activate unrelated R38 continuity',()=>{
  assert.match(manifest,/R38_LEGACY_CONTINUITY_FEATURE=R38_LAB_UNCHANGED_NOT_AUTOMATICALLY_ACTIVATED/);
  assert.match(manifest,/R38_PRODUCTION_CODE_WORKERS_D1=UNTOUCHED/);
+});
+
+test('r38 closure evidence covers all six main SHAs, pending labs and retained r37 LAST_GOOD',()=>{
+ assert.match(ledger,/^R38_GLOBAL_STATE=COMPLETE$/m);
+ assert.match(ledger,/^R38_CURRENT_MAIN_VERIFIED=6\/6$/m);
+ assert.match(ledger,/^R38_PENDING_SAFE_BOUNDARY_COUNT=5$/m);
+ const receipts=ledger.match(/^R38_MAIN_VERIFIED Br174\/.* ref=main sha=[0-9a-f]{40} release=r38 last_good=r37$/gm)||[];
+ assert.equal(receipts.length,6);
+ assert.match(ledger,/^R38_LAST_GOOD_VERIFIED=all_six_main_exact_original_r37_local_core$/m);
+ assert.match(manifest,/^R38_GLOBAL_STATE=COMPLETE_WITH_5_EXPLICIT_LAB_PENDING_SAFE_BOUNDARY$/m);
 });

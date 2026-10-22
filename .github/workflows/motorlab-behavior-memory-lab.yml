@@ -4,6 +4,7 @@ on:
     branches:
       - motorlab/behavior-memory-manager-lab-20261022
       - motorlab/behavior-memory-release-r38-20261022
+      - motorlab/behavior-memory-r38-fanout-closure-20261022
   workflow_dispatch:
 permissions:
   contents: read
