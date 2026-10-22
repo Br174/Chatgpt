@@ -70,3 +70,13 @@ test('pilot registry is linked to canonical Change Compatibility Guard with no c
  assert.match(contract,/No alternate conflict arbiter/);
  assert.equal(validateBehaviorRegistry(registry,{expectedProject:'motorlab'}).valid,true);
 });
+
+test('generic re-entry bridge loads behavior memory without a second guard or CORE promotion',()=>{
+ const entry=fs.readFileSync('MOTORLAB_CORE_ENTRYPOINT_V1.txt','utf8');
+ const manifest=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
+ assert.match(entry,/BEHAVIOR MEMORY LAB V1 — RE-ENTRY BRIDGE/);
+ assert.match(entry,/motorlab-behavior-preflight\.mjs/);
+ assert.match(entry,/EXISTING MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1\.txt/);
+ assert.match(entry,/PENDING_ENFORCEMENT/);
+ assert.match(manifest,/CURRENT_RELEASE=2026\.10\.14-r37/);
+});
