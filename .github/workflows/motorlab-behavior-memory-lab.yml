@@ -18,7 +18,7 @@ jobs:
       - name: Run behavior memory contract tests
         run: node --test tests/motorlab-behavior-memory.test.mjs
       - name: Run existing compatibility guard regression tests
-        run: node --test tests/motorlab-r35-verified-supersession.test.mjs tests/motorlab-r36-guard-and-boot.test.mjs
+        run: node --test tests/motorlab-r36-guard-and-boot.test.mjs tests/motorlab-r37-pacman-release.test.mjs
       - name: Check core behavior registry against known test paths
         run: |
           node --input-type=module -e "import { readFileSync, existsSync } from 'node:fs'; import { validateBehaviorRegistry } from './templates/behavior/motorlab-behavior-memory.mjs'; const c=JSON.parse(readFileSync('behaviors/motorlab-core.json','utf8')); const v=validateBehaviorRegistry(c,{expectedProject:'motorlab'}); if(!v.valid || c.rules.some(r=>r.testPaths.some(p=>!existsSync(p)))) { console.error(v.errors); process.exit(1); } console.log('Core rules: '+v.activeRuleCount);"
