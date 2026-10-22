@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "project": "motorlab",
+  "rules": [
+    {
+      "id": "motorlab.change-compatibility",
+      "owner": "motorlab",
+      "scope": "governance",
+      "version": 1,
+      "status": "active",
+      "protected": true,
+      "behavior": "All project modifications must run Change Compatibility Guard against live authoritative HEAD and retire conflicting legacy paths before verification.",
+      "acceptance": [
+        "Retire old conflicting paths and test them negatively",
+        "Keep single owner of each responsibility"
+      ],
+      "testPaths": [
+        "tests/motorlab-r35-verified-supersession.test.mjs"
+      ],
+      "supersedes": []
+    },
+    {
+      "id": "motorlab.pre-change-approval",
+      "owner": "motorlab",
+      "scope": "authorization",
+      "version": 1,
+      "status": "active",
+      "protected": true,
+      "behavior": "A new modification request never authorizes the initial write until a pre-change report has been approved, while an approved scope does not require repeat approvals.",
+      "acceptance": [
+        "Reject unapproved first writes",
+        "Resume approved in-scope work"
+      ],
+      "testPaths": [
+        "tests/motorlab-r36-guard-and-boot.test.mjs"
+      ],
+      "supersedes": []
+    },
+    {
+      "id": "motorlab.single-writer",
+      "owner": "motorlab",
+      "scope": "execution",
+      "version": 1,
+      "status": "active",
+      "protected": true,
+      "behavior": "Only one coordinator writes any protected ref/resource, while independent isolated lanes can work concurrently.",
+      "acceptance": [
+        "No overlapping writes to same ref",
+        "Single integration lane"
+      ],
+      "testPaths": [
+        "tests/motorlab-execution-fabric.test.mjs"
+      ],
+      "supersedes": []
+    },
+    {
+      "id": "motorlab.project-native-engine",
+      "owner": "motorlab",
+      "scope": "project-integration",
+      "version": 1,
+      "status": "active",
+      "protected": true,
+      "behavior": "Project domain behavior remains owned by the project engine; central MotorLab governs safe orchestration but never replaces the native engine.",
+      "acceptance": [
+        "A satellite module cannot edit app runtime by fanout alone"
+      ],
+      "testPaths": [
+        "tests/motorlab-r36-guard-and-boot.test.mjs"
+      ],
+      "supersedes": []
+    },
+    {
+      "id": "motorlab.pinned-release",
+      "owner": "motorlab",
+      "scope": "release",
+      "version": 1,
+      "status": "active",
+      "protected": true,
+      "behavior": "Use current verified pinned CORE and local satellite; adopt new release only at safe re-entry boundary with LAST_GOOD fallback.",
+      "acceptance": [
+        "Never switch version during modification/build/test",
+        "Downgrade forbidden"
+      ],
+      "testPaths": [
+        "tests/motorlab-r28-sync-pin.test.mjs"
+      ],
+      "supersedes": []
+    }
+  ]
+}
