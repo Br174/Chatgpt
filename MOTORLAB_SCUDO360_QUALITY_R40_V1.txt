@@ -1,6 +1,6 @@
 MOTORLAB / SCUDO 360 QUALITA r40 — LAB EVIDENCE CONTRACT
 DATE=2026-10-29
-STATUS=CORE_RELEASE_PREPARED_6_OF_6_NATIVE_PILOTS_FANOUT_IN_PROGRESS
+STATUS=CORE_R40_CONTROL_PLANE_VERIFIED_6_MAIN_2_ACTIVE_NATIVE_WORKFLOW_WIRING_PENDING
 BASE_RELEASE=2026.10.29-r39
 OWNER=Existing Behavior Memory + Change Compatibility Guard
 IMPLEMENTATION=templates/regression/scudo360-quality-r40.mjs
@@ -40,8 +40,8 @@ Br174/GeoVision-Test = HTML/control proof not Android device proof.
 Br174/MotorAI = real training/Android behavior requires independent evidence.
 Br174/streamflix-BV = Vision delivery adapter, NOT a separate movie source.
 EXCLUDED=Br174/Cover-Lab-AI (DORMANT_RESERVED)
-CENTRAL_RELEASE=r40 protected release candidate; six main satellite readbacks not yet complete.
-FANOUT=IN_PROGRESS_SAFE_TARGET_ONLY
+CENTRAL_RELEASE=r40 verified CORE + 6 main satellites + 2 active Android control refs. Native workflow enforcement is separate.
+FANOUT=COMPLETE_CONTROL_PLANE_6_MAIN_2_ACTIVE
 DEVICE_CERTIFICATION=NOT_VERIFIED
 
 TRANSITION RULE
