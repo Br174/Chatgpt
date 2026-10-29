@@ -5,7 +5,7 @@ import {validateBehaviorRegistry} from '../templates/behavior/motorlab-behavior-
 const read=p=>readFileSync(p,'utf8');
 test('Scudo360 is governed by one existing compatibility owner, no second scheduler',()=>{
  const entry=read('MOTORLAB_CORE_ENTRYPOINT_V1.txt');
- assert.match(entry,/SCUDO360 — CUMULATIVE REGRESSION EVIDENCE CANDIDATE/);
+ assert.match(entry,/SCUDO360 — CUMULATIVE REGRESSION EVIDENCE RELEASE r39/);
  assert.match(entry,/existing Change Compatibility Guard remains the sole conflict/);
  assert.match(entry,/PENDING_ENFORCEMENT/);
  assert.match(entry,/NOT proof that Scudo360 is active in all six projects/);
