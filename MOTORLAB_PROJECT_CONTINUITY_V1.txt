@@ -1,5 +1,9 @@
 MOTORLAB PROJECT CONTINUITY V1 - DURABLE CROSS-CHAT PROJECT STATE
 
+ACTIVE UPDATE FAMILY ROUTING — REQUIRED CROSS-CHAT RECONCILIATION (2026-10-29)
+Before selecting ANY app source branch, follow MOTORLAB_ACTIVE_FAMILY_ROUTING_R39.txt and the current project's Project Continuity ledger. Old historical routing sections below do not override newer verified user-installed app family sources. MusicLab Turbo is NOT old MusicLab/main; Vision LAB184 permanent V1 is NOT old Vision main debug cache identity. Never ask user to paste branch reminder if live GitHub evidence is available; if missing, fail closed. Cover-Lab-AI stays dormant.
+
+
 STATUS
 Mandatory MotorLab CORE capability.
 Established: 2026-09-30.
