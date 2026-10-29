@@ -46,7 +46,7 @@ jobs:
           const fs=require('node:fs');
           const m=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
           const archive=m.includes('R39_PHASE=CONTROL_PLANE_FANOUT_COMPLETE_NATIVE_ENFORCEMENT_PENDING')&&m.includes('SCUDO360_GLOBAL_RELEASE=CONTROL_PLANE_VERIFIED_6_OF_6_NATIVE_GATES_PENDING');
-          const current=m.includes('CURRENT_RELEASE=2026.10.29-r39') || (m.includes('CURRENT_RELEASE=2026.10.29-r40') && m.includes('R40_PHASE=CORE_PREPARED_FANOUT_IN_PROGRESS') && m.includes('R40_TESTED_SIX_NATIVE_PILOTS=6/6') && m.includes('R40_FANOUT_COMPLETE=NO_UNTIL_SIX_SAFE_SATELLITE_RECEIPTS'));
+          const current=m.includes('CURRENT_RELEASE=2026.10.29-r39') || (m.includes('CURRENT_RELEASE=2026.10.29-r40') && m.includes('R40_TESTED_SIX_NATIVE_PILOTS=6/6') && ((m.includes('R40_PHASE=CORE_PREPARED_FANOUT_IN_PROGRESS') && m.includes('R40_FANOUT_COMPLETE=NO_UNTIL_SIX_SAFE_SATELLITE_RECEIPTS')) || (m.includes('R40_PHASE=CORE_AND_SIX_MAIN_PLUS_TWO_ACTIVE_CONTROL_PLANE_VERIFIED') && m.includes('R40_MAIN_VERIFIED=6/6_EXACT_BLOBS') && m.includes('R40_FANOUT_COMPLETE=YES_CONTROL_PLANE_MAIN6_ACTIVE2_NATIVES_PENDING'))));
           if(!archive||!current)throw Error('unapproved release or premature fanout claim');
           if(!m.includes('PACMAN_RELEASE_ACTIVATION=VERIFIED_CORE_AND_SIX_ACTIVE_MAINS'))throw Error('fanout bypass');
           const wf=fs.readFileSync('.github/workflows/motorlab-pacman-core-lab.yml','utf8');
