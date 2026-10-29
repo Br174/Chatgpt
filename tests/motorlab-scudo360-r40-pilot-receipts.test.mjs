@@ -19,7 +19,7 @@ test('R40 pilot has six distinct actual project PR and run receipts',()=>{
   for(const [prefix,repo,pr,run,baselinePrefix=prefix] of projects){
     assert.ok(ledger.includes(prefix+'_PR=https://github.com/'+repo+'/pull/'+pr),'Missing '+repo+' PR');
     assert.ok(ledger.includes(run),'Missing completed CI run '+repo);
-    assert.match(ledger,new RegExp('^'+baselinePrefix+'_R39_BASELINE_SHA=[0-9a-f]{40},'m'));
+    assert.match(ledger,new RegExp('^'+baselinePrefix+'_R39_BASELINE_SHA=[0-9a-f]{40}$','m'));
   }
   assert.match(ledger,/^R40_NATIVE_CI_BEFORE_AFTER_VERIFIED=6_OF_6$/m);
   assert.match(ledger,/^R40_PILOT_PROJECT_CI=6_OF_6_VERIFIED$/m);
