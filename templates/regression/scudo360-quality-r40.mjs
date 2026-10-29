@@ -1,3 +1,7 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
 /**
  * MotorLab Scudo 360 Qualita r40: read-only companion of the EXISTING r39
  * executable gate. It never runs tests, schedules work, signs APKs or promotes.
@@ -88,4 +92,30 @@ export function assessQualityR40({
     requests:rows,errors,
     certifiedScope:status==='CI_BEFORE_AFTER_VERIFIED'?'CI_AND_MAPPED_JUNIT_ONLY':'NONE'
   };
+}
+
+/** Native CI adapter: consume existing Scudo360 report; NEVER execute tests twice. */
+if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+  try{
+    const [manifestPath,reportPath,planPath,outPath]=process.argv.slice(2);
+    if(!manifestPath||!reportPath||!planPath||!outPath)
+      throw new Error('Usage: node scudo360-quality-r40.mjs contracts.json scudo360-report.json r40-plan.json r40-report.json');
+    const load=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+    const manifest=load(manifestPath),after=load(reportPath),plan=load(planPath);
+    const baseline=plan.baselineReportPath?load(plan.baselineReportPath):null;
+    const artifact=plan.artifactReceiptPath?load(plan.artifactReceiptPath):null;
+    const result=assessQualityR40({manifest,after,before:baseline,
+      requestTrace:plan.requestTrace,expectedCommit:process.env.GITHUB_SHA||null,
+      baselineCommit:plan.baselineCommit||null,surface:plan.surface||'ci',
+      artifactReceipt:artifact});
+    const abs=path.resolve(outPath),cwd=path.resolve('.');
+    if(!abs.startsWith(cwd+path.sep))throw new Error('OUTPUT_OUTSIDE_REPOSITORY');
+    fs.mkdirSync(path.dirname(abs),{recursive:true});
+    fs.writeFileSync(abs,JSON.stringify(result,null,2)+'\n');
+    console.log(JSON.stringify({status:result.status,targetCommit:result.targetCommit,
+      requests:result.requests.map(x=>({id:x.requestId,status:x.status})),
+      errors:result.errors},null,2));
+    if(result.status==='BLOCKED'||(process.env.SCUDO360_R40_PROMOTION==='1'&&!result.passed))
+      process.exitCode=1;
+  }catch(e){console.error('SCUDO360_R40_ERROR '+(e?.message||String(e)));process.exitCode=1;}
 }
