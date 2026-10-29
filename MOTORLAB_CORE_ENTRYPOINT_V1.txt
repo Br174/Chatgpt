@@ -1,6 +1,6 @@
 MOTORLAB CORE ENTRYPOINT V1 - CENTRAL + LOCAL SATELLITE BOOT
 
-SCUDO360 — CUMULATIVE REGRESSION EVIDENCE CANDIDATE (2026-10-29)
+SCUDO360 — CUMULATIVE REGRESSION EVIDENCE RELEASE r39 (2026-10-29)
 The existing Behavior Memory is the contract inventory and the existing Change Compatibility Guard remains the sole conflict/ownership arbiter. The subordinate portable executor is templates/regression/scudo360-gate.mjs and MUST NOT act as another scheduler, AI reviewer, release promoter or authority.
 For projects that have safely adopted a verified local Scudo360 adapter and a project-owned .motorlab/scudo360-contracts.json manifest, invoke the executable gate before APK promotion; P0/P1 contracts must map to actually executed per-class JUnit evidence and the exact source commit. Failed, skipped, missing, stale, uncategorized or unexecuted mandatory evidence is BLOCKED, never green.
 The upstream LAB success, a local workflow copy and the presence of this paragraph are NOT proof that Scudo360 is active in all six projects. Active deployment requires a separately verified central release, safe-boundary fanout and native project workflow wiring. Targets missing such wiring are PENDING_ENFORCEMENT, not certified.
@@ -284,3 +284,7 @@ BEHAVIOR MEMORY LAB V1 — RE-ENTRY BRIDGE (2026-10-22; LAB CANDIDATE, NOT CURRE
 At a safe re-entry boundary, after verified project identity/release sync and before any NEW modification, read the owner project's durable behaviors/<project>.json file when it exists. Run the read-only templates/behavior/motorlab-behavior-preflight.mjs validation against the verified project HEAD when the source/runtime supports it, then pass its ownership, missing-test, active/retired and supersession observations into the EXISTING MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt. That existing guard alone resolves equivalents/conflicts, handles newer approved override and routes necessary approvals.
 A missing project registry is NOT permission to invent remembered rules and is NOT a reason to block unrelated legacy projects; report BEHAVIOR_REGISTRY_NOT_REGISTERED and proceed under existing guards. A rule with no tests is PENDING_ENFORCEMENT, never VERIFIED. Do not auto-retire protections from textual similarity, timestamps or opaque AI guesses.
 This read-only bridge is NOT a new scheduler, database, agent, host event hook, authentication route or app runtime. Project-native code retains responsibility for all domain behaviors. Existing in-flight builds, tests, protected main and current r37 release pin must not switch CORE versions; this candidate becomes eligible only after separately approved release validation and safe fanout.
+
+R39_SCUDO360_FANOUT=CONTROL_PLANE_6_OF_6_MAIN_VERIFIED
+R39_SCUDO360_APP_NATIVE_ENFORCEMENT=PER_PROJECT_PENDING_NOT_AUTO_CERTIFIED
+R39_LAST_GOOD=r38

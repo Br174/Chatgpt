@@ -45,7 +45,7 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const m=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
-          if(!m.includes('CURRENT_RELEASE=2026.10.29-r39') || !m.includes('R39_PHASE=CORE_CANDIDATE_PENDING_FANOUT') || !m.includes('SCUDO360_GLOBAL_RELEASE=IN_PROGRESS_NOT_YET_ACTIVE'))throw Error('unapproved release or premature fanout claim');
+          if(!m.includes('CURRENT_RELEASE=2026.10.29-r39') || !m.includes('R39_PHASE=CONTROL_PLANE_FANOUT_COMPLETE_NATIVE_ENFORCEMENT_PENDING') || !m.includes('SCUDO360_GLOBAL_RELEASE=CONTROL_PLANE_VERIFIED_6_OF_6_NATIVE_GATES_PENDING'))throw Error('unapproved release or premature fanout claim');
           if(!m.includes('PACMAN_RELEASE_ACTIVATION=VERIFIED_CORE_AND_SIX_ACTIVE_MAINS'))throw Error('fanout bypass');
           const wf=fs.readFileSync('.github/workflows/motorlab-pacman-core-lab.yml','utf8');
           if(wf.split('\n').some(line=>/^\s*(?:npx\s+)?wrangler\s+(?:deploy|d1\s+execute)/.test(line)))throw Error('production-capable workflow');
