@@ -1,0 +1,19 @@
+MOTORLAB SCUDO360 QUALITA r40 — NATIVE WIRING CHECKPOINT 2026-10-29
+CORE_RELEASE=2026.10.29-r40
+SIX_PILOT_JUNIT_BEFORE_AFTER=VERIFIED
+PERMANENT_NATIVE_COMPLETIONS=3_OF_6_PLUS_GEOVISION_HTML_PARTIAL
+MAIN_OR_ACTIVE_VERIFIED Br174/StudyBook-AI ref=main sha=ac99b80c953109fd7b873ee02951c96c810b619e PR=5 quality_before_cloudflare_deploy=true
+MAIN_OR_ACTIVE_VERIFIED Br174/Visionflix ref=motorlab/active-verlezza-vision sha=9574a6865c330fbe0e77b9b206ae2712c394de0e PR=14 r40_before_signed_apks=true
+MAIN_OR_ACTIVE_VERIFIED Br174/streamflix-BV ref=main sha=efc1f246e8ad48bb64ea5285d5d51041518fcf7f PR=4 r40_before_tv_publication=true
+PARTIAL Br174/GeoVision-Test ref=main sha=648fb3d936987729478d3f82565fa565a9c2afd9 PR=6 HTML_test_r40=true APK_build_r40=pending_provider_safety_block
+PENDING Br174/MotorAI PR=18 target=main native_r40=CI_PENDING main_head=e6187fbaa91aa21ffb615dd0609965fab39e3a06
+PENDING Br174/MusicLab PR=19 target=motorlab/active-musiclab-turbo quality_r40=green generic_Build_PR=pending
+GEO_APK_PROVIDER_SECURITY_BLOCK=DO_NOT_BYPASS
+CORE_SINGLE_AUTHORITY=existing_Change_Compatibility_Guard
+NO_SECOND_NATIVE_TEST_RUNNER=true
+NO_APP_UI_SOURCE_SIGNING_CHANGES=true
+ZERO_NEW_PAID_SERVICES=required
+COVER_LAB_AI=DORMANT_RESERVED_EXCLUDED
+R40_SIX_NATIVE_PIPELINES_COMPLETE=false
+DEVICE_AND_LIVE_PROVIDER_ACCEPTANCE=NOT_CERTIFIED_BY_CI
+NEXT=verify_PR18_and_PR19_at_exact_heads;merge_only_all_green;Geo_APK_stays_pending_safety
