@@ -2,17 +2,17 @@ MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
 STATE_REVISION=86
-STATE_STATUS=LAB54_VERIFIED_R33_MICRO_ACCEL_FASTLANE_PREPARED_DEVICE_PENDING
+STATE_STATUS=TURBO_R10_SCUDO_CI_SUCCESS_USER_APK_DELIVERED_DEVICE_PENDING
 RECONCILE_ON_BOOT=required
 CURRENT_LIVE_OVERRIDE_DATE=2026-10-08
 CURRENT_LIVE_OVERRIDE_SOURCE=live Br174/MusicLab LAB54 branch + GitHub Actions run 37702761124 + locally rechecked update/safety artifacts
-ACTIVE_OPERATION_ID=musiclab-20261008-lab54-cover-playback-global-pagination
-OPERATION_STATUS=LAB54_VERIFIED_ARTIFACT_READY_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB54 exact SHA cc2ab4b857568672d18f902a6c3e8d04d88dfd13 is technically complete from LAB53. Cover preparation now continues during normal music playback in a one-video-at-a-time lightweight lane and pauses only for playback critical start/buffering. Cover uses one global confidence ranking 20->1 and true fixed pages of 10 cut from that ranking, so page 2 continues after page 1 rather than restarting scores. Live/Mix-Remix/Foreign are derived views of the same collected results using title/metadata classification and do not create a separate admission ranking. Main Cover cards show only title, interpreter, discovery source, confidence on the main ALL view and musical publication date. Details are reduced to title, publication date, author, interpreter, composer and origin country only for foreign versions. Source diagnostics uses top-right X. Player buono LAB41 remains byte-identical. GitHub Actions run 37702761124 passed LAB46-LAB54 contracts, UAB preflight, update identity/build/upload and paired safety54 build/isolation/upload.
-CURRENT_REF=uab-build/musiclab-lab54-aggiornamento-family-01
-CURRENT_HEAD_SHA=cc2ab4b857568672d18f902a6c3e8d04d88dfd13
-CURRENT_BUILD_SOURCE_SHA=cc2ab4b857568672d18f902a6c3e8d04d88dfd13
-CURRENT_JOB_ID=37702761124
+ACTIVE_OPERATION_ID=musiclab-turbo-lab79-r10-scudo360-20261029
+OPERATION_STATUS=TURBO_R10_SCUDO_CI_SIGNED_APK_ZIP_SUCCESS
+CURRENT_PHASE=Await next MusicLab Turbo feature request: derive from verified R10+Scudo branch, preserve signature and Scudo tests; device acceptance not asserted
+CURRENT_REF=lab/scudo360-lab79-r10-original-family-20261029
+CURRENT_HEAD_SHA=74719885e5ac12dc2fe9f935b840b0146259b8b6
+CURRENT_BUILD_SOURCE_SHA=74719885e5ac12dc2fe9f935b840b0146259b8b6
+CURRENT_JOB_ID=40905125476
 CURRENT_JOB_STATUS=success
 ARTIFACT_PROGRESS_PERCENT=100
 LAST_VERIFIED_PROGRESS_PERCENT=100
@@ -49,8 +49,8 @@ NEXT_UPDATE_KOTLIN_KSP_TUNING=none
 BUILD_FAST_BASELINE_UPDATE_GRADLE_SECONDS=406
 BUILD_FAST_BASELINE_SAFETY_GRADLE_SECONDS=428
 BUILD_FAST_REMOVED_DEFAULT_DUPLICATE_GRADLE_SECONDS=428
-PENDING_VERIFICATION=Bruno device acceptance: while music is already playing, open Cover and verify video preparation continues without stopping playback; a critical playback start/buffering phase may briefly own the lane, then Cover resumes one video at a time. Verify true pages of 10 from one global 20->1 ranking (page 2 continues from page 1, no score reset), all collected results remain reachable across pages, Live/Mix-Remix/Foreign derive from the same result set, main cards show title/interpreter/source/confidence/publication date, Details show only title/date/author/interpreter/composer plus origin country for foreign pieces, Sources dialog closes with X, and LAB53 approve/reject behavior remains correct.
-NEXT_SAFE_STEP=Install/test MusicLab LAB 54 aggiornamento over LAB53/Family 01 without uninstalling. Do not promote CANDIDATA/MADRE until Bruno explicitly accepts LAB54 on device.
+PENDING_VERIFICATION=User Android device runtime acceptance for Turbo R10 signed Scudo APK; subsequent functional requests still pending
+NEXT_SAFE_STEP=Automatically verify current MusicLab TURBO verified Scudo R10 head and build next requested LAB there; do NOT select generic main, archived old MusicLab or outdated R10 without Scudo
 WRITE_LOCK_SCOPE=none; LAB54 technical gate complete
 
 STATE_AUTHORITY=Br174/Chatgpt + live Br174/MusicLab evidence
@@ -1796,3 +1796,18 @@ PLAYER_BUONO_LAB41_BYTE_IDENTICAL=yes
 CANDIDATA_PROMOTED=no
 MADRE_PROMOTED=no
 DEVICE_ACCEPTANCE=pending
+
+
+ACTIVE FAMILY 2026-10-29 r39 RECONCILED (OLDER LAB54 DETAIL ABOVE IS HISTORY ONLY)
+ACTIVE_PROJECT_FAMILY=MusicLab Turbo LAB79 R10
+ACTIVE_SOURCE_BRANCH=lab/scudo360-lab79-r10-original-family-20261029
+ACTIVE_SOURCE_SHA=74719885e5ac12dc2fe9f935b840b0146259b8b6
+ACTIVE_SOURCE_GITHUB_RUN=40905125476
+ACTIVE_SOURCE_SIGNED_APK=PASS
+ACTIVE_SOURCE_SCUDO360=PASS
+ACTIVE_APP_ID=it.verlezza.musiclab.turbo01
+ACTIVE_CERT_SHA256=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
+PREVIOUS_ACTIVE_SOURCE_BRANCH=uab-build/musiclab-lab54-aggiornamento-family-01
+PREVIOUS_ACTIVE_SOURCE_SHA=cc2ab4b857568672d18f902a6c3e8d04d88dfd13
+PREVIOUS_RECORD_DISPOSITION=ARCHIVED_HISTORICAL_NOT_DEFAULT_ROUTING
+CONTINUITY_ROUTING=MOTORLAB_ACTIVE_FAMILY_ROUTING_R39.txt

@@ -1,0 +1,68 @@
+MOTORLAB ACTIVE FAMILY ROUTING - R39 SAFE RECONCILIATION ADDENDUM
+DATE=2026-10-29
+STATUS=POLICY_REFERENCED_BY_EXISTING_PROJECT_CONTINUITY
+AUTHORITY=Br174/Chatgpt / MOTORLAB_PROJECT_CONTINUITY_V1.txt
+PURPOSE=Do not ask user to remember branch names on each project update; never select ancient branches accidentally.
+DO_NOT_CREATE_SECOND_STATE_ENGINE=yes
+SCUDO360_R39=already available in native project workflows; r40 Qualita is a separate unimplemented enhancement.
+
+MANDATORY ENTRY/REENTRY
+1. Recognize the actual app family from the project conversation and user intent. Distinguish MusicLab TURBO from legacy generic MusicLab/main. Do not redirect legitimate MusicLab Turbo requests to the old application family.
+2. Read the central project continuity state, this addendum, and LIVE GitHub branch + commit + exact workflow evidence BEFORE choosing a base. Live evidence of a newer matching-family successful build supersedes stale ledger and earlier chat.
+3. Verify active source family: app ID, signing certificate identity, versionCode progression, latest verified source commit and Scudo runner. The last user-installed APK is NOT a source branch, but its manifest/signing/provenance pin the correct family.
+4. A new development request MUST create the next isolated LAB starting from the latest VERIFIED HEAD of the SAME ACTIVE FAMILY; never the old generic main branch, archive/, mother/, safety/, candidate/, historical uab-build/ or fallback branch without documented explicit family migration.
+5. When a newer LAB has signed APK+ZIP and required Scudo tests PASS and same-family pin, atomically update the project continuity state at an authorized safe write boundary. Never advance the pointer on failed/pending CI or just on branch creation.
+6. If the last verified head has moved or user approved newer independent work, reconcile live refs and dated source provenance FIRST; never overwrite, force-push, delete or auto-promote. Conflict or unknown package/signature -> STOP WRONG FAMILY, preserve current verified baseline and automatically investigate with available connected tools.
+7. Main/MADRE, LAST_GOOD, archived history and security/safety refs are never mutated by active LAB selection. Preserve new and old sources as needed; never generate new Android signing keys to make an incompatible family appear updatable.
+8. Scudo native gate must actually execute in the selected workflow; availability in a different branch or in central main does NOT count. If missing, safely materialize/adopt only the already verified Scudo control files in a new isolated LAB, run tests, then build.
+9. Never claim unattended ChatGPT cross-chat hook or persistent autonomous executor solely from this file. GitHub Actions enforces only workflows that have this guard wired. When a particular chat cannot access live GitHub, say selection is not verified rather than guessing.
+10. Cost above existing plans = 0. DORMANT_RESERVED Cover-Lab-AI remains excluded unless user explicitly reactivates.
+
+USER-PINNED ACTIVE FAMILIES 2026-10-29
+MUSICLAB_TURBO_REPO=Br174/MusicLab
+MUSICLAB_TURBO_SOURCE_REF=lab/scudo360-lab79-r10-original-family-20261029
+MUSICLAB_TURBO_SOURCE_SHA=74719885e5ac12dc2fe9f935b840b0146259b8b6
+MUSICLAB_TURBO_APK_APP_ID=it.verlezza.musiclab.turbo01
+MUSICLAB_TURBO_APK_VERSION_CODE=33083
+MUSICLAB_TURBO_CERT_SHA256=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
+MUSICLAB_TURBO_WORKFLOW_RUN=40905125476
+MUSICLAB_LEGACY_REFS_RETIRED=musiclab-lab;musiclab-lab-fastwork
+MUSICLAB_LEGACY_ARCHIVE=archive/musiclab-legacy-20261029-verified-duplicate
+MUSICLAB_LEGACY_PR_CLOSED=1;7
+MUSICLAB_TURBO_HISTORIC_DRAFT_PR_CLOSED=10;11
+MUSICLAB_KEEP_SAFETY_MADRE_CHECKPOINTS=YES
+
+VISION_REPO=Br174/Visionflix
+VISION_SOURCE_REF=lab/scudo360-lab184-507-original-family-20261029
+VISION_SOURCE_SHA=6c3c9b57b2ea4e2b8bdb0f09af6ad9290fb85247
+VISION_APK_VERSION=1.7.592
+VISION_APK_VERSION_CODE=521
+VISION_CERT_SHA256=ae10b6198ccb567386af37ad8b92d9ad40aa5bada469b8528811d447fc9612f6
+VISION_WORKFLOW_RUN=40905832509
+VISION_DELIVERY_ADAPTER=Br174/streamflix-BV
+VISION_GENERIC_MAIN_OLD_CERT_DIFFERENT=55d9c2dc94f32e6b7685994f2652eec3d8086432e9de94e0645a8bf30f41918e
+VISION_WRONG_OLD_CERT_WORKFLOW_MUST_NOT_BE_AUTO_SELECTED=YES
+
+STUDYBOOK_REPO=Br174/StudyBook-AI
+STUDYBOOK_LAST_KNOWN_ACTIVE_ANDROID_SOURCE=lab/studybook-core-android-01-update-23
+STUDYBOOK_LAST_KNOWN_APK_CI=38096279519
+STUDYBOOK_SCUDO_R39_MAIN_PRESENT=YES
+STUDYBOOK_R39_ADOPTION_IN_NEXT_LAB_REQUIRED=VERIFY_SAFE_BOUNDARY_AND_SIGNED_IDENTITY
+
+GEOVISION_REPO=Br174/GeoVision-Test
+GEOVISION_LAST_SCUDO_MAIN_SHA=c637a1f8c6561ad10d923e0ae3d5f9325498db02
+GEOVISION_DEVICE_APK_FAMILY=RECONCILE_SIGNING_BEFORE_NEXT_APK;CI_HTML_IS_NOT_DEVICE_PROOF
+
+MOTORAI_REPO=Br174/MotorAI
+MOTORAI_SCUDO_MAIN_SHA=9da9ebb3946ca78c40c3789a5c945dc7630b9be2
+MOTORAI_ACTIVE_DEVICE_SEED=RECONCILE_VERIFIED_DEVICE_FAMILY_BEFORE_ANY_APK_UPDATE
+
+STREAMFLIX_BV_REPO=Br174/streamflix-BV
+STREAMFLIX_BV_ROLE=DELIVERY_ADAPTER_ONLY
+STREAMFLIX_BV_NEW_APP_SOURCE=FORBIDDEN;USE_VISIONFLIX
+
+COVER_LAB_AI_REPO=Br174/Cover-Lab-AI
+COVER_LAB_AI_STATUS=DORMANT_RESERVED_EXCLUDED_FROM_AUTOROUTING_AND_FANOUT
+
+PROOF=MusicLab signed run 40905125476; Vision signed run 40905832509; Cleanup run 40914180047
+STATE_UPGRADE=Project Continuity updates active pointers at safe verified boundary; this addendum is not a separate active coordinator.
