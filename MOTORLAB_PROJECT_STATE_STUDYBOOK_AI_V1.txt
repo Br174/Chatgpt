@@ -253,3 +253,7 @@ LAB23_ZIP_SHA256=710d4d6d9ad59a0a57674799de6e10c09738934dc17201e50fd1a74f70fcc5b
 LAB23_EXTERNAL_SERVICE=studybook-ai-coversearch-lab23.brunoverlezza.workers.dev
 LAB23_APP_ORIGINALS_POLICY=Only online-thematic duplicated photographs from same source may be replaced. Scans, custom user imports, original PDF/eBook and other saved originals left intact.
 LAB23_DEVICE_ACCEPTANCE=PENDING
+
+MOTORLAB_R39_PERMANENT_CONTROL_SOURCE=motorlab/active-studybook-control (Cloudflare main, verified)
+MOTORLAB_R39_ANDROID_SIGNED_FAMILY_SOURCE=motorlab/active-studybook-ai (last verified LAB23 until LAB24 signed Scudo source is confirmed)
+MOTORLAB_R39_ANDROID_SCUDO_LAB24_CI=40921134783 in progress at checkpoint; do not advance active Android before signed result.

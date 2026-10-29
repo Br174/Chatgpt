@@ -35,3 +35,6 @@ MOTORLAB_R25_MAIN_ADOPTION_COMMIT=d5483108d683a865b978403cab98c5838691f964
 MOTORLAB_R26_STATUS=VERIFIED_ADOPTED
 MOTORLAB_R26_EXECUTION=work-elimination-first;intrinsic-acceleration;semantic-workgroups;adaptive-lane-pool;triple-fresh-hedge;10s-hard-trigger;early-stall;r24-latency-branching;single-integration-lane
 MOTORLAB_R26_MAIN_ADOPTION_COMMIT=71332106f45263478789d6268e0747dec5373a53
+
+MOTORLAB_R39_CONTROL_ACTIVE_REF=motorlab/active-geovision-control
+MOTORLAB_R39_CONTROL_ACTIVE_STATUS=Verified on main source commit 7c16f345a7160e58eb6074d83dabd061f149153a, native Geo Scudo and APK CI verified on PR, device app family still requires evidence.
