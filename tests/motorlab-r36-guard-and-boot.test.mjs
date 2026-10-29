@@ -7,7 +7,7 @@ import { join, resolve } from 'node:path';
 
 const repo=resolve(new URL('../',import.meta.url).pathname);
 const read=(file)=>readFile(join(repo,file),'utf8');
-const release='2026.10.22-r38';
+const release='2026.10.29-r39';
 
 test('one canonical Change Compatibility Guard owns all three rule dispositions',async()=>{
  const [guard,entry,manifest]=await Promise.all([read('MOTORLAB_CHANGE_COMPATIBILITY_GUARD_V1.txt'),read('MOTORLAB_CORE_ENTRYPOINT_V1.txt'),read('MOTORLAB_RELEASE_MANIFEST_V1.txt')]);
@@ -19,7 +19,7 @@ test('one canonical Change Compatibility Guard owns all three rule dispositions'
  assert.match(entry,/single existing Change Compatibility Guard owns this classification/);
  const bootLoad=entry.split('5. Load all manifest-required modules')[1]?.split('6. Read Project Continuity')[0] || '';
  assert.equal((bootLoad.match(/MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1\.txt/g)||[]).length,1,'single coordinator in bootstrap load list');
- assert.match(manifest,/CURRENT_RELEASE=2026\.10\.22-r38/);
+ assert.match(manifest,/CURRENT_RELEASE=2026\.10\.29-r39/);
 });
 
 test('current capsule and bundle stay compact and preserve all r34 safety markers',async()=>{
@@ -46,7 +46,7 @@ test('current release boot adapter preserves safe re-entry, preserves safe re-en
  await writeFile(join(temp,'MOTORLAB_PROJECT_HOOK.txt'),'PROJECT_NAME=Demo\nPROJECT_REPOSITORY=Br174/Demo\n');
  await writeFile(join(temp,'.motorlab','MOTORLAB_BOOT_CAPSULE.txt'),await read('MOTORLAB_BOOT_CAPSULE_V1.txt'));
  await writeFile(join(temp,'.motorlab','MOTORLAB_LOCAL_CORE.txt'),await read('MOTORLAB_SATELLITE_BUNDLE_V1.txt'));
- await writeFile(join(temp,'.motorlab','MOTORLAB_SYNC_STATE.txt'),'PROJECT=Demo\nLOCAL_RELEASE=2026.10.22-r38\nSTATE=VERIFIED\nLAST_GOOD_RELEASE=2026.10.08-r34\nRULE_RETIREMENT_PROOF=required\n');
+ await writeFile(join(temp,'.motorlab','MOTORLAB_SYNC_STATE.txt'),'PROJECT=Demo\nLOCAL_RELEASE=2026.10.29-r39\nSTATE=VERIFIED\nLAST_GOOD_RELEASE=2026.10.08-r34\nRULE_RETIREMENT_PROOF=required\n');
  await copyFile(join(repo,'templates','codex','motorlab','motorlab_boot.py'),join(temp,'.codex','hooks','motorlab_boot.py'));
  const cmd=(hook_event_name)=>spawnSync('python3',[join(temp,'.codex','hooks','motorlab_boot.py')],{
   cwd:temp,input:JSON.stringify({hook_event_name,source:'startup',cwd:temp,session_id:'r36-test'}),
@@ -54,13 +54,13 @@ test('current release boot adapter preserves safe re-entry, preserves safe re-en
  });
  const start=cmd('SessionStart');assert.equal(start.status,0,start.stderr);
  const ctx=JSON.parse(start.stdout).hookSpecificOutput.additionalContext;
- assert.match(ctx,/r38 attivo/);
- assert.match(ctx,/SESSION_RELEASE_PIN=2026\.10\.22-r38/);
+ assert.match(ctx,/r39 attivo/);
+ assert.match(ctx,/SESSION_RELEASE_PIN=2026\.10\.29-r39/);
  assert.match(ctx,/RULE_RETIREMENT_PROOF=required/);
  const prompt=cmd('UserPromptSubmit');assert.equal(prompt.status,0,prompt.stderr);
  const continued=JSON.parse(prompt.stdout).hookSpecificOutput.additionalContext;
  assert.match(continued,/MOTORLAB_REENTRY_GATE=required/);
- assert.match(continued,/SESSION_RELEASE_PIN=2026\.10\.22-r38/);
+ assert.match(continued,/SESSION_RELEASE_PIN=2026\.10\.29-r39/);
 });
 
 
