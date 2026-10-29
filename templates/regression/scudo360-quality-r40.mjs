@@ -11,7 +11,7 @@ const byId=rows=>new Map(list(rows).map(r=>[r.id,r]));
 
 export function assessQualityR40({
   manifest, after, before=null, requestTrace, expectedCommit,
-  baselineCommit=null, surface='ci'
+  baselineCommit=null, surface='ci', artifactReceipt=null
 }={}) {
   const errors=[];
   const rows=[];
@@ -61,16 +61,31 @@ export function assessQualityR40({
       comparison='EXACT_COMMIT_COMPARISON_VERIFIED';
     }
   }
+  // Provenance values must match the native signed-APK receipt; syntactic
+  // fields alone are not an independent installation or signature test.
+  const artifactLinked=Boolean(artifactReceipt &&
+    artifactReceipt.sourceCommit===expectedCommit &&
+    /^[a-f0-9]{64}$/i.test(artifactReceipt.apkSha256||'') &&
+    /^[a-f0-9]{64}$/i.test(artifactReceipt.certSha256||'') &&
+    Number.isSafeInteger(artifactReceipt.versionCode) && artifactReceipt.versionCode>0 &&
+    typeof artifactReceipt.applicationId==='string' &&
+    /^[a-z][a-z0-9_.]+$/.test(artifactReceipt.applicationId) &&
+    Number.isSafeInteger(artifactReceipt.runId) && artifactReceipt.runId>0);
+  if(artifactReceipt!==null&&!artifactLinked)
+    errors.push(problem('ARTIFACT_RECEIPT_UNVERIFIED_OR_WRONG_COMMIT'));
   const blocked=errors.length>0;
   const deviceAcceptance=surface==='ci'?'NOT_REQUIRED_FOR_CI':
     'PENDING_REAL_DEVICE_OR_RUNTIME_EVIDENCE';
   const status=blocked?'BLOCKED':
     comparison==='PENDING_BASELINE'?'PENDING_BASELINE':
+    deviceAcceptance!=='NOT_REQUIRED_FOR_CI'&&!artifactLinked?'PENDING_ARTIFACT':
     deviceAcceptance!=='NOT_REQUIRED_FOR_CI'?'PENDING_DEVICE':'CI_BEFORE_AFTER_VERIFIED';
   return {
     schemaVersion:1,feature:'motorlab-scudo360-quality-r40',authority:'existing-Change-Compatibility-Guard',
     status,passed:status==='CI_BEFORE_AFTER_VERIFIED',targetCommit:expectedCommit||null,
-    baselineCommit:baselineCommit||null,comparison,deviceAcceptance,requests:rows,errors,
+    baselineCommit:baselineCommit||null,comparison,deviceAcceptance,
+    artifactReceiptStatus:artifactLinked?'NATIVE_CI_FIELDS_LINKED_NOT_DEVICE_PROOF':'PENDING',
+    requests:rows,errors,
     certifiedScope:status==='CI_BEFORE_AFTER_VERIFIED'?'CI_AND_MAPPED_JUNIT_ONLY':'NONE'
   };
 }
