@@ -1,0 +1,20 @@
+MOTORLAB SCUDO 360 - LAB PILOT
+STATUS=ISOLATED_LAB_NOT_RELEASED
+RELEASE_BASE=2026.10.22-r38
+OWNER=Existing Behavior Memory + Change Compatibility Guard, NOT a second engine.
+EVIDENCE_GATE=templates/regression/scudo360-gate.mjs
+TESTS=tests/motorlab-scudo360-gate.test.mjs
+EXECUTION=Node.js 22, local child processes, JUnit XML evidence, no new paid service.
+GOVERNANCE=CORE pre-change approval, project-native ownership and single-writer unchanged.
+
+POLICY
+1. Do not treat workflow success as coverage. Tests skipped, missing, failed, stale or unexecuted are NOT successful.
+2. Link P0/P1 contractual behaviors to executable tests and the actual commit SHA. A test path alone is not proof.
+3. Each run creates fresh JUnit evidence; remove prior results BEFORE execution, prevent stale-green reuse.
+4. LAB exploratory APKs can be built with risk-scaled checks and must be labelled experimental. Stable promotion needs full mandatory suite.
+5. Preserve LAST_GOOD, identity/signing, project native engine, older working behaviors, and safe release boundaries.
+6. Test selection derives from active contract ownership; supersession is governed solely by Change Compatibility Guard.
+7. No automatic claim of Android-device/UI/emulator coverage from JVM tests; unproven surfaces remain PENDING.
+8. Release integration must use a mandatory pre-build gate; conditional old LAB test steps may remain as archival evidence but cannot substitute the gate.
+9. A passing test suite does not prove runtime behavior at external providers; integration and device testing remain separate.
+10. Copy the portable executor only after project preflight and branch-isolated integration. No CORE promotion or global fanout by writing this LAB.
