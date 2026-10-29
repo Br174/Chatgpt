@@ -1,0 +1,42 @@
+SCUDO360 QUALITA R40 - REAL BEFORE/AFTER PILOT MUSICLAB TURBO
+DATE=2026-10-29
+STATUS=VERIFIED_CI_AND_SIGNED_APK_DEVICE_PENDING_R40_NATIVELY_UNWIRED
+ACTIVE_APP_FAMILY=it.verlezza.musiclab.turbo01
+ORIGINAL_CERT_SHA256=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
+R10_SOURCE_SHA=6b1326745dcee0d5d5068b90efe8b4d274e210b2
+R11_SOURCE_SHA=a8d32987ed8d291d61aa17a91bd45dbf11d1d3ca
+R11_VERSION_CODE=33084
+R11_SIGNED_RUN=https://github.com/Br174/MusicLab/actions/runs/40925182843
+R11_SIGNED_ARTIFACT_ID=12921350318
+R11_SIGNED_ARTIFACT_SHA256=8c4ff7bf740e9bb597225bad8a0b7786a0521447e205f10572eb869e178920b9
+R11_APK_SHA256=3f8459fb48d17506e2079250118862ea717cbabd458ea85ddaf600725e8de916
+R11_ZIP_SHA256=efc8d306c0153ac5361cd70c0cb61b3662a96f480e0eefef1f7bd3c813b3d41f
+R11_ARTIFACT_ARCHIVE_INTEGRITY=PASS
+R11_APK_PACKAGE_CERT_AND_ZIP_WORKFLOW_CHECKS=PASS
+R11_ACTIVE_REF_ADVANCEMENT=VERIFIED
+
+BEFORE_R10_SCUDO_REPORT_ARTIFACT=12918301118
+AFTER_R11_SCUDO_REPORT_ARTIFACT=12919054642
+BEFORE_EXECUTED_JUNIT=555_tests_107_classes_0_fail_0_error_0_skip
+AFTER_EXECUTED_JUNIT=555_tests_107_classes_0_fail_0_error_0_skip
+ACTUAL_JUNIT_SOURCE_COMMIT_MATCH=YES_IN_BOTH_REPORTS
+APP_BUILD_SOURCE_NO_EXTRA_FEATURES=TESTED_R11_REGRESSION_CORRECTION
+OLD_GENERIC_BUILD_PR_FAILURE=https://github.com/Br174/MusicLab/actions/runs/40919752637
+OLD_GENERIC_BUILD_PR_RESULT=555_tests_3_failed
+NEW_GENERIC_BUILD_PR=https://github.com/Br174/MusicLab/actions/runs/40925249102
+NEW_GENERIC_BUILD_PR_RESULT=SUCCESS_INCLUDING_UNIT_TESTS_BUILD_LINT_DEBUG
+FIXED_FAILED_CLASSES=com.metrolist.music.ui.component.CoverLab77DocumentarySourcesTest;com.metrolist.music.ui.component.CoverLab77ResumeAndHistoryTest
+FIXED_FAILED_CASES=sameSingerAndTitleDoNotCollapseDifferentDocumentaryRecordingIds;selectedMusicBrainzSingerIsNotAutomaticallyTheOriginalInterpreter;legacySelectedSingerFlagsCannotCreateAnOriginalCapDuringRestoration
+
+LIMITATIONS
+- R10 signed original package already passed its 555 tests. The old 3 failures
+  occurred in the GENERIC PR Debug configuration; R11 makes those same
+  documentary/restore semantics independent of the debug applicationId.
+- R11 signed native Scudo report proves the full JUnit suite, NOT phone install,
+  cover abundance from live providers, actual playback, audio fluidity, TV UI or
+  any externally hosted service. Device and live-cover acceptance PENDING.
+- The central R40 helper is tested in an isolated MotorLab LAB. Do not treat
+  this audited comparison as proof that the native R40 companion has yet been
+  installed in MusicLab's production LAB workflow or all six projects.
+- Do not replace the signed R11 APK while Bruno is testing it. New quality
+  enforcement requires its own safe LAB boundary and same-family build proof.

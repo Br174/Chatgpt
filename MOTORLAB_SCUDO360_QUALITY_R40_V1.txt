@@ -1,0 +1,52 @@
+MOTORLAB / SCUDO 360 QUALITA r40 — LAB EVIDENCE CONTRACT
+DATE=2026-10-29
+STATUS=ISOLATED_CENTRAL_LAB_ONLY_NOT_RELEASED
+BASE_RELEASE=2026.10.29-r39
+OWNER=Existing Behavior Memory + Change Compatibility Guard
+IMPLEMENTATION=templates/regression/scudo360-quality-r40.mjs
+VERIFICATION=tests/motorlab-scudo360-r40-quality.test.mjs
+NO_SECOND_TEST_RUNNER=yes
+NO_SECOND_SCHEDULER=yes
+NO_NEW_DATABASE=yes
+NEW_PAID_SERVICES=forbidden
+
+APPROVED OBJECTIVES
+1. Trace each explicit user requirement through a named P0/P1 contract to real
+   executed and fresh native JUnit classes on the EXACT target source SHA.
+2. Compare BEFORE and AFTER only when two nonidentical commit-pinned reports
+   exist; absent or untrusted baseline = PENDING_BASELINE, never 100%.
+3. Link a requirement to the native signed APK provenance fields only when its
+   receipt agrees with the exact tested source commit, package, certificate and
+   versionCode. Missing/invalid receipt is PENDING_ARTIFACT or BLOCKED; even a
+   valid receipt does not establish real-device installation or playback.
+4. Distinguish functional CI coverage from device, provider, UI, app runtime and
+   APK installation acceptance. Android or web runtime remains PENDING_DEVICE
+   without independent real-session evidence; a green CI is not device success.
+4. Produce small focused failure diagnostics for only affected request/contract.
+   Reuse existing test executions, no duplicate Gradle/JUnit, no second scheduler.
+5. Persist regression contracts as part of the existing Behavior Memory owner,
+   preserving signed APK identity and project-native engine boundaries.
+6. Measure LAB vs promotion check overhead from actual CI baselines, target
+   bounded LAB overhead (5%-10%) but never weaken a critical gate for speed.
+7. Keep actual project-native workflow and verified safe adoption boundary as
+   condition for all six active projects. The presence of this source alone
+   proves NOTHING about live enforcement or end-user device quality.
+
+NATIVE PROJECT TARGETS
+Br174/MusicLab = verified active MusicLab Turbo family only; generic main is different.
+Br174/Visionflix = original LAB184 permanent-V1 family only.
+Br174/StudyBook-AI = control+app channels need separate source/signing readback.
+Br174/GeoVision-Test = HTML/control proof not Android device proof.
+Br174/MotorAI = real training/Android behavior requires independent evidence.
+Br174/streamflix-BV = Vision delivery adapter, NOT a separate movie source.
+EXCLUDED=Br174/Cover-Lab-AI (DORMANT_RESERVED)
+CENTRAL_RELEASE=r39 stays CURRENT until separately verified protected promotion.
+FANOUT=NOT_STARTED
+DEVICE_CERTIFICATION=NOT_VERIFIED
+
+TRANSITION RULE
+After central R40 CI is green, project adapters may adopt only at verified safe
+boundaries with native workflow execution, explicit request trace, before/after
+reports and exact source attribution. Unwired projects remain PENDING_ENFORCEMENT.
+Do not merge main, promote MADRE/CANDIDATA, deploy production or modify native app
+logic solely because the isolated LAB exists.
