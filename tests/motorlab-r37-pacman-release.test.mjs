@@ -13,10 +13,10 @@ const ledger=read('MOTORLAB_RELEASE_FANOUT_STATE_V1.txt');
 const sync=read('MOTORLAB_SATELLITE_SYNC_V1.txt');
 
 test('r37 historic fanout stays evidenced while newer r40 central identity is coherent',()=>{
- assert.match(manifest,/^CURRENT_RELEASE=2026\.10\.29-r39$/m);
- assert.match(capsule,/^RELEASE=2026\.10\.29-r39$/m);
- assert.match(bundle,/^RELEASE=2026\.10\.29-r39$/m);
- assert.match(registry,/CURRENT CENTRAL RELEASE\nRelease: 2026\.10\.29-r39/);
+ assert.match(manifest,/^CURRENT_RELEASE=2026\.10\.29-r40$/m);
+ assert.match(capsule,/^RELEASE=2026\.10\.29-r40$/m);
+ assert.match(bundle,/^RELEASE=2026\.10\.29-r40$/m);
+ assert.match(registry,/CURRENT CENTRAL RELEASE\nRelease: 2026\.10\.29-r40/);
  assert(Buffer.byteLength(capsule,'utf8')<4000,'Capsule exceeds 4000 UTF-8 bytes');
 });
 test('r37 policy is same existing AutoSetup and follows boot/reentry without a second engine',()=>{
