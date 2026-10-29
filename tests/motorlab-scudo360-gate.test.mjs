@@ -11,7 +11,7 @@ function fixture(root){
   return {schemaVersion:1,project:'pilot',suites:[{
     id:'core',command:['node','--test','tests/unit.mjs'],paths:['tests/unit.mjs'],
     junitDir:'build/test-results',timeoutMs:30000
-  }],contracts:[{id:'pilot.important',priority:'P1',suites:['core'],requiredAt:['lab','promotion']}]};
+  }],contracts:[{id:'pilot.important',priority:'P1',suites:['core'],junitClasses:['example.unit'],requiredAt:['lab','promotion']}]};
 }
 test('valid mandatory contract and executable suite accepted',()=>{
  const root=tmp();const m=fixture(root);assert.equal(preflight(m,{root}).valid,true);
@@ -24,7 +24,7 @@ test('fail closed when suite is absent or skipped',()=>{
 });
 test('fail closed on test failure even if command exit was success',()=>{
  const m=fixture(tmp());
- assert.equal(evaluate(m,[{id:'core',status:'passed',tests:4,failures:1,errors:0,skipped:0}]).passed,false);
+ assert.equal(evaluate(m,[{id:'core',status:'passed',tests:4,failures:1,errors:0,skipped:0,classes:[{name:'example.unit',tests:4,failures:1,errors:0,skipped:0}]}]).passed,false);
 });
 test('test paths must exist, no imaginary coverage',()=>{
  const root=tmp();const m=fixture(root);
@@ -45,10 +45,23 @@ test('actual fail closed runner blocks when no JUnit evidence exists',()=>{
 test('actual runner permits legitimate positive JUnit proof',()=>{
  const root=tmp(),m=fixture(root);
  const spawn=()=>{const d=path.join(root,'build/test-results');fs.mkdirSync(d,{recursive:true});
-  fs.writeFileSync(path.join(d,'TEST-proof.xml'),'<testsuite tests="3" errors="0" failures="0" skipped="0"></testsuite>');
+  fs.writeFileSync(path.join(d,'TEST-example.unit.xml'),'<testsuite tests="3" errors="0" failures="0" skipped="0"></testsuite>');
   return {status:0,stdout:'success'};};
  const report=run(m,{root,spawn});assert.equal(report.passed,true);
  assert.equal(report.verifiedCount,1);
+});
+test('rejects a green suite that did not execute its assigned contract class',()=>{
+ const root=tmp(),m=fixture(root);
+ const actual=run(m,{root,spawn:()=>{const d=path.join(root,'build/test-results');fs.mkdirSync(d,{recursive:true});
+   fs.writeFileSync(path.join(d,'TEST-unrelated.good.xml'),'<testsuite tests="2" failures="0" errors="0" skipped="0"/>');
+   return {status:0};}});
+ assert.equal(actual.suites[0].status,'passed');
+ assert.equal(actual.passed,false);
+ assert.equal(actual.contracts[0].classEvidence[0].passed,false);
+});
+test('rejects an unmapped test class rather than accepting a comment-only declaration',()=>{
+ const root=tmp(),m=fixture(root);m.contracts[0].junitClasses=['example.nonexistent'];
+ assert.ok(preflight(m,{root}).errors.some(e=>e.code==='CONTRACT_CLASS_NOT_MAPPED_TO_SOURCE'));
 });
 test('runner removes stale success XML before execution',()=>{
  const root=tmp(),m=fixture(root),d=path.join(root,'build/test-results');
@@ -60,6 +73,6 @@ test('runner removes stale success XML before execution',()=>{
 test('positive exit with skipped tests is not green',()=>{
  const root=tmp(),m=fixture(root);
  const spawn=()=>{const d=path.join(root,'build/test-results');fs.mkdirSync(d,{recursive:true});
-  fs.writeFileSync(path.join(d,'TEST-proof.xml'),'<testsuite tests="3" errors="0" failures="0" skipped="1"/>');return {status:0};};
+  fs.writeFileSync(path.join(d,'TEST-example.unit.xml'),'<testsuite tests="3" errors="0" failures="0" skipped="1"/>');return {status:0};};
  assert.equal(run(m,{root,spawn}).passed,false);
 });
