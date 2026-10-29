@@ -39,10 +39,19 @@ test('unverified or recycled baseline cannot certify change',()=>{
   const x=assessQualityR40({...args(),baselineCommit:A});
   assert.equal(x.status,'BLOCKED');assert.ok(x.errors.some(e=>e.code==='BASELINE_UNVERIFIED_OR_WRONG_COMMIT'));
 });
-test('device quality remains pending until real, independently checked acceptance',()=>{
+test('device requests without a signed artifact are still pending',()=>{
   const x=assessQualityR40({...args(),surface:'android-device'});
-  assert.equal(x.status,'PENDING_DEVICE');assert.equal(x.passed,false);
+  assert.equal(x.status,'PENDING_ARTIFACT');assert.equal(x.passed,false);
   assert.equal(x.deviceAcceptance,'PENDING_REAL_DEVICE_OR_RUNTIME_EVIDENCE');
+});
+test('same-commit signed APK receipt links the request without claiming real device acceptance',()=>{
+  const artifactReceipt={sourceCommit:A,apkSha256:'d'.repeat(64),certSha256:'e'.repeat(64),
+    applicationId:'it.verlezza.musiclab.turbo01',versionCode:33084,runId:40925249102};
+  const x=assessQualityR40({...args(),surface:'android-device',artifactReceipt});
+  assert.equal(x.status,'PENDING_DEVICE');assert.equal(x.passed,false);
+  assert.equal(x.artifactReceiptStatus,'NATIVE_CI_FIELDS_LINKED_NOT_DEVICE_PROOF');
+  const wrong=assessQualityR40({...args(),artifactReceipt:{...artifactReceipt,sourceCommit:B}});
+  assert.equal(wrong.status,'BLOCKED');
 });
 test('native regression is blocked even when another class was green',()=>{
   const p=args();p.after.contracts[0].status='failed';
