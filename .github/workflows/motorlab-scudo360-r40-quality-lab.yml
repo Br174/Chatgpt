@@ -1,0 +1,26 @@
+name: MotorLab Scudo360 Quality r40 isolated evidence LAB
+on:
+  push:
+    branches:
+      - motorlab/scudo360-quality-r40-lab-20261029
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: R39 existing mandatory class gate and R40 request-before-after quality
+        run: |
+          node --test tests/motorlab-scudo360-gate.test.mjs tests/motorlab-scudo360-r40-quality.test.mjs tests/motorlab-scudo360-integration.test.mjs
+      - name: Preserve existing Behavior Memory and r39 release contracts
+        run: |
+          node --test tests/motorlab-behavior-memory.test.mjs tests/motorlab-behavior-preflight.test.mjs tests/motorlab-scudo360-r39-release.test.mjs
