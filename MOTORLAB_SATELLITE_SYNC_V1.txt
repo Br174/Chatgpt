@@ -356,3 +356,8 @@ Safe-boundary adoption requires release r36 in local bundle, critical capsule, v
 
 R37 PACMAN AUTOSETUP ALIAS SYNC — 2026-10-14
 New satellite r37 must include PACMAN=AutoSetup in the 4KB critical boot capsule, verified current r37 local bundle with public name Pacman and legacy AutoSetup alias, and existing entrypoint/Auto Bootstrap/Re-entry canonical routing. Preserve existing native project engine, Velocity-only scheduler, prior r36 as LAST_GOOD, explicit minimal provider permissions/user consent and no secrets in chat. A project marked DORMANT_RESERVED stays excluded. Active LAB refs pinned to older release remain PENDING_SAFE_BOUNDARY until their actual safe boundary. This release policy does not activate an unconnected MCP app, deploy a Worker or provide autonomous browsing outside supported tools.
+
+R39_SCUDO360_SAFE_ADOPTION=only_after_verified_CORE_release_at_safe_boundary
+R39_SCUDO360_LOCAL_GATE=per_project_owned_manifest_and_actual_test_runner
+R39_SCUDO360_MISSING_PROJECT_GATE=PENDING_ENFORCEMENT
+R39_SCUDO360_NO_APP_RUNTIME_MODIFICATION=required

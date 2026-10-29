@@ -54,3 +54,7 @@ Every project must prove that active rules map to working code/test cases when p
 
 VERSION
 MOTORLAB-BEHAVIOR-MEMORY-V1.0 LAB
+
+R39_SCUDO360_EXTENSION=contract_owned_by_existing_Change_Compatibility_Guard
+R39_SCUDO360_TEST_EVIDENCE=per_class_JUnit_zero_missing_skipped_or_failed
+R39_SCUDO360_PROJECT_COVERAGE=never_inferred_from_control_plane_fanout
