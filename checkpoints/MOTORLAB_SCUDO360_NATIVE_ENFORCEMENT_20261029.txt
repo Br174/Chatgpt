@@ -1,38 +1,64 @@
-MOTORLAB SCUDO360 R39 - REAL NATIVE CI ENFORCEMENT CHECKPOINT
+MOTORLAB SCUDO360 R39 - MAINLINE NATIVE CI ENFORCEMENT RECEIPT
 DATE=2026-10-29
 RELEASE=2026.10.29-r39
-CENTRAL_CONTROL_PLANE=VERIFIED_6_OF_6_MAIN_SATELLITES
-SOURCE_OF_TRUTH=GitHub_current_refs_and_CI_logs
-STATUS=PARTIAL_NATIVE_ENFORCEMENT_WITH_REAL_BLOCKERS
-
-SCOPE
-Control-plane distribution and per-app runnable CI protection are separate.
-Do not claim total zero-regression certification from static policy metadata.
-Do not bypass a failing test or invent a certificate to make a workflow green.
-No application source/UI/provider/player/production signing is modified by this checkpoint.
-
-PROJECT_RECEIPTS
-- Br174/MusicLab: mainline Scudo360 gate installed by PR12 (merged 2026-10-29); real full JVM check passed in PR and push workflows. Main APK workflows use gate as prerequisite. Push build cannot certify signed APK when KEYSTORE is absent; stable DEBUG_KEYSTORE cannot be read by Java keytool (Tag number over 30). LAB-only signing fail-fast precheck PR14 remains DRAFT and not promoted. Do not regenerate signing identities. Evidence: https://github.com/Br174/MusicLab/pull/12 ; https://github.com/Br174/MusicLab/pull/14 ; https://github.com/Br174/MusicLab/actions/runs/40882748756
-- Br174/Visionflix: mainline Scudo360 JVM class evidence gate installed; PR9 Gradle chmod preflight merged to main, native PR gate passed. Mainline APK build blocked by missing original Actions cache key visionflix-debug-keystore-v1; original certificate pinned to 55d9c2dc94f32e6b7685994f2652eec3d8086432e9de94e0645a8bf30f41918e. Do not silently substitute permanent-v1 LAB cert ae10b6198ccb567386af37ad8b92d9ad40aa5bada469b8528811d447fc9612f6. Evidence https://github.com/Br174/Visionflix/pull/9 ; https://github.com/Br174/Visionflix/actions/runs/40886366733
-- Br174/GeoVision-Test: native HTML/python integration present on main; actual HTML test CI passed. Evidence https://github.com/Br174/GeoVision-Test/actions/runs/40883875989
-- Br174/StudyBook-AI: native Cloudflare tests and ordering anti-bypass gate present on main; no production deploy authorized by this Scudo checkpoint. Main UAB check passed. Evidence https://github.com/Br174/StudyBook-AI/actions/runs/40887692956
-- Br174/streamflix-BV: TV APK release origin/signature verification Scudo gate present on main; CI PR gate succeeded, no claim to have run a current production release since integration. Evidence https://github.com/Br174/streamflix-BV/actions/runs/40885038559
-- Br174/MotorAI: PR15 adds native C++ curriculum smoke and gate before APK, but was NOT MERGED. Source-model seed 174 failed L3 held-out test_accuracy 0.875 (required 0.90); C++ compilation succeeded, so this is a model-quality test failure, not a missing build tool. Do not waive, lower threshold or silently change training/runtime model. Evidence https://github.com/Br174/MotorAI/pull/15 ; https://github.com/Br174/MotorAI/actions/runs/40886022807
-
-TRUTHFUL_PROGRESS
-R39_CONTROL_PLANE=6/6_MAIN_VERIFIED
-NATIVE_CI_HOOKS_PRESENT_IN_MAIN=5/6_WITH_DIFFERENT_COVERAGE
-MOTORAI_NATIVE_CI_HOOK=PENDING_PR15
-APPS_FULLY_END_TO_END_CERTIFIED=NOT_VERIFIED
-REAL_DEVICE_TESTS=NOT_VERIFIED
-ZERO_ADDITIONAL_PAID_SERVICES=required
+SOURCE_OF_TRUTH=GitHub_refs_PR_checks_workflow_logs
 R39_LAST_GOOD=2026.10.22-r38
+CONTROL_PLANE_DISTRIBUTION=VERIFIED_6_OF_6_MAIN_SATELLITES
+MAIN_NATIVE_HOOKS=VERIFIED_6_OF_6_WITH_DIFFERENT_COVERAGE
+FULL_APP_END_TO_END_CERTIFICATION=NOT_VERIFIED
+SIGNING_AND_REAL_DEVICE_CERTIFICATION=NOT_VERIFIED
+NO_NEW_PAID_SERVICES=required
 
-NEXT_RELEASE_GATES
-1. Restore original MusicLab release and persistent-debug signing identities using authorized secure provider UI/secret vault, or mark signed-APK build blocked. Never ask to paste credentials in chat.
-2. Recover old Visionflix debug key cache or original signing key with exact certificate match, or keep original signature family blocked. A different signed LAB family must not be silently treated as an in-place update.
-3. Diagnose MotorAI curriculum L3 generalization while preserving independent test holdout and test accuracy threshold. Only promote PR15 after passing real native tests.
-4. Ensure any future changes to native source include contract-level test evidence and reliable mandatory release gate.
-5. Measure TTTA/CI overhead separately for fast LAB, deep CI and promotion. Keep target +20% for normal LAB as a goal, not a fabricated measured outcome.
+PRINCIPLES
+Control-plane synchronization, mandatory native CI wiring, signed-APK publication, and real-device acceptance are distinct milestones.
+A passing CI test is evidence only for its exact source commit, runner, and tested contracts.
+Do not bypass missing original signing identities, reuse incompatible certificates, lower model thresholds, or announce MADRE/APK-ready before checks.
+Preserve r38 LAST_GOOD, original packages, app code, production and deployment scopes, and existing LAB safe boundaries.
 
-STATUS_OF_THIS_DOCUMENT=EVIDENCE_BASED_CHECKPOINT_NOT_AN_ACTIVE_RUNNER
+NATIVE_PROJECT_RECEIPTS
+1. MotorAI / Br174/MotorAI:
+   PR #15 merged onto main at 9da9ebb3946ca78c40c3789a5c945dc7630b9be2, exact HEAD verified 2026-10-29.
+   PR-native three-seed curriculum gate SUCCESS: https://github.com/Br174/MotorAI/actions/runs/40893591984
+   PR Android/debug Scudo + Goal1-Goal10 + APK + final combined gate SUCCESS: https://github.com/Br174/MotorAI/actions/runs/40893581226
+   Push main at 9da9ebb... runs: https://github.com/Br174/MotorAI/actions/runs/40898898699
+   Main-run Scudo, Goal1-Goal10, Android APK, upload and combined gate succeeded; runner completion must be checked separately.
+   Root cause of prior apparent L3 0.875 in augmented C++ instrumentation: pristine baseline same algorithm passed 3 seeds L3=1.000; original file restored with exact Git blob SHA 2ad73c25e08bbbd528cf5502011982cc818814d9, Ubuntu 24.04 pinned and wrapper subprocess timeout extended from 90 to 240 seconds, no threshold/model/dataset changes.
+   Native motor learning on real Android device NOT VERIFIED by this Scudo work.
+2. MusicLab / Br174/MusicLab:
+   Scudo native gate already merged and active on main via PR #12 with real full JVM class evidence.
+   PR #15 LAB open / UNMERGED, adds release credentials presence check and original debug-keystore decode/alias preflight; PR Build PR green but actual signed APK CI blocked by missing KEYSTORE and unreadable DEBUG_KEYSTORE. DO NOT merge by pretending red signed checks are green.
+   PR #14 DRAFT overlaps debug preflight and remains excluded from promotion. Quick workflow remains not modified by PR15; do not duplicate.
+   Evidence: https://github.com/Br174/MusicLab/pull/12 ; https://github.com/Br174/MusicLab/pull/15 ; https://github.com/Br174/MusicLab/actions/runs/40892628615
+   Must restore secure original Android signing identities and check historical APK certificate fingerprint.
+3. Visionflix / Verlezza Vision / Br174/Visionflix:
+   Mainline native JVM search/filter Scudo gate merged, PR #9 Gradle preflight merged.
+   Original GitHub Actions debug signing cache key visionflix-debug-keystore-v1 unavailable; original certificate fingerprint 55d9c2dc94f32e6b7685994f2652eec3d8086432e9de94e0645a8bf30f41918e.
+   Recovery PR #11 DRAFT open / UNMERGED: cache-first, optional pre-existing authorized GitHub Secret VISIONFLIX_ORIGINAL_KEYSTORE_B64, strict original fingerprint check, fail closed; 3 workflow anti-bypass JVM tests. Native PR CI SUCCESS; experimental LAB signed APK blocked as expected if cache and original Secret missing.
+   Evidence: https://github.com/Br174/Visionflix/pull/11 ; https://github.com/Br174/Visionflix/actions/runs/40899635830 ; https://github.com/Br174/Visionflix/actions/runs/40899572692
+   Alternative permanent-v1 backup cert ae10b6198ccb567386af37ad8b92d9ad40aa5bada469b8528811d447fc9612f6 DOES NOT MATCH original. Never silently use it for an update-in-place.
+   Existing TV/Mobile, Downloader, playback, version code, application ID, signing, MADRE all unchanged.
+4. GeoVision-Test / Br174/GeoVision-Test:
+   Native HTML/python integration present on main, CI passed: https://github.com/Br174/GeoVision-Test/actions/runs/40883875989
+5. StudyBook-AI / Br174/StudyBook-AI:
+   Native Cloudflare tests and fail-closed ordering present on main, CI passed; no production deploy implied: https://github.com/Br174/StudyBook-AI/actions/runs/40887692956
+6. streamflix-BV / Br174/streamflix-BV:
+   Native TV release-origin/signature Scudo gate present on main and PR CI succeeded, but no current production-release verification: https://github.com/Br174/streamflix-BV/actions/runs/40885038559
+
+PROGRESS
+R39_CONTROL_PLANE=6/6_MAIN_VERIFIED
+NATIVE_CI_HOOKS_PRESENT_ON_MAIN=6/6_WITH_DIFFERENT_TEST_COVERAGE
+MOTORAI_NATIVE_PR15=MERGED_TO_MAIN
+FULL_ANDROID_SIGNED_RELEASES=BLOCKED_PENDING_ORIGINAL_KEYS_MUSICLAB_VISION
+ALL_APPS_REAL_DEVICE_ACCEPTANCE=PENDING
+ZERO_ADDITIONAL_PAID_SERVICES=required
+
+NEXT_SAFE_OPERATIONS
+- Verify terminal completed status of MotorAI main workflow 40898898699, exact commit/artifact.
+- Recover original MusicLab release and debug signing identities via approved secure provider backup without pasting secrets in chat. Reject any wrong fingerprint.
+- Recover original Visionflix stable debug private key, NOT the incompatible permanent-v1 LAB family. If unavailable, keep original family blocked.
+- Maintain Vision PR11 draft until original signing key restored and exact signed LAB build verified; do not promote just because native PR CI is green.
+- Keep MusicLab PR15 unmerged until mandatory signed CI requirements are met; preserve PR14 as draft non-duplicate.
+- Add fresh native test evidence for functional changes, compare fast LAB and deep promotion overhead with measured baselines.
+- Never equate 6/6 workflow wiring to 6/6 end-to-end zero-regression certification.
+
+STATUS_OF_THIS_DOCUMENT=VERIFIED_EVIDENCE_CHECKPOINT_NOT_AN_AUTONOMOUS_RUNNER
