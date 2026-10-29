@@ -1,5 +1,5 @@
 MOTORLAB SCUDO 360 - LAB PILOT
-STATUS=ISOLATED_LAB_NOT_RELEASED
+STATUS=VERIFIED_LAB_CANDIDATE_PENDING_PROTECTED_CORE_PROMOTION_AND_SAFE_FANOUT
 RELEASE_BASE=2026.10.22-r38
 OWNER=Existing Behavior Memory + Change Compatibility Guard, NOT a second engine.
 EVIDENCE_GATE=templates/regression/scudo360-gate.mjs
@@ -18,3 +18,10 @@ POLICY
 8. Release integration must use a mandatory pre-build gate; conditional old LAB test steps may remain as archival evidence but cannot substitute the gate.
 9. A passing test suite does not prove runtime behavior at external providers; integration and device testing remain separate.
 10. Copy the portable executor only after project preflight and branch-isolated integration. No CORE promotion or global fanout by writing this LAB.
+
+LAB_EVIDENCE_CORE=https://github.com/Br174/Chatgpt/actions/runs/40877576756
+LAB_EVIDENCE_VISION=https://github.com/Br174/Visionflix/actions/runs/40869920327
+LAB_EVIDENCE_MUSIC=https://github.com/Br174/MusicLab/actions/runs/40869953994
+FOLLOW_UP=per_contract_classes_verified;global_coverage_requires_per_project_workflow_integration
+MEASURED_VISION_APK=7.8_min_vs_LAB184_9.1_min_noncontrolled
+MEASURED_MUSIC_APK=8.7_min_vs_R10_6.5_min_noncontrolled

@@ -1,5 +1,12 @@
 MOTORLAB CORE ENTRYPOINT V1 - CENTRAL + LOCAL SATELLITE BOOT
 
+SCUDO360 — CUMULATIVE REGRESSION EVIDENCE CANDIDATE (2026-10-29)
+The existing Behavior Memory is the contract inventory and the existing Change Compatibility Guard remains the sole conflict/ownership arbiter. The subordinate portable executor is templates/regression/scudo360-gate.mjs and MUST NOT act as another scheduler, AI reviewer, release promoter or authority.
+For projects that have safely adopted a verified local Scudo360 adapter and a project-owned .motorlab/scudo360-contracts.json manifest, invoke the executable gate before APK promotion; P0/P1 contracts must map to actually executed per-class JUnit evidence and the exact source commit. Failed, skipped, missing, stale, uncategorized or unexecuted mandatory evidence is BLOCKED, never green.
+The upstream LAB success, a local workflow copy and the presence of this paragraph are NOT proof that Scudo360 is active in all six projects. Active deployment requires a separately verified central release, safe-boundary fanout and native project workflow wiring. Targets missing such wiring are PENDING_ENFORCEMENT, not certified.
+Keep fast LAB experimentation and deep promotion checks separate; report overhead relative to measurable baseline. Preserve native engines, default signing and package identity, MADRE/main, LAST_GOOD, no-paid services and project-native approval/promotion gates.
+
+
 STATUS
 Canonical MotorLab entrypoint for registered software projects and future onboarding.
 Central authority: Br174/Chatgpt.
