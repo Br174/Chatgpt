@@ -21,7 +21,7 @@ NATIVE_PROJECT_RECEIPTS
    PR-native three-seed curriculum gate SUCCESS: https://github.com/Br174/MotorAI/actions/runs/40893591984
    PR Android/debug Scudo + Goal1-Goal10 + APK + final combined gate SUCCESS: https://github.com/Br174/MotorAI/actions/runs/40893581226
    Push main at 9da9ebb... runs: https://github.com/Br174/MotorAI/actions/runs/40898898699
-   Main-run Scudo, Goal1-Goal10, Android APK, upload and combined gate succeeded; runner completion must be checked separately.
+   Main-run Scudo, Goal1-Goal10, Android APK, artifact upload and combined gate all SUCCESS; GitHub workflow completed SUCCESS on source commit 9da9ebb3946ca78c40c3789a5c945dc7630b9be2.
    Root cause of prior apparent L3 0.875 in augmented C++ instrumentation: pristine baseline same algorithm passed 3 seeds L3=1.000; original file restored with exact Git blob SHA 2ad73c25e08bbbd528cf5502011982cc818814d9, Ubuntu 24.04 pinned and wrapper subprocess timeout extended from 90 to 240 seconds, no threshold/model/dataset changes.
    Native motor learning on real Android device NOT VERIFIED by this Scudo work.
 2. MusicLab / Br174/MusicLab:
@@ -53,7 +53,7 @@ ALL_APPS_REAL_DEVICE_ACCEPTANCE=PENDING
 ZERO_ADDITIONAL_PAID_SERVICES=required
 
 NEXT_SAFE_OPERATIONS
-- Verify terminal completed status of MotorAI main workflow 40898898699, exact commit/artifact.
+- MotorAI main workflow 40898898699 COMPLETED SUCCESS; keep exact commit/artifact as verified evidence and test real Android behavior separately.
 - Recover original MusicLab release and debug signing identities via approved secure provider backup without pasting secrets in chat. Reject any wrong fingerprint.
 - Recover original Visionflix stable debug private key, NOT the incompatible permanent-v1 LAB family. If unavailable, keep original family blocked.
 - Maintain Vision PR11 draft until original signing key restored and exact signed LAB build verified; do not promote just because native PR CI is green.
