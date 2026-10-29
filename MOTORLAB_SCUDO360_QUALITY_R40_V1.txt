@@ -15,7 +15,11 @@ APPROVED OBJECTIVES
    executed and fresh native JUnit classes on the EXACT target source SHA.
 2. Compare BEFORE and AFTER only when two nonidentical commit-pinned reports
    exist; absent or untrusted baseline = PENDING_BASELINE, never 100%.
-3. Distinguish functional CI coverage from device, provider, UI, app runtime and
+3. Link a requirement to the native signed APK provenance fields only when its
+   receipt agrees with the exact tested source commit, package, certificate and
+   versionCode. Missing/invalid receipt is PENDING_ARTIFACT or BLOCKED; even a
+   valid receipt does not establish real-device installation or playback.
+4. Distinguish functional CI coverage from device, provider, UI, app runtime and
    APK installation acceptance. Android or web runtime remains PENDING_DEVICE
    without independent real-session evidence; a green CI is not device success.
 4. Produce small focused failure diagnostics for only affected request/contract.
