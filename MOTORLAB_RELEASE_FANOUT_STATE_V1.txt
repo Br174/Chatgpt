@@ -270,11 +270,31 @@ R38_HOST_BACKGROUND_EXECUTOR=NOT_CLAIMED
 R38_MOTORAI_LEGACY_LOCAL_RELEASE_NORMALIZED=2026.10.22-r38;ADOPTED_RELEASE=2026.10.22-r38;LAST_GOOD=r37;no_native_code_changed
 
 R39_RELEASE=2026.10.29-r39
-R39_GLOBAL_STATE=IN_PROGRESS
-R39_CURRENT_MAIN_VERIFIED=0/6
+R39_GLOBAL_STATE=COMPLETE_CONTROL_PLANE_6_OF_6_NATIVE_GATES_PENDING
+R39_CURRENT_MAIN_VERIFIED=6/6
 R39_PREVIOUS_VERIFIED=2026.10.22-r38
 R39_LAST_GOOD=r38
 R39_ACTIVE_MAIN_TARGETS=Br174/MusicLab;Br174/GeoVision-Test;Br174/StudyBook-AI;Br174/Visionflix;Br174/streamflix-BV;Br174/MotorAI
 R39_EXCLUDED_DORMANT=Br174/Cover-Lab-AI
 R39_SCUDO360_PROJECT_NATIVE_GATE_COVERAGE=PENDING_PER_PROJECT_VERIFICATION
 R39_NOTE=main_satellite_rollout_only_after_CORE_PR_checks_and_safe_boundary_readbacks
+
+R39_MAIN_VERIFIED Br174/MusicLab ref=main sha=8650a9646ae2eefd8121f308d6e2e97e2797c79e release=r39 last_good=r38
+R39_MAIN_VERIFIED Br174/GeoVision-Test ref=main sha=45616e37b33e51d272a3b44884fe4fb0893f72eb release=r39 last_good=r38
+R39_MAIN_VERIFIED Br174/StudyBook-AI ref=main sha=14d15450bbed6a6320f5b963d75bc90f4e3e33c5 release=r39 last_good=r38
+R39_MAIN_VERIFIED Br174/Visionflix ref=main sha=9beba1d2ffcbd866d0302f150508bc9b42076e3d release=r39 last_good=r38
+R39_MAIN_VERIFIED Br174/streamflix-BV ref=main sha=efef727b588df84ea94b8e4a3bb00eaa7c5bcdd6 release=r39 last_good=r38
+R39_MAIN_VERIFIED Br174/MotorAI ref=main sha=ae8f04bea07088e6e3ff9142c68d5dbe3fc73ce3 release=r39 last_good=r38
+R39_PENDING_SAFE_BOUNDARY Br174/MusicLab ref=uab-build/musiclab-turbo-lab46-cloud-behavior-progressive-family-02 reason=existing_pinned_device_session
+R39_PENDING_SAFE_BOUNDARY Br174/MusicLab ref=uab-build/musiclab-lab64-aggiornamento-family-01 reason=legacy_unverified_device_pin
+R39_PENDING_SAFE_BOUNDARY Br174/MusicLab ref=uab-build/musiclab-turbo-lab10-artwork-autovideo-family-02 reason=legacy_pinned_family
+R39_PENDING_SAFE_BOUNDARY Br174/StudyBook-AI ref=lab/studybook-core-android-01-update-23 reason=device_acceptance_not_overridden
+R39_PENDING_SAFE_BOUNDARY Br174/MotorAI ref=lab/seed021r3r14-contrastive-two-stage reason=training_pin_not_overridden
+R39_PENDING_SAFE_BOUNDARY Br174/MusicLab ref=lab/musiclab-scudo360-regression-pilot-20261029 reason=active_pilot_branch_and_new_madre_not_authorized
+R39_PENDING_SAFE_BOUNDARY Br174/Visionflix ref=lab/visionflix-scudo360-regression-pilot-20261029 reason=verified_pilot_separate_from_main_and_device_acceptance
+R39_PENDING_SAFE_BOUNDARY Br174/MusicLab ref=lab/musiclab-turbo-lab79-r10-empty-packet-recovery-20261029 reason=separate_native_work_branch
+R39_PENDING_SAFE_BOUNDARY Br174/Visionflix ref=lab/visionflix-lab184-italian-translation-filter-20261029 reason=separate_native_work_branch
+R39_PENDING_SAFE_BOUNDARY_COUNT=9
+R39_MAIN_EXECUTOR_STATUS=CONTROL_PLANE_INSTALLED_NATIVE_TEST_WIRING_PENDING
+R39_APP_RUNTIME_UI_SIGNING_DEPLOY=NOT_TOUCHED
+R39_GIT_SHA_CROSS_CHECK=6_OF_6_LOCAL_CORE_CAPSULE_RUNNER_LAST_GOOD_VERIFIED
