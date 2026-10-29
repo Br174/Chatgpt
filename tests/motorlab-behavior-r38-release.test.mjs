@@ -17,12 +17,12 @@ test('r38 Behavior Memory is globally complete only with six verified satellites
  assert.match(memory,/STATUS=CORE_R38_VERIFIED_6_MAIN_SATELLITES/);
 });
 test('r38 first-context capsule remains under 4000 UTF-8 bytes',()=>{
- assert.match(capsule,/^RELEASE=2026\.10\.29-r39$/m);
+ assert.match(capsule,/^RELEASE=2026\.10\.29-r40$/m);
  assert.match(capsule,/^BEHAVIOR_MEMORY_R38=on$/m);
  assert.ok(Buffer.byteLength(capsule,'utf8')<4000,'boot capsule exceeds 4KB budget');
 });
 test('r38 generic satellite bundle preserves one guard and native engines',()=>{
- assert.match(bundle,/^RELEASE=2026\.10\.29-r39$/m);
+ assert.match(bundle,/^RELEASE=2026\.10\.29-r40$/m);
  assert.match(bundle,/BEHAVIOR_MEMORY_R38=required/);
  assert.match(bundle,/BEHAVIOR_GUARD_OWNER=MotorLab_Change_Compatibility_Guard_only/);
  assert.match(bundle,/BEHAVIOR_NATIVE_ENGINES=preserved/);
