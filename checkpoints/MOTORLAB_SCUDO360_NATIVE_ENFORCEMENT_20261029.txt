@@ -1,0 +1,38 @@
+MOTORLAB SCUDO360 R39 - REAL NATIVE CI ENFORCEMENT CHECKPOINT
+DATE=2026-10-29
+RELEASE=2026.10.29-r39
+CENTRAL_CONTROL_PLANE=VERIFIED_6_OF_6_MAIN_SATELLITES
+SOURCE_OF_TRUTH=GitHub_current_refs_and_CI_logs
+STATUS=PARTIAL_NATIVE_ENFORCEMENT_WITH_REAL_BLOCKERS
+
+SCOPE
+Control-plane distribution and per-app runnable CI protection are separate.
+Do not claim total zero-regression certification from static policy metadata.
+Do not bypass a failing test or invent a certificate to make a workflow green.
+No application source/UI/provider/player/production signing is modified by this checkpoint.
+
+PROJECT_RECEIPTS
+- Br174/MusicLab: mainline Scudo360 gate installed by PR12 (merged 2026-10-29); real full JVM check passed in PR and push workflows. Main APK workflows use gate as prerequisite. Push build cannot certify signed APK when KEYSTORE is absent; stable DEBUG_KEYSTORE cannot be read by Java keytool (Tag number over 30). LAB-only signing fail-fast precheck PR14 remains DRAFT and not promoted. Do not regenerate signing identities. Evidence: https://github.com/Br174/MusicLab/pull/12 ; https://github.com/Br174/MusicLab/pull/14 ; https://github.com/Br174/MusicLab/actions/runs/40882748756
+- Br174/Visionflix: mainline Scudo360 JVM class evidence gate installed; PR9 Gradle chmod preflight merged to main, native PR gate passed. Mainline APK build blocked by missing original Actions cache key visionflix-debug-keystore-v1; original certificate pinned to 55d9c2dc94f32e6b7685994f2652eec3d8086432e9de94e0645a8bf30f41918e. Do not silently substitute permanent-v1 LAB cert ae10b6198ccb567386af37ad8b92d9ad40aa5bada469b8528811d447fc9612f6. Evidence https://github.com/Br174/Visionflix/pull/9 ; https://github.com/Br174/Visionflix/actions/runs/40886366733
+- Br174/GeoVision-Test: native HTML/python integration present on main; actual HTML test CI passed. Evidence https://github.com/Br174/GeoVision-Test/actions/runs/40883875989
+- Br174/StudyBook-AI: native Cloudflare tests and ordering anti-bypass gate present on main; no production deploy authorized by this Scudo checkpoint. Main UAB check passed. Evidence https://github.com/Br174/StudyBook-AI/actions/runs/40887692956
+- Br174/streamflix-BV: TV APK release origin/signature verification Scudo gate present on main; CI PR gate succeeded, no claim to have run a current production release since integration. Evidence https://github.com/Br174/streamflix-BV/actions/runs/40885038559
+- Br174/MotorAI: PR15 adds native C++ curriculum smoke and gate before APK, but was NOT MERGED. Source-model seed 174 failed L3 held-out test_accuracy 0.875 (required 0.90); C++ compilation succeeded, so this is a model-quality test failure, not a missing build tool. Do not waive, lower threshold or silently change training/runtime model. Evidence https://github.com/Br174/MotorAI/pull/15 ; https://github.com/Br174/MotorAI/actions/runs/40886022807
+
+TRUTHFUL_PROGRESS
+R39_CONTROL_PLANE=6/6_MAIN_VERIFIED
+NATIVE_CI_HOOKS_PRESENT_IN_MAIN=5/6_WITH_DIFFERENT_COVERAGE
+MOTORAI_NATIVE_CI_HOOK=PENDING_PR15
+APPS_FULLY_END_TO_END_CERTIFIED=NOT_VERIFIED
+REAL_DEVICE_TESTS=NOT_VERIFIED
+ZERO_ADDITIONAL_PAID_SERVICES=required
+R39_LAST_GOOD=2026.10.22-r38
+
+NEXT_RELEASE_GATES
+1. Restore original MusicLab release and persistent-debug signing identities using authorized secure provider UI/secret vault, or mark signed-APK build blocked. Never ask to paste credentials in chat.
+2. Recover old Visionflix debug key cache or original signing key with exact certificate match, or keep original signature family blocked. A different signed LAB family must not be silently treated as an in-place update.
+3. Diagnose MotorAI curriculum L3 generalization while preserving independent test holdout and test accuracy threshold. Only promote PR15 after passing real native tests.
+4. Ensure any future changes to native source include contract-level test evidence and reliable mandatory release gate.
+5. Measure TTTA/CI overhead separately for fast LAB, deep CI and promotion. Keep target +20% for normal LAB as a goal, not a fabricated measured outcome.
+
+STATUS_OF_THIS_DOCUMENT=EVIDENCE_BASED_CHECKPOINT_NOT_AN_ACTIVE_RUNNER
