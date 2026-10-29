@@ -19,7 +19,7 @@ test('one canonical Change Compatibility Guard owns all three rule dispositions'
  assert.match(entry,/single existing Change Compatibility Guard owns this classification/);
  const bootLoad=entry.split('5. Load all manifest-required modules')[1]?.split('6. Read Project Continuity')[0] || '';
  assert.equal((bootLoad.match(/MOTORLAB_ADAPTIVE_RUNTIME_GOVERNOR_V1\.txt/g)||[]).length,1,'single coordinator in bootstrap load list');
- assert.match(manifest,/CURRENT_RELEASE=2026\.10\.29-r39/);
+ assert.match(manifest,/CURRENT_RELEASE=2026\.10\.29-r40/);
 });
 
 test('current capsule and bundle stay compact and preserve all r34 safety markers',async()=>{
@@ -55,12 +55,12 @@ test('current release boot adapter preserves safe re-entry, preserves safe re-en
  const start=cmd('SessionStart');assert.equal(start.status,0,start.stderr);
  const ctx=JSON.parse(start.stdout).hookSpecificOutput.additionalContext;
  assert.match(ctx,/r40 attivo/);
- assert.match(ctx,/SESSION_RELEASE_PIN=2026\.10\.29-r39/);
+ assert.match(ctx,/SESSION_RELEASE_PIN=2026\.10\.29-r40/);
  assert.match(ctx,/RULE_RETIREMENT_PROOF=required/);
  const prompt=cmd('UserPromptSubmit');assert.equal(prompt.status,0,prompt.stderr);
  const continued=JSON.parse(prompt.stdout).hookSpecificOutput.additionalContext;
  assert.match(continued,/MOTORLAB_REENTRY_GATE=required/);
- assert.match(continued,/SESSION_RELEASE_PIN=2026\.10\.29-r39/);
+ assert.match(continued,/SESSION_RELEASE_PIN=2026\.10\.29-r40/);
 });
 
 
