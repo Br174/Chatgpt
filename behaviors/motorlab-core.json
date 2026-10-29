@@ -85,6 +85,25 @@
         "tests/motorlab-r28-sync-pin.test.mjs"
       ],
       "supersedes": []
+    },
+    {
+      "id": "motorlab.scudo360-evidence-gate",
+      "owner": "motorlab",
+      "scope": "release-evidence",
+      "version": 1,
+      "status": "active",
+      "protected": true,
+      "behavior": "A locally integrated, verified Scudo360 gate must bind each critical behavior to executed fresh per-class JUnit evidence at the exact commit, blocking promotions on missing, skipped or failed contracts; absence of local enforcement is pending, not certified.",
+      "acceptance": [
+        "Detect empty and stale test reports, missing class evidence, skipped/failed tests",
+        "Require single Change Compatibility Guard and protected promotion flow",
+        "Do not claim global activation before safe release fanout"
+      ],
+      "testPaths": [
+        "tests/motorlab-scudo360-gate.test.mjs",
+        "tests/motorlab-scudo360-integration.test.mjs"
+      ],
+      "supersedes": []
     }
   ]
 }
