@@ -9,20 +9,20 @@ const ledger=read('MOTORLAB_RELEASE_FANOUT_STATE_V1.txt');
 const memory=read('MOTORLAB_BEHAVIOR_MEMORY_V1.txt');
 const entry=read('MOTORLAB_CORE_ENTRYPOINT_V1.txt');
 test('r38 Behavior Memory is globally complete only with six verified satellites',()=>{
- assert.match(manifest,/^CURRENT_RELEASE=2026\.10\.22-r38$/m);
- assert.match(manifest,/^FANOUT_STATE=COMPLETE$/m);
- assert.match(manifest,/^FANOUT_MAIN_VERIFIED=6\/6$/m);
- assert.match(manifest,/^RELEASE_FANOUT_STATE=COMPLETE$/m);
+ assert.match(manifest,/^R38_RELEASE=2026\.10\.22-r38$/m);
+ assert.match(manifest,/^R38_GLOBAL_STATE=COMPLETE_WITH_5_EXPLICIT_LAB_PENDING_SAFE_BOUNDARY$/m);
+ assert.match(manifest,/^R38_FANOUT_FINAL_READBACK=6\/6_verified_2026-10-22$/m);
+ assert.match(manifest,/^R38_GLOBAL_STATE=COMPLETE_WITH_5_EXPLICIT_LAB_PENDING_SAFE_BOUNDARY$/m);
  assert.match(manifest,/^R38_AUTOMATIC_HOST_BEHAVIOR=NOT_CLAIMED_WITHOUT_RUNTIME_CONNECTOR$/m);
  assert.match(memory,/STATUS=CORE_R38_VERIFIED_6_MAIN_SATELLITES/);
 });
 test('r38 first-context capsule remains under 4000 UTF-8 bytes',()=>{
- assert.match(capsule,/^RELEASE=2026\.10\.22-r38$/m);
+ assert.match(capsule,/^RELEASE=2026\.10\.29-r39$/m);
  assert.match(capsule,/^BEHAVIOR_MEMORY_R38=on$/m);
  assert.ok(Buffer.byteLength(capsule,'utf8')<4000,'boot capsule exceeds 4KB budget');
 });
 test('r38 generic satellite bundle preserves one guard and native engines',()=>{
- assert.match(bundle,/^RELEASE=2026\.10\.22-r38$/m);
+ assert.match(bundle,/^RELEASE=2026\.10\.29-r39$/m);
  assert.match(bundle,/BEHAVIOR_MEMORY_R38=required/);
  assert.match(bundle,/BEHAVIOR_GUARD_OWNER=MotorLab_Change_Compatibility_Guard_only/);
  assert.match(bundle,/BEHAVIOR_NATIVE_ENGINES=preserved/);

@@ -17,6 +17,6 @@ test('canonical Scudo360 behavior registry maps to executable tests, preserving 
  const scudo=reg.rules.find(r=>r.id==='motorlab.scudo360-evidence-gate');
  assert.ok(scudo?.protected);
  assert.ok(scudo.testPaths.includes('tests/motorlab-scudo360-gate.test.mjs'));
- assert.match(read('MOTORLAB_RELEASE_MANIFEST_V1.txt'),/^CURRENT_RELEASE=2026\.10\.22-r38$/m);
- assert.match(read('MOTORLAB_RELEASE_MANIFEST_V1.txt'),/^SCUDO360_GLOBAL_RELEASE=NOT_ACTIVE_UNTIL_VERIFIED_FANOUT$/m);
+ assert.match(read('MOTORLAB_RELEASE_MANIFEST_V1.txt'),/^CURRENT_RELEASE=2026\.10\.29-r39$/m);
+ assert.match(read('MOTORLAB_RELEASE_MANIFEST_V1.txt'),/^SCUDO360_GLOBAL_RELEASE=IN_PROGRESS_NOT_YET_ACTIVE$/m);
 });

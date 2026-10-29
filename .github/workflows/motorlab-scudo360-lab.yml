@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - motorlab/scudo360-regression-lab-20261029
+      - motorlab/scudo360-r39-release-20261029
   pull_request:
     branches:
       - main
@@ -20,6 +21,6 @@ jobs:
         with:
           node-version: '22'
       - name: Fail-closed regression tests, including deliberate failures
-        run: node --test tests/motorlab-scudo360-gate.test.mjs tests/motorlab-scudo360-integration.test.mjs
+        run: node --test tests/motorlab-scudo360-gate.test.mjs tests/motorlab-scudo360-integration.test.mjs tests/motorlab-scudo360-r39-release.test.mjs
       - name: Preserve active r38 Behavior Memory and Compatibility Guard
         run: node --test tests/motorlab-behavior-memory.test.mjs tests/motorlab-behavior-preflight.test.mjs tests/motorlab-behavior-r38-release.test.mjs
