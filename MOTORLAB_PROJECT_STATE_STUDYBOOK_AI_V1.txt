@@ -1,14 +1,14 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=33
+STATE_REVISION=34
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
 ACTIVE_OPERATION_ID=studybook-lab23-distinct-book-cover-no-duplicate-20261011
 OPERATION_STATUS=LAB23_SIGNED_APK_DELIVERED_TITLE_FIRST_RELEVANCE_DUPLICATE_REPAIR_REAL_THREE_BOOK_WEB_SMOKE_PASSED_DEVICE_ACCEPTANCE_PENDING
 CURRENT_PHASE=LAB23 screenshot root-cause closure: separate books I romani, Appunti fotografati 1 pagine, Tutti santi me compreso share same Roman Wikimedia theme illustration despite different titles. Root cause LAB22 findTheme considered arbitrary context mention Rome higher priority than title and always selected highest-ranked same image; no per-library source image dedup. LAB23 puts title before context, specific title saints/religion maps to religious-themed photo, generic scan titles use context only if generic, performs multiple keyless Wikimedia searches per theme to find diverse CC0/PD pictures. Client sends excludeAssets of photos already used by other book IDs; backend excludes matching Wikimedia source page and image, rechecking before saved. Auto-on-library scoped old duplicate repair: detect repeated online-thematic source URLs, keep most title-relevant owner, clear only duplicated web thematic coverCustom then try saving unique replacement, leave original scan/custom book bytes intact. All 3 screenshot titles external REAL backend smoke HTTP200 with unique commons asset IDs: commons:91903344, commons:91954879, commons:58611951 (run 38096333118). LAB23 complete UAB CI 38096279551 SUCCESS, signed Android 38096279519 SUCCESS version 0.3.60 update-in-place; user phone acceptance pending.
-CURRENT_REF=lab/studybook-core-android-01-update-23
-CURRENT_HEAD_SHA=0de38d462360e028b8c535edfe73031c1c30ddc5
+CURRENT_REF=motorlab/active-studybook-ai
+CURRENT_HEAD_SHA=4df889b03fbf696ceaaaafd96f7a70933c7939d1
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
 JOB_ID=LAB23_UAB_38096279551_SUCCESS_RUN457; LAB23_ANDROID_38096279519_SUCCESS_RUN60; LAB23_WEB_THREE_BOOK_IMAGES_38096333118_SUCCESS; LAB23_PUBLIC_DOMAIN_QUERY_ANALYSIS_38096219145_SUCCESS
 JOB_STATUS=Final LAB23 UAB 38096279551 SUCCESS including baseline and new scripts/test-lab23-cover-uniqueness.mjs; Android 38096279519 SUCCESS signed update APP ID it.studybook.ai.lab cert D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; independent public-domain source query diagnostics 38096219145 found diverse Romans and saints; external live smoke 38096333118 SUCCESS all three books receive DIFFERENT real images HTTP200. Device still unverified.
@@ -256,4 +256,7 @@ LAB23_DEVICE_ACCEPTANCE=PENDING
 
 MOTORLAB_R39_PERMANENT_CONTROL_SOURCE=motorlab/active-studybook-control (Cloudflare main, verified)
 MOTORLAB_R39_ANDROID_SIGNED_FAMILY_SOURCE=motorlab/active-studybook-ai (last verified LAB23 until LAB24 signed Scudo source is confirmed)
-MOTORLAB_R39_ANDROID_SCUDO_LAB24_CI=40921134783 in progress at checkpoint; do not advance active Android before signed result.
+MOTORLAB_R39_ANDROID_SCUDO_LAB24_CI=40921134783 COMPLETE SUCCESS on exact SHA 4df889b03fbf696ceaaaafd96f7a70933c7939d1; native Scudo, original Android signing, APK, and safe automatic GitHub pointer advanced. User phone acceptance still pending.
+
+MOTORLAB_R39_STUDYBOOK_ANDROID_PROVEN_ACTIVE_REF=motorlab/active-studybook-ai
+MOTORLAB_R39_STUDYBOOK_ANDROID_AUTO_UPDATE=GitHub Actions signed APK and Scudo evidence required before nonforced ref advancement; run 40921134783 SUCCESS.
