@@ -29,8 +29,8 @@ test('MusicLab final proof is real and exact-source, never conflated with APK id
   assert.match(ledger,/^MUSICLAB_R40_NATIVE_PROOF_ARTIFACT_ID=12921768697$/m);
   assert.match(ledger,/^MUSICLAB_APPROVED_R11_SIGNED_SHA=a8d32987ed8d291d61aa17a91bd45dbf11d1d3ca$/m);
 });
-test('six-pilot proof is not a premature r40 main release or device certification',()=>{
-  assert.match(manifest,/^CURRENT_RELEASE=2026\.10\.29-r39$/m);
+test('historical pilot checkpoint does not claim permanent fanout or live-device certification',()=>{
+  assert.match(manifest,/^CURRENT_RELEASE=2026\.10\.29-r40$/m);
   assert.match(ledger,/^R40_CENTRAL_PROMOTION=NOT_COMPLETED$/m);
   assert.match(ledger,/^R40_PERMANENT_NATIVE_WORKFLOW_ADOPTION=NOT_COMPLETED$/m);
   assert.match(ledger,/^R40_ALL_DEVICES_LIVE_ACCEPTANCE=NOT_VERIFIED$/m);
