@@ -17,9 +17,30 @@ const median=a=>a[Math.floor(a.length/2)];
 const stable=(x)=>JSON.stringify(x,Object.keys(x||{}).sort());
 const digest=o=>createHash('sha256').update(JSON.stringify(o)).digest('hex');
 
+/** Fast targeted YAML smoke: detects the historical dangling scalar-run bug.
+ * Not a complete YAML parser; the full native workflow runner remains owner. */
+export function inspectWorkflowRunBlocks(source) {
+  if(typeof source!=='string')return [{code:'WORKFLOW_SOURCE_NOT_TEXT',line:0}];
+  const lines=source.split(/\r?\n/),issues=[];
+  for(let i=0;i<lines.length-1;i++){
+    const line=lines[i],match=line.match(/^(\s*)run:\s*(\S.*)$/);
+    if(!match||/^[|>][+-]?(?:\s+#.*)?$/.test(match[2]))continue;
+    let j=i+1;
+    while(j<lines.length&&!lines[j].trim())j++;
+    if(j>=lines.length)continue;
+    const next=lines[j],indented=(next.match(/^ */)||[''])[0].length>match[1].length;
+    if(indented&&next.trim()&&!next.trim().startsWith('#')){
+      issues.push({code:'WORKFLOW_SCALAR_RUN_HAS_DANGLING_CHILD',line:j+1});
+    }
+  }
+  return issues;
+}
+
+
 export function assessEvolutionR41({
   expectedCommit,manifest,r40Report,changedPaths=[],ownership=[],dependencies=[],
-  behaviorRegistry=null,incidents=[],benchmarks=null,artifactReceipt=null
+  behaviorRegistry=null,incidents=[],benchmarks=null,artifactReceipt=null,
+  workflowSources={}
 }={}) {
   const errors=[],warnings=[],diagnostics=[];
   const note=(code,detail='')=>errors.push(fault(code,detail));
@@ -33,6 +54,11 @@ export function assessEvolutionR41({
   const paths=unique(list(changedPaths));
   if(paths.length!==list(changedPaths).length)note('DUPLICATE_CHANGED_PATH');
   for(const p of paths)if(!safePath(p))note('UNSAFE_CHANGED_PATH',String(p));
+  for(const p of paths.filter(p=>p.startsWith('.github/workflows/')&&/\.ya?ml$/.test(p))){
+    const source=workflowSources?.[p];
+    if(typeof source!=='string'){note('CHANGED_WORKFLOW_SOURCE_REQUIRED_FOR_PREFLIGHT',p);continue;}
+    for(const error of inspectWorkflowRunBlocks(source))note(error.code,p+':'+error.line);
+  }
   const contracts=new Map();
   for(const c of list(manifest?.contracts)){
     if(!c||typeof c.id!=='string'||contracts.has(c.id))note('INVALID_OR_DUPLICATE_CONTRACT',String(c?.id));
