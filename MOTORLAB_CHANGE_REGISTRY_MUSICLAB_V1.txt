@@ -999,3 +999,26 @@ VERIFICATION=GitHub Actions run 37702761124 success su exact source SHA cc2ab4b8
 STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
 NEXT_LIFECYCLE_GATE=Bruno device test della LAB54 aggiornamento durante musica in riproduzione e verifica della continuità pagina/ranking. Nessuna promozione CANDIDATA/MADRE prima dell'accettazione esplicita.
 SOURCE_CONFIDENCE=VERIFIED_GIT_CI_LOCAL_ARTIFACT_RECHECK
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261030-r17-quality-progressive-candidate02
+DATE=2026-10-30
+TITLE=Cover finalmente funzionanti con qualita progressiva e nessuna soglia numerica delle evidenze
+SEMANTIC_TAGS=Cover,qualita progressiva,prima tornata,cover.info,MusicBrainz,Discogs,YouTube,evidenze,3 evidenze,2 evidenze,limitazioni,sblocco delle cover,CANDIDATA 02,R17
+USER_INTENT=Eliminare le barriere 3 e 2 verifiche che impedivano l'ingresso di molte cover, conservare titolo e divieti e dare prima qualita discografica e in seguito fonti amatoriali senza blocchi.
+CHANGE_SCOPE=COVER_ADMISSION_RANKING_AND_QUEUE_ONLY
+LIFECYCLE_ROLE=CANDIDATA_02_EXACT_TREE_SOURCE_SNAPSHOT
+SOURCE_BASE_REF=mother/musiclab-turbo-lab46-33048-verified-20261024
+SOURCE_BASE_SHA=57d1967bf90f09a7d881f73c447b210e0386c547
+RESULT_REF=lab/musiclab-turbo-r17-quality-progressive-20261030
+RESULT_SHA=82970f87442ac14035533f48b31043fcaefc305a
+CANDIDATE_REF=candidate/musiclab-turbo-r17-quality-progressive-c02-20261030
+CANDIDATE_SHA=fd5ab051d86f8b6aa13bfed6379d7b6071ca12d3
+SOURCE_TREE_IDENTICAL=a148f8140e0fab0ae492c155690a5b3d3dbfc9c3
+IMPLEMENTATION_COMMITS=3af01e5820e1870dd59d553361f68d97e9a8a3a1,c6c6c1326b4e9057a62ef95995f48ea094b0a0fb,82970f87442ac14035533f48b31043fcaefc305a
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/CoverLabTurboRoundAdmission.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverPriorityOrder.kt,behaviors/musiclab-cover.json
+BEHAVIOR_SUMMARY=Metadati ora ordinano ma non bloccano; titoli italiani pertinenti, adattamenti stranieri documentati e divieti karaoke/MIDI/KAR restano protetti; originale e professionali sopra le versioni meno solide, alternanza coda video pronti. Nessuna modifica all'APK telefonico durante la promozione.
+VERIFICATION=GitHub Actions run 41082239928 success, Scudo360 full JVM + Quality r40 PASS, signed LAB79 R17 APK ZIP verified (artifact 12989784057), same verified source tree replayed on fresh branch directly from MADRE, Bruno confirmed actual-phone Cover results and priority on 2026-10-30.
+STATUS=CANDIDATA_02_SOURCE_VERIFIED_PHONE_APPROVED_LAB;CANDIDATE_STANDALONE_APK_PENDING_NEW_FAMILY
+RESTORE_SCOPE_HINTS=Restore exact matching functional tree from CANDIDATE_REF or the R17 LAB_SHA before any new Cover edits; never restore just the old 3/2 evidence thresholds; preserve player and unrelated functions; do not modify immutable candidate source.
+SOURCE_CONFIDENCE=GITHUB_EXACT_TREE_CI_PHONE_FEEDBACK
