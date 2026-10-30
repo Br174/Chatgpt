@@ -1043,3 +1043,20 @@ SAFETY_REF=safety-source/musiclab-turbo-lab79-r18-filter-only-20261030
 MOTHER_AND_CANDIDATE_PROTECTED=YES
 RESTORE_SCOPE_HINTS=If Bruno requests last known good categories method revert filter logic to R17 without changing source/grade/cover video; immutable CANDIDATA02 unaffected.
 SOURCE_CONFIDENCE=LIVE_GITHUB_CI_APK_ZIP_LOCAL_VERIFICATION
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261030-r19-source-priority-signed-success
+DATE=2026-10-30
+SOURCE_BASE=R18_581a1a41916f84670e9f0f0fccb9406172ca4af8
+SOURCE_REF=lab/musiclab-turbo-r19-source-priority-20261030
+SOURCE_SHA=29377409743ec73cfdcd91e31ad7ec6d804931c5
+CI_RUN=41113678300
+CI_CONCLUSION=SUCCESS
+SIGNED_ANDROID_VERSION_CODE=33092
+APK_ARTIFACT=13005961127
+QUALITY=SCUDO360_R40_JVM_PASS
+DESCRIPTION=Soft source priority only COVER.INFO and catalogue first, MusicLab archived verified identities, YouTube Music ahead of YouTube, original and credible singer popularity hints; no new admission gate; karaoke order preserved; no changes Studio filter/player/producer/10+20+20.
+CI_RUNBOOK=MOTORLAB_MUSICLAB_TURBO_R19_VERIFIED_CI_PATH_20261030.txt
+DEVICE_ACCEPTANCE=PENDING_BRUNO
+MOTHER_MAIN_CANDIDATA02=UNTOUCHED
