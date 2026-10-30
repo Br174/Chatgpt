@@ -1022,3 +1022,24 @@ VERIFICATION=GitHub Actions run 41082239928 success, Scudo360 full JVM + Quality
 STATUS=CANDIDATA_02_SOURCE_VERIFIED_PHONE_APPROVED_LAB;CANDIDATE_STANDALONE_APK_PENDING_NEW_FAMILY
 RESTORE_SCOPE_HINTS=Restore exact matching functional tree from CANDIDATE_REF or the R17 LAB_SHA before any new Cover edits; never restore just the old 3/2 evidence thresholds; preserve player and unrelated functions; do not modify immutable candidate source.
 SOURCE_CONFIDENCE=GITHUB_EXACT_TREE_CI_PHONE_FEEDBACK
+
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261030-r18-four-existing-category-filters
+DATE=2026-10-30
+TITLE=R18 Studio, Live, Remix e Straniere: filtro immediato delle cover già trovate
+SEMANTIC_TAGS=Studio,Live,Remix,Straniere,Tutto,filtri,etichette,categorie,Apple/iTunes,Spotify,Discogs,YouTube Music,YouTube,indicatori,metadati,CANDIDATA02
+USER_INTENT=Correggere i quattro filtri già presenti, usando informazioni esplicite quando disponibili e classificazione Studio per esclusione solo su provenienza pubblicata; classificazione YouTube solo tramite indizi espliciti; nessuna modifica a ingresso, qualità, numero e ordine delle cover.
+CHANGE_SCOPE=FILTER_ONLY_R18_ISOLATED_LAB
+SOURCE_BASE_REF=lab/musiclab-turbo-r17-quality-progressive-20261030
+SOURCE_BASE_SHA=82970f87442ac14035533f48b31043fcaefc305a
+RESULT_REF=lab/musiclab-turbo-r18-cover-filters-20261030
+RESULT_SHA=581a1a41916f84670e9f0f0fccb9406172ca4af8
+CHANGED_FILES=app/src/main/kotlin/com/metrolist/music/ui/component/DiscogsDirectVersionBrowser.kt,app/src/main/kotlin/com/metrolist/music/ui/component/CoverFilterIdentity.kt,app/src/test/kotlin/com/metrolist/music/ui/component/CoverFilterIdentityTest.kt,cloudflare/music-intelligence/test/turbo-r18-category-only.test.mjs,tools/universal-apk-builder/verify-r18-filter-scope.py,tools/universal-apk-builder/prepare-turbo-r18-cover-filters-env.py,.github/workflows/musiclab-turbo-r18-cover-filters-apk.yml
+BEHAVIOR_SUMMARY=Reads existing recorded catalogue sourceNames and existing resolvedVideoTitle. Classifies labels locally with independent category tags; published ordinary studio by exclusion, direct YouTube only with explicit studio wording, Live/Remix/Foreign with explicit words or documented language. Applies filter to main visibleTrueCovers as well as originals, does not alter All results or provider search.
+VERIFICATION=Full native JVM suite Scudo360 R40 and signed APK ZIP on exact source GitHub Actions 41106646330 success. APK SHA256 f86faac4ba1ac5a52732dc77289952b59d394520b97692d87da0a387a52b6b71 ZIP SHA256 d18af0090fa0b5178b86c76d91d45a0843fa29271b3d0220a749ea9ea9b15703 verified locally. Signed family same as R17 with versionCode 33091. Device acceptance not yet asserted.
+STATUS=LAB_TECHNICALLY_VERIFIED_DEVICE_PENDING
+SAFETY_REF=safety-source/musiclab-turbo-lab79-r18-filter-only-20261030
+MOTHER_AND_CANDIDATE_PROTECTED=YES
+RESTORE_SCOPE_HINTS=If Bruno requests last known good categories method revert filter logic to R17 without changing source/grade/cover video; immutable CANDIDATA02 unaffected.
+SOURCE_CONFIDENCE=LIVE_GITHUB_CI_APK_ZIP_LOCAL_VERIFICATION
