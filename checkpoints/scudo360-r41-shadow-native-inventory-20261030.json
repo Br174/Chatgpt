@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "kind": "motorlab-scudo360-r41-shadow-known-test-path-evidence",
+  "date": "2026-10-30",
+  "scope": "EXACT_KNOWN_NATIVE_TEST_ENTRYPOINTS_ONLY",
+  "source": "live-GitHub-readback-of-current-active-ref-and-project-owned-r40-manifest",
+  "warning": "These explicitly verified suite/test paths are NOT general application source ownership. All other changed source paths remain UNMAPPED and may NOT be certified by r41. No class JUnit report is bundled; real r40 artifact required for certification.",
+  "projects": [
+    {
+      "project": "MusicLab",
+      "repo": "Br174/MusicLab",
+      "ref": "motorlab/active-musiclab-turbo",
+      "sourceCommit": "4a7d24440120e90bda1f95c4ea6f8eb121d04710",
+      "baselineCommit": "6b1326745dcee0d5d5068b90efe8b4d274e210b2",
+      "contracts": [
+        {
+          "id": "musiclab.cover.round-continuity",
+          "priority": "P1",
+          "junitClasses": [
+            "com.metrolist.music.ui.component.CoverR10EmptyRoundRecoveryTest"
+          ],
+          "knownSuitePath": "app/src/test/kotlin/com/metrolist/music/ui/component/CoverR10EmptyRoundRecoveryTest.kt"
+        },
+        {
+          "id": "musiclab.cover.documentary-sources",
+          "priority": "P1",
+          "junitClasses": [
+            "com.metrolist.music.ui.component.CoverLab79DocumentarySourcesTest"
+          ],
+          "knownSuitePath": "app/src/test/kotlin/com/metrolist/music/ui/component/CoverLab79DocumentarySourcesTest.kt"
+        },
+        {
+          "id": "musiclab.cover.presentation",
+          "priority": "P1",
+          "junitClasses": [
+            "com.metrolist.music.ui.component.CoverLab78PreparationPolicyTest"
+          ],
+          "knownSuitePath": "app/src/test/kotlin/com/metrolist/music/ui/component/CoverLab78PreparationPolicyTest.kt"
+        },
+        {
+          "id": "musiclab.audio.nonblocking",
+          "priority": "P1",
+          "junitClasses": [
+            "com.metrolist.music.playback.audio.AudioProcessorBufferReuseTest"
+          ],
+          "knownSuitePath": "app/src/test/kotlin/com/metrolist/music/playback/audio/AudioProcessorBufferReuseTest.kt"
+        },
+        {
+          "id": "musiclab.cover.dedupe",
+          "priority": "P1",
+          "junitClasses": [
+            "com.metrolist.music.ui.component.Lab45CoverDedupTest"
+          ],
+          "knownSuitePath": "app/src/test/kotlin/com/metrolist/music/ui/component/Lab45CoverDedupTest.kt"
+        }
+      ],
+      "ownership": [
+        {
+          "prefix": "app/src/test/kotlin/com/metrolist/music/ui/component/CoverR10EmptyRoundRecoveryTest.kt",
+          "owner": "MusicLab",
+          "contractIds": [
+            "musiclab.cover.round-continuity"
+          ]
+        },
+        {
+          "prefix": "app/src/test/kotlin/com/metrolist/music/ui/component/CoverLab79DocumentarySourcesTest.kt",
+          "owner": "MusicLab",
+          "contractIds": [
+            "musiclab.cover.documentary-sources"
+          ]
+        },
+        {
+          "prefix": "app/src/test/kotlin/com/metrolist/music/ui/component/CoverLab78PreparationPolicyTest.kt",
+          "owner": "MusicLab",
+          "contractIds": [
+            "musiclab.cover.presentation"
+          ]
+        },
+        {
+          "prefix": "app/src/test/kotlin/com/metrolist/music/playback/audio/AudioProcessorBufferReuseTest.kt",
+          "owner": "MusicLab",
+          "contractIds": [
+            "musiclab.audio.nonblocking"
+          ]
+        },
+        {
+          "prefix": "app/src/test/kotlin/com/metrolist/music/ui/component/Lab45CoverDedupTest.kt",
+          "owner": "MusicLab",
+          "contractIds": [
+            "musiclab.cover.dedupe"
+          ]
+        }
+      ],
+      "dependencies": [],
+      "coverageLimit": "No domain source paths mapped; no dependency edge inferred without repository-owned explicit proof."
+    },
+    {
+      "project": "VerlezzaVision",
+      "repo": "Br174/Visionflix",
+      "ref": "motorlab/active-verlezza-vision",
+      "sourceCommit": "2d5faa1c76805d3ea1c7983f8fbab92e26c0673a",
+      "baselineCommit": "6c3c9b57b2ea4e2b8bdb0f09af6ad9290fb85247",
+      "contracts": [
+        {
+          "id": "visionflix.search.filters",
+          "priority": "P1",
+          "junitClasses": [
+            "com.streamflixreborn.streamflix.providers.Lab150AdvancedFiltersTest"
+          ],
+          "knownSuitePath": "app/src/test/java/com/streamflixreborn/streamflix/providers/Lab150AdvancedFiltersTest.kt"
+        },
+        {
+          "id": "visionflix.tv.navigation",
+          "priority": "P1",
+          "junitClasses": [
+            "com.streamflixreborn.streamflix.fragments.search.Lab153NavigationTest"
+          ],
+          "knownSuitePath": "app/src/test/java/com/streamflixreborn/streamflix/fragments/search/Lab153NavigationTest.kt"
+        },
+        {
+          "id": "visionflix.year.metadata",
+          "priority": "P1",
+          "junitClasses": [
+            "com.streamflixreborn.streamflix.providers.Lab172NativeYearPolicyTest"
+          ],
+          "knownSuitePath": "app/src/test/java/com/streamflixreborn/streamflix/providers/Lab172NativeYearPolicyTest.kt"
+        },
+        {
+          "id": "visionflix.playback.recovery",
+          "priority": "P1",
+          "junitClasses": [
+            "com.streamflixreborn.streamflix.fragments.player.Lab166TvPlaybackRecoveryPolicyTest"
+          ],
+          "knownSuitePath": "app/src/test/java/com/streamflixreborn/streamflix/fragments/player/Lab166TvPlaybackRecoveryPolicyTest.kt"
+        },
+        {
+          "id": "visionflix.providers.flow",
+          "priority": "P1",
+          "junitClasses": [
+            "com.streamflixreborn.streamflix.fragments.search.Lab181ProviderFlowPolicyTest"
+          ],
+          "knownSuitePath": "app/src/test/java/com/streamflixreborn/streamflix/fragments/search/Lab181ProviderFlowPolicyTest.kt"
+        }
+      ],
+      "ownership": [
+        {
+          "prefix": "app/src/test/java/com/streamflixreborn/streamflix/providers/Lab150AdvancedFiltersTest.kt",
+          "owner": "VerlezzaVision",
+          "contractIds": [
+            "visionflix.search.filters"
+          ]
+        },
+        {
+          "prefix": "app/src/test/java/com/streamflixreborn/streamflix/fragments/search/Lab153NavigationTest.kt",
+          "owner": "VerlezzaVision",
+          "contractIds": [
+            "visionflix.tv.navigation"
+          ]
+        },
+        {
+          "prefix": "app/src/test/java/com/streamflixreborn/streamflix/providers/Lab172NativeYearPolicyTest.kt",
+          "owner": "VerlezzaVision",
+          "contractIds": [
+            "visionflix.year.metadata"
+          ]
+        },
+        {
+          "prefix": "app/src/test/java/com/streamflixreborn/streamflix/fragments/player/Lab166TvPlaybackRecoveryPolicyTest.kt",
+          "owner": "VerlezzaVision",
+          "contractIds": [
+            "visionflix.playback.recovery"
+          ]
+        },
+        {
+          "prefix": "app/src/test/java/com/streamflixreborn/streamflix/fragments/search/Lab181ProviderFlowPolicyTest.kt",
+          "owner": "VerlezzaVision",
+          "contractIds": [
+            "visionflix.providers.flow"
+          ]
+        }
+      ],
+      "dependencies": [],
+      "coverageLimit": "No domain source paths mapped; no dependency edge inferred without repository-owned explicit proof."
+    },
+    {
+      "project": "StudyBook",
+      "repo": "Br174/StudyBook-AI",
+      "ref": "main",
+      "sourceCommit": "ac99b80c953109fd7b873ee02951c96c810b619e",
+      "baselineCommit": "3e4569bd865b7a69f0e6b4dc831661ad3ac63c9b",
+      "contracts": [
+        {
+          "id": "studybook.cloudflare-worker-requests-and-recovery",
+          "priority": "P1",
+          "junitClasses": [
+            "studybook.StudyBookCloudflare"
+          ],
+          "knownSuitePath": "scripts/StudyBookCloudflare.mjs"
+        }
+      ],
+      "ownership": [
+        {
+          "prefix": "scripts/StudyBookCloudflare.mjs",
+          "owner": "StudyBook",
+          "contractIds": [
+            "studybook.cloudflare-worker-requests-and-recovery"
+          ]
+        }
+      ],
+      "dependencies": [],
+      "coverageLimit": "No domain source paths mapped; no dependency edge inferred without repository-owned explicit proof."
+    },
+    {
+      "project": "StreamBV",
+      "repo": "Br174/streamflix-BV",
+      "ref": "main",
+      "sourceCommit": "efc1f246e8ad48bb64ea5285d5d51041518fcf7f",
+      "baselineCommit": "8478565be5327eaec97078da16af762cfb9133b6",
+      "contracts": [
+        {
+          "id": "streambv.release-signature-source-version-contract",
+          "priority": "P0",
+          "junitClasses": [
+            "streambv.StreamBVReleaseContracts"
+          ],
+          "knownSuitePath": "scripts/StreamBVReleaseContracts.mjs"
+        }
+      ],
+      "ownership": [
+        {
+          "prefix": "scripts/StreamBVReleaseContracts.mjs",
+          "owner": "StreamBV",
+          "contractIds": [
+            "streambv.release-signature-source-version-contract"
+          ]
+        }
+      ],
+      "dependencies": [],
+      "coverageLimit": "No domain source paths mapped; no dependency edge inferred without repository-owned explicit proof."
+    },
+    {
+      "project": "MotorAI",
+      "repo": "Br174/MotorAI",
+      "ref": "main",
+      "sourceCommit": "ccf8b839cfa3c65c1b5a77f0b3442617d28ee546",
+      "baselineCommit": "9da9ebb3946ca78c40c3789a5c945dc7630b9be2",
+      "contracts": [
+        {
+          "id": "motorai.native-curriculum-execution",
+          "priority": "P1",
+          "junitClasses": [
+            "motorai.MotorAINativeCurriculum"
+          ],
+          "knownSuitePath": "tools/MotorAINativeCurriculum.mjs"
+        }
+      ],
+      "ownership": [
+        {
+          "prefix": "tools/MotorAINativeCurriculum.mjs",
+          "owner": "MotorAI",
+          "contractIds": [
+            "motorai.native-curriculum-execution"
+          ]
+        }
+      ],
+      "dependencies": [],
+      "coverageLimit": "No domain source paths mapped; no dependency edge inferred without repository-owned explicit proof."
+    },
+    {
+      "project": "GeoVision",
+      "repo": "Br174/GeoVision-Test",
+      "ref": "main",
+      "sourceCommit": "1c5b3645e08a15bdb449e73da5c266fe2321766d",
+      "baselineCommit": "c637a1f8c6561ad10d923e0ae3d5f9325498db02",
+      "contracts": [
+        {
+          "id": "geovision.navigation-geocoding-ai-static-contracts",
+          "priority": "P1",
+          "junitClasses": [
+            "geo.GeovisionStatic"
+          ],
+          "knownSuitePath": "scripts/GeovisionStatic.mjs"
+        }
+      ],
+      "ownership": [
+        {
+          "prefix": "scripts/GeovisionStatic.mjs",
+          "owner": "GeoVision",
+          "contractIds": [
+            "geovision.navigation-geocoding-ai-static-contracts"
+          ]
+        }
+      ],
+      "dependencies": [],
+      "coverageLimit": "No domain source paths mapped; no dependency edge inferred without repository-owned explicit proof."
+    }
+  ]
+}
