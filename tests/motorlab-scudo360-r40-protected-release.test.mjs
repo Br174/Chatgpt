@@ -8,8 +8,10 @@ const capsule=read('MOTORLAB_BOOT_CAPSULE_V1.txt');
 const bundle=read('MOTORLAB_SATELLITE_BUNDLE_V1.txt');
 const contract=read('MOTORLAB_SCUDO360_QUALITY_R40_V1.txt');
 const pilot=read('checkpoints/MOTORLAB_SCUDO360_R40_SIX_PROJECT_PILOT_20261029.txt');
+const nativeClosure=read('checkpoints/MOTORLAB_SCUDO360_R40_NATIVE_ENFORCEMENT_PROGRESS_20261029.txt');
+const nativeComplete=/^R40_NATIVE_MAIN_WORKFLOW_ENFORCEMENT=VERIFIED_SIX_OF_SIX_ACTIVE_NATIVE_PIPELINES$/m.test(manifest);
 
-test('r40 activation must pin the same canonical release without claiming 6/6 before fanout',()=>{
+test('r40 activation requires verified release and native evidence before claiming six deployments',()=>{
  assert.match(manifest,/^CURRENT_RELEASE=2026\.10\.29-r40$/m);
  assert.match(capsule,/^RELEASE=2026\.10\.29-r40$/m);
  assert.match(bundle,/^RELEASE=2026\.10\.29-r40$/m);
@@ -18,7 +20,12 @@ test('r40 activation must pin the same canonical release without claiming 6/6 be
  assert.match(manifest,/^FANOUT_STATE=COMPLETE$/m);
  assert.match(manifest,/^FANOUT_MAIN_VERIFIED=6\/6$/m);
  assert.match(state,/^R40_GLOBAL_STATE=COMPLETE_CONTROL_PLANE_6_OF_6_PLUS_2_ACTIVE_NATIVE_ENFORCEMENT_PENDING$/m);
- assert.match(manifest,/^R40_FANOUT_COMPLETE=YES_CONTROL_PLANE_MAIN6_ACTIVE2_NATIVES_PENDING$/m);
+ if(nativeComplete){
+  assert.match(manifest,/^R40_FANOUT_COMPLETE=YES_CONTROL_PLANE_MAIN6_ACTIVE2_NATIVE_WORKFLOWS6_VERIFIED$/m);
+  assert.match(manifest,/^R40_NATIVE_QUALITY_AUTOMATIC_ENFORCEMENT=VERIFIED_SIX_OF_SIX_NATIVES$/m);
+  assert.match(nativeClosure,/^PERMANENT_NATIVE_COMPLETIONS=6_OF_6_NATIVE_WORKFLOWS_VERIFIED$/m);
+  assert.match(nativeClosure,/^R40_SIX_NATIVE_PIPELINES_COMPLETE=true$/m);
+ }else assert.match(manifest,/^R40_FANOUT_COMPLETE=YES_CONTROL_PLANE_MAIN6_ACTIVE2_NATIVES_PENDING$/m);
  assert.ok(Buffer.byteLength(capsule,'utf8')<4000);
 });
 test('r40 exact six main and two live Android control family readbacks are mandatory',()=>{
@@ -39,9 +46,17 @@ test('r40 has original r39 safety requirements with one existing conflict owner'
  assert.match(manifest,/^R40_NO_APP_OR_APK_CHANGE=required$/m);
  assert.match(state,/^R40_EXCLUDED_DORMANT=Br174\/Cover-Lab-AI$/m);
 });
-test('six CI pilot receipts do not substitute for project native adoption or phone tests',()=>{
+test('six pilot receipts never substitute for proven native workflow adoption or phone tests',()=>{
  assert.match(pilot,/^R40_NATIVE_CI_BEFORE_AFTER_VERIFIED=6_OF_6$/m);
  assert.match(pilot,/^R40_ALL_DEVICES_LIVE_ACCEPTANCE=NOT_VERIFIED$/m);
- assert.match(manifest,/^R40_NATIVE_MAIN_WORKFLOW_ENFORCEMENT=PENDING_EXACT_PROOF$/m);
+ if(nativeComplete){
+  assert.match(nativeClosure,/^R40_GLOBAL_NATIVE_GATING_COMPLETION=6\/6_WITH_PROTECTED_MERGES_AND_REAL_GEO_APK_BUILD$/m);
+  assert.match(nativeClosure,/^R40_GEO_APK_PROTECTED_MERGE=1c5b3645e08a15bdb449e73da5c266fe2321766d$/m);
+  assert.match(nativeClosure,/^R40_GEO_APK_REAL_NATIVE_ACTION_RUN=https:\/\/github.com\/Br174\/GeoVision-Test\/actions\/runs\/40979268250$/m);
+  assert.match(nativeClosure,/^R40_GEO_NATIVE_TESTS=50_TESTS_ZERO_FAILURES_ZERO_ERRORS_ZERO_SKIPS$/m);
+  assert.match(nativeClosure,/^R40_GEO_R39_AND_R40_GATE_STEPS=SUCCESS_EXACT_SHA_1c5b3645e08a15bdb449e73da5c266fe2321766d$/m);
+  assert.match(nativeClosure,/^R40_GEO_APK_BUILD_SIGNING_AND_UPLOAD=SUCCESS$/m);
+  assert.match(nativeClosure,/^R40_APP_RUN_TIME_AND_DEVICE_ACCEPTANCE=NOT_CERTIFIED_BY_CI$/m);
+ }else assert.match(manifest,/^R40_NATIVE_MAIN_WORKFLOW_ENFORCEMENT=PENDING_EXACT_PROOF$/m);
  assert.match(manifest,/^R40_DEVICE_ACCEPTANCE=NOT_VERIFIED$/m);
 });
