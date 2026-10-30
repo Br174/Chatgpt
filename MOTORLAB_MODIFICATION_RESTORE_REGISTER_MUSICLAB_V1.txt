@@ -3,8 +3,8 @@ PROJECT=MusicLab
 REPOSITORY=Br174/MusicLab
 REGISTER_STATUS=ACTIVE_CONFIRMED_ONLY
 DISPLAY_NAME=Registro Modifiche e Ripristini
-NEXT_RESTORE_NO=2
-VISIBLE_SLOTS=1
+NEXT_RESTORE_NO=3
+VISIBLE_SLOTS=2
 
 RESTORE SLOT
 RESTORE_NO=1
@@ -28,6 +28,28 @@ HISTORICAL_REFERENCE_SHA=6900614a785b7b21f7fa9725837ade447a0407c8
 RESTORE_SCOPE_HINTS=Quando Bruno chiede "Player buono", ripristinare selettivamente la fast-first lane LAB41 sul baseline corrente compatibile. Non sostituire l'intera app con LAB07/LAB41 e non sovrascrivere Cover, Originali, Archivio, MADRE o CANDIDATA.
 STATUS=ACTIVE_CONFIRMED_MOTHER
 
+RESTORE SLOT
+RESTORE_NO=2
+FEATURE_KEY=cover_quality_progressive
+TITLE=Ricerca Cover buona R17
+ALIASES=cover buone,ricerca cover funzionante,qualita progressiva,sblocco cover,senza tre evidenze,senza due evidenze,MusicLab R17,CANDIDATA 02
+BEHAVIOR_SUMMARY=La ricerca Cover funziona secondo la conferma Android di Bruno del 30 ottobre 2026. Non esistono piu soglie numeriche di 3/2 prove per l'ingresso; metadati e fonti ordinano le migliori, con vincoli per titoli errati, adattamenti stranieri documentati, karaoke/MIDI/KAR e duplicati. Prima tornata favorisce originali e registrazioni professionali, senza bloccare le altre. La coda evita che troppi lead privi di video sottraggano il turno alle cover pronte.
+BRUNO_CONFIRMED_STATUS=WORKING_APPROVED_FOR_RESTORE_AND_CANDIDATE_SOURCE
+BRUNO_CONFIRMED_DATE=2026-10-30
+PROJECT_LIFECYCLE_ID=CANDIDATA_02_SOURCE_ONLY
+CURRENT_CHANGE_ID=musiclab-20261030-r17-quality-progressive-candidate02
+SOURCE_REF=lab/musiclab-turbo-r17-quality-progressive-20261030
+SOURCE_SHA=82970f87442ac14035533f48b31043fcaefc305a
+CANDIDATE_SOURCE_REF=candidate/musiclab-turbo-r17-quality-progressive-c02-20261030
+CANDIDATE_SOURCE_SHA=fd5ab051d86f8b6aa13bfed6379d7b6071ca12d3
+CANDIDATE_TREE_SHA=a148f8140e0fab0ae492c155690a5b3d3dbfc9c3
+APPROVED_LAB_ANDROID_VERSION_CODE=33090
+APPROVED_LAB_CI_RUN=41082239928
+MOTHER_SOURCE_REF=mother/musiclab-turbo-lab46-33048-verified-20261024
+MOTHER_SOURCE_SHA=57d1967bf90f09a7d881f73c447b210e0386c547
+RESTORE_SCOPE_HINTS=Riutilizzare il metodo cover sbloccato da R17, non reintrodurre 3 o 2 evidenze obbligatorie. I futuri aggiustamenti devono stare in una LAB separata; CANDIDATA 02 immutabile e la MADRE precedente protetta.
+STATUS=ACTIVE_CONFIRMED_CANDIDATE_SOURCE
+
 RULES
 - Only Bruno-confirmed working modifications explicitly approved for conservation enter this visible register.
 - Technical history remains in Git/MOTORLAB_CHANGE_REGISTRY_MUSICLAB_V1.txt.
@@ -35,7 +57,7 @@ RULES
 - One feature family keeps one plain integer number; later confirmed working Player implementations update RESTORE_NO=1 rather than creating another visible Player entry.
 - Failed/unconfirmed restore attempts do not change this slot.
 
-VERSION=MOTORLAB-MUSICLAB-MODIFICATION-RESTORE-REGISTER-V1.6
+VERSION=MOTORLAB-MUSICLAB-MODIFICATION-RESTORE-REGISTER-V1.7
 REVISION=1.1 first visible confirmed slot: Player from device-accepted LAB19 CANDIDATA.
 REVISION=1.2 Bruno explicitly promoted the tested LAB19 CANDIDATA to MADRE mother/musiclab-lab19-final at identical source SHA.
 
@@ -43,3 +65,4 @@ REVISION=1.3 Bruno ha testato CANDIDATA LAB25 e l'ha promossa a MADRE; RESTORE_N
 REVISION=1.4 Bruno ha registrato esplicitamente il player LAB41 come "Player buono"; RESTORE_NO=1 ora punta alla fast-first lane LAB41 senza promozione automatica a MADRE.
 REVISION=1.5 LAB41 "Player buono" promossa a CANDIDATA candidate/musiclab-lab41-player-buono con SHA identico; MADRE invariata.
 REVISION=1.6 CANDIDATA LAB41 "Player buono" promossa a MADRE mother/musiclab-lab41-final con SHA identico; questa è la baseline MADRE ufficiale corrente.
+REVISION=1.7 R17 Cover Quality Progressive confirmed on Android, CANDIDATA 02 exact-tree source, separate Candidate Android package not yet materialized.

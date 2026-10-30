@@ -1813,3 +1813,33 @@ PREVIOUS_RECORD_DISPOSITION=ARCHIVED_HISTORICAL_NOT_DEFAULT_ROUTING
 CONTINUITY_ROUTING=MOTORLAB_ACTIVE_FAMILY_ROUTING_R39.txt
 
 ACTIVE_POINTER_POLICY=Live GitHub refs/heads/motorlab/active-musiclab-turbo advances on signed Scudo APK ZIP proof using safe nonforced Git ref push. Source SHA reconciliation required each new chat. Historical MusicLab and old generic main never default source. Tested live successful run 40919743345.
+
+MUSICLAB_TURBO_R17_CANDIDATA_02_20261030
+AUTHORITY=Bruno confirmed on actual Android phone on 2026-10-30 that R17 Cover search works and priority is acceptable; explicitly requested to mark that exact version CANDIDATA before future refinements.
+LIFECYCLE_STAGE=CANDIDATA_02_SOURCE_REPLAY_VERIFIED
+ORIGIN_MADRE_REF=mother/musiclab-turbo-lab46-33048-verified-20261024
+ORIGIN_MADRE_SHA=57d1967bf90f09a7d881f73c447b210e0386c547
+USER_APPROVED_LAB_REF=lab/musiclab-turbo-r17-quality-progressive-20261030
+USER_APPROVED_LAB_SHA=82970f87442ac14035533f48b31043fcaefc305a
+USER_APPROVED_LAB_DISPLAY=MusicLab Turbo LAB79 Revisione 17 Qualita Progressiva
+USER_APPROVED_LAB_ANDROID_PACKAGE=it.verlezza.musiclab.turbo01
+USER_APPROVED_LAB_VERSION_CODE=33090
+USER_APPROVED_LAB_SIGN_CERT_SHA256=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
+USER_APPROVED_LAB_BUILD_RUN=41082239928
+USER_APPROVED_LAB_ARTIFACT_ID=12989784057
+USER_APPROVED_LAB_APK_SHA256=efcca95ea2f56affd64ca084a1adcefff685e7ff81c3035531adbc123c7e230b
+USER_APPROVED_LAB_ZIP_SHA256=bd03b428be8801544d8cd89713844a02636a512761b471c51155b90e0b308701
+SCUDO360_JVM_AND_R40=PASS
+ACTUAL_PHONE_ACCEPTANCE=Bruno confirmed results entering, better first priority, adequate for now.
+PROVEN_BEHAVIOR=No 3/2 evidence admission threshold; candidates admitted on work-title/foreign documented identity, sources determine rank, karaoke/MIDI/KAR and duplicate protections preserved.
+CANDIDATE_REF=candidate/musiclab-turbo-r17-quality-progressive-c02-20261030
+CANDIDATE_SOURCE_SHA=fd5ab051d86f8b6aa13bfed6379d7b6071ca12d3
+CANDIDATE_SOURCE_TREE_SHA=a148f8140e0fab0ae492c155690a5b3d3dbfc9c3
+APPROVED_LAB_SOURCE_TREE_SHA=a148f8140e0fab0ae492c155690a5b3d3dbfc9c3
+CANDIDATE_EXACT_REPLAY_FROM_ORIGIN_MADRE=YES_NEW_COMMIT_WITH_IDENTICAL_APPROVED_LAB_SOURCE_TREE
+CANDIDATE_REF_POLICY=IMMUTABLE_DO_NOT_COMMIT_FIXES_ON_CANDIDATE
+CANDIDATE_ANDROID_NEW_FAMILY_BINARY=NOT_MATERIALIZED; NO CLAIM_OF_SEPARATE_SIGNED_CANDIDATE_APK
+MOTHER_PROMOTION=NOT_APPROVED
+UNMODIFIED=Br174/MusicLab main, current MADRE, R17 tested APK, audio/player/graphics, production
+FUTURE_MODIFICATIONS=New isolated LAB based on exact verified R17 functional content, not direct candidate edits; after acceptance create a new candidate number.
+NEXT_SIGNING_GATE=If standalone Candidate Android package is required, create distinct compatible package/signing family without changing Turbo logic, then run full Scudo360 and phone test before stating full Android candidate readiness.
