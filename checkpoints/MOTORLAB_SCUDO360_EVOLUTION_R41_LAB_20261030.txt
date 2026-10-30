@@ -1,0 +1,61 @@
+MOTORLAB SCUDO 360 EVOLUTION r41 — ISOLATED LAB CHANGE CAPSULE
+DATE=2026-10-30
+STATUS=LAB_ONLY_NOT_RELEASED
+BASE_RELEASE=2026.10.29-r40
+SOURCE_BRANCH=motorlab/scudo360-evolution-r41-isolated-lab-20261030
+OWNER=existing_Change_Compatibility_Guard_and_Behavior_Memory
+AUTHORITATIVE_RELEASE_UNCHANGED=true
+NO_APP_OR_APK_SOURCE_CHANGED=true
+NO_NEW_PAID_SERVICES=true
+NO_SECOND_RUNNER_OR_ORCHESTRATOR=true
+NO_PRODUCTION_CI_GATES_CHANGED=true
+REAL_ANDROID_DEVICE_ACCEPTANCE=NOT_PROVEN
+R41_RELEASE_PROMOTION=PROHIBITED_BEFORE_NATIVE_PARITY_AND_PERFORMANCE_PROOF
+
+APPROVED CHANGE AND OLD -> NEW OWNERSHIP MAP
+r40 exact source/JUnit quality assessor -> UNCHANGED; new r41 is a complementary
+  pure read-only analyzer, not its replacement, return code or authority.
+Existing Change Compatibility Guard -> UNCHANGED, single owner of conflicting
+  rules, ownership arbitration, protected approval and final promotion.
+Existing Behavior Memory -> UNCHANGED, single owner of active/retired contracts;
+  r41 can READ only its validated versioned behavior registry.
+Existing Root Cause Closure -> UNCHANGED, single owner of executed repairs;
+  r41 can SUGGEST previously verified Git fixes, never apply them.
+Existing Watchdog / Continuity -> UNCHANGED; no new runtime polling or scheduler.
+Existing r39 and r40 project-native workflows -> UNCHANGED on main and active
+  Android refs; no extra Gradle/JUnit execution, build step or signing step.
+Existing APK/cert/version and paid services -> UNCHANGED.
+
+THREE APPROVED EXTENSIONS
+1. PREVENTION: use explicit path->owner->contract mapping (longest path
+   owner only) and declared dependency edges. Unknown paths, ambiguous
+   owners, untested P0/P1 descendants BLOCK. No guessed connections.
+   Protected behavior warns that existing guard approval is mandatory.
+2. DIAGNOSIS: explain missing class evidence; use verified historical
+   incident commit IDs only as reviewable repair suggestions. LAB patch
+   proposal only, never automatic code mutation, merge or promotion.
+3. EVIDENCE: fingerprint only current exact SHA plus request/JUnit mapping;
+   cache NEVER authorizes skipping any r39/r40 mandatory tests. Artifact
+   fields may be source-linked but never substitute for APK installation,
+   player/provider acceptance, real device telemetry or cryptographic
+   independent validation. Unknown evidence means PENDING/BLOCKED.
+
+SPEED INVARIANT
+The production critical path remains exactly r40 because this LAB adds NO
+production workflow/adapter changes. Advisory r41 evaluation is independently
+measured and initially shadow-only. No zero-overhead universal claim is made.
+For later promotion, 7+ comparable paired real samples on the same runner
+and workload must demonstrate non-increase in BOTH median and p95 duration,
+plus preserve all P0/P1 checks, APK signing and negative tests. Without such
+evidence r41 remains LAB_ANALYSIS_ONLY, not a green release.
+The sample timing values inside unit tests are SYNTHETIC NEGATIVE-FIXTURES,
+not real performance proof. A native end-to-end before/after comparison and
+fanout safe-boundary verification would still be separately required.
+
+TEST / SECURITY REQUIREMENTS
+- negative false-green, missing-owner, dependency, stale-SHA and malformed
+  paths, protected behavior, verified history, artifact/device, slow p95.
+- no dynamic network, APIs, new external workers, database, secrets or keys.
+- bounded diagnostics and incident history, linear contract graph traversal.
+- if checker has an internal error, do not certify or promote.
+- r40 release continues for all six active native project workflows.
