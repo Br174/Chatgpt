@@ -1,0 +1,57 @@
+name: MotorLab Scudo360 r41 actual-runner isolated shadow timing LAB
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'checkpoints/scudo360-r41-shadow-native-inventory-20261030.json'
+      - 'checkpoints/MOTORLAB_SCUDO360_R41_SHADOW_PHASE2_20261030.txt'
+      - 'templates/regression/scudo360-r41-shadow-perf.mjs'
+      - 'tests/motorlab-scudo360-r41-shadow-native-inventory.test.mjs'
+      - '.github/workflows/motorlab-scudo360-r41-shadow-perf-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ensure only shadow LAB files added, never native r40 critical path
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            git fetch origin main
+            git diff --name-only origin/main...HEAD >/tmp/r41-shadow-paths
+            cat /tmp/r41-shadow-paths
+            if grep -Ev '^(checkpoints/scudo360-r41-shadow-native-inventory-20261030\.json|checkpoints/MOTORLAB_SCUDO360_R41_SHADOW_PHASE2_20261030\.txt|templates/regression/scudo360-r41-shadow-perf\.mjs|tests/motorlab-scudo360-r41-shadow-native-inventory\.test\.mjs|\.github/workflows/motorlab-scudo360-r41-shadow-perf-lab\.yml)$' /tmp/r41-shadow-paths; then
+              echo R41_NATIVE_SCOPE_CHANGE_BLOCKED
+              exit 1
+            fi
+          fi
+          echo R40_SIX_NATIVE_WORKFLOWS_UNCHANGED
+      - name: Validate pinned native test ownership and r41 negative behavior
+        run: node --test tests/motorlab-scudo360-r41-shadow-native-inventory.test.mjs tests/motorlab-scudo360-evolution-r41.test.mjs
+      - name: Profile 11 actual same-runner paired JS probes, shadow outside mandatory window
+        run: node templates/regression/scudo360-r41-shadow-perf.mjs
+      - name: Confirm r40 stays current and no r41 native promotion is claimed
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const release=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
+          if(!/^CURRENT_RELEASE=2026\.10\.29-r40$/m.test(release))throw Error('R40_MUST_REMAIN_ACTIVE');
+          const p=JSON.parse(fs.readFileSync('.motorlab/scudo360-r41-shadow-perf.json','utf8'));
+          if(p.pairs<7||p.projectCount!==6||p.nativeEndToEndPerformanceCertified!==false||
+              p.promotionEligible!==false||p.newNativeRunner!==false)
+            throw Error('R41_SHADOW_MUST_NOT_CERTIFY_NATIVE');
+          console.log('R41_NATIVE_PROMOTION_REMAINS_PENDING_REAL_7_PAIR_WORKFLOW_LATENCY');
+          NODE
