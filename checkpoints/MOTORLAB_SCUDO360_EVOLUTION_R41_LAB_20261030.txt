@@ -59,3 +59,8 @@ TEST / SECURITY REQUIREMENTS
 - bounded diagnostics and incident history, linear contract graph traversal.
 - if checker has an internal error, do not certify or promote.
 - r40 release continues for all six active native project workflows.
+
+R41_WORKFLOW_YAML_LIGHT_PREFLIGHT=CHANGED_WORKFLOWS_REQUIRE_SOURCE_AND_CATCH_INLINE_RUN_DANGLING_INDENT
+R41_YAML_LIGHT_PREFLIGHT_IS_NOT_FULL_YAML_PARSER=true
+R41_YAML_SOURCE_SCOPE=ONLY_CHANGED_WORKFLOW_FILES
+R41_NEGATIVE_TESTS=20_TARGET
