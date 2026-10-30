@@ -1,0 +1,48 @@
+MOTORLAB MUSICLAB TURBO R20 SIGNED CHECKPOINT
+
+MUSICLAB_TURBO_R20_PLAYER_SPRINT_SIGNED_20261030
+PROJECT=Br174/MusicLab
+REASON=User reported R19 Cover great, but audio stalls, slow first sound, pauses and slow swipe; authorized R20 Sprint.
+SOURCE_BASE_R19=29377409743ec73cfdcd91e31ad7ec6d804931c5
+SOURCE_R20_REF=lab/musiclab-turbo-r20-player-sprint-20261030
+SOURCE_R20_SHA=b43196ec3bfdf42e0fd3eb4eb699c9e90833e611
+SOURCE_SAFETY_REF=safety-source/musiclab-turbo-lab79-r20-player-sprint-20261030
+SOURCE_SAFETY_SHA=b43196ec3bfdf42e0fd3eb4eb699c9e90833e611
+CI_RUN_ID=41124628160
+CI_URL=https://github.com/Br174/MusicLab/actions/runs/41124628160
+CI_STATUS=completed/success
+SCUDO360=FULL_JVM_AND_QUALITY_R40_PASSED
+SIGNED_ANDROID_APPLICATION_ID=it.verlezza.musiclab.turbo01
+SIGNED_ANDROID_VERSION_CODE=33093
+SIGNED_CERT_SHA256=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
+ARTIFACT_ID=13010756785
+APK_SHA256=c550d233a9f75b1e95eb3ec830dc99b01c837619f526c810d7714736f3f1c7b0
+ZIP_SHA256=171249a43be46035235c626aece1511f119d831c51a031e03981fd460f44f3f5
+OUTER_ARTIFACT_SHA256=e2ed254c6f42828ac254fa3a776d3e317a24b951fe8b513243f1c8e5b1bb3b2d
+R20_AUDIO_FOCUS=StreamUrlCache valid hit before Room DB stream metadata; strict buffered background Cover pause; next-track smart prewarm scheduled after READY and then waits to reach 30s regular or 40s with active Cover before fetching 384KB only one already queued track; no additional Cover or Youtube background audio probing.
+FILES_CHANGED=MusicService.kt,DiscogsDirectVersionBrowser.kt,PlaybackSprintPolicy.kt,PlaybackSprintPolicyTest.kt,turbo-lab49-audio-stability-contract.test.mjs,turbo-r20-player-sprint.test.mjs,R20 scope/environment/workflow.
+TEST_GUARD=R19 cover search, admission, 6 rounds/10+20+20, source order and filters unchanged; R17 CANDIDATA02 immutable.
+DEVICE_ACCEPTANCE=PENDING_BRUNO_R20_ANDROID_TEST
+MADRE_MAIN_PRODUCTION=UNTOUCHED
+ACTIVE_FAMILY_POINTER=motorlab/active-musiclab-turbo=581a1a41916f84670e9f0f0fccb9406172ca4af8 (unchanged, pending device proof).
+CI_REUSE_PATH=MOTORLAB_MUSICLAB_TURBO_R19_VERIFIED_CI_PATH_20261030.txt
+NO_AUTOPROMOTION=R20 stays LAB until Bruno tests phone.
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261030-r20-player-sprint-success
+DATE=2026-10-30
+TITLE=MusicLab R20 Player Sprint safe prewarm and cached stream startup
+APPROVAL=Bruno explicitly approved R20 Player Sprint after pre-change report.
+BASE_R19_SHA=29377409743ec73cfdcd91e31ad7ec6d804931c5
+RESULT_REF=lab/musiclab-turbo-r20-player-sprint-20261030
+RESULT_SHA=b43196ec3bfdf42e0fd3eb4eb699c9e90833e611
+CI_RUN=41124628160
+CI_CONCLUSION=SUCCESS
+SCUDO360_R40_AND_JVM=PASS
+SIGNED_ANDROID_CODE=33093
+APK_SHA256=c550d233a9f75b1e95eb3ec830dc99b01c837619f526c810d7714736f3f1c7b0
+ZIP_SHA256=171249a43be46035235c626aece1511f119d831c51a031e03981fd460f44f3f5
+CHANGE_SCOPE=Player only: valid in-memory URL before DB fetch; safe 30s/40s prewarm only after stable actual playback; Cover heavy work paused until player buffer recovered.
+PROTECTED=R19 cover source priority, R18 filter state, R17 quality-progressive admission, MADRE/main/production, CANDIDATA02.
+SAFETY_REF=safety-source/musiclab-turbo-lab79-r20-player-sprint-20261030
+DEVICE_ACCEPTANCE=PENDING
