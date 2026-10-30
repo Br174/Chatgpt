@@ -1060,3 +1060,23 @@ DESCRIPTION=Soft source priority only COVER.INFO and catalogue first, MusicLab a
 CI_RUNBOOK=MOTORLAB_MUSICLAB_TURBO_R19_VERIFIED_CI_PATH_20261030.txt
 DEVICE_ACCEPTANCE=PENDING_BRUNO
 MOTHER_MAIN_CANDIDATA02=UNTOUCHED
+
+CHANGE RECORD
+CHANGE_ID=musiclab-20261030-r20-player-sprint-success
+DATE=2026-10-30
+TITLE=MusicLab R20 Player Sprint safe prewarm and cached stream startup
+APPROVAL=Bruno explicitly approved R20 Player Sprint after pre-change report.
+BASE_R19_SHA=29377409743ec73cfdcd91e31ad7ec6d804931c5
+RESULT_REF=lab/musiclab-turbo-r20-player-sprint-20261030
+RESULT_SHA=b43196ec3bfdf42e0fd3eb4eb699c9e90833e611
+CI_RUN=41124628160
+CI_CONCLUSION=SUCCESS
+SCUDO360_R40_AND_JVM=PASS
+SIGNED_ANDROID_CODE=33093
+APK_SHA256=c550d233a9f75b1e95eb3ec830dc99b01c837619f526c810d7714736f3f1c7b0
+ZIP_SHA256=171249a43be46035235c626aece1511f119d831c51a031e03981fd460f44f3f5
+CHANGE_SCOPE=Player only: valid in-memory URL before DB fetch; safe 30s/40s prewarm only after stable actual playback; Cover heavy work paused until player buffer recovered.
+PROTECTED=R19 cover source priority, R18 filter state, R17 quality-progressive admission, MADRE/main/production, CANDIDATA02.
+SAFETY_REF=safety-source/musiclab-turbo-lab79-r20-player-sprint-20261030
+DEVICE_ACCEPTANCE=PENDING
+
