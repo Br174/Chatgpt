@@ -1,0 +1,52 @@
+name: MotorLab Scudo360 Evolution r41 isolated lightweight LAB
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'templates/regression/scudo360-evolution-r41.mjs'
+      - 'tests/motorlab-scudo360-evolution-r41.test.mjs'
+      - 'checkpoints/MOTORLAB_SCUDO360_EVOLUTION_R41_LAB_20261030.txt'
+      - '.github/workflows/motorlab-scudo360-r41-evolution-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  advisory-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Block any r40 critical path, APK, contract or release edits in r41 LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            git fetch origin main
+            git diff --name-only "origin/main...HEAD" > /tmp/scudo-r41-changed-paths
+            cat /tmp/scudo-r41-changed-paths
+            if grep -Ev '^(templates/regression/scudo360-evolution-r41\.mjs|tests/motorlab-scudo360-evolution-r41\.test\.mjs|checkpoints/MOTORLAB_SCUDO360_EVOLUTION_R41_LAB_20261030\.txt|\.github/workflows/motorlab-scudo360-r41-evolution-lab\.yml)$' /tmp/scudo-r41-changed-paths; then
+              echo 'R41_SCOPE_VIOLATION_BLOCKED'
+              exit 1
+            fi
+          fi
+          echo 'R41_R40_MANDATORY_CRITICAL_PATH_UNCHANGED'
+      - name: Run r41 negative/advisory proofs (no Gradle, no native runner duplication)
+        run: node --test tests/motorlab-scudo360-evolution-r41.test.mjs
+      - name: Confirm r40 main release remains active, r41 remains LAB-only
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const release=fs.readFileSync('MOTORLAB_RELEASE_MANIFEST_V1.txt','utf8');
+          const capsule=fs.readFileSync('checkpoints/MOTORLAB_SCUDO360_EVOLUTION_R41_LAB_20261030.txt','utf8');
+          if(!/^CURRENT_RELEASE=2026\.10\.29-r40$/m.test(release))throw Error('R40_RELEASE_CHANGED');
+          if(!/^R41_RELEASE_PROMOTION=PROHIBITED_BEFORE_NATIVE_PARITY_AND_PERFORMANCE_PROOF$/m.test(capsule))throw Error('UNAPPROVED_R41_ACTIVATION');
+          console.log('R41_LAB_ONLY_R40_SAFE');
+          NODE
