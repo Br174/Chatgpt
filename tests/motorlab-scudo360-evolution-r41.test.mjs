@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {assessQualityR40} from '../templates/regression/scudo360-quality-r40.mjs';
-import {assessEvolutionR41} from '../templates/regression/scudo360-evolution-r41.mjs';
+import {assessEvolutionR41,inspectWorkflowRunBlocks} from '../templates/regression/scudo360-evolution-r41.mjs';
 
 const A='a'.repeat(40), B='b'.repeat(40), C='c'.repeat(40);
 const manifest={
@@ -147,4 +147,37 @@ test('malformed or empty inputs remain blocked with bounded diagnostics',()=>{
  assert.equal(x.status,'BLOCKED');
  assert.ok(x.errors.length>2);
  assert.ok(x.diagnostics.length<=30);
+});
+
+test('r41 catches exact invalid YAML inline-run placement seen in MusicLab and Vision',()=>{
+ const bad=[
+  'steps:',
+  '  - name: Scudo r40',
+  "    run: node scudo360-quality-r40.mjs",
+  "      echo 'this belongs to preceding block'",
+  '  - name: Upload'
+ ].join('\n');
+ const issues=inspectWorkflowRunBlocks(bad);
+ assert.equal(issues.length,1);
+ assert.equal(issues[0].code,'WORKFLOW_SCALAR_RUN_HAS_DANGLING_CHILD');
+ assert.equal(issues[0].line,4);
+});
+test('r41 only inspects changed workflow and requires its source before certification',()=>{
+ const workflowPath='.github/workflows/build.yml';
+ const owner2=[...owner,{prefix:'.github/workflows',contractIds:['vision.filters.year']}];
+ const x=assessEvolutionR41({...args(),changedPaths:[workflowPath],ownership:owner2});
+ assert.equal(x.status,'BLOCKED');
+ assert.ok(x.errors.some(e=>e.code==='CHANGED_WORKFLOW_SOURCE_REQUIRED_FOR_PREFLIGHT'));
+ const repaired=assessEvolutionR41({...args(),changedPaths:[workflowPath],ownership:owner2,
+  workflowSources:{[workflowPath]:'steps:\n  - name: Run checks\n    run: |\n      echo valid\n  - name: Other\n    run: node valid.mjs\n'}});
+ assert.equal(repaired.status,'LAB_ANALYSIS_ONLY');
+ assert.ok(!repaired.errors.some(e=>e.code==='WORKFLOW_SCALAR_RUN_HAS_DANGLING_CHILD'));
+});
+test('r41 blocks suspicious workflow YAML but accepts true multiline shell',()=>{
+ const p='.github/workflows/build.yml';
+ const ownership2=[...owner,{prefix:'.github/workflows',contractIds:['vision.filters.year']}];
+ const source="steps:\n  - name: r40\n    run: node check.mjs\n      echo 'unexpected'\n";
+ const x=assessEvolutionR41({...args(),changedPaths:[p],ownership:ownership2,workflowSources:{[p]:source}});
+ assert.equal(x.status,'BLOCKED');
+ assert.ok(x.errors.some(e=>e.code==='WORKFLOW_SCALAR_RUN_HAS_DANGLING_CHILD'));
 });
