@@ -1,7 +1,7 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=MusicLab
 PROJECT_REPOSITORY=Br174/MusicLab
-STATE_REVISION=91
+STATE_REVISION=92
 STATE_STATUS=TURBO_R39_33119_COMPILATION_SEARCH_DEVICE_ACCEPTED
 RECONCILE_ON_BOOT=required
 CURRENT_LIVE_OVERRIDE_DATE=2026-11-02
@@ -57,6 +57,26 @@ R41_ANDROID_VERSION_CODE=33121
 R41_SIGNING_CERT_SHA256=9A2F67CFB3C199836813ADDBF7BDFB0FA65EDC765FFACE4B6DF9490BB0962749
 R41_SCOPE=Persisted local section UI/date/query/filter/results/scroll/selected item on major Hit Parade Cover Originali Compilation Charts Genres Search Library Album Playlist views; no audio trigger on restore; exact R39 Compilation search preserved
 R41_DEVICE_ACCEPTANCE=PENDING_BRUNO_SMARTPHONE_TEST
+
+R42_OPERATION_ID=musiclab-r42-player-seek-selection-sync-33122-20261102
+R42_STATUS=SCUDO360_PASSED_SIGNED_LAB_ARTIFACTS_VERIFIED_DEVICE_PENDING
+R42_BASE_R41_SHA=e022530e77159231130d1f373e7ca962d312e309
+R42_SOURCE_BRANCH=lab/musiclab-r42-player-seek-selection-sync-33122-20261102
+R42_SOURCE_SHA=7ffd106af1761a2a445ecf11c3ecb36c9df606bb
+R42_UPDATE_FAMILY=it.verlezza.musiclab.turbo01
+R42_VERSION_CODE=33122
+R42_SCUDO360=PASS_GITHUB_ACTIONS_ALL_33_STEPS
+R42_GITHUB_RUN=https://github.com/Br174/MusicLab/actions/runs/41505616076
+R42_ARTIFACT_ID=13172155106
+R42_ARTIFACT_OUTER_SHA256=64e860a0cd3437226304308202a479cd319401dac38c58dc2b63182d6c0ea34e
+R42_APK_SHA256=83700afc6e3bc2e8d92aa333bd835a603e527223dd00d35a9779807f73c6d058
+R42_INSTALL_ZIP_SHA256=964fe17543c4c6f12800bf358f14939e77fe5592f11f72eb89b33f7419df5dee
+R42_FIX=Delayed_music_restart_from_async_editorial_queue_hydration_now_synchronous; seek_bar_updates_when_buffering_and_preserves_manual_seek; selected_card_ranks_follow_next_previous_swipe_and_persist
+R42_PROTECTED=R39_original_Compilation_q_search_R41_durable_memory_Cover_sourcing_signing_and_stable_branches
+R42_NO_PROMOTION=YES_LAB_ONLY
+R42_DEVICE_ACCEPTANCE=PENDING_BRUNO_ANDROID_PLAYBACK_SEEK_SWIPE
+R42_NEXT_SAFE_STEP=Install 33122 LAB and test one song start (no 1-2 sec repeat), manual seek during initial loading, next/previous/swipe in Hit Parade/Classifiche/Compilation, old selections retained per-section after navigation; do not promote until device accepted
+
 R41_NEXT_SAFE_STEP=Test R41 LAB build 33121 on Android; user-confirm date/rank persistence across Hit Parade/Compilation/Cover, cold restart and playlist scroll; keep R39 as verified accepted baseline and R41 as isolated LAB pending device confirmation
 
 R39_RESTORED_R36_Q_SEARCH_PRESERVE=YES_CHANGE_ONLY_ON_EXPLICIT_USER_APPROVAL
