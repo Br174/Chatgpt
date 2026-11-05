@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=36
+STATE_REVISION=37
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab26-quality-guard-20261105
-OPERATION_STATUS=LAB26_SIGNED_ANDROID_ZIP_DELIVERED_WEB_UAB_SCUDO_QUALITY_GUARD_PASS_DEVICE_AND_ACADEMIC_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB26 Quality Guard implemented from LAB25 active verified source: coherent source-anchored full-sentence reduction, no arbitrary comma splits, legal/formula preservation, book-to-source chapter/paragraph/character audit, measured chapter and whole-book letters/words/sentences for 0-50%/Riassunto, source-grounded fact questions and in-chapter Vero/Falso fallback. Native Android LAB26 and UAB/Scudo/quality suite passed. University semantic certification and actual Android install remain unverified.
+ACTIVE_OPERATION_ID=studybook-lab27-simple-language-and-compact-letter-footer-20261105
+OPERATION_STATUS=LAB27_SIGNED_ANDROID_ZIP_AND_APK_AVAILABLE_WEB_UAB_SCUDO_LAB27_REGRESSION_PASS_REAL_DEVICE_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB27: In parole semplici now transforms only the language of the CURRENT selected 0/10/20/30/40/50/Riassunto edition (no extra summary, no recycled independent simpleSummary); legal citations/formulas preserved; long reduction statistics table removed; only one inline Originale/Rielaborato/Risparmiate letter count after each paragraph on phone, analogous compact per-sheet PDF footer (source allocation marked approx when a paragraph spans PDF sheets), book-cover three-number total; HTML print has per-paragraph counts. Original book untouched. QA tests passed on web and Android original signed family. Real device verification pending.
 CURRENT_REF=motorlab/active-studybook-ai
-CURRENT_HEAD_SHA=df4a9f65ea7e0a31a1a3e1407b863c27678fcb09
+CURRENT_HEAD_SHA=52927112260765ca1acf0f69a9c3d41268422228
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB26_UAB_42090182081_SUCCESS;LAB26_ANDROID_42090182563_SUCCESS;QUALITY_WEB_42090037212_SUCCESS
-JOB_STATUS=LAB26 GitHub web+UAB SUCCESS; Android workflow SUCCESS with original Android signing key verified, packageId/versionCode/cert SHA verified, signed APK and downloadable ZIP created. Build artifact ID 13444648432, source df4a9f65. User's device and content test pending.
+JOB_ID=LAB27_UAB_42093651362_SUCCESS;LAB27_ANDROID_42093651425_SUCCESS;LAB27_QUALITY_TEST_PASS
+JOB_STATUS=UAB and all LAB27 tests successful. Signed Android workflow successful, original signing certificate, package identity and versionCode verified, Scudo360 PASS, artifact uploaded ID 13444924977. Real phone acceptance and PDF visual inspection on user document pending.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB26 signed Android APK 0.3.65 code 2026100065 package it.studybook.ai.lab cert D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC AndroidRun=42090182563 source=df4a9f65ea7e0a31a1a3e1407b863c27678fcb09 APK_SHA256=a9afd49aa736e306becd8019e6baf62f619c980dccf2a1f3ce97ac939036bf11 ZIP_REPACK_SHA256=40023cb3634ecdba7d063f9d8ca421e6c86f7274f1fbadfdedf52d2fd2e8b682.
-NEXT_SAFE_STEP=Install LAB26 in place without uninstall. On actual Android phone compare source pages to 50% summary, 0-50/Riassunto counters and chapter endings for legal/technical textbooks. Verify quiz for single chapter, Kelsen/norma primaria examples, PDF parity. If inaccurate, new isolated LAB27 fixes; preserve LAB25 pre-quality safety branch, no automatic mother/candidate promotion.
-PENDING_VERIFICATION=Real Android installation/user acceptance, qualitative legal textbook testing for coherent deep reasoning/fidelity at 50%, accurate chapter segmentation and OCR against full physical book, printed PDF comparison, accessible-language fallback accuracy, any edge case where 50% target not met because protected units exceed budget. Not 100% certified.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB26-AGGIORNAMENTO.apk SHA256=a9afd49aa736e306becd8019e6baf62f619c980dccf2a1f3ce97ac939036bf11 versionName=0.3.65 versionCode=2026100065 AndroidRun=42090182563 artifactId=13444648432 sourceSHA=df4a9f65ea7e0a31a1a3e1407b863c27678fcb09
+LAST_COMPLETED_MATERIAL_STEP=LAB27 Android 0.3.76 versionCode 2026100076 package it.studybook.ai.lab cert D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC AndroidRun=42093651425 source=52927112260765ca1acf0f69a9c3d41268422228 APK_SHA256=d2f5cc8ec4dcb7b22217edf9eb8cb9f2478916abe094ca94d71d5d7a1bf9a823 ZIP_SHA256=13a53ce432c7bd0824dd8739016cd25d1f4f3ed5dd219f1f5c073b3b60729fd7.
+NEXT_SAFE_STEP=Install signed LAB27 0.3.76 without uninstalling. Compare 40%-50% study/simple passages: same selected claims/structure without additional omissions, simplified lexicon. Confirm compact three-number counts after EACH paragraph and PDF printed-page footer, original law/formula unchanged. Screen and PDF may differ in letter counts because PDF page has proportional original allocation for multipage paragraphs, explicitly shown approximate. Check that 50% still approaches target; if 50% 0% due fail-closed, diagnose on real source and implement follow-up LAB.
+PENDING_VERIFICATION=Real Android install, factual fidelity of simplified legal prose, explanatory depth for nonexperts with no external Gemini key, per-paragraph PDF print layout and physical pagination on user manual, high-compression 50% actual result; no universal 100% semantic correctness guarantee.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB27-AGGIORNAMENTO.apk SHA256=d2f5cc8ec4dcb7b22217edf9eb8cb9f2478916abe094ca94d71d5d7a1bf9a823 versionName=0.3.76 versionCode=2026100076 AndroidRun=42093651425 artifactId=13444924977 sourceSHA=52927112260765ca1acf0f69a9c3d41268422228
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=40023cb3634ecdba7d063f9d8ca421e6c86f7274f1fbadfdedf52d2fd2e8b682
+UPDATE_ZIP_SHA256=13a53ce432c7bd0824dd8739016cd25d1f4f3ed5dd219f1f5c073b3b60729fd7
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
 POST_ARTIFACT_ROOT_CAUSE_QUEUE=await_real_user_device_review_of_coherent_sentence_endings_and_flashcard_precision
-LAST_USER_INTENT_SUMMARY=User authorized LAB26 Quality Guard: do not truncate text or produce disconnected half sentences at 40-50%/Riassunto; create content-level anti-regression guard complementary to Scudo360; meaningful verified questions/quiz per chapter; preserve original/legal formulas; count actual letters/words/sentences and percent by chapter and whole book; deliver stable APK+ZIP without extra cost.
-STATE_SOURCE=Br174/StudyBook-AI lab/studybook-core-android-01-update-26-quality-20261105 SHA df4a9f65ea7e0a31a1a3e1407b863c27678fcb09; UAB 42090182081 SUCCESS Android 42090182563 SUCCESS artifact 13444648432
-CONTINUITY_NOTE=LAB25 preserved at lab/safety-studybook-pre-quality26-20261105; LAB26 delivered immutable after signed CI. Native workflow advanced active StudyBook LAB-family ref after signature/scudo, not main/MADRE/CANDIDATA. Local control-plane satellite files are pinned r34 in application, central CORE r40 available; sync control-plane at future safe boundary. Real-device user acceptance pending. No new paid services.
+LAST_USER_INTENT_SUMMARY=LAB27 approved: In parole semplici is ONLY accessible-language replacement/clarification of SAME selected 0-50% edition, never a new reduction; drop giant chapter/all-percent table; below each read paragraph show three inline letter totals Originale/Rielaborato/Risparmiate; PDF printing sheet footer shows same three values; book cover may include book-wide three-number overview. Same old family identity and no paid services.
+STATE_SOURCE=Br174/StudyBook-AI lab/studybook-core-android-01-update-27-simple-metrics-20261105 source SHA 52927112260765ca1acf0f69a9c3d41268422228 UAB run 42093651362 SUCCESS Android run 42093651425 SUCCESS artifactId 13444924977
+CONTINUITY_NOTE=LAB27 signed original-family app source advanced only after successful Scudo 360, LAB27 tests and Android identity checks. Main/MADRE/CANDIDATA untouched. LAB25 safety remains lab/safety-studybook-pre-quality26-20261105. LAB26 prior active source retained in git SHA df4a9f65. Satellite r34 pinned in app, central r40 verified. Real-user acceptance still pending.
 UPDATED_DATE=2026-11-05
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.08-r33
@@ -44,14 +44,14 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100065
-ANDROID_UPDATE_VERSION_NAME=0.3.65
+ANDROID_UPDATE_VERSION_CODE=2026100076
+ANDROID_UPDATE_VERSION_NAME=0.3.76
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 26 Quality Guard
+ANDROID_NEXT_VISIBLE_LAB=LAB 27 In parole semplici
 ANDROID_PAIRED_RECOVERY=LAB23 safety branch lab/safety-studybook-core-android-01-update-23 SHA 0de38d462360e028b8c535edfe73031c1c30ddc5; LAB22 branch unchanged for rollback.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
@@ -294,3 +294,18 @@ SIGNING_CERT_SHA256=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455F
 REAL_ANDROID_DEVICE_ACCEPTANCE=PENDING
 REAL_ACADEMIC_CONTENT_ACCEPTANCE=PENDING
 UNIVERSAL_50_PERCENT_SEMANTIC_CERTIFICATION=NOT_CLAIMED
+
+LAB27_SIMPLE_LANGUAGE_AND_COMPACT_COUNTS_20261105
+SOURCE_BRANCH=lab/studybook-core-android-01-update-27-simple-metrics-20261105
+SOURCE_SHA=52927112260765ca1acf0f69a9c3d41268422228
+LAB27_UAB_RUN=42093651362 SUCCESS
+LAB27_ANDROID_RUN=42093651425 SUCCESS
+LAB27_ARTIFACT_ID=13444924977
+LAB27_VERSION=0.3.76
+LAB27_VERSION_CODE=2026100076
+LAB27_APP_ID=it.studybook.ai.lab
+LAB27_CERT_SHA256=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB27_APK_SHA256=d2f5cc8ec4dcb7b22217edf9eb8cb9f2478916abe094ca94d71d5d7a1bf9a823
+LAB27_ZIP_SHA256=13a53ce432c7bd0824dd8739016cd25d1f4f3ed5dd219f1f5c073b3b60729fd7
+LAB27_REAL_PHONE_ACCEPTANCE=PENDING
+LAB27_REAL_PDF_PRINT_ACCEPTANCE=PENDING
