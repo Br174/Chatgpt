@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=39
+STATE_REVISION=40
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab44-provider-503-429-exponential-cooldown-20261107
-OPERATION_STATUS=LAB44_SIGNED_ANDROID_REAL_GEMINI_SCUDO_SUCCESS_GITHUB_RELEASE_PUBLISHED_DEVICE_PENDING
-CURRENT_PHASE=LAB44 fixes immediate second-model 429/503 fallback, preserves real Retry-After vs locally estimated waits, exponential persisted cooldown and safe provider diagnostics. Real isolated Gemini policy PASS, UAB PASS, Scudo PASS; LAB44 signed APK 0.3.265 and ZIP published GitHub Release. Book progress observed 4/1452 on LAB43; LAB44 device proof PENDING.
+ACTIVE_OPERATION_ID=studybook-lab44-worker-model31-single-real-test-20261107
+OPERATION_STATUS=LAB44_WORKER_MODEL31_DEPLOYED_ONE_REAL_GEMINI_PASS_SCUDO_PASS_PHONE_BOOK_PENDING
+CURRENT_PHASE=LAB44 Android source unchanged (0.3.265 SHA 2da57dad47f3bde4c3ca31c1fff4198bfc7ab533); Worker-only Gemini 3.1 Flash-Lite exclusive study-edition routing deployed on existing studybook-ai-lab44 Worker from isolated source SHA edba094c4393eeccc78b33445e0011d9d9f9046b after Scudo360 23/23 and exactly one real Gemini 3.1 study-pillar summary PASS (536 original letters, 66 summary, cap267, no audit issues). No Android build, no paid tier, existing checkpoint 4/1452 pending device verification.
 CURRENT_REF=motorlab/active-studybook-ai
 CURRENT_HEAD_SHA=2da57dad47f3bde4c3ca31c1fff4198bfc7ab533
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB44_ANDROID_42328655227_SUCCESS; LAB44_UAB_42328655194_SUCCESS; LAB44_GEMINI_REAL_PASS; LAB44_RELEASE_42329076430_SUCCESS
-JOB_STATUS=LAB44 Android CI SUCCESS; sourceSha=2da57dad47f3bde4c3ca31c1fff4198bfc7ab533, v0.3.265, original cert PASS, Gemini isolated lab44 real policy PASS, UAB PASS, Scudo PASS; Release ZIP and APK hashes match signed original. Device 44-page run pending.
+JOB_ID=LAB44_WORKER31_RUN_42351255893_SUCCESS; LAB44_ANDROID_42328655227_SUCCESS_EXISTING; LAB44_UAB_42328655194_SUCCESS_PREVIOUS
+JOB_STATUS=Worker-only Scudo360 PASS 23/23 and mocked quota/fallback tests pass; one live Gemini 3.1 Flash-Lite API request returns structured JSON with summary 66/267 letters, quality issues 0; existing Worker deployed and GET route 405 health PASS; no second live request; Android and book not retested.
 LAST_VERIFIED_PROGRESS_PERCENT=95
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB44 versionName=0.3.265 versionCode=2026100265 appId=it.studybook.ai.lab original cert SHA256=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; APK SHA256=745da80443149165186df5a1a47d832ba4757f08ea20620797304c84b66a1399, ZIP SHA256=6790375c0245ff88d741307dcb1ac4476ee6e787cf31cc9a8f6d4a5e595adaf4; release tag studybook-lab44-v0.3.265.
-NEXT_SAFE_STEP=Install LAB44 ZIP from GitHub Release over LAB43 without uninstall. Open 44-page Filosofia del diritto appunti+sbobine from stored 4/1452 checkpoint. On any pause distinguish Gemini HTTP 429 quota vs 503 overload, display whether retry is a local estimate; check retry delays increase after repeated 503, no repeated immediate requests and no verified loss.
-PENDING_VERIFICATION=End-to-end on Android actual 44-page book 1452 parts, 714 variants, quota response over multiple cool-downs and resume, final full PDF export; short synthetic Gemini smoke only confirms provider functionality. Real phone provider 503/429 root cause unproven without sanitized telemetry.
+LAST_COMPLETED_MATERIAL_STEP=2026-11-07 LAB44 existing Worker 'studybook-ai-lab44' successfully deployed from source edba094c4393eeccc78b33445e0011d9d9f9046b, configuring STUDYBOOK_PREFERRED_EDITION_MODEL=gemini-3.1-flash-lite exclusively for study edition requests. Scudo360 23/23 PASS; one actual Gemini call PASS; safe source lab/safety-studybook-lab44-worker-model31-20261107. Android APK unchanged.
+NEXT_SAFE_STEP=No APK needed. On LAB44 Android v0.3.265, leave cached Gemini 429 pause until expiry, then reopen Studio and use existing checkpoint 4/1452; verify a new successful study edition increments progress; if 429 recurs, inspect per-model actual quota/HTTP (no retries from diagnostics). Continue no-paid and avoid rebuilding/test requests during book processing.
+PENDING_VERIFICATION=Full 44-page real imported legal book on Android after Worker 3.1 switch: progress beyond 4/1452, model-specific quota RPM/TPM/RPD, checkpoints, exact multi-edition pedagogy and final export. A successful single synthetic paragraph and GET smoke do NOT prove 1452 edition completion.
 ACTIVE_ARTIFACT=GitHub Release studybook-lab44-v0.3.265; APK StudyBook-AI-LAB-44-AGGIORNAMENTO.apk sha256=745da80443149165186df5a1a47d832ba4757f08ea20620797304c84b66a1399; ZIP StudyBook-AI-LAB-44-AGGIORNAMENTO.zip sha256=6790375c0245ff88d741307dcb1ac4476ee6e787cf31cc9a8f6d4a5e595adaf4; run 42328655227 artifact 13556536749 source 2da57dad47f3bde4c3ca31c1fff4198bfc7ab533
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
 UPDATE_ZIP_SHA256=6790375c0245ff88d741307dcb1ac4476ee6e787cf31cc9a8f6d4a5e595adaf4
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
-POST_ARTIFACT_ROOT_CAUSE_QUEUE=Verify phone local response classification and multiple paused-retry cycles from 4/1452 on actual imported book. Avoid claims that 503 server capacity can be fixed locally, or that user Gemini project quota is known. Google 429 per-project, 503 overloaded. StudyPillarV38 untouched.
-LAST_USER_INTENT_SUMMARY=User approved LAB44 after LAB43 advanced to 4/1452 then stopped almost instantly with AI_TEMPORARY_OVERLOAD. Demanded accurate 503 vs 429 classification, avoid immediate wasted fallback and repeated 90s synthetic waits, preserve exact study pillar, original signature, saved book and all progress; free tier only; deliver APK/ZIP by Releases.
-STATE_SOURCE=Br174/StudyBook-AI SHA 2da57dad47f3bde4c3ca31c1fff4198bfc7ab533 active + safety lab/safety-studybook-core-android-01-update-44; Android 42328655227 SUCCESS, UAB 42328655194 SUCCESS, release 42329076430 SUCCESS.
-CONTINUITY_NOTE=LAB44 isolated Worker studybook-ai-lab44. Backend 429 shared quota/503 overloaded return without immediate fallback model; actual Google Retry-After/RetryInfo tagged provider vs local estimate; persisted exponential retry intervals 90s, 180s, 360s etc up to 6h, estimated display explicitly labeled. Typed diagnostic reports status/model/timing only. Strong tests provider mocks, 503 checkpoint restore, real short legal Gemini PASS. No StudyPillarV38 changes. Real 44-page device acceptance pending.
+POST_ARTIFACT_ROOT_CAUSE_QUEUE=Monitor real phone model31 progress from existing checkpoint 4/1452, confirm 429 detail if any; avoid further real tests that consume free quota. Preserve LAB44 apk hash/signature and current Worker-safe branch.
+LAST_USER_INTENT_SUMMARY=User explicitly approved Scudo360 diagnosis for Gemini 3.1 Flash Lite and one free real request, then if quality passes deploy Worker LAB44 without a new APK. User provided AI Studio screenshot model 3.5 exceeded rate limit while model 3.1 green in 28-day view. No payment or extra APK authorized.
+STATE_SOURCE=Android active family source=2da57dad47f3bde4c3ca31c1fff4198bfc7ab533 (unchanged), worker candidate/published config source=edba094c4393eeccc78b33445e0011d9d9f9046b, worker safety lab/safety-studybook-lab44-worker-model31-20261107. GitHub Actions Worker-only run 42351255893 SUCCESS. Provider model gemini-3.1-flash-lite for single study editions.
+CONTINUITY_NOTE=MotorLab r40, worker-only update; no change StudyPillarV38, Android package/certificate, APK, local book or checkpoint DB. Code api/editionsV36.js reads allowlisted STUDYBOOK_PREFERRED_EDITION_MODEL when configured, uses exclusive model and no fallback. Dedicated wrangler.lab44-model31.jsonc deploys only studybook-ai-lab44; legacy AI_MODEL 3.5 untouched for unrelated handlers. Scudo Cloudflare contract PASS, one live 3.1 test strict summary 536->66 letters within267 cap, issues=[]; deploy logs show binding gemini-3.1-flash-lite and GET 405. Real on-phone 44-page acceptance pending.
 UPDATED_DATE=2026-11-07
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -318,3 +318,12 @@ LAB44_APK_SHA256=745da80443149165186df5a1a47d832ba4757f08ea20620797304c84b66a139
 LAB44_ZIP_SHA256=6790375c0245ff88d741307dcb1ac4476ee6e787cf31cc9a8f6d4a5e595adaf4
 LAB44_SAFETY_REF=lab/safety-studybook-core-android-01-update-44
 LAB44_DEVICE_ACCEPTANCE=PENDING
+
+LAB44_WORKER31_CHANGE=2026-11-07; user-approved existing-Worker-only study model route from 3.5 rate limited to 3.1 verified in Google AI Studio screenshots; primary/exclusive 3.1 with no 3.5 quota fallback, no extra APK.
+LAB44_WORKER31_GITHUB_RUN=42351255893 SUCCESS
+LAB44_WORKER31_SOURCE_SHA=edba094c4393eeccc78b33445e0011d9d9f9046b
+LAB44_WORKER31_SCUDO360=PASS 23 tests, 0 failures
+LAB44_WORKER31_REAL_GEMINI=ONE request on gemini-3.1-flash-lite, JSON structured PASS, sourceLetters=536 summaryLetters=66 capLetters=267 verified=true issues=[]
+LAB44_WORKER31_DEPLOYMENT=studybook-ai-lab44.brunoverlezza.workers.dev; existing secret retained; Worker GET 405 postdeploy PASS; no second live Gemini call
+LAB44_WORKER31_SAFETY=lab/safety-studybook-lab44-worker-model31-20261107
+LAB44_WORKER31_DEVICE_BOOK_ACCEPTANCE=PENDING
