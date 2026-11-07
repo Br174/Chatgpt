@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=36
+STATE_REVISION=37
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab41-structured-gemini-real-pillar-recovery-20261107
-OPERATION_STATUS=LAB41_SIGNED_APK_DELIVERED_REAL_PILLAR_GEMINI_PASS_SCUDO_PASS_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB41 fixes structured JSON Gemini generation, safe provider timeout/network diagnostics and persistent sparse resume; actual strict progressive study summary 217 source letters, cap91, generated70, semantic and format gate PASS in live isolated Worker. Signed Android and UAB CI SUCCESS, phone 44-page acceptance still pending.
+ACTIVE_OPERATION_ID=studybook-lab42-contextual-anchors-quality-quarantine-20261107
+OPERATION_STATUS=LAB42_SIGNED_ANDROID_GEMINI_REAL_PASS_SCUDO_PASS_DEVICE_BOOK_PENDING
+CURRENT_PHASE=LAB42 signed APK 0.3.254 delivered from verified source SHA 1d1cc81b171479c7c695e277bacfe1a21f5ead31. UAB SUCCESS; isolated LAB42 Cloudflare Worker real Gemini progressive summary PASS (217 letters source, 91 max, 68 generated, 0 quality issues after repair). Scudo360 23/23 PASS. Quality failure quarantined per chunk; after three consecutive quality failures circuit opens. Actual 44-page phone book acceptance PENDING.
 CURRENT_REF=motorlab/active-studybook-ai
-CURRENT_HEAD_SHA=7937d9f98bcbb88132047af1ff7cee6513a172d2
+CURRENT_HEAD_SHA=1d1cc81b171479c7c695e277bacfe1a21f5ead31
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB41_ANDROID_42321396382_SUCCESS; LAB41_UAB_42321396341_SUCCESS; LIVE_GEMINI_POLICY_PASS; SCUDO360_23_OF_23_PASS
-JOB_STATUS=LAB41 Android signed build SUCCESS, stable original signing certificate, isolate Worker live strict Gemini summary PASS 70/91 letters and audit issues 0; UAB SUCCESS; Scudo360 23/23 PASS. Device not yet tested.
+JOB_ID=LAB42_ANDROID_42324174262_SUCCESS; LAB42_UAB_42324174271_SUCCESS; LAB42_LIVE_POLICY_GEMINI_PASS; LAB42_SCUDO360_23_OF_23_PASS
+JOB_STATUS=LAB42 Android GitHub run SUCCESS, signed original certificate, source SHA and active same; UAB SUCCESS; Scudo360 P1 23/23. One introductory older LAB42 run 42324073785 FAILED (isolated Worker skipped and branch promotion permission rejected); never use its artifact. Current run 42324174262 is verified.
 LAST_VERIFIED_PROGRESS_PERCENT=95
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB41 Android versionName=0.3.252 versionCode=2026100252 appId=it.studybook.ai.lab certSHA256=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; APK_SHA256=ed5439a1949c5c2b3f709a3296cf473119eb8154b74a77a120f91c38bedd2987; ZIP_SHA256=1dbb9a2950684ef02bbc55a3b8d727023e72fa860096e5b671c027d9cd7c0dd0; ZIP CRC passed; sourceSHA=7937d9f98bcbb88132047af1ff7cee6513a172d2.
-NEXT_SAFE_STEP=Install LAB41 APK 0.3.252 over LAB40 without uninstalling. Resume original Filosofia del diritto appunti+sbobine 44 pages from checkpoints, check 1/1452 advances. Confirm full progressive exact percentages and exports on phone; if blocked collect diagnostic reason/HTTP without private content. No new import or free-tier costs.
-PENDING_VERIFICATION=Actual Android 44-page book run from 1/1452, six progressive editions all verified with source fidelity, book complete and PDF export. Live strict legal-synthetic summary only PASS; do not claim whole book finished.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-41-AGGIORNAMENTO.apk sha256=ed5439a1949c5c2b3f709a3296cf473119eb8154b74a77a120f91c38bedd2987 version=0.3.252 code=2026100252 runId=42321396382 artifactId=13552942717 sourceSHA=7937d9f98bcbb88132047af1ff7cee6513a172d2
+LAST_COMPLETED_MATERIAL_STEP=LAB42 versionName=0.3.254, versionCode=2026100254, appId=it.studybook.ai.lab, signing SHA256=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; APK SHA256=e8ce00c70cd83208517a4eaa1629fa371497633189dd38a4da23c4e304571682; ZIP SHA256=c6f345382b7764f878578de4476232dfeb85ef373ba654529f6ce3d12f858cd1; independent ZIP CRC and extracted APK SHA matched GitHub receipt.
+NEXT_SAFE_STEP=Install LAB42 APK/ZIP over LAB41 without uninstall. Resume Filosofia del diritto appunti+sbobine 44-page existing checkpoint from 1/1452; check other paragraphs progress despite isolated AI_QUALITY_REVIEW and that no invalid edition counted. If 3 consecutive quality failures cause stop, inspect source-specific diagnostic (no private source). Preserve original, exact progressive percentages, and zero additional paid services.
+PENDING_VERIFICATION=Full Android-device 44-page philosophy book 1/1452 real end-to-end; complete chapter-level semantic fidelity, all six progressive editions, exact letter reduction and final exports. Real short controlled Gemini summary passed only, no claim of complete book.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-42-AGGIORNAMENTO.apk SHA256=e8ce00c70cd83208517a4eaa1629fa371497633189dd38a4da23c4e304571682 versionName=0.3.254 versionCode=2026100254 run=42324174262 artifactId=13554477443 sourceSHA=1d1cc81b171479c7c695e277bacfe1a21f5ead31
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=1dbb9a2950684ef02bbc55a3b8d727023e72fa860096e5b671c027d9cd7c0dd0
+UPDATE_ZIP_SHA256=c6f345382b7764f878578de4476232dfeb85ef373ba654529f6ce3d12f858cd1
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
-POST_ARTIFACT_ROOT_CAUSE_QUEUE=Phone 44-page real Gemini progressive-run and source-specific errors pending; no production changes; strict audit preserved.
-LAST_USER_INTENT_SUMMARY=User confirmed LAB40 still stops 1/1452 with timeout and invalid Gemini output. Approved LAB41 fix JSON structured responses, typed timeout and network diagnosis, checkpoint-resume and real test with exact progressive study requirements. Preserve Android original signing, all PDFs and source.
-STATE_SOURCE=Br174/StudyBook-AI SHA 7937d9f98bcbb88132047af1ff7cee6513a172d2 on LAB41 source; active pointer advanced after signed Scudo; safety branch lab/safety-studybook-core-android-01-update-41; UAB run 42321396341 SUCCESS and Android run 42321396382 SUCCESS.
-CONTINUITY_NOTE=LAB41 source from LAB40 verified signing family. Gemini JSON schema single edition, up to 55s provider response, typed request diagnostics non-sensitive, bounded 2 failure circuit and per-unit resume. Actual progressive policy live probe result 70 letters under max91, core semantic coverage and all hard checks PASS. LAB40 previous issue reproduced then corrected without changing studyPillarV38.js. Isolated LAB41 Cloudflare Worker only; LAB40 and production untouched; phone user acceptance needed.
+POST_ARTIFACT_ROOT_CAUSE_QUEUE=Verify real user book 44-page checkpoint continuation; UI should increase 1/1452 on partial success, but long-form Gemini quality on that source is not independently proven. If blocked, collect issue counts and failing source chunk safely, no automatic repeated quota waste.
+LAST_USER_INTENT_SUMMARY=User approved LAB42 after LAB41 still reported essential-anchors-missing:Piuttosto,Distinzione and core-concept-coverage-below-50 with 1/1452 parts. LAB42 distinguishes sentence capitalization from named anchors without touching percentages; quarantines first failing chunk, continues later chunks, keeps drafts/checkpoints, stops after three consecutive quality fails, executes live Gemini, Scudo360 and signed original Android APK+ZIP.
+STATE_SOURCE=Br174/StudyBook-AI source SHA 1d1cc81b171479c7c695e277bacfe1a21f5ead31 on lab/studybook-core-android-01-update-42-quality-continuation-20261107; active pointer and lab/safety-studybook-core-android-01-update-42 both same compiled SHA; lab branch tip has extra signed receipt commit. Android 42324174262 SUCCESS, UAB 42324174271 SUCCESS, Scudo 23/23.
+CONTINUITY_NOTE=LAB42 original source preserved from signed LAB41. LAB42 modifies anchor detection only within studyPillarV38.js; STUDY_PILLAR_VERSION and exactRetained percentages UNCHANGED. Standalone title-case 'Piuttosto' and 'Distinzione' are not hard anchors; protected legal dates/refs and co-mentioned proper names remain protected; fidelity/semantic gates unchanged. Generator isolates quality-invalid drafts, continues independent chunks, stops after 3 consecutive failures, persistent resume prioritizes previously clean jobs. Gemini free-tier Worker studybook-ai-lab42, no production changes. Actual phone book trial pending.
 UPDATED_DATE=2026-11-07
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -282,3 +282,15 @@ LAB41_ZIP_SHA256=1dbb9a2950684ef02bbc55a3b8d727023e72fa860096e5b671c027d9cd7c0dd
 LAB41_ANDROID_ID=it.studybook.ai.lab; SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
 LAB41_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-41
 LAB41_DEVICE_ACCEPTANCE=PENDING
+
+LAB42_CHANGE_RECORD=2026-11-07; approved contextual source-name anchoring; no exact-letter budget changes; defer invalid summaries and continue other independent paragraphs, durable candidate drafts, 3-consecutive-quality-failure circuit, source-signed original Android update and free Gemini real test.
+LAB42_SIGNED_ANDROID_RUN=42324174262 SUCCESS, SOURCE_SHA=1d1cc81b171479c7c695e277bacfe1a21f5ead31, VERSION_NAME=0.3.254, VERSION_CODE=2026100254
+LAB42_UAB_RUN=42324174271 SUCCESS
+LAB42_REAL_GEMINI_POLICY=PASS originalLetters217 cap91 outputLetters68 auditIssues0 (one repair performed)
+LAB42_RECOVERY_SIMULATED=PASS first invalid chunk unverified, subsequent 12 editions verified and persistent checkpoint recovered with no duplicate requests
+LAB42_SCUDO360=PASS 23/23 tests, 0 errors, 0 skipped
+LAB42_APK_SHA256=e8ce00c70cd83208517a4eaa1629fa371497633189dd38a4da23c4e304571682
+LAB42_ZIP_SHA256=c6f345382b7764f878578de4476232dfeb85ef373ba654529f6ce3d12f858cd1
+LAB42_ANDROID_ID=it.studybook.ai.lab; SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB42_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-42
+LAB42_DEVICE_ACCEPTANCE=PENDING
