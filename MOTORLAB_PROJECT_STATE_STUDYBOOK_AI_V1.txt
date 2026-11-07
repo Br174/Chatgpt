@@ -1,32 +1,32 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=34
+STATE_REVISION=41
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab23-distinct-book-cover-no-duplicate-20261011
-OPERATION_STATUS=LAB23_SIGNED_APK_DELIVERED_TITLE_FIRST_RELEVANCE_DUPLICATE_REPAIR_REAL_THREE_BOOK_WEB_SMOKE_PASSED_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB23 screenshot root-cause closure: separate books I romani, Appunti fotografati 1 pagine, Tutti santi me compreso share same Roman Wikimedia theme illustration despite different titles. Root cause LAB22 findTheme considered arbitrary context mention Rome higher priority than title and always selected highest-ranked same image; no per-library source image dedup. LAB23 puts title before context, specific title saints/religion maps to religious-themed photo, generic scan titles use context only if generic, performs multiple keyless Wikimedia searches per theme to find diverse CC0/PD pictures. Client sends excludeAssets of photos already used by other book IDs; backend excludes matching Wikimedia source page and image, rechecking before saved. Auto-on-library scoped old duplicate repair: detect repeated online-thematic source URLs, keep most title-relevant owner, clear only duplicated web thematic coverCustom then try saving unique replacement, leave original scan/custom book bytes intact. All 3 screenshot titles external REAL backend smoke HTTP200 with unique commons asset IDs: commons:91903344, commons:91954879, commons:58611951 (run 38096333118). LAB23 complete UAB CI 38096279551 SUCCESS, signed Android 38096279519 SUCCESS version 0.3.60 update-in-place; user phone acceptance pending.
+ACTIVE_OPERATION_ID=studybook-lab45-autonomous-verified-fragments-20261107
+OPERATION_STATUS=LAB45_SIGNED_SCUDO_UAB_RELEASED_DEVICE_BOOK_ACCEPTANCE_PENDING
+CURRENT_PHASE=LAB45 actual Android source b44c2b7b18884ed8ce2b78588ad83b01f61044c7 signed versionName 0.3.274; Scudo360 mandatory gate and UAB PASS; pilot 3000 paragraph preview and original-pillar punctuation repair PASS; partial verified fragments readable independently from complete paragraphs; bounded two foreground automatic quality resumes without new checkpoint progress; Worker remains existing LAB44 gemini-3.1. Full 44-page on-device acceptance PENDING.
 CURRENT_REF=motorlab/active-studybook-ai
-CURRENT_HEAD_SHA=4df889b03fbf696ceaaaafd96f7a70933c7939d1
+CURRENT_HEAD_SHA=b44c2b7b18884ed8ce2b78588ad83b01f61044c7
 CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB23_UAB_38096279551_SUCCESS_RUN457; LAB23_ANDROID_38096279519_SUCCESS_RUN60; LAB23_WEB_THREE_BOOK_IMAGES_38096333118_SUCCESS; LAB23_PUBLIC_DOMAIN_QUERY_ANALYSIS_38096219145_SUCCESS
-JOB_STATUS=Final LAB23 UAB 38096279551 SUCCESS including baseline and new scripts/test-lab23-cover-uniqueness.mjs; Android 38096279519 SUCCESS signed update APP ID it.studybook.ai.lab cert D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; independent public-domain source query diagnostics 38096219145 found diverse Romans and saints; external live smoke 38096333118 SUCCESS all three books receive DIFFERENT real images HTTP200. Device still unverified.
-LAST_VERIFIED_PROGRESS_PERCENT=100
+JOB_ID=LAB45_ANDROID_42354618732_SUCCESS; LAB45_UAB_42354618659_SUCCESS; LAB45_PREFLIGHT_42354315707_SUCCESS; LAB45_RELEASE_42354915404_SUCCESS
+JOB_STATUS=Android APK build original signing and Scudo360 SUCCESS; preflight test 44-page checkpoint prior regression + 3000 paragraphs preview + punctuation avoided 6 mock repairs PASS; UAB SUCCESS; direct GitHub ZIP+APK SHA verified and published; device UI/study auto-resume remains unverified.
+LAST_VERIFIED_PROGRESS_PERCENT=95
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB23 APK versionName=0.3.60 versionCode=2026100060 package=it.studybook.ai.lab signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC, APK SHA256=956eb8911e5b0e7274a41fd3ec26890a3bb002b719c3beb04e23f2b05d47d7b5, ZIP SHA256=710d4d6d9ad59a0a57674799de6e10c09738934dc17201e50fd1a74f70fcc5b7; ZIP CRC and nested APK CRC valid; 3 distinct online photo smoke passed.
-NEXT_SAFE_STEP=Install StudyBook-AI-LAB-23-AGGIORNAMENTO.apk over LAB22 without uninstall; open Libreria and inspect I romani, Appunti fotografati, Tutti santi me compreso. The app should automatically reconcile duplicated online-thematic image source URLs and fetch different relevant photos. Never alter user-custom, original book, scanner archive photos. For titles with no suitable CC0/PD candidate, it may leave cover unset; user can long press -> Aggiungi copertina to retry. Android real on-device acceptance still needed. No new Gemini billing.
-PENDING_VERIFICATION=Real Android phone confirmation of existing three duplicate covers automatic repair and UI library persistence; end-to-end live server result confirmed for three title/context examples with different Commons page IDs. Auto-repair affects only online-thematic shared source metadata. User selected/imported covers and original scans intentionally excluded.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-23-AGGIORNAMENTO.apk SHA256=956eb8911e5b0e7274a41fd3ec26890a3bb002b719c3beb04e23f2b05d47d7b5 versionName=0.3.60 versionCode=2026100060 AndroidRun=38096279519 artifactId=11686115307 sourceSHA=0de38d462360e028b8c535edfe73031c1c30ddc5
+LAST_COMPLETED_MATERIAL_STEP=LAB45 signed APK versionName=0.3.274 versionCode=2026100274 appId=it.studybook.ai.lab cert SHA256=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; SHA256 APK=2191c91654f0bec37e539ce957fbbff3b3d98ee869dca394962e892ec12cfda8 ZIP=1b001f0b6cafe22fd67d58beaa108c24f44655578eaa73efeebf000d5bfa0c19; GitHub Release studybook-lab45-v0.3.274.
+NEXT_SAFE_STEP=Install LAB45 ZIP from GitHub Release over existing LAB44 without uninstall. Open saved 44-page Filosofia del diritto appunti+sbobine; verify at least previous 18/1452 chunks survive, early preview readable with source/missing placeholders, autonomous quality stop resumes while Studio foreground with at most 2 attempts without progress, real provider quota pauses respected, signed install stays original. Do not claim offscreen Android WorkManager present.
+PENDING_VERIFICATION=Real Android end-to-end with saved 44-page book at 18/1452, quality stop recovery/preview, 119-paragraph mapping, fidelity of all 714 variants and PDF export; 500/2000/3000 page model generation NOT tested under finite free provider RPM/TPM/RPD. Foreground autonomy only. WorkManager native persistent execution requires a dedicated bridge and independent safety tests.
+ACTIVE_ARTIFACT=GitHub Release studybook-lab45-v0.3.274 (APK 5700643 bytes and ZIP 5324344 bytes); APK SHA256=2191c91654f0bec37e539ce957fbbff3b3d98ee869dca394962e892ec12cfda8; ZIP SHA256=1b001f0b6cafe22fd67d58beaa108c24f44655578eaa73efeebf000d5bfa0c19; Android run 42354618732 artifact 13566529764; final source b44c2b7b18884ed8ce2b78588ad83b01f61044c7.
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=710d4d6d9ad59a0a57674799de6e10c09738934dc17201e50fd1a74f70fcc5b7
+UPDATE_ZIP_SHA256=1b001f0b6cafe22fd67d58beaa108c24f44655578eaa73efeebf000d5bfa0c19
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
-POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=Screenshot real Android LAB22 showing identical Colosseum image with different text labels on I romani, Appunti fotografati 1 pagine, Tutti santi me compreso. User insists each book must get DIFFERENT contextually relevant cover, original first then thematically accurate free photo, no Gemini, no reusing identical pictures. Wants bug fixed with APK signed update without UI changes.
-STATE_SOURCE=Br174/StudyBook-AI LAB23 branch lab/studybook-core-android-01-update-23 SHA 0de38d462360e028b8c535edfe73031c1c30ddc5; safety branch lab/safety-studybook-core-android-01-update-23, UAB run 38096279551 SUCCESS, signed Android run 38096279519 SUCCESS, live images run 38096333118 SUCCESS.
-CONTINUITY_NOTE=LAB23 source and APK immutable after success. Existing LAB22 book images are only repaired automatically if provably duplicated online-thematic same sourceURL, chosen original most title-relevant; manual/original/scan not touched. LAB23 dedicated keyless Worker https://studybook-ai-coversearch-lab23.brunoverlezza.workers.dev, independent of LAB22 and live assistant; sourced Commons PD/CC0 and original catalog. Server excludes previously used assets, client rechecks and saves asset identity. 3 real different Wikimedia image IDs confirmed via live CI run 38096333118. Android phone acceptance pending.
-UPDATED_DATE=2026-10-10
+POST_ARTIFACT_ROOT_CAUSE_QUEUE=Verify real 44-page book runtime/preview and speed; develop native WorkManager bridge only after separate approval and real background security tests. 3000 paragraphs fixture validates in-memory preview only, not 3000-page paid/free quota feasibility; source original and exact STUDY_PERCENTAGES unchanged.
+LAST_USER_INTENT_SUMMARY=User asked whether earlier at 8/1452 paragraphs were already readable and requested continuation of approved LAB45. Comparison LAB37 vs LAB38: more exact progressive whole-paragraph rules entered; keep checked whole-paragraph count distinct from verified fragments early preview. User approved autonomous quality resume, measured punctuation optimization, large-book regressions and safe APK+ZIP only after checks.
+STATE_SOURCE=Br174/StudyBook-AI active and signed final branch source b44c2b7b18884ed8ce2b78588ad83b01f61044c7; isolated safe source lab/safety-studybook-core-android-01-update-45; preflight 42354315707, Android 42354618732, UAB 42354618659, Release 42354915404 all SUCCESS. Current Worker still studybook-ai-lab44 with Gemini 3.1 model.
+CONTINUITY_NOTE=LAB45 restored useful fragment preview without falsely publishing full paragraphs, no unverified drafts shown; source and exact 50/40/30/20/10 percentage engine unchanged. Mechanical period repair only after complete re-audit; six mock requests saved. Quality auto resume while foreground Studio is bounded to 2 no-progress attempts and gives way to provider cooldown. Existing LAB44 Worker 3.1 remains; no Worker redeploy. Android background WorkManager feasibility pending native IndexedDB checkpoint bridge. GitHub Release ZIP/APK SHA verified, official device test pending.
+UPDATED_DATE=2026-11-07
 SATELLITE_LOCAL_RELEASE=2026.10.08-r34
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
 MOTORLAB_R21_VELOCITY_STATUS=VERIFIED_ADOPTED
@@ -44,8 +44,8 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100060
-ANDROID_UPDATE_VERSION_NAME=0.3.60
+ANDROID_UPDATE_VERSION_CODE=2026100274
+ANDROID_UPDATE_VERSION_NAME=0.3.274
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
@@ -260,3 +260,83 @@ MOTORLAB_R39_ANDROID_SCUDO_LAB24_CI=40921134783 COMPLETE SUCCESS on exact SHA 4d
 
 MOTORLAB_R39_STUDYBOOK_ANDROID_PROVEN_ACTIVE_REF=motorlab/active-studybook-ai
 MOTORLAB_R39_STUDYBOOK_ANDROID_AUTO_UPDATE=GitHub Actions signed APK and Scudo evidence required before nonforced ref advancement; run 40921134783 SUCCESS.
+
+LAB40_CHANGE_RECORD=2026-11-07; Gemini reasoning_effort low, bounded 3072 combined output tokens, single alternate free model fallback, invalid-format part skipped and deferred, 2 consecutive malformed parts trigger stop; progressive pillar unchanged.
+LAB40_SIGNED_ANDROID_RUN=42317981818 SUCCESS; SHA=8e0464c3bc3f1bb57e8e7a72c02bfd34e0933bc1; APK=0.3.246; code=2026100246
+LAB40_UAB_RUN=42317981820 SUCCESS
+LAB40_REAL_GEMINI=PASS short real generated response from isolated Worker (full book not verified)
+LAB40_SCUDO360=PASS 23/23 Cloudflare P1 suite
+LAB40_APK_SHA256=4758ffa33b0b5e1139f2cd2e5bf821d3ad6b06aa45b5451e15ff2422db176f7f
+LAB40_ZIP_SHA256=d81acd0b1ff1cd28169309b0e24e08fcfab2686ee8f90d29135358128bf1319c
+LAB40_ANDROID_FAMILY=it.studybook.ai.lab; signing-cert=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB40_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-40 (exact compiled source; safety APK on-demand)
+LAB40_DEVICE_ACCEPTANCE=PENDING
+
+LAB41_CHANGE_RECORD=2026-11-07; approved real Gemini study-pillar structured JSON generation; diagnosed summary initial output >max and second repair concept-coverage shortfall; improved summary lexical preservation prompt, live strict policy PASS 70 letters<=91 and semantic issues=[]; offline network safeguards and checkpoint reuse.
+LAB41_SIGNED_ANDROID_RUN=42321396382 SUCCESS, sourceSHA=7937d9f98bcbb88132047af1ff7cee6513a172d2, version=0.3.252, code=2026100252
+LAB41_UAB_RUN=42321396341 SUCCESS
+LAB41_GEMINI_REAL_PILLAR=PASS sourceLetters=217 summaryCap=91 outputLetters=70 auditIssues=0
+LAB41_SCUDO360=PASS 23/23 tests, 0 failures, 0 skipped
+LAB41_APK_SHA256=ed5439a1949c5c2b3f709a3296cf473119eb8154b74a77a120f91c38bedd2987
+LAB41_ZIP_SHA256=1dbb9a2950684ef02bbc55a3b8d727023e72fa860096e5b671c027d9cd7c0dd0
+LAB41_ANDROID_ID=it.studybook.ai.lab; SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB41_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-41
+LAB41_DEVICE_ACCEPTANCE=PENDING
+
+LAB42_CHANGE_RECORD=2026-11-07; approved contextual source-name anchoring; no exact-letter budget changes; defer invalid summaries and continue other independent paragraphs, durable candidate drafts, 3-consecutive-quality-failure circuit, source-signed original Android update and free Gemini real test.
+LAB42_SIGNED_ANDROID_RUN=42324174262 SUCCESS, SOURCE_SHA=1d1cc81b171479c7c695e277bacfe1a21f5ead31, VERSION_NAME=0.3.254, VERSION_CODE=2026100254
+LAB42_UAB_RUN=42324174271 SUCCESS
+LAB42_REAL_GEMINI_POLICY=PASS originalLetters217 cap91 outputLetters68 auditIssues0 (one repair performed)
+LAB42_RECOVERY_SIMULATED=PASS first invalid chunk unverified, subsequent 12 editions verified and persistent checkpoint recovered with no duplicate requests
+LAB42_SCUDO360=PASS 23/23 tests, 0 errors, 0 skipped
+LAB42_APK_SHA256=e8ce00c70cd83208517a4eaa1629fa371497633189dd38a4da23c4e304571682
+LAB42_ZIP_SHA256=c6f345382b7764f878578de4476232dfeb85ef373ba654529f6ce3d12f858cd1
+LAB42_ANDROID_ID=it.studybook.ai.lab; SIGNING_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB42_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-42
+LAB42_DEVICE_ACCEPTANCE=PENDING
+
+LAB43_CHANGE_RECORD=2026-11-07; approved semantic/lexical false rejection repair and real-pillar checkpoint tests; no changes to STUDY_PERCENTAGES or exact letter-budgets.
+LAB43_ANDROID_RUN=42326500239 SUCCESS, versionName 0.3.261, source f6a64424296598c0148dcbcfb85011f25c4b206a
+LAB43_UAB_RUN=42326500278 SUCCESS
+LAB43_GEMINI_REAL_POLICY=PASS isolated studybook-ai-lab43 Worker, short synthetic legal paragraph; full user book PENDING
+LAB43_SCUDO360=PASS mandatory gate, existing suite; Android signing and version PASS
+LAB43_RELEASE_RUN=42326858299 SUCCESS GitHub release studybook-lab43-v0.3.261
+LAB43_APK_SHA256=a6baa6fb73e92bb994348ea7aa47976a7bd0cc27ead18935c0b12f4193222e35
+LAB43_ZIP_SHA256=6d00828a712ef9c719e11cfa1dcca1fee2071718347c6fd978f0b1bea3635fbe
+LAB43_ANDROID_CERT=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB43_SAFETY_SOURCE_REF=lab/safety-studybook-core-android-01-update-43
+LAB43_DEVICE_BOOK_ACCEPTANCE=PENDING
+
+LAB44_CHANGE_RECORD=2026-11-07; user approved repair of repeated 503 after 2 seconds; Google real 503 is capacity and 429 shared project rate; provider Retry-After vs local estimates never conflated; no paid tier.
+LAB44_SOURCE_SHA=2da57dad47f3bde4c3ca31c1fff4198bfc7ab533
+LAB44_ANDROID_RUN=42328655227 SUCCESS versionName=0.3.265 signed_original_cert PASS
+LAB44_UAB_RUN=42328655194 SUCCESS
+LAB44_SCUDO360=PASS required gate
+LAB44_REAL_GEMINI=PASS live isolated synthetic policy test; full document pending
+LAB44_RELEASE_RUN=42329076430 SUCCESS
+LAB44_APK_SHA256=745da80443149165186df5a1a47d832ba4757f08ea20620797304c84b66a1399
+LAB44_ZIP_SHA256=6790375c0245ff88d741307dcb1ac4476ee6e787cf31cc9a8f6d4a5e595adaf4
+LAB44_SAFETY_REF=lab/safety-studybook-core-android-01-update-44
+LAB44_DEVICE_ACCEPTANCE=PENDING
+
+LAB44_WORKER31_CHANGE=2026-11-07; user-approved existing-Worker-only study model route from 3.5 rate limited to 3.1 verified in Google AI Studio screenshots; primary/exclusive 3.1 with no 3.5 quota fallback, no extra APK.
+LAB44_WORKER31_GITHUB_RUN=42351255893 SUCCESS
+LAB44_WORKER31_SOURCE_SHA=edba094c4393eeccc78b33445e0011d9d9f9046b
+LAB44_WORKER31_SCUDO360=PASS 23 tests, 0 failures
+LAB44_WORKER31_REAL_GEMINI=ONE request on gemini-3.1-flash-lite, JSON structured PASS, sourceLetters=536 summaryLetters=66 capLetters=267 verified=true issues=[]
+LAB44_WORKER31_DEPLOYMENT=studybook-ai-lab44.brunoverlezza.workers.dev; existing secret retained; Worker GET 405 postdeploy PASS; no second live Gemini call
+LAB44_WORKER31_SAFETY=lab/safety-studybook-lab44-worker-model31-20261107
+LAB44_WORKER31_DEVICE_BOOK_ACCEPTANCE=PENDING
+
+LAB45_RELEASE_DATE=2026-11-07
+LAB45_SOURCE_SHA=b44c2b7b18884ed8ce2b78588ad83b01f61044c7
+LAB45_PREFLIGHT_RUN=42354315707 SUCCESS; tested 3000 PARAGRAPHS preview only, no real Gemini load
+LAB45_UAB_RUN=42354618659 SUCCESS
+LAB45_ANDROID_RUN=42354618732 SUCCESS original Android certificate and Scudo360
+LAB45_RELEASE_RUN=42354915404 SUCCESS stable GitHub Release
+LAB45_VERSION=0.3.274 versionCode=2026100274
+LAB45_APK_SHA256=2191c91654f0bec37e539ce957fbbff3b3d98ee869dca394962e892ec12cfda8
+LAB45_ZIP_SHA256=1b001f0b6cafe22fd67d58beaa108c24f44655578eaa73efeebf000d5bfa0c19
+LAB45_SAFETY=lab/safety-studybook-core-android-01-update-45
+LAB45_DEVICE_BOOK_ACCEPTANCE=PENDING
+LAB45_BACKGROUND_NATIVE_WORKMANAGER=NOT_IMPLEMENTED; native checkpoint bridge needs separate safety gate
