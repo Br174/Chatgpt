@@ -1,31 +1,31 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=36
+STATE_REVISION=37
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab71-unit-length-budget-20261108
-OPERATION_STATUS=LAB71_SIGNED_APK_VERIFIED_WORKER_DEPLOYED_OFFLINE_BANDS_PASS_REAL_GEMINI_AND_PHONE_PENDING
-CURRENT_PHASE=LAB71 addresses phone screenshots of LAB70 showing all 6 editions outside band (summary 89.0%, 50 75.3%, 40 83.7%, 30 43.4%, 20 31.4%, 10 0.0%). Root issue: first draft prompt used only global-block target without per-unit letter budgets; LAB71 sends authoritative unit budgets within actual Gemini JSON and its measured retry feedback. Isolated worker, Scudo360, signed Android, offline tests pass. Gemini real-book output not certified.
+ACTIVE_OPERATION_ID=studybook-lab72-local-patch-and-tri-candidate-20261108
+OPERATION_STATUS=LAB72_EXPERIMENTAL_SIGNED_APK_AVAILABLE_SCUDO360_NATIVE_PASS_REAL_10PCT_SYNTHETIC_PASS_5_LEVELS_AND_PHONE_PENDING
+CURRENT_PHASE=LAB72 isolated implementation: corrects conflicting numeric rules and summary cap; Gemini patch-only targeted revision with 3 local alternatives in one call, preserves untouched draft spans, strict 6-band source-fidelity gates. LAB72 Android 0.3.470 signed from pinned source d146c157ce0ad926d6e978019a1dfb50aef101fb and isolated LAB72 Worker deployed. Synthetic real Gemini 10% achieved 10.7%; other 5 levels and real 44-page book pending. LAB71 remains active LAST_GOOD, user device acceptance pending.
 CURRENT_REF=motorlab/active-studybook-ai
 CURRENT_HEAD_SHA=446134acd4a387beaae1e992de6572ce379cdbb9
-CURRENT_PROVIDER=GitHub Android LAB APK + isolated Cloudflare Gemini LAB71 Worker
-JOB_ID=LAB71_ANDROID_RUN=42442776062 SUCCESS; APK_ARTIFACT=13602457097
-JOB_STATUS=LAB71 signed Android SUCCESS and new Worker protocol handshake PASS; offline 44-page six-edition ranges, LAB69 strict tolerance, LAB67 approved legacy, LAB66 nonblocking, Scudo360 PASS. Actual Gemini real-book percentages and SocketException remain unverified. LAB71 earlier premature intermediate signed build superseded by verified final SHA 446134acd.
+CURRENT_PROVIDER=GitHub Actions signed LAB72 experimental APK, isolated Cloudflare Gemini LAB72 Worker; LAB71 active LAST_GOOD
+JOB_ID=LAB72_ANDROID_RUN=42452054556 SUCCESS ARTIFACT=13605209587 SIGNED_SOURCE=d146c157ce0ad926d6e978019a1dfb50aef101fb
+JOB_STATUS=LAB72 Android signed release succeeded, Scudo360 P1 native two contracts run 42451872096 PASS R40 verified, Worker version handshake PASS, signed APK+ZIP checksum verified, original Android signing identity. UAB LAB38 legacy brittle text/regex test still fails separately, not certified device or full-book proof.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB71 signed APK 0.3.446 versionCode=2026100446, package=it.studybook.ai.lab, cert SHA256 D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC, apk SHA256 fa2e789d75e2822b687f157a042ae62c3df1dbd84797e64aeb3801af770efcc3, ZIP SHA256 8f3aa50bf591d4f26f71372bfe46a0d700605ed7a16dd899a082b9672343eda7.
-NEXT_SAFE_STEP=Install LAB71 over LAB70 without uninstall. Open existing Filosofia del diritto book: old results persist until manual Migliora percentuali e chiarezza. Verify all 6 real Gemini results against summary55-65, 50:48-52, 40:38-42, 30:28-32, 20:18-22, 10:8-12; no hidden auto correction. Do not delete old books. If still outside bands, diagnose with captured length counters without declaring success.
-PENDING_VERIFICATION=Real Gemini model actually meeting target bands on actual user book; complete semantic fidelity; Android installation / device test; SocketException transient recovery; UAB CORE existing brittle LAB38 regex test failure unrelated and unresolved.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-71-AGGIORNAMENTO.apk SHA256=fa2e789d75e2822b687f157a042ae62c3df1dbd84797e64aeb3801af770efcc3 versionName=0.3.446 versionCode=2026100446 AndroidRun=42442776062 artifactId=13602457097 sourceSHA=446134acd4a387beaae1e992de6572ce379cdbb9
+LAST_COMPLETED_MATERIAL_STEP=LAB72 0.3.470 versionCode=2026100470 package=it.studybook.ai.lab signed original cert D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC APK_SHA256=578d1f69f027c81f9768b177036d45ee30bdd7465816dfedfaa3bcc2aeb30b2e ZIP_SHA256=ae2d8004fcc962d960ac9ab759c202e3b1afcd14b90aea865a1e3bb830428577. APK and ZIP downloaded and locally inspected.
+NEXT_SAFE_STEP=Install LAB72 0.3.470 over LAB71 0.3.446 without uninstall or deleting data. Open previously saved Filosofia del diritto book and explicitly select Migliora percentuali e chiarezza. Compare six actual reductions to Summary 55–65, 50 48–52, 40 38–42, 30 28–32, 20 18–22, 10 8–12; preserve prior drafts if not conforming. Do not promote active LAB72 before user phone acceptance.
+PENDING_VERIFICATION=Android actual device installation; real Gemini on 44-page book and other 5 reductions; semantic study quality on real book; unrelated SocketException network; separate inherited UAB LAB38 brittle JSX assertion failure.
+ACTIVE_ARTIFACT=LAB72 EXPERIMENTAL signed StudyBook-AI-LAB-72-AGGIORNAMENTO.apk SHA256=578d1f69f027c81f9768b177036d45ee30bdd7465816dfedfaa3bcc2aeb30b2e version=0.3.470 AndroidRun=42452054556 artifact=13605209587 signedSource=d146c157ce0ad926d6e978019a1dfb50aef101fb (LAB71 LAST_GOOD active at 446134acd4a387beaae1e992de6572ce379cdbb9)
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=8f3aa50bf591d4f26f71372bfe46a0d700605ed7a16dd899a082b9672343eda7
+UPDATE_ZIP_SHA256=ae2d8004fcc962d960ac9ab759c202e3b1afcd14b90aea865a1e3bb830428577
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
-POST_ARTIFACT_ROOT_CAUSE_QUEUE=Real Gemini percentage target and text quality on phone, diagnosis SocketException as separate error, inherited UAB adapter LAB38 regex assertion.
-LAST_USER_INTENT_SUMMARY=Phone LAB70 screenshots show all six reduction percentages outside margins: summary 89, 50 75.3, 40 83.7, 30 43.4, 20 31.4, 10 0.0. Follow-up requested implicitly by testing approved first-pass percentage fix. Must preserve original, use nonblocking draft-first then targeted manual recalibration, no extra paid services.
-STATE_SOURCE=Br174/StudyBook-AI lab/studybook-core-android-01-update-71-draft-budget-feedback-20261108; signed source SHA 446134acd4a387beaae1e992de6572ce379cdbb9; safety branch lab/safety-studybook-core-android-01-update-71; Android run 42442776062 SUCCESS; isolated Worker LAB71 deployed.
-CONTINUITY_NOTE=LAB71 first draft now sends per-unit source-letter budgets to Gemini in serialized JSON, validates budgets server-side against source, same single renderer/quality coordinator, separate phase-two recalibration with measured second-try feedback. LAB70 and prior signed source remain preserved for rollback; no silent regeneration of saved drafts. Offline tests with mocks are not Gemini success.
+POST_ARTIFACT_ROOT_CAUSE_QUEUE=Real book six-level conformity and didactic fidelity; Android device update and persistence; SocketException network; inherited UAB LAB38 brittle assertion.
+LAST_USER_INTENT_SUMMARY=Approved LAB72 after exclusion study: unify contradictory memory/code targets, measure real provider finish reason and lengths, use targeted source-based correction only after initial full draft. New Gemini localized patch alternatives, no mechanical truncation, no extra paid services, preserve original/checkpoints and signing.
+STATE_SOURCE=Br174/StudyBook-AI LAB72 branch lab/studybook-core-android-01-update-72-targeted-repair-20261108, signed SOURCE SHA d146c157ce0ad926d6e978019a1dfb50aef101fb, safety branch lab/safety-studybook-core-android-01-update-72, run 42452054556, artifact 13605209587, Worker studybook-ai-lab72.brunoverlezza.workers.dev, exact protocol lab72-canonical-range-observability-v1.
+CONTINUITY_NOTE=LAB72 experimental APK signed and downloadable, not a guaranteed six-level Gemini solution. One real synthetic 10% reached 10.7% (run 42451644456); Scudo360 native P1 exact SHA verified separately and final build signed. All other real levels and Android user acceptance pending. LAB71 remains active LAST_GOOD. Source-level edits outside designated span are preserved. PR remains open; do not merge/promote automatically.
 UPDATED_DATE=2026-11-08
 SATELLITE_LOCAL_RELEASE=2026.10.29-r40
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
@@ -44,14 +44,14 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100446
-ANDROID_UPDATE_VERSION_NAME=0.3.446
+ANDROID_UPDATE_VERSION_CODE=2026100470
+ANDROID_UPDATE_VERSION_NAME=0.3.470
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB71 aggiornamento
+ANDROID_NEXT_VISIBLE_LAB=LAB72 experimental signed update
 ANDROID_PAIRED_RECOVERY=LAB23 safety branch lab/safety-studybook-core-android-01-update-23 SHA 0de38d462360e028b8c535edfe73031c1c30ddc5; LAB22 branch unchanged for rollback.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
@@ -275,3 +275,13 @@ LAB71_SIGNING_CERT_SHA256=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC8
 LAB71_APK_SHA256=fa2e789d75e2822b687f157a042ae62c3df1dbd84797e64aeb3801af770efcc3
 LAB71_ZIP_SHA256=8f3aa50bf591d4f26f71372bfe46a0d700605ed7a16dd899a082b9672343eda7
 LAB71_REAL_GEMINI_AND_DEVICE_ACCEPTANCE=PENDING
+
+LAB72_20261108_EXPERIMENTAL_SIGNED_SOURCE=d146c157ce0ad926d6e978019a1dfb50aef101fb
+LAB72_SIGNED_ANDROID_RUN=42452054556 SUCCESS artifactId=13605209587
+LAB72_APK_SHA256=578d1f69f027c81f9768b177036d45ee30bdd7465816dfedfaa3bcc2aeb30b2e
+LAB72_ZIP_SHA256=ae2d8004fcc962d960ac9ab759c202e3bb830428577
+LAB72_SAFETY_REF=lab/safety-studybook-core-android-01-update-72
+LAB72_WORKER=https://studybook-ai-lab72.brunoverlezza.workers.dev
+LAB72_MOTORLAB_NATIVE_SCUDO_P1=42451872096 VERIFIED
+LAB72_SYNTHETIC_MODEL_10_PERCENT=10.7% RUN 42451644456
+LAB72_OTHER_5_REAL_LEVELS_AND_ANDROID_DEVICE=PENDING
