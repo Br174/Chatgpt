@@ -1,33 +1,33 @@
 MOTORLAB PROJECT STATE V1
 PROJECT_NAME=StudyBook-AI
 PROJECT_REPOSITORY=Br174/StudyBook-AI
-STATE_REVISION=34
+STATE_REVISION=35
 STATE_STATUS=LIVE_RECONCILED
 RECONCILE_ON_BOOT=required
-ACTIVE_OPERATION_ID=studybook-lab23-distinct-book-cover-no-duplicate-20261011
-OPERATION_STATUS=LAB23_SIGNED_APK_DELIVERED_TITLE_FIRST_RELEVANCE_DUPLICATE_REPAIR_REAL_THREE_BOOK_WEB_SMOKE_PASSED_DEVICE_ACCEPTANCE_PENDING
-CURRENT_PHASE=LAB23 screenshot root-cause closure: separate books I romani, Appunti fotografati 1 pagine, Tutti santi me compreso share same Roman Wikimedia theme illustration despite different titles. Root cause LAB22 findTheme considered arbitrary context mention Rome higher priority than title and always selected highest-ranked same image; no per-library source image dedup. LAB23 puts title before context, specific title saints/religion maps to religious-themed photo, generic scan titles use context only if generic, performs multiple keyless Wikimedia searches per theme to find diverse CC0/PD pictures. Client sends excludeAssets of photos already used by other book IDs; backend excludes matching Wikimedia source page and image, rechecking before saved. Auto-on-library scoped old duplicate repair: detect repeated online-thematic source URLs, keep most title-relevant owner, clear only duplicated web thematic coverCustom then try saving unique replacement, leave original scan/custom book bytes intact. All 3 screenshot titles external REAL backend smoke HTTP200 with unique commons asset IDs: commons:91903344, commons:91954879, commons:58611951 (run 38096333118). LAB23 complete UAB CI 38096279551 SUCCESS, signed Android 38096279519 SUCCESS version 0.3.60 update-in-place; user phone acceptance pending.
+ACTIVE_OPERATION_ID=studybook-lab70-draft-length-worker-20261108
+OPERATION_STATUS=LAB70_SIGNED_APK_DELIVERED_WORKER_ISOLATED_OFFLINE_TESTS_PASS_REAL_GEMINI_AND_DEVICE_PENDING
+CURRENT_PHASE=LAB70 fixes first-pass draft-target instructions and former Android LAB69 -> LAB67 backend routing mismatch; isolated LAB70 worker protocol handshake deployed. Android signed, Scudo360 offline passed. Live real Gemini target compliance and SocketException recovery remain unverified on device.
 CURRENT_REF=motorlab/active-studybook-ai
-CURRENT_HEAD_SHA=4df889b03fbf696ceaaaafd96f7a70933c7939d1
-CURRENT_PROVIDER=GitHub Actions Android LAB APK / MotorLab StudyBook adapter
-JOB_ID=LAB23_UAB_38096279551_SUCCESS_RUN457; LAB23_ANDROID_38096279519_SUCCESS_RUN60; LAB23_WEB_THREE_BOOK_IMAGES_38096333118_SUCCESS; LAB23_PUBLIC_DOMAIN_QUERY_ANALYSIS_38096219145_SUCCESS
-JOB_STATUS=Final LAB23 UAB 38096279551 SUCCESS including baseline and new scripts/test-lab23-cover-uniqueness.mjs; Android 38096279519 SUCCESS signed update APP ID it.studybook.ai.lab cert D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC; independent public-domain source query diagnostics 38096219145 found diverse Romans and saints; external live smoke 38096333118 SUCCESS all three books receive DIFFERENT real images HTTP200. Device still unverified.
+CURRENT_HEAD_SHA=6b1bb3a8671b05d311611d130c49722e62876ac6
+CURRENT_PROVIDER=GitHub Android LAB APK + isolated Cloudflare Gemini LAB70 Worker
+JOB_ID=LAB70_ANDROID_RUN=42441485814 SUCCESS; APK_ARTIFACT=13601264922
+JOB_STATUS=Android LAB70 success. 44-page x six-level offline test passed, Worker version handshake and Scudo360 passed, signature and versionCode verified. Separate UAB adapter pre-existing LAB38 JSX whitespace assertion fails, not a functional app regression proof.
 LAST_VERIFIED_PROGRESS_PERCENT=100
 ARTIFACT_PROGRESS_PERCENT=100
-LAST_COMPLETED_MATERIAL_STEP=LAB23 APK versionName=0.3.60 versionCode=2026100060 package=it.studybook.ai.lab signer D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC, APK SHA256=956eb8911e5b0e7274a41fd3ec26890a3bb002b719c3beb04e23f2b05d47d7b5, ZIP SHA256=710d4d6d9ad59a0a57674799de6e10c09738934dc17201e50fd1a74f70fcc5b7; ZIP CRC and nested APK CRC valid; 3 distinct online photo smoke passed.
-NEXT_SAFE_STEP=Install StudyBook-AI-LAB-23-AGGIORNAMENTO.apk over LAB22 without uninstall; open Libreria and inspect I romani, Appunti fotografati, Tutti santi me compreso. The app should automatically reconcile duplicated online-thematic image source URLs and fetch different relevant photos. Never alter user-custom, original book, scanner archive photos. For titles with no suitable CC0/PD candidate, it may leave cover unset; user can long press -> Aggiungi copertina to retry. Android real on-device acceptance still needed. No new Gemini billing.
-PENDING_VERIFICATION=Real Android phone confirmation of existing three duplicate covers automatic repair and UI library persistence; end-to-end live server result confirmed for three title/context examples with different Commons page IDs. Auto-repair affects only online-thematic shared source metadata. User selected/imported covers and original scans intentionally excluded.
-ACTIVE_ARTIFACT=StudyBook-AI-LAB-23-AGGIORNAMENTO.apk SHA256=956eb8911e5b0e7274a41fd3ec26890a3bb002b719c3beb04e23f2b05d47d7b5 versionName=0.3.60 versionCode=2026100060 AndroidRun=38096279519 artifactId=11686115307 sourceSHA=0de38d462360e028b8c535edfe73031c1c30ddc5
+LAST_COMPLETED_MATERIAL_STEP=APK StudyBook-AI-LAB-70-AGGIORNAMENTO.apk 0.3.437 code=2026100437, sha256=8198b53d14c13e7064aed8486d318e45a1c3c87089110bf8f10deaddf533222a; archive sha256=044a6f1d1e0c4d16ef114de061ea5cab262df798702383c6731bc7f7141bbd19.
+NEXT_SAFE_STEP=Install LAB70 over LAB69 without uninstalling. Recalibrate the already saved Filosofia del diritto book with the existing Migliora percentuali e chiarezza control; previous drafts remain until an accepted revision. Test new draft first pass with real Gemini. Observe all six reduction ranges and report SocketException separately.
+PENDING_VERIFICATION=Real Gemini reduction per level (Summary 55-65, 50 48-52, 40 38-42, 30 28-32, 20 18-22, 10 8-12); smartphone Android real installation and meaningful study text; SocketException live recovery; inherited UAB LAB38 whitespace regex failure.
+ACTIVE_ARTIFACT=StudyBook-AI-LAB-70-AGGIORNAMENTO.apk SHA256=8198b53d14c13e7064aed8486d318e45a1c3c87089110bf8f10deaddf533222a versionName=0.3.437 versionCode=2026100437 AndroidRun=42441485814 artifactId=13601264922 sourceSHA=6b1bb3a8671b05d311611d130c49722e62876ac6
 PAIRED_RECOVERY_ARTIFACT=StudyBook-AI-LAB-03-RIPRISTINO.apk sha256=fc14956113e0e54b038b5ad644c97bd0101f58f068f4bc6429916d22b36d6d8a
-UPDATE_ZIP_SHA256=710d4d6d9ad59a0a57674799de6e10c09738934dc17201e50fd1a74f70fcc5b7
+UPDATE_ZIP_SHA256=044a6f1d1e0c4d16ef114de061ea5cab262df798702383c6731bc7f7141bbd19
 RECOVERY_ZIP_SHA256=a7351c5639223e15a871a4b26a3dc4d668c047a5215a20758207ed7c893a02a4
 ROOT_CAUSE_NOTE=Android update rejection was structurally addressed by removing dependence on small workflow-run versionCodes and by forcing/verifying the original LAB signing identity on the final APK. The official LAB03 now uses high monotonic versionCode 2026100015 and the stable LAB certificate. If a device still refuses this exact package, its installed copy necessarily has a different package/signing lineage and requires one final alignment uninstall/reinstall before future in-place updates.
-POST_ARTIFACT_ROOT_CAUSE_QUEUE=empty
-LAST_USER_INTENT_SUMMARY=Screenshot real Android LAB22 showing identical Colosseum image with different text labels on I romani, Appunti fotografati 1 pagine, Tutti santi me compreso. User insists each book must get DIFFERENT contextually relevant cover, original first then thematically accurate free photo, no Gemini, no reusing identical pictures. Wants bug fixed with APK signed update without UI changes.
-STATE_SOURCE=Br174/StudyBook-AI LAB23 branch lab/studybook-core-android-01-update-23 SHA 0de38d462360e028b8c535edfe73031c1c30ddc5; safety branch lab/safety-studybook-core-android-01-update-23, UAB run 38096279551 SUCCESS, signed Android run 38096279519 SUCCESS, live images run 38096333118 SUCCESS.
-CONTINUITY_NOTE=LAB23 source and APK immutable after success. Existing LAB22 book images are only repaired automatically if provably duplicated online-thematic same sourceURL, chosen original most title-relevant; manual/original/scan not touched. LAB23 dedicated keyless Worker https://studybook-ai-coversearch-lab23.brunoverlezza.workers.dev, independent of LAB22 and live assistant; sourced Commons PD/CC0 and original catalog. Server excludes previously used assets, client rechecks and saves asset identity. 3 real different Wikimedia image IDs confirmed via live CI run 38096333118. Android phone acceptance pending.
-UPDATED_DATE=2026-10-10
-SATELLITE_LOCAL_RELEASE=2026.10.08-r34
+POST_ARTIFACT_ROOT_CAUSE_QUEUE=Real Gemini target fidelity test and phone acceptance pending; SocketException live recovery pending; independent inherited LAB38 UAB JSX test regex failure.
+LAST_USER_INTENT_SUMMARY=All six draft versions match final but excessively compress (summary 87.9%, 50 84.7%, 40 81.5%, 30 78.1%, 20 77.4%, 10 73.5%). LAB70 approved to fix initial draft generation without losing study source.
+STATE_SOURCE=Br174/StudyBook-AI lab/studybook-core-android-01-update-70-draft-length-worker-20261108 source SHA=6b1bb3a8671b05d311611d130c49722e62876ac6; safety branch lab/safety-studybook-core-android-01-update-70; Android run=42441485814 SUCCESS.
+CONTINUITY_NOTE=LAB70 isolated Worker https://studybook-ai-lab70.brunoverlezza.workers.dev version lab70-draft-length-v1, no production deployment. Stable original signing family it.studybook.ai.lab. Existing drafts persist and require explicit user recalibration. Offline mocked tests are not real Gemini success.
+UPDATED_DATE=2026-11-08
+SATELLITE_LOCAL_RELEASE=2026.10.29-r40
 SATELLITE_LAST_GOOD_RELEASE=2026.10.05-r20
 MOTORLAB_R21_VELOCITY_STATUS=VERIFIED_ADOPTED
 MOTORLAB_TTTA_PRIMARY_KPI=enabled
@@ -44,14 +44,14 @@ POLLICINO_STATUS=PROJECT_ADOPTED_CONTROL_PLANE
 POLLICINO_PROOF_HEAD=4ca351b37c5512aa20704e14af5e34b3921ed055
 POLLICINO_RUNTIME_COUPLING=none
 ANDROID_UPDATE_FAMILY=it.studybook.ai.lab
-ANDROID_UPDATE_VERSION_CODE=2026100060
-ANDROID_UPDATE_VERSION_NAME=0.3.60
+ANDROID_UPDATE_VERSION_CODE=2026100437
+ANDROID_UPDATE_VERSION_NAME=0.3.437
 ANDROID_FAMILY_SIGNING_FINGERPRINT=D7:BB:93:15:C9:C4:35:18:72:49:54:78:61:0C:48:47:25:08:6E:2B:AB:BC:04:BE:C6:5E:C8:23:45:5F:BD:CC
 ANDROID_RECOVERY_FAMILY=it.studybook.ai.lab.recovery03
 ANDROID_RECOVERY_VERSION_CODE=10
 ANDROID_RECOVERY_VERSION_NAME=0.2.10
 ANDROID_RECOVERY_SIGNING_FINGERPRINT=55:D1:F2:D6:C7:E3:60:D1:11:B3:28:15:BE:34:4B:4A:21:8E:04:64:90:82:7E:63:5A:0C:4F:E0:62:96:29:03
-ANDROID_NEXT_VISIBLE_LAB=LAB 23 aggiornamento
+ANDROID_NEXT_VISIBLE_LAB=LAB70 aggiornamento
 ANDROID_PAIRED_RECOVERY=LAB23 safety branch lab/safety-studybook-core-android-01-update-23 SHA 0de38d462360e028b8c535edfe73031c1c30ddc5; LAB22 branch unchanged for rollback.
 CANDIDATE_POLICY=new immutable family after Bruno acceptance of this LAB state
 MOTHER_POLICY=promote approved candidate same family/source identity
@@ -260,3 +260,9 @@ MOTORLAB_R39_ANDROID_SCUDO_LAB24_CI=40921134783 COMPLETE SUCCESS on exact SHA 4d
 
 MOTORLAB_R39_STUDYBOOK_ANDROID_PROVEN_ACTIVE_REF=motorlab/active-studybook-ai
 MOTORLAB_R39_STUDYBOOK_ANDROID_AUTO_UPDATE=GitHub Actions signed APK and Scudo evidence required before nonforced ref advancement; run 40921134783 SUCCESS.
+
+LAB70_20261108_SIGNED_SOURCE=6b1bb3a8671b05d311611d130c49722e62876ac6
+LAB70_SIGNED_ANDROID_RUN=42441485814 SUCCESS artifactId=13601264922
+LAB70_WORKER_VERSION=lab70-draft-length-v1
+LAB70_SIGNING_CERT_SHA256=D7BB9315C9C4351872495478610C484725086E2BABBC04BEC65EC823455FBDCC
+LAB70_REAL_GEMINI_FIDELITY_AND_DEVICE_ACCEPTANCE=PENDING
