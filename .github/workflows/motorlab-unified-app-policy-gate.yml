@@ -1,0 +1,23 @@
+name: MotorLab Unified App Policy Gate
+on:
+  push:
+    branches: ['motorlab/unified-app-policy-r37-prep-*']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Single Main App lifecycle and r36 pin guards
+        run: node --test tests/motorlab-unified-app-policy.test.mjs
+      - name: Only staged policy, not production app or release mutation
+        run: |
+          test "$(grep -c '^CURRENT_RELEASE=2026.10.12-r36$' MOTORLAB_RELEASE_MANIFEST_V1.txt)" -eq 1
+          test -f MOTORLAB_UPDATE_FAMILY_LIFECYCLE_V1.txt
+          echo "MOTORLAB_UNIFIED_POLICY_PREP_GATE=PASSED"

@@ -14,6 +14,19 @@ BRUNO-FACING NAMES - MANDATORY
   Example: LAB 44 aggiornamento -> LAB 45 aggiornamento -> LAB 46 aggiornamento.
 - Bruno-facing names must remain simple; internal family ids/package ids/signing profiles stay technical metadata.
 
+MOTORLAB SINGLE MAIN APP — APPROVED UNIFICATION RULE (2026-10-12, R37 PREPARATION)
+APP_SCOPE=MotorLab Android app only; this rule must not alter native apps/engines of MusicLab, StudyBook AI, MotorAI, Visionflix or other projects.
+SINGLE_DISTRIBUTION_APP=it.motorlab.app; one main installed MotorLab app progressively gains all accepted features. Multiple isolated LAB APKs and test package ids remain ALLOWED during development and quality assurance, but never become required parallel installs for accepted production functionality.
+CANONICAL_OWNER=this existing Update Family Lifecycle module; Change Compatibility Guard v1.2 owns conflict/old-to-new resolution; do not add a competing app promotion/version scheduler or duplicate rule authority.
+OLD_TO_NEW_SCOPE: previously a LAB feature could remain exclusively in an isolated install as the apparent end product; NEW: after acceptance the feature's approved source is integrated into the canonical main-app source and delivered as a compatible update. Retire mandatory parallel LAB installation as a DELIVERY path only; PRESERVE LAB isolation, CANDIDATA testing, LAST_GOOD, immutable checkpoints and safety-source variants.
+UNIFICATION_FLOW=isolated LAB development -> explicit verification on test APK/device -> versioned source integration of accepted feature into MotorLab main codebase -> anti-regression, migration and authorization gates -> signed canonical main-app update -> feature available in the single MotorLab app. Preserve native approved UI except for specifically approved integration navigation changes.
+IDENTITY_GATE=main package id it.motorlab.app stays stable; Android versionCode must increase; signing certificate must match currently installed main app for update-in-place. Existing LAB01 was signed with an ephemeral test/debug key; signature continuity is NOT proven. Do not publish or promise compatible in-place updates until signing provenance has been verified on the device and a stable protected signing profile is available. Never embed a private signing key in repository source.
+DATA_GATE=isolated LAB02 (it.motorlab.app.lab02) and LAB04 (it.motorlab.app.lab04) have separate Android sandboxes. Their private SQLite databases, Keystore-bound tokens/settings and persisted SAF grants do NOT migrate merely by changing applicationId. Require explicit user-controlled JSON export/import, transactional dedupe and round-trip verification for chats; preserve old LAB data until new main app data is checked. Stored Keystore secrets may require manual entry again; do not claim to transplant them.
+STAGING_GATE=a LAB branch may compile a unified package for isolated testing, but is NOT a MADRE, production candidate or user-installable update until signing/data/device gates pass. Never auto-uninstall the original, overwrite user storage, silently copy an unencrypted JSON backup to cloud, or misrepresent experimental test APK as a safe replacement.
+SKILL_EXPORT=MotorLab Skill Export r36 is an optional file/adapter distribution, not a second Android application; it can be exposed from the main app as an optional export action only when that feature is implemented and verified.
+SAFE_BRANCH_RELEASE=prepare isolated policy and app integration branches first; do not mutate published r36 manifest/six pinned satellites or promote to new CORE release until central test gate, explicit release accounting and safe fanout. R36 remains last verified canonical release until its successor is proved.
+ACCEPTANCE_CRITERIA=one app id; one protected stable signing identity; update retains original main-app local data; LAB-origin records imported only through verified consent-based migration; all prior accepted UI/functions remain; no mandatory second MotorLab app; exact commit/build/device evidence before COMPLETE.
+
 FAMILY IDENTITY
 Each Android update family owns immutable technical identity:
 - UPDATE_FAMILY_ID
@@ -86,9 +99,11 @@ COMPATIBILITY
 This module extends, not replaces, MADRE -> LAB -> CANDIDATA -> NEW MADRE. It changes Android packaging/update mechanics and LAB continuation semantics only where Bruno has explicitly selected update-family mode. Existing historical families remain valid.
 
 VERSION
-MOTORLAB-UPDATE-FAMILY-LIFECYCLE-V1.2
+MOTORLAB-UPDATE-FAMILY-LIFECYCLE-V1.3
 Established: 2026-10-05
 Revision 1.1: paired immutable LAB di sicurezza checkpoint for every LAB aggiornamento, with distinct family/signing identity and recovery-from-safety semantics.
 
 
 Revision 1.2: r32 replaces mandatory eager safety APK builds with permanent immutable GitHub safety-source checkpoints and on-demand safety APK materialization.
+
+Revision 1.3 (2026-10-12): user-approved MotorLab single-final-app integration rule, complementary to isolated LAB/CANDIDATA development and gated on stable Android identity, signing and data migration. PREPARED in isolated r37 branch; r36 still canonical until formal release.
