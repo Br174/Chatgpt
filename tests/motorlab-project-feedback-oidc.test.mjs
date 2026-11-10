@@ -78,6 +78,6 @@ test('existing Worker entry routes project OIDC separately from central OIDC and
  assert.match(entry,/handleProjectFeedbackOidc/);assert.match(entry,/control\/v1\/oidc-relay/);
  assert.match(core,/export async function ensureSchema/);
  assert.match(schema,/CREATE TABLE IF NOT EXISTS operation_events/);
- assert.match(manifest,/CURRENT_RELEASE=2026\.10\.12-r36/);
+ assert.match(manifest,/^CURRENT_RELEASE=2026\.10\.(?:12-r36|14-r37)$/m);
  assert.match(contract,/No independent scheduler/);
 });
