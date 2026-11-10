@@ -1,6 +1,7 @@
 import core, { sha256Hex, validateSnapshot, persistSnapshot } from './index.js';
 import { verifyGitHubActionsOidc } from './github-oidc.js';
 import { handleProjectFeedbackOidc } from './project-feedback.js';
+import { handleAutoSetupCloudflare } from '../../../apps/motorlab-chat-secure-bridge/cloudflare/worker-adapter.mjs';
 export { PollicinoSentinel } from './pollicino-sentinel.js';
 
 export { sha256Hex, validateSnapshot };
@@ -296,6 +297,9 @@ async function pollicinoResumeReady(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // Pacman LAB07: isolated feature prefix delegated to tested AutoSetup LAB06 adapter.
+    // No production deployment from this branch; other routing remains unchanged.
+    if (url.pathname.startsWith('/autosetup/v1/')) return handleAutoSetupCloudflare(request, env);
     if (request.method === 'POST' && url.pathname === '/github-webhook' && request.headers.get('x-github-event') === 'issues') {
       return issueRelay(request, env);
     }

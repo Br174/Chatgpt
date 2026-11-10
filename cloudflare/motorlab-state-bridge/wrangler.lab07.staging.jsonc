@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Pacman LAB07 PREVIEW-ONLY TEMPLATE; never use for deploy in this phase.
+  // Authorized Cloudflare staging account must be independently verified first.
+  // Deliberately NO production account ID, D1, KV, secret, Durable Object binding,
+  // or routes. No remote preview/deploy is permitted by LAB07 CI.
+  "name": "motorlab-state-bridge",
+  "main": "src/entry.js",
+  "compatibility_date": "2026-09-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ENGINE_VERSION": "1.3.5-pacman-lab07",
+    "MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE": "false",
+    "MOTORLAB_AUTOSETUP_PROBE_ONLY": "false",
+    "MOTORLAB_AUTOSETUP_CRYPTO_DIAGNOSTIC": "preview-only"
+  }
+}

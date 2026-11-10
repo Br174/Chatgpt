@@ -1,0 +1,56 @@
+name: MotorLab Pacman LAB07 r37 — OFFLINE only (NO Cloudflare operations)
+on:
+  pull_request:
+    paths:
+      - 'apps/motorlab-chat-secure-bridge/**'
+      - 'cloudflare/motorlab-state-bridge/src/entry.js'
+      - 'cloudflare/motorlab-state-bridge/wrangler.lab07.staging.jsonc'
+      - 'docs/pacman-lab07/**'
+      - 'checkpoints/MOTORLAB_PACMAN_LAB07_20261014.txt'
+      - '.github/workflows/motorlab-pacman-lab07.yml'
+permissions:
+  contents: read
+jobs:
+  pacman-lab07-offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install reused LAB06 gateway dependencies only
+        working-directory: apps/motorlab-chat-secure-bridge
+        run: npm install --no-audit --no-fund --ignore-scripts
+      - name: Validate existing encrypted gateway and Pacman LAB07 safety contract
+        working-directory: apps/motorlab-chat-secure-bridge
+        env:
+          MOTORLAB_AUTOSETUP_LIVE_GITHUB_WRITE: 'false'
+          MOTORLAB_AUTOSETUP_PROBE_ONLY: 'false'
+        run: |
+          node --check cloudflare/worker-adapter.mjs
+          node --check src/github-gateway.mjs
+          npm test
+      - name: Confirm Worker namespaced route syntax and isolated preview config
+        run: |
+          node --check cloudflare/motorlab-state-bridge/src/entry.js
+          node --test tests/motorlab-r37-pacman-release.test.mjs tools/motorlab-pacman/test-pacman-core.mjs
+      - name: Compile staging-only Worker (LOCAL dry run, no upload or credentials)
+        working-directory: apps/motorlab-chat-secure-bridge
+        run: |
+          npx --yes wrangler@4.136.3 deploy --dry-run --config ../../cloudflare/motorlab-state-bridge/wrangler.lab07.staging.jsonc --outdir /tmp/motorlab-pacman-lab07-dryrun
+      - name: Seal staging preview as blocked and keep production unmodified
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const stage=fs.readFileSync('docs/pacman-lab07/STAGING_GATE.md','utf8');
+          const wf=fs.readFileSync('.github/workflows/motorlab-pacman-lab07.yml','utf8');
+          for(const required of ['REMOTE_PREVIEW=NOT_EXECUTED','STAGING_API_IDENTITY=NOT_VERIFIED','STAGING_PERMISSIONS=NOT_VERIFIED','ZERO_ADDITIONAL_COST=NOT_VERIFIED','NO_PRODUCTION_DEPLOY=TRUE']) {
+            if(!stage.includes(required))throw Error('UNSAFE_REMOTE_STAGING_STATUS');
+          }
+          if(/secrets\.|^\s*(?:preview|deploy):\s*$/m.test(wf) || wf.includes('workflow_'+'dispatch:'))throw Error('REMOTE_DEPLOY_ROUTE_FORBIDDEN');
+          if(!wf.includes('wrangler@4.136.3 deploy --dry-run'))throw Error('DRY_RUN_MISSING');
+          console.log('Pacman LAB07: provider requests 0, D1/KV/production writes 0, preview blocked.');
+          NODE
