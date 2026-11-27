@@ -524,3 +524,12 @@ RESEARCH_TRACK_LAB79_ACTIVE_ANDROID_BRANCH_PIN=446134acd4a387beaae1e992de6572ce3
 RESEARCH_TRACK_LAB79_LAST_GOOD_PROMOTION=NO
 RESEARCH_TRACK_LAB79_EXTRA_PAID_COST=EUR_0
 # END CROSS_CHAT_DIDACTIC_RESEARCH_HANDOFF_20261109
+
+
+# CURRENT CONTINUITY UPDATE — 2026-11-27 (supersedes historical build instructions)
+USER_BUILD_POLICY_20261127=GitHub Actions standard runner only; Codespaces/Super Eureka retired as build path; zero additional cost; retain original Android signing identity and installed app family.
+LAB142_ACTIVE_REBUILD_REF=trial/studybook-lab142-rebuild-20261127
+LAB142_VERIFIED_SOURCE_AND_CI=7bb77fec2ecf88521d534b500eca113022d61926; run 46050423556; verify job PASS including EPUB single-50 regression, inherited tests, Vite build and Scudo360.
+LAB142_POLICY_CHECKPOINT=fcdd709848e6572c89f21dac89e24a5987a445e6 (documentation only, no build)
+LAB142_ANDROID_DELIVERY=BLOCKED_ORIGINAL_SIGNER_PROTECTED_ACCESS; Android compilation skipped; no APK/ZIP release; no substitute key, no public private-key transfer, no Cloudflare change.
+LAB142_NEXT_SAFE_STEP=Owner-authorized existing protected signing identity must be available through the protected GitHub Actions signing configuration, then run the existing gated workflow and verify actual release links. Do not rerun until blocker resolved.
